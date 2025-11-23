@@ -598,23 +598,21 @@ describe('Tutor card component', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
     componentInstance.completedChaptersCount = 2;
-    spyOn(
-      componentInstance,
-      'setNextMilestoneAndCheckIfProgressBarIsShown'
-    ).and.callThrough();
+
+    componentInstance.ngOnInit()
 
     expect(
-      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
-    ).toBe(true);
+      componentInstance.shouldShowProgressBar().toBe(true)
+    )
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
+    componentInstance.ngOnInit();
     componentInstance.completedChaptersCount = 4;
+    componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
 
-    expect(
-      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
-    ).toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
+    componentInstance.ngOnInit()
     spyOn(
       componentInstance,
       'isCompletedChaptersCountGreaterThanLastMilestone'
@@ -625,11 +623,16 @@ describe('Tutor card component', () => {
     ).and.returnValue(false);
     chapterProgressService.setChapterCompletedForTheFirstTime(true);
     componentInstance.completedChaptersCount = 55;
+    componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
 
-    expect(
-      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
-    ).toBe(false);
+    expect(componentInstance.shouldShowProgressBar).toBe(false);
   });
+
+  it('should correctly set the milestonProgressBar as false when component is destroyed', () => {
+    componentInstance.ngOnDestroy()
+    
+    expect(componentInstance.shouldShowProgressBar).toBe(false)
+  }); 
 
   it(
     'should not show milestone progress bar if completed chapters count ' +
