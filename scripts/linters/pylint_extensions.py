@@ -2435,6 +2435,10 @@ class ExceptionalTypesCommentChecker(checkers.BaseChecker):  # type: ignore[misc
                     # Eg: var = object()
                     if 'object()' in line:
                         return
+                    # Excluding mock.patch.object usage:
+                    # Eg: mock.patch.object(...)
+                    if 'patch.object' in line:
+                        return
                 # Passing those cases where Any is imported.
                 if exceptional_type == 'Any' and import_status_dict:
                     if (
