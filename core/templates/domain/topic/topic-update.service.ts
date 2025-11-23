@@ -36,11 +36,31 @@ import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
 import {Topic} from 'domain/topic/topic-object.model';
 import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
-import {SubtitledHtml} from 'core/templates/domain/exploration/subtitled-html.model';
+import {
+  SubtitledHtml,
+  SubtitledHtmlBackendDict,
+} from 'core/templates/domain/exploration/subtitled-html.model';
 import {SubtopicPage} from 'core/templates/domain/topic/subtopic-page.model';
-import {RecordedVoiceovers} from 'core/templates/domain/exploration/recorded-voiceovers.model';
-import {StudyGuide} from './study-guide.model';
-import {StudyGuideSection} from './study-guide-sections.model';
+import {
+  RecordedVoiceovers,
+  RecordedVoiceOverBackendDict,
+} from 'core/templates/domain/exploration/recorded-voiceovers.model';
+import {StudyGuide} from 'core/templates/domain/topic/study-guide.model';
+import {
+  StudyGuideSection,
+  StudyGuideSectionBackendDict,
+} from 'core/templates/domain/topic/study-guide-sections.model';
+
+// Type for property values that can appear in TopicChange objects.
+type TopicPropertyValue =
+  | string
+  | string[]
+  | boolean
+  | number
+  | null
+  | SubtitledHtmlBackendDict
+  | RecordedVoiceOverBackendDict
+  | StudyGuideSectionBackendDict[];
 
 type TopicUpdateApply = (
   topicChange: TopicChange,
@@ -79,7 +99,7 @@ export class TopicUpdateService {
   private _applyChange(
     entity: Topic | SubtopicPage | StudyGuide,
     command: string,
-    params: Record<string, unknown>,
+    params: Record<string, TopicPropertyValue>,
     apply: (
       backendChangeObject: TopicChange,
       domainObject: DomainObject
@@ -92,7 +112,7 @@ export class TopicUpdateService {
     let changeDict = cloneDeep(params);
     changeDict.cmd = command;
     let changeObj = new Change(
-      changeDict as unknown as TopicChange,
+      changeDict as Partial<TopicChange> as TopicChange,
       apply as (
         backendChangeObject: BackendChangeObject,
         domainObject: DomainObject
@@ -108,8 +128,8 @@ export class TopicUpdateService {
   private _getParameterFromChangeDict(
     changeDict: TopicChange,
     paramName: string
-  ): unknown {
-    return changeDict[paramName as keyof TopicChange];
+  ): TopicPropertyValue {
+    return changeDict[paramName as keyof TopicChange] as TopicPropertyValue;
   }
 
   // Applies a topic property change, specifically. See _applyChange()
@@ -174,8 +194,8 @@ export class TopicUpdateService {
     subtopicPage: SubtopicPage,
     propertyName: string,
     subtopicId: number,
-    newValue: unknown,
-    oldValue: unknown,
+    newValue: TopicPropertyValue,
+    oldValue: TopicPropertyValue,
     apply: SubtopicUpdateApply,
     reverse: SubtopicUpdateReverse
   ): void {
@@ -203,8 +223,8 @@ export class TopicUpdateService {
     studyGuide: StudyGuide,
     propertyName: string,
     subtopicId: number,
-    newValue: unknown,
-    oldValue: unknown,
+    newValue: TopicPropertyValue,
+    oldValue: TopicPropertyValue,
     apply: StudyGuideUpdateApply,
     reverse: StudyGuideUpdateReverse
   ): void {
@@ -228,12 +248,10 @@ export class TopicUpdateService {
     );
   }
 
-  private _getNewPropertyValueFromChangeDict(changeDict: TopicChange): unknown {
+  private _getNewPropertyValueFromChangeDict(
+    changeDict: TopicChange
+  ): TopicPropertyValue {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
-  }
-
-  private _getSubtopicIdFromChangeDict(changeDict: TopicChange): unknown {
-    return this._getParameterFromChangeDict(changeDict, 'subtopic_id');
   }
 
   // These functions are associated with updates available in
@@ -544,8 +562,12 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
-        let subtopicId = this._getSubtopicIdFromChangeDict(
-          changeDict
+        // Although subtopic_id is always a number when present in TopicChange,
+        // TypeScript can't automatically narrow the parameter to `number`
+        // just based on the 'subtopic_id' string key.
+        let subtopicId = this._getParameterFromChangeDict(
+          changeDict,
+          'subtopic_id'
         ) as number;
         topic.deleteSubtopic(subtopicId, true);
       }) as (
