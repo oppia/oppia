@@ -177,6 +177,7 @@
 /.vscode/launch.json @oppia/dev-workflow-reviewers
 /.vscode/settings.json @oppia/dev-workflow-reviewers
 /conftest.py @oppia/dev-workflow-reviewers
+/conftest_test.py @oppia/dev-workflow-reviewers
 /pytest.ini @oppia/dev-workflow-reviewers
 /AGENTS.md @oppia/dev-workflow-reviewers
 /.coderabbit.yaml @oppia/dev-workflow-reviewers

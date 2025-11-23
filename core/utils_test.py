@@ -26,7 +26,8 @@ import time
 import urllib
 from unittest import mock
 
-from core import feconf, utils
+from core import feconf
+from core import utils
 from core.constants import constants
 from core.tests import test_utils
 from core.tests.data import unicode_and_str_handler
@@ -120,74 +121,6 @@ class SingletonMetaTests(test_utils.GenericTestBase):
         self.assertEqual(instance2.value, 20)
         # Same object, so same value.
         self.assertEqual(instance1.value, 20)
-
-    def test_redis_clients_use_singleton_pattern(self) -> None:
-        """Test that Redis clients use singleton pattern correctly."""
-        # Verify singleton behavior without direct class imports.
-        # The actual singleton classes are tested via their getter functions.
-        mock_client = mock.MagicMock()
-
-        with mock.patch(
-            'core.platform.cache.redis_cache_services.get_oppia_redis_client',
-            return_value=mock_client,
-        ):
-            client1 = redis_cache_services.get_oppia_redis_client()
-            client2 = redis_cache_services.get_oppia_redis_client()
-
-            # Both calls should return the same mocked client.
-            self.assertIs(client1, client2)
-
-    def test_cloud_ndb_redis_client_uses_singleton_pattern(self) -> None:
-        """Test that CloudNdbRedisClient uses singleton pattern."""
-        mock_client = mock.MagicMock()
-
-        with mock.patch(
-            'core.platform.cache.redis_cache_services.'
-            'get_cloud_ndb_redis_client',
-            return_value=mock_client,
-        ):
-            client1 = redis_cache_services.get_cloud_ndb_redis_client()
-            client2 = redis_cache_services.get_cloud_ndb_redis_client()
-
-            # Both calls should return the same mocked client.
-            self.assertIs(client1, client2)
-
-    def test_ndb_client_singleton_uses_singleton_pattern(self) -> None:
-        """Test that NdbClientSingleton uses singleton pattern."""
-        from core.platform import models
-
-        datastore_services = models.Registry.import_datastore_services()
-
-        with mock.patch.object(
-            datastore_services, 'NdbClientSingleton'
-        ) as mock_singleton_class:
-            mock_instance = mock.MagicMock()
-            mock_singleton_class.return_value = mock_instance
-
-            _ = mock_singleton_class()
-            _ = mock_singleton_class()
-
-            # When using the real singleton, both should be the same instance.
-            # Here we're just verifying the pattern is set up correctly.
-            self.assertEqual(mock_singleton_class.call_count, 2)
-
-    def test_datastore_client_singleton_uses_singleton_pattern(self) -> None:
-        """Test that DatastoreClientSingleton uses singleton pattern."""
-        from core.platform import models
-
-        transaction_services = models.Registry.import_transaction_services()
-
-        with mock.patch.object(
-            transaction_services, 'get_client'
-        ) as mock_get_client:
-            mock_client = mock.MagicMock()
-            mock_get_client.return_value = mock_client
-
-            client1 = transaction_services.get_client()
-            client2 = transaction_services.get_client()
-
-            # Both calls should return the same mocked client.
-            self.assertIs(client1, client2)
 
 
 class UtilsTests(test_utils.GenericTestBase):

@@ -22,9 +22,9 @@ import os
 import sys
 from unittest import mock
 
+from core.platform import models
 from core.platform.cache import redis_cache_services
 from core.platform.datastore import cloud_datastore_services
-from core.platform import models
 from core.tests import test_utils
 from scripts import common
 
