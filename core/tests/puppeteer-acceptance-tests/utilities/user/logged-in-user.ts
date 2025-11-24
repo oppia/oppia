@@ -2835,18 +2835,33 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Checks if greeting has name of the user
+   * Checks if greeting has name of the user.
    */
   async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
-    await this.page.waitForSelector(greetingSelector, {
-      visible: true,
-    });
-    const greetingElement = await this.page.$(greetingSelector);
-    const greetingText = await this.page.evaluate(
-      el => el.textContent,
-      greetingElement
+    // Check for redesigned dashboard greeting first.
+    const redesignedGreetingElement = await this.page.$(
+      learnerGreetingsSelector
     );
-    expect(greetingText).toContain(userName);
+    if (redesignedGreetingElement) {
+      await this.page.waitForSelector(learnerGreetingsSelector, {
+        visible: true,
+      });
+      const greetingText = await this.page.$eval(learnerGreetingsSelector, el =>
+        el.textContent?.trim()
+      );
+      expect(greetingText).toContain(userName);
+    } else {
+      // Fall back to old dashboard greeting selector.
+      await this.page.waitForSelector(greetingSelector, {
+        visible: true,
+      });
+      const greetingElement = await this.page.$(greetingSelector);
+      const greetingText = await this.page.evaluate(
+        el => el.textContent,
+        greetingElement
+      );
+      expect(greetingText).toContain(userName);
+    }
   }
 
   /**
