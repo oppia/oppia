@@ -50,6 +50,25 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 - [Discussion forum](https://github.com/oppia/oppia/discussions)
 - [Announcements mailing list](http://groups.google.com/group/oppia-announce)
 
+## Contributing
+
+- **[Fix learner dashboard goals test to verify Completed Goals and Add Goal sections](https://github.com/oppia/oppia/pull/23652) (Merged Nov 3, 2025)**  
+  Improves acceptance tests for the learner dashboard Goals section, adding verification for "Completed Goals" visibility and the "Add a Goal" button, essential for tracking learner progress.
+This PR strengthened the automated acceptance tests for the Goals feature in the learner dashboard, a core part of my OJT project’s gamification and learner progress tracking system. It introduced helper methods that verify visibility of the Completed Goals section and the Add a Goal button, ensuring these UI elements function correctly according to the new designs we implemented. This testing update supports quality assurance and validates the effectiveness of the newly developed dashboard features without impacting user-facing performance.
+
+
+
+- **[Add “New” label in Learner Dashboard and redesigned related pages](https://github.com/oppia/oppia/pull/23576) (Merged Oct 19, 2025)**  
+  This introduced a “New” label highlighting recently published chapters, redesigned dashboard and topic viewer pages, and fixed bugs related to chapter recommendations in my project area.
+As part of enhancing learner engagement in my project, this PR implemented a “New” label for recently published chapters on both the learner dashboard and topic viewer pages. The feature highlights fresh content, making it easier and more intuitive for learners to access updated lessons, thereby boosting interactivity within the platform. Additionally, this PR fixed bugs affecting chapter recommendations and streamlined the learner’s content discovery experience, including UI improvements and frontend test coverage specific to my project module.
+
+
+
+- **[Fix bug with serial chapter feature leakage and related topic viewer fixes](https://github.com/oppia/oppia/pull/23178)**  
+  Fixes bugs in serial chapter feature flags and improved chapter display logic, stabilizing key learner dashboard components.
+This PR addressed bugs within the chapter recommendation and visibility system critical to my OJT project’s scope. It resolved serial chapter feature leakage issues where feature flags incorrectly persisted, causing inaccurate chapter displays and learner confusion. This contribution improved the logic for “Coming Soon” labels and the continue-where-you-left-off list, stabilizing the learner dashboard functionality that I helped build and maintain.
+
+
 ## Social Media
 
 [<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
