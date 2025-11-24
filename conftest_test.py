@@ -191,8 +191,6 @@ class MockNdbClientFixtureTests(test_utils.GenericTestBase):
 
             self.assertEqual(client, mock_client)
 
-            self.assertEqual(client, mock_client)
-
     def test_mocked_ndb_client_has_context_method(self) -> None:
         """Test that mocked NDB client has context method."""
         mock_client = mock.MagicMock()
@@ -215,50 +213,6 @@ class MockNdbClientFixtureTests(test_utils.GenericTestBase):
 
         mock_context.__enter__.assert_called_once()
         mock_context.__exit__.assert_called_once()
-
-
-class ManageEmulatorsFixtureTests(test_utils.GenericTestBase):
-    """Tests for manage_emulators fixture."""
-
-    def test_fixture_is_session_scoped(self) -> None:
-        """Test that manage_emulators is a session-scoped fixture."""
-        # This fixture is a placeholder for future emulator management.
-        # Currently it just yields None, which is acceptable for tests
-        # that use mocked services.
-        pass
-
-
-class TestIsolationFixtureTests(test_utils.GenericTestBase):
-    """Tests for test_isolation fixture."""
-
-    def test_fixture_provides_cleanup_after_test(self) -> None:
-        """Test that test_isolation fixture provides cleanup."""
-        # This fixture ensures proper cleanup between tests.
-        # The actual cleanup is mostly handled by GenericTestBase.tearDown().
-        pass
-
-
-class ConfigureTestEnvironmentFixtureTests(test_utils.GenericTestBase):
-    """Tests for configure_test_environment fixture."""
-
-    def test_fixture_sets_test_mode_environment_variable(self) -> None:
-        """Test that fixture sets OPPIA_IS_TESTING environment variable."""
-        # The fixture should set this at session start.
-        # We can't directly test it here since it's session-scoped,
-        # but we can verify the environment variable exists when tests run.
-        # This is a placeholder to document expected behavior.
-        pass
-
-    def test_fixture_adds_required_paths_to_sys_path(self) -> None:
-        """Test that fixture adds required directories to sys.path."""
-        # The fixture should ensure necessary paths are in sys.path.
-        # Since this is session-scoped and runs before tests,
-        # we expect the paths to already be there.
-        for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-            if os.path.exists(directory):
-                # Path should be in sys.path if the directory exists.
-                # This verifies the fixture did its job.
-                pass
 
 
 class PytestConfigureHookTests(test_utils.GenericTestBase):
@@ -284,21 +238,3 @@ class PytestConfigureHookTests(test_utils.GenericTestBase):
         for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
             if os.path.exists(directory):
                 self.assertIn(directory, sys.path)
-
-
-class PytestCollectionModifyitemsHookTests(test_utils.GenericTestBase):
-    """Tests for pytest_collection_modifyitems hook."""
-
-    def test_hook_processes_test_items(self) -> None:
-        """Test that pytest_collection_modifyitems processes items."""
-        # Create a mock test item.
-        mock_item = mock.MagicMock()
-        mock_item.nodeid = 'test_file.py::test_function'
-
-        # The hook should be able to process items without error.
-        # This is a basic verification that the hook is properly defined.
-        items = [mock_item]
-
-        # If the hook runs without error, the test passes.
-        # The actual hook modifies items in place, which pytest handles.
-        self.assertEqual(len(items), 1)

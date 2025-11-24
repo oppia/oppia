@@ -21,7 +21,7 @@ import sys
 from unittest import mock
 
 import pytest
-from typing import Dict, Generator, List
+from typing import Dict, Generator
 
 # Set up environment variables BEFORE any imports that might use them.
 # These tell Google Cloud clients to use local emulator/test mode.
@@ -82,21 +82,6 @@ def pytest_configure(
         if os.path.exists(directory) and directory not in sys.path:
             sys.path.insert(0, directory)
     sys.path[:] = [path for path in sys.path if 'coverage' not in path]
-
-
-def pytest_collection_modifyitems(
-    config: pytest.Config,  # pylint: disable=unused-argument
-    items: List[pytest.Item],  # pylint: disable=unused-argument
-) -> None:
-    """Modify test collection to work with Oppia's test structure.
-
-    Args:
-        config: pytest.Config. Pytest config object (unused but required by
-            hook).
-        items: List[pytest.Item]. Collected test items (unused but required by
-            hook).
-    """
-    pass
 
 
 @pytest.fixture(autouse=True)
@@ -174,59 +159,3 @@ def mock_ndb_client() -> Generator[mock.MagicMock, None, None]:
         return_value=mock_active_context,
     ):
         yield mock_ndb_client_instance
-
-
-@pytest.fixture(scope='session')
-def manage_emulators() -> Generator[None, None, None]:
-    """Manage emulator lifecycle for the entire test session.
-
-    This fixture is a placeholder for future emulator management.
-    Currently, emulators should be started externally before running tests,
-    or tests should use the mocked services provided by other fixtures.
-
-    Yields:
-        None. Nothing is yielded as this is a placeholder.
-    """
-    # For now, we don't manage emulators in pytest.
-    # Tests use mocked Redis and NDB clients from the autouse fixtures above.
-    # In the future, we will add emulator management here if needed.
-    yield
-
-
-@pytest.fixture(autouse=True)
-def test_isolation() -> Generator[None, None, None]:
-    """Ensure test isolation by cleaning up after each test.
-
-    This fixture provides cleanup after each test to maintain isolation.
-
-    Yields:
-        None. Nothing is yielded before the test runs.
-    """
-    # Setup: nothing needed before test.
-    yield
-
-    # Teardown: cleanup after test.
-    # Note: Most cleanup is handled by test_utils.GenericTestBase.tearDown().
-    # This is just a hook for pytest-specific cleanup if needed later.
-
-
-@pytest.fixture(scope='session', autouse=True)
-def configure_test_environment() -> Generator[None, None, None]:
-    """Configure environment variables and paths for test session.
-
-    Yields:
-        None. Nothing is yielded during the test session.
-    """
-    # Add required paths (belt-and-suspenders with pytest_configure).
-    for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-        if os.path.exists(directory) and directory not in sys.path:
-            sys.path.insert(0, directory)
-
-    # Set additional test environment variables.
-    os.environ['OPPIA_IS_TESTING'] = 'true'
-
-    yield
-
-    # Cleanup.
-    if 'OPPIA_IS_TESTING' in os.environ:
-        del os.environ['OPPIA_IS_TESTING']

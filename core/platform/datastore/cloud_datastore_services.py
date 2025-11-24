@@ -191,9 +191,9 @@ def delete_multi(keys: Sequence[Key]) -> List[None]:
     return ndb.delete_multi(keys)
 
 
-# Here we use object because ndb.Query accepts various keyword arguments with
-# different types depending on the query operation being performed.
-def query_everything(**kwargs: object) -> Query:
+# Here we use type Any because it mimics the types defined in
+# the stubs for this library.
+def query_everything(**kwargs: Dict[str, Any]) -> Query:
     """Returns a query that targets every single entity in the datastore.
 
     IMPORTANT: DO NOT USE THIS FUNCTION OUTSIDE OF UNIT TESTS. Querying
@@ -202,7 +202,8 @@ def query_everything(**kwargs: object) -> Query:
     afterwards.
 
     Args:
-        **kwargs: object. Variable keyword arguments passed to ndb.Query.
+        **kwargs: Dict[str, Any]. Variable keyword arguments passed to
+            ndb.Query.
 
     Returns:
         Query. A query targeting all entities.
