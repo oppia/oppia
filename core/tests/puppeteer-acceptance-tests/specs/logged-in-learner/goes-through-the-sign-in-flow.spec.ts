@@ -120,8 +120,9 @@ describe('Logged In Learner', function () {
 
     // Verify "Learn Something New" section is visible and shows Chapter 1.
     await loggedInUser.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    // Lesson card title format is "Chapter 1: Chapter 1".
     await loggedInUser.expectChapterToBePresentInLearnSomethingNewSection(
-      'Chapter 1'
+      'Chapter 1: Chapter 1'
     );
 
     // Click on "Progress" tab and verify it's empty.
