@@ -599,6 +599,10 @@ describe('Tutor card component', () => {
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
     componentInstance.completedChaptersCount = 2;
 
+    spyOn(chapterProgressService, 'getChapterCompletedForTheFirstTime').and.returnValue(false);
+    spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
+    spyOn(componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
+
     componentInstance.ngOnInit()
 
     expect(componentInstance.shouldShowProgressBar).toBe(true)
