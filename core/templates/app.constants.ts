@@ -331,7 +331,7 @@ export const AppConstants = {
   IMPACT_REPORT_LINK_2023:
     'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
   IMPACT_REPORT_LINK_2024:
-    'https://drive.google.com/file/d/1aEFVWAAsV5N67CIFcdx-suy5c_Pf25zj/view?usp=drive_link',
+    'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
   PARENTS_TEACHERS_PDF_GUIDE_LINK:
     'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
   TEACHER_STORY_TAGGED_BLOGS_LINK:
