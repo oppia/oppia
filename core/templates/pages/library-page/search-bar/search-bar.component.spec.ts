@@ -298,9 +298,9 @@ describe('Search bar component', () => {
 
   it('should trigger search query only when dropdown is closed', () => {
     spyOn(component, 'onSearchQueryChangeExec');
-    component.onDropdownClose(true);
+    component.triggerSearchOnDropdownClose(true);
     expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
-    component.onDropdownClose(false);
+    component.triggerSearchOnDropdownClose(false);
     expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
   });
 

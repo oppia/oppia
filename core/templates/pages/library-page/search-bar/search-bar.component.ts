@@ -195,7 +195,7 @@ export class SearchBarComponent implements OnInit, OnDestroy {
    * Triggers a search query when the dropdown menu is closed.
    * @param {boolean} isOpen - The new open state of the dropdown.
    */
-  onDropdownClose(isOpen: boolean): void {
+  triggerSearchOnDropdownClose(isOpen: boolean): void {
     if (!isOpen) {
       this.onSearchQueryChangeExec();
     }
