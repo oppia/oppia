@@ -25,7 +25,7 @@ runs:
     - name: Check if modified-suite-name-for-uploads contains invalid characters.
       shell: bash
       run: |
-        if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]*$ ]]; then
           echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
           exit 1
         fi

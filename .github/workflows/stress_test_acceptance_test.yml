@@ -97,4 +97,4 @@ jobs:
           test-suite: ${{ inputs.test_suite }}
           viewport-type: ${{ matrix.viewport-type }}
           enable-screen-recording: true
-          modified-suite-name: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
+          modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}
