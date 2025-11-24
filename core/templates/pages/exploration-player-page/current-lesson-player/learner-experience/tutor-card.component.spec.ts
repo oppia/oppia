@@ -601,9 +601,7 @@ describe('Tutor card component', () => {
 
     componentInstance.ngOnInit()
 
-    expect(
-      componentInstance.shouldShowProgressBar().toBe(true)
-    )
+    expect(componentInstance.shouldShowProgressBar).toBe(true)
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
     componentInstance.ngOnInit();
