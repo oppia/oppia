@@ -96,10 +96,20 @@ class SingletonMeta(type):
 
         Returns:
             object. The singleton instance of the class.
+
+        Raises:
+            ValueError. If the singleton instance already exists and new
+                initialization arguments are provided.
         """
         if cls not in cls._instances:
             cls._instances[cls] = super(SingletonMeta, cls).__call__(
                 *args, **kwargs
+            )
+        elif args or kwargs:
+            raise ValueError(
+                f'Singleton instance of {cls.__name__} already exists. '
+                f'Cannot reinitialize with new arguments: args={args}, '
+                f'kwargs={kwargs}'
             )
         return cls._instances[cls]
 

@@ -100,7 +100,7 @@ class SingletonMetaTests(test_utils.GenericTestBase):
         class ConfigurableSingleton(metaclass=utils.SingletonMeta):
             """Singleton with configurable initialization."""
 
-            def __init__(self, value: int) -> None:
+            def __init__(self, value: int = 0) -> None:
                 """Initialize with a value."""
                 self.value = value
 
@@ -108,17 +108,37 @@ class SingletonMetaTests(test_utils.GenericTestBase):
         instance1 = ConfigurableSingleton(10)
         self.assertEqual(instance1.value, 10)
 
-        # Second call with value=20 should return the same instance.
-        # The __init__ is called again but the instance is already created.
-        instance2 = ConfigurableSingleton(20)
+        # Second call without arguments should return the same instance.
+        instance2 = ConfigurableSingleton()
         self.assertIs(instance1, instance2)
+        self.assertEqual(instance2.value, 10)
 
-        # The value might be updated by the second __init__ call.
-        # This demonstrates that singleton pattern returns existing instance
-        # but __init__ still runs.
-        self.assertEqual(instance2.value, 20)
-        # Same object, so same value.
-        self.assertEqual(instance1.value, 20)
+        # Second call with different arguments should raise an error.
+        with self.assertRaisesRegex(
+            ValueError,
+            'Singleton instance of ConfigurableSingleton already exists',
+        ):
+            ConfigurableSingleton(20)
+
+    def test_singleton_raises_error_on_reinit_with_kwargs(self) -> None:
+        """Test that singleton raises error when reinitialized with kwargs."""
+
+        class KeywordSingleton(metaclass=utils.SingletonMeta):
+            """Singleton with keyword arguments."""
+
+            def __init__(self, name: str = 'default') -> None:
+                """Initialize with a name."""
+                self.name = name
+
+        # First call.
+        instance1 = KeywordSingleton(name='first')
+        self.assertEqual(instance1.name, 'first')
+
+        # Second call with different kwargs should raise an error.
+        with self.assertRaisesRegex(
+            ValueError, 'Singleton instance of KeywordSingleton already exists'
+        ):
+            KeywordSingleton(name='second')
 
 
 class UtilsTests(test_utils.GenericTestBase):
