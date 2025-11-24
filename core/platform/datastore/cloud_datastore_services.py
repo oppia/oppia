@@ -26,7 +26,9 @@ from core.platform import models
 
 from google.cloud import ndb
 from typing import (
+    Any,
     ContextManager,
+    Dict,
     List,
     Optional,
     Sequence,
