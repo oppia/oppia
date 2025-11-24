@@ -23,6 +23,7 @@ from core.constants import constants
 from core.domain import change_domain, state_domain, translation_domain
 
 from typing import (
+    Any,
     Callable,
     Dict,
     Final,
@@ -266,8 +267,12 @@ class StudyGuidePageContentsDict(TypedDict):
     """
 
     subtitled_html: state_domain.SubtitledHtmlDict
-    recorded_voiceovers: Dict
-    written_translations: Dict
+    # Here we use type Any because dict 'recorded_voiceovers' is a
+    # legacy field that will always be empty for study guides.
+    recorded_voiceovers: Dict[str, Any]
+    # Here we use type Any because dict 'written_translations' is a
+    # legacy field that will always be empty for study guides.
+    written_translations: Dict[str, Any]
 
 
 class StudyGuideAndroidDict(TypedDict):
