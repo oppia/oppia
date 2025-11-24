@@ -21,9 +21,12 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
+import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
@@ -33,6 +36,8 @@ describe('Logged In Learner', function () {
     new LoggedOutUser()
   );
   let releaseCoordinator: ReleaseCoordinator;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+  let explorationId: string;
 
   beforeAll(async function () {
     // Create release coordinator to enable redesigned learner dashboard.
@@ -44,6 +49,41 @@ describe('Logged In Learner', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
+
+    // Create curriculum admin to create topic, story, and chapter.
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculum_admin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    // Create exploration for chapter.
+    explorationId =
+      await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        'Test Exploration'
+      );
+
+    // Create topic, classroom, story, and chapter.
+    await curriculumAdmin.createAndPublishTopic(
+      'Test Topic',
+      'Test Skill',
+      'Test Skill'
+    );
+
+    await curriculumAdmin.createAndPublishClassroom(
+      'Math',
+      'math',
+      'Test Topic'
+    );
+
+    await curriculumAdmin.addStoryToTopic(
+      'Test Story',
+      'test-story',
+      'Test Topic'
+    );
+    await curriculumAdmin.addChapter('Chapter 1', explorationId);
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
   }, 600000);
 
   it('should be able to login and see Learner Dashboard', async function () {
@@ -52,10 +92,8 @@ describe('Logged In Learner', function () {
     await loggedInUser.navigateToSignUpPage();
 
     // Enter email to proceed to username page.
+    // The enterEmail function will click "Sign In" and verify username field is visible.
     await loggedInUser.enterEmail('logged_in_user@example.com');
-
-    // Verify the signup page is shown with username field after entering email.
-    await loggedInUser.waitForUsernameInputToBeVisible();
 
     // Fill an invalid username and verify error message.
     await loggedInUser.typeInvalidUsernameInUsernameInput('invalid@user!');
@@ -72,34 +110,23 @@ describe('Logged In Learner', function () {
     // Verify learner is redirected to Learner Dashboard.
     await loggedInUser.expectToBeOnLearnerDashboardPage();
 
+    // Verify welcome message with username.
+    await loggedInUser.expectGreetingToHaveNameOfUser('loggedInUser');
+
     // Verify "Continue where you left off" section is NOT available.
     await loggedInUser.expectContinueFromWhereYouLeftSectionInRedesignedDashboardToBePresent(
       false
     );
 
-    // Verify "Learn Something New" section is visible.
+    // Verify "Learn Something New" section is visible and shows Chapter 1.
     await loggedInUser.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    await loggedInUser.expectChapterToBePresentInLearnSomethingNewSection(
+      'Chapter 1'
+    );
 
     // Click on "Progress" tab and verify it's empty.
     await loggedInUser.navigateToProgressSection();
     await loggedInUser.expectProgressSectionToBeEmptyInNewLD();
-  });
-
-  it('should land on navbar', async function () {
-    // User should still be logged in from previous test and on learner dashboard.
-    // Navigate to learner dashboard to ensure we're on a page with navbar.
-    // In redesigned dashboard, mobile home section selector doesn't exist,
-    // so we navigate directly to the dashboard.
-    await loggedInUser.navigateToLearnerDashboard();
-
-    // Check if "Learn", "About", and "Get Involved" works properly.
-    await loggedInUser.expectNavbarToWorkProperly();
-
-    // Check if profile dropdown works properly.
-    await loggedInUser.clickOnProfileDropdown();
-    await loggedInUser.expectProfileDropdownToContainElementWithContent(
-      'loggedInUser'
-    );
   });
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

@@ -742,7 +742,10 @@ export class LoggedInUser extends BaseUser {
         submittedMessageSelector,
         (el: Element) => el.textContent
       );
-      if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
+      if (
+        !submittedMessageText ||
+        submittedMessageText.trim() !== 'Thank you for the feedback!'
+      ) {
         throw new Error(
           `Unexpected submitted message text: ${submittedMessageText}`
         );
@@ -892,6 +895,10 @@ export class LoggedInUser extends BaseUser {
       // is redirected to the home page it is dependent to "redirects" in URL.
       await this.page.waitForSelector(signUpEmailField, {
         hidden: true,
+      });
+
+      await this.page.waitForSelector(signUpUsernameField, {
+        visible: true,
       });
     }
   }
@@ -2817,14 +2824,23 @@ export class LoggedInUser extends BaseUser {
   /**
    * Checks if Learner is on the learner dashboard page.
    */
-  expectToBeOnLearnerDashboardPage(): void {
-    expect(this.page.url()).toBe(`${baseUrl}/learner-dashboard`);
+  async expectToBeOnLearnerDashboardPage(): Promise<void> {
+    await this.page.waitForFunction(
+      (url: string) => {
+        return window.location.href.includes(url);
+      },
+      {},
+      '/learner-dashboard'
+    );
   }
 
   /**
    * Checks if greeting has name of the user
    */
   async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
+    await this.page.waitForSelector(greetingSelector, {
+      visible: true,
+    });
     const greetingElement = await this.page.$(greetingSelector);
     const greetingText = await this.page.evaluate(
       el => el.textContent,
@@ -3134,6 +3150,28 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       learnSomethingNewSectionSelector,
       visible
+    );
+  }
+
+  /**
+   * Function to verify that a specific chapter is present in the Learn Something New section.
+   * @param {string} chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInLearnSomethingNewSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.page.waitForSelector(learnSomethingNewSectionSelector, {
+      visible: true,
+    });
+    const learnSomethingNewSection = await this.page.$(
+      learnSomethingNewSectionSelector
+    );
+    if (!learnSomethingNewSection) {
+      throw new Error('Learn Something New section not found.');
+    }
+    await this.expectLessonCardToBePresent(
+      chapterTitle,
+      learnSomethingNewSection
     );
   }
 
