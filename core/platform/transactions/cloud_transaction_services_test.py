@@ -44,7 +44,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
 
         mock_client = MockClient()
 
-        def mock_get_client() -> MockClient:  # type: ignore[misc]
+        def mock_get_client() -> MockClient:
             return mock_client
 
         swap_get_client = self.swap(
