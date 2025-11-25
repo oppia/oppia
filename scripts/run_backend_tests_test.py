@@ -784,7 +784,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         args = [
-            '--skip-install',
+            '--skip_install',
             '--test_targets',
             test_target,
             '--generate_coverage_report',
@@ -821,7 +821,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
 
-        args = ['--skip-install', '--test_targets', test_targets]
+        args = ['--skip_install', '--test_targets', test_targets]
         with self.print_swap, self.swap_redis_server, swap_execute_task:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 run_backend_tests.main(args=args)
@@ -1127,7 +1127,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with swap_coverage, self.swap_execute_task:
-                        run_backend_tests.main(args=['--skip-install'])
+                        run_backend_tests.main(args=['--skip_install'])
             mock_third_party_install.assert_not_called()
 
     def test_third_party_install_with_skip_flag_not_set(self) -> None:
@@ -1150,7 +1150,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_with_verbose_flag(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--verbose', '--skip-install']
+            ['--verbose', '--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('-v', pytest_args)
@@ -1158,7 +1158,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_without_verbose_flag(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--skip-install']
+            ['--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('-q', pytest_args)
@@ -1166,7 +1166,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_with_coverage_report(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--generate_coverage_report', '--skip-install']
+            ['--generate_coverage_report', '--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('--cov=.', pytest_args)
@@ -1178,7 +1178,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             [
                 '--generate_coverage_report',
                 '--ignore_coverage',
-                '--skip-install',
+                '--skip_install',
             ]
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
@@ -1214,7 +1214,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
         for test_target, expected_path in test_data:
             parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-                [f'--test_targets={test_target}', '--skip-install']
+                [f'--test_targets={test_target}', '--skip_install']
             )
             pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
             self.assertIn(
@@ -1227,7 +1227,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
             [
                 '--test_targets=core.utils_test,core.feconf_test',
-                '--skip-install',
+                '--skip_install',
             ]
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
@@ -1236,14 +1236,14 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_with_test_path(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_path=core/controllers', '--skip-install']
+            ['--test_path=core/controllers', '--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('core/controllers', pytest_args)
 
     def test_convert_args_to_pytest_with_test_shard(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_shard=1', '--skip-install']
+            ['--test_shard=1', '--skip_install']
         )
 
         # Mock the shard contents.
@@ -1291,7 +1291,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_with_exclude_load_tests(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--exclude_load_tests', '--skip-install']
+            ['--exclude_load_tests', '--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('--ignore=core/tests/load_tests', pytest_args)
@@ -1299,7 +1299,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_default_runs_all_tests(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--skip-install']
+            ['--skip_install']
         )
         pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
         self.assertIn('.', pytest_args)
@@ -1308,7 +1308,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_shard=1', '--skip-install']
+            ['--test_shard=1', '--skip_install']
         )
 
         def mock_check_shards_match_tests(
@@ -1328,7 +1328,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_convert_args_to_pytest_with_run_on_changed_files(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--run_on_changed_files_in_branch', '--skip-install']
+            ['--run_on_changed_files_in_branch', '--skip_install']
         )
 
         def mock_get_changed_files() -> Set[str]:
@@ -1355,7 +1355,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_run_tests_with_pytest_success(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_targets=core.utils_test', '--skip-install']
+            ['--test_targets=core.utils_test', '--skip_install']
         )
 
         with unittest.mock.patch('pytest.main', return_value=0) as mock_pytest:
@@ -1370,7 +1370,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_run_tests_with_pytest_failure(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_targets=core.utils_test', '--skip-install']
+            ['--test_targets=core.utils_test', '--skip_install']
         )
 
         with unittest.mock.patch('pytest.main', return_value=1) as mock_pytest:
@@ -1388,9 +1388,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                         # Should not raise an exception.
                         run_backend_tests.main(
                             args=[
-                                '--use-pytest',
+                                '--use_pytest',
                                 '--test_targets=core.utils_test',
-                                '--skip-install',
+                                '--skip_install',
                             ]
                         )
         self.assertIn('Done!', self.print_arr)
@@ -1405,9 +1405,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                         ):
                             run_backend_tests.main(
                                 args=[
-                                    '--use-pytest',
+                                    '--use_pytest',
                                     '--test_targets=core.utils_test',
-                                    '--skip-install',
+                                    '--skip_install',
                                 ]
                             )
 
@@ -1437,9 +1437,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with swap_redis, swap_datastore, self.print_swap:
                 run_backend_tests.main(
                     args=[
-                        '--use-pytest',
+                        '--use_pytest',
                         '--test_targets=core.utils_test',
-                        '--skip-install',
+                        '--skip_install',
                     ]
                 )
 

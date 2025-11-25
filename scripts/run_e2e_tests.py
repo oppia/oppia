@@ -42,7 +42,7 @@ single test or test suite.
 )
 
 _PARSER.add_argument(
-    '--skip-install',
+    '--skip_install',
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true',
 )

@@ -156,17 +156,16 @@ _PARSER.add_argument(
     action='store_true',
 )
 _PARSER.add_argument(
-    '--skip-install',
+    '--skip_install',
     help='optional; if specified, skips the installation of '
     'third party libraries',
     action='store_true',
 )
 _PARSER.add_argument(
-    '--use-pytest',
+    '--use_pytest',
     help='optional; if specified, uses pytest as the test runner instead of '
     'the default gae_suite runner',
     action='store_true',
-    dest='use_pytest',
 )
 
 
@@ -590,7 +589,7 @@ def main(args: Optional[List[str]] = None) -> None:
     if not parsed_args.skip_install:
         install_third_party_libs.main()
 
-    # If --use-pytest flag is set, delegate to pytest and return early.
+    # If --use_pytest flag is set, delegate to pytest and return early.
     if parsed_args.use_pytest:
         with contextlib.ExitStack() as stack:
             # Same emulator setup as the regular path.

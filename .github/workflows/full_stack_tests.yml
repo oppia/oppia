@@ -119,7 +119,7 @@ jobs:
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=0
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-          python -m scripts.run_e2e_tests --skip-install
+          python -m scripts.run_e2e_tests --skip_install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E test logs
@@ -134,7 +134,7 @@ jobs:
           set -o pipefail;
           VIDEO_RECORDING_IS_ENABLED=1
           xvfb-run -a --server-args="-screen 0, 1285x1000x24"
-          python -m scripts.run_e2e_tests --skip-install
+          python -m scripts.run_e2e_tests --skip_install
           --skip-build --suite=${{ matrix.suite.name }} --prod_env --server_log_level=info
           | tee e2e_test_retry_${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.log
       - name: Upload E2E retry test logs
