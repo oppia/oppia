@@ -594,31 +594,44 @@ describe('Tutor card component', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should correctly show milestone progress bar', () => {
-    componentInstance.inStoryMode = true;
-    chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    componentInstance.completedChaptersCount = 2;
+ it('should correctly show milestone progress bar', () => {
 
-    spyOn(chapterProgressService, 'getChapterCompletedForTheFirstTime').and.returnValue(false);
-    spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
-    spyOn(componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
+  componentInstance.inStoryMode = true;
+  componentInstance.completedChaptersCount = 2;
+  
 
-    componentInstance.ngOnInit()
+  componentInstance.displayedCard = {
+    getContentHtml: jasmine.createSpy('getContentHtml').and.returnValue('<p>Test content</p>'),
+    getInputResponsePairs: jasmine.createSpy('getInputResponsePairs').and.returnValue([]),
+    getInteractionHtml: jasmine.createSpy('getInteractionHtml').and.returnValue('<div>Interaction</div>'),
+    getInteractionId: jasmine.createSpy('getInteractionId').and.returnValue('TextInput'),
+    getStateName: jasmine.createSpy('getStateName').and.returnValue('State 1'),
+    isCompleted: jasmine.createSpy('isCompleted').and.returnValue(false),
+    isTerminal: jasmine.createSpy('isTerminal').and.returnValue(false)
+  } as any;
+  
 
-    expect(componentInstance.shouldShowProgressBar).toBe(true)
-    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+  spyOn(chapterProgressService, 'getChapterCompletedForTheFirstTime').and.returnValue(false);
+  
 
-    componentInstance.ngOnInit();
-    componentInstance.completedChaptersCount = 4;
-    componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
+  spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
+  spyOn(componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
 
-    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
-    componentInstance.ngOnInit()
-    spyOn(
-      componentInstance,
-      'isCompletedChaptersCountGreaterThanLastMilestone'
-    ).and.returnValue(false);
+  componentInstance.ngOnInit();
+  fixture.detectChanges();
+
+
+  expect(componentInstance.shouldShowProgressBar).toBe(true);
+  expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+
+
+  componentInstance.completedChaptersCount = 4;
+  componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
+
+  expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+  expect(componentInstance.shouldShowProgressBar).toBe(true);
+});
     spyOn(
       componentInstance,
       'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
