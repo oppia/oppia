@@ -363,21 +363,23 @@ describe('Goals tab Component', () => {
     expect(component.currentGoalsStoryIsShown[0]).toEqual(false);
   });
 
-    it('should call preventDefault when checkbox is clicked', () => {
-    component.editGoalsTopicClassification = [0]
-    fixture.detectChanges()
+  it('should call preventDefault when checkbox is clicked', () => {
+    component.editGoalsTopicClassification = [0];
+    fixture.detectChanges();
 
-      const checkbox = fixture.nativeElement.querySelector(
-    '.e2e-test-remove-topic-from-current-goals-button'
+    const checkbox = fixture.nativeElement.querySelector(
+      '.e2e-test-remove-topic-from-current-goals-button'
     );
 
-    const addToLearnerGoalsSpy = spyOn(component,'addToLearnerGoals').and.callThrough();
+    const addToLearnerGoalsSpy = spyOn(
+      component,
+      'addToLearnerGoals'
+    ).and.callThrough();
 
     checkbox.click();
 
     expect(addToLearnerGoalsSpy).toHaveBeenCalled();
-
-  })
+  });
 
   it('should add topic to learner goals if not already present', () => {
     component.topicIdsInCurrentGoals.length = 0;
