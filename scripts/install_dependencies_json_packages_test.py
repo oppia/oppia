@@ -444,11 +444,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_url_open(self) -> None:
-        response = install_dependencies_json_packages.url_open(
-            'http://www.google.com'
+        # Use a URL that Oppia's CI environment is expected to have access to.
+        github_api_url = (
+            'https://api.github.com/repos/oppia/oppia/releases/latest'
         )
+        response = install_dependencies_json_packages.url_open(github_api_url)
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
+        self.assertEqual(response.url, github_api_url)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext

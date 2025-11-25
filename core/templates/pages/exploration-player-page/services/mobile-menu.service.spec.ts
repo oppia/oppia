@@ -39,6 +39,18 @@ describe('MobileMenuService', () => {
     });
   });
 
+  it('should initially have sidebar expanded set to false', () => {
+    expect(service.getSidebarIsExpanded()).toBe(false);
+  });
+
+  it('should toggle sidebar expanded state', () => {
+    expect(service.getSidebarIsExpanded()).toBe(false);
+    service.toggleSidebar();
+    expect(service.getSidebarIsExpanded()).toBe(true);
+    service.toggleSidebar();
+    expect(service.getSidebarIsExpanded()).toBe(false);
+  });
+
   it('should update menu visibility when toggled', () => {
     let currentValue: boolean | undefined;
     service.getMenuVisibility().subscribe(value => (currentValue = value));
