@@ -356,18 +356,8 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
 
         self.all_test_suites = {
             'acceptance': {
-                'docker': {
-                    'count': 1,
-                    'suites': [
-                        {
-                            'name': 'exploration-player/view-exploration',
-                            'module': 'exploration-player/view-exploration.spec.ts',
-                            'environment': 'docker',
-                        }
-                    ],
-                },
                 'python': {
-                    'count': 2,
+                    'count': 3,
                     'suites': [
                         {
                             'name': 'blog-admin/assign-roles',
@@ -376,6 +366,11 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         {
                             'name': 'blog-editor/publish',
                             'module': 'blog-editor/publish.spec.ts',
+                        },
+                        {
+                            'name': 'exploration-player/view-exploration',
+                            'module': 'exploration-player/view-exploration.spec.ts',
+                            'environment': 'docker',
                         },
                     ],
                 },
@@ -749,7 +744,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'count': 0, 'suites': []},
                                     'python': {'count': 0, 'suites': []},
                                 },
                                 'lighthouse_accessibility': {
@@ -817,7 +811,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {
+                                    'python': {
                                         'count': 1,
                                         'suites': [
                                             {
@@ -827,7 +821,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             }
                                         ],
                                     },
-                                    'python': {'count': 0, 'suites': []},
                                 },
                                 'lighthouse_performance': {
                                     'suites': [
@@ -890,7 +883,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {
+                                    'python': {
                                         'suites': [
                                             {
                                                 'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
@@ -900,7 +893,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                         ],
                                         'count': 1,
                                     },
-                                    'python': {'count': 0, 'suites': []},
                                 },
                                 'lighthouse_accessibility': {
                                     'suites': [],
@@ -937,7 +929,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'suites': [], 'count': 0},
                                     'python': {'suites': [], 'count': 0},
                                 },
                                 'lighthouse_accessibility': {
@@ -1007,7 +998,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                             {
                                 'e2e': self.all_test_suites['e2e'],
                                 'acceptance': {
-                                    'docker': {'count': 0, 'suites': []},
                                     'python': {
                                         'suites': [
                                             {
