@@ -28,7 +28,7 @@ import tempfile
 import threading
 import unittest.mock
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 from scripts import (
     common,

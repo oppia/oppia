@@ -23,7 +23,6 @@ import os
 import subprocess
 import sys
 
-from core import feconf
 from core.tests import test_utils
 
 from typing import List, Optional

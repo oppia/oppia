@@ -43,12 +43,6 @@ from scripts import (  # pylint: disable=wrong-import-position, wrong-import-ord
 from typing import Final
 
 install_python_dev_dependencies.main(['--assert_compiled'])
-from . import (
-    pre_commit_hook,
-)  # pylint: disable=wrong-import-position, wrong-import-order
-from . import (
-    pre_push_hook,
-)  # pylint: disable=wrong-import-position, wrong-import-order
 
 from core import (  # pylint: disable=wrong-import-position, wrong-import-order
     utils,
@@ -61,6 +55,8 @@ from scripts import (  # pylint: disable=wrong-import-position, wrong-import-ord
 from . import (  # pylint: disable=wrong-import-position, wrong-import-order
     clean,
     common,
+    pre_commit_hook,
+    pre_push_hook,
 )
 
 # Place to download zip files for temporary storage.

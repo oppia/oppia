@@ -29,7 +29,12 @@ import sys
 import threading
 
 from core import utils
-from scripts import common
+from scripts import (
+    common,
+    install_python_dev_dependencies,
+    install_third_party_libs,
+    servers,
+)
 
 import rcssmin
 from typing import (
@@ -41,12 +46,6 @@ from typing import (
     TextIO,
     Tuple,
     TypedDict,
-)
-
-from scripts import (
-    install_python_dev_dependencies,
-    install_third_party_libs,
-    servers,
 )
 
 ASSETS_DEV_DIR = os.path.join('assets', '')

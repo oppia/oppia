@@ -22,7 +22,6 @@ import os
 import subprocess
 import sys
 
-from core import feconf
 from core.constants import constants
 from core.tests import test_utils
 from scripts import build, common, run_lighthouse_tests, servers

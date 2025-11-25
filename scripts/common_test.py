@@ -35,7 +35,7 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 from scripts import servers
 
