@@ -483,31 +483,23 @@ def convert_args_to_pytest(parsed_args: argparse.Namespace) -> List[str]:
         # Convert dot notation to pytest path notation.
         for test_target in parsed_args.test_targets.split(','):
             # Check if this is a specific test (has _test. in it).
+            # Since _test always appears as a suffix on module names, we can
+            # simply split on '.' and find the part ending with '_test'.
             if '_test.' in test_target:
-                # Format: module.path._test.ClassName or .ClassName.method_name
-                # Convert to: module/path/_test.py::ClassName or ::ClassName::method_name .
+                # Find the module ending with _test.
                 parts = test_target.split('.')
-                # Find where _test is.
-                test_idx = -1
-                for i, part in enumerate(parts):
-                    if part.endswith('_test'):
-                        test_idx = i
-                        break
+                test_idx = next(
+                    i for i, part in enumerate(parts) if part.endswith('_test')
+                )
 
-                if test_idx >= 0:
-                    # Everything up to and including _test is the file path.
-                    file_parts = parts[: test_idx + 1]
-                    test_path = '%s.py' % '/'.join(file_parts)
+                # Original format: module.path_test.ClassName(.method_name).
+                # Convert to: module/path_test.py::ClassName(::method_name).
+                test_path = '%s.py::%s' % (
+                    '/'.join(parts[: test_idx + 1]),
+                    '::'.join(parts[test_idx + 1 :]),
+                )
 
-                    # Everything after _test is the test specifier.
-                    test_spec_parts = parts[test_idx + 1 :]
-                    if test_spec_parts:
-                        test_path += '::%s' % '::'.join(test_spec_parts)
-
-                    pytest_args.append(test_path)
-                else:
-                    # Fallback: just convert dots to slashes.
-                    pytest_args.append(test_target.replace('.', '/') + '.py')
+                pytest_args.append(test_path)
             elif test_target.endswith('_test'):
                 # Just a test module.
                 test_path = test_target.replace('.', '/') + '.py'

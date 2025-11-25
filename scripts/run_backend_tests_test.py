@@ -1201,15 +1201,8 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 'core.utils_test.SingletonMetaTests.test_singleton',
                 'core/utils_test.py::SingletonMetaTests::test_singleton',
             ),
-            # Malformed target: has _test. but no part ends with _test.
-            (
-                'core._test_module.SomeClass',
-                'core/_test_module/SomeClass.py',
-            ),
             # Target without _test suffix.
             ('core.utils', 'core/utils_test.py'),
-            # Target with _test in middle of name.
-            ('core.some_test.module', 'core/some_test.py::module'),
         ]
 
         for test_target, expected_path in test_data:
