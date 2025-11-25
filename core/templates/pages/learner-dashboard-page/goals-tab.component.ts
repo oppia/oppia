@@ -186,6 +186,7 @@ export class GoalsTabComponent implements OnInit {
     topicId: string,
     index: number
   ): Promise<void> {
+    event.preventDefault();
     var activityId = topicId;
     var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;
     if (!this.topicIdsInCurrentGoals.includes(activityId)) {

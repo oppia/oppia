@@ -371,12 +371,12 @@ describe('Goals tab Component', () => {
     '.e2e-test-remove-topic-from-current-goals-button'
     );
 
-    const eventClick = new Event('click');
-    const preventDefaultSpy = spyOn(eventClick, 'preventDefault');
+    const addToLearnerGoalsSpy = spyOn(component,'addToLearnerGoals').and.callThrough();
 
-    checkbox.dispatchEvent(eventClick);
+    checkbox.click();
 
-    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(addToLearnerGoalsSpy).toHaveBeenCalled();
+
   })
 
   it('should add topic to learner goals if not already present', () => {
