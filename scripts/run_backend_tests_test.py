@@ -1186,49 +1186,42 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('--cov-report=term-missing', pytest_args)
         self.assertNotIn('--cov-fail-under=100', pytest_args)
 
-    def test_convert_args_to_pytest_with_test_target_module(self) -> None:
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_targets=core.utils_test', '--skip-install']
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        self.assertIn('core/utils_test.py', pytest_args)
+    def test_convert_args_to_pytest_with_different_test_targets(self) -> None:
+        """Test conversion of various --test_targets formats."""
+        test_data: List[Tuple[str, str]] = [
+            # Test module.
+            ('core.utils_test', 'core/utils_test.py'),
+            # Test class.
+            (
+                'core.utils_test.SingletonMetaTests',
+                'core/utils_test.py::SingletonMetaTests',
+            ),
+            # Test method.
+            (
+                'core.utils_test.SingletonMetaTests.test_singleton',
+                'core/utils_test.py::SingletonMetaTests::test_singleton',
+            ),
+            # Malformed target: has _test. but no part ends with _test.
+            (
+                'core._test_module.SomeClass',
+                'core/_test_module/SomeClass.py',
+            ),
+            # Target without _test suffix.
+            ('core.utils', 'core/utils_test.py'),
+            # Target with _test in middle of name.
+            ('core.some_test.module', 'core/some_test.py::module'),
+        ]
 
-    def test_convert_args_to_pytest_with_test_target_class(self) -> None:
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            [
-                '--test_targets=core.utils_test.SingletonMetaTests',
-                '--skip-install',
-            ]
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        self.assertIn('core/utils_test.py::SingletonMetaTests', pytest_args)
-
-    def test_convert_args_to_pytest_with_test_target_method(self) -> None:
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            [
-                '--test_targets=core.utils_test.SingletonMetaTests.test_singleton',
-                '--skip-install',
-            ]
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        self.assertIn(
-            'core/utils_test.py::SingletonMetaTests::test_singleton',
-            pytest_args,
-        )
-
-    def test_convert_args_to_pytest_with_malformed_test_dotted_target(
-        self,
-    ) -> None:
-        """Test fallback when target has _test. but no part ends with _test."""
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            [
-                '--test_targets=core._test_module.SomeClass',
-                '--skip-install',
-            ]
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        # Fallback path: contains _test. but no split part ends with _test.
-        self.assertIn('core/_test_module/SomeClass.py', pytest_args)
+        for test_target, expected_path in test_data:
+            parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+                [f'--test_targets={test_target}', '--skip-install']
+            )
+            pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+            self.assertIn(
+                expected_path,
+                pytest_args,
+                msg=f'\n\nTest target: {test_target}',
+            )
 
     def test_convert_args_to_pytest_with_multiple_test_targets(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
@@ -1359,28 +1352,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(test_file_args), {'core/utils_test.py', 'core/feconf_test.py'}
         )
-
-    def test_convert_args_to_pytest_with_test_target_without_test_suffix(
-        self,
-    ) -> None:
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_targets=core.utils', '--skip-install']
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        # Should add _test suffix automatically.
-        self.assertIn('core/utils_test.py', pytest_args)
-
-    def test_convert_args_to_pytest_with_test_in_middle_of_name(
-        self,
-    ) -> None:
-        # Test case where '_test.' is in target and a part ends with '_test'.
-        # This should successfully convert using the normal path.
-        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
-            ['--test_targets=core.some_test.module', '--skip-install']
-        )
-        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
-        # Should find 'some_test' as the test file and 'module' as test spec.
-        self.assertIn('core/some_test.py::module', pytest_args)
 
     def test_run_tests_with_pytest_success(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
