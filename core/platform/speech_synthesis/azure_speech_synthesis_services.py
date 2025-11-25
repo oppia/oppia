@@ -340,7 +340,9 @@ def convert_plaintext_to_ssml_content(
 
 
 def regenerate_speech_from_text(
-    plaintext: str, language_accent_code: str
+    plaintext: str,
+    language_accent_code: str,
+    oppia_project_id: Optional[str] = None,
 ) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
     """Regenerates speech (Oppia's voiceovers) from the provided text.
 
@@ -352,6 +354,9 @@ def regenerate_speech_from_text(
         plaintext: str. The plaintext that needs to be synthesized into speech.
         language_accent_code: str. The language accent code in which the speech
             is to be synthesized.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         tuple. A tuple containing three elements:
@@ -368,7 +373,9 @@ def regenerate_speech_from_text(
     """
 
     # Azure text-to-speech API key.
-    azure_tts_api_key = secrets_services.get_secret('AZURE_TTS_API_KEY')
+    azure_tts_api_key = secrets_services.get_secret(
+        'AZURE_TTS_API_KEY', project_id=oppia_project_id
+    )
 
     if azure_tts_api_key is None:
         raise Exception('Azure TTS API key is not available.')

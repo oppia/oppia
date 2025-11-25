@@ -46,6 +46,10 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             str,
             'Namespace for isolating the NDB operations during tests.',
         ),
+        'oppia_project_id': (
+            str,
+            'The ID of the Google Cloud Project for Oppia.',
+        ),
     }
 
     def __init__(

@@ -272,6 +272,7 @@ def synthesize_voiceover_for_html_string(
     content_html: str,
     language_accent_code: str,
     voiceover_filename: str,
+    oppia_project_id: Optional[str] = None,
 ) -> List[Dict[str, Union[str, float]]]:
     """The method generates automated voiceovers for the given HTML content
     using cloud service helper functions.
@@ -283,6 +284,9 @@ def synthesize_voiceover_for_html_string(
         language_accent_code: str. The language accent code for generating the
             automated voiceover.
         voiceover_filename: str. The filename for the generated voiceover.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         list(dict(str, str|float)). A list of dictionaries. Each dictionary
@@ -339,7 +343,7 @@ def synthesize_voiceover_for_html_string(
         try:
             binary_audio_data, audio_offset_list, error_details = (
                 speech_synthesis_services.regenerate_speech_from_text(
-                    parsed_text, language_accent_code
+                    parsed_text, language_accent_code, oppia_project_id
                 )
             )
         except Exception as e:

@@ -123,10 +123,18 @@ def run_job(
     Raises:
         RuntimeError. Failed to deploy given job to the Dataflow service.
     """
+    logging.info(
+        'Logging Oppia project ID before creating Beam job pipeline: %s'
+        % app_identity_services.get_application_id()
+    )
+
     if pipeline is None:
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
-            options=job_options.JobOptions(namespace=namespace),
+            options=job_options.JobOptions(
+                namespace=namespace,
+                oppia_project_id=app_identity_services.get_application_id(),
+            ),
         )
 
     job = job_class(pipeline)

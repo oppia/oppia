@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import os
 import logging
 import time
 
@@ -31,7 +30,7 @@ from core.domain import (
     voiceover_regeneration_services,
     voiceover_services,
 )
-from core.jobs import base_jobs
+from core.jobs import base_jobs, job_options
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
@@ -71,6 +70,10 @@ WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 # ignore here.
 class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
     """A DoFn that generates voiceovers for a given exploration."""
+
+    def __init__(self, oppia_project_id: Optional[str] = None) -> None:
+        super().__init__()
+        self.oppia_project_id = oppia_project_id
 
     def process(
         self,
@@ -134,6 +137,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
                 entity_translation_models=entity_translation_models,
                 entity_voiceover_models=entity_voiceover_models,
                 voiceover_policy_model=autogeneration_policy_model,
+                oppia_project_id=self.oppia_project_id,
             )
         )
 
@@ -192,6 +196,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             voiceover_models.EntityVoiceoversModel
         ],
         voiceover_policy_model: voiceover_models.VoiceoverAutogenerationPolicyModel,
+        oppia_project_id: Optional[str] = None,
     ) -> Tuple[Sequence[voiceover_models.EntityVoiceoversModel], str]:
         """Generates voiceovers in English and all translated languages,
         covering every supported accent for the given exploration.
@@ -205,6 +210,9 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 entity voiceover models related to the exploration.
             voiceover_policy_model: VoiceoverAutogenerationPolicyModel. The
                 voiceover autogeneration policy model.
+            oppia_project_id: Optional[str]. The Google Cloud Project ID.
+                Explicitly required when running on Beam Dataflow, as workers
+                cannot retrieve the ID from environment variables.
 
         Returns:
             Iterable[EntityVoiceoversModel]. An iterable of
@@ -373,6 +381,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 content_html,
                                 language_accent_code,
                                 voiceover_filename,
+                                oppia_project_id,
                             )
 
                             voiceover = voiceover_regeneration_services.fetch_voiceover_by_filename(
@@ -546,11 +555,14 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
             )
         )
 
+        custom_options = self.pipeline.options.view_as(job_options.JobOptions)
+        oppia_project_id = custom_options.oppia_project_id
+
         voiceovers_and_status = (
             combined_models
             | 'Generate voiceovers for each exploration'
             >> beam.ParDo(
-                GenerateVoiceoversFn(),
+                GenerateVoiceoversFn(oppia_project_id=oppia_project_id),
                 beam.pvalue.AsSingleton(voiceover_policy_model),
             ).with_outputs('status', main='voiceovers')
         )
@@ -573,32 +585,3 @@ class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
     """Audit job for VoiceoverSynthesisJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
-
-
-class AuditEnvVariableAccessFromBeamJob(base_jobs.JobBase):
-    """A one-off job to audit access to environment variables from within
-    Beam jobs.
-    """
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of job run result to audit access to environment
-        variables from within Beam jobs.
-
-        Returns:
-            beam.PCollection[job_run_result.JobRunResult]. A PCollection
-            containing job run results with the details of environment variable
-            access.
-        """
-
-        accessed_env_variables = (
-            self.pipeline
-            | 'Create dummy' >> beam.Create([None])
-            | 'Audit env variable access'
-            >> beam.Map(
-                lambda _: os.environ.get('GOOGLE_CLOUD_PROJECT', 'NOT SET')
-            )
-        )
-
-        return accessed_env_variables | 'Format results' >> beam.Map(
-            job_run_result.JobRunResult.as_stdout
-        )

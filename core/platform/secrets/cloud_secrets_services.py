@@ -46,16 +46,22 @@ CLIENT = secretmanager.SecretManagerServiceClient(
 
 
 @functools.lru_cache(maxsize=64)
-def get_secret(name: str) -> Optional[str]:
+def get_secret(name: str, project_id: Optional[str] = None) -> Optional[str]:
     """Gets the value of a secret.
 
     Args:
         name: str. The name of the secret to retrieve.
+        project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         str. The value of the secret.
     """
-    oppia_project_id = app_identity_services.get_application_id()
+    if project_id is not None:
+        oppia_project_id = project_id
+    else:
+        oppia_project_id = app_identity_services.get_application_id()
     logging.info('Retrieved project ID: %s', oppia_project_id)
 
     secret_name = f'projects/{oppia_project_id}/secrets/{name}/versions/latest'
