@@ -462,10 +462,11 @@ def convert_args_to_pytest(parsed_args: argparse.Namespace) -> List[str]:
 
     Raises:
         Exception. The shard configuration in backend_test_shards.json doesn't
-        match the actual test files on the filesystem when using the
-        `--test_shard` flag. This can happen when (a) a test file listed in the
-        JSON shards file doesn't exist, (b) a test file exists but isn't listed
-        in any shard, or (c) a test file is listed in multiple shards.
+            match the actual test files on the filesystem when using the
+            --test_shard flag. This can happen when (a) a test file listed in
+            the JSON shards file doesn't exist, (b) a test file exists but
+            isn't listed in any shard, or (c) a test file is listed in
+            multiple shards.
     """
     pytest_args = []
 
