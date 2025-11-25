@@ -525,8 +525,18 @@ class AndroidPlatformParametersHandler(base.BaseHandler[Dict[str, str], Dict[str
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            # No strict validation here; handler will parse and raise 400 on
-            # malformed values per product requirement.
+            'android_min_version_code_for_recommending_app_update': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_version_code': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_api_level': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
         }
     }
 
@@ -569,7 +579,10 @@ class AndroidFeatureFlagsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            # permissive schema; we'll parse explicitly below.
+            'android_enable_fast_language_switching_in_lesson': {
+                'schema': {'type': 'bool'},
+                'default_value': None,
+            },
         }
     }
 
