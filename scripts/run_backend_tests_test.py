@@ -1216,6 +1216,20 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             pytest_args,
         )
 
+    def test_convert_args_to_pytest_with_malformed_test_dotted_target(
+        self,
+    ) -> None:
+        """Test fallback when target has _test. but no part ends with _test."""
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            [
+                '--test_targets=core._test_module.SomeClass',
+                '--skip-install',
+            ]
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        # Fallback path: contains _test. but no split part ends with _test.
+        self.assertIn('core/_test_module/SomeClass.py', pytest_args)
+
     def test_convert_args_to_pytest_with_multiple_test_targets(self) -> None:
         parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
             [
