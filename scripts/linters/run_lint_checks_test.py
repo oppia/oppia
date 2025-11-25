@@ -78,9 +78,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.sys_swap = self.swap(sys, 'exit', mock_exit)
-        self.oppia_is_dockerized_swap = self.swap(
-            feconf, 'OPPIA_IS_DOCKERIZED', False
-        )
         self.install_swap = self.swap_with_checks(
             install_third_party_libs, 'main', mock_install_third_party_libs_main
         )
@@ -99,7 +96,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with all_filepath_swap:
                     run_lint_checks.main()
         self.assert_same_list_elements(
@@ -117,7 +114,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with get_changed_filepaths_swap:
                     run_lint_checks.main()
         self.assert_same_list_elements(
@@ -150,7 +147,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap, shards_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with get_filenames_from_path_swap:
                     run_lint_checks.main(args=['--shard', '1'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
@@ -225,7 +222,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap, shards_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with get_filenames_from_path_swap:
                     run_lint_checks.main(
                         args=['--shard', run_lint_checks.OTHER_SHARD_NAME]
@@ -234,7 +231,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_main_with_files_arg(self) -> None:
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 run_lint_checks.main(args=['--files=%s' % PYLINTRC_FILEPATH])
         self.assertTrue(all_checks_passed(self.linter_stdout))
 
@@ -244,7 +241,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with self.install_swap, all_errors_swap:
                     run_lint_checks.main(args=['--path=%s' % VALID_PY_FILEPATH])
             self.assert_same_list_elements(
@@ -253,7 +250,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_main_with_path_arg(self) -> None:
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 run_lint_checks.main(args=['--path=%s' % INVALID_CSS_FILEPATH])
         self.assertFalse(all_checks_passed(self.linter_stdout))
         self.assert_same_list_elements(
@@ -287,14 +284,14 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with get_all_files_swap:
                     run_lint_checks.main(args=['--path=scripts/linters/'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_only_check_file_extensions_arg(self) -> None:
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 run_lint_checks.main(
                     args=[
                         '--path=%s' % VALID_TS_FILEPATH,
@@ -326,7 +323,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
     def test_get_all_files_in_directory(self) -> None:
         with self.print_swap, self.sys_swap:
-            with self.install_swap, self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 run_lint_checks.main(
                     args=[
                         '--path=scripts/linters/',
@@ -335,7 +332,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 )
 
     def test_html_file(self) -> None:
-        with self.oppia_is_dockerized_swap:
+        with self.install_swap:
             with self.print_swap, self.sys_swap, self.install_swap:
                 run_lint_checks.main(args=['--path=%s' % VALID_HTML_FILEPATH])
         self.assert_same_list_elements(
@@ -351,6 +348,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.oppia_is_dockerized_swap:
+            with self.install_swap:
                 with self.install_swap, subprocess_swap:
                     run_lint_checks.main()

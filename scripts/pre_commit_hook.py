@@ -49,7 +49,6 @@ sys.path.append(os.getcwd())
 
 # These imports must come after sys.path modification,
 # so the pylint import-position rules are disabled.
-from core import feconf  # pylint: disable=wrong-import-position
 
 from typing import (  # pylint: disable=wrong-import-position
     Final,
@@ -83,10 +82,8 @@ KEYS_UPDATED_IN_CONSTANTS: Final = [
     b'FIREBASE_CONFIG_STORAGE_BUCKET',
     b'FIREBASE_CONFIG_GOOGLE_CLIENT_ID',
 ]
-NPX_CMD: Final = (
-    'npx'
-    if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx')
+NPX_CMD: Final = os.path.join(
+    os.pardir, 'oppia_tools', 'node-16.13.0', 'bin', 'npx'
 )
 
 

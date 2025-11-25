@@ -216,12 +216,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                 'name': 'blog-editor/publish',
                                 'module': 'blog-editor/publish.spec.ts',
                             },
-                        ],
-                        'docker_suites': [
                             {
                                 'name': 'exploration-player/view-exploration',
                                 'module': 'exploration-player/view-exploration.spec.ts',
-                            }
+                            },
                         ],
                     }
                 )
@@ -576,7 +574,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             )
         )
 
-    def test_split_tests_by_docker(self) -> None:
         suites_to_split: check_ci_test_suites_to_run.CITestSuitesDict = {
             'count': 3,
             'suites': [
@@ -599,7 +596,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            check_ci_test_suites_to_run.split_tests_by_docker(suites_to_split),
             {
                 'docker': {
                     'count': 1,

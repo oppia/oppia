@@ -837,10 +837,9 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                tmp.write('Some content in mock_app_dev.yaml\n')
-                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
-                tmp.write('version: default')
+            tmp.write('Some content in mock_app_dev.yaml\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
@@ -886,16 +885,9 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        # TODO(#18260): Change this when we permanently move to
-        # the Dockerized Setup.
-        firebase_host = (
-            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
-        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write(
-                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host
-            )
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
