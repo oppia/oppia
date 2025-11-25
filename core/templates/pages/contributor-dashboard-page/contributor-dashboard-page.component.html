@@ -151,7 +151,7 @@
     </div>
   </div>
   <div *ngIf="activeTabName === 'myContributionTab' || !activeTabName">
-    <oppia-contributions-and-review>
+    <oppia-contributions-and-review [activeTopicName]="topicName">
     </oppia-contributions-and-review>
   </div>
   <div *ngIf="activeTabName === 'submitQuestionTab'"

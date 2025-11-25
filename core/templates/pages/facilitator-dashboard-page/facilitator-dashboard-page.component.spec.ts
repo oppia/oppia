@@ -137,4 +137,31 @@ describe('FacilitatorDashboardPageComponent', () => {
       '/create-learner-group/groupId1'
     );
   });
+
+  it('should sort learner group summaries by title in alphabetical order', fakeAsync(() => {
+    const shortSummaryBackendDict2 = {
+      id: 'groupId2',
+      title: 'A group title',
+      description: 'group description',
+      facilitator_usernames: ['facilitator2'],
+      learners_count: 3,
+    };
+    const shortLearnerGroupSummary2 =
+      ShortLearnerGroupSummary.createFromBackendDict(shortSummaryBackendDict2);
+
+    spyOn(
+      facilitatorDashboardBackendApiService,
+      'fetchTeacherDashboardLearnerGroupsAsync'
+    ).and.returnValue(
+      Promise.resolve([shortLearnerGroupSummary, shortLearnerGroupSummary2])
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.shortLearnerGroupSummaries).toEqual([
+      shortLearnerGroupSummary2,
+      shortLearnerGroupSummary,
+    ]);
+  }));
 });

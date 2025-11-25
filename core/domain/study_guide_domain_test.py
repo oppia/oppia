@@ -172,6 +172,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         # Check that HTML is concatenated properly.
         page_contents = android_dict['page_contents']
         self.assertIn('subtitled_html', page_contents)
+        self.assertIn('recorded_voiceovers', page_contents)
 
         html_content = page_contents['subtitled_html']['html']
         self.assertIn('<p><strong>Test Heading</strong></p>', html_content)
