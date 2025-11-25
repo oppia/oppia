@@ -67,21 +67,21 @@ Data structures and logic: arrays/lists, maps/dictionaries, filtering, sorting, 
 
 Flow: Activity completion → backend checks criteria → creates Achievement record → updates badge count → profile fetches and displays badges → user interacts with badge modal.​
 
-Getting Started
+**##Getting Started**
 Prerequisites: Node.js, Angular CLI, any backend/mock API setup.​
 
 Installation steps: clone repo, install dependencies, run dev server, configure API base URL for badges/achievements.​
 
 How to run with mock data if real backend is not available.​
 
-Usage Guide
+**##Usage Guide**
 How a learner earns a badge (example flows: quiz, course, video).​
 
 How to view badges on the profile and open badge details.​
 
 How instructors/admins can verify achievements (if applicable).​
 
-Configuration
+**##Configuration**
 How to define new badges and criteria (e.g., JSON or TypeScript config).​
 
 How to enable/disable features like leaderboards, notifications, social sharing.​
@@ -95,7 +95,7 @@ Optional: leaderboard/achievement stats dashboard.​
 
 Link to 2–3 minute demo video.​
 
-Testing
+**##Testing**
 Manual test scenarios: quiz badge, course badge, video badge, no duplicate badges.​
 
 Edge cases: user with 0 badges, many badges, missing images, offline activity.​
@@ -109,12 +109,7 @@ More advanced animations for badge unlocks.​
 
 Better error handling and UI/UX polish based on user feedback.​
 
-Project Structure
-Describe folders: components, services, models, assets, etc.​
-
-Mention feature branches like feature/gamification-achievement-system if you follow that workflow.​
-
-Contributors & Acknowledgements
+**##Contributors & Acknowledgements**
 Om Ambole and Soham Bhangale, Harshit sir.​
 
 
