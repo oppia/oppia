@@ -30,7 +30,7 @@ environment setup and troubleshooting.
 
 - Run backend unit tests locally:
 
-  python -m scripts.run_backend_tests --test-target <path_or_testname>
+  python -m scripts.run_backend_tests --test_target <path_or_testname>
 
   (This is the same test runner used by CI.)
 
@@ -98,7 +98,7 @@ Integration points / external dependencies:
 Small examples for agents to be effective quickly:
 
 -- To run a focused backend test for a file locally:
-`python -m scripts.run_backend_tests --test-target <path_or_testname>`.
+`python -m scripts.run_backend_tests --test_target <path_or_testname>`.
 -- When editing frontend deps or build config locally: install Node 16 (nvm),
 then run `yarn install --pure-lockfile` from `assets/` and follow the steps
 for running frontend scripts described on the wiki.
