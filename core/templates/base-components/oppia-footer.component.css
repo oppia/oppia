@@ -341,3 +341,15 @@
   font-size: 10px;
   text-align: right;
 }
+
+/* Force all links in the footer lists to have a pointer and underline on hover */
+.oppia-footer ul li a {
+  cursor: pointer;
+  color: #fff;  /* Ensures text is white */
+  text-decoration: none;
+}
+
+.oppia-footer ul li a:hover {
+  text-decoration: underline;
+  color: #fff;
+}

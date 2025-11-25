@@ -47,9 +47,9 @@
         <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
-            <a (click)="navigateToAboutPage()"
-               class="e2e-test-footer-about-link">
-               {{ 'I18N_FOOTER_ABOUT' | translate }}
+            <a href="/about"
+              class="e2e-test-footer-about-link">
+              {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
           <li>
@@ -82,10 +82,10 @@
             </a>
           </li>
           <li>
-            <a (click)="navigateToTeachPage()"
-               class="e2e-test-teach-link">
-               {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
-            </a>
+            <a href="/teach"
+              class="e2e-test-teach-link">
+              {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
+              </a>
           </li>
           <li>
             <a href="/community-library"
