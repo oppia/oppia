@@ -60,3 +60,14 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 [facebook]: https://www.facebook.com/oppiaorg/
 [oppia-org-youtube]: https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw
 [dev-youtube]: https://www.youtube.com/channel/UCsrAX-oeqm0-NIQzQrdiUkQ
+
+
+PR #23869 – Relax the regex for app feedback domain reports
+Link: https://github.com/oppia/oppia/pull/23869
+This Pull Request relaxes the regular expression (regex) used for validating app feedback domain reports. The update makes the regex less restrictive by allowing digits in language codes, fixing an issue where the previous regex incorrectly rejected valid Android language codes.
+
+
+PR #23806 – Fix: Highlight bug during language switch
+Link: https://github.com/oppia/oppia/pull/23806
+This PR resolves a highlighting issue in the Exploration Player and preview pages when users switch between different language accents. The update ensures that text highlighting now stays properly synced with the voiceover playback, providing an accurate and consistent reading experience across all supported accents.
+
