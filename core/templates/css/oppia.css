@@ -362,6 +362,7 @@ body {
 }
 
 .carousel-indicators {
+  cursor: pointer;
   display: flex;
   justify-content: center;
   left: 50%;

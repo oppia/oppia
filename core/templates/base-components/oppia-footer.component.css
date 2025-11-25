@@ -3,9 +3,6 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
-a:hover {
-  text-decoration: underline;
-}
 
 .oppia-footer-container {
   margin-left: auto;
