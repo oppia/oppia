@@ -507,6 +507,7 @@ class VoiceoverSynthesisJobRunTests(VoiceoverSynthesisBaseClass):
             _content_html: str,
             _language_accent_code: str,
             _voiceover_filename: str,
+            _oppia_project_id: str,
         ) -> List[Dict[str, Union[str, float]]]:
             raise Exception('Failed to generate voiceovers.')
 
