@@ -1357,6 +1357,10 @@ URLS = [
     ),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
+        r'/android_platform_parameters', android.AndroidPlatformParametersHandler
+    ),
+    get_redirect_route(r'/android_feature_flags', android.AndroidFeatureFlagsHandler),
+    get_redirect_route(
         '/automatic_voiceover_regeneration_record',
         voiceover.AutomaticVoiceoverRegenerationRecordHandler,
     ),

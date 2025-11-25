@@ -45,6 +45,7 @@ from core.domain import (
 )
 
 from typing import Dict, List, Optional, Sequence, TypedDict, Union
+import logging
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -508,3 +509,87 @@ class AndroidActivityHandler(
                 activities.append(response_dict)
 
         self.render_json(activities)
+
+
+class AndroidPlatformParametersHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler that returns Android platform parameters.
+
+    Returns a JSON list of {"name": <param_name>, "value": <int>}.
+    Accepts GET query params to override returned values. On parse error
+    raises `InvalidInputException` (HTTP 400) so Android can validate error
+    handling end-to-end.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            # No strict validation here; handler will parse and raise 400 on
+            # malformed values per product requirement.
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        # Default values.
+        params = {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 21,
+        }
+
+        # Read overrides from query string, parse as ints and raise 400 on
+        # malformed input.
+        for key in list(params.keys()):
+            if self.request.GET.get(key) is not None:
+                raw = self.request.GET.get(key)
+                try:
+                    params[key] = int(raw)
+                except Exception as e:  # pragma: no cover - defensive
+                    logging.warning('Failed to parse platform param %s=%s: %s', key, raw, e)
+                    raise self.InvalidInputException('Invalid integer for %s' % key)
+
+        response = [
+            {'name': name, 'value': value} for name, value in params.items()
+        ]
+        self.render_json(response)
+
+
+class AndroidFeatureFlagsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler that returns Android feature flags.
+
+    Returns a JSON list of {"name": <flag_name>, "enabled": <bool>}.
+    Accepts GET query params to override returned values. On parse error
+    raises `InvalidInputException` (HTTP 400).
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            # permissive schema; we'll parse explicitly below.
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        flags = {
+            'android_enable_fast_language_switching_in_lesson': False,
+        }
+
+        for key in list(flags.keys()):
+            if self.request.GET.get(key) is not None:
+                raw = self.request.GET.get(key)
+                raw_lower = raw.lower()
+                if raw_lower in ('true', '1', 'yes'):
+                    flags[key] = True
+                elif raw_lower in ('false', '0', 'no'):
+                    flags[key] = False
+                else:
+                    logging.warning('Failed to parse feature flag %s=%s', key, raw)
+                    raise self.InvalidInputException('Invalid boolean for %s' % key)
+
+        response = [{'name': name, 'enabled': enabled} for name, enabled in flags.items()]
+        self.render_json(response)
