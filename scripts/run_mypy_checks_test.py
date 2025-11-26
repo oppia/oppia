@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import subprocess
 
-from core import feconf
 from core.tests import test_utils
 from scripts import run_mypy_checks
 
