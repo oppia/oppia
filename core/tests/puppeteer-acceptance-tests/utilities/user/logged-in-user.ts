@@ -3178,10 +3178,6 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(learnSomethingNewSectionSelector, {
       visible: true,
     });
-    // Wait for lesson cards to load.
-    await this.page.waitForSelector(lessonCardContainer, {
-      visible: true,
-    });
     const learnSomethingNewSection = await this.page.$(
       learnSomethingNewSectionSelector
     );
