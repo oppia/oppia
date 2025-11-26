@@ -465,7 +465,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
 
     def test_mypy_check_failure(self) -> None:
         self.mypy_check_code = 1
-        with self.get_remote_name_swap, self.print_swap:
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.get_changed_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
                     with self.execute_mypy_checks_swap:
