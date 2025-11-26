@@ -66,7 +66,7 @@ export class VoiceoverRegenerationTaskMappingService {
 
     this.getLatestVoiceoverRegenerationStatus();
 
-    this.pollingSub = interval(30000)
+    this.pollingSub = interval(5000)
       .pipe(
         switchMap(() =>
           from(

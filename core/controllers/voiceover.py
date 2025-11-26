@@ -317,22 +317,17 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
-        'exploration_id': {'schema': {'type': 'basestring'}},
-        'exploration_version': {'schema': {'type': 'int'}},
+        'exploration_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
 
     @acl_decorators.can_play_exploration
-    def get(
-        self,
-        exploration_id: str,
-        exploration_version: int,
-    ) -> None:
+    def get(self, exploration_id: str) -> None:
         self.values.update(
             {
                 'voiceover_regeneration_task_run_mappings': (
                     cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
-                        exploration_id, exploration_version
+                        exploration_id
                     )
                 )
             }

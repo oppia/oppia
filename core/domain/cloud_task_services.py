@@ -22,7 +22,7 @@ from core.domain import cloud_task_domain, voiceover_services
 
 from typing import List, TypedDict
 from core.platform import models
-import feconf
+from core import feconf
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -65,14 +65,13 @@ def get_voiceover_regeneration_task(
 
 
 def get_existing_voiceover_regeneration_requests_in_task_queue(
-    exploration_id: str, exploration_version: int
+    exploration_id: str,
 ):
     """Returns the existing voiceover regeneration cloud task run requests for
     the given exploration.
 
     Args:
         exploration_id: str. The id of the exploration.
-        exploration_version: int. The version of the exploration.
 
     Returns:
         dict. A mapping of language accents to their content regeneration
@@ -222,14 +221,14 @@ def save_voiceover_regeneration_task_run_mapping(
             cloud_task_models.VoiceoverRegenerationTaskMapping(
                 id=voiceover_regeneration_task_model_id,
                 exploration_id=voiceover_regeneration_task.exploration_id,
-                task_run_id=voiceover_regeneration_task.task_run_id,
+                cloud_task_run_id=voiceover_regeneration_task.task_run_id,
             )
         )
 
     voiceover_regeneration_task_model.language_accent_to_content_status_map = (
         voiceover_regeneration_task.language_accent_to_content_status_map
     )
-    voiceover_regeneration_task_model.update_timestamp()
+    voiceover_regeneration_task_model.update_timestamps()
     voiceover_regeneration_task_model.put()
 
 

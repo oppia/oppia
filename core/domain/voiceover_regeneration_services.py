@@ -305,6 +305,8 @@ def synthesize_voiceover_for_html_string(
 
     parsed_text = parse_html(content_html)
 
+    time.sleep(10)
+
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
             parsed_text
