@@ -128,24 +128,20 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             self.assertEqual(output[0], b'')
 
     def test_main_with_files_without_mypy_errors(self) -> None:
-
         with self.popen_swap_success:
             process = run_mypy_checks.main(args=['--files', 'file1.py'])
             self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self) -> None:
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-            with self.popen_swap_success:
-                process = run_mypy_checks.main(args=[])
-                self.assertEqual(process, 0)
+        with self.popen_swap_success:
+            process = run_mypy_checks.main(args=[])
+            self.assertEqual(process, 0)
 
     def test_main_with_files_with_mypy_errors(self) -> None:
-
         with self.assertRaisesRegex(SystemExit, '1'):
             run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self) -> None:
-
         with self.popen_swap_failure:
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

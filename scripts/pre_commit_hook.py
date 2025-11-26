@@ -34,12 +34,7 @@ import shutil
 import subprocess
 import sys
 
-from typing import (
-    Final,
-    List,
-    Optional,
-    Tuple,
-)
+from typing import Final, List, Optional, Tuple
 
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
