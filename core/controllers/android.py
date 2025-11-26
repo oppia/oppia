@@ -508,3 +508,101 @@ class AndroidActivityHandler(
                 activities.append(response_dict)
 
         self.render_json(activities)
+
+
+class AndroidPlatformParametersHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that exposes a minimal set of Android platform parameters
+    for the Android client used in E2E tests.
+
+    Supports optional GET query-parameter overrides. Invalid values will
+    result in HTTP 400 responses thanks to schema validation.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {
+            'android_min_version_code_for_recommending_app_update': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_version_code': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_api_level': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns platform parameters as a list of {name, value} objects.
+
+        Query parameters may override defaults; schema validation enforces
+        correct types and returns 400 on parse errors.
+        """
+        assert self.normalized_request is not None
+
+        # Defaults used by the Android client in tests.
+        defaults = {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 21,
+        }
+
+        result = []
+        for name, default_value in defaults.items():
+            # If a validated override was provided, use it.
+            override = self.normalized_request.get(name)
+            value = override if override is not None else default_value
+            result.append({'name': name, 'value': value})
+
+        self.render_json(result)
+
+
+class AndroidFeatureFlagsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that exposes a minimal set of Android feature flags
+    for the Android client used in E2E tests.
+
+    Supports optional GET query-parameter overrides. Invalid values will
+    result in HTTP 400 responses thanks to schema validation.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+        'GET': {
+            'android_enable_fast_language_switching_in_lesson': {
+                'schema': {'type': 'bool'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns feature flags as a list of {name, enabled} objects.
+
+        Query parameters may override defaults; schema validation enforces
+        correct types and returns 400 on parse errors.
+        """
+        assert self.normalized_request is not None
+
+        defaults = {
+            'android_enable_fast_language_switching_in_lesson': False,
+        }
+
+        result = []
+        for name, default_enabled in defaults.items():
+            override = self.normalized_request.get(name)
+            enabled = override if override is not None else default_enabled
+            result.append({'name': name, 'enabled': enabled})
+
+        self.render_json(result)
