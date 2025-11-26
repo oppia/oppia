@@ -386,7 +386,7 @@ describe('Questions List Component', () => {
         })
       );
 
-      expect(component.difficultyCount).toBeUndefined();
+      expect(component.difficultyCount).toEqual(0);
 
       component.ngOnInit();
       tick();
