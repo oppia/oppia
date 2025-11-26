@@ -179,7 +179,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.assertIn('voiceovers_mapping', recorded_voiceovers)
 
         written_translations = page_contents['written_translations']
-        self.assertIn('translations_mapping', recorded_voiceovers)
+        self.assertIn('translations_mapping', written_translations)
 
         html_content = page_contents['subtitled_html']['html']
         self.assertIn('<p><strong>Test Heading</strong></p>', html_content)
