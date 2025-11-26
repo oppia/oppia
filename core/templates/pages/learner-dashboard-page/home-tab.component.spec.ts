@@ -715,10 +715,15 @@ describe('Home tab Component', () => {
 
     // Verify that even though there are published and unpublished nodes,
     // when the flag is OFF, all nodes are counted.
-    const publishedNodes = allNodes.filter(
-      (node: {getPublishedStatus: () => boolean}) => node.getPublishedStatus()
-    );
-    expect(publishedNodes.length).toEqual(2);
+    const publishedNodeIds = allNodes
+      .filter((node: {getPublishedStatus: () => boolean}) =>
+        node.getPublishedStatus()
+      )
+      .map((node: {getId: () => string}) => node.getId());
+    expect(publishedNodeIds.length).toEqual(2);
+    expect(publishedNodeIds).toContain('completed_node');
+    expect(publishedNodeIds).toContain('remaining_node');
+    expect(publishedNodeIds).not.toContain('unpublished_node');
 
     // With the feature flag OFF, ALL nodes should be counted (including unpublished).
     // Story has 3 total nodes (all counted when flag is OFF).
