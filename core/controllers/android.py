@@ -522,7 +522,7 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
                 'schema': {'type': 'int'},
@@ -577,7 +577,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
                 'schema': {'type': 'bool'},

@@ -391,6 +391,10 @@ describe('ImageEditor', () => {
 
   beforeEach(() => {
     httpTestingController = TestBed.inject(HttpTestingController);
+    // Mock feature flags evaluation handler used by the app startup.
+    httpTestingController
+      .expectOne('/feature_flags_evaluation_handler')
+      .flush({ feature_flag_values: {} });
     svgSanitizerService = TestBed.inject(SvgSanitizerService);
     alertsService = TestBed.inject(AlertsService);
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
