@@ -20,7 +20,7 @@ import datetime
 import random
 import string
 
-from core import feconf, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     exp_domain,
@@ -7678,6 +7678,9 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             stats.translation_suggestion_counts_by_lang_code, {'hi': 2}
         )
 
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
     def test_accept_translation_suggestion_lowers_translation_suggestion_count(
         self,
     ) -> None:

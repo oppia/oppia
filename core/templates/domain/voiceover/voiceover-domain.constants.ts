@@ -29,4 +29,6 @@ export const VoiceoverDomainConstants = {
     '/automatic_voiceover_regeneration_record',
   REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL:
     '/regenerate_automatic_voiceover/<exploration_id>',
+  REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL:
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/<exploration_version>/<exploration_title>',
 } as const;

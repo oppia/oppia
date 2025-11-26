@@ -168,7 +168,7 @@ describe('Topic Manager', function () {
     );
   });
 
-  it('should be able to edit and preivew the chapter', async function () {
+  it('should be able to edit and preview the chapter', async function () {
     await topicManager.openChapterEditor(
       'Solving problems',
       'The Broken Calculator',

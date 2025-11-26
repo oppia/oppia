@@ -292,6 +292,18 @@ describe('Conversation display component', () => {
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
+  it('should return true if in exploration context', () => {
+    spyOn(pageContextService, 'isInExplorationContext').and.returnValue(true);
+    expect(componentInstance.isInExplorationPlayerContext()).toBeTrue();
+    expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
+  });
+
+  it('should return false if not in exploration context', () => {
+    spyOn(pageContextService, 'isInExplorationContext').and.returnValue(false);
+    expect(componentInstance.isInExplorationPlayerContext()).toBeFalse();
+    expect(pageContextService.isInExplorationContext).toHaveBeenCalled();
+  });
+
   it('should return true if displayedCard is not completed', () => {
     componentInstance.displayedCard = mockDisplayedCard;
     spyOn(mockDisplayedCard, 'isCompleted').and.returnValue(false);

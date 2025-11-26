@@ -18,9 +18,11 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    feature_flag_services,
+    opportunity_services,
     taskqueue_services,
     voiceover_regeneration_services,
     voiceover_services,
@@ -345,4 +347,51 @@ class RegenerateAutomaticVoiceoverHandler(
             }
         )
 
+        self.render_json(self.values)
+
+
+class RegenerateVoiceoverOnExpUpdateHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Regenerates the automatic voiceover for the given exploration data
+    when an exploration is updated.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}},
+        'exploration_version': {'schema': {'type': 'int'}},
+        'exploration_title': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+    @acl_decorators.can_voiceover_exploration
+    def post(
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        exploration_title: str,
+    ) -> None:
+        """Regenerates the voiceover for the given exploration data when an
+        exploration is updated.
+        """
+        # Asynchronously regenerates voiceovers using a deferred job when
+        # curated exploration content changes.
+        if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id
+        ) and feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            None,
+        ):
+            taskqueue_services.defer(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+                ],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                exploration_id,
+                exploration_title,
+                exploration_version,
+                feconf.SYSTEM_COMMITTER_ID,
+                datetime.datetime.utcnow().isoformat(),
+            )
         self.render_json(self.values)

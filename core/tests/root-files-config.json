@@ -20,9 +20,7 @@
     "core/templates/components/common-layout-directives/navigation-bars/side-navigation-bar.component.css",
     "core/templates/components/forms/validators/README.md",
     "core/templates/css/README.md",
-    "core/templates/domain/exploration/ParamTypeObjectFactorySpec.ts",
     "core/templates/domain/statistics/learner-answer-details.model.ts",
-    "core/templates/domain/exploration/TranslatedContentObjectFactorySpec.ts",
     "core/templates/pages/about-page/about-page.constants.ts",
     "core/templates/pages/exploration-player-page/new-lesson-player/README.md",
     "core/templates/pages/exploration-player-page/current-lesson-player/README.md",
@@ -39,7 +37,6 @@
     "extensions/interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-short-response.component.html",
     "extensions/rich_text_components/README.md",
     "core/tests/ci-test-suite-configs/README.md",
-    "core/templates/domain/skill/MisconceptionObjectFactorySpec.ts",
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
