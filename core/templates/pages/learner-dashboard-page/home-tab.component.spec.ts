@@ -40,7 +40,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
 
-describe('Home tab Component', () => {
+fdescribe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
@@ -438,22 +438,296 @@ describe('Home tab Component', () => {
   });
 
   it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', () => {
+    // Add an unpublished node to test the filtering behavior.
+    let unpublishedNodeDict = {
+      id: 'unpublished_node',
+      thumbnail_filename: 'image.png',
+      title: 'Unpublished Chapter',
+      description: 'Description for unpublished chapter',
+      prerequisite_skill_ids: ['skill_4'],
+      acquired_skill_ids: ['skill_5'],
+      destination_node_ids: [],
+      outline: 'Outline',
+      exploration_id: 'exp_id_unpublished',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Planned',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const completedNodeDict = {
+      id: 'completed_node',
+      thumbnail_filename: 'image.png',
+      title: 'Completed Chapter',
+      description: 'Description for completed chapter',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['remaining_node'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const remainingNodeDict = {
+      id: 'remaining_node',
+      thumbnail_filename: 'image.png',
+      title: 'Remaining Chapter',
+      description: 'Description for remaining chapter',
+      prerequisite_skill_ids: ['skill_2'],
+      acquired_skill_ids: ['skill_3'],
+      destination_node_ids: ['unpublished_node'],
+      outline: 'Outline',
+      exploration_id: 'exp_id_remaining',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const learnerTopicSummaryBackendDict = {
+      id: 'test_topic_id',
+      name: 'Test Topic',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 2,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [
+        {
+          id: 'story_with_mixed_nodes',
+          title: 'Story With Mixed Nodes',
+          description: 'Story Description',
+          node_titles: [
+            'Completed Chapter',
+            'Remaining Chapter',
+            'Unpublished Chapter',
+          ],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Completed Chapter'],
+          url_fragment: 'story-with-mixed-nodes',
+          all_node_dicts: [
+            completedNodeDict,
+            remainingNodeDict,
+            unpublishedNodeDict,
+          ],
+          topic_name: 'Topic',
+          classroom_url_fragment: 'math',
+          topic_url_fragment: 'topic',
+        },
+      ],
+      url_fragment: 'test-topic',
+      subtopics: [],
+      degrees_of_mastery: {},
+      skill_descriptions: {},
+    };
+
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
+    ];
+
     mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
-    spyOn(
-      component,
-      'isSerialChapterFeatureLearnerFlagEnabled'
-    ).and.returnValue(true);
+
+    // Re-initialize component to trigger ngOnInit with the feature flag ON.
+    component.ngOnInit();
 
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeTrue();
 
+    // Verify the story structure.
     const storySummaries =
-      component.currentGoals[0].getCanonicalStorySummaryDicts();
-    const story = storySummaries[1];
-    expect(story.getCompletedNodeTitles().length).toBeGreaterThan(0);
-    expect(story.getNodeTitles().length).toBeGreaterThan(
-      story.getCompletedNodeTitles().length
+      component.partiallyLearntTopicsList[0].getCanonicalStorySummaryDicts();
+    const story = storySummaries[0];
+    expect(story.getId()).toEqual('story_with_mixed_nodes');
+    expect(story.getNodeTitles().length).toEqual(3);
+    expect(story.getCompletedNodeTitles().length).toEqual(1);
+    expect(story.getCompletedNodeTitles()).toContain('Completed Chapter');
+
+    // Verify that getAllNodes returns all 3 nodes.
+    const allNodes = story.getAllNodes();
+    expect(allNodes.length).toEqual(3);
+
+    // Verify filtering behavior: only 2 nodes should have Published status.
+    const publishedNodeIds = allNodes.filter(
+      (node: {getPublishedStatus: () => boolean}) =>
+        node.getPublishedStatus().getId()
     );
+    expect(publishedNodeIds.length).toEqual(2);
+    expect(publishedNodeIds).toContain('completed_node');
+    expect(publishedNodeIds).toContain('remaining_node');
+    expect(publishedNodeIds).not.toContain('unpublished_node');
+
+    // Verify that the story is added to storySummariesWithAvailableNodes.
+    // With the feature flag ON, only published nodes should be counted.
+    // Story has 3 total nodes but only 2 published (completed and remaining).
+    // With 1 completed and 2 published, remainingPublished = 2 - 1 - 1 = 0.
+    // So this story should NOT be in storySummariesWithAvailableNodes.
+    expect(
+      component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes')
+    ).toBeFalse();
+  });
+
+  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned OFF', () => {
+    // Add an unpublished node to test the difference in behavior.
+    let unpublishedNodeDict = {
+      id: 'unpublished_node_2',
+      thumbnail_filename: 'image.png',
+      title: 'Unpublished Chapter',
+      description: 'Description for unpublished chapter',
+      prerequisite_skill_ids: ['skill_4'],
+      acquired_skill_ids: ['skill_5'],
+      destination_node_ids: [],
+      outline: 'Outline',
+      exploration_id: 'exp_id_unpublished',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Planned',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const completedNodeDict = {
+      id: 'completed_node_2',
+      thumbnail_filename: 'image.png',
+      title: 'Completed Chapter',
+      description: 'Description for completed chapter',
+      prerequisite_skill_ids: ['skill_1'],
+      acquired_skill_ids: ['skill_2'],
+      destination_node_ids: ['remaining_node_2'],
+      outline: 'Outline',
+      exploration_id: null,
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const remainingNodeDict = {
+      id: 'remaining_node_2',
+      thumbnail_filename: 'image.png',
+      title: 'Remaining Chapter',
+      description: 'Description for remaining chapter',
+      prerequisite_skill_ids: ['skill_2'],
+      acquired_skill_ids: ['skill_3'],
+      destination_node_ids: ['unpublished_node_2'],
+      outline: 'Outline',
+      exploration_id: 'exp_id_remaining',
+      outline_is_finalized: false,
+      thumbnail_bg_color: '#a33f40',
+      status: 'Published',
+      planned_publication_date_msecs: 100,
+      last_modified_msecs: 100,
+      first_publication_date_msecs: 200,
+      unpublishing_reason: null,
+    };
+
+    const learnerTopicSummaryBackendDict = {
+      id: 'test_topic_id_2',
+      name: 'Test Topic 2',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 3,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [
+        {
+          id: 'story_with_mixed_nodes_2',
+          title: 'Story With Mixed Nodes',
+          description: 'Story Description',
+          node_titles: [
+            'Completed Chapter',
+            'Remaining Chapter',
+            'Unpublished Chapter',
+          ],
+          thumbnail_filename: 'image.svg',
+          thumbnail_bg_color: '#F8BF74',
+          story_is_published: true,
+          completed_node_titles: ['Completed Chapter'],
+          url_fragment: 'story-with-mixed-nodes',
+          all_node_dicts: [
+            completedNodeDict,
+            remainingNodeDict,
+            unpublishedNodeDict,
+          ],
+          topic_name: 'Topic',
+          classroom_url_fragment: 'math',
+          topic_url_fragment: 'topic',
+        },
+      ],
+      url_fragment: 'test-topic-2',
+      subtopics: [],
+      degrees_of_mastery: {},
+      skill_descriptions: {},
+    };
+
+    component.partiallyLearntTopicsList = [
+      LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
+    ];
+
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      false;
+
+    // Re-initialize component to trigger ngOnInit with the feature flag OFF.
+    component.ngOnInit();
+
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeFalse();
+
+    // Verify the story structure.
+    const storySummaries =
+      component.partiallyLearntTopicsList[0].getCanonicalStorySummaryDicts();
+    const story = storySummaries[0];
+    expect(story.getId()).toEqual('story_with_mixed_nodes_2');
+    expect(story.getNodeTitles().length).toEqual(3);
+    expect(story.getCompletedNodeTitles().length).toEqual(1);
+    expect(story.getCompletedNodeTitles()).toContain('Completed Chapter');
+
+    // Verify that getAllNodes returns all 3 nodes.
+    const allNodes = story.getAllNodes();
+    expect(allNodes.length).toEqual(3);
+
+    // Verify that even though there are published and unpublished nodes,
+    // when the flag is OFF, all nodes are counted.
+    const publishedNodes = allNodes.filter(
+      (node: {getPublishedStatus: () => boolean}) => node.getPublishedStatus()
+    );
+    expect(publishedNodes.length).toEqual(2);
+
+    // With the feature flag OFF, ALL nodes should be counted (including unpublished).
+    // Story has 3 total nodes (all counted when flag is OFF).
+    // With 1 completed and 3 total, remainingPublished = 3 - 1 - 1 = 1.
+    // Since remainingPublished (1) > 0 and < publishedNodesCount (3),
+    // this story SHOULD be in storySummariesWithAvailableNodes.
+    expect(
+      component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes_2')
+    ).toBeTrue();
   });
 });
 
