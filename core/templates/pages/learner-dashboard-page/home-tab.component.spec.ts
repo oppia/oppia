@@ -40,7 +40,7 @@ import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summ
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
 
-fdescribe('Home tab Component', () => {
+describe('Home tab Component', () => {
   let component: HomeTabComponent;
   let fixture: ComponentFixture<HomeTabComponent>;
   let urlInterpolationService: UrlInterpolationService;
