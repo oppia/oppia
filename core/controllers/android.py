@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 from core import feconf
 from core.constants import constants
@@ -46,6 +45,10 @@ from core.domain import (
     voiceover_domain,
     voiceover_services,
 )
+# -------------------------------
+# 👉 TYPE HINT IMPORTS MUST BE LAST
+# -------------------------------
+from typing import Dict, List, Optional, Sequence, TypedDict, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
