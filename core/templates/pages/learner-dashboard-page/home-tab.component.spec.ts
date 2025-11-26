@@ -250,16 +250,16 @@ describe('Home tab Component', () => {
   it('should get the correct width in mobile view', () => {
     component.ngOnInit();
     expect(component.width).toEqual(233);
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
   });
 
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
 
     mockResizeEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
   });
 
   it('should get time of day as morning', () => {
@@ -331,11 +331,11 @@ describe('Home tab Component', () => {
     () => {
       component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
 
-      expect(component.isGoalLimitReached()).toBeTrue();
+      expect(component.isGoalLimitReached()).toBe(true);
 
       component.currentGoalsLength = 2;
       component.goalTopicsLength = 2;
-      expect(component.isGoalLimitReached()).toBeTrue();
+      expect(component.isGoalLimitReached()).toBe(true);
     }
   );
 
@@ -344,7 +344,7 @@ describe('Home tab Component', () => {
       "'when goal selection limit is not reached'",
     () => {
       component.goalTopicsLength = 0;
-      expect(component.isGoalLimitReached()).toBeFalse();
+      expect(component.isGoalLimitReached()).toBe(false);
     }
   );
 
@@ -356,7 +356,7 @@ describe('Home tab Component', () => {
       component.goalTopicsLength = 2;
       component.currentGoalsLength = 0;
       component.goalTopicsLength = 3;
-      expect(component.isGoalLimitReached()).toBeFalse();
+      expect(component.isGoalLimitReached()).toBe(false);
     }
   );
 
@@ -550,7 +550,7 @@ describe('Home tab Component', () => {
     // Re-initialize component to trigger ngOnInit with the feature flag ON.
     component.ngOnInit();
 
-    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeTrue();
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(true);
 
     // Verify the story structure.
     const storySummaries =
@@ -566,10 +566,16 @@ describe('Home tab Component', () => {
     expect(allNodes.length).toEqual(3);
 
     // Verify filtering behavior: only 2 nodes should have Published status.
-    const publishedNodeIds = allNodes.filter(
-      (node: {getPublishedStatus: () => boolean}) =>
-        node.getPublishedStatus().getId()
-    );
+    const publishedNodeIds = allNodes
+      .filter((node: {getPublishedStatus: () => boolean}) =>
+        node.getPublishedStatus()
+      )
+      .map((node: {getId: () => string}) => node.getId());
+    expect(publishedNodeIds.length).toEqual(2);
+    expect(publishedNodeIds).toContain('completed_node');
+    expect(publishedNodeIds).toContain('remaining_node');
+    expect(publishedNodeIds).not.toContain('unpublished_node');
+
     expect(publishedNodeIds.length).toEqual(2);
     expect(publishedNodeIds).toContain('completed_node');
     expect(publishedNodeIds).toContain('remaining_node');
@@ -582,7 +588,7 @@ describe('Home tab Component', () => {
     // So this story should NOT be in storySummariesWithAvailableNodes.
     expect(
       component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes')
-    ).toBeFalse();
+    ).toBe(false);
   });
 
   it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned OFF', () => {
@@ -698,7 +704,7 @@ describe('Home tab Component', () => {
     // Re-initialize component to trigger ngOnInit with the feature flag OFF.
     component.ngOnInit();
 
-    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBeFalse();
+    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(false);
 
     // Verify the story structure.
     const storySummaries =
@@ -715,15 +721,10 @@ describe('Home tab Component', () => {
 
     // Verify that even though there are published and unpublished nodes,
     // when the flag is OFF, all nodes are counted.
-    const publishedNodeIds = allNodes
-      .filter((node: {getPublishedStatus: () => boolean}) =>
-        node.getPublishedStatus()
-      )
-      .map((node: {getId: () => string}) => node.getId());
-    expect(publishedNodeIds.length).toEqual(2);
-    expect(publishedNodeIds).toContain('completed_node');
-    expect(publishedNodeIds).toContain('remaining_node');
-    expect(publishedNodeIds).not.toContain('unpublished_node');
+    const publishedNodes = allNodes.filter(
+      (node: {getPublishedStatus: () => boolean}) => node.getPublishedStatus()
+    );
+    expect(publishedNodes.length).toEqual(2);
 
     // With the feature flag OFF, ALL nodes should be counted (including unpublished).
     // Story has 3 total nodes (all counted when flag is OFF).
@@ -732,7 +733,7 @@ describe('Home tab Component', () => {
     // this story SHOULD be in storySummariesWithAvailableNodes.
     expect(
       component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes_2')
-    ).toBeTrue();
+    ).toBe(true);
   });
 });
 
@@ -788,7 +789,7 @@ describe('Home tab Component Loader visibility tests', () => {
     component.ngOnInit();
 
     expect(component.totalLessonCards).toEqual(0);
-    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.allCardsLoaded).toBe(true);
     expect(component.loadingMessage).toEqual('');
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
   });
@@ -828,10 +829,10 @@ describe('Home tab Component Loader visibility tests', () => {
 
     component.ngOnInit();
 
-    expect(component.allCardsLoaded).toBeFalse();
+    expect(component.allCardsLoaded).toBe(false);
     expect(component.totalLessonCards).toBeGreaterThan(0);
     tick(10100);
-    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.allCardsLoaded).toBe(true);
     expect(component.loadingMessage).toEqual('');
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
   }));
@@ -886,7 +887,7 @@ describe('Home tab Component Loader visibility tests', () => {
     component.onLessonLoaded();
 
     expect(component.loadedLessonCards).toEqual(5);
-    expect(component.allCardsLoaded).toBeTrue();
+    expect(component.allCardsLoaded).toBe(true);
     expect(component.loadingMessage).toEqual('');
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
   });
@@ -901,7 +902,7 @@ describe('Home tab Component Loader visibility tests', () => {
     component.onLessonLoaded();
 
     expect(component.loadedLessonCards).toEqual(3);
-    expect(component.allCardsLoaded).toBeFalse();
+    expect(component.allCardsLoaded).toBe(false);
     expect(component.loadingMessage).toEqual('Loading');
     expect(hideLoadingScreenSpy).not.toHaveBeenCalled();
   });
