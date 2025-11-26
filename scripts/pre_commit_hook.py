@@ -34,6 +34,13 @@ import shutil
 import subprocess
 import sys
 
+from typing import (
+    Final,
+    List,
+    Optional,
+    Tuple,
+)
+
 # When executing Python scripts using `python -m ...` from oppia/oppia,
 # Python adds the repository root to sys.path. See the documentation at
 #
@@ -46,16 +53,6 @@ import sys
 # rather than the opipa/oppia root. To correct this problem, we add the
 # current working directory to sys.path.
 sys.path.append(os.getcwd())
-
-# These imports must come after sys.path modification,
-# so the pylint import-position rules are disabled.
-
-from typing import (  # pylint: disable=wrong-import-position
-    Final,
-    List,
-    Optional,
-    Tuple,
-)
 
 FECONF_FILEPATH: Final = os.path.join('core', 'feconf.py')
 CONSTANTS_FILEPATH: Final = os.path.join('.', 'assets', 'constants.ts')

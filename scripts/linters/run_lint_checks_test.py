@@ -240,12 +240,11 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.install_swap:
-                with self.install_swap, all_errors_swap:
-                    run_lint_checks.main(args=['--path=%s' % VALID_PY_FILEPATH])
-            self.assert_same_list_elements(
-                ['This is an error.'], self.linter_stdout
-            )
+            with self.install_swap, all_errors_swap:
+                run_lint_checks.main(args=['--path=%s' % VALID_PY_FILEPATH])
+        self.assert_same_list_elements(
+            ['This is an error.'], self.linter_stdout
+        )
 
     def test_main_with_path_arg(self) -> None:
         with self.print_swap, self.sys_swap:
@@ -331,9 +330,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 )
 
     def test_html_file(self) -> None:
-        with self.install_swap:
-            with self.print_swap, self.sys_swap, self.install_swap:
-                run_lint_checks.main(args=['--path=%s' % VALID_HTML_FILEPATH])
+        with self.print_swap, self.sys_swap, self.install_swap:
+            run_lint_checks.main(args=['--path=%s' % VALID_HTML_FILEPATH])
         self.assert_same_list_elements(
             ['All Linter Checks Passed.'], self.linter_stdout
         )
@@ -346,7 +344,5 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             subprocess, 'check_output', mock_check_output
         )
 
-        with self.print_swap, self.sys_swap:
-            with self.install_swap:
-                with self.install_swap, subprocess_swap:
-                    run_lint_checks.main()
+        with self.print_swap, self.sys_swap, self.install_swap, subprocess_swap:
+            run_lint_checks.main()

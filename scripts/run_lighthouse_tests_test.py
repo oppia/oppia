@@ -500,7 +500,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with self.lighthouse_pages_json_filepath_swap:
-
                             run_lighthouse_tests.main(
                                 args=['--mode', 'accessibility']
                             )
@@ -556,7 +555,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-
                                 run_lighthouse_tests.main(
                                     args=['--mode', 'performance']
                                 )
@@ -613,7 +611,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
                             with self.lighthouse_pages_json_filepath_swap:
-
                                 run_lighthouse_tests.main(
                                     args=[
                                         '--mode',
@@ -682,7 +679,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
-
                         with self.lighthouse_pages_json_filepath_swap:
                             run_lighthouse_tests.main(
                                 args=[
@@ -768,7 +764,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 with self.swap_ng_build, swap_emulator_mode, self.print_swap:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with swap_run_puppeteer_script:
-
                             with self.lighthouse_pages_json_filepath_swap:
                                 run_lighthouse_tests.main(
                                     args=[

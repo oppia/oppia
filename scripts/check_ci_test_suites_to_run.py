@@ -87,17 +87,11 @@ class CITestSuitesDict(TypedDict):
     count: int
 
 
-class AcceptanceTestSuitesDict(TypedDict):
-    """A dictionary representing acceptance test suites split by environment."""
-
-    python: CITestSuitesDict
-
-
 class CITestSuitesToRunDict(TypedDict):
     """A dictionary representing the test suites to run in the CI."""
 
     e2e: CITestSuitesDict
-    acceptance: AcceptanceTestSuitesDict
+    acceptance: CITestSuitesDict
     lighthouse_performance: CITestSuitesDict
     lighthouse_accessibility: CITestSuitesDict
 
@@ -165,7 +159,7 @@ def create_ci_test_suites_to_run_dict(
     """
     return {
         'e2e': e2e or create_ci_test_suites_dict(),
-        'acceptance': {'python': acceptance or create_ci_test_suites_dict()},
+        'acceptance': acceptance or create_ci_test_suites_dict(),
         'lighthouse_performance': lighthouse_performance
         or create_ci_test_suites_dict(),
         'lighthouse_accessibility': lighthouse_accessibility

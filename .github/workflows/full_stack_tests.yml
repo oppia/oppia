@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-22.04
     if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).e2e.count > 0 ||
             fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).lighthouse_performance.count > 0 ||
-            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
+            fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
     steps:
       - name: Checkout repository so that local actions can be used
         uses: actions/checkout@v4
@@ -167,15 +167,15 @@ jobs:
         with:
           message: "An E2E test failed on the upstream develop branch."
           webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
-  acceptance_test_with_python_installation:
+  acceptance_test:
     needs: [check_test_suites_to_run, build]
     runs-on: ubuntu-22.04
-    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.count > 0 }}
+    if: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.count > 0 }}
     strategy:
       # Fast fail only if it's a merge queue.
       fail-fast: ${{ github.event_name == 'merge_group' }}
       matrix:
-        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.python.suites }}
+        suite: ${{ fromJSON(needs.check_test_suites_to_run.outputs.TEST_SUITES_TO_RUN).acceptance.suites }}
     name: Acceptance (${{ matrix.suite.name }})
     steps:
       - name: Check for broken suites
@@ -476,7 +476,7 @@ jobs:
     needs:
       - check_test_suites_to_run
       - e2e_test
-      - acceptance_test_with_python_installation
+      - acceptance_test
       - lighthouse_accessibility_test
       - lighthouse_performance_test
     if: always()
