@@ -374,7 +374,7 @@ def regenerate_speech_from_text(
 
     # Azure text-to-speech API key.
     azure_tts_api_key = secrets_services.get_secret(
-        'AZURE_TTS_API_KEY', project_id=oppia_project_id
+        'AZURE_TTS_API_KEY', oppia_project_id
     )
 
     if azure_tts_api_key is None:

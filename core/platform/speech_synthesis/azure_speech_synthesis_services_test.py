@@ -42,9 +42,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(
             secrets_services,
             'get_secret',
-            lambda _: 'azure_key',
+            lambda _, oppia_project_id: 'azure_key',
             expected_args=[
-                ('AZURE_TTS_API_KEY',),
+                ('AZURE_TTS_API_KEY', None),
             ],
         )
 
