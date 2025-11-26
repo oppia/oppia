@@ -370,7 +370,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                         {
                             'name': 'exploration-player/view-exploration',
                             'module': 'exploration-player/view-exploration.spec.ts',
-                            'environment': 'docker',
                         },
                     ],
                 },
@@ -817,7 +816,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             {
                                                 'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                                 'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
-                                                'environment': 'docker',
                                             }
                                         ],
                                     },
@@ -888,7 +886,6 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                                             {
                                                 'name': 'exploration-player/view-exploration',  # pylint: disable=line-too-long
                                                 'module': 'exploration-player/view-exploration.spec.ts',  # pylint: disable=line-too-long
-                                                'environment': 'docker',
                                             }
                                         ],
                                         'count': 1,
