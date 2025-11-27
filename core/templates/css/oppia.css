@@ -318,6 +318,12 @@ html {
   --bs-gutter-y: revert;
 }
 
+.nav-tabs .nav-link {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  border-bottom-color: transparent;
+}
+
 .btn-close {
   color: #000;
   float: right;
