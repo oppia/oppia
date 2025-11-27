@@ -475,14 +475,14 @@ describe('Schema validators', () => {
     it('should return null when single validator passes', () => {
       const control: MockFormControl = new MockFormControl([], []);
       control.setValue('test');
-      const validators = [{id: 'is_nonempty'}];
+      const validators = [{id: 'is_nonempty'}] as any[];
       expect(validate(control, validators)).toBe(null);
     });
 
     it('should return validation errors when single validator fails', () => {
       const control: MockFormControl = new MockFormControl([], []);
       control.setValue('');
-      const validators = [{id: 'is_nonempty'}];
+      const validators = [{id: 'is_nonempty'}] as any[];
       const result = validate(control, validators);
       expect(result).toEqual({isNonempty: true});
     });
@@ -504,7 +504,7 @@ describe('Schema validators', () => {
       const validators = [
         {id: 'is_nonempty'},
         {id: 'is_at_least', min_value: 1},
-      ];
+      ] as any[];
       const result = validate(control, validators);
       expect(result).toEqual({
         isNonempty: true,
