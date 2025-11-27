@@ -266,7 +266,7 @@ export class OppiaAngularRootComponent implements AfterViewInit {
           onSubmitCallback?: (
             arg0: Partial<CustomizationArgsForRteType>
           ) => void,
-          onDismissCallback?: (reason: boolean | 'cancel') => void
+          onDismissCallback?: (widgetShouldBeRemoved: boolean) => void
         ) =>
           OppiaAngularRootComponent.rteHelperService.openCustomizationModal(
             componentIsNewlyCreated,
