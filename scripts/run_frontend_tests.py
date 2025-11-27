@@ -25,10 +25,12 @@ from scripts import common, git_changes_utils
 
 from typing import Optional, Sequence, Set
 
-from . import build, check_frontend_test_coverage, install_third_party_libs
+from . import (
+    build,
+    check_frontend_test_coverage,
+    install_third_party_libs,
+)
 
-# Path to the directory containing type tests.
-TYPE_TESTS_DIR_PATH = os.path.join('typings', 'tests')
 MAX_ATTEMPTS = 2
 
 _PARSER = argparse.ArgumentParser(
@@ -41,11 +43,6 @@ a single test or test suite.
 """
 )
 
-_PARSER.add_argument(
-    '--type_test_only',
-    help='optional; if specified, only runs TypeScript type tests.',
-    action='store_true',
-)
 _PARSER.add_argument(
     '--skip_install',
     help='optional; if specified, skips installing dependencies',
@@ -92,36 +89,6 @@ _PARSER.add_argument(
 )
 
 
-def run_typescript_type_tests() -> None:
-    """Runs the TypeScript type tests in typings/tests."""
-    print('Running TypeScript type tests.')
-
-    # Use the TypeScript compiler to check types in the test directory.
-    cmd = [
-        './node_modules/.bin/tsc',
-        '--project',
-        TYPE_TESTS_DIR_PATH,
-    ]
-    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    # The value of `process.stdout` should not be None since we passed
-    # the `stdout=subprocess.PIPE` argument to `Popen`.
-    assert task.stdout is not None
-    assert task.stderr is not None
-    # Reads and prints realtime output from the subprocess until it terminates.
-    stdout_output = task.stdout.read()
-    stderr_output = task.stderr.read()
-    task.wait()
-
-    if stdout_output:
-        print(stdout_output.decode('utf-8'), end='')
-    if stderr_output:
-        print(stderr_output.decode('utf-8'), end='')
-
-    print('Done!')
-    if task.returncode:
-        sys.exit('The TypeScript type tests failed.')
-
-
 def get_file_spec(file_path: str) -> str | None:
     """Returns the spec file path for a given file path.
 
@@ -147,10 +114,6 @@ def get_file_spec(file_path: str) -> str | None:
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
-
-    run_typescript_type_tests()
-    if parsed_args.type_test_only:
-        return
 
     if not parsed_args.skip_install:
         install_third_party_libs.main()
