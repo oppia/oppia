@@ -117,7 +117,7 @@ export class CkEditor4RteComponent
     private renderer: Renderer2
   ) {
     this.rteHelperService =
-      OppiaAngularRootComponent.rteHelperService as RteHelperService;
+      OppiaAngularRootComponent.rteHelperService as unknown as RteHelperService;
     this.subscriptions = new Subscription();
   }
 
