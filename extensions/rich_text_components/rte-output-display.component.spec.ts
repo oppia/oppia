@@ -354,14 +354,14 @@ describe('RTE display component', () => {
 
     // BR should not break sentence spans.
     expect(output).toContain('<br><br>');
-    expect(output).toContain('id=\"highlightBlock1\"');
-    expect(output).toContain('id=\"highlightBlock2\"');
+    expect(output).toContain('id="highlightBlock1"');
+    expect(output).toContain('id="highlightBlock2"');
 
     // Ensure highlightBlock1 contains "Hello".
-    expect(output).toContain('<span id=\"highlightBlock1\">Hello.</span>');
+    expect(output).toContain('<span id="highlightBlock1">Hello.</span>');
 
     // Ensure highlightBlock2 contains "World".
-    expect(output).toContain('<span id=\"highlightBlock2\">World.</span>');
+    expect(output).toContain('<span id="highlightBlock2">World.</span>');
   }));
 
   it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {

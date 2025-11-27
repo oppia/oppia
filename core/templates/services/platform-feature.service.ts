@@ -39,7 +39,6 @@ import {Injectable} from '@angular/core';
 import {
   FeatureStatusChecker,
   FeatureStatusSummary,
-  FeatureNames,
 } from 'domain/feature-flag/feature-status-summary.model';
 import {FeatureFlagBackendApiService} from 'domain/feature-flag/feature-flag-backend-api.service';
 import {LoggerService} from 'services/contextual/logger.service';
@@ -137,11 +136,6 @@ export class PlatformFeatureService {
         PlatformFeatureService._isSkipped = true;
         PlatformFeatureService.featureStatusSummary =
           FeatureStatusSummary.createDefault();
-        // Ensure automatic voiceover (auto-TTS) is enabled at platform level.
-        PlatformFeatureService.featureStatusSummary.featureNameToFlag.set(
-          FeatureNames.AutomaticVoiceoverRegenerationFromExp,
-          true
-        );
         return;
       }
 
@@ -154,14 +148,9 @@ export class PlatformFeatureService {
             `${err.message ? err.message : err}`
         );
       }
-      // If any error, just disable all features. Still, ensure automatic
-      // voiceover (auto-TTS) is enabled so voiceover features remain active.
+      // If any error, just disable all features.
       PlatformFeatureService.featureStatusSummary =
         FeatureStatusSummary.createDefault();
-      PlatformFeatureService.featureStatusSummary.featureNameToFlag.set(
-        FeatureNames.AutomaticVoiceoverRegenerationFromExp,
-        true
-      );
       PlatformFeatureService._isInitializedWithError = true;
       this.clearSavedResults();
     }

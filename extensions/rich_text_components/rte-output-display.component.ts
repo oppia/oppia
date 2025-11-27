@@ -285,32 +285,30 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        let nodeTemp = node.cloneNode();
+        // Clone only the element, not its children (important!).
+        let nodeTemp = node.cloneNode(false) as Node;
 
         for (let spanNode of spanNodeList) {
-          // Preserve <br> directly without assigning highlight ids.
+          // Preserve <br> tags exactly as-is (clone so we don't move original nodes).
           if (spanNode.nodeName === 'BR') {
-            nodeTemp.appendChild(spanNode);
+            nodeTemp.appendChild(spanNode.cloneNode(false));
             continue;
           }
 
+          // Process highlight spans.
           let textInsideSpanTag = '';
-
           for (let tempChildNode of spanNode.childNodes) {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
-          if (textInsideSpanTag === ' ') {
-            nodeTemp.appendChild(spanNode);
-            continue;
-          }
+          const span = document.createElement('span');
+          const elementId = `highlightBlock${this.index}`;
+          span.id = elementId;
+          span.textContent = textInsideSpanTag;
 
-          let elementId = `highlightBlock${this.index}`;
-          spanNode.id = elementId;
-          this.index++;
-
-          nodeTemp.appendChild(spanNode);
+          nodeTemp.appendChild(span);
           this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
+          this.index++;
         }
 
         return nodeTemp;
