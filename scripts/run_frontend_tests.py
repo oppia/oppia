@@ -25,10 +25,7 @@ from scripts import common, git_changes_utils
 
 from typing import Optional, Sequence, Set
 
-from . import (
-    build,
-    check_frontend_test_coverage,
-)
+from . import build, check_frontend_test_coverage
 
 MAX_ATTEMPTS = 2
 

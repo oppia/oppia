@@ -275,7 +275,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 return b''
 
         class MockTask:
-            def __init__(self, returncode: int, stdout_output: bytes) -> None:
+            def __init__(
+                self,
+                returncode: int,
+                stdout_output: bytes,  # pylint: disable=unused-argument
+            ) -> None:
                 self.returncode = returncode
                 self.stdout = MockFile()
                 self.stderr = MockFile()
@@ -310,7 +314,11 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 return b''
 
         class MockTask:
-            def __init__(self, returncode: int, stdout_output: bytes) -> None:
+            def __init__(
+                self,
+                returncode: int,
+                stdout_output: bytes,  # pylint: disable=unused-argument
+            ) -> None:
                 self.returncode = returncode
                 self.stdout = MockFile()
                 self.stderr = MockFile()

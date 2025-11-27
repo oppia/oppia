@@ -1436,7 +1436,7 @@ class CommonTests(test_utils.GenericTestBase):
                 with utils.open_file(hashes_path, 'r') as hashes_file:
                     self.assertEqual(
                         json.loads(hashes_file.read()),
-                        {"path/file.js": "123456"},
+                        {'path/file.js': '123456'},
                     )
 
             # Test writing multiple hashes.
