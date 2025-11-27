@@ -301,10 +301,21 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
             textInsideSpanTag += this.getReadableTextFromNode(tempChildNode);
           }
 
+          // If the span is just a space, reinsert it as-is (no highlight id).
+          if (textInsideSpanTag === ' ') {
+            nodeTemp.appendChild(spanNode.cloneNode(true));
+            continue;
+          }
+
           const span = document.createElement('span');
           const elementId = `highlightBlock${this.index}`;
           span.id = elementId;
-          span.textContent = textInsideSpanTag;
+
+          // Preserve inline structure (e.g. <em>, <strong>) by cloning child nodes
+          // into the new span instead of setting textContent.
+          for (let tempChildNode of spanNode.childNodes) {
+            span.appendChild(tempChildNode.cloneNode(true));
+          }
 
           nodeTemp.appendChild(span);
           this.highlightIdToSentenceText[elementId] = textInsideSpanTag;
