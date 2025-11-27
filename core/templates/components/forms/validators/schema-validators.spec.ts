@@ -18,7 +18,7 @@
 
 import {AbstractControl, ValidationErrors} from '@angular/forms';
 import {SchemaDefaultValue} from 'services/schema-default-value.service';
-import {SchemaValidators} from './schema-validators';
+import {SchemaValidators, validate} from './schema-validators';
 
 class MockFormControl extends AbstractControl {
   value: SchemaDefaultValue = '1';
@@ -462,6 +462,112 @@ describe('Schema validators', () => {
       expect(filter(control)).toBe(null);
       control.setValue('computer-sciencet');
       expect(filter(control)).toBe(null);
+    });
+  });
+
+  describe('validate', () => {
+    it('should return null when validators array is empty', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('test');
+      expect(validate(control, [])).toBe(null);
+    });
+
+    it('should return null when single validator passes', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('test');
+      const validators = [{id: 'is_nonempty'}];
+      expect(validate(control, validators)).toBe(null);
+    });
+
+    it('should return validation errors when single validator fails', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('');
+      const validators = [{id: 'is_nonempty'}];
+      const result = validate(control, validators);
+      expect(result).toEqual({isNonempty: true});
+    });
+
+    it('should aggregate errors from multiple validators', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(-5);
+      const validators = [
+        {id: 'is_at_least', min_value: 0},
+        {id: 'is_at_most', max_value: 100},
+      ];
+      const result = validate(control, validators);
+      expect(result).toEqual({isAtLeast: {minValue: 0, actual: -5}});
+    });
+
+    it('should aggregate all errors when multiple validators fail', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('');
+      const validators = [
+        {id: 'is_nonempty'},
+        {id: 'is_at_least', min_value: 1},
+      ];
+      const result = validate(control, validators);
+      expect(result).toEqual({
+        isNonempty: true,
+        isAtLeast: {minValue: 1, actual: ''},
+      });
+    });
+
+    it('should handle validators with underscores in IDs', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(-1);
+      const validators = [{id: 'is_at_least', min_value: 0}];
+      const result = validate(control, validators);
+      expect(result).toEqual({isAtLeast: {minValue: 0, actual: -1}});
+    });
+
+    it('should return null when all validators pass', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(50);
+      const validators = [
+        {id: 'is_at_least', min_value: 0},
+        {id: 'is_at_most', max_value: 100},
+      ];
+      expect(validate(control, validators)).toBe(null);
+    });
+  });
+
+  describe('hasLengthAtLeast edge cases', () => {
+    it('should handle null value', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(null);
+      const filter = SchemaValidators.hasLengthAtLeast({minValue: 5});
+      expect(filter(control)).toEqual({
+        hasLengthAtLeast: {minValue: 5, actual: null},
+      });
+    });
+
+    it('should handle undefined value', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(undefined);
+      const filter = SchemaValidators.hasLengthAtLeast({minValue: 5});
+      expect(filter(control)).toEqual({
+        hasLengthAtLeast: {minValue: 5, actual: undefined},
+      });
+    });
+  });
+
+  describe('hasLengthAtMost edge cases', () => {
+    it('should handle null value', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(null);
+      const filter = SchemaValidators.hasLengthAtMost({maxValue: 5});
+      expect(filter(control)).toEqual({
+        hasLengthAtMost: {minValue: 5, actual: null},
+      });
+    });
+
+    it('should handle undefined value', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue(undefined);
+      const filter = SchemaValidators.hasLengthAtMost({maxValue: 5});
+      expect(filter(control)).toEqual({
+        hasLengthAtMost: {minValue: 5, actual: undefined},
+      });
     });
   });
 });

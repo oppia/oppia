@@ -410,4 +410,46 @@ describe('Question Editor Component', () => {
     expect(component.nextContentIdIndexDisplayedValue).toBe(1);
     expect(component.nextContentIdIndexMemento).toBe(1);
   });
+
+  it('should not update question when answer groups is null', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionAnswerGroups(null!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when answer groups is undefined', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionAnswerGroups(undefined!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when default outcome is null', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionDefaultOutcome(null!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when default outcome is undefined', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionDefaultOutcome(undefined!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when interaction data is null', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionData(null!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when interaction data is undefined', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionData(undefined!);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not update question when customization args is missing', () => {
+    const questionChangeSpy = spyOn(component.questionChange, 'emit');
+    component.saveInteractionData({interactionId: 'test'} as InteractionData);
+    expect(questionChangeSpy).not.toHaveBeenCalled();
+  });
 });
