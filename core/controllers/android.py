@@ -519,7 +519,7 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use 'object' because the nested schema dictionaries contain mixed
+    # Here we use object because the nested schema dictionaries contain mixed
     # value types (ints, bools, and nested dicts). No narrower type annotation
     # can represent all possible values without breaking mypy compatibility.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
@@ -575,7 +575,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use 'object' because the nested schema dictionaries contain mixed
+    # Here we use object because the nested schema dictionaries contain mixed
     # value types (ints, bools, and nested dicts). No narrower type annotation
     # can represent all possible values without breaking mypy compatibility.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
