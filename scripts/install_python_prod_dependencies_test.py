@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import importlib.metadata
 import itertools
 import json
 import os
@@ -31,7 +32,6 @@ from core import utils
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
-import pkg_resources
 from typing import Dict, List, Optional, Set, Tuple
 
 
@@ -54,31 +54,20 @@ class Distribution:
             metadata_dict: dict(str: str). The stringified metadata contents of
                 the library.
         """
-        self.project_name = library_name
+        self.name = library_name
         self.version = version_string
         self.metadata_dict = metadata_dict
 
-    def has_metadata(self, key: str) -> bool:
-        """Returns whether the given metadata key exists.
+    def read_text(self, filename: str) -> Optional[str]:
+        """Returns the contents of the given metadata file.
 
         Args:
-            key: str. The key corresponding to the metadata.
+            filename: str. The filename corresponding to the metadata.
 
         Returns:
-            bool. Whether the metadata exists.
+            str|None. The contents of the metadata file, or None if not found.
         """
-        return key in self.metadata_dict
-
-    def get_metadata(self, key: str) -> str:
-        """The contents of the corresponding metadata.
-
-        Args:
-            key: str. The key corresponding to the metadata.
-
-        Returns:
-            str. The contents of the metadata.
-        """
-        return self.metadata_dict[key]
+        return self.metadata_dict.get(filename)
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -263,7 +252,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         with swap_requirements, swap_find_distributions:
             self.assertEqual(
@@ -813,7 +802,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -862,7 +851,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)

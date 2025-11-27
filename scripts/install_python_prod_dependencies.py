@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import collections
+import importlib.metadata
 import json
 import os
 import re
@@ -24,11 +25,11 @@ import shutil
 import subprocess
 import sys
 
+from packaging import version
+from typing import Dict, Final, List, Optional, Set, Tuple
+
 from core import utils
 from scripts import install_python_dev_dependencies
-
-import pkg_resources
-from typing import Dict, Final, List, Optional, Set, Tuple
 
 from . import common
 
@@ -195,7 +196,7 @@ def _get_requirements_file_contents() -> Dict[str, str]:
     return requirements_contents
 
 
-def _dist_has_meta_data(dist: pkg_resources.Distribution) -> bool:
+def _dist_has_meta_data(dist: importlib.metadata.Distribution) -> bool:
     """Checks if the Distribution has meta-data.
 
     Args:
@@ -204,7 +205,11 @@ def _dist_has_meta_data(dist: pkg_resources.Distribution) -> bool:
     Returns:
         bool. The distribution has meta-data or not.
     """
-    return dist.has_metadata('direct_url.json')
+    try:
+        dist.read_text('direct_url.json')
+        return True
+    except FileNotFoundError:
+        return False
 
 
 def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
@@ -217,23 +222,32 @@ def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
         installed as the key and the version string of that library as the
         value.
     """
+    all_distributions = list(
+        importlib.metadata.distributions(
+            path=[common.THIRD_PARTY_PYTHON_LIBS_DIR]
+        )
+    )
     direct_url_packages, standard_packages = utils.partition(
-        pkg_resources.find_distributions(common.THIRD_PARTY_PYTHON_LIBS_DIR),
+        all_distributions,
         predicate=_dist_has_meta_data,
     )
 
-    installed_packages = {
-        pkg.project_name: pkg.version for pkg in standard_packages
-    }
+    installed_packages = {pkg.name: pkg.version for pkg in standard_packages}
 
     for pkg in direct_url_packages:
-        metadata = json.loads(pkg.get_metadata('direct_url.json'))
+        metadata_text = pkg.read_text('direct_url.json')
+        if not metadata_text:
+            raise Exception(
+                f'Package {pkg.name} was identified as having direct_url.json '
+                'metadata but the file could not be read.'
+            )
+        metadata = json.loads(metadata_text)
         version_string = '%s+%s@%s' % (
             metadata['vcs_info']['vcs'],
             metadata['url'],
             metadata['vcs_info']['commit_id'],
         )
-        installed_packages[pkg.project_name] = version_string
+        installed_packages[pkg.name] = version_string
 
     # Libraries with different case are considered equivalent libraries:
     # e.g 'Flask' is the same library as 'flask'. Therefore, we
@@ -252,9 +266,9 @@ def _remove_metadata(library_name: str, version_string: str) -> None:
     was reinstalled with a new version. The reason we need this function is
     because `pip install --upgrade` upgrades libraries to a new version but
     does not remove the metadata that was installed with the previous version.
-    These metadata files confuse the pkg_resources function that extracts all of
-    the information about the currently installed python libraries and causes
-    this installation script to behave incorrectly.
+    These metadata files confuse the importlib.metadata function that extracts
+    all of the information about the currently installed python libraries and
+    causes this installation script to behave incorrectly.
 
     Args:
         library_name: str. Name of the library to remove the metadata for.
@@ -353,10 +367,10 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
 
     for normalized_library_name, versions in pip_mismatches:
         requirements_version = (
-            pkg_resources.parse_version(versions[0]) if versions[0] else None
+            version.Version(versions[0]) if versions[0] else None
         )
         directory_version = (
-            pkg_resources.parse_version(versions[1]) if versions[1] else None
+            version.Version(versions[1]) if versions[1] else None
         )
 
         # The library listed in 'requirements.txt' is not in the
