@@ -461,7 +461,6 @@ class AndroidActivityHandler(
                     }
                 )
         else:
-          
             ids_and_versions = [
                 (activity_data['id'], activity_data.get('version'))
                 for activity_data in activities_data
@@ -520,7 +519,9 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Allow GET overrides through schema validation.
+    # Here we use 'object' because the nested schema dictionaries contain mixed
+    # types (ints, bools, and nested dicts). A more specific type would not
+    # reflect the actual structure correctly and would cause mypy failures.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
@@ -547,7 +548,6 @@ class AndroidPlatformParametersHandler(
         """
         assert self.normalized_request is not None
 
-      
         defaults = {
             'android_min_version_code_for_recommending_app_update': 0,
             'android_min_supported_version_code': 0,
@@ -576,7 +576,9 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Allow GET overrides through schema validation.
+    # Here we use 'object' because the nested schema dictionaries contain mixed
+    # types (ints, bools, and nested dicts). A more specific type would not
+    # reflect the actual structure correctly and would cause mypy failures.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
