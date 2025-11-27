@@ -922,7 +922,7 @@ def filter_hashes(file_hashes: Dict[str, str]) -> Dict[str, str]:
 
 
 def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
-    """Return JS code that loads hashes needed for frontend into variable.
+    """Filters and saves hashes needed for frontend to hashes.json file.
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -930,13 +930,7 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     """
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
-
-    common.ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
-    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
-        hashes_json_file.write(
-            str(json.dumps(filtered_hashes, ensure_ascii=False))
-        )
-        hashes_json_file.write('\n')
+    common.write_hashes_json_file(filtered_hashes)
 
 
 def minify_func(source_path: str, target_path: str, filename: str) -> None:

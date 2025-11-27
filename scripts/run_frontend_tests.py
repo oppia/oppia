@@ -28,7 +28,6 @@ from typing import Optional, Sequence, Set
 from . import (
     build,
     check_frontend_test_coverage,
-    install_third_party_libs,
 )
 
 MAX_ATTEMPTS = 2
@@ -43,11 +42,6 @@ a single test or test suite.
 """
 )
 
-_PARSER.add_argument(
-    '--skip_install',
-    help='optional; if specified, skips installing dependencies',
-    action='store_true',
-)
 _PARSER.add_argument(
     '--verbose',
     help='optional; if specified, enables the karma terminal and prints all the'
@@ -115,13 +109,10 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     """Runs the frontend tests."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if not parsed_args.skip_install:
-        install_third_party_libs.main()
-
     common.setup_chrome_bin_env_variable()
     # We need to create an empty hashes.json file for the build so that
     # we don't get the error "assets/hashes.json file doesn't exist".
-    build.save_hashes_to_file({})
+    common.write_hashes_json_file({})
     common.print_each_string_after_two_new_lines(
         [
             'View interactive frontend test coverage reports by navigating to',
