@@ -1,19 +1,55 @@
-﻿# SSO Integration for Oppia
+# SSO Integration for Oppia
 
 **Adding GitHub and LinkedIn Sign-In to Oppia**
 
 ---
 
-## 📖 About
+## About
 
 This project adds **GitHub** and **LinkedIn** authentication to Oppia, an open-source learning platform. Currently, Oppia only supports Google Sign-In. I'm adding more options so users can sign in with their preferred accounts.
 
 **Current:** Google Sign-In only  
-**Adding:** GitHub (Phase 1) -> LinkedIn (Phase 2)
+**Adding:** GitHub (Phase 1) → LinkedIn (Phase 2)
 
 ---
 
-## 🎯 What I'm Adding
+## Tech Stack
+
+**Frontend:**
+
+- Angular 11
+- TypeScript 4.1
+- Firebase SDK
+- RxJS
+
+**Backend:**
+
+- Python 3.10
+- Google App Engine
+- Firebase Admin SDK
+
+**Authentication:**
+
+- OAuth 2.0
+- OpenID Connect 1.0
+- JWT (JSON Web Tokens)
+
+**Infrastructure:**
+
+- Docker & Docker Compose
+- Redis (caching)
+- Elasticsearch (search)
+- Google Cloud Datastore (database)
+
+**Development Tools:**
+
+- ESLint, Pylint, MyPy
+- Karma, Jasmine, Jest
+- Puppeteer (E2E testing)
+
+---
+
+## What I'm Adding
 
 ### Phase 1: GitHub Sign-In (Current)
 
@@ -27,85 +63,103 @@ This project adds **GitHub** and **LinkedIn** authentication to Oppia, an open-s
 - Professional network integration
 - Reuse GitHub implementation patterns
 
----
+## Data Flow Diagram
 
-## 🔄 User Flow
+### Level 1 - Authentication Flow
 
 ```
+┌─────────┐
+│  User   │
+└────┬────┘
+     │
+     │ 1. Clicks "Sign in with GitHub"
+     ↓
 ┌─────────────────────────────────────┐
-│     Welcome to Oppia - Sign In      │
-├─────────────────────────────────────┤
-│                                     │
-│  [🔵 Sign in with Google]          │
-│                                     │
-│  [⚫ Sign in with GitHub]  <- NEW   │
-│                                     │
-│  [🔷 Sign in with LinkedIn] <- SOON │
-│                                     │
-└─────────────────────────────────────┘
-         ↓
-User clicks GitHub button
-         ↓
-Redirects to GitHub login
-         ↓
-User logs in with GitHub
-         ↓
-GitHub sends back token
-         ↓
-Oppia validates & creates session
-         ↓
-User is logged in! ✅
+│  Frontend (Angular)                 │
+│  - auth.service.ts                  │
+│  - sign-in-buttons.component.ts     │
+└────┬────────────────────────────────┘
+     │
+     │ 2. signInWithRedirectAsync('github')
+     ↓
+┌─────────────────────────────────────┐
+│  Firebase SDK                       │
+│  - Redirects to GitHub OAuth        │
+└────┬────────────────────────────────┘
+     │
+     │ 3. OAuth Request
+     ↓
+┌─────────────────────────────────────┐
+│  GitHub (External)                  │
+│  - User logs in                     │
+│  - Authorizes Oppia                 │
+└────┬────────────────────────────────┘
+     │
+     │ 4. Authorization Code
+     ↓
+┌─────────────────────────────────────┐
+│  Firebase Authentication            │
+│  - Exchanges code for ID Token      │
+└────┬────────────────────────────────┘
+     │
+     │ 5. ID Token (JWT)
+     ↓
+┌─────────────────────────────────────┐
+│  Frontend (Angular)                 │
+│  - auth-backend-api.service.ts      │
+└────┬────────────────────────────────┘
+     │
+     │ 6. POST /session_begin
+     │    Header: Bearer <ID_TOKEN>
+     ↓
+┌─────────────────────────────────────┐
+│  Backend (Python)                   │
+│  - firebase_auth_services.py        │
+│  - Validates token                  │
+│  - Extracts user info               │
+└────┬────────────────────────────────┘
+     │
+     │ 7. Create Session Cookie
+     ↓
+┌─────────────────────────────────────┐
+│  Backend (Python)                   │
+│  - auth_services.py                 │
+│  - Check if user exists             │
+└────┬────────────────────────────────┘
+     │
+     │ 8. Query/Store User
+     ↓
+┌─────────────────────────────────────┐
+│  Database (Datastore)               │
+│  - UserAuthDetailsModel             │
+│  - UserIdByFirebaseAuthIdModel      │
+└────┬────────────────────────────────┘
+     │
+     │ 9. User Data
+     ↓
+┌─────────────────────────────────────┐
+│  Backend (Python)                   │
+│  - Returns session cookie           │
+└────┬────────────────────────────────┘
+     │
+     │ 10. Set-Cookie: session_cookie
+     ↓
+┌─────────────────────────────────────┐
+│  Frontend (Angular)                 │
+│  - Stores cookie                    │
+│  - Redirects to dashboard           │
+└────┬────────────────────────────────┘
+     │
+     │ 11. User logged in!
+     ↓
+┌─────────┐
+│  User   │
+└─────────┘
 ```
 
----
+## Files I'm Working With
 
-## 🔧 How to Use This Feature
-
-### For Developers Testing Locally:
-
-**1. Enable GitHub OAuth in Firebase:**
-
-```
-1. Go to Firebase Console
-2. Authentication -> Sign-in method
-3. Enable "GitHub" provider
-4. Add your GitHub OAuth credentials
-```
-
-**2. Create GitHub OAuth App:**
-
-```
-1. Go to GitHub Settings -> Developer settings -> OAuth Apps
-2. Click "New OAuth App"
-3. Set callback URL: http://localhost:8181/__/auth/handler
-4. Copy Client ID and Client Secret
-5. Paste in Firebase Console
-```
-
-**3. Configuration Fields Needed:**
-
-- GitHub Client ID
-- GitHub Client Secret
-- Firebase API Key (already in app.constants.ts)
-
-**4. Test the Button:**
-
-```bash
-# Start Oppia
-docker-compose up
-
-# Go to http://localhost:8181
-# Click "Sign in with GitHub"
-# Should redirect to GitHub login
-```
-
----
-
-## 📂 Files I'm Working With
-
-### 🎨 **FRONTEND (Angular/TypeScript)**
-
-#### Files I Will Edit
+### **FRONTEND (Angular/TypeScript)**
 
 **1. oppia/core/templates/services/auth.service.ts**
 
@@ -157,7 +211,7 @@ docker-compose up
 
 ---
 
-#### 🧪 Frontend Tests
+#### Frontend Tests
 
 **6. oppia/core/templates/services/auth.service.spec.ts**
 
@@ -171,7 +225,7 @@ docker-compose up
 
 ---
 
-#### 🔍 Frontend Files to Verify (No Changes)
+#### Frontend Files to Verify
 
 **7. oppia/core/templates/services/auth-backend-api.service.ts**
 
@@ -181,34 +235,7 @@ docker-compose up
 
 ---
 
-### **BACKEND (Python)**
-
-#### 🔍 Files I Will Check (No Changes Needed)
-
-**8. oppia/core/platform/auth/firebase_auth_services.py**
-
-- **What it is:** Main backend authentication service
-- **Current:** Validates tokens and creates sessions
-- **Action:** Verify GitHub tokens work with existing validation
-- **Why no changes:** Already supports all OAuth providers!
-
-**9. oppia/core/domain/auth_services.py**
-
-- **What it is:** Domain layer authentication service
-- **Current:** User account management
-- **Action:** Verify user creation works with GitHub
-- **Why no changes:** Provider-agnostic design
-
-**10. oppia/core/domain/auth_domain.py**
-
-- **What it is:** Authentication data structures
-- **Current:** Defines AuthClaims, UserAuthDetails
-- **Action:** Verify it handles GitHub data
-- **Why no changes:** Works with all providers
-
----
-
-#### 🧪 Backend Tests
+#### Backend Tests
 
 **11. oppia/core/platform/auth/firebase_auth_services_test.py**
 
@@ -221,21 +248,7 @@ docker-compose up
 
 ---
 
-### 📊 Summary
-
-| Category            | Count        | Details                                                     |
-| ------------------- | ------------ | ----------------------------------------------------------- |
-| **Frontend Edit**   | 2 files      | auth.service.ts, oppia-root.module.ts                       |
-| **Frontend Create** | 3 files      | Component (ts, html, css)                                   |
-| **Frontend Test**   | 1 file       | auth.service.spec.ts                                        |
-| **Frontend Verify** | 1 file       | auth-backend-api.service.ts                                 |
-| **Backend Verify**  | 3 files      | firebase_auth_services.py, auth_services.py, auth_domain.py |
-| **Backend Test**    | 1 file       | firebase_auth_services_test.py                              |
-| **TOTAL**           | **11 files** | 7 Frontend + 4 Backend                                      |
-
----
-
-## 🧪 How to Test
+## How to Test
 
 ### Manual Testing:
 
@@ -268,18 +281,18 @@ python -m scripts.run_presubmit_checks
 
 ### What to Verify:
 
-- ✅ GitHub button appears on sign-in page
-- ✅ Clicking redirects to GitHub
-- ✅ After login, redirects back to Oppia
-- ✅ User is logged in with GitHub email
-- ✅ Session persists on page refresh
-- ✅ Sign out works correctly
+- GitHub button appears on sign-in page
+- Clicking redirects to GitHub
+- After login, redirects back to Oppia
+- User is logged in with GitHub email
+- Session persists on page refresh
+- Sign out works correctly
 
 ---
 
 ## 📋 Implementation Timeline
 
-**Week 2:** ✅ Documentation & Planning  
+**Week 2:** Documentation & Planning  
 **Week 3:** Firebase + GitHub OAuth setup  
 **Week 4:** Frontend implementation  
 **Week 5:** Testing & bug fixes  
@@ -287,22 +300,7 @@ python -m scripts.run_presubmit_checks
 
 ---
 
-## 🔗 Related PRs
-
-**My PRs:**
-
-- [ ] #XXXX - Add GitHub SSO (In Progress)
-- [ ] #XXXX - Add LinkedIn SSO (Future)
-
-**Reference PRs I Studied:**
-
-- Firebase authentication migration
-- OAuth provider integration
-- Session management improvements
-
----
-
-## 👤 Author
+## Author
 
 **Name:** Sristy  
 **Institution:** [Your College/University]  
@@ -312,7 +310,7 @@ python -m scripts.run_presubmit_checks
 
 ---
 
-## 📚 Resources
+## Resources
 
 - [Oppia GitHub](https://github.com/oppia/oppia)
 - [Firebase Auth Docs](https://firebase.google.com/docs/auth)
