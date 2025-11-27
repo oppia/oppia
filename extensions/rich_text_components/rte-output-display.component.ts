@@ -181,7 +181,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     sentenceRegex: RegExp
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
-
+    // Preserve <br> nodes as-is so visual line breaks are retained.
+    if (node.nodeName === 'BR') {
+      return [node]; // Preserve <br>
+    }
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
       const sentences = textContent.split(sentenceRegex);
@@ -228,6 +231,10 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let textContent = '';
 
         for (let tempChildNode of updatedChildNodes) {
+          // Skip <br> when building the combined text for sentence parsing.
+          if (tempChildNode.nodeName === 'BR') {
+            continue;
+          }
           textContent += this.getReadableTextFromNode(tempChildNode) + ' ';
         }
 
@@ -240,11 +247,20 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let nextSentenceOffset = '';
 
         for (let childNode of updatedChildNodes) {
+          // If we encounter a <br>, keep it visually but don't treat it as
+          // Part of the sentence text; push it into the span list and
+          // Continue.
+          if (childNode.nodeName === 'BR') {
+            // Visually keep the <br>, but do not treat it as text.
+            spanNodeList.push(childNode);
+            continue;
+          }
+
           let currentText = this.getReadableTextFromNode(childNode);
 
           let sentence = nextSentenceOffset + currentText;
 
-          // Removing spaces to avoid ambiguity in sentence matching.
+          // Remove spaces to avoid ambiguity in sentence matching.
           sentence = sentence.split(' ').join('').trim();
           currentSentenceToMatch = currentSentenceToMatch
             ?.split(' ')
@@ -272,6 +288,12 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let nodeTemp = node.cloneNode();
 
         for (let spanNode of spanNodeList) {
+          // Preserve <br> directly without assigning highlight ids.
+          if (spanNode.nodeName === 'BR') {
+            nodeTemp.appendChild(spanNode);
+            continue;
+          }
+
           let textInsideSpanTag = '';
 
           for (let tempChildNode of spanNode.childNodes) {
@@ -346,16 +368,16 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return;
     }
     // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
-    // to the HTML (eg: '<p> Text &nbsp; &nbsp; %nbsp;</p>'), which can
+    // To the HTML (e.g. '<p> Text &nbsp; &nbsp; &nbsp;</p>'), which can
     // lead to UI issues when displaying it. Hence, the following block
-    // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
+    // Replaces the trailing '&nbsp;' occurrences followed by '</p>' with just '</p>'.
     // We can't just find and replace '&nbsp;' here since, those in the
     // middle may actually be required. Only the trailing ones need to be
     // replaced.
     this.rteString = this.rteString.replace(/(&nbsp;(\s)?)*(<\/p>)/g, '</p>');
     // The following line is required since blank newlines in between
-    // paragraphs are treated as <p>&nbsp;</p> by ckedior. So, these
-    // have to be restored, as this will get reduced to <p></p> above.
+    // paragraphs are treated as '<p>&nbsp;</p>' by CKEditor. So, these
+    // have to be restored, as this will get reduced to '<p></p>' above.
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
@@ -387,14 +409,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     };
     dfs(this.node);
     this.cdRef.detectChanges();
-    // The following logic is to remove comment tags (used by angular for
+    // The following logic is to remove comment tags (used by Angular for
     // bindings). New lines and spaces inside the pre-tags are treated
-    // differently when compared to other tags. So with the comments come new
-    // line inside pre tags. These cause the rte output to look differently than
-    // what it was shown in ck-editor. So we remove all the comments and empty
-    // TextNode. Am empty TextNode is a TextNode whose nodeValue only consists
-    // of whiteSpace characters and new lines. The setTimeout is needed to run
-    // it in the next clock cycle so that the view has been rendered.
+    // Differently when compared to other tags. So with the comments come new
+    // Line inside pre tags. These cause the rte output to look differently than
+    // What it was shown in CKEditor. So we remove all the comments and empty
+    // TextNode. An empty TextNode is a TextNode whose nodeValue only consists
+    // Of whiteSpace characters and new lines. The setTimeout is needed to run
+    // It in the next clock cycle so that the view has been rendered.
     setTimeout(() => {
       (this.elementRef.nativeElement as HTMLElement)
         .querySelectorAll('pre')
@@ -437,7 +459,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // If the below feature flag is not enabld then the sentence highlighting
+    // If the feature flag below is not enabled then the sentence highlighting
     // feature will not work.
     if (!this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
       return;
@@ -449,7 +471,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this.updateAutomatedVoiceoversAudioOffsets();
     });
 
-    // The below lines runs on every 200ms to highlight the sentence being
+    // These lines run every 100ms to highlight the sentence being
     // played in the audio player.
     setInterval(() => {
       this.highlightSentenceDuringVoiceoverPlay();
@@ -607,26 +629,24 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       changes.rteString.previousValue !== changes.rteString.currentValue
     ) {
       /**
-       * The following serves as an excellent example of why we shouldn't use
-       * js and elementRef.nativeElement to manipulate the DOM. When doing so
-       * angular has no reference to the node we create and attach to the DOM.
-       * So angular won't be able to clear the nodes out during change detection
-       * runs. And since we were relying on angular to do so and not manually
-       * deleting, this creates a memory leak. We will still have stale elements
-       * in the dom. To get around this, there is variable called show, that is
-       * used as an expression of ngIf. Whenever this is false, all the children
-       * inside it will be destroyed (irrespective of whether angular created it
-       * or us). The setTimeout is to make sure that a changeDetection cycle
-       * runs and we only start showing the content after it. If the setTimeout
-       * is removed, angular won't register a change in this.show as this.show
-       * is set to false and then back to true on the same change detection
-       * cycle and hence, we will still have the problem.
+       * The following serves as an example of why we shouldn't use
+       * JavaScript and `elementRef.nativeElement` to manipulate the DOM.
+       * When doing so, Angular has no reference to the node we create and
+       * attach to the DOM, so Angular cannot clear those nodes during change
+       * detection runs. Relying on Angular to clear nodes that we created
+       * manually can create memory leaks and leave stale elements in the DOM.
+       * To work around this, the `show` variable is used as an `ngIf` expression.
+       * Whenever `show` is false, all children inside it will be destroyed
+       * (irrespective of whether Angular created them or we did). The
+       * `setTimeout` ensures a change detection cycle runs before we show the
+       * content again: without it, Angular may not register the change in
+       * `show` when it is toggled off and back on in the same cycle.
        */
       this.show = false;
       this.wrapped = false;
-      // The rte text node is inserted outside the bounds of ng container.
-      // Hence, it needs to be removed manually otherwise resdiual text will
-      // appear when rte text changes.
+      // The RTE text node is inserted outside the bounds of the ng container.
+      // Hence, it needs to be removed manually; otherwise residual text will
+      // appear when the RTE text changes.
       const textNodes: Text[] = [];
 
       for (const node of this.elementRef.nativeElement.childNodes) {
@@ -639,7 +659,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       this._updateNode();
 
-      // If the below feature flag is not enabld then the sentence highlighting
+      // If the feature flag below is not enabled then the sentence highlighting
       // feature will not work.
       if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
         const activeContentId = this.getActiveContentId();
@@ -660,7 +680,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
 /**
  * The directive below is required because we have &nbsp; in the string. String
- * interpolation is a very safe operation in angular and these values are
+ * interpolation is a very safe operation in Angular and these values are
  * changed to show the characters &nbsp; (they actually show &#160, the machine
  * code for &nbsp;) instead of whitespace. In order to get around this, the
  * directive is used instead of `{{}}` and `[innerHtml]`. This is a very safe
