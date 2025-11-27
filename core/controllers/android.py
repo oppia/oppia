@@ -522,6 +522,11 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    # Here we use object because the nested schema dicts include
+    # both schema definitions and default values with varying types
+    # (e.g. bools, ints and nested dicts). Using `object` accurately
+    # represents the mixed types stored in these dicts while keeping
+    # mypy checks satisfied. See handler validation logic for details.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
@@ -577,6 +582,11 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    # Here we use object because the nested schema dicts include
+    # both schema definitions and default values with varying types
+    # (e.g. bools, ints and nested dicts). Using `object` accurately
+    # represents the mixed types stored in these dicts while keeping
+    # mypy checks satisfied. See handler validation logic for details.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
