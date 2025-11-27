@@ -172,6 +172,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
+    // Default: return textContent or empty string to avoid undefined values
+    return node.textContent || '';
   }
 
   // The method recursively traverses the node and wraps span tags around
@@ -390,7 +392,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     // There is no other via user input to get <p></p>, so this wouldn't
     // affect any other data.
     this.rteString = this.rteString.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
-    this.rteString = this.rteString.replace(/\n/g, '');
+    // Replace newlines with spaces to preserve separation without merging words.
+    this.rteString = this.rteString.replace(/\n/g, ' ');
 
     // The following line wraps each sentence in a span tag to highlight
     // the sentence during voiceover playback.
