@@ -19,7 +19,7 @@
 import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 
-import {Subscription} from 'rxjs';
+import {ReplaySubject, Subscription} from 'rxjs';
 
 import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
@@ -141,7 +141,7 @@ describe('Player position service', () => {
   });
 
   it('should fetch EventEmitter for loading most recent checkpoint', () => {
-    let mockLoadMostRecentCheckpointEvent = new EventEmitter();
+    let mockLoadMostRecentCheckpointEvent = new ReplaySubject<void>(1);
     expect(pps.onLoadedMostRecentCheckpoint).toEqual(
       mockLoadMostRecentCheckpointEvent
     );

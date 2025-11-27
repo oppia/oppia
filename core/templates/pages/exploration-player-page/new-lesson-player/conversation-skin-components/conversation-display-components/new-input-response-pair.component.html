@@ -8,7 +8,7 @@
 </ng-template>
 
 <div class="answer-wrapper">
-  <div class="conversation-skin-learner-answer-container">
+  <div class="conversation-skin-learner-answer-container" [@fadeInOut]>
     <svg width="30" class="right-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
     [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(1)'} : {}">
       <path fill-rule="evenodd" clip-rule="evenodd" d="M0.832031 0C12.8267 5.31326 22.692 13.4676 29.1014 23.3701V0H0.832031Z" fill="#fff8e5"/>
@@ -40,7 +40,7 @@
 
 <div class="feedback-wrapper">
   <div class="conversation-skin-oppia-feedback-container"
-        *ngIf="data.oppiaResponse && feedbackIsEnabled">
+        *ngIf="data.oppiaResponse && feedbackIsEnabled" [@fadeInOut]>
 
     <svg width="30" class="left-side-curve" height="24" viewBox="0 0 30 24" fill="none" xmlns="http://www.w3.org/2000/svg"
     [ngStyle]="isLanguageRTL() ? {'transform': 'scaleX(-1)'} : {}">

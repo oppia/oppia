@@ -301,6 +301,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
 .oppia-learner-dash-container {
   background-color: #f2f4f7;
+  min-height: calc(100vh - 56px) !important;
   min-width: 320px;
   overflow-x: hidden;
   padding: 0 16px;
@@ -310,9 +311,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 .oppia-learner-dash-sidebar {
   background-color: #00645c;
   border-radius: 4px;
-  height: 100%;
+  height: calc(100vh - 88px);
   list-style-type: none;
   margin-bottom: 0;
+  overflow-y: auto;
   padding: 16px;
   width: 248px;
 }
@@ -349,9 +351,11 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
 .oppia-learner-dash-sidebar_position {
   height: calc(100vh - 56px);
+  left: 0;
   padding: 16px 0;
-  position: sticky;
+  position: fixed;
   top: 56px;
+  z-index: 10;
 }
 
 .oppia-learner-dash-tab {
@@ -364,6 +368,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   display: flex;
   gap: 0 16px;
   justify-content: center;
+  padding-left: 280px;
   position: relative;
 }
 
@@ -376,6 +381,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     align-content: flex-start;
     flex-direction: column;
     gap: 0;
+    padding-left: 0;
   }
 
   .oppia-learner-dash-sidebar {
@@ -385,6 +391,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     height: max-content;
     justify-content: space-around;
     overflow-x: auto;
+    overflow-y: visible;
     padding: 8px 0;
     width: 100%;
   }
@@ -441,6 +448,7 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
 
   .oppia-learner-dash-sidebar_position {
     height: max-content;
+    left: 0;
     padding: 0;
     position: relative;
     top: 0;
@@ -506,6 +514,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
     margin-bottom: 12px;
     padding: 12px;
   }
+
+  .oppia-learner-dash-sidebar_position {
+    position: relative;
+  }
 }
 
 /* Ultra-small screens (320px and below) */
@@ -563,6 +575,10 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   oppia-learner-dashboard-page .oppia-learner-groups-icon {
     font-size: 28px;
   }
+
+  .oppia-learner-dash-sidebar_position {
+    position: relative;
+  }
 }
 
 @media screen and (min-width: 1513px) {
@@ -572,11 +588,17 @@ oppia-learner-dashboard-page .oppia-learner-groups-icon {
   }
   
   .oppia-learner-dash-sidebar {
-    max-height: 100%;
+    max-height: calc(100vh - 88px);
   }
 
   .oppia-learner-dash-sidebar_position {
+    left: calc(50% - 744px);
     max-height: 100%;
+    position: fixed;
+  }
+
+  .oppia-learner-dash-content {
+    padding-left: 280px;
   }
 
   .oppia-learner-dash-tab {

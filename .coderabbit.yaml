@@ -1,0 +1,66 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+reviews:
+  # Provide more detailed, quality-focused feedback.
+  profile: assertive
+  auto_review:
+    # Note: We'll only turn this on once we are happy with the review
+    # results. To generate a review manually, post a comment with the
+    # command "@coderabbitai review".
+    enabled: false
+    # Reviews every new push to an existing PR, keeping feedback up-to-date.
+    auto_incremental_review: true
+  # Always generate a clear, high-level summary of what the PR changes.
+  high_level_summary: true
+  # Generate a detailed file-by-file walkthrough in a collapsible section.
+  collapse_walkthrough: true
+  # By default, don't block the PR from merging. Leave that to reviewers.
+  request_changes_workflow: false 
+  # Paths to completely ignore from any review to reduce noise and focus the AI.
+  path_filters:
+    - "!node_modules/**"
+    - "!third_party/**"
+    - "!dist/**"
+    - "!**.min.js"
+    - "!**.map"
+    - "!**/*.d.ts"
+    - "!build/**"
+    - "!assets/**" # Binary or non-code files
+  tools:
+    eslint:
+      enabled: true
+    gitleaks:
+      enabled: true # Security check for accidental secrets in history
+
+  # Path-specific instructions which provide targeted rules for Python
+  # (backend) and TypeScript/Angular (frontend).
+  path_instructions:
+    # 🎯 Python Backend (core/domain and platform logic)
+    - path: "**/*.py"
+      instructions: |
+        - Ensure all Python code adheres strictly to PEP 8 standards.
+        - Follow the style guidelines here: https://github.com/oppia/oppia/wiki/Coding-style-guide#python
+        - Consider the checks here: https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers
+        - Follow reviewer guidance here: https://github.com/oppia/oppia/wiki/Instructions-for-Reviewers#doing-the-review
+        - Verify functions and methods use type hints correctly and
+          consistently.
+        - Check for security vulnerabilities like SQL injection risks or
+          insecure defaults.
+        - Prioritize efficiency and performance, particularly in data-intensive
+          areas and `for` loops. For example, prefer use of get_multi() and
+          put_multi() when dealing with multiple Datastore entities, rather
+          than a `for` loop that deals with a single entity at a time.
+        - All new public functions must have comprehensive docstrings.
+
+    # 🎯 TypeScript & Angular Frontend
+    - path: "**/*.ts"
+      instructions: |
+        - Enforce Angular best practices: check for changes that lead to poor
+          performance (e.g., in change detection).
+        - Follow the style guidelines here: https://github.com/oppia/oppia/wiki/Coding-style-guide#typescript
+        - Consider the checks here: https://github.com/oppia/oppia/wiki/Oppia%27s-code-owners-and-checks-to-be-carried-out-by-developers
+        - Follow reviewer guidance here: https://github.com/oppia/oppia/wiki/Instructions-for-Reviewers#doing-the-review
+        - Ensure good component encapsulation and separation of concerns.
+        - Validate HTML templates for accessibility (A11y) and security.
+        - All new/modified TypeScript must use interfaces and types correctly.
+        - Ensure proper use of Angular services and dependency injection.

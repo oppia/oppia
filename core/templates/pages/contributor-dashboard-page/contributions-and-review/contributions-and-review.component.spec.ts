@@ -2216,6 +2216,24 @@ describe('Contributions and review component', () => {
         'translate_content'
       );
     });
+    it('should update topicReady when active topic changes', fakeAsync(() => {
+      const getActiveTopicNameSpy = spyOn(
+        translationTopicService,
+        'getActiveTopicName'
+      );
+
+      getActiveTopicNameSpy.and.returnValue(null);
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeFalse();
+
+      getActiveTopicNameSpy.and.returnValue('Math');
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeTrue();
+    }));
   });
 
   describe(
