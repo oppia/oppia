@@ -196,21 +196,6 @@ def _get_requirements_file_contents() -> Dict[str, str]:
     return requirements_contents
 
 
-def _dist_has_meta_data(dist: importlib.metadata.Distribution) -> bool:
-    """Checks if the Distribution has meta-data.
-
-    Args:
-        dist: Distribution. The distribution.
-
-    Returns:
-        bool. The distribution has meta-data or not.
-    """
-    try:
-        return dist.read_text('direct_url.json') is not None
-    except FileNotFoundError:
-        return False
-
-
 def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
     """Returns a dictionary containing all of the normalized libraries name
     strings with their corresponding version strings installed in the
@@ -221,32 +206,30 @@ def _get_third_party_python_libs_directory_contents() -> Dict[str, str]:
         installed as the key and the version string of that library as the
         value.
     """
-    all_distributions = list(
-        importlib.metadata.distributions(
-            path=[common.THIRD_PARTY_PYTHON_LIBS_DIR]
-        )
-    )
-    direct_url_packages, standard_packages = utils.partition(
-        all_distributions,
-        predicate=_dist_has_meta_data,
-    )
+    installed_packages = {}
 
-    installed_packages = {pkg.name: pkg.version for pkg in standard_packages}
+    for pkg in importlib.metadata.distributions(
+        path=[common.THIRD_PARTY_PYTHON_LIBS_DIR]
+    ):
+        # Check if this is a direct URL package (from git).
+        metadata_text = None
+        try:
+            metadata_text = pkg.read_text('direct_url.json')
+        except FileNotFoundError:
+            pass
 
-    for pkg in direct_url_packages:
-        metadata_text = pkg.read_text('direct_url.json')
-        if not metadata_text:
-            raise Exception(
-                f'Package {pkg.name} was identified as having direct_url.json '
-                'metadata but the file could not be read.'
+        if metadata_text:
+            # This is a git package with direct URL metadata.
+            metadata = json.loads(metadata_text)
+            version_string = '%s+%s@%s' % (
+                metadata['vcs_info']['vcs'],
+                metadata['url'],
+                metadata['vcs_info']['commit_id'],
             )
-        metadata = json.loads(metadata_text)
-        version_string = '%s+%s@%s' % (
-            metadata['vcs_info']['vcs'],
-            metadata['url'],
-            metadata['vcs_info']['commit_id'],
-        )
-        installed_packages[pkg.name] = version_string
+            installed_packages[pkg.name] = version_string
+        else:
+            # This is a standard package.
+            installed_packages[pkg.name] = pkg.version
 
     # Libraries with different case are considered equivalent libraries:
     # e.g 'Flask' is the same library as 'flask'. Therefore, we
@@ -352,43 +335,48 @@ def _rectify_third_party_directory(mismatches: MismatchType) -> None:
             directory_version,
         )
 
-    git_mismatches, pip_mismatches = utils.partition(
-        validated_mismatches.items(), predicate=_is_git_url_mismatch
-    )
-
-    for normalized_library_name, versions in git_mismatches:
+    for normalized_library_name, versions in validated_mismatches.items():
         requirements_version, directory_version = versions
 
-        # The library listed in 'requirements.txt' is not in the
-        # 'third_party/python_libs' directory.
-        if not directory_version or requirements_version != directory_version:
-            _install_direct_url(normalized_library_name, requirements_version)
+        # Check if this is a git URL dependency.
+        if requirements_version.startswith('git'):
+            # The library listed in 'requirements.txt' is not in the
+            # 'third_party/python_libs' directory.
+            if (
+                not directory_version
+                or requirements_version != directory_version
+            ):
+                _install_direct_url(
+                    normalized_library_name, requirements_version
+                )
+        else:
+            # This is a standard pip package.
+            requirements_version_parsed = (
+                version.Version(requirements_version)
+                if requirements_version
+                else None
+            )
+            directory_version_parsed = (
+                version.Version(directory_version)
+                if directory_version
+                else None
+            )
 
-    for normalized_library_name, versions in pip_mismatches:
-        requirements_version = (
-            version.Version(versions[0]) if versions[0] else None
-        )
-        directory_version = (
-            version.Version(versions[1]) if versions[1] else None
-        )
-
-        # The library listed in 'requirements.txt' is not in the
-        # 'third_party/python_libs' directory.
-        if not directory_version:
-            _install_library(normalized_library_name, str(requirements_version))
-        # The currently installed library version is not equal to the required
-        # 'requirements.txt' version.
-        elif requirements_version != directory_version:
-            _install_library(normalized_library_name, str(requirements_version))
-            _remove_metadata(normalized_library_name, str(directory_version))
-
-
-def _is_git_url_mismatch(
-    mismatch_item: Tuple[str, ValidatedMismatchType],
-) -> bool:
-    """Returns whether the given mismatch item is for a GitHub URL."""
-    _, (required, _) = mismatch_item
-    return required.startswith('git')
+            # The library listed in 'requirements.txt' is not in the
+            # 'third_party/python_libs' directory.
+            if not directory_version_parsed:
+                _install_library(
+                    normalized_library_name, str(requirements_version_parsed)
+                )
+            # The currently installed library version is not equal to the
+            # required 'requirements.txt' version.
+            elif requirements_version_parsed != directory_version_parsed:
+                _install_library(
+                    normalized_library_name, str(requirements_version_parsed)
+                )
+                _remove_metadata(
+                    normalized_library_name, str(directory_version_parsed)
+                )
 
 
 def _install_direct_url(library_name: str, direct_url: str) -> None:
