@@ -520,8 +520,8 @@ class AndroidPlatformParametersHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     # Here we use 'object' because the nested schema dictionaries contain mixed
-    # types (ints, bools, and nested dicts). A more specific type would not
-    # reflect the actual structure correctly and would cause mypy failures.
+    # value types (ints, bools, and nested dicts). No narrower type annotation
+    # can represent all possible values without breaking mypy compatibility.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
@@ -556,7 +556,6 @@ class AndroidPlatformParametersHandler(
 
         result = []
         for name, default_value in defaults.items():
-         
             override = self.normalized_request.get(name)
             value = override if override is not None else default_value
             result.append({'name': name, 'value': value})
@@ -577,8 +576,8 @@ class AndroidFeatureFlagsHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     # Here we use 'object' because the nested schema dictionaries contain mixed
-    # types (ints, bools, and nested dicts). A more specific type would not
-    # reflect the actual structure correctly and would cause mypy failures.
+    # value types (ints, bools, and nested dicts). No narrower type annotation
+    # can represent all possible values without breaking mypy compatibility.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
