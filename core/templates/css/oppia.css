@@ -318,12 +318,6 @@ html {
   --bs-gutter-y: revert;
 }
 
-.nav-tabs .nav-link {
-  background-color: #e9ecef;
-  border: 1px solid #dee2e6;
-  border-bottom-color: transparent;
-}
-
 .btn-close {
   color: #000;
   float: right;
@@ -844,6 +838,11 @@ textarea {
   font-size: 14px;
   padding: 0.5rem 1rem;
   position: relative;
+}
+.nav-tabs .nav-link {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  border-bottom-color: transparent;
 }
 .oppia-navbar-nav > .nav-link {
   padding: 10px 5px;
