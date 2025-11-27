@@ -179,39 +179,39 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage
         )
 
-    def test_run_dtslint_type_tests_passed(self) -> None:
+    def test_run_typescript_type_tests_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.run_dtslint_type_tests()
+            run_frontend_tests.run_typescript_type_tests()
         cmd = [
-            './node_modules/dtslint/bin/index.js',
-            run_frontend_tests.DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-            '--localTs',
-            run_frontend_tests.TYPESCRIPT_DIR_RELATIVE_PATH,
+            './node_modules/.bin/tsc',
+            '--project',
+            run_frontend_tests.TYPE_TESTS_DIR_PATH,
         ]
         self.assertIn(cmd, self.cmd_token_list)
-        self.assertIn('Running dtslint type tests.', self.print_arr)
+        self.assertIn('Running TypeScript type tests.', self.print_arr)
         self.assertNotIn(
-            'The dtslint (type tests) failed.', self.sys_exit_message
+            'The TypeScript type tests failed.', self.sys_exit_message
         )
 
-    def test_run_dtslint_type_tests_failed(self) -> None:
+    def test_run_typescript_type_tests_failed(self) -> None:
         with self.swap_failed_Popen, self.print_swap:
             with self.swap_sys_exit:
-                run_frontend_tests.run_dtslint_type_tests()
+                run_frontend_tests.run_typescript_type_tests()
         cmd = [
-            './node_modules/dtslint/bin/index.js',
-            run_frontend_tests.DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-            '--localTs',
-            run_frontend_tests.TYPESCRIPT_DIR_RELATIVE_PATH,
+            './node_modules/.bin/tsc',
+            '--project',
+            run_frontend_tests.TYPE_TESTS_DIR_PATH,
         ]
         self.assertIn(cmd, self.cmd_token_list)
-        self.assertIn('Running dtslint type tests.', self.print_arr)
-        self.assertIn('The dtslint (type tests) failed.', self.sys_exit_message)
+        self.assertIn('Running TypeScript type tests.', self.print_arr)
+        self.assertIn(
+            'The TypeScript type tests failed.', self.sys_exit_message
+        )
 
-    def test_no_tests_are_run_when_dtslint_flag_passed(self) -> None:
+    def test_no_tests_are_run_when_type_test_flag_passed(self) -> None:
         with self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.main(args=['--dtslint_only'])
-        self.assertIn('Running dtslint type tests.', self.print_arr)
+            run_frontend_tests.main(args=['--type_test_only'])
+        self.assertIn('Running TypeScript type tests.', self.print_arr)
         self.assertIn('Done!', self.print_arr)
         self.assertEqual(len(self.cmd_token_list), 1)
 
