@@ -57,6 +57,7 @@ class InitializeAndroidTestDataHandler(
     """Handler to initialize android specific structures."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    # Allow GET/POST overrides through schema validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
@@ -460,10 +461,7 @@ class AndroidActivityHandler(
                     }
                 )
         else:
-            # All other activities are standard versioned models
-            # that can be fetched in bulk using their
-            # respective get_multiple_*_by_ids_and_version
-            # methods.
+          
             ids_and_versions = [
                 (activity_data['id'], activity_data.get('version'))
                 for activity_data in activities_data
@@ -522,11 +520,7 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because the nested schema dicts include
-    # both schema definitions and default values with varying types
-    # (e.g. bools, ints and nested dicts). Using `object` accurately
-    # represents the mixed types stored in these dicts while keeping
-    # mypy checks satisfied. See handler validation logic for details.
+    # Allow GET overrides through schema validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
@@ -553,7 +547,7 @@ class AndroidPlatformParametersHandler(
         """
         assert self.normalized_request is not None
 
-        # Defaults used by the Android client in tests.
+      
         defaults = {
             'android_min_version_code_for_recommending_app_update': 0,
             'android_min_supported_version_code': 0,
@@ -562,7 +556,7 @@ class AndroidPlatformParametersHandler(
 
         result = []
         for name, default_value in defaults.items():
-            # If a validated override was provided, use it.
+         
             override = self.normalized_request.get(name)
             value = override if override is not None else default_value
             result.append({'name': name, 'value': value})
@@ -582,11 +576,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because the nested schema dicts include
-    # both schema definitions and default values with varying types
-    # (e.g. bools, ints and nested dicts). Using `object` accurately
-    # represents the mixed types stored in these dicts while keeping
-    # mypy checks satisfied. See handler validation logic for details.
+    # Allow GET overrides through schema validation.
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
