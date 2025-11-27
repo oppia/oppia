@@ -1430,18 +1430,11 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 lambda _: None,
                 expected_args=[
                     # When the code under test runs, the first sys.exit call halts
-                    # execution. However, when this test runs, sys.exit is mocked
-                    # and so does not interrupt the execution flow. Therefore we
-                    # call sys.exit with the error code from the webpack compilation
-                    # process (2) 5 times (the maximum number of attempts allowed to
-                    # compile webpack) and then exit with code 1 after giving up
-                    # trying to compile webpack.
+                    # execution. The current implementation exits immediately when
+                    # a CalledProcessError is raised, so there's only one call
+                    # to sys.exit with the error code from the webpack compilation
+                    # process (2).
                     (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (1,),
                 ],
             )
         )
