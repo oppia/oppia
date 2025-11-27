@@ -214,7 +214,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
         def mock_find_distributions(  # pylint: disable=unused-argument
-            paths: List[str],
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -387,19 +387,27 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.swap_run:
                     install_python_prod_dependencies.main()
 
+        # Check that the pip-compile command was run first.
         self.assertEqual(
-            self.cmd_token_list,
+            self.cmd_token_list[0],
             [
-                [
-                    'pip-compile',
-                    '--no-emit-index-url',
-                    '--quiet',
-                    '--strip-extras',
-                    '--generate-hashes',
-                    'requirements.in',
-                    '--output-file',
-                    'requirements.txt',
-                ],
+                'pip-compile',
+                '--no-emit-index-url',
+                '--quiet',
+                '--strip-extras',
+                '--generate-hashes',
+                'requirements.in',
+                '--output-file',
+                'requirements.txt',
+            ],
+        )
+
+        # Check that all the expected install commands were run (order doesn't
+        # matter for the install commands since dependencies can be processed
+        # in any order).
+        self.assertCountEqual(
+            self.cmd_token_list[1:],
+            [
                 [
                     'python',
                     '-m',
@@ -767,7 +775,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_correct_metadata_directory_names_do_not_throw_error(self) -> None:
         def mock_find_distributions(
-            unused_paths: List[str],
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency-1', '1.5.1', {}),
@@ -816,7 +824,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         def mock_find_distributions(
-            unused_paths: List[str],
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -986,12 +994,18 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_normalize_python_library_name(self) -> None:
         expected_normalized_names = [
-            ('backports-tarfile', 'backports.tarfile'),
-            ('backports-tarfile-2', 'backports.tarfile-2'),
+            ('backports-tarfile', 'backports-tarfile'),
+            ('backports.tarfile', 'backports-tarfile'),
+            ('backports_tarfile', 'backports-tarfile'),
+            ('backports-tarfile-2', 'backports-tarfile-2'),
             ('apache-beam[gcp]', 'apache-beam'),
             ('Pillow', 'pillow'),
             ('pylatexenc', 'pylatexenc'),
             ('PyYAML', 'pyyaml'),
+            ('importlib-metadata', 'importlib-metadata'),
+            ('importlib_metadata', 'importlib-metadata'),
+            ('typing-extensions', 'typing-extensions'),
+            ('typing_extensions', 'typing-extensions'),
         ]
 
         for lib_name, expected_normalized_name in expected_normalized_names:
