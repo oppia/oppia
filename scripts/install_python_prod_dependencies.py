@@ -206,8 +206,7 @@ def _dist_has_meta_data(dist: importlib.metadata.Distribution) -> bool:
         bool. The distribution has meta-data or not.
     """
     try:
-        dist.read_text('direct_url.json')
-        return True
+        return dist.read_text('direct_url.json') is not None
     except FileNotFoundError:
         return False
 

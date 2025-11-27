@@ -206,6 +206,35 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ):
                 install_python_prod_dependencies.get_mismatches()
 
+    def test_direct_url_package_with_no_metadata_text_raises_exception(
+        self,
+    ) -> None:
+        swap_requirements = self.swap(
+            common,
+            'COMPILED_REQUIREMENTS_FILE_PATH',
+            self.REQUIREMENTS_TEST_TXT_FILE_PATH,
+        )
+
+        def mock_find_distributions(  # pylint: disable=unused-argument
+            paths: List[str],
+        ) -> List[Distribution]:
+            # Create a distribution that will be identified as having
+            # direct_url.json but read_text returns None.
+            dist = Distribution('dependency5', '0.5.3', {'direct_url.json': ''})
+            return [dist]
+
+        swap_find_distributions = self.swap(
+            importlib.metadata, 'distributions', mock_find_distributions
+        )
+
+        with swap_requirements, swap_find_distributions:
+            with self.assertRaisesRegex(
+                Exception,
+                'Package dependency5 was identified as having direct_url.json '
+                'metadata but the file could not be read.',
+            ):
+                install_python_prod_dependencies.get_mismatches()
+
     def test_multiple_discrepancies_returns_correct_mismatches(self) -> None:
         swap_requirements = self.swap(
             common,

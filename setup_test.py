@@ -31,7 +31,14 @@ class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
 
     def test_setuptools_is_invoked_with_correct_parameters(self) -> None:
-        packages = 'module1==2.1.2\nmodule2==3.2.3\nmodule3==4.3.4\n'
+        packages = (
+            'module1==2.1.2 \\\n'
+            '    --hash=sha256:abcd1234\n'
+            'module2==3.2.3 \\\n'
+            '    --hash=sha256:efgh5678\n'
+            '# This is a comment\n'
+            'module3==4.3.4\n'
+        )
         with open('dummy_requirements.txt', 'w', encoding='utf-8') as f:
             f.write(packages)
 
@@ -44,7 +51,12 @@ class SetupTests(test_utils.GenericTestBase):
             expected_args=(('requirements.txt',),),
         )
 
-        required_packages = packages.split('\n')[:-1]
+        # The expected packages should not include comments or hashes.
+        required_packages = [
+            'module1==2.1.2',
+            'module2==3.2.3',
+            'module3==4.3.4',
+        ]
 
         swap_setup = self.swap_with_checks(
             setuptools,
