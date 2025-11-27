@@ -68,10 +68,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 self.run_counter += 1
                 return b''
 
+            def read(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
+
         class MockTask:
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile()
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -83,6 +87,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile(flakes=1)
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -94,6 +99,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile(flakes=10)
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -105,6 +111,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 1
                 self.stdout = MockFile()
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
