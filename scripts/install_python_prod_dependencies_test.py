@@ -133,7 +133,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_check_call(
             cmd_tokens: List[str], **_kwargs: str
         ) -> scripts_test_utils.PopenStub:  # pylint: disable=unused-argument
-            if cmd_tokens and cmd_tokens[0].endswith('%spython' % os.path.sep):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('%spython' % os.path.sep)
+                or cmd_tokens[0].endswith('%spython3' % os.path.sep)
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -142,7 +145,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return scripts_test_utils.PopenStub()
 
         def mock_run(cmd_tokens: List[str], **_kwargs: str) -> str:
-            if cmd_tokens and cmd_tokens[0].endswith('python'):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('python')
+                or cmd_tokens[0].endswith('python3')
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -774,7 +780,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
     def test_correct_metadata_directory_names_do_not_throw_error(self) -> None:
-        def mock_find_distributions(
+        def mock_find_distributions(  # pylint: disable=unused-argument
             path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
@@ -823,7 +829,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_exception_raised_when_metadata_directory_names_are_missing(
         self,
     ) -> None:
-        def mock_find_distributions(
+        def mock_find_distributions(  # pylint: disable=unused-argument
             path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
