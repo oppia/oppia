@@ -317,6 +317,53 @@ describe('RTE display component', () => {
     expect(outputWrappedString).toBe(expectedOutputWrappedString);
   }));
 
+  it('should preserve <br> nodes when rendering RTE content', fakeAsync(() => {
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+
+    const rteString = '<p>Hello<br><br>World</p>';
+
+    component.rteString = rteString;
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    flush();
+
+    // eslint-disable-next-line oppia/no-inner-html
+    const html = fixture.nativeElement.innerHTML;
+
+    // Should contain exactly two <br> tags.
+    const brCount = (html.match(/<br/g) || []).length;
+    expect(brCount).toBe(2);
+
+    // Should preserve the separation between Hello and World.
+    expect(html).toContain('Hello');
+    expect(html).toContain('World');
+  }));
+
+  it('should not treat <br> as text when wrapping sentences for highlighting', fakeAsync(() => {
+    spyOn(
+      localStorageService,
+      'getLastSelectedTranslationLanguageCode'
+    ).and.returnValue('en');
+
+    const rteString = '<p>Hello.<br><br>World.</p>';
+
+    const output = component.wrapSentencesInSpansForHighlighting(rteString);
+
+    // BR should not break sentence spans.
+    expect(output).toContain('<br><br>');
+    expect(output).toContain('id=\"highlightBlock1\"');
+    expect(output).toContain('id=\"highlightBlock2\"');
+
+    // Ensure highlightBlock1 contains "Hello".
+    expect(output).toContain('<span id=\"highlightBlock1\">Hello.</span>');
+
+    // Ensure highlightBlock2 contains "World".
+    expect(output).toContain('<span id=\"highlightBlock2\">World.</span>');
+  }));
+
   it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {
     spyOn(
       component,
