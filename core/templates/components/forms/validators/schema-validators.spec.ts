@@ -252,6 +252,18 @@ describe('Schema validators', () => {
           .toBeDefined();
       });
     });
+
+    it('should return null if value.toString throws', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      const throwingValue = {
+        toString: () => {
+          throw new Error('toString failed');
+        },
+      } as unknown as string;
+      control.setValue(throwingValue);
+      const filter = SchemaValidators.isFloat();
+      expect(filter(control)).toBe(null);
+    });
   });
 
   describe('when validating integer', () => {
@@ -533,6 +545,16 @@ describe('Schema validators', () => {
         {id: 'is_at_least', min_value: 0},
         {id: 'is_at_most', max_value: 100},
       ];
+      expect(validate(control, validators)).toBe(null);
+    });
+
+    it('should ignore unknown validator IDs and return null', () => {
+      const control: MockFormControl = new MockFormControl([], []);
+      control.setValue('anything');
+      const validators = [
+        // This ID does not map to any SchemaValidators function.
+        {id: 'nonexistent_validator'},
+      ] as unknown as Parameters<typeof validate>[1];
       expect(validate(control, validators)).toBe(null);
     });
   });
