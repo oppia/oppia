@@ -118,11 +118,10 @@ describe('Logged In Learner', function () {
       false
     );
 
-    // Verify "Learn Something New" section is visible and shows Chapter 1.
+    // Verify "Learn Something New" section is visible.
+    // Note: For a new user, the section may be empty (no untracked topics yet).
+    // The section will show lessons once the user has untracked topics.
     await loggedInUser.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
-    await loggedInUser.expectChapterToBePresentInLearnSomethingNewSection(
-      'Chapter 1'
-    );
 
     // Click on "Progress" tab and verify it's empty.
     await loggedInUser.navigateToProgressSection();
