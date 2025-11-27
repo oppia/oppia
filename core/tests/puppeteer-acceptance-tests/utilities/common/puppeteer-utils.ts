@@ -355,6 +355,29 @@ export class BaseUser {
    */
   async signInWithEmail(email: string): Promise<void> {
     await this.goto(testConstants.URLs.Home);
+    // Pre-warm: wait for the Home page to expose the sign-in control so we
+    // don't attempt interactions too early and hit navigation/timeouts when
+    // the devserver is still warming up. This waits for either an anchor
+    // linking to /login or any button/link containing the text 'Sign in'.
+    try {
+      await this.page.waitForFunction(
+        () => {
+          // Look for a direct login link first.
+          if (document.querySelector('a[href="/login"]')) {
+            return true;
+          }
+          // Otherwise look for any button or link with visible 'Sign in' text.
+          const els = Array.from(document.querySelectorAll('button, a'));
+          return els.some(e => (e.textContent || '').trim().includes('Sign in'));
+        },
+        {timeout: 45000}
+      );
+    } catch (e) {
+      // If this fails, proceed anyway and let the normal interactions fail
+      // with more specific errors; avoid blocking the test indefinitely.
+      // eslint-disable-next-line no-console
+      console.warn('Pre-warm wait for Sign in control timed out.');
+    }
     if (!this.userHasAcceptedCookies) {
       await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
@@ -728,12 +751,29 @@ export class BaseUser {
    * This function navigates to the given URL.
    */
   async goto(url: string, verifyURL: boolean = true): Promise<void> {
-    await this.page.goto(url, {waitUntil: ['networkidle0', 'load']});
+    // Use a more resilient navigation strategy: avoid waiting for
+    // 'networkidle0' because long-lived connections (SSE/WebSockets)
+    // in the devserver can prevent the navigation from resolving.
+    // First attempt: wait for DOMContentLoaded+load with a slightly
+    // increased timeout. If that fails, retry once with
+    // 'domcontentloaded' only. This keeps the change small and
+    // TypeScript-friendly while addressing the common timeout.
+    try {
+      await this.page.goto(url, {
+        waitUntil: ['domcontentloaded', 'load'],
+        timeout: 45000,
+      });
+    } catch (error) {
+      showMessage(`Initial goto(${url}) failed: ${error}. Retrying with domcontentloaded only.`);
+      // Fallback: try a lighter navigation wait. Let any error bubble
+      // up if it still fails.
+      await this.page.goto(url, {waitUntil: 'domcontentloaded', timeout: 45000});
+    }
 
     if (verifyURL) {
       await this.page.waitForFunction(
-        (url: string) => {
-          return window.location.href.includes(url);
+        (expectedUrl: string) => {
+          return window.location.href.includes(expectedUrl);
         },
         {},
         url

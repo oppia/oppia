@@ -704,7 +704,23 @@ export class CurriculumAdmin extends TopicManager {
    */
   async addBasicAlgebraQuestionToSkill(skillName: string): Promise<void> {
     await this.openSkillEditor(skillName);
-    await this.clickOnElementWithSelector(createQuestionButton);
+    // The skill editor can show either a div label or a button for creating
+    // a question depending on viewport / code path. Try the primary selector
+    // first, and fall back to the create-question-button if necessary.
+    try {
+      await this.page.waitForSelector(createQuestionButton, {
+        visible: true,
+        timeout: 30000,
+      });
+      await this.clickOnElementWithSelector(createQuestionButton);
+    } catch (err) {
+      // Fallback to button-style selector.
+      await this.page.waitForSelector('.e2e-test-create-question-button', {
+        visible: true,
+        timeout: 30000,
+      });
+      await this.clickOnElementWithSelector('.e2e-test-create-question-button');
+    }
     await this.clickOnElementWithSelector(textStateEditSelector);
     await this.page.waitForSelector(richTextAreaField, {visible: true});
     await this.typeInInputField(richTextAreaField, 'Add 1+2');

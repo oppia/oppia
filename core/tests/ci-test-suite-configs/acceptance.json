@@ -117,6 +117,14 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
     },
     {
+      "name": "logged-in-learner/manage-goals-in-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/manage-goals-in-learner-dashboard.spec.ts"
+    },
+    {
+      "name": "logged-in-learner/interact-with-goals-in-learner-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/interact-with-goals-in-learner-dashboard.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-links-on-get-started-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-get-started-page.spec.ts"
     },
@@ -300,6 +308,7 @@
       "name": "logged-in-learner/sets-goal-on-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/sets-goal-on-learner-dashboard.spec.ts"
     },
+    
     {
       "name": "logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/choose-new-lesson-to-play-from-learner-dashboard.spec.ts"
