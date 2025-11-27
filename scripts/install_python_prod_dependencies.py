@@ -25,11 +25,11 @@ import shutil
 import subprocess
 import sys
 
-from packaging import version
-from typing import Dict, Final, List, Optional, Set, Tuple
-
 from core import utils
 from scripts import install_python_dev_dependencies
+
+from packaging import version
+from typing import Dict, Final, List, Optional, Set, Tuple
 
 from . import common
 

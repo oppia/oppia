@@ -24,8 +24,8 @@ import re
 
 from core import feconf
 
-from packaging import requirements
 import setuptools
+from packaging import requirements
 
 
 def main() -> None:
