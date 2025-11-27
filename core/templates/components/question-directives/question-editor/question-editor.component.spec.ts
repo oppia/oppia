@@ -413,37 +413,39 @@ describe('Question Editor Component', () => {
 
   it('should not update question when answer groups is null', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionAnswerGroups(null!);
+    component.saveInteractionAnswerGroups(null as unknown as AnswerGroup[]);
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
   it('should not update question when answer groups is undefined', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionAnswerGroups(undefined!);
+    component.saveInteractionAnswerGroups(
+      undefined as unknown as AnswerGroup[]
+    );
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
   it('should not update question when default outcome is null', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionDefaultOutcome(null!);
+    component.saveInteractionDefaultOutcome(null as unknown as Outcome);
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
   it('should not update question when default outcome is undefined', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionDefaultOutcome(undefined!);
+    component.saveInteractionDefaultOutcome(undefined as unknown as Outcome);
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
   it('should not update question when interaction data is null', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionData(null!);
+    component.saveInteractionData(null as unknown as InteractionData);
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
   it('should not update question when interaction data is undefined', () => {
     const questionChangeSpy = spyOn(component.questionChange, 'emit');
-    component.saveInteractionData(undefined!);
+    component.saveInteractionData(undefined as unknown as InteractionData);
     expect(questionChangeSpy).not.toHaveBeenCalled();
   });
 
