@@ -475,14 +475,20 @@ describe('Schema validators', () => {
     it('should return null when single validator passes', () => {
       const control: MockFormControl = new MockFormControl([], []);
       control.setValue('test');
-      const validators = [{id: 'is_nonempty'}] as any[];
+      // Using an object that doesn't strictly match the validator type
+      // but is valid for the 'is_nonempty' validator which doesn't need min/max.
+      const validators = [{id: 'is_nonempty'}] as unknown as Parameters<
+        typeof validate
+      >[1];
       expect(validate(control, validators)).toBe(null);
     });
 
     it('should return validation errors when single validator fails', () => {
       const control: MockFormControl = new MockFormControl([], []);
       control.setValue('');
-      const validators = [{id: 'is_nonempty'}] as any[];
+      const validators = [{id: 'is_nonempty'}] as unknown as Parameters<
+        typeof validate
+      >[1];
       const result = validate(control, validators);
       expect(result).toEqual({isNonempty: true});
     });
@@ -504,7 +510,7 @@ describe('Schema validators', () => {
       const validators = [
         {id: 'is_nonempty'},
         {id: 'is_at_least', min_value: 1},
-      ] as any[];
+      ] as unknown as Parameters<typeof validate>[1];
       const result = validate(control, validators);
       expect(result).toEqual({
         isNonempty: true,
