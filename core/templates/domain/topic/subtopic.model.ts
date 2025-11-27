@@ -93,7 +93,10 @@ export class Subtopic {
     return this._urlFragment;
   }
 
-  setUrlFragment(urlFragment: string): void {
+  // In order to allow restoring unset state during undo operations (see
+  // topic-update.service), null must be an acceptable value for the input
+  // parameter.
+  setUrlFragment(urlFragment: string | null): void {
     this._urlFragment = urlFragment;
   }
 
@@ -175,7 +178,10 @@ export class Subtopic {
     }
   }
 
-  setThumbnailFilename(thumbnailFilename: string): void {
+  // In order to allow restoring unset state during undo operations (see
+  // topic-update.service), null must be an acceptable value for the input
+  // parameter.
+  setThumbnailFilename(thumbnailFilename: string | null): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -184,7 +190,10 @@ export class Subtopic {
     return this._thumbnailFilename;
   }
 
-  setThumbnailBgColor(thumbnailBgColor: string): void {
+  // In order to allow restoring unset state during undo operations (see
+  // topic-update.service), null must be an acceptable value for the input
+  // parameter.
+  setThumbnailBgColor(thumbnailBgColor: string | null): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 
