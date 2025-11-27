@@ -304,9 +304,9 @@ html {
 }
 
 .row > * {
-  margin-top: 0;
-  padding-left: 0;
-  padding-right: 0;
+  margin-top: revert;
+  padding-left: revert;
+  padding-right: revert;
 }
 
 .row button {
@@ -314,8 +314,8 @@ html {
 }
 
 .row {
-  --bs-gutter-x: 0;
-  --bs-gutter-y: 0;
+  --bs-gutter-x: revert;
+  --bs-gutter-y: revert;
 }
 
 .btn-close {
