@@ -773,6 +773,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 Distribution('dependency-1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
                 Distribution('dependency-5', '0.5.3', {}),
+                Distribution('jaraco-classes', '3.4.0', {}),
                 Distribution(
                     'dependency6',
                     '0.5.3',
@@ -795,6 +796,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
                 'dependency-5-0.5.3-py3.10.egg-info',
+                'jaraco.classes-3.4.0.dist-info',
                 'dependency_6-0.5.3-py3.10.egg-info',
             ]
 

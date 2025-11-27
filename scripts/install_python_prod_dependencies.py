@@ -435,29 +435,31 @@ def _get_possible_normalized_metadata_directory_names(
         set(str). Set containing the possible normalized directory name strings
         of metadata folders.
     """
-    # Some metadata folders replace the hyphens in the library name with
-    # underscores.
-    return {
-        normalize_directory_name(
-            '%s-%s.dist-info' % (library_name, version_string)
-        ),
-        normalize_directory_name(
-            '%s-%s.dist-info' % (library_name.replace('-', '_'), version_string)
-        ),
-        normalize_directory_name(
-            '%s-%s.egg-info' % (library_name, version_string)
-        ),
-        normalize_directory_name(
-            '%s-%s.egg-info' % (library_name.replace('-', '_'), version_string)
-        ),
-        normalize_directory_name(
-            '%s-%s-py3.10.egg-info' % (library_name, version_string)
-        ),
-        normalize_directory_name(
-            '%s-%s-py3.10.egg-info'
-            % (library_name.replace('-', '_'), version_string)
-        ),
-    }
+    # Metadata folders can use different separators: hyphens, underscores, or
+    # dots. We need to check all possible combinations since different packages
+    # use different conventions (e.g., jaraco.classes, jaraco-classes,
+    # jaraco_classes).
+    name_variations = [
+        library_name,
+        library_name.replace('-', '_'),
+        library_name.replace('-', '.'),
+    ]
+
+    possible_names = set()
+    for name in name_variations:
+        possible_names.add(
+            normalize_directory_name('%s-%s.dist-info' % (name, version_string))
+        )
+        possible_names.add(
+            normalize_directory_name('%s-%s.egg-info' % (name, version_string))
+        )
+        possible_names.add(
+            normalize_directory_name(
+                '%s-%s-py3.10.egg-info' % (name, version_string)
+            )
+        )
+
+    return possible_names
 
 
 def verify_pip_is_installed() -> None:
