@@ -36,8 +36,7 @@ os.environ['APPLICATION_ID'] = 'dev-project-id'
 # We only add CURR_DIR here at module load time because that's the minimum
 # required to import scripts.common, which defines the full list of paths.
 CURR_DIR = os.path.abspath(os.getcwd())
-if CURR_DIR not in sys.path:
-    sys.path.insert(0, CURR_DIR)
+sys.path.insert(0, CURR_DIR)
 
 # Now we can import from the scripts module, which defines the canonical
 # list of paths to add to sys.path.

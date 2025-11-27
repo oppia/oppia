@@ -20,13 +20,14 @@ from __future__ import annotations
 
 import os
 import sys
+import unittest
 from unittest import mock
 
 import conftest
 from scripts import common
 
 
-class PytestConfigureHookTests:
+class PytestConfigureHookTests(unittest.TestCase):
     """Tests for pytest_configure hook."""
 
     def test_pytest_configure_adds_missing_paths_to_sys_path(self) -> None:
@@ -106,7 +107,7 @@ class PytestConfigureHookTests:
                 ), f'Required directory {directory} not found in sys.path'
 
 
-class EnvironmentSetupTests:
+class EnvironmentSetupTests(unittest.TestCase):
     """Tests for environment variable setup in conftest.py."""
 
     def test_environment_variables_are_set(self) -> None:
@@ -125,3 +126,11 @@ class EnvironmentSetupTests:
             assert (
                 os.environ[var] == expected_value
             ), f'Environment variable {var} has wrong value'
+
+    def test_curr_dir_added_to_sys_path(self) -> None:
+        """Test that CURR_DIR is added to sys.path at module load time."""
+        # When conftest.py is imported, it should add CURR_DIR to sys.path.
+        # By the time this test runs, CURR_DIR should already be in sys.path
+        # because conftest.py was imported at test collection time.
+        curr_dir = os.path.abspath(os.getcwd())
+        assert curr_dir in sys.path, 'CURR_DIR not found in sys.path'
