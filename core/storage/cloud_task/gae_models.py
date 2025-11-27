@@ -24,7 +24,7 @@ import uuid
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Final, Type
+from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -293,13 +293,13 @@ class CloudTaskRunModel(base_models.BaseModel):
         )
 
 
-class VoiceoverRegenerationTaskMapping(base_models.BaseModel):
-    """Maps an exploration's voiceover regeneration request to its Cloud Task
-    run.
+class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
+    """The model maps an exploration's voiceover regeneration request to its
+    Cloud Task run.
 
     The model key is formed by combining the exploration ID and cloud task run
     ID, separated by a colon (:), ensuring a unique entry for each regeneration
-    request.
+    task request.
     """
 
     # The exploration ID for which the voiceover regeneration is requested.
@@ -343,12 +343,22 @@ class VoiceoverRegenerationTaskMapping(base_models.BaseModel):
         )
 
     @classmethod
-    def get_voiceover_regeneration_tasks_by_exploration_id(cls, exploration_id):
+    def get_voiceover_regeneration_tasks_by_exploration_id(
+        cls, exploration_id: str
+    ) -> List[VoiceoverRegenerationTaskMappingModel]:
         """The method fetches all voiceover regeneration task requests for the
         given exploration ID.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Returns:
+            list(VoiceoverRegenerationTaskMappingModel). A list of
+            VoiceoverRegenerationTaskMappingModel instances matching the given
+            exploration ID.
         """
         return list(
-            VoiceoverRegenerationTaskMapping.query(
+            VoiceoverRegenerationTaskMappingModel.query(
                 datastore_services.all_of(
                     cls.exploration_id == exploration_id,
                     cls.deleted  # pylint: disable=singleton-comparison

@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
-from core.domain import cloud_task_domain, voiceover_services
-
-from typing import List, TypedDict
-from core.platform import models
 from core import feconf
+from core.domain import cloud_task_domain
+from core.platform import models
+
+from typing import Dict, List, TypedDict, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,14 +33,26 @@ if MYPY:  # pragma: no cover
 
 def get_voiceover_regeneration_task(
     exploration_id: str, cloud_task_run_id: str
-):
+) -> Optional[cloud_task_domain.VoiceoverRegenerationTaskMapping]:
+    """
+    Returns the VoiceoverRegenerationTaskMapping object for the given
+    exploration id and cloud task run id.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        cloud_task_run_id: str. The id of the cloud task run.
+
+    Returns:
+        VoiceoverRegenerationTaskMapping. The VoiceoverRegenerationTaskMapping
+        object for the given exploration id and cloud task run id.
+    """
     voiceover_regeneration_task_id = '%s:%s' % (
         exploration_id,
         cloud_task_run_id,
     )
     voiceover_regeneration_task_run_model = (
-        cloud_task_models.VoiceoverRegenerationTaskMapping.get(
-            voiceover_regeneration_task_id, None
+        cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+            voiceover_regeneration_task_id, strict=False
         )
     )
 
@@ -66,7 +78,7 @@ def get_voiceover_regeneration_task(
 
 def get_existing_voiceover_regeneration_requests_in_task_queue(
     exploration_id: str,
-):
+) -> Dict[str, str | Dict[str, str]]:
     """Returns the existing voiceover regeneration cloud task run requests for
     the given exploration.
 
@@ -80,7 +92,7 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
 
     # Getting all the existing voiceover regeneration requests for the given
     # exploration ID.
-    voiceover_regeneration_task_requests = cloud_task_models.VoiceoverRegenerationTaskMapping.get_voiceover_regeneration_tasks_by_exploration_id(
+    voiceover_regeneration_task_requests = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
         exploration_id
     )
 
@@ -124,20 +136,20 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
 def delete_voiceover_regeneration_task_run_mapping(
     cloud_task_run_id: str,
 ) -> None:
-    """Deletes the VoiceoverRegenerationTaskMapping model entry for the given
+    """Deletes the VoiceoverRegenerationTaskMappingModel entry for the given
     cloud task run id.
 
     Args:
         cloud_task_run_id: str. The id of the cloud task run.
     """
-    cloud_task_models.VoiceoverRegenerationTaskMapping.delete_by_id(
+    cloud_task_models.VoiceoverRegenerationTaskMappingModel.delete_by_id(
         cloud_task_run_id
     )
 
 
 def resolve_multiple_cloud_task_runs_for_exploration(
     voiceover_regeneration_task_domain_objects,
-):
+) -> Dict[str, Dict[str, str]]:
     """Resolves multiple voiceover regeneration cloud task run requests for
     the same exploration by merging their content status.
 
@@ -206,19 +218,25 @@ def resolve_multiple_cloud_task_runs_for_exploration(
 def save_voiceover_regeneration_task_run_mapping(
     voiceover_regeneration_task: cloud_task_domain.VoiceoverRegenerationTaskMapping,
 ) -> None:
+    """Saves the VoiceoverRegenerationTaskMapping object to the datastore.
+
+    Args:
+        voiceover_regeneration_task: VoiceoverRegenerationTaskMapping. The
+            VoiceoverRegenerationTaskMapping domain object to be saved.
+    """
     voiceover_regeneration_task_model_id = '%s:%s' % (
         voiceover_regeneration_task.exploration_id,
         voiceover_regeneration_task.task_run_id,
     )
     voiceover_regeneration_task_model = (
-        cloud_task_models.VoiceoverRegenerationTaskMapping.get(
-            voiceover_regeneration_task_model_id, None
+        cloud_task_models.VoiceoverRegenerationTaskMappingModel.get(
+            voiceover_regeneration_task_model_id, strict=False
         )
     )
 
     if voiceover_regeneration_task_model is None:
         voiceover_regeneration_task_model = (
-            cloud_task_models.VoiceoverRegenerationTaskMapping(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel(
                 id=voiceover_regeneration_task_model_id,
                 exploration_id=voiceover_regeneration_task.exploration_id,
                 cloud_task_run_id=voiceover_regeneration_task.task_run_id,

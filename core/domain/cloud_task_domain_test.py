@@ -104,3 +104,188 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(cloud_task_run.to_dict(), cloud_task_run_dict)
+
+
+class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
+    """Unit tests for VoiceoverRegenerationTaskMapping domain object."""
+
+    def test_that_domain_object_is_created_correctly(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'succeeded',
+                'content_1': 'failed',
+            }
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.exploration_id, exploration_id
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.task_run_id, task_run_id
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            language_accent_to_content_status_map,
+        )
+
+    def test_should_create_domain_object_from_dict(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'succeeded',
+                'content_1': 'failed',
+            }
+        }
+
+        voiceover_regeneration_task_mapping_dict: (
+            cloud_task_domain.VoiceoverRegenerationTaskMappingDict
+        ) = {
+            'exploration_id': exploration_id,
+            'task_run_id': task_run_id,
+            'language_accent_to_content_status_map': (
+                language_accent_to_content_status_map
+            ),
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(
+                voiceover_regeneration_task_mapping_dict
+            )
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.to_dict(),
+            voiceover_regeneration_task_mapping_dict,
+        )
+
+    def test_should_be_able_to_create_default_object(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+
+        voiceover_regeneration_task_mapping = cloud_task_domain.VoiceoverRegenerationTaskMapping.create_default_voiceover_regeneration_task_mapping(
+            exploration_id, task_run_id
+        )
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.exploration_id, exploration_id
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.task_run_id, task_run_id
+        )
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            {},
+        )
+
+    def test_should_verify_all_voiceovers_are_generated(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'succeeded',
+                'content_1': 'succeeded',
+            },
+            'hi-IN': {
+                'content_0': 'succeeded',
+                'content_1': 'succeeded',
+            },
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        self.assertTrue(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
+        )
+
+        voiceover_regeneration_task_mapping.language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'succeeded',
+                'content_1': 'failed',
+            }
+        }
+
+        self.assertFalse(
+            voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
+        )
+
+    def test_should_update_content_status_for_cloud_task_run(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'generating',
+                'content_1': 'generating',
+                'content_2': 'generating',
+            }
+        }
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        voiceover_regeneration_task_mapping.update_content_status_for_cloud_task_run(
+            'en-US', ['content_1']
+        )
+
+        expected_language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'succeeded',
+                'content_1': 'failed',
+                'content_2': 'succeeded',
+            }
+        }
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+
+    def test_should_add_language_accent_to_content_status_map(self) -> None:
+        exploration_id = 'exp_id'
+        task_run_id = 'task_run_id'
+        language_accent_to_content_status_map = {}
+
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        voiceover_regeneration_task_mapping.add_language_accent_to_content_status_map(
+            'en-US', ['content_0', 'content_1']
+        )
+
+        expected_language_accent_to_content_status_map = {
+            'en-US': {
+                'content_0': 'generating',
+                'content_1': 'generating',
+            }
+        }
+
+        self.assertEqual(
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )

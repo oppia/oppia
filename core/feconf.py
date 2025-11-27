@@ -1734,6 +1734,16 @@ class TranslatedContentDict(TypedDict):
     content_format: str
 
 
+class VoiceoverRegenerationState(enum.Enum):
+    """Represents the possible states of voiceover regeneration for
+    exploration content.
+    """
+
+    GENERATING = 'generating'
+    SUCCEEDED = 'succeeded'
+    FAILED = 'failed'
+
+
 class VoiceoverType(enum.Enum):
     """Represents all possible voicever types."""
 

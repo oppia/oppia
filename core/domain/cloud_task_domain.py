@@ -20,7 +20,9 @@ from __future__ import annotations
 
 import datetime
 
-from typing import List, TypedDict
+from core import feconf
+
+from typing import Dict, List, TypedDict
 
 
 class CloudTaskRunDict(TypedDict):
@@ -121,13 +123,24 @@ class CloudTaskRun:
         )
 
 
+class VoiceoverRegenerationTaskMappingDict(TypedDict):
+    """Dictionary representing the VoiceoverRegenerationTaskMapping object."""
+
+    exploration_id: str
+    task_run_id: str
+    language_accent_to_content_status_map: Dict[str, Dict[str, str]]
+
+
 class VoiceoverRegenerationTaskMapping:
-    """A domain object that models a voiceover regeneration request for an
+    """Domain object class that models the voiceover regeneration request for an
     exploration, associated with a specific cloud task run ID.
     """
 
     def __init__(
-        self, exploration_id, task_run_id, language_accent_to_content_status_map
+        self,
+        exploration_id: str,
+        task_run_id: str,
+        language_accent_to_content_status_map: Dict[str, Dict[str, str]],
     ) -> None:
         self.exploration_id = exploration_id
         self.task_run_id = task_run_id
@@ -135,7 +148,7 @@ class VoiceoverRegenerationTaskMapping:
             language_accent_to_content_status_map
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> VoiceoverRegenerationTaskMappingDict:
         """Returns a dictionary representation of this domain object.
 
         Returns:
@@ -153,23 +166,29 @@ class VoiceoverRegenerationTaskMapping:
         }
 
     @classmethod
-    def from_dict(cls, mapping_dict: dict) -> VoiceoverRegenerationTaskMapping:
+    def from_dict(
+        cls,
+        voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationTaskMappingDict,
+    ) -> VoiceoverRegenerationTaskMapping:
         """Returns a domain object from a dictionary.
 
         Args:
-            mapping_dict: dict. A dictionary representation of the
-                VoiceoverRegenerationTaskMapping object.
+            voiceover_regeneration_task_mapping_dict: dict. A dictionary
+                representation of the VoiceoverRegenerationTaskMapping object.
 
         Returns:
-            VoiceoverRegenerationTaskMapping. A
-            VoiceoverRegenerationTaskMapping domain object created from the
-            given dictionary.
+            VoiceoverRegenerationTaskMapping. A VoiceoverRegenerationTaskMapping
+            domain object created from the given dict object.
         """
         return cls(
-            exploration_id=mapping_dict['exploration_id'],
-            task_run_id=mapping_dict['task_run_id'],
+            exploration_id=voiceover_regeneration_task_mapping_dict[
+                'exploration_id'
+            ],
+            task_run_id=voiceover_regeneration_task_mapping_dict['task_run_id'],
             language_accent_to_content_status_map=(
-                mapping_dict['language_accent_to_content_status_map']
+                voiceover_regeneration_task_mapping_dict[
+                    'language_accent_to_content_status_map'
+                ]
             ),
         )
 
@@ -184,31 +203,38 @@ class VoiceoverRegenerationTaskMapping:
             content_id_to_regeneration_status
         ) in self.language_accent_to_content_status_map.values():
             for status in content_id_to_regeneration_status.values():
-                if status != 'generated':
+                if status != feconf.VoiceoverRegenerationState.SUCCEEDED.value:
                     return False
         return True
 
     def update_content_status_for_cloud_task_run(
         self, language_accent_code: str, failed_content_ids: List[str]
-    ) -> dict:
-        if (
-            language_accent_code
-            not in self.language_accent_to_content_status_map
-        ):
-            return
+    ) -> None:
+        """Updates the content status map for a specific language accent code
+        based on the failed content IDs.
 
+        Args:
+            language_accent_code: str. The language accent code.
+            failed_content_ids: List[str]. The list of content IDs for which
+                voiceover regeneration has failed.
+        """
         content_status_map = self.language_accent_to_content_status_map.get(
-            language_accent_code
+            language_accent_code, {}
         )
 
-        for content_id, regeneration_status in content_status_map.items():
+        for content_id in content_status_map.keys():
             if content_id in failed_content_ids:
-                content_status_map[content_id] = 'failed'
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.FAILED.value
+                )
             else:
-                content_status_map[content_id] = 'succeeded'
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                )
 
+    @classmethod
     def create_default_voiceover_regeneration_task_mapping(
-        exploration_id: str, task_run_id: str
+        cls, exploration_id: str, task_run_id: str
     ) -> VoiceoverRegenerationTaskMapping:
         """Creates a default voiceover regeneration task mapping.
 
@@ -220,7 +246,7 @@ class VoiceoverRegenerationTaskMapping:
             VoiceoverRegenerationTaskMapping. The created voiceover
             regeneration task mapping.
         """
-        return VoiceoverRegenerationTaskMapping(
+        return cls(
             exploration_id=exploration_id,
             task_run_id=task_run_id,
             language_accent_to_content_status_map={},
@@ -242,7 +268,9 @@ class VoiceoverRegenerationTaskMapping:
 
         content_status_map = {}
         for content_id in content_id_list:
-            content_status_map[content_id] = 'generating'
+            content_status_map[content_id] = (
+                feconf.VoiceoverRegenerationState.GENERATING.value
+            )
 
         self.language_accent_to_content_status_map[language_accent_code] = (
             content_status_map
