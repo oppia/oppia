@@ -173,6 +173,13 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         page_contents = android_dict['page_contents']
         self.assertIn('subtitled_html', page_contents)
         self.assertIn('recorded_voiceovers', page_contents)
+        self.assertIn('written_translations', page_contents)
+
+        recorded_voiceovers = page_contents['recorded_voiceovers']
+        self.assertIn('voiceovers_mapping', recorded_voiceovers)
+
+        written_translations = page_contents['written_translations']
+        self.assertIn('translations_mapping', written_translations)
 
         html_content = page_contents['subtitled_html']['html']
         self.assertIn('<p><strong>Test Heading</strong></p>', html_content)
