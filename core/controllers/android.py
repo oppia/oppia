@@ -62,9 +62,9 @@ class InitializeAndroidTestDataHandler(
 
     @acl_decorators.open_access
     def post(self) -> None:
-        """Generates structures for Android integration testing.
+        """Generates structures for Android end-to-end tests.
 
-        This handler generates structures for Android integration testing in
+        This handler generates structures for Android end-to-end tests in
         order to evaluate the integration of network requests from the
         Android client to the backend. This handler should only be called
         once (or otherwise raises an exception), and can only be used in
@@ -131,6 +131,19 @@ class ActivityDataResponseDict(
 
     version: Optional[int]
     language_code: Optional[str]
+
+
+# TypedDicts for handler arg entries. These are top-level so mypy can
+# strictly type each field: `schema` is always a mapping and
+# `default_value` is an `Optional[int]` or `Optional[bool]` respectively.
+class HandlerArgEntryInt(TypedDict):
+    schema: Dict[str, str]
+    default_value: Optional[int]
+
+
+class HandlerArgEntryBool(TypedDict):
+    schema: Dict[str, str]
+    default_value: Optional[bool]
 
 
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
@@ -523,13 +536,7 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[
-        str,
-        Dict[
-            str,
-            Dict[str, Union[Dict[str, str], Optional[int]]]
-        ]
-    ] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, HandlerArgEntryInt]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
                 'schema': {'type': 'int'},
@@ -589,7 +596,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Dict[str, Union[Dict[str, str], Optional[bool]]]]] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, HandlerArgEntryBool]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
                 'schema': {'type': 'bool'},
