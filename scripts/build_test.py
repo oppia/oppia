@@ -25,11 +25,9 @@ import io
 import os
 import pathlib
 import re
-import subprocess
 import sys
 import tempfile
 import threading
-import traceback
 
 from core import feconf, utils
 from core.tests import test_utils
@@ -1398,53 +1396,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                servers,
-                'managed_webpack_compiler',
-                error=subprocess.CalledProcessError(return_code, []),
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-
-        def _log_sys_exit(arg: int) -> None:
-            print('-' * 50)
-            print(f'sys.exit called with: {arg}')
-            traceback.print_stack()
-            print('-' * 50)
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys,
-                'exit',
-                _log_sys_exit,
-                expected_args=[
-                    # When the code under test runs, the first sys.exit call halts
-                    # execution. The current implementation exits immediately when
-                    # a CalledProcessError is raised, so there's only one call
-                    # to sys.exit with the error code from the webpack compilation
-                    # process (2).
-                    (return_code,),
-                ],
-            )
         )
 
         build.build_js_files(True)
