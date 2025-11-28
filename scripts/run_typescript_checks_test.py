@@ -295,7 +295,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         print_arr: List[str] = []
 
-        def mock_print(msg: str) -> None:
+        def mock_print(
+            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+        ) -> None:
             print_arr.append(msg)
 
         print_swap = self.swap(builtins, 'print', mock_print)
@@ -334,7 +336,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         print_arr: List[str] = []
 
-        def mock_print(msg: str) -> None:
+        def mock_print(
+            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+        ) -> None:
             print_arr.append(msg)
 
         print_swap = self.swap(builtins, 'print', mock_print)
