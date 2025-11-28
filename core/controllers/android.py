@@ -57,14 +57,14 @@ class InitializeAndroidTestDataHandler(
     """Handler to initialize android specific structures."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Allow GET/POST overrides through schema validation.
+   
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
     def post(self) -> None:
-        """Generates structures for Android end-to-end tests.
+        """Generates structures for Android integration testing.
 
-        This handler generates structures for Android end-to-end tests in
+        This handler generates structures for Android integration testing in
         order to evaluate the integration of network requests from the
         Android client to the backend. This handler should only be called
         once (or otherwise raises an exception), and can only be used in
@@ -461,6 +461,10 @@ class AndroidActivityHandler(
                     }
                 )
         else:
+            # All other activities are standard versioned models
+            # that can be fetched in bulk using their
+            # respective get_multiple_*_by_ids_and_version
+            # methods.
             ids_and_versions = [
                 (activity_data['id'], activity_data.get('version'))
                 for activity_data in activities_data
@@ -511,7 +515,7 @@ class AndroidPlatformParametersHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler that exposes a minimal set of Android platform parameters
-    for the Android client used in E2E tests.
+    for the Android client used in integration testing.
 
     Supports optional GET query-parameter overrides. Invalid values will
     result in HTTP 400 responses thanks to schema validation.
@@ -519,10 +523,13 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because the nested schema dictionaries contain mixed
-    # value types (ints, bools, and nested dicts). No narrower type annotation
-    # can represent all possible values without breaking mypy compatibility.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
+    HANDLER_ARGS_SCHEMAS: Dict[
+        str,
+        Dict[
+            str,
+            Dict[str, Union[Dict[str, str], Optional[int]]]
+        ]
+    ] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
                 'schema': {'type': 'int'},
@@ -541,10 +548,17 @@ class AndroidPlatformParametersHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Returns platform parameters as a list of {name, value} objects.
+        """Returns platform parameters as a JSON array of objects.
 
-        Query parameters may override defaults; schema validation enforces
-        correct types and returns 400 on parse errors.
+        This is a temporary implementation that allows query parameters to override
+        defaults. Schema validation ensures that invalid parameter values result in
+        a 400 error response.
+
+        Each list item has:
+            - name (str): the parameter name.
+            - value (int): the resolved parameter value.
+
+        Query parameters may override defaults.
         """
         assert self.normalized_request is not None
 
@@ -567,7 +581,7 @@ class AndroidFeatureFlagsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
     """Handler that exposes a minimal set of Android feature flags
-    for the Android client used in E2E tests.
+    for the Android client used in integration testing.
 
     Supports optional GET query-parameter overrides. Invalid values will
     result in HTTP 400 responses thanks to schema validation.
@@ -575,10 +589,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because the nested schema dictionaries contain mixed
-    # value types (ints, bools, and nested dicts). No narrower type annotation
-    # can represent all possible values without breaking mypy compatibility.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, Dict[str, Union[Dict[str, str], Optional[bool]]]]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
                 'schema': {'type': 'bool'},
@@ -589,10 +600,17 @@ class AndroidFeatureFlagsHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        """Returns feature flags as a list of {name, enabled} objects.
+        """Returns Android feature flags as a JSON list of objects.
 
-        Query parameters may override defaults; schema validation enforces
-        correct types and returns 400 on parse errors.
+        Each item in the returned list has the structure:
+            {
+                'name': str,       # The name of the feature flag.
+                'enabled': bool    # Whether the flag is enabled.
+            }
+
+        Query parameters may override the default values. Schema validation
+        ensures that each override is a valid boolean; invalid values result in
+        a 400 error.
         """
         assert self.normalized_request is not None
 

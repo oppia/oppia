@@ -37,45 +37,63 @@ from core.tests import test_utils
 
 class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
     """Test suite for Android platform parameters and feature flags."""
+    def setUp(self) -> None:
+        super().setUp()
+        # Explicit expected defaults for platform parameters.
+        self.expected_platform_defaults = {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 21,
+        }
 
     def test_platform_parameters_defaults(self) -> None:
         response = self.get_json('/android_platform_parameters')
+
         mapping = {item['name']: item['value'] for item in response}
 
-        self.assertIn('android_min_version_code_for_recommending_app_update', mapping)
-        self.assertIn('android_min_supported_version_code', mapping)
-        self.assertIn('android_min_supported_api_level', mapping)
+        # Direct explicit assertion, no logic.
+        self.assertEqual(mapping, self.expected_platform_defaults)
 
-        self.assertEqual(mapping['android_min_version_code_for_recommending_app_update'], 0)
-        self.assertEqual(mapping['android_min_supported_version_code'], 0)
-        self.assertEqual(mapping['android_min_supported_api_level'], 21)
-
-    def test_platform_parameters_override_and_parse_error(self) -> None:
+    def test_platform_parameters_override(self) -> None:
         response = self.get_json(
             '/android_platform_parameters?android_min_supported_api_level=40'
         )
-        mapping = {item['name']: item['value'] for item in response}
-        self.assertEqual(mapping['android_min_supported_api_level'], 40)
 
+        mapping = {item['name']: item['value'] for item in response}
+
+        # Explicit assertion — no logic.
+        self.assertEqual(mapping, {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 40,
+        })
+
+    def test_platform_parameters_parse_error(self) -> None:
         self.get_json(
             '/android_platform_parameters?android_min_supported_api_level=notanint',
-            expected_status_int=400
+            expected_status_int=400,
         )
 
-    def test_feature_flags_defaults_and_overrides(self) -> None:
+    def test_feature_flags_defaults(self) -> None:
         response = self.get_json('/android_feature_flags')
         mapping = {item['name']: item['enabled'] for item in response}
 
-        self.assertIn('android_enable_fast_language_switching_in_lesson', mapping)
-        self.assertFalse(mapping['android_enable_fast_language_switching_in_lesson'])
+        self.assertEqual(mapping, {
+            'android_enable_fast_language_switching_in_lesson': False
+        })
 
+    def test_feature_flags_override(self) -> None:
         response = self.get_json(
             '/android_feature_flags?android_enable_fast_language_switching_in_lesson=true'
         )
         mapping = {item['name']: item['enabled'] for item in response}
-        self.assertTrue(mapping['android_enable_fast_language_switching_in_lesson'])
 
+        self.assertEqual(mapping, {
+            'android_enable_fast_language_switching_in_lesson': True
+        })
+
+    def test_feature_flags_parse_error(self) -> None:
         self.get_json(
             '/android_feature_flags?android_enable_fast_language_switching_in_lesson=notabool',
-            expected_status_int=400
+            expected_status_int=400,
         )
