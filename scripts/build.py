@@ -222,7 +222,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in range(max_tries):
+    for index in range(max_tries):
         try:
             managed_webpack_compiler = servers.managed_webpack_compiler(
                 use_source_maps=source_maps
@@ -230,6 +230,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
+            print('Webpack compilation failed (Attempt #%d)' % (index + 1))
             print(error.output)
             sys.exit(error.returncode)
         if os.path.isdir(webpack_bundles_dir_name):

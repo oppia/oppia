@@ -1433,27 +1433,27 @@ class CommonTests(test_utils.GenericTestBase):
             hashes = {'path/file.js': '123456'}
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
-                    self.assertEqual(
-                        json.loads(hashes_file.read()),
-                        {'path/file.js': '123456'},
-                    )
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'path/file.js': '123456'},
+                )
 
             # Test writing multiple hashes.
             hashes = {'file.js': '123456', 'file.min.js': '654321'}
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
-                    self.assertEqual(
-                        json.loads(hashes_file.read()),
-                        {'file.min.js': '654321', 'file.js': '123456'},
-                    )
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'file.min.js': '654321', 'file.js': '123456'},
+                )
 
             # Test writing an empty dict (used by dev/test scripts).
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file({})
-                with utils.open_file(hashes_path, 'r') as hashes_file:
-                    self.assertEqual(json.loads(hashes_file.read()), {})
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(json.loads(hashes_file.read()), {})
 
 
 class UrlRetrieveTests(CommonTests):

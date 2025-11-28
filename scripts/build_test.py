@@ -29,6 +29,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import traceback
 
 from core import feconf, utils
 from core.tests import test_utils
@@ -1423,11 +1424,19 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 common, 'run_ng_compilation', lambda: None, expected_args=[()]
             )
         )
+
+        def _log_sys_exit(arg):
+            print('-' * 50)
+            print(f'sys.exit called with: {arg}')
+            traceback.print_stack()
+            print('-' * 50)
+            return None
+
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 sys,
                 'exit',
-                lambda _: None,
+                _log_sys_exit,
                 expected_args=[
                     # When the code under test runs, the first sys.exit call halts
                     # execution. The current implementation exits immediately when
