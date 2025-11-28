@@ -78,6 +78,7 @@ export class FacilitatorDashboardPageComponent implements OnInit, OnDestroy {
     this.facilitatorDashboardBackendApiService
       .fetchTeacherDashboardLearnerGroupsAsync()
       .then(shortGroupSummaries => {
+        shortGroupSummaries.sort((a, b) => a.title.localeCompare(b.title));
         this.shortLearnerGroupSummaries = shortGroupSummaries;
         this.loaderService.hideLoadingScreen();
       });

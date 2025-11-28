@@ -62,7 +62,8 @@
     var iframes = document.querySelectorAll('div > iframe');
     iframes.forEach(function(iframe) {
       var src = iframe.getAttribute('src');
-      iframe.setAttribute('src', src.replace(placeholderExplorationId, newExplorationId));
+      iframe.setAttribute('src', src.replace(
+        placeholderExplorationId, encodeURIComponent(newExplorationId)));
     });
 
     placeholderExplorationId = newExplorationId;
