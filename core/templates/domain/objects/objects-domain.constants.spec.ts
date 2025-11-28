@@ -16,17 +16,20 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {all, create} from 'mathjs';
+import {MathJsStatic, all, create} from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
 describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
-  let mathjsUnits: string[] = [];
-  const math = create(all);
+  let mathjsUnits: string[]= [];
+  const math = create(all) as MathJsStatic;
 
   const isValidUnit = (unit: string): boolean => {
+    if(unit === undefined) {
+      throw new Error("Unit is undefined");
+    }
     return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
   };
 
@@ -55,7 +58,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return Object.keys(math.Unit.UNITS);
+    return Object.keys((math.Unit as any).UNITS);
   };
 
   beforeEach(() => {

@@ -19,17 +19,17 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from 'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import {State} from 'domain/state/state.model';
-import {States} from 'domain/exploration/states.model';
+import {State, StateBackendDict} from 'domain/state/state.model';
+import {States, StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
 
 describe('States', () => {
-  let statesDict = null;
-  let newState = null;
-  let newState2 = null;
-  let secondState = null;
-  let statesWithCyclicOutcomeDict = null;
-  let stateDictToDelete = null;
+  let statesDict: StateObjectsBackendDict;
+  let newState: StateBackendDict;
+  let newState2: StateBackendDict;
+  let secondState: StateBackendDict;
+  let statesWithCyclicOutcomeDict: StateObjectsBackendDict;
+  let stateDictToDelete: StateObjectsBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -102,10 +102,13 @@ describe('States', () => {
           missing_prerequisite_skill_id: null,
         },
         hints: [],
+        solution: null,
       },
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: true,
+      inapplicable_skill_misconception_ids: null,
     };
 
     newState2 = {
@@ -142,10 +145,13 @@ describe('States', () => {
         },
         hints: [],
         id: 'TextInput',
+        solution: null,
       },
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: true,
+      inapplicable_skill_misconception_ids: null,
     };
 
     secondState = {
@@ -177,6 +183,8 @@ describe('States', () => {
           },
           labelled_as_correct: false,
           param_changes: [],
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null,
         },
         hints: [],
         solution: {
@@ -192,6 +200,9 @@ describe('States', () => {
       linked_skill_id: null,
       param_changes: [],
       solicit_answer_details: false,
+      card_is_checkpoint: true,
+      inapplicable_skill_misconception_ids: null,
+      classifier_model_id: null,
     };
 
     statesDict = {
@@ -222,6 +233,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -229,6 +241,8 @@ describe('States', () => {
                   inputs: {x: 10},
                 },
               ],
+              training_data: [],
+              tagged_skill_misconception_id: null,
             },
           ],
           default_outcome: {
@@ -240,12 +254,19 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null,
           },
           hints: [],
           solution: null,
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
+        classifier_model_id: null, 
+        card_is_checkpoint: true, 
+        linked_skill_id: null, 
+        inapplicable_skill_misconception_ids: null,
       },
       'second state': {
         content: {
@@ -270,6 +291,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -277,6 +299,8 @@ describe('States', () => {
                   inputs: {x: 10},
                 },
               ],
+              training_data: [], 
+              tagged_skill_misconception_id: null,
             },
           ],
           default_outcome: {
@@ -288,12 +312,19 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null, 
+            missing_prerequisite_skill_id: null,
           },
           hints: [],
           solution: null,
+          confirmed_unclassified_answers: [],
         },
         param_changes: [],
         solicit_answer_details: false,
+        classifier_model_id: null, 
+        card_is_checkpoint: true, 
+        linked_skill_id: null, 
+        inapplicable_skill_misconception_ids: null,
       },
     };
 
@@ -316,6 +347,7 @@ describe('States', () => {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null,
               },
               rule_specs: [
                 {
@@ -323,6 +355,8 @@ describe('States', () => {
                   inputs: {x: 20},
                 },
               ],
+              training_data: [], 
+              tagged_skill_misconception_id: null,
             },
           ],
           confirmed_unclassified_answers: [],
@@ -347,6 +381,8 @@ describe('States', () => {
             },
             labelled_as_correct: false,
             param_changes: [],
+            refresher_exploration_id: null, 
+            missing_prerequisite_skill_id: null,
           },
           hints: [
             {
@@ -363,10 +399,14 @@ describe('States', () => {
             },
           ],
           id: 'TextInput',
+          solution: null,
         },
         linked_skill_id: null,
         param_changes: [],
         solicit_answer_details: false,
+        classifier_model_id: null, 
+        card_is_checkpoint: true, 
+        inapplicable_skill_misconception_ids: null,
       },
       'second state': secondState,
     };
@@ -399,7 +439,7 @@ describe('States', () => {
       'first state',
       State.createFromBackendDict('first state', newState)
     );
-    expect(newStates.getFinalStateNames()).toEqual['new state'];
+    expect(newStates.getFinalStateNames()).toEqual('new state');
   });
 
   it('should correctly delete a state', () => {
@@ -444,6 +484,7 @@ describe('States', () => {
                     labelled_as_correct: false,
                     param_changes: [],
                     refresher_exploration_id: null,
+                    missing_prerequisite_skill_id: null,
                   },
                   rule_specs: [
                     {
@@ -451,6 +492,8 @@ describe('States', () => {
                       inputs: {x: 10},
                     },
                   ],
+                  training_data: [], 
+                  tagged_skill_misconception_id: null,
                 },
               ],
               default_outcome: {
@@ -462,12 +505,19 @@ describe('States', () => {
                 },
                 labelled_as_correct: false,
                 param_changes: [],
+                refresher_exploration_id: null, 
+                missing_prerequisite_skill_id: null,
               },
               hints: [],
               solution: null,
+              confirmed_unclassified_answers: [],
             },
             param_changes: [],
             solicit_answer_details: false,
+            classifier_model_id: null, 
+            card_is_checkpoint: true, 
+            linked_skill_id: null, 
+            inapplicable_skill_misconception_ids: null,
           },
         })
       );

@@ -98,15 +98,16 @@ export class WrittenTranslation {
   }
 
   static createNew(
-    dataFormat: DataFormatToDefaultValuesKey
+    dataFormat: string
   ): WrittenTranslation {
     if (!DATA_FORMAT_TO_DEFAULT_VALUES.hasOwnProperty(dataFormat)) {
       throw new Error('Invalid translation data format: ' + dataFormat);
     }
+    const checkedFormat = dataFormat as DataFormatToDefaultValuesKey;
 
     return new WrittenTranslation(
-      dataFormat,
-      JSON.parse(JSON.stringify(DATA_FORMAT_TO_DEFAULT_VALUES[dataFormat])),
+      checkedFormat,
+      JSON.parse(JSON.stringify(DATA_FORMAT_TO_DEFAULT_VALUES[checkedFormat])),
       false
     );
   }

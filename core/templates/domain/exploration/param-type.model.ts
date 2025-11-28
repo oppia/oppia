@@ -110,4 +110,9 @@ export class ParamType {
     }
     return this.registry[backendName];
   }
+
+  /** @returns {Object.<string, ParamType>} */
+  static getRegistry(): Record<string, ParamType>{
+    return this.registry
+  }
 }
