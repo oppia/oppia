@@ -42,16 +42,16 @@ class PytestConfigureHookTests(unittest.TestCase):
             # Remove one of the required directories from sys.path to test
             # that pytest_configure adds it back.
             test_dir = common.DIRS_TO_ADD_TO_SYS_PATH[0]
+            assert os.path.exists(test_dir)
+
+            # Ensure that that directory is not in sys.path.
             if test_dir in sys.path:
                 sys.path.remove(test_dir)
-
-            # Verify it's not in sys.path.
             assert test_dir not in sys.path
 
             # Call pytest_configure and verify the directory was added.
             conftest.pytest_configure(mock_config)
-            if os.path.exists(test_dir):
-                assert test_dir in sys.path
+            assert test_dir in sys.path
         finally:
             # Restore original sys.path.
             sys.path[:] = original_sys_path
@@ -67,14 +67,13 @@ class PytestConfigureHookTests(unittest.TestCase):
         try:
             # Ensure all paths are already in sys.path.
             for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-                if os.path.exists(directory) and directory not in sys.path:
+                assert os.path.exists(directory)
+                if directory not in sys.path:
                     sys.path.insert(0, directory)
 
             # Count how many times each directory appears.
             path_counts = {
-                d: sys.path.count(d)
-                for d in common.DIRS_TO_ADD_TO_SYS_PATH
-                if os.path.exists(d)
+                d: sys.path.count(d) for d in common.DIRS_TO_ADD_TO_SYS_PATH
             }
 
             # Call pytest_configure.
@@ -82,10 +81,9 @@ class PytestConfigureHookTests(unittest.TestCase):
 
             # Verify no duplicates were added.
             for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-                if os.path.exists(directory):
-                    assert (
-                        sys.path.count(directory) == path_counts[directory]
-                    ), f'Directory {directory} was duplicated in sys.path'
+                assert (
+                    sys.path.count(directory) == path_counts[directory]
+                ), f'Directory {directory} was duplicated in sys.path'
         finally:
             # Restore original sys.path.
             sys.path[:] = original_sys_path
@@ -101,10 +99,10 @@ class PytestConfigureHookTests(unittest.TestCase):
 
         # Verify all existing directories are in sys.path.
         for directory in common.DIRS_TO_ADD_TO_SYS_PATH:
-            if os.path.exists(directory):
-                assert (
-                    directory in sys.path
-                ), f'Required directory {directory} not found in sys.path'
+            assert os.path.exists(directory)
+            assert (
+                directory in sys.path
+            ), f'Required directory {directory} not found in sys.path'
 
 
 class EnvironmentSetupTests(unittest.TestCase):
