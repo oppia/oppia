@@ -1425,7 +1425,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             )
         )
 
-        def _log_sys_exit(arg):
+        def _log_sys_exit(arg: int) -> None:
             print('-' * 50)
             print(f'sys.exit called with: {arg}')
             traceback.print_stack()
