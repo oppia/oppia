@@ -37,6 +37,7 @@ from core.tests import test_utils
 
 class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
     """Test suite for Android platform parameters and feature flags."""
+
     def setUp(self) -> None:
         super().setUp()
         # Explicit expected defaults for platform parameters.

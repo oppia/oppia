@@ -57,7 +57,7 @@ class InitializeAndroidTestDataHandler(
     """Handler to initialize android specific structures."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    
+
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
@@ -137,11 +137,25 @@ class ActivityDataResponseDict(
 # strictly type each field: `schema` is always a mapping and
 # `default_value` is an `Optional[int]` or `Optional[bool]` respectively.
 class HandlerArgEntryInt(TypedDict):
+    """TypedDict for handler argument entries whose value is an int.
+
+    Fields:
+        schema: A JSON schema mapping for the argument.
+        default_value: Optional integer default for the argument.
+    """
+
     schema: Dict[str, str]
     default_value: Optional[int]
 
 
 class HandlerArgEntryBool(TypedDict):
+    """TypedDict for handler argument entries whose value is a bool.
+
+    Fields:
+        schema: A JSON schema mapping for the argument.
+        default_value: Optional boolean default for the argument.
+    """
+
     schema: Dict[str, str]
     default_value: Optional[bool]
 
@@ -527,12 +541,7 @@ class AndroidActivityHandler(
 class AndroidPlatformParametersHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler that exposes a minimal set of Android platform parameters
-    for the Android client used in integration testing.
-
-    Supports optional GET query-parameter overrides. Invalid values will
-    result in HTTP 400 responses thanks to schema validation.
-    """
+    """Handler that returns Android platform parameters for testing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -587,12 +596,7 @@ class AndroidPlatformParametersHandler(
 class AndroidFeatureFlagsHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler that exposes a minimal set of Android feature flags
-    for the Android client used in integration testing.
-
-    Supports optional GET query-parameter overrides. Invalid values will
-    result in HTTP 400 responses thanks to schema validation.
-    """
+    """Handler that returns Android feature flags for testing."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
