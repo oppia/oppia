@@ -491,10 +491,8 @@ def run_typescript_type_tests() -> None:
     stderr_output = task.stderr.read()
     task.wait()
 
-    if stdout_output:
-        print(stdout_output.decode('utf-8'), end='')
-    if stderr_output:
-        print(stderr_output.decode('utf-8'), end='')
+    print(stdout_output.decode('utf-8'), end='')
+    print(stderr_output.decode('utf-8'), end='')
 
     if task.returncode != 0:
         sys.exit(1)
