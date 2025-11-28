@@ -367,33 +367,38 @@ describe('Goals tab Component', () => {
     component.editGoalsTopicClassification = [0];
     fixture.detectChanges();
 
-    const checkbox = fixture.nativeElement.querySelector(
-      '.e2e-test-remove-topic-from-current-goals-button'
+    const checkbox = fixture.debugElement.query(
+      By.css('.e2e-test-remove-topic-from-current-goals-button')
     );
+    if (!checkbox){
+      throw new Error("Unable to find the checkbox event")
+    }
 
     const addToLearnerGoalsSpy = spyOn(
       component,
       'addToLearnerGoals'
     ).and.callThrough();
 
-    checkbox.click();
+    checkbox.triggerEventHandler('click', { preventDefault: () => {} } as Event)
+    fixture.detectChanges()
 
     expect(addToLearnerGoalsSpy).toHaveBeenCalled();
   });
 
-  it('should add topic to learner goals if not already present', () => {
+  it('should add topic to learner goals if not already present', fakeAsync(() => {
     component.topicIdsInCurrentGoals.length = 0;
     component.topicIdsInCompletedGoals = ['1', '2'];
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
     ).and.returnValue(Promise.resolve(true));
+    tick();
     component.untrackedTopics = {math: [component.editGoals[0]]};
     component.addToLearnerGoals(component.editGoals[0], 'sample_topic_id', 1);
     fixture.detectChanges();
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
-  });
+  }));
   it('should remove topic from learner goals if already present', () => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 

@@ -184,7 +184,8 @@ export class GoalsTabComponent implements OnInit {
   async addToLearnerGoals(
     topic: LearnerTopicSummary,
     topicId: string,
-    index: number
+    index: number,
+    event?: Event,
   ): Promise<void> {
     event.preventDefault();
     var activityId = topicId;
