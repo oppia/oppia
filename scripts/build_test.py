@@ -1430,7 +1430,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             print(f'sys.exit called with: {arg}')
             traceback.print_stack()
             print('-' * 50)
-            return None
 
         self.exit_stack.enter_context(
             self.swap_with_checks(
