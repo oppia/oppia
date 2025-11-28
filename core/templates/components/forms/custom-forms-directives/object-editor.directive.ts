@@ -249,6 +249,11 @@ export class ObjectEditorComponent
   ) {}
 
   ngAfterViewInit(): void {
+    // Defensive check: Ensure objType is defined before using it.
+    if (!this.objType) {
+      this.loggerService.error('objType is required but was not provided');
+      return;
+    }
     const editorName = this.objType
       .replace(/([a-z])([A-Z])/g, '$1-$2')
       .toLowerCase();

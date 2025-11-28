@@ -140,6 +140,14 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Defensive check: Ensure selectedSkillId exists.
+    if (!this.selectedSkillId) {
+      this.loggerService.error(
+        'Cannot create question without a selected skill'
+      );
+      return;
+    }
+
     this.newQuestionSkillIds = [this.selectedSkillId];
     this.associatedSkillSummaries = [];
     this.linkedSkillsWithDifficulty = [
@@ -315,7 +323,11 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       this.pageContextService.setImageSaveDestinationToLocalStorage();
     }
 
-    this.windowRef.nativeWindow.location.hash = '/questions#' + this.questionId;
+    // Defensive check: Ensure windowRef and nativeWindow exist before accessing location.
+    if (this.windowRef?.nativeWindow?.location) {
+      this.windowRef.nativeWindow.location.hash =
+        '/questions#' + this.questionId;
+    }
   }
 
   removeQuestionSkillLinkAsync(

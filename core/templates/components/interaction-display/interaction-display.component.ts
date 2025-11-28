@@ -83,6 +83,10 @@ export class InteractionDisplayComponent {
   }
 
   buildInteraction(): void {
+    // Defensive check: Ensure htmlData exists and is not empty.
+    if (!this.htmlData || this.htmlData.trim().length === 0) {
+      return;
+    }
     if (this.htmlData) {
       let domparser = new DOMParser();
       let dom = domparser.parseFromString(this.htmlData, 'text/html');
@@ -106,7 +110,19 @@ export class InteractionDisplayComponent {
         const componentRef =
           this.viewContainerRef.createComponent(componentFactory);
 
-        let attributes = dom.body.firstElementChild.attributes;
+        // Defensive check: Ensure component was created successfully.
+        if (!componentRef || !componentRef.instance) {
+          return;
+        }
+
+        let attributes = dom.body.firstElementChild?.attributes;
+
+        // Defensive check: Ensure attributes exist before iterating.
+        if (!attributes) {
+          componentRef.changeDetectorRef.detectChanges();
+          this.changeDetectorRef.detectChanges();
+          return;
+        }
 
         Array.from(attributes).forEach(attribute => {
           const attributeNameInCamelCase = camelCaseFromHyphen(attribute.name);
