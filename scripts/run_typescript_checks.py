@@ -236,7 +236,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     # 'core/templates/domain/question/question-backend-api.service.spec.ts',
     # 'core/templates/domain/question/question-update.service.ts',
     # 'core/templates/domain/topic/topic-creation-backend-api.service.spec.ts',
-    # 'core/templates/domain/topic_viewer/topic-viewer-backend-api.service.ts',
+    # 'core/templates/domain/topic_viewer/topic-viewer-backend-api.service.ts',.
     'core/templates/domain/voiceover/voiceover-backend-api.service.spec.ts',
     'core/templates/filters/truncate-input-based-on-interaction-answer-type.pipe.ts',
     'core/templates/pages/admin-page/activities-tab/admin-dev-mode-activities-tab.component.spec.ts',
