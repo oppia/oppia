@@ -1037,6 +1037,25 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     return out, err
 
 
+def write_hashes_json_file(file_hashes: Dict[str, str]) -> None:
+    """Writes asset hashes to the hashes.json file.
+
+    This file is imported by TypeScript code and must exist for compilation
+    to succeed. During development/testing, an empty dict is typically passed
+    to create an empty but valid JSON file. During production builds, actual
+    hash mappings are provided for cache invalidation.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values. Pass an empty dict to create
+            an empty hashes file.
+    """
+    ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
+    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
+        hashes_json_file.write(str(json.dumps(file_hashes, ensure_ascii=False)))
+        hashes_json_file.write('\n')
+
+
 class LogType(enum.Enum):
     """Enumeration of supported log message types for CI log colorization."""
 
