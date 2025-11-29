@@ -20,6 +20,7 @@ import contextlib
 import errno
 import getpass
 import io
+import json
 import os
 import platform
 import re
@@ -194,6 +195,7 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 )
 WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
 NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
+HASHES_JSON_FILEPATH = os.path.join('assets', 'hashes.json')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
@@ -1029,3 +1031,22 @@ def start_subprocess_for_result(cmd: List[str]) -> Tuple[bytes, bytes]:
     task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err = task.communicate()
     return out, err
+
+
+def write_hashes_json_file(file_hashes: Dict[str, str]) -> None:
+    """Writes asset hashes to the hashes.json file.
+
+    This file is imported by TypeScript code and must exist for compilation
+    to succeed. During development/testing, an empty dict is typically passed
+    to create an empty but valid JSON file. During production builds, actual
+    hash mappings are provided for cache invalidation.
+
+    Args:
+        file_hashes: dict(str, str). Dictionary with filepaths as keys and
+            hashes of file content as values. Pass an empty dict to create
+            an empty hashes file.
+    """
+    ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
+    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
+        hashes_json_file.write(str(json.dumps(file_hashes, ensure_ascii=False)))
+        hashes_json_file.write('\n')
