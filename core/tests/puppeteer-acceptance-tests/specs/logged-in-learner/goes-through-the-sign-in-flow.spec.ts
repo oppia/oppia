@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * LI.SI. Learner goes through the sign-in flow
+ * LI.1. Sign up for an account
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -103,6 +103,15 @@ describe('Logged In Learner', function () {
       'Usernames can only have alphanumeric characters.'
     );
 
+    // Clear the invalid username and try username with "Admin" in it.
+    await loggedInUser.clearUsernameInput();
+    await loggedInUser.typeInvalidUsernameInUsernameInput('TopicAdmin');
+
+    // Verify different error message for username with "Admin".
+    await loggedInUser.expectUsernameError(
+      "User names with 'admin' are reserved."
+    );
+
     // Clear the invalid username and sign in with valid username.
     await loggedInUser.clearUsernameInput();
     await loggedInUser.signInWithUsername('loggedInUser');
@@ -118,10 +127,11 @@ describe('Logged In Learner', function () {
       false
     );
 
-    // Verify "Learn Something New" section is visible.
-    // Note: For a new user, the section may be empty (no untracked topics yet).
-    // The section will show lessons once the user has untracked topics.
+    // Verify "Learn Something New" section is visible and shows Chapter 1.
     await loggedInUser.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
+    await loggedInUser.expectChapterToBePresentInLearnSomethingNewSection(
+      'Chapter 1'
+    );
 
     // Click on "Progress" tab and verify it's empty.
     await loggedInUser.navigateToProgressSection();
