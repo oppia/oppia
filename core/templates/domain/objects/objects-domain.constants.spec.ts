@@ -23,13 +23,10 @@ import {ObjectsDomainConstants} from './objects-domain.constants';
 describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
-  let mathjsUnits: string[]= [];
+  let mathjsUnits: string[] = [];
   const math = create(all) as MathJsStatic;
 
   const isValidUnit = (unit: string): boolean => {
-    if(unit === undefined) {
-      throw new Error("Unit is undefined");
-    }
     return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
   };
 
@@ -58,7 +55,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return Object.keys((math.Unit as any).UNITS);
+    return Object.keys(math.Unit.units);
   };
 
   beforeEach(() => {
