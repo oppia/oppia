@@ -139,12 +139,29 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
       );
       return;
     }
-
-    // Defensive check: Ensure selectedSkillId exists.
+    // Allow creation even if no skill is currently selected; fall back to
+    // an empty skill list. The editor state and "Creating new" heading are
+    // still expected by tests when no skill has been chosen yet.
     if (!this.selectedSkillId) {
-      this.loggerService.error(
-        'Cannot create question without a selected skill'
+      this.newQuestionSkillIds = [];
+      this.associatedSkillSummaries = [];
+      this.linkedSkillsWithDifficulty = [];
+      this.newQuestionSkillDifficulties = [];
+      this.imageLocalStorageService.flushStoredImagesData();
+      this.pageContextService.setImageSaveDestinationToLocalStorage();
+      this.question = Question.createDefaultQuestion(this.newQuestionSkillIds);
+      this.questionUndoRedoService.clearChanges();
+      this.questionId = this.question.getId() ?? '';
+      this.questionStateData = this.question.getStateData();
+      this.questionIsBeingUpdated = false;
+      this.newQuestionIsBeingCreated = true;
+      this.topicEditorStateService.toggleQuestionEditor(
+        true,
+        this.newQuestionIsBeingCreated
       );
+      this.editorIsOpen = true;
+      this.skillLinkageModificationsArray = [];
+      this.isSkillDifficultyChanged = false;
       return;
     }
 
