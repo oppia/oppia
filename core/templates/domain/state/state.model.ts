@@ -181,7 +181,7 @@ export class State extends BaseTranslatableObject {
       ParamChanges.createFromBackendList(stateDict.param_changes),
       stateDict.solicit_answer_details,
       stateDict.card_is_checkpoint,
-      stateDict.inapplicable_skill_misconception_ids
+      stateDict.inapplicable_skill_misconception_ids ?? null
     );
   }
 }
