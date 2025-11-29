@@ -112,7 +112,7 @@ export class ParamType {
   }
 
   /** @returns {Object.<string, ParamType>} */
-  static getRegistry(): Record<string, ParamType>{
-    return this.registry
+  static getRegistry(): Record<string, ParamType> {
+    return this.registry;
   }
 }
