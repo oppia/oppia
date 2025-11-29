@@ -3,7 +3,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
-    "lib": ["es2017", "dom", "webworker"],
+    "lib": ["es2017", "dom", "dom.iterable", "webworker"],
     "module": "es2020",
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js_for_test",

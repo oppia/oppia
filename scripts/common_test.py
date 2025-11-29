@@ -22,6 +22,7 @@ import errno
 import getpass
 import http.server
 import io
+import json
 import os
 import pathlib
 import re
@@ -1420,6 +1421,39 @@ class CommonTests(test_utils.GenericTestBase):
                         )
                     except yaml.YAMLError as e:
                         self.fail(f'Error parsing file "{filename}": {str(e)}')
+
+    def test_write_hashes_json_file(self) -> None:
+        """Test write_hashes_json_file writes provided hash dict correctly to
+        JSON file.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            hashes_path = os.path.join(tmpdir, 'hashes.json')
+
+            # Test writing a simple hash dict.
+            hashes = {'path/file.js': '123456'}
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file(hashes)
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'path/file.js': '123456'},
+                )
+
+            # Test writing multiple hashes.
+            hashes = {'file.js': '123456', 'file.min.js': '654321'}
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file(hashes)
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'file.min.js': '654321', 'file.js': '123456'},
+                )
+
+            # Test writing an empty dict (used by dev/test scripts).
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file({})
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(json.loads(hashes_file.read()), {})
 
 
 class UrlRetrieveTests(CommonTests):
