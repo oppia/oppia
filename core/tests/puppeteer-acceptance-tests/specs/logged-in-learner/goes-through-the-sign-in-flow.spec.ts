@@ -92,8 +92,10 @@ describe('Logged In Learner', function () {
     await loggedInUser.navigateToSignUpPage();
 
     // Enter email to proceed to username page.
-    // The enterEmail function will click "Sign In" and verify username field is visible.
-    await loggedInUser.enterEmail('logged_in_user@example.com');
+    // The enterEmailAndProceedToNextPage function will click "Sign In" and verify username field is visible.
+    await loggedInUser.enterEmailAndProceedToNextPage(
+      'logged_in_user@example.com'
+    );
 
     // Fill an invalid username and verify error message.
     await loggedInUser.typeInvalidUsernameInUsernameInput('invalid@user!');

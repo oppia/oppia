@@ -873,9 +873,10 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to sign in the user with the given email to the Oppia website only when the email is valid.
+   * Function to enter email and proceed to the next page (username page).
+   * This will click "Sign In" and verify the username field is visible.
    */
-  async enterEmail(email: string): Promise<void> {
+  async enterEmailAndProceedToNextPage(email: string): Promise<void> {
     await this.page.waitForSelector(signUpEmailField, {
       visible: true,
     });
