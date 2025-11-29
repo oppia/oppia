@@ -21,6 +21,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
+  tick
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -399,13 +400,14 @@ describe('Goals tab Component', () => {
 
     expect(learnerGoalsSpy).toHaveBeenCalled();
   }));
-  it('should remove topic from learner goals if already present', () => {
+  it('should remove topic from learner goals if already present', fakeAsync(() => {
     component.topicIdsInCurrentGoals = ['1', '2', '3'];
 
     const learnerGoalsSpy = spyOn(
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
     ).and.returnValue(Promise.resolve(true));
+    tick()
     const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
 
     component.addToLearnerGoals(component.editGoals[0], '2', 1);
@@ -413,7 +415,7 @@ describe('Goals tab Component', () => {
 
     expect(removeTopicSpy).toHaveBeenCalled();
     expect(learnerGoalsSpy).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should remove topic from the learner goals', () => {
     expect(learnerDashboardActivityBackendApiService.removeActivityModalStatus)
