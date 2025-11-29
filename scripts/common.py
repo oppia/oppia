@@ -21,6 +21,7 @@ import enum
 import errno
 import getpass
 import io
+import json
 import os
 import platform
 import re
@@ -198,6 +199,7 @@ PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
 )
 WEBDRIVERIO_CONFIG_FILE_PATH = os.path.join('core', 'tests', 'wdio.conf.js')
 NODEMODULES_WDIO_BIN_PATH = os.path.join(NODE_MODULES_PATH, '.bin', 'wdio')
+HASHES_JSON_FILEPATH = os.path.join('assets', 'hashes.json')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     GOOGLE_APP_ENGINE_SDK_HOME,
