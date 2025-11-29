@@ -313,11 +313,6 @@ html {
   width: auto;
 }
 
-.row {
-  --bs-gutter-x: revert;
-  --bs-gutter-y: revert;
-}
-
 .btn-close {
   color: #000;
   float: right;
@@ -938,6 +933,9 @@ textarea {
   right: 0;
 }
 
+.dropdown-item {
+  color: var(--bs-dropdown-link-color) !important;
+}
 .dropdown-item.active, .dropdown-item:active {
   background-color: transparent;
 }
