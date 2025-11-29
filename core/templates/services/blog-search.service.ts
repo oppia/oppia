@@ -65,10 +65,36 @@ export class BlogPostSearchService {
     }
     return querySuffix;
   }
-
   hasReachedLastPage(): boolean {
     return this._searchOffset === null;
   }
+
+  get lastQuery():string{
+    return this._lastQuery
+  }
+  get searchOffset():number|null{
+    return this._searchOffset
+  }
+  get lastSelectedtags():string[]{
+    return this._lastSelectedTags
+  }
+  get isCurrentlyFetchingResults(){
+    return this._isCurrentlyFetchingResults
+  }
+
+  set lastQuery(value:string){
+    this._lastQuery=value
+  }
+  set searchOffset(value:number|null){
+    this._searchOffset = value
+  }
+  set lastSelectedtags(value:string[]){
+    this._lastSelectedTags = value
+  }
+  set isCurrentlyFetchingResults(value){
+    this._isCurrentlyFetchingResults = value
+  }
+
 
   _getSelectedTagsFromUrl(itemsType: string, urlComponent: string): string[] {
     // Returns list of tags for which the filter is applied from the url.

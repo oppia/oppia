@@ -110,6 +110,19 @@ describe('Blog Post Search Service', () => {
     });
   });
 
+  describe('resetSearchState', () => {
+    it('should reset all search service state properties' , () => {
+      searchService.searchOffset = 15;
+      searchService.lastQuery = "search query";
+
+      searchService.resetSearchState();
+
+      expect(searchService.lastQuery).toBe('');
+      expect(searchService.lastSelectedtags).toEqual([]);
+      expect(searchService.isCurrentlyFetchingResults).toBe(false);
+    });
+  });
+
   describe('getSearchUrlQueryString', () => {
     it('should successfully get search url query string', () => {
       const searchQuery = 'blog search';
