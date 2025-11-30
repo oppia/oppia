@@ -74,8 +74,8 @@ export class Outcome extends BaseTranslatableObject {
     return outcomeContentIdToHtml;
   }
 
-  setDestination(newValue: string): void {
-    this.dest = newValue;
+  setDestination(newValue: string | null): void {
+    this.dest = newValue ?? '';
   }
 
   toBackendDict(): OutcomeBackendDict {
