@@ -33,17 +33,18 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 
 import cloneDeep from 'lodash/cloneDeep';
 
-import {FeaturesTabComponent} from 'pages/release-coordinator-page/features-tab/features-tab.component';
-import {FeatureFlagDummyBackendApiService} from 'domain/feature-flag/feature-flag-dummy-backend-api.service';
+import {FeaturesTabComponent} from '../../../pages/release-coordinator-page/features-tab/features-tab.component';
+import {FeatureFlagDummyBackendApiService} from '../../../domain/feature-flag/feature-flag-dummy-backend-api.service';
 import {
   FeatureFlagBackendApiService,
   FeatureFlagsResponse,
-} from 'domain/feature-flag/feature-flag-backend-api.service';
-import {UserGroup} from 'domain/release_coordinator/user-group.model';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {FeatureStage} from 'domain/platform-parameter/platform-parameter.model';
-import {FeatureFlag} from 'domain/feature-flag/feature-flag.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+} from '../../../domain/feature-flag/feature-flag-backend-api.service';
+import {FeatureFlagViewModel} from './features-tab.component';
+import {UserGroup} from '../../../domain/release_coordinator/user-group.model';
+import {WindowRef} from '../../../services/contextual/window-ref.service';
+import {FeatureStage} from '../../../domain/platform-parameter/platform-parameter.model';
+import {FeatureFlag} from '../../../domain/feature-flag/feature-flag.model';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
 import {HttpErrorResponse} from '@angular/common/http';
 
 let dummyFeatureStatus = false;
@@ -62,6 +63,16 @@ class MockPlatformFeatureService {
     };
   }
 }
+
+const createFeatureFlagViewModel = function (
+  flag: FeatureFlag
+): FeatureFlagViewModel {
+  return {
+    ...flag,
+    searchQuery: '',
+    filteredUserGroups: [],
+  };
+};
 
 describe('Release coordinator page feature tab', function () {
   let component: FeaturesTabComponent;
@@ -184,7 +195,7 @@ describe('Release coordinator page feature tab', function () {
     let featureFlagVM = component.featureFlagViewModels[0];
     component.resetUserGroupSearch(featureFlagVM);
 
-    expect(component.userGroupInputs._results[0].nativeElement.value).toEqual(
+    expect(component.userGroupInputs.toArray()[0].nativeElement.value).toEqual(
       'UserGroup1'
     );
     expect(featureFlagVM.filteredUserGroups).toEqual(component.allUserGroups);
@@ -205,6 +216,7 @@ describe('Release coordinator page feature tab', function () {
       ]);
 
       let featureFlagVM = component.featureFlagViewModels[0];
+
       spyOn(component, 'resetUserGroupSearch').and.callThrough();
 
       component.addUserGroupToFeatureFlagViewModel(
@@ -495,7 +507,9 @@ describe('Release coordinator page feature tab', function () {
           last_updated: '08/17/2023, 15:30:45:123456',
         });
 
-        expect(component.getLastUpdatedDate(featureFlag)).toEqual(
+        let featureFlagVM = createFeatureFlagViewModel(featureFlag);
+
+        expect(component.getLastUpdatedDate(featureFlagVM)).toEqual(
           'Aug 17, 2023'
         );
       }
@@ -519,7 +533,9 @@ describe('Release coordinator page feature tab', function () {
         user_group_ids: [],
         last_updated: null,
       });
-      expect(component.getFeatureStageString(featureFlagTestStage)).toBe(
+      let featureFlagVMTestStage =
+        createFeatureFlagViewModel(featureFlagTestStage);
+      expect(component.getFeatureStageString(featureFlagVMTestStage)).toBe(
         'Test (can only be enabled on dev and test server).'
       );
     });
@@ -534,7 +550,9 @@ describe('Release coordinator page feature tab', function () {
         user_group_ids: [],
         last_updated: null,
       });
-      expect(component.getFeatureStageString(featureFlagProdStage)).toBe(
+      let featureFlagVMProdStage =
+        createFeatureFlagViewModel(featureFlagProdStage);
+      expect(component.getFeatureStageString(featureFlagVMProdStage)).toBe(
         'Prod (can only be enabled on dev, test and prod server).'
       );
     });
@@ -551,6 +569,8 @@ describe('Release coordinator page feature tab', function () {
       last_updated: null,
     });
 
+    let featureFlagVMDevStage = createFeatureFlagViewModel(featureFlagDevStage);
+
     let featureFlagProdStage = FeatureFlag.createFromBackendDict({
       description: 'This is a dummy feature flag.',
       feature_stage: FeatureStage.PROD,
@@ -560,6 +580,9 @@ describe('Release coordinator page feature tab', function () {
       user_group_ids: [],
       last_updated: null,
     });
+
+    let featureFlagVMProdStage =
+      createFeatureFlagViewModel(featureFlagProdStage);
 
     afterEach(() => {
       component.serverStage = '';
@@ -572,7 +595,7 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'dev';
 
         expect(
-          component.getFeatureValidOnCurrentServer(featureFlagDevStage)
+          component.getFeatureValidOnCurrentServer(featureFlagVMDevStage)
         ).toBe(true);
       }
     );
@@ -584,7 +607,7 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'test';
 
         expect(
-          component.getFeatureValidOnCurrentServer(featureFlagDevStage)
+          component.getFeatureValidOnCurrentServer(featureFlagVMDevStage)
         ).toBe(false);
       }
     );
@@ -596,7 +619,7 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'test';
 
         expect(
-          component.getFeatureValidOnCurrentServer(featureFlagProdStage)
+          component.getFeatureValidOnCurrentServer(featureFlagVMProdStage)
         ).toBe(true);
       }
     );
@@ -608,7 +631,7 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'prod';
 
         expect(
-          component.getFeatureValidOnCurrentServer(featureFlagProdStage)
+          component.getFeatureValidOnCurrentServer(featureFlagVMProdStage)
         ).toBe(true);
       }
     );
@@ -620,7 +643,7 @@ describe('Release coordinator page feature tab', function () {
         component.serverStage = 'prod';
 
         expect(
-          component.getFeatureValidOnCurrentServer(featureFlagDevStage)
+          component.getFeatureValidOnCurrentServer(featureFlagVMDevStage)
         ).toBe(false);
       }
     );
@@ -629,7 +652,7 @@ describe('Release coordinator page feature tab', function () {
       component.serverStage = 'unknown';
 
       expect(
-        component.getFeatureValidOnCurrentServer(featureFlagDevStage)
+        component.getFeatureValidOnCurrentServer(featureFlagVMDevStage)
       ).toBe(false);
     });
   });
@@ -809,41 +832,43 @@ describe('Release coordinator page feature tab', function () {
         last_updated: null,
       });
 
+      let featureFlagVM = createFeatureFlagViewModel(featureFlag);
+
       expect(() => {
-        component.isFeatureFlagViewModelChanged(featureFlag);
+        component.isFeatureFlagViewModelChanged(featureFlagVM);
       }).toThrowError();
     });
   });
 
   describe('.validateFeatureFlagViewModel', () => {
     it('should return empty array if no issue', () => {
-      const issues = component.validateFeatureFlagViewModel(
-        FeatureFlag.createFromBackendDict({
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          name: 'dummy_feature_flag_for_e2e_tests',
-          force_enable_for_all_users: false,
-          rollout_percentage: 0,
-          user_group_ids: [],
-          last_updated: null,
-        })
-      );
+      const featureFlag = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.DEV,
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 0,
+        user_group_ids: [],
+        last_updated: null,
+      });
+      let featureFlagVM = createFeatureFlagViewModel(featureFlag);
+      const issues = component.validateFeatureFlagViewModel(featureFlagVM);
 
       expect(issues).toEqual([]);
     });
 
     it('should return issues if rollout percentage is not between 10 and 100', () => {
-      const issues = component.validateFeatureFlagViewModel(
-        FeatureFlag.createFromBackendDict({
-          description: 'This is a dummy feature flag.',
-          feature_stage: FeatureStage.DEV,
-          name: 'dummy_feature_flag_for_e2e_tests',
-          force_enable_for_all_users: false,
-          rollout_percentage: 110,
-          user_group_ids: [],
-          last_updated: null,
-        })
-      );
+      const featureFlag = FeatureFlag.createFromBackendDict({
+        description: 'This is a dummy feature flag.',
+        feature_stage: FeatureStage.DEV,
+        name: 'dummy_feature_flag_for_e2e_tests',
+        force_enable_for_all_users: false,
+        rollout_percentage: 110,
+        user_group_ids: [],
+        last_updated: null,
+      });
+      let featureFlagVM = createFeatureFlagViewModel(featureFlag);
+      const issues = component.validateFeatureFlagViewModel(featureFlagVM);
 
       expect(issues).toEqual([
         'Rollout percentage should be between 0 to 100.',

@@ -27,10 +27,10 @@ import {NgbNavModule} from '@ng-bootstrap/ng-bootstrap';
 import {
   ThreadMessage,
   ThreadMessageBackendDict,
-} from 'domain/feedback_message/ThreadMessage.model';
-import {AlertsService} from 'services/alerts.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
-import {LoaderService} from 'services/loader.service';
+} from '../../domain/feedback_message/ThreadMessage.model';
+import {AlertsService} from '../../services/alerts.service';
+import {DateTimeFormatService} from '../../services/date-time-format.service';
+import {LoaderService} from '../../services/loader.service';
 import {ModeratorPageComponent} from './moderator-page.component';
 import {
   ActivityIdTypeDict,
@@ -82,6 +82,13 @@ describe('Moderator Page Component', () => {
   let activityResponse: FeaturedActivityResponse = {
     featured_activity_references: [],
   };
+
+  interface ErrorResponse {
+    status: number;
+    error: {
+      error: string;
+    };
+  }
 
   class MockModeratorPageBackendApiService {
     getRecentCommitsAsync() {
@@ -286,7 +293,7 @@ describe('Moderator Page Component', () => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
+            catch: (errorCallback: (err: ErrorResponse) => void) => {
               errorCallback(mockError);
             },
           };
@@ -329,7 +336,7 @@ describe('Moderator Page Component', () => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
+            catch: (errorCallback: (err: ErrorResponse) => void) => {
               errorCallback(mockError);
             },
           };
@@ -372,7 +379,7 @@ describe('Moderator Page Component', () => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
+            catch: (errorCallback: (err: ErrorResponse) => void) => {
               errorCallback(mockError);
             },
           };
@@ -415,7 +422,7 @@ describe('Moderator Page Component', () => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
+            catch: (errorCallback: (err: ErrorResponse) => void) => {
               errorCallback(mockError);
             },
           };
@@ -447,7 +454,7 @@ describe('Moderator Page Component', () => {
       return {
         then: () => {
           return {
-            catch: (errorCallback: (err: string) => void) => {
+            catch: (errorCallback: (err: ErrorResponse) => void) => {
               errorCallback(mockError);
             },
           };

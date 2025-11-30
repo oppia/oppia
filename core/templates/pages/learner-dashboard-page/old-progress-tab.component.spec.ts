@@ -23,17 +23,17 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
-import {MaterialModule} from 'modules/material.module';
+import {MaterialModule} from '../../modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {UrlInterpolationService} from '../../domain/utilities/url-interpolation.service';
+import {MockTranslatePipe} from '../../tests/unit-test-utils';
 import {OldProgressTabComponent} from './old-progress-tab.component';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import {StorySummary} from 'domain/story/story-summary.model';
-import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {LearnerDashboardBackendApiService} from '../../domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {StorySummary} from '../../domain/story/story-summary.model';
+import {LearnerTopicSummary} from '../../domain/topic/learner-topic-summary.model';
+import {WindowDimensionsService} from '../../services/contextual/window-dimensions.service';
 
 describe('Old Progress tab Component', () => {
   let component: OldProgressTabComponent;
@@ -117,17 +117,18 @@ describe('Old Progress tab Component', () => {
       unpublishing_reason: null,
     };
     const learnerTopicSummaryBackendDict1 = {
-      id: 'BqXdwH8YOsGX',
+      id: 'QqXdwH8YOsGX',
       name: 'Topic Name',
       language_code: 'en',
       description: 'description',
       version: 1,
-      total_published_node_count: 0,
       story_titles: ['Story 1'],
+      total_published_node_count: 2,
       thumbnail_filename: 'image.svg',
       thumbnail_bg_color: '#C6DCDA',
-      classroom: 'math',
-      practice_tab_is_displayed: true,
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
+      practice_tab_is_displayed: false,
       canonical_story_summary_dict: [
         {
           id: '0',
@@ -283,14 +284,6 @@ describe('Old Progress tab Component', () => {
         skill_id_2: 'Skill Description 2',
       },
     };
-    let subtopic1 = {
-      skill_ids: ['skill_id_2'],
-      id: 1,
-      title: 'subtopic_name',
-      thumbnail_filename: 'image.svg',
-      thumbnail_bg_color: '#F8BF74',
-      url_fragment: 'subtopic-name',
-    };
     const learnerTopicSummaryBackendDict1 = {
       id: 'QqXdwH8YOsGX',
       name: 'Topic Name',
@@ -319,10 +312,10 @@ describe('Old Progress tab Component', () => {
         },
       ],
       url_fragment: 'topic-name',
-      subtopics: [subtopic1],
+      subtopics: [subtopic],
       degrees_of_mastery: {
-        skill_id_1: 0,
-        skill_id_2: 0,
+        skill_id_1: 0.5,
+        skill_id_2: 0.3,
       },
       skill_descriptions: {
         skill_id_1: 'Skill Description 1',

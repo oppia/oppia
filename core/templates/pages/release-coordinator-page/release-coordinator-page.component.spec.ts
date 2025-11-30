@@ -28,16 +28,16 @@ import {FormBuilder} from '@angular/forms';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {NO_ERRORS_SCHEMA, ElementRef} from '@angular/core';
 
-import {PromoBarBackendApiService} from 'services/promo-bar-backend-api.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
+import {PromoBarBackendApiService} from '../../services/promo-bar-backend-api.service';
+import {WindowRef} from '../../services/contextual/window-ref.service';
 import {
   ReleaseCoordinatorBackendApiService,
   UserGroupsResponse,
 } from './services/release-coordinator-backend-api.service';
-import {ReleaseCoordinatorPageConstants} from 'pages/release-coordinator-page/release-coordinator-page.constants';
-import {ReleaseCoordinatorPageComponent} from 'pages/release-coordinator-page/release-coordinator-page.component';
-import {UserGroup} from 'domain/release_coordinator/user-group.model';
-import {PromoBar} from 'domain/promo_bar/promo-bar.model';
+import {ReleaseCoordinatorPageConstants} from '../../pages/release-coordinator-page/release-coordinator-page.constants';
+import {ReleaseCoordinatorPageComponent} from '../../pages/release-coordinator-page/release-coordinator-page.component';
+import {UserGroup} from '../../domain/release_coordinator/user-group.model';
+import {PromoBar} from '../../domain/promo_bar/promo-bar.model';
 
 class MockWindowRef {
   nativeWindow = {
@@ -444,7 +444,13 @@ describe('Release coordinator page', () => {
         component.ngOnInit();
         tick();
 
-        component.addUserToUserGroup({value: ''}, 'UserGroup1');
+        const userGroup = UserGroup.createFromBackendDict({
+          user_group_id: 'group1',
+          name: 'Test Group',
+          member_usernames: ['alice', 'bob'],
+        });
+
+        component.addUserToUserGroup({value: ''}, userGroup);
 
         expect(
           component.userGroups[0].memberUsernames.includes('')
@@ -697,7 +703,7 @@ describe('Release coordinator page', () => {
       const userGroup = UserGroup.createFromBackendDict({
         user_group_id: 'randomUserGroupId',
         name: 'random_user_group',
-        users: ['user', 'testuser'],
+        member_usernames: ['user', 'testuser'],
       });
 
       expect(() => {

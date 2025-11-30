@@ -18,10 +18,10 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {AssetsBackendApiService} from '../../../services/assets-backend-api.service';
+import {MockTranslatePipe} from '../../../tests/unit-test-utils';
 import {ClassroomCardComponent} from './classroom-card.component';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {I18nLanguageCodeService} from '../../../services/i18n-language-code.service';
 
 describe('ClassroomCardComponent', () => {
   let component: ClassroomCardComponent;
@@ -76,7 +76,7 @@ describe('ClassroomCardComponent', () => {
 
   it('should show translated classroom name if translation key is present', () => {
     component.classroomSummary = dummyClassroomData;
-    component.classroomSummary.name = null;
+    component.classroomSummary.name = '';
     expect(component.isHackyClassroomNameTranslationDisplayed()).toBeFalse();
 
     component.classroomSummary.name = 'math';

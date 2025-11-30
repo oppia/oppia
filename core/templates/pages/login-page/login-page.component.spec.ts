@@ -30,12 +30,12 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import {UserInfo} from 'domain/user/user-info.model';
-import {AlertsService} from 'services/alerts.service';
-import {AuthService} from 'services/auth.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {LoaderService} from 'services/loader.service';
-import {UserService} from 'services/user.service';
+import {UserInfo} from '../../domain/user/user-info.model';
+import {AlertsService} from '../../services/alerts.service';
+import {AuthService} from '../../services/auth.service';
+import {WindowRef} from '../../services/contextual/window-ref.service';
+import {LoaderService} from '../../services/loader.service';
+import {UserService} from '../../services/user.service';
 import {LoginPageComponent} from './login-page.component';
 
 class MockWindowRef {
@@ -107,18 +107,23 @@ describe('Login Page', () => {
   };
 
   beforeEach(() => {
+    // TODO as part of (#23496): fix AlertsService and SpyObj typing in order to
+    // pass strict typechecks. classes currently incompatible.
     alertsService = jasmine.createSpyObj<AlertsService>('AlertsService', [
       'addWarning',
-    ]);
+    ]) as jasmine.SpyObj<AlertsService>;
     authService = jasmine.createSpyObj<AuthService>('AuthService', {
       handleRedirectResultAsync: Promise.resolve(false),
       signInWithRedirectAsync: Promise.resolve(),
       signInWithEmail: Promise.resolve(),
     });
+    // TODO as part of (#23496): fix LoaderService and SpyObj typing in order to
+    // pass strict typechecks. classes currently incompatible.
     loaderService = jasmine.createSpyObj<LoaderService>('LoaderService', [
       'showLoadingScreen',
       'hideLoadingScreen',
-    ]);
+    ]) as jasmine.SpyObj<LoaderService>;
+
     userService = jasmine.createSpyObj<UserService>('UserService', {
       getUserInfoAsync: Promise.resolve(UserInfo.createDefault()),
     });

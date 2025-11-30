@@ -34,29 +34,29 @@ import {
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
-import {AppConstants} from 'app.constants';
-import {CollectionSummaryBackendDict} from 'domain/collection/collection-summary.model';
-import {CreatorExplorationSummaryBackendDict} from 'domain/summary/creator-exploration-summary.model';
-import {UserInfo} from 'domain/user/user-info.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {LoggerService} from 'services/contextual/logger.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {KeyboardShortcutService} from 'services/keyboard-shortcut.service';
-import {LoaderService} from 'services/loader.service';
-import {PageTitleService} from 'services/page-title.service';
-import {SearchService} from 'services/search.service';
-import {UserService} from 'services/user.service';
-import {MockTranslateModule} from 'tests/unit-test-utils';
+import {AppConstants} from '../../app.constants';
+import {CollectionSummaryBackendDict} from '../../domain/collection/collection-summary.model';
+import {CreatorExplorationSummaryBackendDict} from '../../domain/summary/creator-exploration-summary.model';
+import {UserInfo} from '../../domain/user/user-info.model';
+import {UrlInterpolationService} from '../../domain/utilities/url-interpolation.service';
+import {LoggerService} from '../../services/contextual/logger.service';
+import {WindowDimensionsService} from '../../services/contextual/window-dimensions.service';
+import {WindowRef} from '../../services/contextual/window-ref.service';
+import {I18nLanguageCodeService} from '../../services/i18n-language-code.service';
+import {KeyboardShortcutService} from '../../services/keyboard-shortcut.service';
+import {LoaderService} from '../../services/loader.service';
+import {PageTitleService} from '../../services/page-title.service';
+import {SearchService} from '../../services/search.service';
+import {UserService} from '../../services/user.service';
+import {MockTranslateModule} from '../../tests/unit-test-utils';
 import {LibraryPageComponent} from './library-page.component';
 import {
   ActivityDict,
   LibraryIndexData,
   LibraryPageBackendApiService,
 } from './services/library-page-backend-api.service';
-import {ClassroomBackendApiService} from 'domain/classroom/classroom-backend-api.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {ClassroomBackendApiService} from '../../domain/classroom/classroom-backend-api.service';
+import {SiteAnalyticsService} from '../../services/site-analytics.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -857,8 +857,16 @@ describe('Library Page Component', () => {
     ).toHaveBeenCalled();
   });
   it('should set max-width style on carousel element when it exists', fakeAsync(() => {
-    const originalLibraryTileWidth = AppConstants.LIBRARY_TILE_WIDTH_PX;
-    AppConstants.LIBRARY_TILE_WIDTH_PX = 200;
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      AppConstants,
+      'LIBRARY_TILE_WIDTH_PX'
+    );
+
+    Object.defineProperty(AppConstants, 'LIBRARY_TILE_WIDTH_PX', {
+      value: 200,
+      writable: true,
+      configurable: true,
+    });
 
     componentInstance.tileDisplayCount = 3;
     componentInstance.libraryWindowIsNarrow = false;
@@ -918,7 +926,13 @@ describe('Library Page Component', () => {
     );
     expect(rendererSetStyleSpy).toHaveBeenCalledTimes(1);
 
-    AppConstants.LIBRARY_TILE_WIDTH_PX = originalLibraryTileWidth;
+    if (originalDescriptor) {
+      Object.defineProperty(
+        AppConstants,
+        'LIBRARY_TILE_WIDTH_PX',
+        originalDescriptor
+      );
+    }
   }));
 
   it('should scroll the carousel to the right smoothly', fakeAsync(() => {

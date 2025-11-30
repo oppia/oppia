@@ -72,7 +72,7 @@ export class ModeratorPageComponent {
     private alertsService: AlertsService,
     private dateTimeFormatService: DateTimeFormatService,
     private loaderService: LoaderService,
-    private moderatorPageBackendApiService: ModeratorPageBackendApiService,
+    public moderatorPageBackendApiService: ModeratorPageBackendApiService,
     private changeDetectorRef: ChangeDetectorRef
   ) {}
 

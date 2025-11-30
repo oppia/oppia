@@ -118,8 +118,8 @@ export class LibraryPageComponent {
     private pageTitleService: PageTitleService,
     private translateService: TranslateService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private renderer: Renderer2,
-    private el: ElementRef
+    public renderer: Renderer2,
+    public el: ElementRef
   ) {}
 
   setActiveGroup(groupIndex: number): void {

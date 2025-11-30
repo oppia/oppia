@@ -21,7 +21,7 @@ import {TestBed} from '@angular/core/testing';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+// Old import: import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 import {LoggerService} from '../../../services/contextual/logger.service';
 
 describe('Player transcript service', () => {
@@ -40,8 +40,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewCard(
@@ -50,8 +49,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -65,8 +63,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     expect(pts.getCard(0).getStateName()).toBe('Third state');
@@ -79,8 +76,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewCard(
@@ -89,8 +85,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewCard(
@@ -99,8 +94,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     expect(pts.hasEncounteredStateBefore('First state')).toEqual(true);
@@ -114,8 +108,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -134,8 +127,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewCard(
@@ -144,8 +136,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addPreviousCard();
@@ -166,8 +157,7 @@ describe('Player transcript service', () => {
           'Content HTML',
           '<oppia-text-input-html></oppia-text-input-html>',
           {} as Interaction,
-          {} as RecordedVoiceovers,
-          ''
+          JSON.stringify({})
         )
       );
 
@@ -185,8 +175,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -197,8 +186,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -208,8 +196,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
   });
@@ -221,8 +208,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewInput('first answer', false);
@@ -267,8 +253,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     pts.addNewCard(
@@ -277,8 +262,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
     expect(pts.getNumCards()).toBe(2);
@@ -304,8 +288,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -314,8 +297,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-number-input-html></oppia-number-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     pts.updateLatestInteractionHtml(secondCard.getInteractionHtml());
@@ -331,8 +313,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card2 = StateCard.createNewCard(
@@ -340,8 +321,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card3 = StateCard.createNewCard(
@@ -349,8 +329,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card4 = StateCard.createNewCard(
@@ -358,8 +337,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let oldTranscript = [card3, card4];
@@ -382,8 +360,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card2 = StateCard.createNewCard(
@@ -391,8 +368,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card3 = StateCard.createNewCard(
@@ -400,8 +376,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card4 = StateCard.createNewCard(
@@ -409,8 +384,7 @@ describe('Player transcript service', () => {
       'Content HTML',
       '<oppia-text-input-html></oppia-text-input-html>',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let oldTranscript = [card3, card4];
@@ -436,8 +410,7 @@ describe('Player transcript service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
       )
     );
 
@@ -454,8 +427,7 @@ describe('Player transcript service', () => {
       '',
       '',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card2 = StateCard.createNewCard(
@@ -463,8 +435,7 @@ describe('Player transcript service', () => {
       '',
       '',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card3 = StateCard.createNewCard(
@@ -472,8 +443,7 @@ describe('Player transcript service', () => {
       '',
       '',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     let card4 = StateCard.createNewCard(
@@ -481,8 +451,7 @@ describe('Player transcript service', () => {
       '',
       '',
       {} as Interaction,
-      {} as RecordedVoiceovers,
-      ''
+      JSON.stringify({})
     );
 
     pts.addNewCard(card1);

@@ -25,7 +25,7 @@ import {PlayerPositionService} from './player-position.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 import {StateCard} from '../../../domain/state_card/state-card.model';
 import {Interaction} from '../../../domain/exploration/interaction.model';
-import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
+// Old import: import {RecordedVoiceovers} from '../../../domain/exploration/recorded-voiceovers.model';
 
 describe('Player position service', () => {
   let pts: PlayerTranscriptService;
@@ -76,8 +76,8 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
+        // {} as RecordedVoiceovers,
       )
     );
 
@@ -87,8 +87,8 @@ describe('Player position service', () => {
         'Content HTML',
         '<oppia-text-input-html></oppia-text-input-html>',
         {} as Interaction,
-        {} as RecordedVoiceovers,
-        ''
+        JSON.stringify({})
+        // {} as RecordedVoiceovers,
       )
     );
     let callBack = () => {};

@@ -45,9 +45,13 @@ interface IntSchema {
   validators: object[];
 }
 
-interface FeatureFlagViewModel extends FeatureFlag {
+export interface FeatureFlagViewModel extends FeatureFlag {
   searchQuery: string;
   filteredUserGroups: UserGroup[];
+  name: string;
+  userGroupIds: string[];
+  forceEnableForAllUsers: boolean;
+  rolloutPercentage: number;
 }
 
 @Component({
