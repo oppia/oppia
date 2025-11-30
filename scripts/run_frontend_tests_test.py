@@ -596,7 +596,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ), self.swap(
             build, 'main', mock_build_main
         ), self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.main(args=['--skip_install'])
+            run_frontend_tests.main(args=[])
 
         self.assertEqual(len(install_called), 0)
 
@@ -657,10 +657,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 args=['--run_on_changed_files_in_branch', '--allow_no_spec']
             )
 
-        self.assertIn(
-            'No valid specs found to run.',
-            [msg.strip() for msg in self.print_arr],
-        )
+        printed = [
+            (
+                msg.decode('utf-8') if isinstance(msg, bytes) else str(msg)
+            ).strip()
+            for msg in self.print_arr
+        ]
+
+        self.assertIn('No valid specs found to run.', printed)
 
     def test_stdout_line_with_web_server_logs_skipped(self) -> None:
         class MockFile:
@@ -698,7 +702,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.cmd_token_list = []
 
         with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
-            run_frontend_tests.main(args=['--skip_install'])
+            run_frontend_tests.main(args=[])
 
         printed_lines: list[str] = []
         for line in self.print_arr:
@@ -743,7 +747,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             return MockTask()
 
         with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
-            run_frontend_tests.main(args=['--skip_install'])
+            run_frontend_tests.main(args=[])
 
         angular_msg = (
             'If you run into the error "Trying to get the Angular '
