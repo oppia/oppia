@@ -22,6 +22,8 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
+import time
+from typing import Any, Callable, Iterator, Optional, Sequence
 
 from typing import Callable, Iterator, Optional, Sequence
 
@@ -33,6 +35,7 @@ from . import (
     servers,
 )
 from core.constants import constants
+from core import feconf
 
 
 _PARSER = argparse.ArgumentParser(
@@ -92,7 +95,7 @@ PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
 @contextlib.contextmanager
-def alert_on_exit() -> Iterator[None]:
+def _alert_on_exit() -> Iterator[None]:
     """Context manager that alerts developers to wait for a graceful shutdown.
 
     Yields:
@@ -114,7 +117,7 @@ def alert_on_exit() -> Iterator[None]:
         )
 
 
-def notify_about_successful_shutdown() -> None:
+def _notify_about_successful_shutdown() -> None:
     """Notifies developers that the servers have shutdown gracefully."""
     print(
         '\n\n'
@@ -128,12 +131,6 @@ def notify_about_successful_shutdown() -> None:
         '\033[0m'
         '\n\n'
     )
-
-
-def call_extend_index_yaml() -> None:
-    """Calls the extend_index_yaml.py script."""
-    print('\033[94mExtending index.yaml...\033[0m')
-    extend_index_yaml.main()
 
 
 def get_build_args(parsed_args: argparse.Namespace) -> list[str]:
@@ -206,7 +203,9 @@ def start_services(
 
 
 def attempt_launch_browser(
-    parsed_args: argparse.Namespace, enter_context_fn: Callable[..., object]
+    parsed_args: argparse.Namespace,
+    enter_context_fn: Callable[..., object],
+    dev_appserver: Any,
 ) -> None:
     """Attempts to launch the web browser if not disabled."""
 
@@ -220,48 +219,123 @@ def attempt_launch_browser(
             ]
         )
     else:
-        try:
-            enter_context_fn(
-                servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER)
-            )
-            common.print_each_string_after_two_new_lines(
-                [
-                    'INFORMATION',
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
-                ]
-            )
-        except Exception as error:
-            common.print_each_string_after_two_new_lines(
-                [
-                    'ERROR',
-                    'Error occurred while attempting to automatically launch '
-                    'the web browser: %s' % error,
-                ]
-            )
-            common.print_each_string_after_two_new_lines(
-                [
-                    'INFORMATION',
-                    'Local development server is ready! You can access it by '
-                    'navigating to http://localhost:%s/ in a web '
-                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                ]
-            )
+        last_error: Optional[Exception] = None
+        start_time = time.time()
+        retry_timeout = 10.0  # seconds
+        retry_interval = 0.5  # seconds
+
+        # Keep attempting to open the browser while the dev server appears to
+        # be running. This avoids giving up immediately if the browser launch
+        # fails briefly during startup.
+        while True:
+            # If the server isn't running yet, wait for it to come up until
+            # a retry timeout expires. If it has died or never comes up, then
+            # stop retrying and print a fallback info message.
+            if (
+                hasattr(dev_appserver, 'is_running')
+                and not dev_appserver.is_running()
+            ):
+                if time.time() - start_time >= retry_timeout:
+                    if last_error is not None:
+                        common.print_each_string_after_two_new_lines(
+                            [
+                                'ERROR',
+                                'Error occurred while attempting to automatically launch '
+                                'the web browser: %s' % last_error,
+                            ]
+                        )
+                    common.print_each_string_after_two_new_lines(
+                        [
+                            'INFORMATION',
+                            'Local development server is ready! You can access it by '
+                            'navigating to http://localhost:%s/ in a web '
+                            'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+                        ]
+                    )
+                    return
+                time.sleep(retry_interval)
+                continue
+
+            try:
+                enter_context_fn(
+                    servers.create_managed_web_browser(
+                        PORT_NUMBER_FOR_GAE_SERVER
+                    )
+                )
+                common.print_each_string_after_two_new_lines(
+                    [
+                        'INFORMATION',
+                        'Local development server is ready! Opening a default web '
+                        'browser window pointing to it: '
+                        'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                    ]
+                )
+                return
+            except (
+                Exception
+            ) as error:  # pragma: no cover - error flows covered in tests
+                last_error = error
+                # If we've exceeded our allotted retry timeout, stop trying.
+                if time.time() - start_time >= retry_timeout:
+                    common.print_each_string_after_two_new_lines(
+                        [
+                            'ERROR',
+                            'Error occurred while attempting to automatically launch '
+                            'the web browser: %s' % last_error,
+                        ]
+                    )
+                    common.print_each_string_after_two_new_lines(
+                        [
+                            'INFORMATION',
+                            'Local development server is ready! You can access it by '
+                            'navigating to http://localhost:%s/ in a web '
+                            'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+                        ]
+                    )
+                    return
+                time.sleep(retry_interval)
 
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
-        common.print_each_string_after_two_new_lines(
+    # Verify that none of the ports required by the dev services are in use
+    # before starting any service. This avoids partially starting services
+    # which could lead to unexpected errors. If a port is in use, print an
+    # error and exit.
+    required_ports: list[tuple[int, str]] = [
+        (PORT_NUMBER_FOR_GAE_SERVER, 'GAE dev appserver'),
+        (8000, 'GAE dev appserver admin port'),
+        (feconf.REDISPORT, 'Redis server'),
+        (feconf.ES_LOCALHOST_PORT, 'ElasticSearch server'),
+    ]
+    if constants.EMULATOR_MODE:
+        required_ports.extend(
             [
-                'WARNING',
-                'Could not start new server. There is already an existing server '
-                'running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER,
+                (feconf.FIREBASE_EMULATOR_PORT, 'Firebase auth emulator'),
+                (
+                    feconf.CLOUD_DATASTORE_EMULATOR_PORT,
+                    'Cloud Datastore emulator',
+                ),
             ]
         )
+
+    # Collect all ports that are already in use and report them together.
+    in_use_start: list[tuple[int, str]] = []
+    for port, name in required_ports:
+        if common.is_port_in_use(port):
+            in_use_start.append((port, name))
+    if in_use_start:
+        port_msgs = ', '.join([f"{p} ({n})" for p, n in in_use_start])
+        common.print_each_string_after_two_new_lines(
+            [
+                'ERROR',
+                'Could not start new server. The following ports are already in '
+                'use and need to be available: %s' % port_msgs,
+            ]
+        )
+        raise SystemExit(1)
 
     # The build stack ensures the constants are reset if the build is cancelled.
     # Only after the build successfully completes do we create the dev-server
@@ -286,42 +360,68 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # At this point, build completed successfully. Create the service stack
     # and register callbacks and contexts that must only run if the dev
     # server successfully starts.
-    with contextlib.ExitStack() as stack:
-        # ExitStack unwinds in reverse-order, so callbacks registered first
-        # will run last on exit. Desired shutdown order:
-        # 1) alert_on_exit() (printed first)  -- registered last
-        # 2) common.set_constants_to_default
-        # 3) call_extend_index_yaml
-        # 4) notify_about_successful_shutdown (printed last)
-        stack.callback(notify_about_successful_shutdown)
-        stack.callback(call_extend_index_yaml)
-        stack.callback(common.set_constants_to_default)
+    # Ensure port verification after unwinding occurs even if an exception
+    # arises while running the services. The finally block will run after
+    # the context manager unwinds.
+    stack: Optional[contextlib.ExitStack] = None
+    try:
+        with contextlib.ExitStack() as stack:
+            # ExitStack unwinds in reverse-order, so callbacks registered first
+            # will run last on exit. Desired shutdown order:
+            # 1) _alert_on_exit() (printed first)  -- registered last
+            # 2) common.set_constants_to_default
+            # 3) extend_index_yaml.main
+            # 4) _notify_about_successful_shutdown (printed last)
+            stack.callback(_notify_about_successful_shutdown)
+            stack.callback(extend_index_yaml.main)
+            stack.callback(common.set_constants_to_default)
 
-        # Start the services (they are registered with the stack here so that
-        # they are exited before the callbacks above run during unwinding).
-        dev_appserver = start_services(parsed_args, stack)
+            # Start the services (they are registered with the stack here so that
+            # they are exited before the callbacks above run during unwinding).
+            dev_appserver = start_services(parsed_args, stack)
 
-        # Enter the alert_on_exit context before attempting to launch the
-        # browser so that an exception while launching the browser still
-        # triggers the alert to be printed during stack unwinding.
-        #
-        # This must be registered before the attempt to launch the browser so
-        # that alert_on_exit is always in the stack when the unwinding begins.
-        stack.enter_context(alert_on_exit())
+            # Enter the _alert_on_exit context before attempting to launch the
+            # browser so that an exception while launching the browser still
+            # triggers the alert to be printed during stack unwinding.
+            #
+            # This must be registered before the attempt to launch the browser so
+            # that alert_on_exit is always in the stack when the unwinding begins.
+            stack.enter_context(_alert_on_exit())
 
-        # Try launching the default web browser after the server is up.
-        # Because we registered `alert_on_exit` above, a cancel/error while
-        # launching the browser will still cause the alert to be printed first
-        # during the unwinding of the service stack.
-        #
-        # following shutdown order on cancellation during this phase:
-        # 1) alert_on_exit() is printed first, then browser/context closures,
-        # 2) common.set_constants_to_default,
-        # 3) call_extend_index_yaml,
-        # 4) notify_about_successful_shutdown.
-        attempt_launch_browser(parsed_args, stack.enter_context)
+            # Try launching the default web browser after the server is up.
+            # Because we registered `_alert_on_exit` above, a cancel/error while
+            # launching the browser will still cause the alert to be printed first
+            # during the unwinding of the service stack.
+            #
+            # following shutdown order on cancellation during this phase:
+            # 1) _alert_on_exit() is printed first, then browser/context closures,
+            # 2) common.set_constants_to_default,
+            # 3) extend_index_yaml.main,
+            # 4) _notify_about_successful_shutdown.
+            attempt_launch_browser(
+                parsed_args, stack.enter_context, dev_appserver
+            )
 
-        dev_appserver.wait()
+            dev_appserver.wait()
+
+    finally:
+        # After ExitStack unwinding and shutdown, verify that the ports we
+        # attempted to use are now free. This helps detect lingering processes
+        # that didn't shut down correctly.
+        # NOTE: We use the same required_ports list as above.
+        in_use: list[tuple[int, str]] = []
+        for port, name in required_ports:
+            if common.is_port_in_use(port):
+                in_use.append((port, name))
+        if in_use:
+            port_msgs = ', '.join([f"{p} ({n})" for p, n in in_use])
+            common.print_each_string_after_two_new_lines(
+                [
+                    'WARNING',
+                    'The following ports are still in use after exiting: %s'
+                    % port_msgs,
+                ]
+            )
 
 
 if __name__ == '__main__':  # pragma: no cover

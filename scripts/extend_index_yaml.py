@@ -86,6 +86,7 @@ def reformat_xml_dict_into_yaml_dict(
 def main() -> None:
     """Extends index.yaml file."""
     if not os.path.exists(WEB_INF_INDEX_XML_PATH):
+        print('No new index definitions were created during this server run.')
         return
 
     with open(WEB_INF_INDEX_XML_PATH, 'r', encoding='utf-8') as f:
@@ -97,6 +98,8 @@ def main() -> None:
     )
     if web_inf_index_yaml_dict is None:
         return
+
+    print('\033[94mExtending index.yaml...\033[0m')
 
     with open(INDEX_YAML_PATH, 'r', encoding='utf-8') as f:
         index_yaml_dict = yaml.safe_load(f)
@@ -120,3 +123,5 @@ def main() -> None:
     index_yaml = new_index_yaml_dict.replace('- kind', '\n- kind')
     with open(INDEX_YAML_PATH, 'w', encoding='utf-8') as f:
         f.write(index_yaml)
+
+    print('\033[92mDone!\033[0m')

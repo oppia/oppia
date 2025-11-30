@@ -37,6 +37,14 @@ class MockCompiler:
     def wait(self) -> None:  # pylint: disable=missing-docstring
         pass
 
+    def is_running(self) -> bool:
+        """Mock whether the process is running. Return True by default.
+
+        Tests that simulate a stopped dev server may replace this method with
+        a version that returns False.
+        """
+        return True
+
 
 class MockCompilerContextManager:
     def __init__(self) -> None:
@@ -452,7 +460,7 @@ class StartTests(test_utils.GenericTestBase):
         """If the dev-server phase is cancelled (e.g. while launching the
         browser), the stack should unwind and produce the following sequence:
         alert_on_exit -> services exit -> set_constants_to_default ->
-        call_extend_index_yaml -> notify_about_successful_shutdown.
+            extend_index_yaml.main -> notify_about_successful_shutdown.
         """
         with self.swap_install_third_party_libs:
             from scripts import start
@@ -484,8 +492,10 @@ class StartTests(test_utils.GenericTestBase):
             'notify_about_successful_shutdown',
             lambda: order.append('notify'),
         )
+        # Inlined to use extend_index_yaml.main directly instead of the
+        # former wrapper `call_extend_index_yaml`.
         swap_extend_index = self.swap(
-            start, 'call_extend_index_yaml', lambda: order.append('extend')
+            extend_index_yaml, 'main', lambda: order.append('extend')
         )
         swap_set_constants = self.swap(
             common,
