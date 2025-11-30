@@ -66,7 +66,7 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
     """Tests for make_dev_appserver_env function."""
 
     @mock.patch.dict('os.environ', {'TEST': 'value'})
-    def test_make_dev_appserver_env_prod_env_true_returns_app_yaml(self):
+    def test_returns_app_yaml_when_prod_env_true(self):
         parsed_args = argparse.Namespace(prod_env=True)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app.yaml')
@@ -74,7 +74,7 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
         self.assertEqual(env['PIP_NO_DEPS'], 'True')
 
     @mock.patch.dict('os.environ', {'TEST': 'value'})
-    def test_make_dev_appserver_env_prod_env_false_returns_app_dev_yaml(self):
+    def test_returns_app_dev_yaml_when_prod_env_false(self):
         parsed_args = argparse.Namespace(prod_env=False)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app_dev.yaml')
@@ -86,39 +86,21 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     """Tests for attempt_launch_browser function."""
 
     def setUp(self):
-        # Set up mock arguments and dev_appserver for browser launch tests.
         self.parsed_args_no_browser = argparse.Namespace(no_browser=True)
         self.parsed_args_with_browser = argparse.Namespace(no_browser=False)
         self.dev_appserver = mock.Mock()
         self.dev_appserver.is_running.return_value = True
+        # This function takes a context manager as its argument and adds it to
+        # the exit stack. When the ExitStack exits, it calls the context
+        # manager's `__exit__` method. We mock this so that we can confirm that
+        # it only gets called if the browser successfully launches.
         self.enter_context_fn = mock.Mock()
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    def test_attempt_launch_browser_no_browser_flag_prints_info_message(
-        self, mock_print
-    ):
-        # This test verifies that attempt_launch_browser prints an info message and does not launch the browser when no_browser is True.
-        start.attempt_launch_browser(
-            self.parsed_args_no_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
-        )
-        mock_print.assert_called_once_with(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:8181/ in a web browser.',
-            ]
-        )
-        self.enter_context_fn.assert_not_called()
-
-    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_browser_launch_success_prints_opening_message(
+    def test_browser_launch_success_prints_opening_message(
         self, mock_create_browser, mock_print
     ):
-        # This test verifies that attempt_launch_browser successfully launches
-        # the browser and prints an opening message when the server is running.
         start.attempt_launch_browser(
             self.parsed_args_with_browser,
             self.enter_context_fn,
@@ -139,19 +121,20 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.time.sleep')
     @mock.patch('scripts.start.time.time')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_browser_launch_retry_until_success(
-        self, mock_create_browser, mock_time, mock_sleep, mock_print
+    def test_attempt_launch_browser_retries_until_successful_browser_launch(
+        self, mock_create_browser, mock_time, mock_sleep, _
     ):
-        # This test verifies that attempt_launch_browser retries browser launch on failure and succeeds on the second attempt.
+        # This test simulates attempt_launch_browser() trying to start the
+        # browser, failing, retrying after BROWSER_RETRY_INTERVAL_SECS, and
+        # succeeding on the second attempt.
         mock_time.side_effect = [
             0,
-            0.5,
-            1.0,
-        ]  # Simulate time progression for retry logic.
+            start.BROWSER_RETRY_INTERVAL_SECS,
+        ]
         mock_create_browser.side_effect = [
             Exception('fail'),
-            None,
-        ]  # Fail first, succeed second.
+            mock_create_browser.return_value,
+        ]
 
         start.attempt_launch_browser(
             self.parsed_args_with_browser,
@@ -160,144 +143,23 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         )
 
         self.assertEqual(mock_sleep.call_count, 1)
-        self.assertEqual(
-            mock_create_browser.call_count, 2
-        )  # Called twice: fail, then success.
-        self.enter_context_fn.assert_called_once_with(None)
-
-    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    @mock.patch('scripts.start.time.sleep')
-    @mock.patch('scripts.start.time.time')
-    def test_attempt_launch_browser_gives_up_if_devserver_never_runs_prints_info_message(
-        self, mock_time, mock_sleep, mock_print
-    ):
-        # This test verifies that attempt_launch_browser times out and prints an info message if the dev server never runs.
-        mock_time.side_effect = [
-            0,
-            0.5,
-            10.5,
-        ]  # Simulate timeout after 10 seconds.
-        self.dev_appserver.is_running.return_value = False
-
-        start.attempt_launch_browser(
-            self.parsed_args_with_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
+        # Called twice: fails, then succeeds.
+        self.assertEqual(mock_create_browser.call_count, 2)
+        self.enter_context_fn.assert_called_once_with(
+            mock_create_browser.return_value
         )
-
-        mock_print.assert_any_call(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:8181/ in a web browser.',
-            ]
-        )
-        self.enter_context_fn.assert_not_called()
-
-    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    @mock.patch('scripts.start.time.sleep')
-    @mock.patch('scripts.start.time.time')
-    @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_reports_error_and_fallback_on_timeout(
-        self, mock_create_browser, mock_time, mock_sleep, mock_print
-    ):
-        # This test verifies that attempt_launch_browser reports an error and prints a fallback message when browser launch fails repeatedly and times out.
-        mock_time.side_effect = [0, 0.5, 10.5]  # Simulate timeout.
-        self.dev_appserver.is_running.return_value = True
-        mock_create_browser.side_effect = Exception('browser fail')
-
-        start.attempt_launch_browser(
-            self.parsed_args_with_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
-        )
-
-        mock_print.assert_any_call(
-            [
-                'ERROR',
-                'Error occurred while attempting to automatically launch '
-                'the web browser: browser fail',
-            ]
-        )
-        mock_print.assert_any_call(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:8181/ in a web browser.',
-            ]
-        )
-        self.enter_context_fn.assert_not_called()
-
-    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    @mock.patch('scripts.start.time.time')
-    def test_attempt_launch_browser_gives_up_immediately_if_devserver_not_running(
-        self, mock_time, mock_print
-    ):
-        # This test verifies that attempt_launch_browser gives up immediately and prints an info message if the dev server is not running and the timeout is reached without attempting browser launch.
-        mock_time.side_effect = [0, 10]  # start_time = 0, check = 10 - 0 >= 10
-        self.dev_appserver.is_running.return_value = False
-
-        start.attempt_launch_browser(
-            self.parsed_args_with_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
-        )
-
-        mock_print.assert_called_once_with(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:8181/ in a web browser.',
-            ]
-        )
-        self.enter_context_fn.assert_not_called()
-
-    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    @mock.patch('scripts.start.time.sleep')
-    @mock.patch('scripts.start.time.time')
-    @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_reports_error_on_timeout_when_devserver_not_running(
-        self, mock_create_browser, mock_time, mock_sleep, mock_print
-    ):
-        # This test verifies that attempt_launch_browser reports an error and prints a fallback message when the dev server is not running, browser launch fails, and timeout occurs.
-        mock_time.side_effect = [
-            0,
-            0.5,
-            10,
-        ]  # start_time = 0, after sleep = 0.5, after second sleep = 10
-        mock_create_browser.side_effect = Exception('browser fail')
-        self.dev_appserver.is_running.return_value = False
-
-        start.attempt_launch_browser(
-            self.parsed_args_with_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
-        )
-
-        print("Calls:", len(mock_print.call_args_list))
-        mock_print.assert_any_call(
-            [
-                'ERROR',
-                'Error occurred while attempting to automatically launch '
-                'the web browser: browser fail',
-            ]
-        )
-        mock_print.assert_any_call(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:8181/ in a web browser.',
-            ]
-        )
-        self.enter_context_fn.assert_not_called()
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
-    def test_attempt_launch_browser_success_when_devserver_has_no_is_running_attr(
+    def test_attempt_launch_browser_success_when_devserver_is_running(
         self, mock_create_browser, mock_print
     ):
-        # This test verifies that attempt_launch_browser successfully launches the browser when the dev server does not have the is_running attribute.
-        dev_appserver = object()  # No is_running attribute
+        # This test verifies that attempt_launch_browser successfully launches
+        # the browser when the dev server is running.
+        dev_appserver = mock.Mock()
+        dev_appserver.is_running.return_value = True
+        # Since this mock is actually used, we need to set up its context
+        # manager methods.
         mock_create_browser.return_value.__enter__.return_value = None
         mock_create_browser.return_value.__exit__.return_value = None
 
@@ -318,12 +180,47 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
             ]
         )
 
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.sleep')
+    @mock.patch('scripts.start.time.time')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_reports_error_and_fallback_on_timeout(
+        self, mock_create_browser, mock_time, mock_sleep, mock_print
+    ):
+        # This test verifies that attempt_launch_browser reports an error and
+        # prints a fallback message when browser launch fails repeatedly.
+        mock_time.side_effect = [
+            0,
+            start.BROWSER_RETRY_INTERVAL_SECS,
+            start.BROWSER_LAUNCH_TIMEOUT_SECS
+            + start.BROWSER_RETRY_INTERVAL_SECS,
+        ]
+        self.dev_appserver.is_running.return_value = True
+        mock_create_browser.side_effect = Exception('BROWSER FAIL')
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
+        )
+
+        mock_print.assert_any_call(
+            [
+                'ERROR',
+                'Error occurred while attempting to automatically launch '
+                'the web browser: BROWSER FAIL',
+            ]
+        )
+        mock_print.assert_any_call(start.SERVER_READY_MESSAGE)
+        self.enter_context_fn.assert_not_called()
+
 
 class MainTests(unittest.TestCase):
     """Tests for main function."""
 
     def setUp(self):
-        # Set up patches for all external dependencies to isolate the main function for unit testing.
+        # Set up patches for all external dependencies to isolate the main()
+        # function for unit testing.
         self.patcher_common_is_port_in_use = mock.patch(
             'scripts.start.common.is_port_in_use'
         )
@@ -445,8 +342,7 @@ class MainTests(unittest.TestCase):
         self.patcher_servers_create_browser.stop()
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    def test_main_exits_if_ports_in_use_prints_error(self, mock_print):
-        # This test verifies that main exits with SystemExit and prints an error when required ports are in use.
+    def test_main_exits_and_prints_error_if_ports_in_use(self, mock_print):
         self.mock_is_port_in_use.return_value = True
         with self.assertRaises(SystemExit) as cm:
             start.main(['--no_browser'])
@@ -465,36 +361,32 @@ class MainTests(unittest.TestCase):
         )
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_successful_startup_with_no_browser(self, mock_attempt_launch):
-        # This test verifies that main completes successfully with no_browser flag, skipping installation and calling build and browser attempt.
+    def test_main_successful_startup_with_no_install(self, mock_attempt_launch):
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             start.main(['--no_browser', '--skip-install'])
         self.mock_install.assert_not_called()
         self.mock_build.assert_called_once_with(args=[])
-        mock_attempt_launch.assert_called_once()
+        mock_attempt_launch.assert_not_called()
         self.dev_appserver_mock.wait.assert_called_once()
 
     @mock.patch('scripts.start.attempt_launch_browser')
     def test_main_successful_startup_with_install(self, mock_attempt_launch):
-        # This test verifies that main completes successfully with no_browser flag, running installation and calling build and browser attempt.
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             start.main(['--no_browser'])
         self.mock_install.assert_called_once()
         self.mock_build.assert_called_once_with(args=[])
-        mock_attempt_launch.assert_called_once()
+        mock_attempt_launch.assert_not_called()
         self.dev_appserver_mock.wait.assert_called_once()
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_build_failure_resets_constants(self, mock_attempt_launch):
-        # This test verifies that main resets constants when build fails and re-raises the exception.
+    def test_main_build_failure_resets_constants(self, _):
         self.mock_build.side_effect = Exception('build failed')
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             with self.assertRaises(Exception):
                 start.main(['--no_browser', '--skip-install'])
         self.mock_set_constants.assert_called_once()
 
-    def test_main_serves_production_and_maintenance_build_flags(self):
-        # This test verifies that main passes the correct build flags to build.main based on command-line arguments.
+    def test_main_correctly_passes_build_flags_to_build_script(self):
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             start.main(['--prod_env', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--prod_env'])
@@ -504,15 +396,13 @@ class MainTests(unittest.TestCase):
             start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--maintenance_mode'])
 
-    def test_save_datastore_flags_are_propagated(self):
-        # This test verifies that main propagates the save_datastore flag to emulator contexts when EMULATOR_MODE is enabled.
+    def test_main_correctly_passes_save_datastore_flags_to_emulators(self):
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
             start.main(['--save_datastore', '--no_browser', '--skip-install'])
         self.mock_firebase.assert_called_once_with(recover_users=True)
         self.mock_datastore.assert_called_once_with(clear_datastore=False)
 
-    def test_disable_host_checking_and_no_auto_restart_applied(self):
-        # This test verifies that main applies disable_host_checking and no_auto_restart flags to the dev appserver.
+    def test_main_correctly_passes_flags_to_dev_appserver(self):
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             start.main(
                 [
@@ -531,37 +421,12 @@ class MainTests(unittest.TestCase):
             env=mock.ANY,
         )
 
-    @mock.patch.object(start.common, 'print_each_string_after_two_new_lines')
-    @mock.patch('scripts.start.attempt_launch_browser')
-    def test_start_servers_successfully_prints_opening_message(
-        self, mock_attempt_launch, mock_print
-    ):
-        # This test verifies that main prints an opening message when starting servers without no_browser flag.
-        mock_attempt_launch.side_effect = lambda *args, **kwargs: mock_print(
-            [
-                'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: http://localhost:8181/',
-            ]
-        )
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(['--skip-install'])
-        mock_print.assert_called_with(
-            [
-                'INFORMATION',
-                'Local development server is ready! Opening a default web '
-                'browser window pointing to it: http://localhost:8181/',
-            ]
-        )
-
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     def test_final_port_check_warns_if_ports_still_in_use_after_exit(
         self, mock_print
     ):
-        # This test verifies that main warns about ports still in use after the server stack unwinds due to an exception.
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
         port_calls = []
-        original_is_port_in_use = start.common.is_port_in_use
 
         def mock_is_port_in_use(port):
             port_calls.append(port)
@@ -595,8 +460,10 @@ class MainTests(unittest.TestCase):
     def test_exitstack_callbacks_and_alert_order_on_cancel(
         self, mock_notify, mock_set_constants, mock_extend, mock_alert
     ):
-        # This test verifies the order of ExitStack callbacks during unwinding: alert first, then set_constants, extend, notify.
+        # This test verifies the order of ExitStack callbacks during unwinding:
+        # alert first, then set_constants, extend, notify.
         order = []
+
         alert_cm = mock.Mock()
         alert_cm.__enter__ = mock.Mock(
             side_effect=lambda *args, **kwargs: order.append('alert')
@@ -606,20 +473,17 @@ class MainTests(unittest.TestCase):
         mock_set_constants.side_effect = lambda: order.append('set_constants')
         mock_extend.side_effect = lambda: order.append('extend')
         mock_notify.side_effect = lambda: order.append('notify')
-        self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
 
+        self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
             with self.assertRaises(KeyboardInterrupt):
                 start.main(['--no_browser', '--skip-install'])
         self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])
 
     def test_main_when_emulator_mode_is_enabled_uses_emulators(self):
-        # This test verifies that main starts emulator contexts when EMULATOR_MODE is enabled.
+        # This test verifies that main starts emulator contexts when
+        # EMULATOR_MODE is enabled.
         with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
             start.main(['--no_browser', '--skip-install'])
         self.mock_firebase.assert_called_once_with(recover_users=False)
         self.mock_datastore.assert_called_once_with(clear_datastore=True)
-
-
-if __name__ == '__main__':
-    unittest.main()

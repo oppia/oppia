@@ -94,6 +94,19 @@ _PARSER.add_argument(
 PORT_NUMBER_FOR_GAE_SERVER = 8181
 
 
+# Browser launch configuration
+BROWSER_LAUNCH_TIMEOUT_SECS = 10.0
+BROWSER_RETRY_INTERVAL_SECS = 0.5
+
+# Server ready message
+SERVER_READY_MESSAGE = [
+    'INFORMATION',
+    'Local development server is ready! You can access it by '
+    'navigating to http://localhost:%s/ in a web '
+    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+]
+
+
 @contextlib.contextmanager
 def _alert_on_exit() -> Iterator[None]:
     """Context manager that alerts developers to wait for a graceful shutdown.
@@ -207,93 +220,42 @@ def attempt_launch_browser(
     enter_context_fn: Callable[..., object],
     dev_appserver: Any,
 ) -> None:
-    """Attempts to launch the web browser if not disabled."""
+    """Attempts to launch the web browser."""
 
-    if parsed_args.no_browser:
-        common.print_each_string_after_two_new_lines(
-            [
-                'INFORMATION',
-                'Local development server is ready! You can access it by '
-                'navigating to http://localhost:%s/ in a web '
-                'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-            ]
-        )
-    else:
-        last_error: Optional[Exception] = None
-        start_time = time.time()
-        retry_timeout = 10.0  # seconds
-        retry_interval = 0.5  # seconds
+    # Try to launch browser with timeout.
+    last_error: Optional[Exception] = None
+    browser_start_time = time.time()
 
-        # Keep attempting to open the browser while the dev server appears to
-        # be running. This avoids giving up immediately if the browser launch
-        # fails briefly during startup.
-        while True:
-            # If the server isn't running yet, wait for it to come up until
-            # a retry timeout expires. If it has died or never comes up, then
-            # stop retrying and print a fallback info message.
-            if (
-                hasattr(dev_appserver, 'is_running')
-                and not dev_appserver.is_running()
-            ):
-                if time.time() - start_time >= retry_timeout:
-                    if last_error is not None:
-                        common.print_each_string_after_two_new_lines(
-                            [
-                                'ERROR',
-                                'Error occurred while attempting to automatically launch '
-                                'the web browser: %s' % last_error,
-                            ]
-                        )
-                    common.print_each_string_after_two_new_lines(
-                        [
-                            'INFORMATION',
-                            'Local development server is ready! You can access it by '
-                            'navigating to http://localhost:%s/ in a web '
-                            'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                        ]
-                    )
-                    return
-                time.sleep(retry_interval)
-                continue
-
-            try:
-                enter_context_fn(
-                    servers.create_managed_web_browser(
-                        PORT_NUMBER_FOR_GAE_SERVER
-                    )
-                )
+    while True:
+        try:
+            enter_context_fn(
+                servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER)
+            )
+            common.print_each_string_after_two_new_lines(
+                [
+                    'INFORMATION',
+                    'Local development server is ready! Opening a default web '
+                    'browser window pointing to it: '
+                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                ]
+            )
+            return
+        except Exception as error:
+            last_error = error
+            # If we've exceeded our allotted timeout for browser launch, give up
+            if time.time() - browser_start_time >= BROWSER_LAUNCH_TIMEOUT_SECS:
                 common.print_each_string_after_two_new_lines(
                     [
-                        'INFORMATION',
-                        'Local development server is ready! Opening a default web '
-                        'browser window pointing to it: '
-                        'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                        'ERROR',
+                        'Error occurred while attempting to automatically launch '
+                        'the web browser: %s' % last_error,
                     ]
                 )
+                common.print_each_string_after_two_new_lines(
+                    SERVER_READY_MESSAGE
+                )
                 return
-            except (
-                Exception
-            ) as error:  # pragma: no cover - error flows covered in tests
-                last_error = error
-                # If we've exceeded our allotted retry timeout, stop trying.
-                if time.time() - start_time >= retry_timeout:
-                    common.print_each_string_after_two_new_lines(
-                        [
-                            'ERROR',
-                            'Error occurred while attempting to automatically launch '
-                            'the web browser: %s' % last_error,
-                        ]
-                    )
-                    common.print_each_string_after_two_new_lines(
-                        [
-                            'INFORMATION',
-                            'Local development server is ready! You can access it by '
-                            'navigating to http://localhost:%s/ in a web '
-                            'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                        ]
-                    )
-                    return
-                time.sleep(retry_interval)
+            time.sleep(BROWSER_RETRY_INTERVAL_SECS)
 
 
 def main(args: Optional[Sequence[str]] = None) -> None:
@@ -398,9 +360,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # 2) common.set_constants_to_default,
             # 3) extend_index_yaml.main,
             # 4) _notify_about_successful_shutdown.
-            attempt_launch_browser(
-                parsed_args, stack.enter_context, dev_appserver
-            )
+            if not parsed_args.no_browser:
+                attempt_launch_browser(
+                    parsed_args, stack.enter_context, dev_appserver
+                )
+            else:
+                common.print_each_string_after_two_new_lines(
+                    SERVER_READY_MESSAGE
+                )
 
             dev_appserver.wait()
 
