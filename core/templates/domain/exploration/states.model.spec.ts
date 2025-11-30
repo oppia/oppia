@@ -435,10 +435,17 @@ describe('States', () => {
   it('should correctly retrieve the terminal states', () => {
     let newStates = States.createFromBackendDict(statesDict);
 
-    newStates.setState(
-      'first state',
-      State.createFromBackendDict('first state', newState)
+    newStates.addState(
+      'new state',
+      'new state content',
+      'new state default outcome'
     );
+    
+    newStates.setState(
+      'new state',
+      State.createFromBackendDict('new state', newState)
+    );
+
     expect(newStates.getFinalStateNames()).toEqual('new state');
   });
 
