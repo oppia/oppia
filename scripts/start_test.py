@@ -22,17 +22,19 @@ from unittest import mock
 
 from scripts import start
 
+from typing import List
+
 
 class GetBuildArgsTests(unittest.TestCase):
     """Tests for get_build_args function."""
 
-    def test_get_build_args_no_flags_returns_empty_list(self):
+    def test_get_build_args_no_flags_returns_empty_list(self) -> None:
         parsed_args = argparse.Namespace(
             prod_env=False, maintenance_mode=False, source_maps=False
         )
         self.assertEqual(start.get_build_args(parsed_args), [])
 
-    def test_get_build_args_prod_env_flag_returns_prod_env(self):
+    def test_get_build_args_prod_env_flag_returns_prod_env(self) -> None:
         parsed_args = argparse.Namespace(
             prod_env=True, maintenance_mode=False, source_maps=False
         )
@@ -40,7 +42,7 @@ class GetBuildArgsTests(unittest.TestCase):
 
     def test_get_build_args_maintenance_mode_flag_returns_maintenance_mode(
         self,
-    ):
+    ) -> None:
         parsed_args = argparse.Namespace(
             prod_env=False, maintenance_mode=True, source_maps=False
         )
@@ -48,13 +50,13 @@ class GetBuildArgsTests(unittest.TestCase):
             start.get_build_args(parsed_args), ['--maintenance_mode']
         )
 
-    def test_get_build_args_source_maps_flag_returns_source_maps(self):
+    def test_get_build_args_source_maps_flag_returns_source_maps(self) -> None:
         parsed_args = argparse.Namespace(
             prod_env=False, maintenance_mode=False, source_maps=True
         )
         self.assertEqual(start.get_build_args(parsed_args), ['--source_maps'])
 
-    def test_get_build_args_all_flags_returns_all(self):
+    def test_get_build_args_all_flags_returns_all(self) -> None:
         parsed_args = argparse.Namespace(
             prod_env=True, maintenance_mode=True, source_maps=True
         )
@@ -68,7 +70,7 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
     """Tests for make_dev_appserver_env function."""
 
     @mock.patch.dict('os.environ', {'TEST': 'value'})
-    def test_returns_app_yaml_when_prod_env_true(self):
+    def test_returns_app_yaml_when_prod_env_true(self) -> None:
         parsed_args = argparse.Namespace(prod_env=True)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app.yaml')
@@ -76,7 +78,7 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
         self.assertEqual(env['PIP_NO_DEPS'], 'True')
 
     @mock.patch.dict('os.environ', {'TEST': 'value'})
-    def test_returns_app_dev_yaml_when_prod_env_false(self):
+    def test_returns_app_dev_yaml_when_prod_env_false(self) -> None:
         parsed_args = argparse.Namespace(prod_env=False)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app_dev.yaml')
@@ -87,7 +89,7 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
 class AttemptLaunchBrowserTests(unittest.TestCase):
     """Tests for attempt_launch_browser function."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.parsed_args_no_browser = argparse.Namespace(no_browser=True)
         self.parsed_args_with_browser = argparse.Namespace(no_browser=False)
         self.dev_appserver = mock.Mock()
@@ -101,8 +103,8 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
     def test_browser_launch_success_prints_opening_message(
-        self, mock_create_browser, mock_print
-    ):
+        self, mock_create_browser: mock.Mock, mock_print: mock.Mock
+    ) -> None:
         start.attempt_launch_browser(self.enter_context_fn)
         self.enter_context_fn.assert_called_once_with(
             mock_create_browser.return_value
@@ -120,8 +122,12 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.time.time')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
     def test_attempt_launch_browser_retries_until_successful_browser_launch(
-        self, mock_create_browser, mock_time, mock_sleep, _
-    ):
+        self,
+        mock_create_browser: mock.Mock,
+        mock_time: mock.Mock,
+        mock_sleep: mock.Mock,
+        _: mock.Mock,
+    ) -> None:
         # This test simulates attempt_launch_browser() trying to start the
         # browser, failing, retrying after BROWSER_RETRY_INTERVAL_SECS, and
         # succeeding on the second attempt.
@@ -148,8 +154,8 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
     def test_attempt_launch_browser_success_when_devserver_is_running(
-        self, mock_create_browser, mock_print
-    ):
+        self, mock_create_browser: mock.Mock, mock_print: mock.Mock
+    ) -> None:
         # This test verifies that attempt_launch_browser successfully launches
         # the browser when the dev server is running.
         dev_appserver = mock.Mock()
@@ -179,8 +185,12 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.time.time')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
     def test_attempt_launch_browser_reports_error_and_fallback_on_timeout(
-        self, mock_create_browser, mock_time, _, mock_print
-    ):
+        self,
+        mock_create_browser: mock.Mock,
+        mock_time: mock.Mock,
+        _: mock.Mock,
+        mock_print: mock.Mock,
+    ) -> None:
         # This test verifies that attempt_launch_browser reports an error and
         # prints a fallback message when browser launch fails repeatedly.
         mock_time.side_effect = [
@@ -210,7 +220,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
 class MainTests(unittest.TestCase):
     """Tests for main function."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         # Set up patches for all external dependencies to isolate the main()
         # function for unit testing.
         self.patcher_common_is_port_in_use = mock.patch(
@@ -314,7 +324,7 @@ class MainTests(unittest.TestCase):
             cm.return_value.__enter__.return_value = None
             cm.return_value.__exit__.return_value = None
 
-    def tearDown(self):
+    def tearDown(self) -> None:
         # Stop all patches to clean up after each test.
         self.patcher_common_is_port_in_use.stop()
         self.patcher_install.stop()
@@ -334,7 +344,9 @@ class MainTests(unittest.TestCase):
         self.patcher_servers_create_browser.stop()
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
-    def test_main_exits_and_prints_error_if_ports_in_use(self, mock_print):
+    def test_main_exits_and_prints_error_if_ports_in_use(
+        self, mock_print: mock.Mock
+    ) -> None:
         required_ports = [
             (8181, 'GAE dev appserver'),
             (8000, 'GAE dev appserver admin port'),
@@ -360,7 +372,9 @@ class MainTests(unittest.TestCase):
             )
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_successful_startup_with_no_install(self, mock_attempt_launch):
+    def test_main_successful_startup_with_no_install(
+        self, mock_attempt_launch: mock.Mock
+    ) -> None:
         start.main(['--no_browser', '--skip-install'])
         self.mock_install.assert_not_called()
         self.mock_build.assert_called_once_with(args=[])
@@ -368,7 +382,9 @@ class MainTests(unittest.TestCase):
         self.dev_appserver_mock.wait.assert_called_once()
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_successful_startup_with_install(self, mock_attempt_launch):
+    def test_main_successful_startup_with_install(
+        self, mock_attempt_launch: mock.Mock
+    ) -> None:
         start.main(['--no_browser'])
         self.mock_install.assert_called_once()
         self.mock_build.assert_called_once_with(args=[])
@@ -376,13 +392,13 @@ class MainTests(unittest.TestCase):
         self.dev_appserver_mock.wait.assert_called_once()
 
     @mock.patch('scripts.start.attempt_launch_browser')
-    def test_main_build_failure_resets_constants(self, _):
+    def test_main_build_failure_resets_constants(self, _: mock.Mock) -> None:
         self.mock_build.side_effect = Exception('build failed')
         with self.assertRaises(Exception):
             start.main(['--no_browser', '--skip-install'])
         self.mock_set_constants.assert_called_once()
 
-    def test_main_correctly_passes_build_flags_to_build_script(self):
+    def test_main_correctly_passes_build_flags_to_build_script(self) -> None:
         start.main(['--prod_env', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--prod_env'])
 
@@ -390,12 +406,14 @@ class MainTests(unittest.TestCase):
         start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--maintenance_mode'])
 
-    def test_main_correctly_passes_save_datastore_flags_to_emulators(self):
+    def test_main_correctly_passes_save_datastore_flags_to_emulators(
+        self,
+    ) -> None:
         start.main(['--save_datastore', '--no_browser', '--skip-install'])
         self.mock_firebase.assert_called_once_with(recover_users=True)
         self.mock_datastore.assert_called_once_with(clear_datastore=False)
 
-    def test_main_correctly_passes_flags_to_dev_appserver(self):
+    def test_main_correctly_passes_flags_to_dev_appserver(self) -> None:
         start.main(
             [
                 '--disable_host_checking',
@@ -415,13 +433,13 @@ class MainTests(unittest.TestCase):
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     def test_final_port_check_warns_if_ports_still_in_use_after_exit(
-        self, mock_print
-    ):
+        self, mock_print: mock.Mock
+    ) -> None:
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
 
         call_count = 0
 
-        def mock_get_ports(ports):
+        def mock_get_ports(ports: List[int]) -> List[int]:
             nonlocal call_count
             call_count += 1
             return ports if call_count == 2 else []
@@ -453,11 +471,15 @@ class MainTests(unittest.TestCase):
     @mock.patch('scripts.start.common.set_constants_to_default')
     @mock.patch('scripts.start._notify_about_successful_shutdown')
     def test_exitstack_callbacks_and_alert_order_on_cancel(
-        self, mock_notify, mock_set_constants, mock_extend, mock_alert
-    ):
+        self,
+        mock_notify: mock.Mock,
+        mock_set_constants: mock.Mock,
+        mock_extend: mock.Mock,
+        mock_alert: mock.Mock,
+    ) -> None:
         # This test verifies the order of ExitStack callbacks during unwinding:
         # alert first, then set_constants, extend, notify.
-        order = []
+        order: List[str] = []
 
         alert_cm = mock.Mock()
         alert_cm.__enter__ = mock.Mock(

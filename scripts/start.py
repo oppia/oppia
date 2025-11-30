@@ -27,7 +27,7 @@ import time
 from core import feconf
 
 import psutil
-from typing import Callable, ContextManager, Iterator, Optional, Sequence
+from typing import Callable, ContextManager, Iterator, List, Optional, Sequence
 
 from . import (
     build,
@@ -140,7 +140,7 @@ def _notify_about_successful_shutdown() -> None:
     )
 
 
-def get_build_args(parsed_args: argparse.Namespace) -> list[str]:
+def get_build_args(parsed_args: argparse.Namespace) -> List[str]:
     """Returns the build arguments based on parsed command-line arguments."""
     build_args = []
     if parsed_args.prod_env:
@@ -164,7 +164,7 @@ def make_dev_appserver_env(
 
 def start_services(
     parsed_args: argparse.Namespace, stack: contextlib.ExitStack
-):
+) -> psutil.Process:
     """Starts all the required services and returns the dev appserver."""
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())

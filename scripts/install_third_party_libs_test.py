@@ -25,11 +25,12 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import types
 
 from core import feconf
 from core.tests import test_utils
 
-from typing import Final, List, Tuple
+from typing import Final, List, Optional, Tuple, Type
 
 from . import (
     clean,
@@ -75,10 +76,37 @@ class Ret:
     ) -> None:
         self.returncode = returncode
         self.communicate_val = communicate_val
+        self.stdout = None
+        self.args: List[str] = []
 
-    def communicate(self) -> Tuple[bytes, bytes]:
+    def communicate(
+        self,
+        _input_data: Optional[bytes] = None,
+        _timeout: Optional[float] = None,
+    ) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val
+
+    def kill(self) -> None:
+        """Mock kill method."""
+        pass
+
+    def poll(self) -> int:
+        """Mock poll method."""
+        return self.returncode
+
+    def __enter__(self) -> 'Ret':
+        """Context manager enter."""
+        return self
+
+    def __exit__(
+        self,
+        _exc_type: Optional[Type[BaseException]],
+        _exc_val: Optional[BaseException],
+        _exc_tb: Optional[types.TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        pass
 
 
 class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
