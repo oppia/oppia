@@ -123,6 +123,11 @@ describe('OppiaFooterComponent', () => {
     expect(component.validateEmailAddress()).toBeTrue();
   });
 
+  it('should return false when email address is null', () => {
+    component.emailAddress = null;
+    expect(component.validateEmailAddress()).toBeFalse();
+  });
+
   it('should return true if not processing subscription and email address is invalid', () => {
     component.subscriptionProcessing = false;
     component.emailAddress = 'invalidEmail';
@@ -170,6 +175,43 @@ describe('OppiaFooterComponent', () => {
     fixture.detectChanges();
 
     expect(component.emailDuplicated).toBeFalse();
+  }));
+
+  it('should not subscribe when email is invalid', () => {
+    component.emailAddress = 'invalidEmail';
+    spyOn(mailingListBackendApiService, 'subscribeUserToMailingList');
+
+    component.subscribeToMailingList();
+
+    expect(component.newsletterTouched).toBeTrue();
+    expect(
+      mailingListBackendApiService.subscribeUserToMailingList
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should subscribe with null name when name is not provided', fakeAsync(() => {
+    component.emailAddress = 'valid@example.com';
+    component.name = null;
+    spyOn(alertsService, 'addInfoMessage');
+    spyOn(
+      mailingListBackendApiService,
+      'subscribeUserToMailingList'
+    ).and.returnValue(Promise.resolve(true));
+
+    component.subscribeToMailingList();
+
+    expect(component.subscriptionProcessing).toBeTrue();
+
+    flushMicrotasks();
+
+    expect(
+      mailingListBackendApiService.subscribeUserToMailingList
+    ).toHaveBeenCalledWith(
+      'valid@example.com',
+      null,
+      AppConstants.MAILING_LIST_WEB_TAG
+    );
+    expect(component.subscriptionProcessing).toBeFalse();
   }));
 
   it('should add user to mailing list and return status', fakeAsync(() => {
