@@ -20,6 +20,7 @@ import {
   Component,
   ComponentFactoryResolver,
   ComponentRef,
+  ComponentFactory,
   SimpleChange,
   ViewChild,
   ViewContainerRef,
@@ -456,7 +457,7 @@ describe('Interaction display', () => {
     componentInstance.htmlData =
       '<oppia-interactive-text-input></oppia-interactive-text-input>';
     componentInstance.viewContainerRef = hostVcr;
-    const fakeFactory = {} as any;
+    const fakeFactory = {} as ComponentFactory<unknown>;
     spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
       fakeFactory
     );
@@ -464,7 +465,7 @@ describe('Interaction display', () => {
       null as unknown as ComponentRef<unknown>
     );
 
-    expect(() => componentInstance.buildInteraction()).not.toThrow();
+    expect(() => componentInstance.buildInteraction()).not.toThrowError();
     expect(hostVcr.createComponent).toHaveBeenCalled();
   });
 
@@ -481,7 +482,7 @@ describe('Interaction display', () => {
       },
     } as unknown as ComponentRef<unknown>;
 
-    const fakeFactory = {} as any;
+    const fakeFactory = {} as ComponentFactory<unknown>;
     spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
       fakeFactory
     );
@@ -502,7 +503,7 @@ describe('Interaction display', () => {
 
     const mockInteractionElement = {
       tagName: 'OPPIA-INTERACTIVE-TEXT-INPUT',
-      attributes: undefined, // Missing attributes should trigger early return
+      attributes: undefined, // Missing attributes should trigger early return.
     };
 
     const mockBody = {
@@ -528,21 +529,21 @@ describe('Interaction display', () => {
       },
     } as unknown as ComponentRef<unknown>;
 
-    const fakeFactory = {} as any;
+    const fakeFactory = {} as ComponentFactory<unknown>;
     spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
       fakeFactory
     );
     spyOn(hostVcr, 'createComponent').and.returnValue(mockComponentRef);
-    spyOn(componentInstance['changeDetectorRef'], 'detectChanges');
+    spyOn(componentInstance.changeDetectorRef, 'detectChanges');
 
     componentInstance.buildInteraction();
 
-    // Should call change detection before returning early
+    // Should call change detection before returning early.
     expect(componentChangeDetectorSpy).toHaveBeenCalled();
     expect(
-      componentInstance['changeDetectorRef'].detectChanges
+      componentInstance.changeDetectorRef.detectChanges
     ).toHaveBeenCalled();
-    // setAttribute should not be called since we returned early
+    // The setAttribute call should not occur since we returned early.
     expect(
       mockComponentRef.location.nativeElement.setAttribute
     ).not.toHaveBeenCalled();
