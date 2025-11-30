@@ -362,8 +362,7 @@ class MainTests(unittest.TestCase):
 
     @mock.patch('scripts.start.attempt_launch_browser')
     def test_main_successful_startup_with_no_install(self, mock_attempt_launch):
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(['--no_browser', '--skip-install'])
+        start.main(['--no_browser', '--skip-install'])
         self.mock_install.assert_not_called()
         self.mock_build.assert_called_once_with(args=[])
         mock_attempt_launch.assert_not_called()
@@ -371,8 +370,7 @@ class MainTests(unittest.TestCase):
 
     @mock.patch('scripts.start.attempt_launch_browser')
     def test_main_successful_startup_with_install(self, mock_attempt_launch):
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(['--no_browser'])
+        start.main(['--no_browser'])
         self.mock_install.assert_called_once()
         self.mock_build.assert_called_once_with(args=[])
         mock_attempt_launch.assert_not_called()
@@ -381,37 +379,32 @@ class MainTests(unittest.TestCase):
     @mock.patch('scripts.start.attempt_launch_browser')
     def test_main_build_failure_resets_constants(self, _):
         self.mock_build.side_effect = Exception('build failed')
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            with self.assertRaises(Exception):
-                start.main(['--no_browser', '--skip-install'])
+        with self.assertRaises(Exception):
+            start.main(['--no_browser', '--skip-install'])
         self.mock_set_constants.assert_called_once()
 
     def test_main_correctly_passes_build_flags_to_build_script(self):
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(['--prod_env', '--no_browser', '--skip-install'])
+        start.main(['--prod_env', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--prod_env'])
 
         self.mock_build.reset_mock()
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
+        start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
         self.mock_build.assert_called_once_with(args=['--maintenance_mode'])
 
     def test_main_correctly_passes_save_datastore_flags_to_emulators(self):
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
-            start.main(['--save_datastore', '--no_browser', '--skip-install'])
+        start.main(['--save_datastore', '--no_browser', '--skip-install'])
         self.mock_firebase.assert_called_once_with(recover_users=True)
         self.mock_datastore.assert_called_once_with(clear_datastore=False)
 
     def test_main_correctly_passes_flags_to_dev_appserver(self):
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            start.main(
-                [
-                    '--disable_host_checking',
-                    '--no_auto_restart',
-                    '--no_browser',
-                    '--skip-install',
-                ]
-            )
+        start.main(
+            [
+                '--disable_host_checking',
+                '--no_auto_restart',
+                '--no_browser',
+                '--skip-install',
+            ]
+        )
         self.mock_dev_appserver.assert_called_once_with(
             'app_dev.yaml',
             enable_host_checking=False,
@@ -430,7 +423,7 @@ class MainTests(unittest.TestCase):
 
         def mock_is_port_in_use(port):
             port_calls.append(port)
-            if len(port_calls) <= 5:  # Initial checks return False.
+            if len(port_calls) <= 6:  # Initial checks return False.
                 return False
             else:  # Final checks return True.
                 return True
@@ -439,16 +432,16 @@ class MainTests(unittest.TestCase):
             'scripts.start.common.is_port_in_use',
             side_effect=mock_is_port_in_use,
         ):
-            with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-                with self.assertRaises(KeyboardInterrupt):
-                    start.main(['--no_browser', '--skip-install'])
+            with self.assertRaises(KeyboardInterrupt):
+                start.main(['--no_browser', '--skip-install'])
         mock_print.assert_called_with(
             [
                 'WARNING',
                 (
                     'The following ports are still in use after exiting: '
-                    '8000 (GAE dev appserver admin port), 6379 (Redis server), '
-                    '9200 (ElasticSearch server)'
+                    '8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), '
+                    '6379 (Redis server), 9200 (ElasticSearch server), '
+                    '9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)'
                 ),
             ]
         )
@@ -475,15 +468,6 @@ class MainTests(unittest.TestCase):
         mock_notify.side_effect = lambda: order.append('notify')
 
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
-            with self.assertRaises(KeyboardInterrupt):
-                start.main(['--no_browser', '--skip-install'])
-        self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])
-
-    def test_main_when_emulator_mode_is_enabled_uses_emulators(self):
-        # This test verifies that main starts emulator contexts when
-        # EMULATOR_MODE is enabled.
-        with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
+        with self.assertRaises(KeyboardInterrupt):
             start.main(['--no_browser', '--skip-install'])
-        self.mock_firebase.assert_called_once_with(recover_users=False)
-        self.mock_datastore.assert_called_once_with(clear_datastore=True)
+        self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])

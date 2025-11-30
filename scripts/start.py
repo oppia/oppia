@@ -34,7 +34,6 @@ from . import (
     install_third_party_libs,
     servers,
 )
-from core.constants import constants
 from core import feconf
 
 
@@ -174,18 +173,16 @@ def start_services(
     """Starts all the required services and returns the dev appserver."""
     stack.enter_context(servers.managed_redis_server())
     stack.enter_context(servers.managed_elasticsearch_dev_server())
-
-    if constants.EMULATOR_MODE:
-        stack.enter_context(
-            servers.managed_firebase_auth_emulator(
-                recover_users=parsed_args.save_datastore
-            )
+    stack.enter_context(
+        servers.managed_firebase_auth_emulator(
+            recover_users=parsed_args.save_datastore
         )
-        stack.enter_context(
-            servers.managed_cloud_datastore_emulator(
-                clear_datastore=not parsed_args.save_datastore
-            )
+    )
+    stack.enter_context(
+        servers.managed_cloud_datastore_emulator(
+            clear_datastore=not parsed_args.save_datastore
         )
+    )
 
     # NOTE: When prod_env=True the Webpack compiler is run by build.main().
     if not parsed_args.prod_env:
@@ -271,17 +268,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         (8000, 'GAE dev appserver admin port'),
         (feconf.REDISPORT, 'Redis server'),
         (feconf.ES_LOCALHOST_PORT, 'ElasticSearch server'),
+        (feconf.FIREBASE_EMULATOR_PORT, 'Firebase auth emulator'),
+        (feconf.CLOUD_DATASTORE_EMULATOR_PORT, 'Cloud Datastore emulator'),
     ]
-    if constants.EMULATOR_MODE:
-        required_ports.extend(
-            [
-                (feconf.FIREBASE_EMULATOR_PORT, 'Firebase auth emulator'),
-                (
-                    feconf.CLOUD_DATASTORE_EMULATOR_PORT,
-                    'Cloud Datastore emulator',
-                ),
-            ]
-        )
 
     # Collect all ports that are already in use and report them together.
     in_use_start: list[tuple[int, str]] = []
