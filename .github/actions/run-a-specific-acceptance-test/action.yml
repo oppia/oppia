@@ -81,6 +81,11 @@ runs:
         # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
         path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
 
+    - name: Check for video recordings
+      shell: bash
+      run: |
+        ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/**
+
     - name: Upload test recordings
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
@@ -90,4 +95,4 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
-        path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}
+        path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
