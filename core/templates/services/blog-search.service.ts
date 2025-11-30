@@ -39,7 +39,7 @@ export class BlogPostSearchService {
   private _lastQuery!: string;
   private _searchOffset!: number | null;
   private _lastSelectedTags: string[] = [];
-  private _isCurrentlyFetchingResults = false;
+  private _isCurrentlyFetchingResults: boolean = false;
   private _searchBarLoadedEventEmitter = new EventEmitter<string>();
   private _initialSearchResultsLoadedEventEmitter =
     new EventEmitter<SearchResponseData>();
@@ -69,32 +69,33 @@ export class BlogPostSearchService {
     return this._searchOffset === null;
   }
 
-  get lastQuery():string{
+  get lastQuery(): string {
     return this._lastQuery
   }
-  get searchOffset():number|null{
+  set lastQuery(value: string){
+    this._lastQuery = value;
+  }
+
+  get searchOffset(): number|null {
     return this._searchOffset
   }
-  get lastSelectedtags():string[]{
+  set searchOffset(value: number|null){
+    this._searchOffset = value;
+  }
+
+  get lastSelectedtags(): string[] {
     return this._lastSelectedTags
   }
-  get isCurrentlyFetchingResults(){
+  set lastSelectedtags(value: string[]){
+    this._lastSelectedTags = value;
+  }
+
+  get isCurrentlyFetchingResults(): boolean {
     return this._isCurrentlyFetchingResults
   }
-
-  set lastQuery(value:string){
-    this._lastQuery=value
+  set isCurrentlyFetchingResults(value: boolean) {
+    this._isCurrentlyFetchingResults = value;
   }
-  set searchOffset(value:number|null){
-    this._searchOffset = value
-  }
-  set lastSelectedtags(value:string[]){
-    this._lastSelectedTags = value
-  }
-  set isCurrentlyFetchingResults(value){
-    this._isCurrentlyFetchingResults = value
-  }
-
 
   _getSelectedTagsFromUrl(itemsType: string, urlComponent: string): string[] {
     // Returns list of tags for which the filter is applied from the url.

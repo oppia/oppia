@@ -114,14 +114,14 @@ describe('Blog Post Search Service', () => {
     const testQuery = 'test query string';
 
     it('should correctly get the value of lastQuery (getter)', () => {
-      searchService.lastQuery = testQuery; 
-    
+      searchService.lastQuery = testQuery;
+
       expect(searchService.lastQuery).toBe(testQuery);
     });
 
     it('should correctly set the value of lastQuery (setter)', () => {
       searchService.lastQuery = testQuery;
-      
+
       expect(searchService.lastQuery).toBe(testQuery);
     });
     });
@@ -166,7 +166,7 @@ describe('Blog Post Search Service', () => {
 
       expect(searchService.isCurrentlyFetchingResults).toBe(true);
     });
-    
+
     it('should correctly get and set the value to false', () => {
       searchService.isCurrentlyFetchingResults = false;
 
@@ -175,9 +175,9 @@ describe('Blog Post Search Service', () => {
     });
 
   describe('resetSearchState', () => {
-    it('should reset all search service state properties' , () => {
+    it('should reset all search service state properties', () => {
       searchService.searchOffset = 15;
-      searchService.lastQuery = "search query";
+      searchService.lastQuery = 'search query';
 
       searchService.resetSearchState();
 
