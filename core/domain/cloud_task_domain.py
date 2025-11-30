@@ -133,7 +133,7 @@ class VoiceoverRegenerationTaskMappingDict(TypedDict):
 
 class VoiceoverRegenerationTaskMapping:
     """Domain object class that models the voiceover regeneration request for an
-    exploration, associated with a specific cloud task run ID.
+    exploration, associated with a specific cloud task run.
     """
 
     def __init__(
@@ -142,6 +142,14 @@ class VoiceoverRegenerationTaskMapping:
         task_run_id: str,
         language_accent_to_content_status_map: Dict[str, Dict[str, str]],
     ) -> None:
+        """Initializes a VoiceoverRegenerationTaskMapping domain object.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+            task_run_id: str. The ID of the cloud task run.
+            language_accent_to_content_status_map: dict. A mapping of language
+                accents to their content regeneration status.
+        """
         self.exploration_id = exploration_id
         self.task_run_id = task_run_id
         self.language_accent_to_content_status_map = (
@@ -170,7 +178,7 @@ class VoiceoverRegenerationTaskMapping:
         cls,
         voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationTaskMappingDict,
     ) -> VoiceoverRegenerationTaskMapping:
-        """Returns a domain object from a dictionary.
+        """Returns a domain object from the given dictionary.
 
         Args:
             voiceover_regeneration_task_mapping_dict: dict. A dictionary
@@ -178,7 +186,7 @@ class VoiceoverRegenerationTaskMapping:
 
         Returns:
             VoiceoverRegenerationTaskMapping. A VoiceoverRegenerationTaskMapping
-            domain object created from the given dict object.
+            domain object created from the given dict representation.
         """
         return cls(
             exploration_id=voiceover_regeneration_task_mapping_dict[
@@ -191,46 +199,6 @@ class VoiceoverRegenerationTaskMapping:
                 ]
             ),
         )
-
-    def are_all_voiceovers_generated(self) -> bool:
-        """Checks if all the contents for the voiceover regeneration request
-        have been generated.
-
-        Returns:
-            bool. Whether all contents have been generated.
-        """
-        for (
-            content_id_to_regeneration_status
-        ) in self.language_accent_to_content_status_map.values():
-            for status in content_id_to_regeneration_status.values():
-                if status != feconf.VoiceoverRegenerationState.SUCCEEDED.value:
-                    return False
-        return True
-
-    def update_content_status_for_cloud_task_run(
-        self, language_accent_code: str, failed_content_ids: List[str]
-    ) -> None:
-        """Updates the content status map for a specific language accent code
-        based on the failed content IDs.
-
-        Args:
-            language_accent_code: str. The language accent code.
-            failed_content_ids: List[str]. The list of content IDs for which
-                voiceover regeneration has failed.
-        """
-        content_status_map = self.language_accent_to_content_status_map.get(
-            language_accent_code, {}
-        )
-
-        for content_id in content_status_map.keys():
-            if content_id in failed_content_ids:
-                content_status_map[content_id] = (
-                    feconf.VoiceoverRegenerationState.FAILED.value
-                )
-            else:
-                content_status_map[content_id] = (
-                    feconf.VoiceoverRegenerationState.SUCCEEDED.value
-                )
 
     @classmethod
     def create_default_voiceover_regeneration_task_mapping(
@@ -252,11 +220,57 @@ class VoiceoverRegenerationTaskMapping:
             language_accent_to_content_status_map={},
         )
 
+    def are_all_voiceovers_generated(self) -> bool:
+        """Checks if all the contents for the voiceover regeneration request
+        have been generated successfully.
+
+        Returns:
+            bool. Whether all contents have been generated successfully or not.
+        """
+        for (
+            content_id_to_regeneration_status
+        ) in self.language_accent_to_content_status_map.values():
+            for (
+                regeneration_status
+            ) in content_id_to_regeneration_status.values():
+                if (
+                    regeneration_status
+                    != feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                ):
+                    return False
+        return True
+
+    def update_final_content_status_for_cloud_task_run(
+        self, language_accent_code: str, failed_content_ids: List[str]
+    ) -> None:
+        """Updates the content-status map for a given language-accent code by
+        marking the IDs in failed_content_ids as FAILED and all remaining IDs
+        as SUCCEEDED.
+
+        Args:
+            language_accent_code: str. The language accent code.
+            failed_content_ids: List[str]. The list of content IDs for which
+                voiceover regeneration has failed.
+        """
+        content_status_map = self.language_accent_to_content_status_map.get(
+            language_accent_code, {}
+        )
+
+        for content_id in content_status_map.keys():
+            if content_id in failed_content_ids:
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.FAILED.value
+                )
+            else:
+                content_status_map[content_id] = (
+                    feconf.VoiceoverRegenerationState.SUCCEEDED.value
+                )
+
     def add_language_accent_to_content_status_map(
         self, language_accent_code: str, content_id_list: List[str]
     ) -> None:
         """Adds a new language accent to content status mapping for the
-        voiceover regeneration task.
+        voiceover regeneration task and mark all content IDs as GENERATING.
 
         Args:
             language_accent_code: str. The language accent code.

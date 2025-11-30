@@ -1739,9 +1739,9 @@ class VoiceoverRegenerationState(enum.Enum):
     exploration content.
     """
 
-    GENERATING = 'generating'
-    SUCCEEDED = 'succeeded'
-    FAILED = 'failed'
+    GENERATING = 'GENERATING'
+    SUCCEEDED = 'SUCCEEDED'
+    FAILED = 'FAILED'
 
 
 class VoiceoverType(enum.Enum):

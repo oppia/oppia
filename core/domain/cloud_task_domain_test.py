@@ -225,7 +225,9 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             voiceover_regeneration_task_mapping.are_all_voiceovers_generated()
         )
 
-    def test_should_update_content_status_for_cloud_task_run(self) -> None:
+    def test_should_update_final_content_status_for_cloud_task_run(
+        self,
+    ) -> None:
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map = {
@@ -244,7 +246,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             )
         )
 
-        voiceover_regeneration_task_mapping.update_content_status_for_cloud_task_run(
+        voiceover_regeneration_task_mapping.update_final_content_status_for_cloud_task_run(
             'en-US', ['content_1']
         )
 

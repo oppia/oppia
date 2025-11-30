@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.]
 
-"""Domain objects for Cloud task run."""
+"""Service methods for Cloud task run."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import cloud_task_domain
 from core.platform import models
 
-from typing import Dict, List, TypedDict, Optional
+from typing import Dict, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -34,8 +34,7 @@ if MYPY:  # pragma: no cover
 def get_voiceover_regeneration_task(
     exploration_id: str, cloud_task_run_id: str
 ) -> Optional[cloud_task_domain.VoiceoverRegenerationTaskMapping]:
-    """
-    Returns the VoiceoverRegenerationTaskMapping object for the given
+    """Returns the VoiceoverRegenerationTaskMapping instance for the given
     exploration id and cloud task run id.
 
     Args:
@@ -43,8 +42,9 @@ def get_voiceover_regeneration_task(
         cloud_task_run_id: str. The id of the cloud task run.
 
     Returns:
-        VoiceoverRegenerationTaskMapping. The VoiceoverRegenerationTaskMapping
-        object for the given exploration id and cloud task run id.
+        VoiceoverRegenerationTaskMapping|None. The
+        VoiceoverRegenerationTaskMapping instance for the given exploration id
+        and cloud task run id.
     """
     voiceover_regeneration_task_id = '%s:%s' % (
         exploration_id,
@@ -80,7 +80,7 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
     exploration_id: str,
 ) -> Dict[str, str | Dict[str, str]]:
     """Returns the existing voiceover regeneration cloud task run requests for
-    the given exploration.
+    the given exploration ID.
 
     Args:
         exploration_id: str. The id of the exploration.
@@ -118,7 +118,7 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
 
     # If multiple voiceover-regeneration requests exist in the Cloud Task queue
     # for the same exploration ID, they should be merged into a single
-    # dictionary containing the latest data.
+    # dictionary containing the latest status data.
     language_accent_to_content_status_map = (
         resolve_multiple_cloud_task_runs_for_exploration(
             voiceover_regeneration_task_domain_objects
@@ -126,10 +126,9 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
     )
 
     return {
-        'exploration_id': exploration_id,
         'language_accent_to_content_status_map': (
             language_accent_to_content_status_map
-        ),
+        )
     }
 
 

@@ -338,7 +338,9 @@ class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
             **{
                 'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
                 'cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-                'language_accent_to_content_status_map': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_to_content_status_map': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
             },
         )
 

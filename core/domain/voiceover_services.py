@@ -896,6 +896,26 @@ def create_voiceover_regeneration_task_with_status_generating(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     language_code_to_autogeneratable_accent_codes: Dict[str, List[str]],
 ):
+    """Creates a VoiceoverRegenerationTaskMapping object with all contents set
+    to 'GENERATING' status.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        task_run_id: str. The unique identifier for the voiceover regeneration
+            task.
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to their corresponding content IDs and HTML that require
+            voiceover regeneration.
+        language_code_to_autogeneratable_accent_codes: dict. A dictionary
+            mapping language codes to a list of accent codes that support
+            autogeneration.
+
+    Returns:
+        VoiceoverRegenerationTaskMapping. An instance of
+        VoiceoverRegenerationTaskMapping with all contents set to
+        'GENERATING' status.
+    """
     language_accent_to_content_status_map = {}
     for (
         language_code,
@@ -906,7 +926,7 @@ def create_voiceover_regeneration_task_with_status_generating(
         )
         for accent_code in accent_codes:
             language_accent_to_content_status_map[accent_code] = {
-                content_id: 'generating'
+                content_id: feconf.VoiceoverRegenerationState.GENERATING.value
                 for content_id in content_ids_to_content_values.keys()
             }
 
@@ -947,6 +967,9 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration process was initiated.
         author_id: str. The ID of the user who triggered the voiceover
             regeneration, either directly or indirectly.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task. If None, the method is invoked by a
+            synchronous process and task-tracking is not required.
     """
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
@@ -993,11 +1016,12 @@ def _regenerate_voiceovers_for_given_contents(
     # A list of language accents for which voiceovers are regenerated.
     language_accents_used_for_voiceover_regeneration = []
 
-    voiceover_regeneration_task = (
-        cloud_task_services.get_voiceover_regeneration_task(
-            exploration_id, task_run_id
+    if task_run_id is not None:
+        voiceover_regeneration_task = (
+            cloud_task_services.get_voiceover_regeneration_task(
+                exploration_id, task_run_id
+            )
         )
-    )
 
     if voiceover_regeneration_task is None:
         voiceover_regeneration_task = (
@@ -1040,9 +1064,10 @@ def _regenerate_voiceovers_for_given_contents(
                 error[0] for error in errors_while_voiceover_regeneration
             ]
 
-            voiceover_regeneration_task.update_content_status_for_cloud_task_run(
-                language_accent_code, failed_content_ids
-            )
+            if task_run_id is not None:
+                voiceover_regeneration_task.update_final_content_status_for_cloud_task_run(
+                    language_accent_code, failed_content_ids
+                )
 
             if errors_while_voiceover_regeneration:
                 error_collections_during_voiceover_regeneration.append(
@@ -1056,9 +1081,10 @@ def _regenerate_voiceovers_for_given_contents(
                     errors_while_voiceover_regeneration
                 )
 
-    cloud_task_services.save_voiceover_regeneration_task_run_mapping(
-        voiceover_regeneration_task
-    )
+    if task_run_id is not None:
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task
+        )
 
     # Confirming that the app can deliver emails.
     server_can_send_emails = (
@@ -1104,6 +1130,8 @@ def regenerate_voiceovers_for_updated_exploration(
             exploration.
         date_time: str. The date and time when the changes were
             made to the exploration.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task.
 
     Raises:
         Exception. If the voiceover regeneration fails for any of the content
@@ -1184,6 +1212,8 @@ def regenerate_voiceovers_on_exploration_curation(
             voiceovers for.
         date_time: str. The timestamp when the exploration was curated.
         author_id: str. The ID of the user who curated the exploration.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task.
     """
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains

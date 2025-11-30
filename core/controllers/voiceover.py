@@ -311,8 +311,8 @@ class RegenerateVoiceoverOnExpUpdateHandler(
 class VoiceoverRegenerationRequestToCloudTaskHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler class to get voiceover regeneration task run mappings for a given
-    exploration.
+    """Retrieves the status of all voiceover-regeneration requests queued in
+    Cloud Tasks for the specified exploration.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -323,13 +323,16 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id: str) -> None:
+        """Retrieves the status of all voiceover-regeneration requests queued in
+        Cloud Tasks for the specified exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
         self.values.update(
-            {
-                'voiceover_regeneration_task_run_mappings': (
-                    cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
-                        exploration_id
-                    )
-                )
-            }
+            cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                exploration_id
+            )
         )
         self.render_json(self.values)
