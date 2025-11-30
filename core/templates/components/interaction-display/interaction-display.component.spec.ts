@@ -441,4 +441,110 @@ describe('Interaction display', () => {
     expect(hostVcr.clear).toHaveBeenCalled();
     expect(componentInstance.buildInteraction).toHaveBeenCalled();
   });
+
+  it('should not build interaction when htmlData is only whitespace', () => {
+    componentInstance.htmlData = '   ';
+    componentInstance.viewContainerRef = hostVcr;
+    spyOn(hostVcr, 'createComponent');
+
+    componentInstance.buildInteraction();
+
+    expect(hostVcr.createComponent).not.toHaveBeenCalled();
+  });
+
+  it('should return early when dynamic component creation returns null', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input></oppia-interactive-text-input>';
+    componentInstance.viewContainerRef = hostVcr;
+    const fakeFactory = {} as any;
+    spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
+      fakeFactory
+    );
+    spyOn(hostVcr, 'createComponent').and.returnValue(
+      null as unknown as ComponentRef<unknown>
+    );
+
+    expect(() => componentInstance.buildInteraction()).not.toThrow();
+    expect(hostVcr.createComponent).toHaveBeenCalled();
+  });
+
+  it('should return early when dynamic component instance is missing', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input></oppia-interactive-text-input>';
+    componentInstance.viewContainerRef = hostVcr;
+
+    const mockComponentRef = {
+      changeDetectorRef: {detectChanges: () => {}},
+      // Intentionally omit instance property to trigger early return path.
+      location: {
+        nativeElement: {setAttribute: jasmine.createSpy('setAttribute')},
+      },
+    } as unknown as ComponentRef<unknown>;
+
+    const fakeFactory = {} as any;
+    spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
+      fakeFactory
+    );
+    spyOn(hostVcr, 'createComponent').and.returnValue(mockComponentRef);
+
+    componentInstance.buildInteraction();
+
+    // Since instance is missing, attribute setting should never be called.
+    expect(
+      mockComponentRef.location.nativeElement.setAttribute
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early when attributes are undefined on parsed element', () => {
+    componentInstance.htmlData =
+      '<oppia-interactive-text-input></oppia-interactive-text-input>';
+    componentInstance.viewContainerRef = hostVcr;
+
+    const mockInteractionElement = {
+      tagName: 'OPPIA-INTERACTIVE-TEXT-INPUT',
+      attributes: undefined, // Missing attributes should trigger early return
+    };
+
+    const mockBody = {
+      firstElementChild: mockInteractionElement,
+    };
+
+    const mockDocument = {
+      body: mockBody,
+    };
+
+    spyOn(DOMParser.prototype, 'parseFromString').and.returnValue(
+      mockDocument as unknown as Document
+    );
+
+    const componentChangeDetectorSpy = jasmine.createSpy(
+      'componentDetectChanges'
+    );
+    const mockComponentRef = {
+      changeDetectorRef: {detectChanges: componentChangeDetectorSpy},
+      instance: {},
+      location: {
+        nativeElement: {setAttribute: jasmine.createSpy('setAttribute')},
+      },
+    } as unknown as ComponentRef<unknown>;
+
+    const fakeFactory = {} as any;
+    spyOn(componentFactoryResolver, 'resolveComponentFactory').and.returnValue(
+      fakeFactory
+    );
+    spyOn(hostVcr, 'createComponent').and.returnValue(mockComponentRef);
+    spyOn(componentInstance['changeDetectorRef'], 'detectChanges');
+
+    componentInstance.buildInteraction();
+
+    // Should call change detection before returning early
+    expect(componentChangeDetectorSpy).toHaveBeenCalled();
+    expect(
+      componentInstance['changeDetectorRef'].detectChanges
+    ).toHaveBeenCalled();
+    // setAttribute should not be called since we returned early
+    expect(
+      mockComponentRef.location.nativeElement.setAttribute
+    ).not.toHaveBeenCalled();
+  });
 });
