@@ -70,28 +70,28 @@ export class BlogPostSearchService {
   }
 
   get lastQuery(): string {
-    return this._lastQuery
+    return this._lastQuery;
   }
-  set lastQuery(value: string){
+  set lastQuery(value: string) {
     this._lastQuery = value;
   }
 
   get searchOffset(): number|null {
-    return this._searchOffset
+    return this._searchOffset;
   }
-  set searchOffset(value: number|null){
+  set searchOffset(value: number|null) {
     this._searchOffset = value;
   }
 
   get lastSelectedtags(): string[] {
-    return this._lastSelectedTags
+    return this._lastSelectedTags;
   }
-  set lastSelectedtags(value: string[]){
+  set lastSelectedtags(value: string[]) {
     this._lastSelectedTags = value;
   }
 
   get isCurrentlyFetchingResults(): boolean {
-    return this._isCurrentlyFetchingResults
+    return this._isCurrentlyFetchingResults;
   }
   set isCurrentlyFetchingResults(value: boolean) {
     this._isCurrentlyFetchingResults = value;

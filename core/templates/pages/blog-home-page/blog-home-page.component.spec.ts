@@ -195,7 +195,16 @@ describe('Blog home page component', () => {
     component.filterWasUsed = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
-    component.blogPostSummaries = [{'id': 1, title: 'Test'}] as any;
+    component.blogPostSummaries = [{
+      _id: '1',
+      _authorUsername: 'user1',
+      _displayedAuthorName: 'User One',
+      _title: 'Test Post Title',
+      _summary: 'A short summary.',
+      _tags: ['test', 'dev'],
+      _thumbnailFilename: 'thumb1.svg',
+      _urlFragment: 'test-post',
+    }] as BlogPostSummary[];
     component.totalBlogPosts = 50;
     component.showBlogPostCardsLoadingScreen = true;
 
