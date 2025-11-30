@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import importlib.metadata
 import itertools
 import json
 import os
@@ -31,7 +32,6 @@ from core import utils
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
-import pkg_resources
 from typing import Dict, List, Optional, Set, Tuple
 
 
@@ -54,31 +54,20 @@ class Distribution:
             metadata_dict: dict(str: str). The stringified metadata contents of
                 the library.
         """
-        self.project_name = library_name
+        self.name = library_name
         self.version = version_string
         self.metadata_dict = metadata_dict
 
-    def has_metadata(self, key: str) -> bool:
-        """Returns whether the given metadata key exists.
+    def read_text(self, filename: str) -> Optional[str]:
+        """Returns the contents of the given metadata file.
 
         Args:
-            key: str. The key corresponding to the metadata.
+            filename: str. The filename corresponding to the metadata.
 
         Returns:
-            bool. Whether the metadata exists.
+            str|None. The contents of the metadata file, or None if not found.
         """
-        return key in self.metadata_dict
-
-    def get_metadata(self, key: str) -> str:
-        """The contents of the corresponding metadata.
-
-        Args:
-            key: str. The key corresponding to the metadata.
-
-        Returns:
-            str. The contents of the metadata.
-        """
-        return self.metadata_dict[key]
+        return self.metadata_dict.get(filename)
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -144,7 +133,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         def mock_check_call(
             cmd_tokens: List[str], **_kwargs: str
         ) -> scripts_test_utils.PopenStub:  # pylint: disable=unused-argument
-            if cmd_tokens and cmd_tokens[0].endswith('%spython' % os.path.sep):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('%spython' % os.path.sep)
+                or cmd_tokens[0].endswith('%spython3' % os.path.sep)
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -153,7 +145,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return scripts_test_utils.PopenStub()
 
         def mock_run(cmd_tokens: List[str], **_kwargs: str) -> str:
-            if cmd_tokens and cmd_tokens[0].endswith('python'):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('python')
+                or cmd_tokens[0].endswith('python3')
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -225,7 +220,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
         def mock_find_distributions(  # pylint: disable=unused-argument
-            paths: List[str],
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -263,7 +258,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         with swap_requirements, swap_find_distributions:
             self.assertEqual(
@@ -398,19 +393,27 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 with self.swap_run:
                     install_python_prod_dependencies.main()
 
+        # Check that the pip-compile command was run first.
         self.assertEqual(
-            self.cmd_token_list,
+            self.cmd_token_list[0],
             [
-                [
-                    'pip-compile',
-                    '--no-emit-index-url',
-                    '--quiet',
-                    '--strip-extras',
-                    '--generate-hashes',
-                    'requirements.in',
-                    '--output-file',
-                    'requirements.txt',
-                ],
+                'pip-compile',
+                '--no-emit-index-url',
+                '--quiet',
+                '--strip-extras',
+                '--generate-hashes',
+                'requirements.in',
+                '--output-file',
+                'requirements.txt',
+            ],
+        )
+
+        # Check that all the expected install commands were run (order doesn't
+        # matter for the install commands since dependencies can be processed
+        # in any order).
+        self.assertCountEqual(
+            self.cmd_token_list[1:],
+            [
                 [
                     'python',
                     '-m',
@@ -777,12 +780,13 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
     def test_correct_metadata_directory_names_do_not_throw_error(self) -> None:
-        def mock_find_distributions(
-            unused_paths: List[str],
+        def mock_find_distributions(  # pylint: disable=unused-argument
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency-1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency3-hyphenated', '3.4.0', {}),
                 Distribution('dependency-5', '0.5.3', {}),
                 Distribution(
                     'dependency6',
@@ -805,6 +809,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
+                'dependency3.hyphenated-3.4.0.dist-info',
                 'dependency-5-0.5.3-py3.10.egg-info',
                 'dependency_6-0.5.3-py3.10.egg-info',
             ]
@@ -813,7 +818,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -824,8 +829,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_exception_raised_when_metadata_directory_names_are_missing(
         self,
     ) -> None:
-        def mock_find_distributions(
-            unused_paths: List[str],
+        def mock_find_distributions(  # pylint: disable=unused-argument
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -862,7 +867,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -995,12 +1000,18 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_normalize_python_library_name(self) -> None:
         expected_normalized_names = [
-            ('backports-tarfile', 'backports.tarfile'),
-            ('backports-tarfile-2', 'backports.tarfile-2'),
+            ('backports-tarfile', 'backports-tarfile'),
+            ('backports.tarfile', 'backports-tarfile'),
+            ('backports_tarfile', 'backports-tarfile'),
+            ('backports-tarfile-2', 'backports-tarfile-2'),
             ('apache-beam[gcp]', 'apache-beam'),
             ('Pillow', 'pillow'),
             ('pylatexenc', 'pylatexenc'),
             ('PyYAML', 'pyyaml'),
+            ('importlib-metadata', 'importlib-metadata'),
+            ('importlib_metadata', 'importlib-metadata'),
+            ('typing-extensions', 'typing-extensions'),
+            ('typing_extensions', 'typing-extensions'),
         ]
 
         for lib_name, expected_normalized_name in expected_normalized_names:

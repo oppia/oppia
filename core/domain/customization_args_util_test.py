@@ -376,7 +376,7 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             interaction_ids_with_used_ca_frontend_interfaces,
         )
 
-    def test_frontend_customization_args_dtslint_test_coverage(self) -> None:
+    def test_frontend_customization_args_type_test_coverage(self) -> None:
         """Test to ensure that customization-args-defs-test.ts covers testing
         customization arguments types for each interaction. Uses regex to
         confirm that there exists a test named
