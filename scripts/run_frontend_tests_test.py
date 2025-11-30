@@ -657,12 +657,12 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 args=['--run_on_changed_files_in_branch', '--allow_no_spec']
             )
 
-        printed = [
-            (
-                msg.decode('utf-8') if isinstance(msg, bytes) else str(msg)
-            ).strip()
-            for msg in self.print_arr
-        ]
+        printed: list[str] = []
+        for msg in self.print_arr:
+            if isinstance(msg, bytes):
+                printed.append(msg.decode('utf-8').strip())
+            else:
+                printed.append(str(msg).strip())
 
         self.assertIn('No valid specs found to run.', printed)
 
