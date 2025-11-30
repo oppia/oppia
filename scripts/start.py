@@ -255,6 +255,21 @@ def attempt_launch_browser(
             time.sleep(BROWSER_RETRY_INTERVAL_SECS)
 
 
+def _get_ports_in_use_with_names(
+    required_ports: list[tuple[int, str]],
+) -> list[tuple[int, str]]:
+    """Gets the list of required ports that are currently in use.
+
+    Args:
+        required_ports: List of (port, name) tuples.
+
+    Returns:
+        List of (port, name) tuples for ports that are in use.
+    """
+    ports_in_use = common.get_ports_in_use([p for p, _ in required_ports])
+    return [(p, n) for p, n in required_ports if p in ports_in_use]
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -273,12 +288,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     ]
 
     # Collect all ports that are already in use and report them together.
-    in_use_start: list[tuple[int, str]] = []
-    for port, name in required_ports:
-        if common.is_port_in_use(port):
-            in_use_start.append((port, name))
-    if in_use_start:
-        port_msgs = ', '.join([f"{p} ({n})" for p, n in in_use_start])
+    ports_in_use = _get_ports_in_use_with_names(required_ports)
+    if ports_in_use:
+        port_msgs = ', '.join([f"{p} ({n})" for p, n in ports_in_use])
         common.print_each_string_after_two_new_lines(
             [
                 'ERROR',
@@ -365,10 +377,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # attempted to use are now free. This helps detect lingering processes
         # that didn't shut down correctly.
         # NOTE: We use the same required_ports list as above.
-        in_use: list[tuple[int, str]] = []
-        for port, name in required_ports:
-            if common.is_port_in_use(port):
-                in_use.append((port, name))
+        in_use = _get_ports_in_use_with_names(required_ports)
         if in_use:
             port_msgs = ', '.join([f"{p} ({n})" for p, n in in_use])
             common.print_each_string_after_two_new_lines(

@@ -343,22 +343,29 @@ class MainTests(unittest.TestCase):
 
     @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
     def test_main_exits_and_prints_error_if_ports_in_use(self, mock_print):
-        self.mock_is_port_in_use.return_value = True
-        with self.assertRaises(SystemExit) as cm:
-            start.main(['--no_browser'])
-        self.assertEqual(cm.exception.code, 1)
-        mock_print.assert_called_with(
-            [
-                'ERROR',
-                (
-                    'Could not start new server. The following ports are '
-                    'already in use and need to be available: 8181 (GAE dev '
-                    'appserver), 8000 (GAE dev appserver admin port), 6379 '
-                    '(Redis server), 9200 (ElasticSearch server), 9099 '
-                    '(Firebase auth emulator), 8089 (Cloud Datastore emulator)'
-                ),
-            ]
-        )
+        required_ports = [
+            (8181, 'GAE dev appserver'),
+            (8000, 'GAE dev appserver admin port'),
+            (6379, 'Redis server'),
+            (9200, 'ElasticSearch server'),
+            (9099, 'Firebase auth emulator'),
+            (8089, 'Cloud Datastore emulator'),
+        ]
+
+        # Mock get_ports_in_use to return all ports as in use.
+        with mock.patch(
+            'scripts.start.common.get_ports_in_use',
+            return_value=[p for p, _ in required_ports],
+        ):
+            with self.assertRaises(SystemExit) as cm:
+                start.main(['--no_browser'])
+            self.assertEqual(cm.exception.code, 1)
+            mock_print.assert_called_with(
+                [
+                    'ERROR',
+                    'Could not start new server. The following ports are already in use and need to be available: 8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), 6379 (Redis server), 9200 (ElasticSearch server), 9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)',
+                ]
+            )
 
     @mock.patch('scripts.start.attempt_launch_browser')
     def test_main_successful_startup_with_no_install(self, mock_attempt_launch):
@@ -419,29 +426,32 @@ class MainTests(unittest.TestCase):
         self, mock_print
     ):
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
-        port_calls = []
 
-        def mock_is_port_in_use(port):
-            port_calls.append(port)
-            if len(port_calls) <= 6:  # Initial checks return False.
-                return False
-            else:  # Final checks return True.
-                return True
+        call_count = 0
+
+        def mock_get_ports(ports):
+            nonlocal call_count
+            call_count += 1
+            return ports if call_count == 2 else []
 
         with mock.patch(
-            'scripts.start.common.is_port_in_use',
-            side_effect=mock_is_port_in_use,
+            'scripts.common.get_ports_in_use',
+            side_effect=mock_get_ports,
         ):
             with self.assertRaises(KeyboardInterrupt):
                 start.main(['--no_browser', '--skip-install'])
+
         mock_print.assert_called_with(
             [
                 'WARNING',
                 (
                     'The following ports are still in use after exiting: '
-                    '8181 (GAE dev appserver), 8000 (GAE dev appserver admin port), '
-                    '6379 (Redis server), 9200 (ElasticSearch server), '
-                    '9099 (Firebase auth emulator), 8089 (Cloud Datastore emulator)'
+                    '8181 (GAE dev appserver), '
+                    '8000 (GAE dev appserver admin port), '
+                    '6379 (Redis server), '
+                    '9200 (ElasticSearch server), '
+                    '9099 (Firebase auth emulator), '
+                    '8089 (Cloud Datastore emulator)'
                 ),
             ]
         )
