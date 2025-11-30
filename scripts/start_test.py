@@ -14,585 +14,612 @@
 
 """Unit tests for scripts/start.py."""
 
-from __future__ import annotations
+import argparse
+import unittest
+from unittest import mock
 
-import os
-
-import contextlib
-from core.constants import constants
-from core.tests import test_utils
-from scripts import (
-    build,
-    common,
-    extend_index_yaml,
-    install_third_party_libs,
-    servers,
-)
-
-PORT_NUMBER_FOR_GAE_SERVER = 8181
-MANAGED_WEB_BROWSER_ERROR = 'Mock Exception while launching web browser.'
+from scripts import start
 
 
-class MockCompiler:
-    def wait(self) -> None:  # pylint: disable=missing-docstring
-        pass
+class GetBuildArgsTests(unittest.TestCase):
+    """Tests for get_build_args function."""
 
-    def is_running(self) -> bool:
-        """Mock whether the process is running. Return True by default.
+    def test_get_build_args_no_flags_returns_empty_list(self):
+        parsed_args = argparse.Namespace(
+            prod_env=False, maintenance_mode=False, source_maps=False
+        )
+        self.assertEqual(start.get_build_args(parsed_args), [])
 
-        Tests that simulate a stopped dev server may replace this method with
-        a version that returns False.
-        """
-        return True
+    def test_get_build_args_prod_env_flag_returns_prod_env(self):
+        parsed_args = argparse.Namespace(
+            prod_env=True, maintenance_mode=False, source_maps=False
+        )
+        self.assertEqual(start.get_build_args(parsed_args), ['--prod_env'])
 
-
-class MockCompilerContextManager:
-    def __init__(self) -> None:
-        pass
-
-    def __enter__(self) -> MockCompiler:
-        return MockCompiler()
-
-    def __exit__(self, *unused_args: str) -> None:
-        pass
-
-
-class StartTests(test_utils.GenericTestBase):
-    """Unit tests for scripts/start.py."""
-
-    def setUp(self) -> None:
-        super().setUp()
-
-        self.print_arr: list[str] = []
-
-        def mock_print(msg: str) -> None:
-            self.print_arr.append(msg)
-
-        def mock_context_manager() -> MockCompilerContextManager:
-            return MockCompilerContextManager()
-
-        self.swap_print = self.swap(
-            common, 'print_each_string_after_two_new_lines', mock_print
+    def test_get_build_args_maintenance_mode_flag_returns_maintenance_mode(
+        self,
+    ):
+        parsed_args = argparse.Namespace(
+            prod_env=False, maintenance_mode=True, source_maps=False
+        )
+        self.assertEqual(
+            start.get_build_args(parsed_args), ['--maintenance_mode']
         )
 
-        def mock_constants() -> None:
-            print('mock_set_constants_to_default')
+    def test_get_build_args_source_maps_flag_returns_source_maps(self):
+        parsed_args = argparse.Namespace(
+            prod_env=False, maintenance_mode=False, source_maps=True
+        )
+        self.assertEqual(start.get_build_args(parsed_args), ['--source_maps'])
 
-        env = os.environ.copy()
-        env['PIP_NO_DEPS'] = 'True'
-        # We need to create a swap for install_third_party_libs because
-        # scripts/start.py installs third party libraries whenever it is
-        # imported.
-        self.swap_install_third_party_libs = self.swap(
-            install_third_party_libs, 'main', lambda: None
+    def test_get_build_args_all_flags_returns_all(self):
+        parsed_args = argparse.Namespace(
+            prod_env=True, maintenance_mode=True, source_maps=True
         )
-        self.swap_extend_index_yaml = self.swap(
-            extend_index_yaml, 'main', lambda: None
-        )
-        self.swap_webpack_compiler = self.swap_with_checks(
-            servers,
-            'managed_webpack_compiler',
-            lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[
-                {
-                    'use_prod_env': False,
-                    'use_source_maps': False,
-                    'watch_mode': True,
-                }
-            ],
-        )
-        self.swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'watch_mode': True}],
-        )
-        self.swap_redis_server = self.swap(
-            servers, 'managed_redis_server', mock_context_manager
-        )
-        self.swap_elasticsearch_dev_server = self.swap(
-            servers, 'managed_elasticsearch_dev_server', mock_context_manager
-        )
-        self.swap_firebase_auth_emulator = self.swap_with_checks(
-            servers,
-            'managed_firebase_auth_emulator',
-            lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'recover_users': False}],
-        )
-        self.swap_cloud_datastore_emulator = self.swap_with_checks(
-            servers,
-            'managed_cloud_datastore_emulator',
-            lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[{'clear_datastore': True}],
-        )
-        self.swap_dev_appserver = self.swap_with_checks(
-            servers,
-            'managed_dev_appserver',
-            lambda *unused_args, **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[
-                {
-                    'enable_host_checking': True,
-                    'automatic_restart': True,
-                    'skip_sdk_update_check': True,
-                    'port': PORT_NUMBER_FOR_GAE_SERVER,
-                    'env': env,
-                }
-            ],
-        )
-        self.swap_create_server = self.swap_with_checks(
-            servers,
-            'create_managed_web_browser',
-            lambda _: MockCompilerContextManager(),
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-        self.swap_create_managed_web_browser = self.swap_to_always_raise(
-            servers,
-            'create_managed_web_browser',
-            Exception(MANAGED_WEB_BROWSER_ERROR),
-        )
-        self.swap_mock_set_constants_to_default = self.swap(
-            common, 'set_constants_to_default', mock_constants
+        self.assertEqual(
+            start.get_build_args(parsed_args),
+            ['--prod_env', '--maintenance_mode', '--source_maps'],
         )
 
-    def test_start_servers_successfully(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}],
-        )
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_create_server, self.swap_webpack_compiler:
-                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
-                        with self.swap_firebase_auth_emulator, self.swap_print:
-                            with self.swap_mock_set_constants_to_default:
-                                with swap_check_port_in_use:
-                                    start.main(args=[])
 
-        self.assertIn(
+class MakeDevAppserverEnvTests(unittest.TestCase):
+    """Tests for make_dev_appserver_env function."""
+
+    @mock.patch.dict('os.environ', {'TEST': 'value'})
+    def test_make_dev_appserver_env_prod_env_true_returns_app_yaml(self):
+        parsed_args = argparse.Namespace(prod_env=True)
+        env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
+        self.assertEqual(app_yaml_path, 'app.yaml')
+        self.assertIn('PIP_NO_DEPS', env)
+        self.assertEqual(env['PIP_NO_DEPS'], 'True')
+
+    @mock.patch.dict('os.environ', {'TEST': 'value'})
+    def test_make_dev_appserver_env_prod_env_false_returns_app_dev_yaml(self):
+        parsed_args = argparse.Namespace(prod_env=False)
+        env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
+        self.assertEqual(app_yaml_path, 'app_dev.yaml')
+        self.assertIn('PIP_NO_DEPS', env)
+        self.assertEqual(env['PIP_NO_DEPS'], 'True')
+
+
+class AttemptLaunchBrowserTests(unittest.TestCase):
+    """Tests for attempt_launch_browser function."""
+
+    def setUp(self):
+        # Set up mock arguments and dev_appserver for browser launch tests.
+        self.parsed_args_no_browser = argparse.Namespace(no_browser=True)
+        self.parsed_args_with_browser = argparse.Namespace(no_browser=False)
+        self.dev_appserver = mock.Mock()
+        self.dev_appserver.is_running.return_value = True
+        self.enter_context_fn = mock.Mock()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    def test_attempt_launch_browser_no_browser_flag_prints_info_message(
+        self, mock_print
+    ):
+        # This test verifies that attempt_launch_browser prints an info message and does not launch the browser when no_browser is True.
+        start.attempt_launch_browser(
+            self.parsed_args_no_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
+        )
+        mock_print.assert_called_once_with(
             [
                 'INFORMATION',
-                (
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:8181/ in a web browser.',
+            ]
         )
+        self.enter_context_fn.assert_not_called()
 
-    def test_start_servers_successfully_in_production_mode(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': ['--prod_env']}],
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_browser_launch_success_prints_opening_message(
+        self, mock_create_browser, mock_print
+    ):
+        # This test verifies that attempt_launch_browser successfully launches
+        # the browser and prints an opening message when the server is running.
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
         )
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        self.enter_context_fn.assert_called_once_with(
+            mock_create_browser.return_value
         )
-        with self.swap_cloud_datastore_emulator, self.swap_create_server:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_print, swap_check_port_in_use:
-                            with self.swap_mock_set_constants_to_default:
-                                start.main(args=['--prod_env'])
-
-        self.assertIn(
+        mock_print.assert_called_with(
             [
                 'INFORMATION',
-                (
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'Local development server is ready! Opening a default web '
+                'browser window pointing to it: http://localhost:8181/',
+            ]
         )
 
-    def test_start_servers_successfully_in_maintenance_mode(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': ['--maintenance_mode']}],
-        )
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-        with self.swap_cloud_datastore_emulator, swap_build, self.swap_ng_build:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_create_server, self.swap_webpack_compiler:
-                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
-                        with self.swap_firebase_auth_emulator, self.swap_print:
-                            with self.swap_mock_set_constants_to_default:
-                                with swap_check_port_in_use:
-                                    start.main(args=['--maintenance_mode'])
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.sleep')
+    @mock.patch('scripts.start.time.time')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_browser_launch_retry_until_success(
+        self, mock_create_browser, mock_time, mock_sleep, mock_print
+    ):
+        # This test verifies that attempt_launch_browser retries browser launch on failure and succeeds on the second attempt.
+        mock_time.side_effect = [
+            0,
+            0.5,
+            1.0,
+        ]  # Simulate time progression for retry logic.
+        mock_create_browser.side_effect = [
+            Exception('fail'),
+            None,
+        ]  # Fail first, succeed second.
 
-        self.assertIn(
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
+        )
+
+        self.assertEqual(mock_sleep.call_count, 1)
+        self.assertEqual(
+            mock_create_browser.call_count, 2
+        )  # Called twice: fail, then success.
+        self.enter_context_fn.assert_called_once_with(None)
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.sleep')
+    @mock.patch('scripts.start.time.time')
+    def test_attempt_launch_browser_gives_up_if_devserver_never_runs_prints_info_message(
+        self, mock_time, mock_sleep, mock_print
+    ):
+        # This test verifies that attempt_launch_browser times out and prints an info message if the dev server never runs.
+        mock_time.side_effect = [
+            0,
+            0.5,
+            10.5,
+        ]  # Simulate timeout after 10 seconds.
+        self.dev_appserver.is_running.return_value = False
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
+        )
+
+        mock_print.assert_any_call(
             [
                 'INFORMATION',
-                (
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:8181/ in a web browser.',
+            ]
+        )
+        self.enter_context_fn.assert_not_called()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.sleep')
+    @mock.patch('scripts.start.time.time')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_reports_error_and_fallback_on_timeout(
+        self, mock_create_browser, mock_time, mock_sleep, mock_print
+    ):
+        # This test verifies that attempt_launch_browser reports an error and prints a fallback message when browser launch fails repeatedly and times out.
+        mock_time.side_effect = [0, 0.5, 10.5]  # Simulate timeout.
+        self.dev_appserver.is_running.return_value = True
+        mock_create_browser.side_effect = Exception('browser fail')
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
         )
 
-    def test_could_not_start_new_server_when_port_is_in_use(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}],
-        )
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: True,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-        with self.swap_cloud_datastore_emulator, self.swap_webpack_compiler:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_firebase_auth_emulator, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_check_port_in_use:
-                        with self.swap_print, swap_build, self.swap_ng_build:
-                            with self.swap_mock_set_constants_to_default:
-                                start.main(args=['--no_browser'])
-
-        self.assertIn(
+        mock_print.assert_any_call(
             [
-                'WARNING',
-                (
-                    'Could not start new server. There is already an existing '
-                    'server running at port %s.' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'ERROR',
+                'Error occurred while attempting to automatically launch '
+                'the web browser: browser fail',
+            ]
         )
-
-        self.assertIn(
+        mock_print.assert_any_call(
             [
                 'INFORMATION',
-                (
-                    'Local development server is ready! You can access it by '
-                    'navigating to http://localhost:%s/ in a web '
-                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:8181/ in a web browser.',
+            ]
+        )
+        self.enter_context_fn.assert_not_called()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.time')
+    def test_attempt_launch_browser_gives_up_immediately_if_devserver_not_running(
+        self, mock_time, mock_print
+    ):
+        # This test verifies that attempt_launch_browser gives up immediately and prints an info message if the dev server is not running and the timeout is reached without attempting browser launch.
+        mock_time.side_effect = [0, 10]  # start_time = 0, check = 10 - 0 >= 10
+        self.dev_appserver.is_running.return_value = False
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
         )
 
-    def test_source_maps_are_compiled_by_webpack(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': ['--source_maps']}],
-        )
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
-        self.swap_webpack_compiler = self.swap_with_checks(
-            servers,
-            'managed_webpack_compiler',
-            lambda **unused_kwargs: MockCompilerContextManager(),
-            expected_kwargs=[
-                {
-                    'use_prod_env': False,
-                    'use_source_maps': True,
-                    'watch_mode': True,
-                }
-            ],
-        )
-        with self.swap_webpack_compiler, self.swap_create_server:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with swap_emulator_mode, self.swap_dev_appserver:
-                    with self.swap_extend_index_yaml, swap_build:
-                        with self.swap_print, self.swap_ng_build:
-                            with self.swap_mock_set_constants_to_default:
-                                start.main(args=['--source_maps'])
-
-        self.assertIn(
+        mock_print.assert_called_once_with(
             [
                 'INFORMATION',
-                (
-                    'Local development server is ready! Opening a default web '
-                    'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER
-                ),
-            ],
-            self.print_arr,
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:8181/ in a web browser.',
+            ]
+        )
+        self.enter_context_fn.assert_not_called()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.time.sleep')
+    @mock.patch('scripts.start.time.time')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_reports_error_on_timeout_when_devserver_not_running(
+        self, mock_create_browser, mock_time, mock_sleep, mock_print
+    ):
+        # This test verifies that attempt_launch_browser reports an error and prints a fallback message when the dev server is not running, browser launch fails, and timeout occurs.
+        mock_time.side_effect = [
+            0,
+            0.5,
+            10,
+        ]  # start_time = 0, after sleep = 0.5, after second sleep = 10
+        mock_create_browser.side_effect = Exception('browser fail')
+        self.dev_appserver.is_running.return_value = False
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            self.dev_appserver,
         )
 
-    def test_could_not_auto_launch_web_browser(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}],
+        print("Calls:", len(mock_print.call_args_list))
+        mock_print.assert_any_call(
+            [
+                'ERROR',
+                'Error occurred while attempting to automatically launch '
+                'the web browser: browser fail',
+            ]
+        )
+        mock_print.assert_any_call(
+            [
+                'INFORMATION',
+                'Local development server is ready! You can access it by '
+                'navigating to http://localhost:8181/ in a web browser.',
+            ]
+        )
+        self.enter_context_fn.assert_not_called()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.servers.create_managed_web_browser')
+    def test_attempt_launch_browser_success_when_devserver_has_no_is_running_attr(
+        self, mock_create_browser, mock_print
+    ):
+        # This test verifies that attempt_launch_browser successfully launches the browser when the dev server does not have the is_running attribute.
+        dev_appserver = object()  # No is_running attribute
+        mock_create_browser.return_value.__enter__.return_value = None
+        mock_create_browser.return_value.__exit__.return_value = None
+
+        start.attempt_launch_browser(
+            self.parsed_args_with_browser,
+            self.enter_context_fn,
+            dev_appserver,
         )
 
-        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_create_managed_web_browser:
-                    with self.swap_webpack_compiler, self.swap_dev_appserver:
-                        with self.swap_extend_index_yaml, self.swap_print:
-                            with self.swap_firebase_auth_emulator:
-                                with self.swap_mock_set_constants_to_default:
-                                    start.main(args=[])
+        self.enter_context_fn.assert_called_once_with(
+            mock_create_browser.return_value
+        )
+        mock_print.assert_called_with(
+            [
+                'INFORMATION',
+                'Local development server is ready! Opening a default web '
+                'browser window pointing to it: http://localhost:8181/',
+            ]
+        )
 
-        self.assertIn(
+
+class MainTests(unittest.TestCase):
+    """Tests for main function."""
+
+    def setUp(self):
+        # Set up patches for all external dependencies to isolate the main function for unit testing.
+        self.patcher_common_is_port_in_use = mock.patch(
+            'scripts.start.common.is_port_in_use'
+        )
+        self.mock_is_port_in_use = self.patcher_common_is_port_in_use.start()
+        self.mock_is_port_in_use.return_value = False
+
+        self.patcher_install = mock.patch(
+            'scripts.start.install_third_party_libs.main'
+        )
+        self.mock_install = self.patcher_install.start()
+
+        self.patcher_build = mock.patch('scripts.start.build.main')
+        self.mock_build = self.patcher_build.start()
+
+        self.patcher_servers_managed_redis = mock.patch(
+            'scripts.start.servers.managed_redis_server'
+        )
+        self.mock_redis = self.patcher_servers_managed_redis.start()
+
+        self.patcher_servers_managed_es = mock.patch(
+            'scripts.start.servers.managed_elasticsearch_dev_server'
+        )
+        self.mock_es = self.patcher_servers_managed_es.start()
+
+        self.patcher_servers_managed_dev_appserver = mock.patch(
+            'scripts.start.servers.managed_dev_appserver'
+        )
+        self.mock_dev_appserver = (
+            self.patcher_servers_managed_dev_appserver.start()
+        )
+
+        self.patcher_common_write_hashes = mock.patch(
+            'scripts.start.common.write_hashes_json_file'
+        )
+        self.mock_write_hashes = self.patcher_common_write_hashes.start()
+
+        self.patcher_servers_managed_ng_build = mock.patch(
+            'scripts.start.servers.managed_ng_build'
+        )
+        self.mock_ng_build = self.patcher_servers_managed_ng_build.start()
+
+        self.patcher_servers_managed_webpack = mock.patch(
+            'scripts.start.servers.managed_webpack_compiler'
+        )
+        self.mock_webpack = self.patcher_servers_managed_webpack.start()
+
+        self.patcher_servers_managed_firebase = mock.patch(
+            'scripts.start.servers.managed_firebase_auth_emulator'
+        )
+        self.mock_firebase = self.patcher_servers_managed_firebase.start()
+
+        self.patcher_servers_managed_datastore = mock.patch(
+            'scripts.start.servers.managed_cloud_datastore_emulator'
+        )
+        self.mock_datastore = self.patcher_servers_managed_datastore.start()
+
+        self.patcher_extend_index = mock.patch(
+            'scripts.start.extend_index_yaml.main'
+        )
+        self.mock_extend_index = self.patcher_extend_index.start()
+
+        self.patcher_time_sleep = mock.patch('scripts.start.time.sleep')
+        self.mock_time_sleep = self.patcher_time_sleep.start()
+
+        self.patcher_servers_create_browser = mock.patch(
+            'scripts.start.servers.create_managed_web_browser'
+        )
+        self.mock_create_browser = self.patcher_servers_create_browser.start()
+        self.mock_create_browser.return_value.__enter__.return_value = None
+        self.mock_create_browser.return_value.__exit__.return_value = None
+
+        self.patcher_common_set_constants = mock.patch(
+            'scripts.start.common.set_constants_to_default'
+        )
+        self.mock_set_constants = self.patcher_common_set_constants.start()
+
+        self.patcher_attempt_launch = mock.patch(
+            'scripts.start.attempt_launch_browser'
+        )
+        self.mock_attempt_launch = self.patcher_attempt_launch.start()
+
+        self.dev_appserver_mock = mock.Mock()
+        self.dev_appserver_mock.wait = mock.Mock()
+        self.dev_appserver_mock.is_running = mock.Mock(return_value=True)
+        self.mock_dev_appserver.return_value.__enter__.return_value = (
+            self.dev_appserver_mock
+        )
+        self.mock_dev_appserver.return_value.__exit__.return_value = None
+
+        # Mock context managers to avoid starting real services.
+        for cm in [
+            self.mock_redis,
+            self.mock_es,
+            self.mock_ng_build,
+            self.mock_webpack,
+            self.mock_firebase,
+            self.mock_datastore,
+        ]:
+            cm.return_value.__enter__.return_value = None
+            cm.return_value.__exit__.return_value = None
+
+    def tearDown(self):
+        # Stop all patches to clean up after each test.
+        self.patcher_common_is_port_in_use.stop()
+        self.patcher_install.stop()
+        self.patcher_build.stop()
+        self.patcher_servers_managed_redis.stop()
+        self.patcher_servers_managed_es.stop()
+        self.patcher_servers_managed_dev_appserver.stop()
+        self.patcher_common_write_hashes.stop()
+        self.patcher_servers_managed_ng_build.stop()
+        self.patcher_servers_managed_webpack.stop()
+        self.patcher_servers_managed_firebase.stop()
+        self.patcher_servers_managed_datastore.stop()
+        self.patcher_extend_index.stop()
+        self.patcher_common_set_constants.stop()
+        self.patcher_attempt_launch.stop()
+        self.patcher_time_sleep.stop()
+        self.patcher_servers_create_browser.stop()
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    def test_main_exits_if_ports_in_use_prints_error(self, mock_print):
+        # This test verifies that main exits with SystemExit and prints an error when required ports are in use.
+        self.mock_is_port_in_use.return_value = True
+        with self.assertRaises(SystemExit) as cm:
+            start.main(['--no_browser'])
+        self.assertEqual(cm.exception.code, 1)
+        mock_print.assert_called_with(
             [
                 'ERROR',
                 (
-                    'Error occurred while attempting to automatically launch '
-                    'the web browser: %s' % MANAGED_WEB_BROWSER_ERROR
+                    'Could not start new server. The following ports are '
+                    'already in use and need to be available: 8181 (GAE dev '
+                    'appserver), 8000 (GAE dev appserver admin port), 6379 '
+                    '(Redis server), 9200 (ElasticSearch server), 9099 '
+                    '(Firebase auth emulator), 8089 (Cloud Datastore emulator)'
                 ),
-            ],
-            self.print_arr,
+            ]
         )
 
-        self.assertIn(
+    @mock.patch('scripts.start.attempt_launch_browser')
+    def test_main_successful_startup_with_no_browser(self, mock_attempt_launch):
+        # This test verifies that main completes successfully with no_browser flag, skipping installation and calling build and browser attempt.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(['--no_browser', '--skip-install'])
+        self.mock_install.assert_not_called()
+        self.mock_build.assert_called_once_with(args=[])
+        mock_attempt_launch.assert_called_once()
+        self.dev_appserver_mock.wait.assert_called_once()
+
+    @mock.patch('scripts.start.attempt_launch_browser')
+    def test_main_successful_startup_with_install(self, mock_attempt_launch):
+        # This test verifies that main completes successfully with no_browser flag, running installation and calling build and browser attempt.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(['--no_browser'])
+        self.mock_install.assert_called_once()
+        self.mock_build.assert_called_once_with(args=[])
+        mock_attempt_launch.assert_called_once()
+        self.dev_appserver_mock.wait.assert_called_once()
+
+    @mock.patch('scripts.start.attempt_launch_browser')
+    def test_main_build_failure_resets_constants(self, mock_attempt_launch):
+        # This test verifies that main resets constants when build fails and re-raises the exception.
+        self.mock_build.side_effect = Exception('build failed')
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            with self.assertRaises(Exception):
+                start.main(['--no_browser', '--skip-install'])
+        self.mock_set_constants.assert_called_once()
+
+    def test_main_serves_production_and_maintenance_build_flags(self):
+        # This test verifies that main passes the correct build flags to build.main based on command-line arguments.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(['--prod_env', '--no_browser', '--skip-install'])
+        self.mock_build.assert_called_once_with(args=['--prod_env'])
+
+        self.mock_build.reset_mock()
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
+        self.mock_build.assert_called_once_with(args=['--maintenance_mode'])
+
+    def test_save_datastore_flags_are_propagated(self):
+        # This test verifies that main propagates the save_datastore flag to emulator contexts when EMULATOR_MODE is enabled.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
+            start.main(['--save_datastore', '--no_browser', '--skip-install'])
+        self.mock_firebase.assert_called_once_with(recover_users=True)
+        self.mock_datastore.assert_called_once_with(clear_datastore=False)
+
+    def test_disable_host_checking_and_no_auto_restart_applied(self):
+        # This test verifies that main applies disable_host_checking and no_auto_restart flags to the dev appserver.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(
+                [
+                    '--disable_host_checking',
+                    '--no_auto_restart',
+                    '--no_browser',
+                    '--skip-install',
+                ]
+            )
+        self.mock_dev_appserver.assert_called_once_with(
+            'app_dev.yaml',
+            enable_host_checking=False,
+            automatic_restart=False,
+            skip_sdk_update_check=True,
+            port=8181,
+            env=mock.ANY,
+        )
+
+    @mock.patch.object(start.common, 'print_each_string_after_two_new_lines')
+    @mock.patch('scripts.start.attempt_launch_browser')
+    def test_start_servers_successfully_prints_opening_message(
+        self, mock_attempt_launch, mock_print
+    ):
+        # This test verifies that main prints an opening message when starting servers without no_browser flag.
+        mock_attempt_launch.side_effect = lambda *args, **kwargs: mock_print(
             [
                 'INFORMATION',
+                'Local development server is ready! Opening a default web '
+                'browser window pointing to it: http://localhost:8181/',
+            ]
+        )
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            start.main(['--skip-install'])
+        mock_print.assert_called_with(
+            [
+                'INFORMATION',
+                'Local development server is ready! Opening a default web '
+                'browser window pointing to it: http://localhost:8181/',
+            ]
+        )
+
+    @mock.patch('scripts.start.common.print_each_string_after_two_new_lines')
+    def test_final_port_check_warns_if_ports_still_in_use_after_exit(
+        self, mock_print
+    ):
+        # This test verifies that main warns about ports still in use after the server stack unwinds due to an exception.
+        self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
+        port_calls = []
+        original_is_port_in_use = start.common.is_port_in_use
+
+        def mock_is_port_in_use(port):
+            port_calls.append(port)
+            if len(port_calls) <= 5:  # Initial checks return False.
+                return False
+            else:  # Final checks return True.
+                return True
+
+        with mock.patch(
+            'scripts.start.common.is_port_in_use',
+            side_effect=mock_is_port_in_use,
+        ):
+            with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+                with self.assertRaises(KeyboardInterrupt):
+                    start.main(['--no_browser', '--skip-install'])
+        mock_print.assert_called_with(
+            [
+                'WARNING',
                 (
-                    'Local development server is ready! You can access it by '
-                    'navigating to http://localhost:%s/ in a web '
-                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER
+                    'The following ports are still in use after exiting: '
+                    '8000 (GAE dev appserver admin port), 6379 (Redis server), '
+                    '9200 (ElasticSearch server)'
                 ),
-            ],
-            self.print_arr,
+            ]
         )
 
-    def test_not_mock_set_constants_to_default_error(self) -> None:
-        with self.swap_install_third_party_libs:
-            from scripts import start
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}],
+    @mock.patch('scripts.start._alert_on_exit')
+    @mock.patch('scripts.start.extend_index_yaml.main')
+    @mock.patch('scripts.start.common.set_constants_to_default')
+    @mock.patch('scripts.start._notify_about_successful_shutdown')
+    def test_exitstack_callbacks_and_alert_order_on_cancel(
+        self, mock_notify, mock_set_constants, mock_extend, mock_alert
+    ):
+        # This test verifies the order of ExitStack callbacks during unwinding: alert first, then set_constants, extend, notify.
+        order = []
+        alert_cm = mock.Mock()
+        alert_cm.__enter__ = mock.Mock(
+            side_effect=lambda *args, **kwargs: order.append('alert')
         )
-        assert_raises_regexp = self.assertRaisesRegex(
-            Exception, 'Please mock this method in the test.'
-        )
+        alert_cm.__exit__ = mock.Mock(return_value=None)
+        mock_alert.return_value = alert_cm
+        mock_set_constants.side_effect = lambda: order.append('set_constants')
+        mock_extend.side_effect = lambda: order.append('extend')
+        mock_notify.side_effect = lambda: order.append('notify')
+        self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
 
-        with self.swap_cloud_datastore_emulator, self.swap_ng_build, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_redis_server:
-                with self.swap_create_server, self.swap_webpack_compiler:
-                    with self.swap_extend_index_yaml, self.swap_dev_appserver:
-                        with self.swap_firebase_auth_emulator, self.swap_print:
-                            with assert_raises_regexp:
-                                start.main(args=[])
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': False}):
+            with self.assertRaises(KeyboardInterrupt):
+                start.main(['--no_browser', '--skip-install'])
+        self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])
 
-    def test_build_cancellation_resets_constants(self) -> None:
-        """If the build fails or is cancelled, constants should be reset and
-        no dev-server callbacks (extend/notify) should be called.
-        """
-        with self.swap_install_third_party_libs:
-            from scripts import start
+    def test_main_when_emulator_mode_is_enabled_uses_emulators(self):
+        # This test verifies that main starts emulator contexts when EMULATOR_MODE is enabled.
+        with mock.patch.dict(start.constants, {'EMULATOR_MODE': True}):
+            start.main(['--no_browser', '--skip-install'])
+        self.mock_firebase.assert_called_once_with(recover_users=False)
+        self.mock_datastore.assert_called_once_with(clear_datastore=True)
 
-        order: list[str] = []
 
-        # Swap set_constants_to_default to record its invocation.
-        swap_set_constants = self.swap(
-            common,
-            'set_constants_to_default',
-            lambda: order.append('set_constants'),
-        )
-
-        # Swap build to raise an exception simulating a build cancellation.
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: (_ for _ in ()).throw(
-                Exception('build_failed')
-            ),
-            expected_kwargs=[{'args': []}],
-        )
-
-        # Keep other server-related swaps in case import-time side-effects run.
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-
-        with swap_check_port_in_use, swap_build:
-            with self.swap_print, swap_set_constants:
-                # Expect build to raise and set_constants to be invoked.
-                with self.assertRaisesRegex(Exception, 'build_failed'):
-                    start.main(args=[])
-
-        self.assertIn('set_constants', order)
-
-    def test_devserver_cancellation_triggers_alert_and_callbacks_in_order(
-        self,
-    ) -> None:
-        """If the dev-server phase is cancelled (e.g. while launching the
-        browser), the stack should unwind and produce the following sequence:
-        alert_on_exit -> services exit -> set_constants_to_default ->
-            extend_index_yaml.main -> notify_about_successful_shutdown.
-        """
-        with self.swap_install_third_party_libs:
-            from scripts import start
-
-        order: list[str] = []
-
-        # Helper context manager that records exit events.
-        class RecordContextManager:
-            def __init__(self, name: str) -> None:
-                self.name = name
-
-            def __enter__(self):
-                return self
-
-            def __exit__(self, *unused_args: str) -> None:
-                order.append(self.name)
-
-        # Create a context manager that raises on enter to simulate cancellation
-        class RaisingOnEnterContextManager:
-            def __enter__(self):
-                raise KeyboardInterrupt('user_cancel')
-
-            def __exit__(self, *unused_args: str) -> None:
-                pass
-
-        # Swaps to record the invocation order for callbacks.
-        swap_notify = self.swap(
-            start,
-            'notify_about_successful_shutdown',
-            lambda: order.append('notify'),
-        )
-        # Inlined to use extend_index_yaml.main directly instead of the
-        # former wrapper `call_extend_index_yaml`.
-        swap_extend_index = self.swap(
-            extend_index_yaml, 'main', lambda: order.append('extend')
-        )
-        swap_set_constants = self.swap(
-            common,
-            'set_constants_to_default',
-            lambda: order.append('set_constants'),
-        )
-
-        # Replace alert_on_exit with one that records its exit.
-        def mock_alert_on_exit():
-            @contextlib.contextmanager
-            def _cm():
-                try:
-                    yield
-                finally:
-                    order.append('alert')
-
-            return _cm()
-
-        swap_alert = self.swap(start, 'alert_on_exit', mock_alert_on_exit)
-
-        # Replace service context managers to record when they are cleaned up.
-        swap_dev_appserver = self.swap(
-            servers,
-            'managed_dev_appserver',
-            lambda *a, **k: RecordContextManager('dev_appserver'),
-        )
-        swap_webpack = self.swap(
-            servers,
-            'managed_webpack_compiler',
-            lambda **k: RecordContextManager('webpack'),
-        )
-        swap_ng_build = self.swap(
-            servers,
-            'managed_ng_build',
-            lambda **k: RecordContextManager('ng_build'),
-        )
-        swap_cloud_ds = self.swap(
-            servers,
-            'managed_cloud_datastore_emulator',
-            lambda **k: RecordContextManager('datastore'),
-        )
-        swap_firebase = self.swap(
-            servers,
-            'managed_firebase_auth_emulator',
-            lambda **k: RecordContextManager('firebase'),
-        )
-        swap_elastic = self.swap(
-            servers,
-            'managed_elasticsearch_dev_server',
-            lambda **k: RecordContextManager('elastic'),
-        )
-        swap_redis = self.swap(
-            servers,
-            'managed_redis_server',
-            lambda **k: RecordContextManager('redis'),
-        )
-
-        # Swap create_managed_web_browser to raise on enter to trigger unwind.
-        swap_create_browser = self.swap(
-            servers,
-            'create_managed_web_browser',
-            lambda _: RaisingOnEnterContextManager(),
-        )
-
-        swap_build = self.swap_with_checks(
-            build,
-            'main',
-            lambda **unused_kwargs: None,
-            expected_kwargs=[{'args': []}],
-        )
-        swap_check_port_in_use = self.swap_with_checks(
-            common,
-            'is_port_in_use',
-            lambda _: False,
-            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
-        )
-
-        with swap_check_port_in_use:
-            with self.swap_print, (
-                swap_alert
-            ), swap_notify, swap_extend_index, swap_set_constants:
-                with swap_dev_appserver, swap_webpack, swap_ng_build:
-                    with swap_cloud_ds, swap_firebase, swap_elastic, swap_redis:
-                        with swap_create_browser, swap_build:
-                            with self.assertRaisesRegex(
-                                KeyboardInterrupt, 'user_cancel'
-                            ):
-                                start.main(args=[])
-
-        # Check that alert is printed first.
-        self.assertEqual(order[0], 'alert')
-        # Find the first callback index for set_constants.
-        idx_set_constants = order.index('set_constants')
-        idx_extend = order.index('extend')
-        idx_notify = order.index('notify')
-
-        # Check callback ordering and that service exits appear before the
-        # callbacks (e.g. dev_appserver exit occurs before set_constants).
-        self.assertTrue(order.index('dev_appserver') < idx_set_constants)
-        self.assertTrue(idx_set_constants < idx_extend < idx_notify)
+if __name__ == '__main__':
+    unittest.main()
