@@ -17,6 +17,7 @@
  */
 
 import {MathJsStatic, all, create} from 'mathjs';
+import * as math from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
@@ -24,7 +25,7 @@ describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
   let mathjsUnits: string[] = [];
-  const math = create(all) as MathJsStatic;
+  //const math = create(all) as MathJsStatic;
 
   const isValidUnit = (unit: string): boolean => {
     return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
@@ -55,8 +56,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    const units = (math as MathJsStatic).createUnit({}, {override: false});
-    return Object.keys(units);
+    return Object.keys((math as MathJsStatic).Unit.units);
   };
 
   beforeEach(() => {
