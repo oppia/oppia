@@ -57,12 +57,19 @@
   var onChangeExpId = function() {
     var inputField = document.querySelector('.e2e-test-exploration-id-input-field');
     var newExplorationId = inputField ? inputField.value : '';
+    if (!/^[a-zA-Z0-9_-]+$/.test(newExplorationId)) {
+      alert(
+        'Invalid exploration ID. Only letters, numbers, underscores and ' +
+        'dashes are allowed.');
+      return;
+    }
 
     var iframes = document.querySelectorAll('div > iframe');
     iframes.forEach(function(iframe) {
       var currentSrc = iframe.getAttribute('src');
       if (currentSrc && currentSrc.includes(placeholderExplorationId)) {
-        var updatedSrc = currentSrc.replace(placeholderExplorationId, newExplorationId);
+        var updatedSrc = currentSrc.replace(
+          placeholderExplorationId, encodeURIComponent(newExplorationId));
         iframe.setAttribute('src', updatedSrc);
       }
     });
@@ -71,7 +78,7 @@
 
     var oppiaElements = document.querySelectorAll('oppia[oppia-id="idToBeReplaced"]');
     oppiaElements.forEach(function(element) {
-      element.setAttribute('oppia-id', newExplorationId);
+      element.setAttribute('oppia-id', encodeURIComponent(newExplorationId));
     });
 
     var results = document.querySelector('.e2e-test-results');

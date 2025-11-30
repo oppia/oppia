@@ -22,6 +22,7 @@ import errno
 import getpass
 import http.server
 import io
+import json
 import os
 import pathlib
 import re
@@ -1421,6 +1422,39 @@ class CommonTests(test_utils.GenericTestBase):
                     except yaml.YAMLError as e:
                         self.fail(f'Error parsing file "{filename}": {str(e)}')
 
+    def test_write_hashes_json_file(self) -> None:
+        """Test write_hashes_json_file writes provided hash dict correctly to
+        JSON file.
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            hashes_path = os.path.join(tmpdir, 'hashes.json')
+
+            # Test writing a simple hash dict.
+            hashes = {'path/file.js': '123456'}
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file(hashes)
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'path/file.js': '123456'},
+                )
+
+            # Test writing multiple hashes.
+            hashes = {'file.js': '123456', 'file.min.js': '654321'}
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file(hashes)
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(
+                    json.loads(hashes_file.read()),
+                    {'file.min.js': '654321', 'file.js': '123456'},
+                )
+
+            # Test writing an empty dict (used by dev/test scripts).
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+                common.write_hashes_json_file({})
+            with utils.open_file(hashes_path, 'r') as hashes_file:
+                self.assertEqual(json.loads(hashes_file.read()), {})
+
 
 class UrlRetrieveTests(CommonTests):
     """Test the methods related to retrieving URLs."""
@@ -1469,9 +1503,13 @@ class UrlRetrieveTests(CommonTests):
         )
 
     def test_url_open(self) -> None:
-        response = common.url_open('http://www.google.com')
+        # Use a URL that Oppia's CI environment is expected to have access to.
+        github_api_url = (
+            'https://api.github.com/repos/oppia/oppia/releases/latest'
+        )
+        response = common.url_open(github_api_url)
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, 'http://www.google.com')
+        self.assertEqual(response.url, github_api_url)
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

@@ -22,7 +22,17 @@ from core import feconf, utils
 from core.constants import constants
 from core.domain import change_domain, state_domain, translation_domain
 
-from typing import Callable, Final, List, Literal, Optional, TypedDict, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Final,
+    List,
+    Literal,
+    Optional,
+    TypedDict,
+    Union,
+)
 
 STUDY_GUIDE_PROPERTY_SECTIONS: Final = 'sections'
 
@@ -257,6 +267,12 @@ class StudyGuidePageContentsDict(TypedDict):
     """
 
     subtitled_html: state_domain.SubtitledHtmlDict
+    # Here we use type Any because dict 'recorded_voiceovers' is a
+    # legacy field that will always be empty for study guides.
+    recorded_voiceovers: Dict[str, Any]
+    # Here we use type Any because dict 'written_translations' is a
+    # legacy field that will always be empty for study guides.
+    written_translations: Dict[str, Any]
 
 
 class StudyGuideAndroidDict(TypedDict):
@@ -354,7 +370,9 @@ class StudyGuide:
                 'subtitled_html': {
                     'content_id': 'content',
                     'html': concatenated_html,
-                }
+                },
+                'recorded_voiceovers': {'voiceovers_mapping': {}},
+                'written_translations': {'translations_mapping': {}},
             },
             'page_contents_schema_version': self.sections_schema_version,
             'language_code': self.language_code,
