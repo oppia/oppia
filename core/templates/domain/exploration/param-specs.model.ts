@@ -112,7 +112,7 @@ export class ParamSpecs {
   static createFromBackendDict(
     paramSpecsBackendDict: ParamSpecsBackendDict
   ): ParamSpecs {
-    const paramDict: ParamDict = {};
+    var paramDict: ParamDict = {};
     Object.keys(paramSpecsBackendDict).forEach(paramName => {
       paramDict[paramName] = ParamSpec.createFromBackendDict(
         paramSpecsBackendDict[paramName]
