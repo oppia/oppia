@@ -14,6 +14,8 @@
 
 """Unit tests for scripts/start.py."""
 
+from __future__ import annotations
+
 import argparse
 import unittest
 from unittest import mock
@@ -101,11 +103,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     def test_browser_launch_success_prints_opening_message(
         self, mock_create_browser, mock_print
     ):
-        start.attempt_launch_browser(
-            self.parsed_args_with_browser,
-            self.enter_context_fn,
-            self.dev_appserver,
-        )
+        start.attempt_launch_browser(self.enter_context_fn)
         self.enter_context_fn.assert_called_once_with(
             mock_create_browser.return_value
         )
@@ -137,9 +135,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         ]
 
         start.attempt_launch_browser(
-            self.parsed_args_with_browser,
             self.enter_context_fn,
-            self.dev_appserver,
         )
 
         self.assertEqual(mock_sleep.call_count, 1)
@@ -164,9 +160,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         mock_create_browser.return_value.__exit__.return_value = None
 
         start.attempt_launch_browser(
-            self.parsed_args_with_browser,
             self.enter_context_fn,
-            dev_appserver,
         )
 
         self.enter_context_fn.assert_called_once_with(
@@ -185,7 +179,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
     @mock.patch('scripts.start.time.time')
     @mock.patch('scripts.start.servers.create_managed_web_browser')
     def test_attempt_launch_browser_reports_error_and_fallback_on_timeout(
-        self, mock_create_browser, mock_time, mock_sleep, mock_print
+        self, mock_create_browser, mock_time, _, mock_print
     ):
         # This test verifies that attempt_launch_browser reports an error and
         # prints a fallback message when browser launch fails repeatedly.
@@ -199,9 +193,7 @@ class AttemptLaunchBrowserTests(unittest.TestCase):
         mock_create_browser.side_effect = Exception('BROWSER FAIL')
 
         start.attempt_launch_browser(
-            self.parsed_args_with_browser,
             self.enter_context_fn,
-            self.dev_appserver,
         )
 
         mock_print.assert_any_call(

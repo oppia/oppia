@@ -22,10 +22,10 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
+import psutil
 import time
-from typing import Any, Callable, Iterator, Optional, Sequence
 
-from typing import Callable, Iterator, Optional, Sequence
+from core import feconf
 
 from . import (
     build,
@@ -34,7 +34,14 @@ from . import (
     install_third_party_libs,
     servers,
 )
-from core import feconf
+
+from typing import (
+    Callable,
+    ContextManager,
+    Iterator,
+    Optional,
+    Sequence,
+)
 
 
 _PARSER = argparse.ArgumentParser(
@@ -91,13 +98,8 @@ _PARSER.add_argument(
 )
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
-
-
-# Browser launch configuration
 BROWSER_LAUNCH_TIMEOUT_SECS = 10.0
 BROWSER_RETRY_INTERVAL_SECS = 0.5
-
-# Server ready message
 SERVER_READY_MESSAGE = [
     'INFORMATION',
     'Local development server is ready! You can access it by '
@@ -213,9 +215,9 @@ def start_services(
 
 
 def attempt_launch_browser(
-    parsed_args: argparse.Namespace,
-    enter_context_fn: Callable[..., object],
-    dev_appserver: Any,
+    enter_context_fn: Callable[
+        [ContextManager[psutil.Process]], psutil.Process
+    ],
 ) -> None:
     """Attempts to launch the web browser."""
 
@@ -239,7 +241,8 @@ def attempt_launch_browser(
             return
         except Exception as error:
             last_error = error
-            # If we've exceeded our allotted timeout for browser launch, give up
+            # If we've exceeded our allotted timeout for browser launch, give
+            # up.
             if time.time() - browser_start_time >= BROWSER_LAUNCH_TIMEOUT_SECS:
                 common.print_each_string_after_two_new_lines(
                     [
@@ -261,10 +264,11 @@ def _get_ports_in_use_with_names(
     """Gets the list of required ports that are currently in use.
 
     Args:
-        required_ports: List of (port, name) tuples.
+        required_ports: list[tuple[int, str]]. List of (port, name) tuples.
 
     Returns:
-        List of (port, name) tuples for ports that are in use.
+        list[tuple[int, str]]. List of (port, name) tuples for ports that are
+        in use.
     """
     ports_in_use = common.get_ports_in_use([p for p, _ in required_ports])
     return [(p, n) for p, n in required_ports if p in ports_in_use]
@@ -290,7 +294,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # Collect all ports that are already in use and report them together.
     ports_in_use = _get_ports_in_use_with_names(required_ports)
     if ports_in_use:
-        port_msgs = ', '.join([f"{p} ({n})" for p, n in ports_in_use])
+        port_msgs = ', '.join([f'{p} ({n})' for p, n in ports_in_use])
         common.print_each_string_after_two_new_lines(
             [
                 'ERROR',
@@ -362,9 +366,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             # 3) extend_index_yaml.main,
             # 4) _notify_about_successful_shutdown.
             if not parsed_args.no_browser:
-                attempt_launch_browser(
-                    parsed_args, stack.enter_context, dev_appserver
-                )
+                attempt_launch_browser(stack.enter_context)
             else:
                 common.print_each_string_after_two_new_lines(
                     SERVER_READY_MESSAGE
@@ -377,9 +379,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # attempted to use are now free. This helps detect lingering processes
         # that didn't shut down correctly.
         # NOTE: We use the same required_ports list as above.
-        in_use = _get_ports_in_use_with_names(required_ports)
-        if in_use:
-            port_msgs = ', '.join([f"{p} ({n})" for p, n in in_use])
+        ports_in_use = _get_ports_in_use_with_names(required_ports)
+        if ports_in_use:
+            port_msgs = ', '.join([f'{p} ({n})' for p, n in ports_in_use])
             common.print_each_string_after_two_new_lines(
                 [
                     'WARNING',
