@@ -216,7 +216,7 @@ describe('Topic Manager', function () {
 
     // Number Input Interaction.
     await topicManager.clickOnAddQuestionButton();
-    await topicManager.updateCardContent('Number Input.');
+    await topicManager.updateCardContent('Enter Number less than 100.');
     await topicManager.addInteraction(INTERACTION_TYPES.NUMBER_INPUT, false);
     await topicManager.customizeNumberInputInteraction(true);
     await topicManager.updateAnswersInResponseModal(
@@ -238,7 +238,7 @@ describe('Topic Manager', function () {
       true
     );
     await topicManager.saveQuestion();
-    await topicManager.expectQuestionToBeVisible('Number Input.');
+    await topicManager.expectQuestionToBeVisible('Enter Number less than 100.');
 
     // Fraction Input Interaction.
     await topicManager.clickOnAddQuestionButton();

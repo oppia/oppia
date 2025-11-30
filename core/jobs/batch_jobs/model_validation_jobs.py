@@ -33,7 +33,7 @@ import apache_beam as beam
 from typing import Dict, FrozenSet, Iterable, Iterator, List, Set, Tuple, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -51,13 +51,13 @@ KIND_BY_INDEX: Tuple[str, ...] = tuple(AUDIT_DO_FN_TYPES_BY_KIND.keys())
 ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR: Dict[
     str, Tuple[Tuple[model_property.ModelProperty, Tuple[str, ...]], ...]
 ] = (
-    base_validation_registry.
-    get_id_referencing_properties_by_kind_of_possessor()
+    base_validation_registry.get_id_referencing_properties_by_kind_of_possessor()
 )
 
 # Type is: set(str). All model kinds referenced by one or more properties.
 ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES: Set[str] = (
-    base_validation_registry.get_all_model_kinds_referenced_by_properties())
+    base_validation_registry.get_all_model_kinds_referenced_by_properties()
+)
 
 
 class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
@@ -75,14 +75,16 @@ class ModelKey(collections.namedtuple('ModelKey', ['model_kind', 'model_id'])):
         """
         return cls(
             model_kind=job_utils.get_model_kind(model),
-            model_id=job_utils.get_model_id(model))
+            model_id=job_utils.get_model_id(model),
+        )
 
 
 class AuditAllStorageModelsJob(base_jobs.JobBase):
     """Runs a comprehensive audit on every model in the datastore."""
 
-    def run(self) -> beam.PCollection[
-        base_validation_errors.BaseValidationError]:
+    def run(
+        self,
+    ) -> beam.PCollection[base_validation_errors.BaseValidationError]:
         """Returns a PCollection of audit errors aggregated from all models.
 
         Returns:
@@ -91,10 +93,10 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         """
         existing_models, deleted_models = (
             self.pipeline
-            | 'Get all models' >> (
-                ndb_io.GetModels(datastore_services.query_everything()))
-            | 'Partition by model.deleted' >> (
-                beam.Partition(lambda model, _: int(model.deleted), 2))
+            | 'Get all models'
+            >> (ndb_io.GetModels(datastore_services.query_everything()))
+            | 'Partition by model.deleted'
+            >> (beam.Partition(lambda model, _: int(model.deleted), 2))
         )
 
         models_of_kind_by_index = (
@@ -113,21 +115,24 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
             # Since this job is concerned with running audits on EVERY MODEL IN
             # STORAGE, Partition is the clear winner regardless of the overhead
             # we'll see in unit tests.
-            | 'Split models into parallelizable PCollections' >> beam.Partition(
+            | 'Split models into parallelizable PCollections'
+            >> beam.Partition(
                 lambda m, _, kinds: kinds.index(job_utils.get_model_kind(m)),
                 # NOTE: Partition requires a hard-coded number of slices; it
                 # cannot be used with dynamic numbers generated in a pipeline.
                 # KIND_BY_INDEX is a constant tuple so that requirement is
                 # satisfied in this case.
-                len(KIND_BY_INDEX), KIND_BY_INDEX)
+                len(KIND_BY_INDEX),
+                KIND_BY_INDEX,
+            )
         )
 
         existing_key_count_pcolls = []
         missing_key_error_pcolls = []
         audit_error_pcolls = [
             deleted_models
-            | 'Apply ValidateDeletedModel on deleted models' >> (
-                beam.ParDo(base_validation.ValidateDeletedModel()))
+            | 'Apply ValidateDeletedModel on deleted models'
+            >> (beam.ParDo(base_validation.ValidateDeletedModel()))
         ]
 
         model_groups = zip(KIND_BY_INDEX, models_of_kind_by_index)
@@ -136,11 +141,13 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
 
             if kind in ALL_MODEL_KINDS_REFERENCED_BY_PROPERTIES:
                 existing_key_count_pcolls.append(
-                    models_of_kind | GetExistingModelKeyCounts(kind))
+                    models_of_kind | GetExistingModelKeyCounts(kind)
+                )
 
             if kind in ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR:
                 missing_key_error_pcolls.extend(
-                    models_of_kind | GetMissingModelKeyErrors(kind))
+                    models_of_kind | GetMissingModelKeyErrors(kind)
+                )
 
         existing_key_counts = (
             existing_key_count_pcolls
@@ -153,8 +160,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         audit_error_pcolls.append(
             (existing_key_counts, missing_key_errors)
             | 'Group counts and errors by key' >> beam.CoGroupByKey()
-            | 'Filter keys without any errors' >> (
-                beam.FlatMapTuple(self._get_model_relationship_errors))
+            | 'Filter keys without any errors'
+            >> (beam.FlatMapTuple(self._get_model_relationship_errors))
         )
 
         return audit_error_pcolls | 'Combine audit results' >> beam.Flatten()
@@ -163,9 +170,8 @@ class AuditAllStorageModelsJob(base_jobs.JobBase):
         self,
         unused_join_key: ModelKey,
         counts_and_errors: Tuple[
-            List[int],
-            List[base_validation_errors.ModelRelationshipError]
-        ]
+            List[int], List[base_validation_errors.ModelRelationshipError]
+        ],
     ) -> List[base_validation_errors.ModelRelationshipError]:
         """Returns errors associated with the given model key if it's missing.
 
@@ -200,8 +206,7 @@ class ApplyAuditDoFns(beam.PTransform):  # type: ignore[misc]
         Args:
             kind: str. The kind of models this PTransform will receive.
         """
-        super().__init__(
-            label='Apply every Audit DoFn targeting %s' % kind)
+        super().__init__(label='Apply every Audit DoFn targeting %s' % kind)
         self._kind = kind
         self._do_fn_types = tuple(AUDIT_DO_FN_TYPES_BY_KIND[kind])
 
@@ -243,7 +248,8 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
             kind: str. The kind of model this PTransform will receive.
         """
         super().__init__(
-            label='Generate (key, count)s for all existing %ss' % kind)
+            label='Generate (key, count)s for all existing %ss' % kind
+        )
         self._kind = kind
 
     def expand(
@@ -260,8 +266,8 @@ class GetExistingModelKeyCounts(beam.PTransform):  # type: ignore[misc]
         """
         return (
             input_or_inputs
-            | 'Generate (key, count) for %ss' % self._kind >> beam.Map(
-                lambda model: (ModelKey.from_model(model), 1))
+            | 'Generate (key, count) for %ss' % self._kind
+            >> beam.Map(lambda model: (ModelKey.from_model(model), 1))
         )
 
 
@@ -280,9 +286,11 @@ class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
             kind: str. The kind of model this PTransform will receive.
         """
         super().__init__(
-            label='Generate (key, error)s from the ID properties in %s' % kind)
+            label='Generate (key, error)s from the ID properties in %s' % kind
+        )
         self._id_referencing_properties = (
-            ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind])
+            ID_REFERENCING_PROPERTIES_BY_KIND_OF_POSSESSOR[kind]
+        )
 
     def expand(
         self, input_or_inputs: beam.PCollection[base_models.BaseModel]
@@ -304,19 +312,20 @@ class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
         """
         return (
             input_or_inputs
-            | 'Generate errors from %s' % property_of_model >> beam.FlatMap(
-                self._generate_missing_key_errors, property_of_model,
-                referenced_kinds)
-
-            for property_of_model, referenced_kinds in
-            self._id_referencing_properties
+            | 'Generate errors from %s' % property_of_model
+            >> beam.FlatMap(
+                self._generate_missing_key_errors,
+                property_of_model,
+                referenced_kinds,
+            )
+            for property_of_model, referenced_kinds in self._id_referencing_properties
         )
 
     def _generate_missing_key_errors(
         self,
         model: base_models.BaseModel,
         property_of_model: model_property.ModelProperty,
-        referenced_kinds: Tuple[str, ...]
+        referenced_kinds: Tuple[str, ...],
     ) -> Iterator[
         Tuple[ModelKey, base_validation_errors.ModelRelationshipError]
     ]:
@@ -341,5 +350,6 @@ class GetMissingModelKeyErrors(beam.PTransform):  # type: ignore[misc]
             referenced_id = property_value
             for referenced_kind in referenced_kinds:
                 error = base_validation_errors.ModelRelationshipError(
-                    property_of_model, model, referenced_kind, referenced_id)
+                    property_of_model, model, referenced_kind, referenced_id
+                )
                 yield (ModelKey(referenced_kind, referenced_id), error)

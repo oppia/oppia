@@ -43,14 +43,35 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.committer_2_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         commit1 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 0, self.committer_1_id, 'create',
-            'created first commit', [], 'public', True)
+            'entity_1',
+            0,
+            self.committer_1_id,
+            'create',
+            'created first commit',
+            [],
+            'public',
+            True,
+        )
         commit2 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_1', 1, self.committer_2_id, 'edit', 'edited commit', [],
-            'public', True)
+            'entity_1',
+            1,
+            self.committer_2_id,
+            'edit',
+            'edited commit',
+            [],
+            'public',
+            True,
+        )
         commit3 = exp_models.ExplorationCommitLogEntryModel.create(
-            'entity_2', 0, self.committer_1_id, 'create',
-            'created second commit', [], 'private', False)
+            'entity_2',
+            0,
+            self.committer_1_id,
+            'create',
+            'created second commit',
+            [],
+            'private',
+            False,
+        )
         commit1.exploration_id = 'exp_1'
         commit2.exploration_id = 'exp_1'
         commit3.exploration_id = 'exp_2'
@@ -66,90 +87,111 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.login(self.MODERATOR_EMAIL)
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={'query_type': 'all_non_private_commits'})
+            params={'query_type': 'all_non_private_commits'},
+        )
         self.assertEqual(len(response_dict['results']), 2)
         self.assertDictContainsSubset(
-            {'username': self.VIEWER_USERNAME, 'exploration_id': 'exp_1',
-             'post_commit_status': 'public', 'version': 0,
-             'commit_message': 'created first commit',
-             'commit_type': 'create'},
-            response_dict['results'][1])
+            {
+                'username': self.VIEWER_USERNAME,
+                'exploration_id': 'exp_1',
+                'post_commit_status': 'public',
+                'version': 0,
+                'commit_message': 'created first commit',
+                'commit_type': 'create',
+            },
+            response_dict['results'][1],
+        )
         self.assertDictContainsSubset(
-            {'username': self.NEW_USER_USERNAME, 'exploration_id': 'exp_1',
-             'post_commit_status': 'public', 'version': 1,
-             'commit_message': 'edited commit',
-             'commit_type': 'edit'},
-            response_dict['results'][0])
+            {
+                'username': self.NEW_USER_USERNAME,
+                'exploration_id': 'exp_1',
+                'post_commit_status': 'public',
+                'version': 1,
+                'commit_message': 'edited commit',
+                'commit_type': 'edit',
+            },
+            response_dict['results'][0],
+        )
         self.logout()
 
     def test_get_recent_commits_explorations(self) -> None:
         """Test that the response dict contains the correct exploration."""
         self.login(self.MODERATOR_EMAIL)
         self.save_new_default_exploration(
-            'exp_1', 'owner0', title='MyExploration')
+            'exp_1', 'owner0', title='MyExploration'
+        )
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={'query_type': 'all_non_private_commits'})
+            params={'query_type': 'all_non_private_commits'},
+        )
         self.assertEqual(len(response_dict['exp_ids_to_exp_data']), 1)
         self.assertEqual(
             response_dict['exp_ids_to_exp_data']['exp_1']['title'],
-            'MyExploration')
+            'MyExploration',
+        )
         self.logout()
 
     def test_get_recent_commits_three_pages_with_cursor(self) -> None:
         self.login(self.MODERATOR_EMAIL)
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={'query_type': 'all_non_private_commits'})
+            params={'query_type': 'all_non_private_commits'},
+        )
         self.assertFalse(response_dict['more'])
         for i in range(feconf.COMMIT_LIST_PAGE_SIZE * 2):
             entity_id = 'my_entity_%s' % i
             exp_id = 'exp_%s' % i
 
             commit_i = exp_models.ExplorationCommitLogEntryModel.create(
-                entity_id, 0, self.committer_2_id, 'create', 'created commit',
-                [], 'public', True)
+                entity_id,
+                0,
+                self.committer_2_id,
+                'create',
+                'created commit',
+                [],
+                'public',
+                True,
+            )
             commit_i.exploration_id = exp_id
             commit_i.update_timestamps()
             commit_i.put()
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={'query_type': 'all_non_private_commits'})
+            params={'query_type': 'all_non_private_commits'},
+        )
 
         self.assertEqual(
-            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE)
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE
+        )
         self.assertTrue(response_dict['more'])
 
         cursor = response_dict['cursor']
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={
-                'query_type': 'all_non_private_commits',
-                'cursor': cursor
-            })
+            params={'query_type': 'all_non_private_commits', 'cursor': cursor},
+        )
         self.assertEqual(
-            len(response_dict['results']),
-            feconf.COMMIT_LIST_PAGE_SIZE)
+            len(response_dict['results']), feconf.COMMIT_LIST_PAGE_SIZE
+        )
         self.assertTrue(response_dict['more'])
         cursor = response_dict['cursor']
         response_dict = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
-            params={
-                'query_type': 'all_non_private_commits',
-                'cursor': cursor
-            })
+            params={'query_type': 'all_non_private_commits', 'cursor': cursor},
+        )
         self.assertFalse(response_dict['more'])
         self.assertEqual(len(response_dict['results']), 2)
         self.logout()
 
     def test_get_recent_commits_with_invalid_query_type_returns_404_status(
-        self
+        self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
         response = self.get_json(
             feconf.RECENT_COMMITS_DATA_URL,
             params={'query_type': 'invalid_query_type'},
-            expected_status_int=400)
+            expected_status_int=400,
+        )
         self.assertIn(
             'Schema validation for \'query_type\' failed: Received '
             'invalid_query_type which is not in the allowed range of '

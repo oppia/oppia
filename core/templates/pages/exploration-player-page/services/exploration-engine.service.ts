@@ -59,6 +59,9 @@ import isEqual from 'lodash/isEqual';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {LearnerAnswerInfoService} from './learner-answer-info.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
+import forEach from 'lodash/forEach';
 
 @Injectable({
   providedIn: 'root',
@@ -86,6 +89,8 @@ export class ExplorationEngineService {
     private audioPreloaderService: AudioPreloaderService,
     private contentTranslationLanguageService: ContentTranslationLanguageService,
     private pageContextService: PageContextService,
+    private computeGraphService: ComputeGraphService,
+    private stateGraphLayoutService: StateGraphLayoutService,
     private contentTranslationManagerService: ContentTranslationManagerService,
     private entityTranslationsService: EntityTranslationsService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
@@ -220,6 +225,37 @@ export class ExplorationEngineService {
       outcome.feedback.html,
       envs
     );
+  }
+
+  extractDepthGraph(): {[stateName: string]: number} {
+    const graphData = this.computeGraphService.compute(
+      this.getInitialStateName(),
+      this.getExploration().states
+    );
+    const computedNodes = this.stateGraphLayoutService.computeLayout(
+      graphData.nodes,
+      graphData.links,
+      graphData.initStateId,
+      graphData.finalStateIds
+    );
+
+    let depthGraph: {[stateName: string]: number} = {};
+    forEach(computedNodes, node => {
+      depthGraph[node.id] = node.depth;
+    });
+
+    return depthGraph;
+  }
+
+  getMaxStateDepth(): number {
+    const depthGraph = this.extractDepthGraph();
+    let maxDepth = 0;
+    for (let stateName in depthGraph) {
+      if (depthGraph[stateName] > maxDepth) {
+        maxDepth = depthGraph[stateName];
+      }
+    }
+    return maxDepth;
   }
 
   /**
@@ -386,6 +422,10 @@ export class ExplorationEngineService {
       initialState.content.contentId
     );
     successCallback(initialCard, nextFocusLabel);
+  }
+
+  getInitialStateName(): string {
+    return this.exploration.getInitialState().name;
   }
 
   /**
@@ -588,6 +628,10 @@ export class ExplorationEngineService {
    */
   getStateFromStateName(stateName: string): State {
     return this.exploration.getState(stateName);
+  }
+
+  getExploration(): Exploration {
+    return this.exploration;
   }
 
   /**

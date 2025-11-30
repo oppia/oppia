@@ -28,7 +28,7 @@ import apache_beam as beam
 from typing import List, Tuple
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     # Here, state_domain is imported only for type checking.
     from core.domain import state_domain
     from mypy_imports import exp_models
@@ -50,45 +50,41 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
 
         exp_models_pcoll = (
             self.pipeline
-            | 'Get all ExplorationModels' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all()
-            )
+            | 'Get all ExplorationModels'
+            >> ndb_io.GetModels(exp_models.ExplorationModel.get_all())
         )
 
         exp_models_filtered = (
             exp_models_pcoll
-            | 'Filter Math ExplorationModels' >> beam.Filter(
-                self.contains_math_interactions
-            )
+            | 'Filter Math ExplorationModels'
+            >> beam.Filter(self.contains_math_interactions)
         )
 
         exp_models_with_states = (
             exp_models_filtered
-            | 'Mapping exp_ids with states' >> (
-                beam.FlatMap(self.flat_map_exp_with_states)
-            )
+            | 'Mapping exp_ids with states'
+            >> (beam.FlatMap(self.flat_map_exp_with_states))
         )
 
         exp_models_with_states_filtered = (
             exp_models_with_states
-            | 'Filtering out states without math interactions' >> (
+            | 'Filtering out states without math interactions'
+            >> (
                 beam.Filter(
-                    lambda tup: tup[2][
-                        'interaction']['id'] in feconf.MATH_INTERACTION_IDS
+                    lambda tup: tup[2]['interaction']['id']
+                    in feconf.MATH_INTERACTION_IDS
                 )
             )
         )
 
         exp_models_with_states_and_rules = (
             exp_models_with_states_filtered
-            | 'Mapping with rule types list' >> (
-                beam.Map(self.map_with_rule_types)
-            )
+            | 'Mapping with rule types list'
+            >> (beam.Map(self.map_with_rule_types))
         )
 
-        return (
-            exp_models_with_states_and_rules
-            | 'Final output' >> beam.Map(job_run_result.JobRunResult.as_stdout)
+        return exp_models_with_states_and_rules | 'Final output' >> beam.Map(
+            job_run_result.JobRunResult.as_stdout
         )
 
     def contains_math_interactions(
@@ -105,7 +101,8 @@ class FindMathExplorationsWithRulesJob(base_jobs.JobBase):
         """
         return any(
             state_dict['interaction']['id'] in feconf.MATH_INTERACTION_IDS
-            for state_dict in model.states.values())
+            for state_dict in model.states.values()
+        )
 
     def flat_map_exp_with_states(
         self, model: exp_models.ExplorationModel

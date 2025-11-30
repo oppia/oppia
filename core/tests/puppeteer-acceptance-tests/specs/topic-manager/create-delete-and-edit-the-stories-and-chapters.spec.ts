@@ -110,7 +110,7 @@ describe('Topic Manager', function () {
       'new-url-fragment'
     );
     await topicManager.saveStoryDraft();
-    await topicManager.clickOn('Expand Preview');
+    await topicManager.clickOnElementWithText('Expand Preview');
     await topicManager.expectPreviewCardToBeVisible(
       'New Story Title',
       'New Story Description'
@@ -162,13 +162,13 @@ describe('Topic Manager', function () {
       'The Broken Calculator',
       'Arithmetic Operations'
     );
-    await topicManager.clickOn('Create Chapter');
+    await topicManager.clickOnElementWithText('Create Chapter');
     await topicManager.expectNewChapterErrorSpan(
       'The states [Introduction] contain restricted interaction types.'
     );
   });
 
-  it('should be able to edit and preivew the chapter', async function () {
+  it('should be able to edit and preview the chapter', async function () {
     await topicManager.openChapterEditor(
       'Solving problems',
       'The Broken Calculator',

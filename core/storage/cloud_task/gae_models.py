@@ -27,7 +27,7 @@ from core.platform import models
 from typing import Dict, Final, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services
 
 (base_models,) = models.Registry.import_models([models.Names.BASE_MODEL])
@@ -54,13 +54,14 @@ def _get_new_model_id(model_class: Type[base_models.BaseModel]) -> str:
         new_id = utils.convert_to_hash(uuid.uuid4().hex, 22)
         if model_class.get(new_id, strict=False) is None:
             return new_id
-    raise RuntimeError('Failed to generate a unique ID after %d attempts' % (
-        _MAX_ID_GENERATION_ATTEMPTS))
+    raise RuntimeError(
+        'Failed to generate a unique ID after %d attempts'
+        % (_MAX_ID_GENERATION_ATTEMPTS)
+    )
 
 
 class CloudTaskState(enum.Enum):
-    """Constants from an enum, this represents the state of a cloud task run.
-    """
+    """Constants from an enum, this represents the state of a cloud task run."""
 
     # The job is successfully completed.
     SUCCEEDED = 'SUCCEEDED'
@@ -87,46 +88,57 @@ class CloudTaskRunModel(base_models.BaseModel):
     # The pattern of the cloud task name is:
     # projects/{project_id}/locations/{location_id}/queues/{queue_id}/tasks/
     # {task_id}
-    cloud_task_name = (
-        datastore_services.StringProperty(required=False, indexed=True))
+    cloud_task_name = datastore_services.StringProperty(
+        required=False, indexed=True
+    )
 
     # The task_id is the ID of the cloud task run. Added as a seperate
     # property to allow for easier querying of tasks by their ID.
     task_id = datastore_services.StringProperty(
-        required=True, indexed=True, default=None)
+        required=True, indexed=True, default=None
+    )
 
     # The queue_id is the ID of the queue that the cloud task belongs to. Added
     # as a separate property to allow for easier querying of tasks by their
     # queue ID.
     queue_id = datastore_services.StringProperty(
-        required=True, indexed=True, default=None)
+        required=True, indexed=True, default=None
+    )
 
     # The state of the job at the time the model was last updated.
     latest_job_state = datastore_services.StringProperty(
-        required=True, indexed=True, choices=[
+        required=True,
+        indexed=True,
+        choices=[
             CloudTaskState.RUNNING.value,
             CloudTaskState.SUCCEEDED.value,
             CloudTaskState.PERMANENTLY_FAILED.value,
             CloudTaskState.FAILED_AND_AWAITING_RETRY.value,
             CloudTaskState.PENDING.value,
-        ])
+        ],
+    )
 
     # The function_id corresponding to the function that is being run
     # by the cloud task. This is used to identify which function is being
     # executed by the cloud task, and is used to determine the function name
     # that is being executed in the deferred job handler.
     function_id = datastore_services.StringProperty(
-        required=True, indexed=True,
+        required=True,
+        indexed=True,
         choices=list(
-            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS.values()))
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS.values()
+        ),
+    )
 
     # The property stores exception messages for failed runs of the cloud task.
     exception_messages_for_failed_runs = datastore_services.JsonProperty(
-        required=False, indexed=False, default=[])
+        required=False, indexed=False, default=[]
+    )
 
     # The property tracks the number of retry attempts for the cloud task run.
     current_retry_attempt = datastore_services.IntegerProperty(
-        required=True, indexed=True, default=0)
+        required=True, indexed=True, default=0
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -143,24 +155,29 @@ class CloudTaskRunModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_model_association_to_user(
-    ) -> base_models.MODEL_ASSOCIATION_TO_USER:
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
         """Model doesn't contain user data."""
         return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
 
     @classmethod
     def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
         """Model doesn't contain any data directly corresponding to a user."""
-        return dict(super(CloudTaskRunModel, cls).get_export_policy(), **{
-            'cloud_task_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
-            'exception_messages_for_failed_runs': (
-                base_models.EXPORT_POLICY.NOT_APPLICABLE),
-            'current_retry_attempt': base_models.EXPORT_POLICY.NOT_APPLICABLE
-        })
+        return dict(
+            super(CloudTaskRunModel, cls).get_export_policy(),
+            **{
+                'cloud_task_name': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'task_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'queue_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'latest_job_state': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'function_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exception_messages_for_failed_runs': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+                'current_retry_attempt': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with signature of super class's get_new_id() method.
@@ -180,7 +197,7 @@ class CloudTaskRunModel(base_models.BaseModel):
         cloud_task_name: str,
         latest_job_state: str,
         function_id: str,
-        current_retry_attempt: int = 0
+        current_retry_attempt: int = 0,
     ) -> CloudTaskRunModel:
         """Creates a new CloudTaskRunModel instance.
 
@@ -197,9 +214,9 @@ class CloudTaskRunModel(base_models.BaseModel):
         """
 
         queue_id = CloudTaskRunModel.get_queue_id_from_task_name(
-            cloud_task_name)
-        task_id = CloudTaskRunModel.get_task_id_from_task_name(
-            cloud_task_name)
+            cloud_task_name
+        )
+        task_id = CloudTaskRunModel.get_task_id_from_task_name(cloud_task_name)
 
         cloud_task_run_model = cls(
             id=cloud_task_run_model_id,
@@ -208,7 +225,7 @@ class CloudTaskRunModel(base_models.BaseModel):
             task_id=task_id,
             latest_job_state=latest_job_state,
             function_id=function_id,
-            current_retry_attempt=current_retry_attempt
+            current_retry_attempt=current_retry_attempt,
         )
 
         cloud_task_run_model.update_timestamps()
@@ -265,9 +282,12 @@ class CloudTaskRunModel(base_models.BaseModel):
             list[CloudTaskRunModel]. A list of CloudTaskRunModels with the
             specified queue ID.
         """
-        return list(CloudTaskRunModel.query(
-            datastore_services.all_of(
-                cls.queue_id == queue_id,
-                cls.deleted == False  # pylint: disable=singleton-comparison
-            )
-        ).fetch())
+        return list(
+            CloudTaskRunModel.query(
+                datastore_services.all_of(
+                    cls.queue_id == queue_id,
+                    cls.deleted  # pylint: disable=singleton-comparison
+                    == False,
+                )
+            ).fetch()
+        )

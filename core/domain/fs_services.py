@@ -28,7 +28,7 @@ from core.platform import models
 from typing import Dict, List, Optional
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import app_identity_services, storage_services
 
 storage_services = models.Registry.import_storage_services()
@@ -44,11 +44,11 @@ ALLOWED_ENTITY_NAMES: List[str] = [
     feconf.ENTITY_TYPE_STORY,
     feconf.ENTITY_TYPE_QUESTION,
     feconf.ENTITY_TYPE_USER,
-    feconf.ENTITY_TYPE_CLASSROOM
+    feconf.ENTITY_TYPE_CLASSROOM,
 ]
 ALLOWED_SUGGESTION_IMAGE_CONTEXTS: List[str] = [
     feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
-    feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS
+    feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
 ]
 
 
@@ -85,14 +85,16 @@ class GeneralFileSystem:
             ValidationError. When parameters passed in are invalid.
         """
         if (
-                entity_name not in ALLOWED_ENTITY_NAMES and
-                entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS
+            entity_name not in ALLOWED_ENTITY_NAMES
+            and entity_name not in ALLOWED_SUGGESTION_IMAGE_CONTEXTS
         ):
             raise utils.ValidationError(
-                'Invalid entity_name received: %s.' % entity_name)
+                'Invalid entity_name received: %s.' % entity_name
+            )
         if not isinstance(entity_id, str):
             raise utils.ValidationError(
-                'Invalid entity_id received: %s' % entity_id)
+                'Invalid entity_id received: %s' % entity_id
+            )
         if entity_id == '':
             raise utils.ValidationError('Entity id cannot be empty')
 
@@ -161,7 +163,8 @@ class GcsFileSystem(GeneralFileSystem):
         """
         self._check_filepath(filepath)
         return storage_services.isfile(
-            self._bucket_name, self._get_gcs_file_url(filepath))
+            self._bucket_name, self._get_gcs_file_url(filepath)
+        )
 
     def get(self, filepath: str) -> bytes:
         """Gets a file as an unencoded stream of raw bytes.
@@ -178,15 +181,13 @@ class GcsFileSystem(GeneralFileSystem):
         """
         if self.isfile(filepath):
             return storage_services.get(
-                self._bucket_name, self._get_gcs_file_url(filepath))
+                self._bucket_name, self._get_gcs_file_url(filepath)
+            )
         else:
             raise IOError('File %s not found.' % (filepath))
 
     def commit(
-        self,
-        filepath: str,
-        raw_bytes: bytes,
-        mimetype: Optional[str] = None
+        self, filepath: str, raw_bytes: bytes, mimetype: Optional[str] = None
     ) -> None:
         """Commit raw_bytes to the relevant file in the entity's assets folder.
 
@@ -206,7 +207,7 @@ class GcsFileSystem(GeneralFileSystem):
             self._bucket_name,
             self._get_gcs_file_url(filepath),
             raw_bytes,
-            mimetype
+            mimetype,
         )
 
     def delete(self, filepath: str) -> None:
@@ -221,7 +222,8 @@ class GcsFileSystem(GeneralFileSystem):
         """
         if self.isfile(filepath):
             storage_services.delete(
-                self._bucket_name, self._get_gcs_file_url(filepath))
+                self._bucket_name, self._get_gcs_file_url(filepath)
+            )
         else:
             raise IOError('File does not exist: %s' % filepath)
 
@@ -255,8 +257,8 @@ class GcsFileSystem(GeneralFileSystem):
         self._check_filepath(dir_name)
         if dir_name.startswith('/') or dir_name.endswith('/'):
             raise IOError(
-                'The dir_name should not start with / or end with / : %s' %
-                dir_name
+                'The dir_name should not start with / or end with / : %s'
+                % dir_name
             )
 
         # The trailing slash is necessary to prevent non-identical directory
@@ -277,7 +279,7 @@ def save_original_and_compressed_versions_of_image(
     entity_id: str,
     original_image_content: bytes,
     filename_prefix: str,
-    image_is_compressible: bool
+    image_is_compressible: bool,
 ) -> None:
     """Saves the three versions of the image file.
 
@@ -292,49 +294,51 @@ def save_original_and_compressed_versions_of_image(
     """
     filepath = '%s/%s' % (filename_prefix, filename)
 
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
+    filename_wo_filetype = filename[: filename.rfind('.')]
+    filetype = filename[filename.rfind('.') + 1 :]
 
     compressed_image_filename = '%s_compressed.%s' % (
-        filename_wo_filetype, filetype)
+        filename_wo_filetype,
+        filetype,
+    )
     compressed_image_filepath = '%s/%s' % (
-        filename_prefix, compressed_image_filename)
+        filename_prefix,
+        compressed_image_filename,
+    )
 
-    micro_image_filename = '%s_micro.%s' % (
-        filename_wo_filetype, filetype)
+    micro_image_filename = '%s_micro.%s' % (filename_wo_filetype, filetype)
     micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
 
     fs = GcsFileSystem(entity_type, entity_id)
 
     if image_is_compressible:
         compressed_image_content = image_services.compress_image(
-            original_image_content, 0.8)
+            original_image_content, 0.8
+        )
         micro_image_content = image_services.compress_image(
-            original_image_content, 0.7)
+            original_image_content, 0.7
+        )
     else:
         compressed_image_content = original_image_content
         micro_image_content = original_image_content
 
-    mimetype = (
-        'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype)
+    mimetype = 'image/svg+xml' if filetype == 'svg' else 'image/%s' % filetype
     # Because in case of CreateVersionsOfImageJob, the original image is
     # already there. Also, even if the compressed, micro versions for some
     # image exists, then this would prevent from creating another copy of
     # the same.
     if not fs.isfile(filepath):
-        fs.commit(
-            filepath, original_image_content, mimetype=mimetype)
+        fs.commit(filepath, original_image_content, mimetype=mimetype)
 
     if not fs.isfile(compressed_image_filepath):
         fs.commit(
             compressed_image_filepath,
             compressed_image_content,
-            mimetype=mimetype
+            mimetype=mimetype,
         )
 
     if not fs.isfile(micro_image_filepath):
-        fs.commit(
-            micro_image_filepath, micro_image_content, mimetype=mimetype)
+        fs.commit(micro_image_filepath, micro_image_content, mimetype=mimetype)
 
 
 def copy_images(
@@ -342,7 +346,7 @@ def copy_images(
     source_entity_id: str,
     destination_entity_type: str,
     destination_entity_id: str,
-    filenames: List[str]
+    filenames: List[str],
 ) -> None:
     """Copy images from source to destination.
 
@@ -355,21 +359,23 @@ def copy_images(
     """
     source_fs = GcsFileSystem(source_entity_type, source_entity_id)
     destination_fs = GcsFileSystem(
-        destination_entity_type, destination_entity_id)
+        destination_entity_type, destination_entity_id
+    )
     for filename in filenames:
-        filename_wo_filetype = filename[:filename.rfind('.')]
-        filetype = filename[filename.rfind('.') + 1:]
+        filename_wo_filetype = filename[: filename.rfind('.')]
+        filetype = filename[filename.rfind('.') + 1 :]
         compressed_image_filename = '%s_compressed.%s' % (
-            filename_wo_filetype, filetype)
-        micro_image_filename = '%s_micro.%s' % (
-            filename_wo_filetype, filetype)
+            filename_wo_filetype,
+            filetype,
+        )
+        micro_image_filename = '%s_micro.%s' % (filename_wo_filetype, filetype)
+        destination_fs.copy(source_fs.assets_path, ('image/%s' % filename))
         destination_fs.copy(
-            source_fs.assets_path, ('image/%s' % filename))
+            source_fs.assets_path, ('image/%s' % compressed_image_filename)
+        )
         destination_fs.copy(
-            source_fs.assets_path,
-            ('image/%s' % compressed_image_filename))
-        destination_fs.copy(
-            source_fs.assets_path, ('image/%s' % micro_image_filename))
+            source_fs.assets_path, ('image/%s' % micro_image_filename)
+        )
 
 
 def validate_and_save_image(
@@ -377,7 +383,7 @@ def validate_and_save_image(
     filename: str,
     filename_prefix: str,
     entity_type: str,
-    entity_id: str
+    entity_id: str,
 ) -> None:
     """Validates and saves image.
 
@@ -394,12 +400,17 @@ def validate_and_save_image(
     """
     validated_file_format = (
         image_validation_services.validate_image_and_filename(
-        raw_image, filename, entity_type
-    ))
+            raw_image, filename, entity_type
+        )
+    )
     is_compressible = validated_file_format in feconf.COMPRESSIBLE_IMAGE_FORMATS
     save_original_and_compressed_versions_of_image(
-        filename, entity_type, entity_id, raw_image,
-        filename_prefix, is_compressible
+        filename,
+        entity_type,
+        entity_id,
+        raw_image,
+        filename_prefix,
+        is_compressible,
     )
 
 
@@ -437,8 +448,8 @@ def get_static_asset_url(filepath: str) -> str:
         # files in assets folder by that it bypasses
         # the handlers that call this method, thus preventing
         # loop.
-        return 'http://localhost:8181/assetsstatic/%s' % (
-            filepath
-        )
+        return 'http://localhost:8181/assetsstatic/%s' % (filepath)
     return 'https://storage.googleapis.com/%s-static/%s' % (
-        app_identity_services.get_application_id(), filepath)
+        app_identity_services.get_application_id(),
+        filepath,
+    )

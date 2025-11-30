@@ -24,33 +24,32 @@ import re
 
 from core import feconf
 
-import pkg_resources
 import setuptools
+from packaging import requirements
 
 
 def main() -> None:
     """Builds python package used by Google Cloud Dataflow workers."""
     # Configure the required packages and scripts to install.
-    with open('requirements.txt', encoding='utf-8') as requirements_txt: # pylint: disable=replace-disallowed-function-calls
+    with open(
+        'requirements.txt', encoding='utf-8'
+    ) as requirements_txt:  # pylint: disable=replace-disallowed-function-calls
         requirements_content = requirements_txt.read()
         # Removing the hashes from the requirements.txt file because they are
-        # not supported by the 'pkg_resources.parse_requirements' function while
-        # parsing the requirements.
+        # not supported by the 'Requirement' parsing while parsing the
+        # requirements.
         modified_requirements_content = re.sub(
             r'^\s*--hash=sha256:.*$|\\$',
             '',
             requirements_content,
-            flags=re.MULTILINE
+            flags=re.MULTILINE,
         )
 
-        # The 'parse_requirements' returns a list of 'Requirement' objects.
-        # We need to transform these to strings using the str() function.
+        # Parse each non-empty, non-comment line as a requirement.
         required_packages = [
-            str(requirement)  # pylint: disable=replace-disallowed-function-calls
-            # Here we use MyPy ignore because mypy type hint on
-            # pkg_resources.parse_requirements is 'TextIO' only, which is wrong,
-            # it can also be a string.
-            for requirement in pkg_resources.parse_requirements(modified_requirements_content)  # type: ignore[arg-type]
+            str(requirements.Requirement(line))
+            for line in modified_requirements_content.splitlines()
+            if line.strip() and not line.strip().startswith('#')
         ]
 
     setuptools.setup(

@@ -75,10 +75,8 @@ class BaseValidationJob(base_jobs.JobBase):
             PCollection. A PCollection of dictionaries, where keys are error
             types and values are lists of truncated model IDs.
         """
-        all_models = (
-            self.pipeline
-            | 'Get all models' >> (
-                ndb_io.GetModels(datastore_services.query_everything()))
+        all_models = self.pipeline | 'Get all models' >> (
+            ndb_io.GetModels(datastore_services.query_everything())
         )
 
         default_validation_fns = [
@@ -103,20 +101,25 @@ class BaseValidationJob(base_jobs.JobBase):
         # representative sample of each error type is visible in the initial
         # set of logs, even if the total number of errors for a particular
         # type exceeds the truncation limit.
-        return results | 'Group Errors by Type' >> beam.GroupBy(
-            lambda error: type(error).__name__
-        ) | 'Extract Error Messages' >> beam.Map(
-            lambda group: {
-                group[0]: sorted([error.stderr for error in group[1]])[
-                    :ERROR_TRUNCATION_LIMIT]
-            }
+        return (
+            results
+            | 'Group Errors by Type'
+            >> beam.GroupBy(lambda error: type(error).__name__)
+            | 'Extract Error Messages'
+            >> beam.Map(
+                lambda group: {
+                    group[0]: sorted([error.stderr for error in group[1]])[
+                        :ERROR_TRUNCATION_LIMIT
+                    ]
+                }
+            )
         )
 
-    def get_validation_fns(self) -> List[
-        Callable[
-            [base_models.BaseModel],
-            Iterator[job_run_result.JobRunResult]
-        ]]:
+    def get_validation_fns(
+        self,
+    ) -> List[
+        Callable[[base_models.BaseModel], Iterator[job_run_result.JobRunResult]]
+    ]:
         """Provides a list of validation functions to be applied on a model.
         Should be implemented in the inherited classes.
 
@@ -125,13 +128,12 @@ class BaseValidationJob(base_jobs.JobBase):
                 classes.
         """
         raise NotImplementedError(
-            'Missing implementation for get_validation_fns '
-            'in derived class.'
+            'Missing implementation for get_validation_fns in derived class.'
         )
 
     def validate_created_on_less_than_last_updated(
-        self, model: base_models.BaseModel) -> Iterator[
-            job_run_result.JobRunResult]:
+        self, model: base_models.BaseModel
+    ) -> Iterator[job_run_result.JobRunResult]:
         """Validates that the model's created_on time is less than or equal to
         its last_updated time.
 
@@ -142,13 +144,15 @@ class BaseValidationJob(base_jobs.JobBase):
             JobRunResult. The result of the validation (if any error is found).
         """
         if model.created_on > (
-            model.last_updated + base_validation.MAX_CLOCK_SKEW_DURATION):
+            model.last_updated + base_validation.MAX_CLOCK_SKEW_DURATION
+        ):
             yield base_validation_errors.InconsistentTimestampsError(model)
 
-    def get_validate_domain_object_fn(self) -> Callable[
-            [base_models.BaseModel],
-            Iterator[job_run_result.JobRunResult]
-        ]:
+    def get_validate_domain_object_fn(
+        self,
+    ) -> Callable[
+        [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
+    ]:
         """Provides a function to validate domain object for the
         corresponding model. Should be implemented in the inherited classes.
 
@@ -170,17 +174,19 @@ class ApplyAllValidations(beam.DoFn):  # type: ignore[misc]
     """A PTransform to apply all validation functions to a single model."""
 
     def __init__(
-        self, validation_functions: List[
+        self,
+        validation_functions: List[
             Callable[
-                [base_models.BaseModel],
-                Iterator[job_run_result.JobRunResult]
-            ]]
-        ):
+                [base_models.BaseModel], Iterator[job_run_result.JobRunResult]
+            ]
+        ],
+    ):
         super().__init__()
         self._validation_functions = validation_functions
 
-    def process(self, model: base_models.BaseModel) -> Iterator[
-        job_run_result.JobRunResult]:
+    def process(
+        self, model: base_models.BaseModel
+    ) -> Iterator[job_run_result.JobRunResult]:
         for validation_fn in self._validation_functions:
             for error in validation_fn(model):
                 yield error

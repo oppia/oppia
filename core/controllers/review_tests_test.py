@@ -54,8 +54,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.story_url_fragment_1 = 'public-story-title'
         self.story_url_fragment_2 = 'private-story-title'
 
-        self.save_new_valid_exploration(
-            self.exp_id, self.owner_id)
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
         self.publish_exploration(self.owner_id, self.exp_id)
 
         self.node_1: story_domain.StoryNodeDict = {
@@ -64,7 +63,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
@@ -76,15 +76,19 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
-            'unpublishing_reason': None
+            'unpublishing_reason': None,
         }
 
         self.save_new_skill('skill_id_1', self.admin_id, description='Skill 1')
         self.save_new_skill('skill_id_2', self.admin_id, description='Skill 2')
 
         self.story = story_domain.Story.create_default_story(
-            self.story_id_1, 'Public Story Title', 'Description', self.topic_id,
-            self.story_url_fragment_1)
+            self.story_id_1,
+            'Public Story Title',
+            'Description',
+            self.topic_id,
+            self.story_url_fragment_1,
+        )
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
         ]
@@ -93,22 +97,33 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'Private Story Title', 'Description',
-            self.topic_id, self.story_url_fragment_2)
+            self.story_id_2,
+            'Private Story Title',
+            'Description',
+            self.topic_id,
+            self.story_url_fragment_2,
+        )
         story_services.save_new_story(self.admin_id, self.story_2)
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
-            1, 'Subtopic Title 1', 'url-frag-one')
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
         subtopic_1.skill_ids = ['skill_id_1']
         subtopic_1.url_fragment = 'sub-one-frag'
         self.save_new_topic(
-            self.topic_id, 'user', name='Topic',
+            self.topic_id,
+            'user',
+            name='Topic',
             description='A new topic',
             canonical_story_ids=[self.story_id_1, self.story_id_3],
-            additional_story_ids=[], uncategorized_skill_ids=[],
-            subtopics=[subtopic_1], next_subtopic_id=2)
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
-            self.topic_id, self.story_id_1, self.admin_id)
+            self.topic_id, self.story_id_1, self.admin_id
+        )
 
         self.login(self.VIEWER_EMAIL)
 
@@ -117,27 +132,28 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
     def test_any_user_can_access_review_tests_data(self) -> None:
         story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.story_id_1, self.node_id)
+            self.viewer_id, self.story_id_1, self.node_id
+        )
         json_response = self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_1))
+            '%s/staging/topic/%s'
+            % (feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_url_fragment_1)
+        )
         self.assertEqual(len(json_response['skill_descriptions']), 2)
         self.assertEqual(
-            json_response['skill_descriptions']['skill_id_1'],
-            'Skill 1')
+            json_response['skill_descriptions']['skill_id_1'], 'Skill 1'
+        )
         self.assertEqual(
-            json_response['skill_descriptions']['skill_id_2'],
-            'Skill 2')
+            json_response['skill_descriptions']['skill_id_2'], 'Skill 2'
+        )
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(
-        self
+        self,
     ) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_2),
-            expected_status_int=404)
+            '%s/staging/topic/%s'
+            % (feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_url_fragment_2),
+            expected_status_int=404,
+        )
 
     def test_get_fails_when_acquired_skills_dont_exist(self) -> None:
         node_id = 'node_1'
@@ -147,7 +163,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
             'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
-                'chapter'][0],
+                'chapter'
+            ][0],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],
@@ -159,39 +176,46 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'planned_publication_date_msecs': 100,
             'last_modified_msecs': 100,
             'first_publication_date_msecs': None,
-            'unpublishing_reason': None
+            'unpublishing_reason': None,
         }
         story = story_domain.Story.create_default_story(
-            self.story_id_3, 'Public Story Title', 'Description', self.topic_id,
-            'public-story-title-two')
-        story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node)
-        ]
+            self.story_id_3,
+            'Public Story Title',
+            'Description',
+            self.topic_id,
+            'public-story-title-two',
+        )
+        story.story_contents.nodes = [story_domain.StoryNode.from_dict(node)]
         story.story_contents.initial_node_id = node_id
         story.story_contents.next_node_id = self.node_id_2
         story_services.save_new_story(self.admin_id, story)
 
         topic_services.publish_story(
-            self.topic_id, self.story_id_3, self.admin_id)
+            self.topic_id, self.story_id_3, self.admin_id
+        )
 
         story_services.record_completed_node_in_story_context(
-            self.viewer_id, self.story_id_3, node_id)
+            self.viewer_id, self.story_id_3, node_id
+        )
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                'public-story-title-two'),
-            expected_status_int=404)
+            '%s/staging/topic/%s'
+            % (feconf.REVIEW_TEST_DATA_URL_PREFIX, 'public-story-title-two'),
+            expected_status_int=404,
+        )
 
     def test_get_fails_when_story_doesnt_exist(self) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
+            '%s/staging/topic/%s'
+            % (
                 feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                'non-existent-story-url-fragment'),
-            expected_status_int=400)
+                'non-existent-story-url-fragment',
+            ),
+            expected_status_int=400,
+        )
 
     def test_get_fails_when_no_completed_story_node(self) -> None:
         self.get_json(
-            '%s/staging/topic/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_url_fragment_1),
-            expected_status_int=404)
+            '%s/staging/topic/%s'
+            % (feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_url_fragment_1),
+            expected_status_int=404,
+        )
