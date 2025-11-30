@@ -34,8 +34,14 @@ export class FormatRtePreviewPipe {
   transform(html: string): string {
     html = html.replace(/&nbsp;/gi, ' ');
     html = html.replace(/&quot;/gi, '');
+
     // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
-    html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    // Use a loop to repeat removal until there are no more matches.
+    let prevHtml;
+    do {
+      prevHtml = html;
+      html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
+    } while (html !== prevHtml);
 
     let formattedOutput = html.replace(/(<([^>]+)>)/g, rteTag => {
       let replaceString = this.capitalizePipe.transform(

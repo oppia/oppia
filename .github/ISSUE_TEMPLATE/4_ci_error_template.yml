@@ -18,10 +18,12 @@ body:
     id: ci-test-type
     attributes:
       label: CI Test Type
-      description: In which CI test did this failure occur?
+      description: >
+        In which CI test did this failure occur? For E2E or Acceptance test failures,
+        please use our dedicated template instead by navigating to our
+        [issues page](https://github.com/oppia/oppia/issues), clicking "New issue",
+        and selecting the template for "E2E or Acceptance Test CI Failure Report".
       options:
-        - E2E
-        - Acceptance
         - Frontend
         - Backend
         - Lighthouse CI performance
@@ -51,16 +53,10 @@ body:
   - type: textarea
     id: screenshots
     attributes:
-      label: Screenshots (if e2e tests)
+      label: Screenshots / Screen Recordings
       description: >
-        For e2e CI failures, include screenshots/videos of the failure here,
-        since these get wiped from GitHub Actions after a few days.
-
-
-        To do this: Click on "Summary" at the top-left of the test log page,
-        scroll to the bottom, download the appropriate
-        webdriverio-screenshots/webdriverio-video artifacts, and upload them
-        here.
+        If screenshots or screen recordings would help explain the failure,
+        include them here.
     validations:
       required: false
   - type: textarea

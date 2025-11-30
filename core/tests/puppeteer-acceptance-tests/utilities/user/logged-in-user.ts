@@ -3151,6 +3151,19 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Function to verify the add goals button in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the button should be visible or not.
+   */
+  async expectAddGoalsButtonInRedesignedDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      addGoalsButtonInRedesignedLearnerDashboard,
+      visible
+    );
+  }
+
+  /**
    * Function to verify the progress of a lesson in the redesigned learner dashboard.
    * @param {string} lessonTitle - The title of the lesson.
    * @param {string} progress - The progress of the lesson.

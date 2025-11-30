@@ -52,8 +52,6 @@ describe('Voiceover Submitter', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable required feature flags.
-    await releaseCoordinator.enableFeatureFlag('enable_voiceover_contribution');
     await releaseCoordinator.enableFeatureFlag(
       'show_voiceover_tab_for_non_curated_explorations'
     );

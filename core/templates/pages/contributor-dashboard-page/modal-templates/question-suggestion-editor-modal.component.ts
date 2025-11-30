@@ -38,6 +38,7 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionSuggestionBackendApiService} from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
@@ -113,6 +114,13 @@ export class QuestionSuggestionEditorModalComponent
     );
 
     modalRef.componentInstance.skillId = this.skillId;
+    modalRef.componentInstance.linkedSkillsWithDifficulty = [
+      SkillDifficulty.create(
+        this.skillId,
+        this.skill.getDescription(),
+        this.skillDifficulty
+      ),
+    ];
     modalRef.result.then(
       result => {
         if (this.alertsService.warnings.length === 0) {

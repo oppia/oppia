@@ -128,8 +128,15 @@ export class CkEditorCopyContentService {
   ) {
     let elementTagName =
       containedWidgetTagName || element.tagName.toLowerCase();
+
     let html = element.outerHTML;
-    html = html.replace(/<!--[^>]*-->/g, '').trim();
+    let prevHtml;
+    do {
+      prevHtml = html;
+      html = html.replace(/<!--[^>]*-->/g, '');
+    } while (html !== prevHtml);
+    html = html.trim();
+
     if (!containedWidgetTagName) {
       editor.insertHtml(html);
     } else {
