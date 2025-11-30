@@ -440,7 +440,7 @@ describe('States', () => {
       'new state content',
       'new state default outcome'
     );
-    
+
     newStates.setState(
       'new state',
       State.createFromBackendDict('new state', newState)
