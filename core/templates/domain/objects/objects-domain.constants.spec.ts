@@ -55,7 +55,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return math.Units.getUnits();
+    return math.Unit.getUnits();
   };
 
   beforeEach(() => {
