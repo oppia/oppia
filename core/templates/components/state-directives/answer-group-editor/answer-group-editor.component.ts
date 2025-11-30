@@ -235,7 +235,9 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
     let inputs = {};
     const inputTypes = {};
-    while (description.match(PATTERN)) {
+    let maxIterations = 100;
+    let iterationCount = 0;
+    while (description.match(PATTERN) && iterationCount < maxIterations) {
       let varName = description.match(PATTERN)[1];
       let varType = description.match(PATTERN)[2];
       if (varType) {
@@ -245,6 +247,7 @@ export class AnswerGroupEditor implements OnInit, OnDestroy {
       inputTypes[varName] = varType;
       inputs[varName] = this.getDefaultInputValue(varType);
       description = description.replace(PATTERN, ' ');
+      iterationCount++;
     }
 
     // Save the state of the rules before adding a new one (in case the

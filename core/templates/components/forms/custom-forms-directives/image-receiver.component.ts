@@ -23,6 +23,7 @@ import {
   Output,
   EventEmitter,
   ViewChild,
+  OnDestroy,
 } from '@angular/core';
 import {AppConstants} from 'app.constants';
 import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
@@ -40,7 +41,7 @@ interface ImageTypeMapping {
   selector: 'oppia-image-receiver',
   templateUrl: './image-receiver.component.html',
 })
-export class ImageReceiverComponent {
+export class ImageReceiverComponent implements OnDestroy {
   @Output() fileChanged: EventEmitter<File> = new EventEmitter();
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
@@ -54,6 +55,11 @@ export class ImageReceiverComponent {
   errorMessage!: string | null;
   backgroundWhileUploading: boolean = false;
   licenseUrl = AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LICENSE.ROUTE;
+  private dropHandler!: (event: DragEvent) => void;
+  private dragoverHandler!: (event: Event) => void;
+  private dragleaveHandler!: (event: Event) => void;
+  private windowDragoverHandler!: (event: Event) => void;
+  private windowDropHandler!: (event: Event) => void;
 
   constructor(
     public blogDashboardPageService: BlogDashboardPageService,
@@ -69,44 +75,81 @@ export class ImageReceiverComponent {
   }
 
   ngAfterViewInit(): void {
-    this.dropAreaRef.nativeElement.addEventListener(
-      'drop',
-      (event: DragEvent) => {
-        this.onDragEnd(event);
-        if (event.dataTransfer !== null) {
-          let file = event.dataTransfer.files[0];
-          this.errorMessage = this.validateUploadedFile(file, file.name);
-          if (!this.errorMessage) {
-            // Only fire this event if validations pass.
-            this.fileChanged.emit(file);
-          }
+    this.dropHandler = (event: DragEvent) => {
+      this.onDragEnd(event);
+      if (event.dataTransfer !== null) {
+        let file = event.dataTransfer.files[0];
+        this.errorMessage = this.validateUploadedFile(file, file.name);
+        if (!this.errorMessage) {
+          // Only fire this event if validations pass.
+          this.fileChanged.emit(file);
         }
       }
-    );
+    };
 
+    this.dragoverHandler = (event: Event) => {
+      event.preventDefault();
+      this.backgroundWhileUploading = true;
+    };
+
+    this.dragleaveHandler = this.onDragEnd.bind(this);
+
+    this.windowDragoverHandler = (event: Event) => {
+      event.preventDefault();
+    };
+
+    this.windowDropHandler = (event: Event) => {
+      event.preventDefault();
+    };
+
+    this.dropAreaRef.nativeElement.addEventListener('drop', this.dropHandler);
     this.dropAreaRef.nativeElement.addEventListener(
       'dragover',
-      (event: Event) => {
-        event.preventDefault();
-        this.backgroundWhileUploading = true;
-      }
+      this.dragoverHandler
     );
-
     this.dropAreaRef.nativeElement.addEventListener(
       'dragleave',
-      this.onDragEnd.bind(this)
+      this.dragleaveHandler
     );
 
     // If the user accidentally drops an image outside of the image-uploader
     // we want to prevent the browser from applying normal drag-and-drop
     // logic, which is to load the image in the browser tab.
-    this.windowRef.nativeWindow.addEventListener('dragover', (event: Event) => {
-      event.preventDefault();
-    });
+    this.windowRef.nativeWindow.addEventListener(
+      'dragover',
+      this.windowDragoverHandler
+    );
+    this.windowRef.nativeWindow.addEventListener(
+      'drop',
+      this.windowDropHandler
+    );
+  }
 
-    this.windowRef.nativeWindow.addEventListener('drop', (event: Event) => {
-      event.preventDefault();
-    });
+  ngOnDestroy(): void {
+    if (this.dropAreaRef && this.dropAreaRef.nativeElement) {
+      this.dropAreaRef.nativeElement.removeEventListener(
+        'drop',
+        this.dropHandler
+      );
+      this.dropAreaRef.nativeElement.removeEventListener(
+        'dragover',
+        this.dragoverHandler
+      );
+      this.dropAreaRef.nativeElement.removeEventListener(
+        'dragleave',
+        this.dragleaveHandler
+      );
+    }
+    if (this.windowRef && this.windowRef.nativeWindow) {
+      this.windowRef.nativeWindow.removeEventListener(
+        'dragover',
+        this.windowDragoverHandler
+      );
+      this.windowRef.nativeWindow.removeEventListener(
+        'drop',
+        this.windowDropHandler
+      );
+    }
   }
 
   onDragEnd(e: Event): void {

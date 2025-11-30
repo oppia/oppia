@@ -226,7 +226,9 @@ export class RuleEditorComponent
 
     // Finds the parameters and sets them in ctrl.rule.inputs.
     let PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-    while (true) {
+    let maxIterations = 100;
+    let iterationCount = 0;
+    while (iterationCount < maxIterations) {
       if (!tmpRuleDescription.match(PATTERN)) {
         break;
       }
@@ -251,6 +253,7 @@ export class RuleEditorComponent
       }
 
       tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+      iterationCount++;
     }
 
     for (let key in this.rule.inputs) {
