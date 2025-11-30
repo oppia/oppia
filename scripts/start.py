@@ -22,10 +22,12 @@ from __future__ import annotations
 import argparse
 import contextlib
 import os
-import psutil
 import time
 
 from core import feconf
+
+import psutil
+from typing import Callable, ContextManager, Iterator, Optional, Sequence
 
 from . import (
     build,
@@ -34,15 +36,6 @@ from . import (
     install_third_party_libs,
     servers,
 )
-
-from typing import (
-    Callable,
-    ContextManager,
-    Iterator,
-    Optional,
-    Sequence,
-)
-
 
 _PARSER = argparse.ArgumentParser(
     description="""
