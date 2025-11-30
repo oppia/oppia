@@ -60,7 +60,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return Object.keys(unitObj.UNITS)
+    return Object.keys(unitObj.UNITS);
   };
 
   beforeEach(() => {
