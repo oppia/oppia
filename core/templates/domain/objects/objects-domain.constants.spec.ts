@@ -55,7 +55,8 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return Object.keys(math.Unit.units);
+    const units = (math as MathJsStatic).createUnit({}, {override: false});
+    return Object.keys(units);
   };
 
   beforeEach(() => {
