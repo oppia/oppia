@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import os
 
+import contextlib
 from core.constants import constants
 from core.tests import test_utils
 from scripts import (
@@ -402,3 +403,186 @@ class StartTests(test_utils.GenericTestBase):
                         with self.swap_firebase_auth_emulator, self.swap_print:
                             with assert_raises_regexp:
                                 start.main(args=[])
+
+    def test_build_cancellation_resets_constants(self) -> None:
+        """If the build fails or is cancelled, constants should be reset and
+        no dev-server callbacks (extend/notify) should be called.
+        """
+        with self.swap_install_third_party_libs:
+            from scripts import start
+
+        order: list[str] = []
+
+        # Swap set_constants_to_default to record its invocation.
+        swap_set_constants = self.swap(
+            common,
+            'set_constants_to_default',
+            lambda: order.append('set_constants'),
+        )
+
+        # Swap build to raise an exception simulating a build cancellation.
+        swap_build = self.swap_with_checks(
+            build,
+            'main',
+            lambda **unused_kwargs: (_ for _ in ()).throw(
+                Exception('build_failed')
+            ),
+            expected_kwargs=[{'args': []}],
+        )
+
+        # Keep other server-related swaps in case import-time side-effects run.
+        swap_check_port_in_use = self.swap_with_checks(
+            common,
+            'is_port_in_use',
+            lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
+
+        with swap_check_port_in_use, swap_build:
+            with self.swap_print, swap_set_constants:
+                # Expect build to raise and set_constants to be invoked.
+                with self.assertRaisesRegex(Exception, 'build_failed'):
+                    start.main(args=[])
+
+        self.assertIn('set_constants', order)
+
+    def test_devserver_cancellation_triggers_alert_and_callbacks_in_order(
+        self,
+    ) -> None:
+        """If the dev-server phase is cancelled (e.g. while launching the
+        browser), the stack should unwind and produce the following sequence:
+        alert_on_exit -> services exit -> set_constants_to_default ->
+        call_extend_index_yaml -> notify_about_successful_shutdown.
+        """
+        with self.swap_install_third_party_libs:
+            from scripts import start
+
+        order: list[str] = []
+
+        # Helper context manager that records exit events.
+        class RecordContextManager:
+            def __init__(self, name: str) -> None:
+                self.name = name
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *unused_args: str) -> None:
+                order.append(self.name)
+
+        # Create a context manager that raises on enter to simulate cancellation
+        class RaisingOnEnterContextManager:
+            def __enter__(self):
+                raise KeyboardInterrupt('user_cancel')
+
+            def __exit__(self, *unused_args: str) -> None:
+                pass
+
+        # Swaps to record the invocation order for callbacks.
+        swap_notify = self.swap(
+            start,
+            'notify_about_successful_shutdown',
+            lambda: order.append('notify'),
+        )
+        swap_extend_index = self.swap(
+            start, 'call_extend_index_yaml', lambda: order.append('extend')
+        )
+        swap_set_constants = self.swap(
+            common,
+            'set_constants_to_default',
+            lambda: order.append('set_constants'),
+        )
+
+        # Replace alert_on_exit with one that records its exit.
+        def mock_alert_on_exit():
+            @contextlib.contextmanager
+            def _cm():
+                try:
+                    yield
+                finally:
+                    order.append('alert')
+
+            return _cm()
+
+        swap_alert = self.swap(start, 'alert_on_exit', mock_alert_on_exit)
+
+        # Replace service context managers to record when they are cleaned up.
+        swap_dev_appserver = self.swap(
+            servers,
+            'managed_dev_appserver',
+            lambda *a, **k: RecordContextManager('dev_appserver'),
+        )
+        swap_webpack = self.swap(
+            servers,
+            'managed_webpack_compiler',
+            lambda **k: RecordContextManager('webpack'),
+        )
+        swap_ng_build = self.swap(
+            servers,
+            'managed_ng_build',
+            lambda **k: RecordContextManager('ng_build'),
+        )
+        swap_cloud_ds = self.swap(
+            servers,
+            'managed_cloud_datastore_emulator',
+            lambda **k: RecordContextManager('datastore'),
+        )
+        swap_firebase = self.swap(
+            servers,
+            'managed_firebase_auth_emulator',
+            lambda **k: RecordContextManager('firebase'),
+        )
+        swap_elastic = self.swap(
+            servers,
+            'managed_elasticsearch_dev_server',
+            lambda **k: RecordContextManager('elastic'),
+        )
+        swap_redis = self.swap(
+            servers,
+            'managed_redis_server',
+            lambda **k: RecordContextManager('redis'),
+        )
+
+        # Swap create_managed_web_browser to raise on enter to trigger unwind.
+        swap_create_browser = self.swap(
+            servers,
+            'create_managed_web_browser',
+            lambda _: RaisingOnEnterContextManager(),
+        )
+
+        swap_build = self.swap_with_checks(
+            build,
+            'main',
+            lambda **unused_kwargs: None,
+            expected_kwargs=[{'args': []}],
+        )
+        swap_check_port_in_use = self.swap_with_checks(
+            common,
+            'is_port_in_use',
+            lambda _: False,
+            expected_args=((PORT_NUMBER_FOR_GAE_SERVER,),),
+        )
+
+        with swap_check_port_in_use:
+            with self.swap_print, (
+                swap_alert
+            ), swap_notify, swap_extend_index, swap_set_constants:
+                with swap_dev_appserver, swap_webpack, swap_ng_build:
+                    with swap_cloud_ds, swap_firebase, swap_elastic, swap_redis:
+                        with swap_create_browser, swap_build:
+                            with self.assertRaisesRegex(
+                                KeyboardInterrupt, 'user_cancel'
+                            ):
+                                start.main(args=[])
+
+        # Check that alert is printed first.
+        self.assertEqual(order[0], 'alert')
+        # Find the first callback index for set_constants.
+        idx_set_constants = order.index('set_constants')
+        idx_extend = order.index('extend')
+        idx_notify = order.index('notify')
+
+        # Check callback ordering and that service exits appear before the
+        # callbacks (e.g. dev_appserver exit occurs before set_constants).
+        self.assertTrue(order.index('dev_appserver') < idx_set_constants)
+        self.assertTrue(idx_set_constants < idx_extend < idx_notify)
