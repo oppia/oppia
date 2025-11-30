@@ -20,7 +20,7 @@ import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {State, StateObjectFactory} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {EditabilityService} from 'services/editability.service';
 import {ExternalSaveService} from 'services/external-save.service';
@@ -30,9 +30,9 @@ import {StateTranslationEditorComponent} from './state-translation-editor.compon
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
@@ -58,7 +58,6 @@ describe('State Translation Editor Component', () => {
   let entityVoiceoversService: EntityVoiceoversService;
   let changeListService: ChangeListService;
   let explorationStatesService: ExplorationStatesService;
-  let stateObjectFactory: StateObjectFactory;
   let translationLanguageService: TranslationLanguageService;
   let externalSaveService: ExternalSaveService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
@@ -101,15 +100,10 @@ describe('State Translation Editor Component', () => {
     );
     editabilityService = TestBed.inject(EditabilityService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
-    stateObjectFactory = TestBed.inject(StateObjectFactory);
     translationStatusService = TestBed.inject(TranslationStatusService);
     pageContextService = TestBed.inject(PageContextService);
 
-    state = stateObjectFactory.createDefaultState(
-      '',
-      'content1',
-      'default_outcome'
-    );
+    state = State.createDefaultState('', 'content1', 'default_outcome');
     state.content.html = 'This is a html text1';
     spyOn(explorationStatesService, 'getState').and.returnValue(state);
 

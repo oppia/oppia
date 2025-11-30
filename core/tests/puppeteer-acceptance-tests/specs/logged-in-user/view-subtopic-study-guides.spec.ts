@@ -46,9 +46,12 @@ describe('Logged-in User', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flag.
+    // Enable the feature flags.
     await releaseCoordinator.enableFeatureFlag(
       'show_restructured_study_guides'
+    );
+    await releaseCoordinator.enableFeatureFlag(
+      'enable_worked_examples_rte_component'
     );
 
     await curriculumAdmin.createAndPublishTopicWithSubtopicsAndStudyGuides(
@@ -69,7 +72,7 @@ describe('Logged-in User', function () {
     );
 
     // Setup taking longer than 300000ms.
-  }, 420000);
+  }, 500000);
 
   it(
     'should be able to view the updated study guides',
@@ -89,6 +92,11 @@ describe('Logged-in User', function () {
         'finalSubtopicViewerView',
         __dirname
       );
+      await loggedInUser1.clickOnExpandWorkedexampleButton();
+      await loggedInUser1.expectScreenshotToMatch(
+        'finalSubtopicViewerViewSolutionExpanded',
+        __dirname
+      );
       await loggedInUser1.clickOnNextStudyGuideButton();
       await loggedInUser1.expectSubtopicStudyGuideToHaveTitleAndSections(
         'Subtracting Numbers',
@@ -98,6 +106,7 @@ describe('Logged-in User', function () {
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnPracticeButton();
       await loggedInUser1.expectToBeOnPage('practice');
+      await loggedInUser1.navigateToPracticeTabUsingURL('addition-and-subtrac');
       await loggedInUser1.navigateToStudyTab();
       await loggedInUser1.selectReviewCardToLearn('Adding Numbers');
       await loggedInUser1.clickOnBackToTopicButton();

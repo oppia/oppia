@@ -13,7 +13,7 @@ otherwise they will interfere with the iframed conversation skin directive. */
   left: 0;
   padding: 0;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   width: 100%;
   z-index: 16;
 }
@@ -50,7 +50,8 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   display: flex;
   justify-content: center;
   margin: 0 auto;
-  max-width: 1400px;
+  margin-bottom: 50px;
+  margin-top: 100px;
   padding: 56px 14px 0;
   padding-bottom: 50px;
   width: 100%;
@@ -61,10 +62,10 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
 }
 
 .new-conversation-skin-tutor-card-container {
-  flex-shrink: 10000;
-  margin-bottom: 10px;
-  max-width: 650px;
+  margin: auto;
+  max-width: 660px;
   position: relative;
+  width: 90vw;
   z-index: 3;
 }
 
@@ -75,7 +76,8 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   margin-left: 12px;
   margin-top: 30px;
   max-width: 650px;
-  position: relative;
+  position: sticky;
+  top: 100px;
   z-index: 2;
 }
 
@@ -87,6 +89,12 @@ oppia-new-conversation-skin .new-supplemental-card-parent-container {
   cursor: default;
   margin-left: 10px;
   margin-right: 10px;
+}
+
+.supplemental-cards {
+  margin: 0;
+  margin-bottom: 28px;
+  width: 40vw;
 }
 
 oppia-new-conversation-skin .oppia-new-button-raised.mat-raised-raised {
@@ -104,21 +112,44 @@ oppia-new-conversation-skin .oppia-button-icon {
 
 .oppia-exploration-checkpoints-message .toast-container .checkpoints-toast-info {
   cursor: default;
+  margin-top: 100px;
 }
 
+oppia-card-navigation-control {
+  bottom: 0;
+  position: fixed;
+  width: calc(100vw - 83px);
+  z-index: 100;
+}
 
-@media(min-width: 768px) {
-  .new-progress-nav-bar-container {
-    display: block;
+.expanded-sidebar {
+  width: calc(100vw - 243px);
+}
+
+.question-player-footer {
+  width: 100%;
+}
+
+@media(max-width: 767px) {
+  oppia-card-navigation-control {
+    width: 100vw;
+  }
+
+  .expanded-sidebar {
+    width: 100vw;
   }
 }
 
 @media (max-width: 480px) {
   .new-conversation-skin-cards-container {
     display: block;
-    padding: 0 50px 20px 8px;
+    padding: 0 50px 50px 8px;
     position: relative;
     width: 100%;
+  }
+
+  .new-conversation-skin-tutor-card-container {
+    width: 70vw;
   }
 }
 
@@ -128,6 +159,10 @@ oppia-new-conversation-skin .oppia-button-icon {
     padding: 66px 80px 66px 25px;
     position: relative;
     width: 100%;
+  }
+
+  .new-conversation-skin-tutor-card-container {
+    width: 70vw;
   }
 }
 

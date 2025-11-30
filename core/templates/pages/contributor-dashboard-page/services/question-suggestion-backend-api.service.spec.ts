@@ -30,9 +30,9 @@ import {
 import {AppConstants} from 'app.constants';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {ConceptCard} from 'domain/skill/concept-card.model';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionSuggestionBackendApiService} from './question-suggestion-backend-api.service';
 

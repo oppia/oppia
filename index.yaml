@@ -667,3 +667,9 @@ indexes:
   - name: suggestion_type
   - name: author_id
   - name: target_id
+
+- kind: StudyGuideSnapshotMetadataModel
+  properties:
+  - name: committer_id
+  - name: commit_message
+  - name: commit_type

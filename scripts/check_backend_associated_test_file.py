@@ -29,6 +29,8 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     # These are data files for testing and have no logic to be tested.
     'scripts/linters/test_files/invalid_annotations.py',
     'scripts/linters/test_files/invalid_author.py',
+    'scripts/linters/test_files/invalid_black_pragma_fmt_off.py',
+    'scripts/linters/test_files/invalid_black_pragma_fmt_skip.py',
     'scripts/linters/test_files/invalid_copyright.py',
     'scripts/linters/test_files/invalid_docstring.py',
     'scripts/linters/test_files/invalid_import_order.py',
@@ -103,9 +105,9 @@ def main() -> None:
     errors = ''
     for file in non_empty_files:
         if file not in FILES_WITHOUT_ASSOCIATED_TEST_FILES:
-            errors += (
-                '\033[1m{}\033[0m needs an associated backend test file.\n'
-                .format(file))
+            errors += '\033[1m{}\033[0m needs an associated backend test file.\n'.format(
+                file
+            )
 
     if errors:
         print('-------------------------------------------')
@@ -122,5 +124,5 @@ def main() -> None:
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when check_backend_associated_test_file.py
 # is used as a script.
-if __name__ == '__main__': # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

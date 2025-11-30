@@ -85,7 +85,7 @@ export class BlogPostEditorComponent implements OnInit {
   HTML_SCHEMA: EditorSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'BLOG_COMPONENTS',
+      rte_component_config_id: 'BLOG_COMPONENTS',
       hide_complex_extensions: false,
       startupFocusEnabled: false,
     },

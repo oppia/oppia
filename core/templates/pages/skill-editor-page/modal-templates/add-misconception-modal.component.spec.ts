@@ -22,7 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 import {Misconception} from 'domain/skill/misconception.model';
-import {Skill, SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {SkillEditorStateService} from '../services/skill-editor-state.service';
 import {AddMisconceptionModalComponent} from './add-misconception-modal.component';
 
@@ -41,7 +41,6 @@ describe('Add Misconception Modal Component', function () {
   let fixture: ComponentFixture<AddMisconceptionModalComponent>;
   let ngbActiveModal: NgbActiveModal;
   let skillEditorStateService: SkillEditorStateService;
-  let skillObjectFactory: SkillObjectFactory;
   let skillObject: Skill;
 
   beforeEach(waitForAsync(() => {
@@ -64,7 +63,6 @@ describe('Add Misconception Modal Component', function () {
     fixture = TestBed.createComponent(AddMisconceptionModalComponent);
     component = fixture.componentInstance;
     skillEditorStateService = TestBed.inject(SkillEditorStateService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
 
     let misconceptionDict1 = {
@@ -94,7 +92,7 @@ describe('Add Misconception Modal Component', function () {
         voiceovers_mapping: {},
       },
     };
-    skillObject = skillObjectFactory.createFromBackendDict({
+    skillObject = Skill.createFromBackendDict({
       id: 'skill1',
       description: 'test description 1',
       misconceptions: [misconceptionDict1, misconceptionDict2],

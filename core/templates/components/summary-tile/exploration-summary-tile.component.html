@@ -1,4 +1,4 @@
-<div *ngIf="!mobileCardToBeShown" class="e2e-test-lesson-card">
+<div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                  [activityType]="activityType"
                                  [activityId]="explorationId"
@@ -64,7 +64,7 @@
           <span [innerHTML]="'I18N_LIBRARY_NO_OBJECTIVE' | translate">
           </span>
         </div>
-        <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-align-space-between-center layout-row">
+        <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-row">
           <li>
             <span class="e2e-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
               <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate" placement="top" container="body">
@@ -109,7 +109,8 @@
     </i>
   </button>
 </div>
-<div *ngIf="mobileCardToBeShown">
+
+<div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
                                  [activityType]="activityType"
                                  [activityId]="explorationId"
@@ -162,3 +163,10 @@
     </i>
   </button>
 </div>
+
+<a [href]="getExplorationLink()" *ngIf="isInNewLessonPlayer()">
+  <button class="exploration-summary-btn" tabindex="0">
+    <i class="fa-solid fa-arrow-right arrow-icon"></i>
+    <p>{{ explorationTitle }}<br><span><i class="fa-solid fa-star star-icon"></i>{{avgRating ? avgRating : 'N/A'}}</span></p>
+  </button>
+</a>

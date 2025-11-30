@@ -71,6 +71,8 @@ export default {
       'https://drive.google.com/file/d/1uRe145ou9Ka5O2duTB-N-i89NVPEtxh1/view',
     ImpactReport2023Url:
       'https://drive.google.com/file/d/1lPu2g3HXpMDrKJu-Nssh67ynxpWxxfw9/view',
+    ImpactReport2024Url:
+      'https://drive.google.com/file/d/1NMc0VYDCRwNuteYQovTZ38pxgxBqYOHR/view?usp=drive_link',
     LearnerDashboard: 'http://localhost:8181/learner-dashboard',
     Login: 'http://localhost:8181/login',
     Logout: 'http://localhost:8181/logout',
@@ -120,7 +122,7 @@ export default {
       GoogleSignUp: 'https://accounts.google.com/lifecycle/steps/signup/name',
     },
     TeacherStoryTaggedBlogsLink:
-      'https://www.oppia.org/blog/search/find?q=&tags=(%22Teacher%20story%22)',
+      '/blog/search/find?q=&tags=(%22Teacher%20story%22)',
     ParentsTeachersGuideUrl:
       'https://drive.google.com/file/d/1gMixZ2c0j5XAGPx4qDBDvRgiFvF6PMkk/view',
     LessonCreatorLinkedInUrl:
@@ -143,20 +145,19 @@ export default {
 
   Roles: {
     TRANSLATION_ADMIN: 'translation admin',
+    TRANSLATION_COORDINATOR: 'translation coordinator',
     BLOG_ADMIN: 'blog admin',
     BLOG_POST_EDITOR: 'blog post editor',
     CURRICULUM_ADMIN: 'curriculum admin',
     QUESTION_ADMIN: 'question admin',
+    QUESTION_COORDINATOR: 'question coordinator',
     VOICEOVER_ADMIN: 'voiceover admin',
     TOPIC_MANAGER: 'topic manager',
     MODERATOR: 'moderator',
     RELEASE_COORDINATOR: 'release coordinator',
     COLLECTION_EDITOR: 'collection editor',
-  } as const,
-
-  BlogRights: {
-    BLOG_ADMIN: 'BLOG_ADMIN',
-    BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
+    TRANSLATION_REVIEWER: 'translation reviewer',
+    VOICEOVER_SUBMITTER: 'voiceover submitter',
   } as const,
 
   ViewportWidthBreakpoints: {
@@ -192,6 +193,14 @@ export default {
     LongVoiceoverInHindi: path.resolve(
       __dirname,
       '../../data/audio/voiceover_hindi_25secs.mp3'
+    ),
+    VoiceoverEnglishIndia: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_english_india_15secs.mp3'
+    ),
+    VoiceoverEnglishIndiaOver5Min: path.resolve(
+      __dirname,
+      '../../data/audio/voiceover_en_in_over5m.mp3'
     ),
   },
   SocialsShare: {
@@ -284,4 +293,24 @@ export const FILEPATHS = {
     __dirname,
     '../../data/profile-pictures/profile.svg'
   ),
+  PROFILE_PHOTO_HIRES: path.resolve(
+    __dirname,
+    '../../data/profile-pictures/profile-1920.png'
+  ),
+  BANNER_BMP: path.resolve(__dirname, '../../data/banners/banner.bmp'),
+  BANNER_GIF: path.resolve(__dirname, '../../data/banners/banner.gif'),
+  BANNER_JPG: path.resolve(__dirname, '../../data/banners/banner.jpg'),
+  BANNER_PNG: path.resolve(__dirname, '../../data/banners/banner.png'),
+  BANNER_SVG: path.resolve(__dirname, '../../data/banners/banner-small.svg'),
+  BANNER_HIGH_RES: path.resolve(
+    __dirname,
+    '../../data/banners/banner-HiRes.png'
+  ),
 } as const;
+
+// Blog Rights.
+export const BLOG_RIGHTS = {
+  BLOG_ADMIN: 'BLOG_ADMIN',
+  BLOG_POST_EDITOR: 'BLOG_POST_EDITOR',
+} as const;
+export type BlogRoles = (typeof BLOG_RIGHTS)[keyof typeof BLOG_RIGHTS];

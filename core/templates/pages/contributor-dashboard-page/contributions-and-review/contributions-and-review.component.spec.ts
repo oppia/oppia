@@ -37,7 +37,7 @@ import {
 } from './contributions-and-review.component';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {SkillObjectFactory} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model';
 import {PageContextService} from 'services/page-context.service';
 import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
@@ -46,7 +46,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {UserInfo} from 'domain/user/user-info.model';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {AlertsService} from 'services/alerts.service';
-import {QuestionObjectFactory} from 'domain/question/QuestionObjectFactory';
+import {Question} from 'domain/question/question.model';
 import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
@@ -87,11 +87,9 @@ describe('Contributions and review component', () => {
   var contributionAndReviewService: ContributionAndReviewService;
   var contributionOpportunitiesService: ContributionOpportunitiesService;
   var skillBackendApiService: SkillBackendApiService;
-  var skillObjectFactory: SkillObjectFactory;
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  let questionObjectFactory: QuestionObjectFactory;
   var getUserCreatedTranslationSuggestionsAsyncSpy = null;
   var getReviewableQuestionSuggestionsAsyncSpy = null;
   var getReviewableTranslationSuggestionsAsyncSpy = null;
@@ -140,8 +138,6 @@ describe('Contributions and review component', () => {
         SkillBackendApiService,
         FormatRtePreviewPipe,
         HtmlEscaperService,
-        QuestionObjectFactory,
-        SkillObjectFactory,
         CsrfTokenService,
         TranslationTopicService,
         {
@@ -162,9 +158,7 @@ describe('Contributions and review component', () => {
     component = fixture.componentInstance;
 
     ngbModal = TestBed.inject(NgbModal);
-    questionObjectFactory = TestBed.inject(QuestionObjectFactory);
     alertsService = TestBed.inject(AlertsService);
-    skillObjectFactory = TestBed.inject(SkillObjectFactory);
     contributionAndReviewService = TestBed.inject(ContributionAndReviewService);
     userService = TestBed.inject(UserService);
     pageContextService = TestBed.inject(PageContextService);
@@ -491,7 +485,7 @@ describe('Contributions and review component', () => {
     ).and.returnValue(mockActiveTopicEventEmitter);
     spyOn(skillBackendApiService, 'fetchSkillAsync').and.returnValue(
       Promise.resolve({
-        skill: skillObjectFactory.createFromBackendDict({
+        skill: Skill.createFromBackendDict({
           id: 'skill1',
           description: 'test description 1',
           misconceptions: [
@@ -618,7 +612,7 @@ describe('Contributions and review component', () => {
         skill_description: 'string',
         skill_rubrics: [],
       };
-      let question = questionObjectFactory.createFromBackendDict({
+      let question = Question.createFromBackendDict({
         question_state_data_schema_version: null,
         id: 'question_1',
         question_state_data: {
@@ -2222,6 +2216,24 @@ describe('Contributions and review component', () => {
         'translate_content'
       );
     });
+    it('should update topicReady when active topic changes', fakeAsync(() => {
+      const getActiveTopicNameSpy = spyOn(
+        translationTopicService,
+        'getActiveTopicName'
+      );
+
+      getActiveTopicNameSpy.and.returnValue(null);
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeFalse();
+
+      getActiveTopicNameSpy.and.returnValue('Math');
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeTrue();
+    }));
   });
 
   describe(

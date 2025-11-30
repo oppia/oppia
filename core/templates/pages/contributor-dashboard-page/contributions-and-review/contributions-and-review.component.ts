@@ -22,6 +22,7 @@ import {
   OnInit,
   ViewChild,
   HostListener,
+  Input,
 } from '@angular/core';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
@@ -30,11 +31,7 @@ import {Subscription, Observable} from 'rxjs';
 import {Rubric} from 'domain/skill/rubric.model';
 import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {
   ActiveContributionDict,
   TranslationSuggestionReviewModalComponent,
@@ -133,6 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
   templateUrl: './contributions-and-review.component.html',
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
+  @Input() activeTopicName: string;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
 
@@ -162,6 +160,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewableQuestionsSortKey: string;
   userCreatedTranslationsSortKey: string;
   reviewableTranslationsSortKey: string;
+  topicReady: boolean;
   commitTimeout?: NodeJS.Timeout;
   queuedSuggestionSummary = null;
   queuedSuggestion = null;
@@ -198,7 +197,6 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private contributionOpportunitiesService: ContributionOpportunitiesService,
     private formatRtePreviewPipe: FormatRtePreviewPipe,
     private ngbModal: NgbModal,
-    private questionObjectFactory: QuestionObjectFactory,
     private skillBackendApiService: SkillBackendApiService,
     private translationLanguageService: TranslationLanguageService,
     private translationTopicService: TranslationTopicService,
@@ -339,9 +337,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     const suggestionId = suggestion.suggestion_id;
     const updatedQuestion =
       question ||
-      this.questionObjectFactory.createFromBackendDict(
-        suggestion.change_cmd.question_dict
-      );
+      Question.createFromBackendDict(suggestion.change_cmd.question_dict);
 
     const modalRef = this.ngbModal.open(
       QuestionSuggestionReviewModalComponent,
@@ -804,6 +800,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
+    this.topicReady = false;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
     this.activeTabType = '';
     this.activeTabSubtype = '';
@@ -838,6 +835,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         enabled: true,
       },
     ];
+
+    // Whenever the active topic changes, update the `topicReady` flag.
+    // `topicReady` is true if there is an active topic, false otherwise.
+    // This flag can be used to conditionally render parts of the UI or
+    // enable/disable features that depend on a selected topic.
+    this.translationTopicService.onActiveTopicChanged.subscribe(() => {
+      const topic = this.translationTopicService.getActiveTopicName();
+      this.topicReady = !!topic;
+    });
 
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(

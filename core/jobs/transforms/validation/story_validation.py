@@ -27,7 +27,7 @@ from core.platform import models
 from typing import Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
+if MYPY:  # pragma: no cover
     from mypy_imports import story_models
 
 (story_models,) = models.Registry.import_models([models.Names.STORY])
@@ -42,7 +42,8 @@ class ValidateStorySnapshotMetadataModel(
     """Overrides _get_change_domain_class for StorySnapshotMetadataModel."""
 
     def _get_change_domain_class(
-        self, unused_input_model: story_models.StorySnapshotMetadataModel  # pylint: disable=unused-argument
+        self,
+        unused_input_model: story_models.StorySnapshotMetadataModel,  # pylint: disable=unused-argument
     ) -> Type[story_domain.StoryChange]:
         """Returns a change domain class.
 

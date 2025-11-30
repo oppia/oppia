@@ -21,10 +21,7 @@ import {EventEmitter} from '@angular/core';
 import {fakeAsync, flush, TestBed, tick} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationChangeAddState} from 'domain/exploration/exploration-draft.model';
-import {
-  StateObjectsBackendDict,
-  StatesObjectFactory,
-} from 'domain/exploration/StatesObjectFactory';
+import {StateObjectsBackendDict, States} from 'domain/exploration/states.model';
 import {AlertsService} from 'services/alerts.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {EditabilityService} from 'services/editability.service';
@@ -48,6 +45,9 @@ import {ExplorationTagsService} from './exploration-tags.service';
 import {ExplorationTitleService} from './exploration-title.service';
 import {ExplorationWarningsService} from './exploration-warnings.service';
 import {RouterService} from './router.service';
+import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {PageContextService} from '../../../services/page-context.service';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 class MockNgbModal {
   open() {
@@ -58,6 +58,14 @@ class MockNgbModal {
 class MockrouterService {
   savePendingChanges() {}
   onRefreshVersionHistory = new EventEmitter();
+}
+
+class MockPlatformFeatureService {
+  status = {
+    EnableBackgroundVoiceoverSynthesis: {
+      isEnabled: true,
+    },
+  };
 }
 
 describe(
@@ -125,6 +133,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -304,6 +316,10 @@ describe(
           {
             provide: RouterService,
             useClass: MockrouterService,
+          },
+          {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
           },
           {
             provide: WindowRef,
@@ -520,6 +536,10 @@ describe(
             useClass: MockrouterService,
           },
           {
+            provide: PlatformFeatureService,
+            useClass: MockPlatformFeatureService,
+          },
+          {
             provide: WindowRef,
             useValue: {
               nativeWindow: {
@@ -583,7 +603,6 @@ describe('Exploration save service ' + 'while saving changes', () => {
   let changeListService: ChangeListService;
   let explorationRightsService: ExplorationRightsService;
   let ngbModal: NgbModal;
-  let statesObjectFactory: StatesObjectFactory;
   let siteAnalyticsService: SiteAnalyticsService;
   let routerService: RouterService;
   let explorationDiffService: ExplorationDiffService;
@@ -591,6 +610,8 @@ describe('Exploration save service ' + 'while saving changes', () => {
   let explorationWarningsService: ExplorationWarningsService;
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
   let alertsService: AlertsService;
+  let pageContextService: PageContextService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
   let changeListServiceSpy: jasmine.Spy;
   class MockInternetConnectivityService {
     onInternetStateChange = mockConnectionServiceEmitter;
@@ -822,6 +843,9 @@ describe('Exploration save service ' + 'while saving changes', () => {
               errorCb({error: {error: 'errorMessage'}});
             },
             discardDraftAsync() {},
+            data: {
+              version: 1,
+            },
           },
         },
         FocusManagerService,
@@ -841,6 +865,10 @@ describe('Exploration save service ' + 'while saving changes', () => {
         {
           provide: RouterService,
           useClass: MockrouterService,
+        },
+        {
+          provide: PlatformFeatureService,
+          useClass: MockPlatformFeatureService,
         },
         {
           provide: WindowRef,
@@ -866,12 +894,13 @@ describe('Exploration save service ' + 'while saving changes', () => {
     explorationRightsService = TestBed.inject(ExplorationRightsService);
     ngbModal = TestBed.inject(NgbModal);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
-    statesObjectFactory = TestBed.inject(StatesObjectFactory);
     alertsService = TestBed.inject(AlertsService);
     routerService = TestBed.inject(RouterService);
     explorationDiffService = TestBed.inject(ExplorationDiffService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
+    pageContextService = TestBed.inject(PageContextService);
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
 
     changeListServiceSpy = spyOn(changeListService, 'discardAllChanges');
     changeListServiceSpy.and.returnValue(Promise.resolve(null));
@@ -894,10 +923,17 @@ describe('Exploration save service ' + 'while saving changes', () => {
   it('should open exploration save modal', fakeAsync(() => {
     let startLoadingCb = jasmine.createSpy('startLoadingCb');
     let endLoadingCb = jasmine.createSpy('endLoadingCb');
-    let sampleStates =
-      statesObjectFactory.createFromBackendDict(statesBackendDict);
+    let sampleStates = States.createFromBackendDict(statesBackendDict);
     spyOn(routerService, 'savePendingChanges').and.returnValue();
     spyOn(explorationStatesService, 'getStates').and.returnValue(sampleStates);
+    spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
+      true
+    );
+    let regenerateVoiceoverSpy = spyOn(
+      voiceoverBackendApiService,
+      'regenerateVoiceoverOnExplorationUpdateAsync'
+    );
+    spyOn(explorationRightsService, 'isPrivate').and.returnValue(true);
     spyOn(explorationDiffService, 'getDiffGraphData').and.returnValue({
       nodes: {
         nodes: {
@@ -932,6 +968,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     flush();
 
     expect(modalSpy).toHaveBeenCalled();
+    expect(regenerateVoiceoverSpy).toHaveBeenCalled();
   }));
 
   it(
@@ -962,8 +999,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1012,8 +1048,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates
@@ -1059,8 +1094,7 @@ describe('Exploration save service ' + 'while saving changes', () => {
     fakeAsync(() => {
       let startLoadingCb = jasmine.createSpy('startLoadingCb');
       let endLoadingCb = jasmine.createSpy('endLoadingCb');
-      let sampleStates =
-        statesObjectFactory.createFromBackendDict(statesBackendDict);
+      let sampleStates = States.createFromBackendDict(statesBackendDict);
       spyOn(routerService, 'savePendingChanges').and.returnValue();
       spyOn(explorationStatesService, 'getStates').and.returnValue(
         sampleStates

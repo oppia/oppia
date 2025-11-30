@@ -22,6 +22,8 @@
  */
 
 import {Injectable} from '@angular/core';
+import {ExplorationEngineService} from './exploration-engine.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +32,52 @@ export class CheckpointProgressService {
   mostRecentlyReachedCheckpoint!: string;
   visitedCheckpointStateNames: string[] = [];
 
-  constructor() {}
+  constructor(
+    private playerTranscriptService: PlayerTranscriptService,
+    private explorationEngineService: ExplorationEngineService
+  ) {}
+
+  getCheckpointStates(): number[] {
+    const depthGraph = this.explorationEngineService.extractDepthGraph();
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let checkpointIndexes: number[] = [];
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint && value.name !== null) {
+        checkpointIndexes.push(depthGraph[value.name]);
+      }
+    }
+    checkpointIndexes.sort((a, b) => a - b);
+    return checkpointIndexes;
+  }
+
+  fetchCheckpointCount(): number {
+    const expStates = this.explorationEngineService
+      .getExploration()
+      .states.getStates();
+    let count = 0;
+    for (let value of expStates) {
+      if (value.cardIsCheckpoint) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  getMostRecentlyReachedCheckpointIndex(): number {
+    let checkpointIndex = 0;
+    let numberOfCards = this.playerTranscriptService.getNumCards();
+    for (let i = 0; i < numberOfCards; i++) {
+      let stateName = this.playerTranscriptService.getCard(i).getStateName();
+      let correspondingState =
+        this.explorationEngineService.getStateFromStateName(stateName);
+      if (correspondingState.cardIsCheckpoint) {
+        checkpointIndex++;
+      }
+    }
+    return checkpointIndex;
+  }
 
   setMostRecentlyReachedCheckpoint(checkpointStateName: string | null): void {
     if (!checkpointStateName) {
@@ -52,6 +99,7 @@ export class CheckpointProgressService {
     }
     return this.visitedCheckpointStateNames;
   }
+
   setVisitedCheckpointStateNames(checkpointStateName: string): void {
     if (!this.visitedCheckpointStateNames.includes(checkpointStateName)) {
       this.visitedCheckpointStateNames.push(checkpointStateName);

@@ -17,9 +17,3 @@
 <% for (var chunk in htmlWebpackPlugin.files.js) { %>
   <link rel="preload" as="script" href="<%= htmlWebpackPlugin.files.js[chunk] %>">
 <% } %>
-
-<% if (htmlWebpackPlugin.options.hybrid && webpackConfig.mode == 'production') { %>
-  <script src="/third_party/static/angularjs-1.8.2/angular.min.js"></script>
-<% } else if (htmlWebpackPlugin.options.hybrid) { %>
-  <script src="/third_party/static/angularjs-1.8.2/angular.js"></script>
-<% } %>

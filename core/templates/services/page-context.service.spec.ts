@@ -232,6 +232,14 @@ describe('PageContext service', () => {
         expect(ecs.isInExplorationContext()).toBe(false);
       }
     );
+
+    it('should correctly return if subtopic preview is open', () => {
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+      ecs.setSubtopicPreviewIsOpen();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(true);
+      ecs.setSubtopicPreviewIsClosed();
+      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
+    });
   });
 
   describe('behavior in question editor modal', () => {
@@ -476,6 +484,19 @@ describe('PageContext service', () => {
 
     it('should correctly retrieve the learner group id', () => {
       expect(ecs.getLearnerGroupId()).toBe('groupId');
+    });
+  });
+
+  describe('behavior in the studyguide viewer page', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(PageContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
+      ecs.removeCustomEntityContext();
+    });
+
+    it('should correctly retrieve the studyguide viewer page context', () => {
+      expect(ecs.getPageContext()).toBe('studyguide');
     });
   });
 

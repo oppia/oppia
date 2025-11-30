@@ -46,16 +46,17 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {WindowRef} from '../../../../services/contextual/window-ref.service';
-import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {EntityVoiceoversService} from '../../../../services/entity-voiceovers.services';
 import {VoiceoverBackendApiService} from '../../../../domain/voiceover/voiceover-backend-api.service';
 import {AudioPreloaderService} from '../../services/audio-preloader.service';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {PlayerPositionService} from '../../services/player-position.service';
-import {ExplorationObjectFactory} from '../../../../domain/exploration/ExplorationObjectFactory';
+import {Exploration} from '../../../../domain/exploration/exploration.model';
 import {AutomaticVoiceoverHighlightService} from '../../../../services/automatic-voiceover-highlight-service';
 import {PageContextService} from '../../../../services/page-context.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {LoggerService} from '../../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../../domain/utilities/url-interpolation.service';
 
 class MockContentTranslationLanguageService {
   currentLanguageCode!: string;
@@ -92,19 +93,6 @@ class MockWindowRef {
   };
 }
 
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: true,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
-
 describe('Content language selector component', () => {
   let component: ContentLanguageSelectorComponent;
   let contentTranslationLanguageService: ContentTranslationLanguageService;
@@ -116,10 +104,11 @@ describe('Content language selector component', () => {
   let audioPreloaderService: AudioPreloaderService;
   let voiceoverPlayerService: VoiceoverPlayerService;
   let playerPositionService: PlayerPositionService;
-  let explorationObjectFactory: ExplorationObjectFactory;
   let automaticVoiceoverHighlightService: AutomaticVoiceoverHighlightService;
   let pageContextService: PageContextService;
   let stateEditorService: StateEditorService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -142,10 +131,6 @@ describe('Content language selector component', () => {
           provide: I18nLanguageCodeService,
           useClass: MockI18nLanguageCodeService,
         },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
       ],
     })
       .overrideModule(BrowserDynamicTestingModule, {
@@ -164,13 +149,14 @@ describe('Content language selector component', () => {
     audioPreloaderService = TestBed.inject(AudioPreloaderService);
     voiceoverPlayerService = TestBed.inject(VoiceoverPlayerService);
     playerPositionService = TestBed.inject(PlayerPositionService);
-    explorationObjectFactory = TestBed.inject(ExplorationObjectFactory);
     windowRef = TestBed.inject(WindowRef);
     automaticVoiceoverHighlightService = TestBed.inject(
       AutomaticVoiceoverHighlightService
     );
     stateEditorService = TestBed.inject(StateEditorService);
     pageContextService = TestBed.inject(PageContextService);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
@@ -246,8 +232,11 @@ describe('Content language selector component', () => {
         edits_allowed: true,
       },
     };
-    audioPreloaderService.exploration =
-      explorationObjectFactory.createFromBackendDict(explorationDict);
+    audioPreloaderService.exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
 
     component.ngOnInit();
     flush();

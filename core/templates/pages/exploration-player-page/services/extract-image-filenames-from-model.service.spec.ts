@@ -19,27 +19,26 @@
 import {TestBed} from '@angular/core/testing';
 
 import {CamelCaseToHyphensPipe} from '../../../filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import {LoggerService} from '../../../services/contextual/logger.service';
+import {UrlInterpolationService} from '../../../domain/utilities/url-interpolation.service';
 import {PageContextService} from '../../../services/page-context.service';
 import {
   ExplorationBackendDict,
-  ExplorationObjectFactory,
-} from '../../../domain/exploration/ExplorationObjectFactory';
+  Exploration,
+} from '../../../domain/exploration/exploration.model';
 import {
   ExtractImageFilenamesFromModelService,
   // eslint-disable-next-line max-len
 } from './extract-image-filenames-from-model.service';
 
-import {
-  SkillBackendDict,
-  SkillObjectFactory,
-} from '../../../domain/skill/SkillObjectFactory';
+import {SkillBackendDict, Skill} from 'domain/skill/skill.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('Extracting Image file names in the state service', () => {
   let eifms: ExtractImageFilenamesFromModelService;
-  let eof: ExplorationObjectFactory;
-  let sof: SkillObjectFactory;
   let ecs: PageContextService;
+  let loggerService: LoggerService;
+  let urlInterpolationService: UrlInterpolationService;
   let explorationDict: ExplorationBackendDict;
   let ImageFilenamesInExploration: {[x: string]: string[]};
   let skillDict: SkillBackendDict;
@@ -49,10 +48,10 @@ describe('Extracting Image file names in the state service', () => {
       imports: [HttpClientTestingModule],
       providers: [CamelCaseToHyphensPipe],
     });
-    eof = TestBed.inject(ExplorationObjectFactory);
     ecs = TestBed.inject(PageContextService);
     eifms = TestBed.inject(ExtractImageFilenamesFromModelService);
-    sof = TestBed.inject(SkillObjectFactory);
+    loggerService = TestBed.inject(LoggerService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
 
     explorationDict = {
@@ -935,7 +934,11 @@ describe('Extracting Image file names in the state service', () => {
   });
 
   it('should get all the filenames of the images in a state', () => {
-    let exploration = eof.createFromBackendDict(explorationDict);
+    let exploration = Exploration.createFromBackendDict(
+      explorationDict,
+      loggerService,
+      urlInterpolationService
+    );
     let states = exploration.getStates();
     let stateNames = states.getStateNames();
     stateNames.forEach(statename => {
@@ -949,7 +952,7 @@ describe('Extracting Image file names in the state service', () => {
   });
 
   it('should get all the filenames of the images in a skill', () => {
-    let skill = sof.createFromBackendDict(skillDict);
+    let skill = Skill.createFromBackendDict(skillDict);
     let imageFilenamesInSkill = eifms.getImageFilenamesInSkill(skill).sort();
     expect(imageFilenamesInSkill).toEqual(expectedImageFilenamesInSkill.sort());
   });

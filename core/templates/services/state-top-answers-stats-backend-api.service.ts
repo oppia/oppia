@@ -23,15 +23,13 @@ import {ServicesConstants} from 'services/services.constants';
 import {
   StateTopAnswersStats,
   StateTopAnswersStatsBackendDict,
-  StateTopAnswersStatsObjectFactory,
-} from 'domain/statistics/state-top-answers-stats-object.factory';
+} from 'domain/statistics/state-top-answers-stats.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 @Injectable({providedIn: 'root'})
 export class StateTopAnswersStatsBackendApiService {
   constructor(
     private http: HttpClient,
-    private stateTopAnswersStatsObjectFactory: StateTopAnswersStatsObjectFactory,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -45,7 +43,7 @@ export class StateTopAnswersStatsBackendApiService {
       )
       .toPromise()
       .then(
-        d => this.stateTopAnswersStatsObjectFactory.createFromBackendDict(d),
+        d => StateTopAnswersStats.createFromBackendDict(d),
         errorResponse => {
           throw new Error(errorResponse.error.error);
         }

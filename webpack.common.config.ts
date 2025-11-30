@@ -55,8 +55,6 @@ module.exports = {
     ],
     extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png'],
     alias: {
-      '@angular/upgrade/static':
-        '@angular/upgrade/bundles/upgrade-static.umd.js',
       // These both are used so that we can refer to them in imports using their
       // full path: 'assets/{{filename}}'.
       'assets/constants': 'constants.ts',
@@ -70,10 +68,6 @@ module.exports = {
       commonPrefix + '/pages/lightweight-oppia-root/index.ts',
   },
 
-  /**
-   * TODO(#13079): Remove the hybrid field from the html webpack plugin options
-   * once angularjs is removed from corresponding pages.
-   */
   plugins: [
     // TODO(#18260): Change this when we permanently move to the Docker Setup.
     // This plugin is used to define the environment variable USE_FIREBASE_ENDPOINT, which is used

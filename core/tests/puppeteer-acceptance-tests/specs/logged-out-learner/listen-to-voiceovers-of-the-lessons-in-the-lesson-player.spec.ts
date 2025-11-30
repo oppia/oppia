@@ -68,9 +68,6 @@ describe('Logged-Out Learner', function () {
       await releaseCoordinator.enableFeatureFlag(
         'exploration_editor_can_modify_translations'
       );
-      await releaseCoordinator.enableFeatureFlag(
-        'enable_voiceover_contribution'
-      );
 
       // Enable Voiceover Contributions.
       await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');
@@ -213,7 +210,7 @@ describe('Logged-Out Learner', function () {
     expect(
       await loggedOutLearner.isTextPresentOnPage('Listen to the lesson')
     ).toBe(true);
-    await loggedOutLearner.expectAudioExpandButtonToBeVisibleInLP();
+    await loggedOutLearner.expectAudioExpandButtonToBeVisible();
 
     // Check audio (voiceover) avaibility.
     await loggedOutLearner.expectVoiceoverIsPlayable(false);

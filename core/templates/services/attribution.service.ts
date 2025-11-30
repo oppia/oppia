@@ -21,6 +21,7 @@ import {ApplicationRef, Injectable} from '@angular/core';
 import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
 import {HumanReadableContributorsSummary} from 'domain/summary/creator-exploration-summary.model';
 import {PageContextService} from 'services/page-context.service';
+import {UrlService} from './contextual/url.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,8 @@ export class AttributionService {
   constructor(
     private applicationRef: ApplicationRef,
     private pageContextService: PageContextService,
-    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService
+    private explorationSummaryBackendApiService: ExplorationSummaryBackendApiService,
+    private urlService: UrlService
   ) {}
 
   init(): void {

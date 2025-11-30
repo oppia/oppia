@@ -26,7 +26,7 @@ import {
   TRANSLATION_DATA_FORMAT_UNICODE,
   TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
   TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
-} from 'domain/exploration/WrittenTranslationObjectFactory';
+} from 'domain/exploration/written-translation.model';
 import {InteractionCustomizationArgs} from 'interactions/customization-args-defs';
 import {Rule} from 'domain/exploration/rule.model';
 import {CkEditorCopyContentService} from 'components/ck-editor-helpers/ck-editor-copy-content.service';
@@ -52,7 +52,7 @@ import {BaseTranslatableObject} from 'interactions/rule-input-defs';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -126,11 +126,6 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
-  }
-
-  isVoiceoverContributionEnabled(): boolean {
-    return this.platformFeatureService.status.EnableVoiceoverContribution
-      .isEnabled;
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {

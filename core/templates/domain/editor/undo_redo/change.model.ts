@@ -25,11 +25,11 @@ import cloneDeep from 'lodash/cloneDeep';
 
 import {MisconceptionBackendDict} from 'domain/skill/misconception.model';
 import {RecordedVoiceOverBackendDict} from 'domain/exploration/recorded-voiceovers.model';
-import {StateBackendDict} from 'domain/state/StateObjectFactory';
+import {StateBackendDict} from 'domain/state/state.model';
 import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 import {Collection} from 'domain/collection/collection.model';
-import {Question} from 'domain/question/QuestionObjectFactory';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Question} from 'domain/question/question.model';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Story} from 'domain/story/story.model';
 import {Topic} from 'domain/topic/topic-object.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
@@ -616,7 +616,7 @@ interface TopicDeleteSubtopicChange {
 
 export interface TopicMoveSkillToSubtopicChange {
   cmd: 'move_skill_id_to_subtopic';
-  old_subtopic_id: number;
+  old_subtopic_id: number | null;
   new_subtopic_id: number;
   skill_id: string;
 }

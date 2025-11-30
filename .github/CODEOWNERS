@@ -54,7 +54,6 @@
 /core/templates/components/oppia-angular-root.component.* @oppia/lace-frontend-reviewers
 /core/templates/modules/ @oppia/lace-frontend-reviewers
 /core/templates/pages/common-imports.ts @oppia/lace-frontend-reviewers
-/core/templates/pages/mock-ajs.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
@@ -65,8 +64,6 @@
 /core/templates/services/i18n-language-code.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/question-validation.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/request-interceptor.service*.ts @oppia/lace-frontend-reviewers
-/core/templates/services/UpgradedServices.ts @oppia/lace-frontend-reviewers
-/core/templates/hybrid-router-module-provider*.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/hashes.ts @oppia/lace-frontend-reviewers
 /core/templates/utility/string-utility*.ts @oppia/lace-frontend-reviewers
 /proxy.conf.json @oppia/lace-frontend-reviewers
@@ -148,7 +145,6 @@
 /CHANGELOG @oppia/release-workflow-reviewers
 /core/templates/pages/android-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/about-page/ @oppia/lace-frontend-reviewers
-/core/templates/pages/about-page/about-page.constants.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/license-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/privacy-page/ @oppia/lace-frontend-reviewers
 /core/templates/pages/privacy-page/privacy-page.component.ts @oppia/lace-frontend-reviewers
@@ -178,6 +174,8 @@
 
 
 # Dev workflow team.
+/AGENTS.md @oppia/dev-workflow-reviewers
+/.coderabbit.yaml @oppia/dev-workflow-reviewers
 /.eslintignore @oppia/dev-workflow-reviewers
 /.eslintrc @oppia/dev-workflow-reviewers
 /.htmllintrc @oppia/dev-workflow-reviewers
@@ -195,6 +193,7 @@
 /docker/ @oppia/dev-workflow-reviewers
 /Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
+/pyproject.toml @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
 /scripts/check_frontend_test_coverage*.py @oppia/dev-workflow-reviewers
 /scripts/install_prerequisites.sh @oppia/dev-workflow-reviewers
@@ -293,6 +292,7 @@
 /core/templates/components/common-layout-directives/common-elements/sharing-links.component*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/common-elements/common-elements.module.ts @oppia/lace-frontend-reviewers
 /core/templates/components/custom-snackbar/ @oppia/lace-frontend-reviewers
+/core/templates/components/progress-bar/ @oppia/lace-frontend-reviewers
 /core/templates/components/language-banner/ @oppia/lace-frontend-reviewers
 /core/templates/components/profile-link-directives/ @oppia/lace-frontend-reviewers
 /core/templates/components/summary-tile/ @oppia/lace-frontend-reviewers
@@ -307,6 +307,8 @@
 
 # Global frontend services
 /core/templates/services/alerts.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/chapter-progress-loader.service*.ts @oppia/lace-frontend-reviewers 
+/core/templates/services/chapter-label-visibility.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/html-escaper.service*.ts @oppia/lace-frontend-reviewers
@@ -693,9 +695,7 @@
 
 # Frontend unit tests
 /core/templates/**/*.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/**/*Spec.ts @oppia/lace-frontend-reviewers
 /extensions/**/*.spec.ts @oppia/lace-frontend-reviewers
-/extensions/**/*Spec.ts @oppia/lace-frontend-reviewers
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers
@@ -713,7 +713,6 @@
 /core/tests/ @oppia/dev-workflow-reviewers
 /assets/ @oppia/lace-frontend-reviewers
 /data/ @oppia/lace-backend-reviewers
-/core/templates/karma.module.ts @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_utils/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio_desktop/ @oppia/dev-workflow-reviewers
 /core/tests/webdriverio/ @oppia/dev-workflow-reviewers
@@ -792,8 +791,6 @@
 /core/domain/role_services*.py @oppia/core-reviewers
 /core/storage/ @oppia/core-reviewers
 /core/domain/user*.py @oppia/core-reviewers
-/AUTHORS @oppia/core-reviewers
-/CONTRIBUTORS @oppia/core-reviewers
 /LICENSE @oppia/core-reviewers
 /NOTICE @oppia/core-reviewers
 /core/templates/pages/terms-page/terms-page.component.html @oppia/core-reviewers

@@ -602,13 +602,21 @@ var RichTextChecker = async function (arrayOfElems, arrayOfTexts, fullText) {
   // specially.
   var justPassedRteComponent = false;
 
+  var removeHtmlComments = function (input) {
+    let previous;
+    do {
+      previous = input;
+      input = input.replace(/<!--[^>]*-->/g, '');
+    } while (input !== previous);
+
+    return input;
+  };
+
   var _readFormattedText = async function (text, tagName) {
     expect(await arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
     expect(
-      (await arrayOfElems[arrayPointer].getHTML(false))
-        .replace(/<!--[^>]*-->/g, '')
-        .trim()
+      removeHtmlComments(await arrayOfElems[arrayPointer].getHTML(false)).trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;

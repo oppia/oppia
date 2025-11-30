@@ -72,6 +72,7 @@ const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
+const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
 const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
@@ -547,7 +548,7 @@ const takeQuizButtonSelector = '.e2e-test-take-diagnostic-test';
 const startDiagnosticTestButtonSelector = '.e2e-test-start-diagnostic-test';
 
 // Diagnostic Test Player.
-const diagnosticTestPlayerSelector = 'oppia-dignostic-test-player';
+const diagnosticTestPlayerSelector = 'oppia-diagnostic-test-player';
 const skipQuestionButton = '.e2e-test-skip-question-button';
 const currentProgessSelector = '.e2e-test-progress-container';
 
@@ -574,8 +575,17 @@ const lessonInfoSignUpButtonSelector = '.e2e-test-sign-up-button';
 const profilePictureSelector = '.e2e-test-profile-dropdown';
 const lessonInfoTextSelector = '.e2e-test-lesson-info-header';
 const floatFormInput = '.e2e-test-float-form-input';
+const expandWorkedExampleButton = '.e2e-test-expand-workedexample';
+const collapseWorkedExampleButton = '.e2e-test-collapse-workedexample';
 const topicViewerContainerSelector = '.e2e-test-topic-viewer-container';
 const toastMessageSelector = '.e2e-test-toast-message';
+const previousConversationToggleSelector = '.e2e-test-previous-responses-text';
+const formErrorContainer = '.e2e-test-form-error-container';
+const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
+
+const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
+const promoBarTextSelector = '.e2e-test-promo-bar-text';
+const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -636,6 +646,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToDonationThanksModalOnAboutPage(): Promise<void> {
     await this.goto(aboutPageThanksModalURL);
+    await this.page.waitForSelector(thanksForDonatingClass, {visible: true});
   }
 
   /**
@@ -688,14 +699,14 @@ export class LoggedOutUser extends BaseUser {
       if ((await this.isElementVisible(navbarLearnTab)) !== true) {
         throw new Error('Learn tab is not visible in the navbar.');
       }
-      await this.clickOn(navbarLearnTab);
+      await this.clickOnElementWithSelector(navbarLearnTab);
     }
 
     // Click on Community Library link.
     const selector = this.isViewportAtMobileWidth()
       ? communityLibraryLinkInNavMenuSelector
       : communityLibraryLinkInNavbarSelector;
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     // Verify navigated to Community Library.
     if (
@@ -821,7 +832,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async returnToLibraryFromExplorationCompletion(): Promise<void> {
     await this.expectElementToBeVisible(returnToLibraryButtonSelector);
-    await this.clickOn(returnToLibraryButtonSelector);
+    await this.clickOnElementWithSelector(returnToLibraryButtonSelector);
   }
 
   /**
@@ -831,8 +842,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogSearchInputSelector, {
       visible: true,
     });
-    await this.type(blogSearchInputSelector, keyword);
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+    await this.typeInInputField(blogSearchInputSelector, keyword);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
 
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('q');
@@ -875,12 +886,12 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(blogTagFilterSelector, {
       visible: true,
     });
-    await this.clickOn(blogTagFilterSelector);
-    await this.clickOn(`.e2e-test-select-${tagName}`);
+    await this.clickOnElementWithSelector(blogTagFilterSelector);
+    await this.clickOnElementWithSelector(`.e2e-test-select-${tagName}`);
     await this.page.waitForSelector(blogTagFilterDropdownSelector, {
       hidden: true,
     });
-    await this.clickAndWaitForNavigation(blogSubmitButtonSelector);
+    await this.clickAndWaitForNavigation(blogSubmitButtonSelector, true);
 
     const url = new URL(this.page.url());
     const queryParam = url.searchParams.get('tags');
@@ -944,7 +955,7 @@ export class LoggedOutUser extends BaseUser {
     if (!nextButton) {
       return;
     }
-    await this.clickOn(blogPaginationNextSelector);
+    await this.clickOnElementWithSelector(blogPaginationNextSelector);
     await this.waitForNetworkIdle();
 
     const newFirstPostTitle = await this.page.$eval(
@@ -971,7 +982,7 @@ export class LoggedOutUser extends BaseUser {
     if (!prevButton) {
       return;
     }
-    await this.clickOn(blogPaginationPrevSelector);
+    await this.clickOnElementWithSelector(blogPaginationPrevSelector);
 
     const newFirstPostTitle = await this.page.$eval(
       blogPostTitleSelector,
@@ -987,13 +998,11 @@ export class LoggedOutUser extends BaseUser {
    */
   private async clickButtonToNavigateToNewPage(
     button: string,
-    buttonName: string,
     expectedDestinationPageUrl: string,
-    expectedDestinationPageName: string
+    useSelector: boolean = true
   ): Promise<void> {
-    await this.clickAndWaitForNavigation(button);
-
-    expect(this.page.url()).toBe(expectedDestinationPageUrl);
+    await this.clickAndWaitForNavigation(button, useSelector);
+    await this.expectPageURLToContain(expectedDestinationPageUrl);
   }
 
   /**
@@ -1007,7 +1016,7 @@ export class LoggedOutUser extends BaseUser {
     expectedDestinationPageName: string
   ): Promise<void> {
     const pageTarget = this.page.target();
-    await this.clickOn(button);
+    await this.clickOnElementWithSelector(button);
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
@@ -1030,23 +1039,19 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
+        mathClassroomUrl
       );
     } else {
       await this.page.waitForSelector(navbarLearnTab, {
         visible: true,
       });
-      await this.clickOn(navbarLearnTab);
+      await this.clickOnElementWithSelector(navbarLearnTab);
       await this.clickButtonToNavigateToNewPage(
         navbarLearnTabBasicMathematicsButton,
-        'Basic Mathematics button in the Learn Menu on navbar',
-        mathClassroomUrl,
-        'Math Classroom'
+        mathClassroomUrl
       );
     }
   }
@@ -1060,24 +1065,20 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
-        'About Oppia button in the About Menu on mobile sidebar',
-        aboutUrl,
-        'About'
+        aboutUrl
       );
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,
       });
-      await this.clickOn(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabAboutButton,
-        'About Oppia button in the About Menu on navbar',
-        aboutUrl,
-        'About'
+        aboutUrl
       );
     }
   }
@@ -1091,24 +1092,20 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandAboutMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarTeachButton,
-        'Teach button in the About Menu on mobile sidebar',
-        teachUrl,
-        'Teach'
+        teachUrl
       );
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,
       });
-      await this.clickOn(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
       await this.clickButtonToNavigateToNewPage(
         navbarAboutTabTeachButton,
-        'Teach button in the About Menu on navbar',
-        teachUrl,
-        'Teach'
+        teachUrl
       );
     }
   }
@@ -1156,7 +1153,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
       visible: true,
     });
-    await this.clickOn(mobileNavbarOpenSidebarButton);
+    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
     await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
       visible: true,
     });
@@ -1172,9 +1169,16 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.clickOn(mobileSidebarExpandImpactReportSubMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandImpactReportSubMenuButton
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
         '2023',
@@ -1187,13 +1191,18 @@ export class LoggedOutUser extends BaseUser {
       );
 
       // Close Navbar once links are verified.
-      await this.clickOn(mobileSidebarExpandAboutMenuButton);
-      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,
       });
-      await this.clickOn(navbarAboutTab);
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
       await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
         '2023',
@@ -1216,24 +1225,22 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuPartnershipsButton,
-        'School and Organizations in the Get Involved Menu on mobile sidebar',
-        partnershipsUrl,
-        'Partnerships'
+        partnershipsUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
-      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabSchoolAndOrganizationsButton,
-        'School and Organizations in the Get Involved Menu on navbar',
-        partnershipsUrl,
-        'Partnerships'
+        partnershipsUrl
       );
     }
   }
@@ -1247,24 +1254,22 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuVolunteerButton,
-        'Volunteer in the Get Involved Menu on mobile sidebar',
-        volunteerUrl,
-        'Volunteer'
+        volunteerUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
-      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabVolunteerButton,
-        'Volunteer in the Get Involved Menu on navbar',
-        volunteerUrl,
-        'Volunteer'
+        volunteerUrl
       );
     }
   }
@@ -1278,24 +1283,22 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
       await this.clickButtonToNavigateToNewPage(
         mobileSidevbarGetInvolvedMenuDonateButton,
-        'Donate in the Get Involved Menu on mobile sidebar',
-        donateUrl,
-        'Donate'
+        donateUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
-      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabDonateButton,
-        'Donate in the Get Involved Menu on navbar',
-        donateUrl,
-        'Donate'
+        donateUrl
       );
     }
   }
@@ -1309,24 +1312,22 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
-      await this.clickOn(mobileSidebarExpandGetInvolvedMenuButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(
+        mobileSidebarExpandGetInvolvedMenuButton
+      );
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarGetInvolvedMenuContactUsButton,
-        'Contact Us in the Get Involved Menu on mobile sidebar',
-        contactUrl,
-        'Contact'
+        contactUrl
       );
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
-      await this.clickOn(navbarGetInvolvedTab);
+      await this.clickOnElementWithSelector(navbarGetInvolvedTab);
       await this.clickButtonToNavigateToNewPage(
         navbarGetInvolvedTabContactUsButton,
-        'Contact Us in the Get Involved Menu on navbar',
-        contactUrl,
-        'Contact'
+        contactUrl
       );
     }
   }
@@ -1343,17 +1344,12 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOn(mobileNavbarOpenSidebarButton);
+      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
     }
     await this.page.waitForSelector(navbarDonateButton, {
       visible: true,
     });
-    await this.clickButtonToNavigateToNewPage(
-      navbarDonateButton,
-      'Donate button on navbar',
-      donateUrl,
-      'Donate'
-    );
+    await this.clickButtonToNavigateToNewPage(navbarDonateButton, donateUrl);
   }
 
   /**
@@ -1369,7 +1365,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([this.clickAndWaitForNavigation(watchAVideoButton)]);
+    await this.clickAndWaitForNavigation(watchAVideoButton, true);
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
@@ -1395,7 +1391,7 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await this.clickAndWaitForNavigation(readOurBlogButton);
+    await this.clickAndWaitForNavigation(readOurBlogButton, true);
 
     if (this.page.url() !== blogUrl) {
       throw new Error(
@@ -1428,7 +1424,7 @@ export class LoggedOutUser extends BaseUser {
       await this.navigateToProfilePage(username);
     }
 
-    await this.clickOn(subscribeButton);
+    await this.clickOnElementWithSelector(subscribeButton);
     await this.page.waitForSelector(unsubscribeLabel);
     showMessage(`Subscribed to the creator with username ${username}.`);
   }
@@ -1465,7 +1461,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async dismissDonationThanksModalOnDonatePage(): Promise<void> {
     await this.page.waitForSelector(dismissButton, {visible: true});
-    await this.clickOn(dismissButton);
+    await this.clickOnElementWithSelector(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
@@ -1495,7 +1491,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async dismissDonationThanksModalOnAboutPage(): Promise<void> {
     await this.page.waitForSelector(dismissButton, {visible: true});
-    await this.clickOn(dismissButton);
+    await this.clickOnElementWithSelector(dismissButton);
     await this.page.waitForSelector(thanksForDonatingClass, {hidden: true});
     const thanksForDonatingHeader = await this.page.$(thanksForDonatingClass);
     if (thanksForDonatingHeader !== null) {
@@ -1523,23 +1519,13 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the About page using the oppia website footer.
    */
   async clickOnAboutLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerAboutLink,
-      'About Oppia link in the About Oppia section in the footer',
-      aboutUrl,
-      'About'
-    );
+    await this.clickButtonToNavigateToNewPage(footerAboutLink, aboutUrl);
   }
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
   async clickOnBlogLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      footerBlogLink,
-      'Blog link in the About Oppia section in the footer',
-      blogUrl,
-      'Blog'
-    );
+    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
   }
 
   /**
@@ -1549,7 +1535,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerForumlink, {
       visible: true,
     });
-    await this.clickAndWaitForNavigation(footerForumlink);
+    await this.clickAndWaitForNavigation(footerForumlink, true);
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
   }
@@ -1561,9 +1547,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerGetStartedLink);
     await this.clickButtonToNavigateToNewPage(
       footerGetStartedLink,
-      'Get Started link in the footer',
-      getStartedUrl,
-      'Get Started'
+      getStartedUrl
     );
   }
 
@@ -1574,9 +1558,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCreatorGuidelinesLink,
-      'Creator Guidelines link in the footer',
-      creatorGuidelinesUrl,
-      'Creator Guidelines'
+      creatorGuidelinesUrl
     );
   }
 
@@ -1585,12 +1567,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerTeachLink,
-      'For Parents/Teachers link in footer',
-      teachUrl,
-      'Oppia for Parents, Teachers, and Guardians'
-    );
+    await this.clickButtonToNavigateToNewPage(footerTeachLink, teachUrl);
   }
 
   /**
@@ -1598,12 +1575,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnTermsOfServiceLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerTermsLink,
-      'Terms of use link in footer',
-      termsUrl,
-      'Terms of Use'
-    );
+    await this.clickButtonToNavigateToNewPage(footerTermsLink, termsUrl);
   }
 
   /**
@@ -1613,9 +1585,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerPrivacyPolicyLink,
-      'Privacy Policy link in the footer',
-      privacyPolicyUrl,
-      'Privacy Policy'
+      privacyPolicyUrl
     );
   }
 
@@ -1626,9 +1596,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
     await this.clickButtonToNavigateToNewPage(
       footerCommunityLibraryLink,
-      'Browse the Library link in the footer',
-      communityLibraryUrl,
-      'Community Library'
+      communityLibraryUrl
     );
   }
 
@@ -1637,12 +1605,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnContactUsLinkInFooter(): Promise<void> {
     await this.page.waitForSelector(footerCreatorGuidelinesLink);
-    await this.clickButtonToNavigateToNewPage(
-      footerContactUsLink,
-      'Contact Us link in the footer',
-      contactUrl,
-      'Contact'
-    );
+    await this.clickButtonToNavigateToNewPage(footerContactUsLink, contactUrl);
   }
 
   /**
@@ -1673,7 +1636,7 @@ export class LoggedOutUser extends BaseUser {
   async clickCreateOneHereLinkOnGetStartedPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"create one here")]');
     const pageTarget = this.page.target();
-    await this.clickOn('create one here');
+    await this.clickOnElementWithText('create one here');
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
     );
@@ -1747,7 +1710,10 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickForumLinkOnCreatorGuidelinesPage(): Promise<void> {
     await this.page.waitForXPath('//a[contains(text(),"forum")]');
-    await Promise.all([this.page.waitForNavigation(), this.clickOn('forum')]);
+    await Promise.all([
+      this.page.waitForNavigation(),
+      this.clickOnElementWithText('forum'),
+    ]);
     await this.waitForNetworkIdle();
 
     expect(this.page.url()).toBe(googleGroupsOppiaUrl);
@@ -1761,7 +1727,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Design Tips'),
+      await this.clickOnElementWithText('Design Tips'),
     ]);
 
     expect(this.page.url()).toBe(explorationDesignTipsUrl);
@@ -1777,7 +1743,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Create an Exploration'),
+      await this.clickOnElementWithText('Create an Exploration'),
     ]);
 
     expect(this.page.url()).toBe(creatorDashboardCreateModeUrl);
@@ -1793,7 +1759,7 @@ export class LoggedOutUser extends BaseUser {
 
     await Promise.all([
       this.page.waitForNavigation(),
-      await this.clickOn('Browse our Explorations'),
+      await this.clickOnElementWithText('Browse our Explorations'),
     ]);
 
     expect(this.page.url()).toBe(communityLibraryUrl);
@@ -1841,7 +1807,7 @@ export class LoggedOutUser extends BaseUser {
     );
     await Promise.all([
       this.page.waitForNavigation({waitUntil: 'networkidle0'}),
-      this.clickOn('https://www.oppia.org'),
+      this.clickOnElementWithText('https://www.oppia.org'),
     ]);
 
     expect(this.page.url()).toBe(homeUrl);
@@ -1853,9 +1819,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutCookiesOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://allaboutcookies.org/how-to-manage-cookies',
-      'link to learn about cookies on the Privacy Policy page',
       allAboutCookiesUrl,
-      'All About Cookies'
+      false
     );
   }
 
@@ -1865,9 +1830,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'https://www.google.com/policies/privacy/partners/',
-      'link to learn about Google Analytivs on the Privacy Policy page',
       googleAnalyticsPartnerPoliciesUrl,
-      'Google Privacy & Terms'
+      false
     );
   }
 
@@ -1877,9 +1841,8 @@ export class LoggedOutUser extends BaseUser {
   async clickLinkAboutGoogleAnalyticsOptOutOnPrivacyPolicyPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       googleAnalyticsOptOutUrl,
-      'link to opt out of cookies on the Privacy Policy pager',
       googleAnalyticsOptOutUrl,
-      'Google Analytics Opt-out Browser Add-on'
+      false
     );
   }
 
@@ -1897,7 +1860,7 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(socialIconSelector);
     const pageTarget = this.page.target();
-    await this.clickOn(socialIconSelector);
+    await this.clickOnElementWithSelector(socialIconSelector);
     await this.waitForStaticAssetsToLoad();
     const newTarget = await this.browserObject.waitForTarget(
       target => target.opener() === pageTarget
@@ -2035,9 +1998,7 @@ export class LoggedOutUser extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       await this.clickButtonToNavigateToNewPage(
         exploreLessonsButtonAtTheTopInTeachPage,
-        'Explore Lessons button',
-        classroomsPageUrl,
-        'Classrooms page'
+        classroomsPageUrl
       );
     }
   }
@@ -2049,9 +2010,7 @@ export class LoggedOutUser extends BaseUser {
   async clickExploreLessonsButtonAtTheBottomInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       exploreLessonsButtonAtTheBottomInTeachPage,
-      'Explore Lessons button',
-      classroomsPageUrl,
-      'Classrooms page'
+      classroomsPageUrl
     );
   }
 
@@ -2062,9 +2021,7 @@ export class LoggedOutUser extends BaseUser {
   async clickGetAndroidAppButtonInTeachPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       getAndroidAppButtonInTeachPage,
-      'Get Android App button',
-      androidUrl,
-      'Android page'
+      androidUrl
     );
   }
 
@@ -2075,9 +2032,7 @@ export class LoggedOutUser extends BaseUser {
   async clickGetAndroidAppButtonInSplashPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       getAndroidAppButtonSelector,
-      'Access the Android App',
-      androidUrl,
-      'Android Page'
+      androidUrl
     );
   }
 
@@ -2110,7 +2065,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(testimonialCarouselNextButton);
+      await this.clickOnElementWithSelector(testimonialCarouselNextButton);
     } else {
       await carouselIndicators[1].click();
     }
@@ -2128,7 +2083,7 @@ export class LoggedOutUser extends BaseUser {
 
     // Toggle to the previous slide.
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(testimonialCarouselPrevButton);
+      await this.clickOnElementWithSelector(testimonialCarouselPrevButton);
     } else {
       await carouselIndicators[0].click();
     }
@@ -2176,7 +2131,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // Toggle to the next slide.
-    await this.clickOn(creatorsCarouselNextButton);
+    await this.clickOnElementWithSelector(creatorsCarouselNextButton);
 
     const secondLessonCreatorName = await this.page.$eval(
       creatorsCarouselNameInTeachPage,
@@ -2189,7 +2144,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // Toggle to the previous slide.
-    await this.clickOn(creatorsCarouselPrevButton);
+    await this.clickOnElementWithSelector(creatorsCarouselPrevButton);
 
     const firstLessonCreatorNameAgain = await this.page.$eval(
       creatorsCarouselNameInTeachPage,
@@ -2221,13 +2176,17 @@ export class LoggedOutUser extends BaseUser {
     } else {
       showMessage('The lesson creation section is visible on the teach page.');
     }
-    await this.clickOn(lessonCreationAccordionExpandButtonInTeachPage);
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionExpandButtonInTeachPage
+    );
     await this.page.waitForSelector(
       lessonCreationAccordionPanelContentInTeachPage,
       {visible: true}
     );
     showMessage('Lesson Creation accordion expand button is working correctly');
-    await this.clickOn(lessonCreationAccordionCloseButtonInTeachPage);
+    await this.clickOnElementWithSelector(
+      lessonCreationAccordionCloseButtonInTeachPage
+    );
     await this.page.waitForSelector(
       lessonCreationAccordionPanelContentInTeachPage,
       {hidden: true}
@@ -2240,7 +2199,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async clickOnCreateAccountButtonInSaveProgressModal(): Promise<void> {
     await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector);
-    await this.clickOn(lessonInfoSignUpButtonSelector);
+    await this.waitForElementToStabilize(lessonInfoSignUpButtonSelector);
+    await this.clickOnElementWithSelector(lessonInfoSignUpButtonSelector);
 
     await this.expectElementToBeVisible(lessonInfoSignUpButtonSelector, false);
   }
@@ -2270,7 +2230,7 @@ export class LoggedOutUser extends BaseUser {
       el => el.textContent
     );
     await languageDropdownElement.click();
-    await this.clickOn(languageOption);
+    await this.clickOnElementWithSelector(languageOption);
     // Here we need to reload the page again to confirm the language change.
     await this.page.reload();
 
@@ -2314,6 +2274,9 @@ export class LoggedOutUser extends BaseUser {
    * The button is in the first section of the page.
    */
   async clickPartnerWithUsButtonInPartnershipsPage(): Promise<void> {
+    await this.waitForElementToStabilize(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
     await this.clickLinkButtonToNewTab(
       partnerWithUsButtonAtTheTopOfPartnershipsPage,
       'Partner With Us button at the bottom of the Partnerships page',
@@ -2400,9 +2363,7 @@ export class LoggedOutUser extends BaseUser {
   async clickReadMoreStoriesButtonInPartnershipsPageAndVerifyNavigation(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       readMoreStoriesButtonInPartnershipsPage,
-      'Read more stories button',
-      blogUrl,
-      'Blog'
+      blogUrl
     );
   }
 
@@ -2436,7 +2397,7 @@ export class LoggedOutUser extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       await tabLablels[1].click();
     } else {
-      await this.clickOn(tabsNextButtonInVolunteerPage);
+      await this.clickOnElementWithSelector(tabsNextButtonInVolunteerPage);
     }
 
     const secondTabHeading = await this.page.$eval(
@@ -2453,7 +2414,7 @@ export class LoggedOutUser extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       await tabLablels[0].click();
     } else {
-      await this.clickOn(tabsPreviousButtonInVolunteerPage);
+      await this.clickOnElementWithSelector(tabsPreviousButtonInVolunteerPage);
     }
 
     const firstTabAgain = await this.page.$eval(
@@ -2517,9 +2478,7 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickButtonToNavigateToNewPage(
       privacyPolicyLinkInTermsPage,
-      'Privacy Policy link in the terms page',
-      privacyPolicyUrl,
-      'Privacy Policy'
+      privacyPolicyUrl
     );
   }
 
@@ -2531,9 +2490,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(ccLicenseLinkInTermsPage, {visible: true});
     await this.clickButtonToNavigateToNewPage(
       ccLicenseLinkInTermsPage,
-      'License link in the terms page',
-      ccLicenseUrl,
-      'License'
+      ccLicenseUrl
     );
   }
 
@@ -2547,9 +2504,7 @@ export class LoggedOutUser extends BaseUser {
     });
     await this.clickButtonToNavigateToNewPage(
       googleGroupSignUpLinkInTermsPage,
-      'Google Group Sign Up link in the terms page',
-      OppiaAnnounceGoogleGroupUrl,
-      'Oppia-announce Google Group page'
+      OppiaAnnounceGoogleGroupUrl
     );
   }
 
@@ -2558,12 +2513,7 @@ export class LoggedOutUser extends BaseUser {
    * it navigates to the correct URL.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(
-      'DONATE TODAY',
-      'DONATE TODAY button',
-      donateUrl,
-      'Donate'
-    );
+    await this.clickButtonToNavigateToNewPage('DONATE TODAY', donateUrl, false);
   }
 
   /**
@@ -2573,9 +2523,8 @@ export class LoggedOutUser extends BaseUser {
   async clickBecomeAPartnerButtonInContactUsPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'BECOME A PARTNER',
-      'BECOME A PARTNER button',
       partnershipsUrl,
-      'Partnerships'
+      false
     );
   }
 
@@ -2586,9 +2535,8 @@ export class LoggedOutUser extends BaseUser {
   async clickVolunteerButtonInContactUsPage(): Promise<void> {
     await this.clickButtonToNavigateToNewPage(
       'BECOME A VOLUNTEER',
-      'BECOME A VOLUNTEER button',
       volunteerUrl,
-      'Volunteer'
+      false
     );
   }
 
@@ -2770,12 +2718,16 @@ export class LoggedOutUser extends BaseUser {
         ? featuresAccordionCloseButtonMobileInAboutPage
         : featuresAccordionCloseButtonDesktopInAboutPage;
 
-    await this.clickOn(featuresAccordionExpandButtonInAboutPage);
+    await this.clickOnElementWithSelector(
+      featuresAccordionExpandButtonInAboutPage
+    );
     await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
       visible: true,
     });
 
-    await this.clickOn(featuresAccordionCloseButtonInAboutPage);
+    await this.clickOnElementWithSelector(
+      featuresAccordionCloseButtonInAboutPage
+    );
     await this.page.waitForSelector(featuresAccordionPanelContentInAboutPage, {
       hidden: true,
     });
@@ -2825,7 +2777,9 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // Toggle to the next slide.
-    await this.clickOn(volunteerCarouselNextButtonInAboutPage);
+    await this.clickOnElementWithSelector(
+      volunteerCarouselNextButtonInAboutPage
+    );
 
     const secondVolunteerSlideSlideHeading = await this.page.$eval(
       volunteerCarouselSlideHeadingInAboutPage,
@@ -2838,7 +2792,9 @@ export class LoggedOutUser extends BaseUser {
     }
 
     // Toggle to the previous slide.
-    await this.clickOn(volunteerCarouselPrevButtonInAboutPage);
+    await this.clickOnElementWithSelector(
+      volunteerCarouselPrevButtonInAboutPage
+    );
 
     const firstVolunteerSlideHeadingAgain = await this.page.$eval(
       volunteerCarouselSlideHeadingInAboutPage,
@@ -2858,7 +2814,7 @@ export class LoggedOutUser extends BaseUser {
   async clickViewReportButtonInAboutPage(): Promise<void> {
     await this.openExternalLink(
       impactReportButtonInAboutPage,
-      impactReport2023Url
+      impactReport2024Url
     );
   }
 
@@ -2888,9 +2844,7 @@ export class LoggedOutUser extends BaseUser {
       : volunteerLearnMoreDesktopButtonInAboutPage;
     await this.clickButtonToNavigateToNewPage(
       volunteerLearnMoreButtonInAboutPage,
-      'Learn More button of Volunteer tab',
-      volunteerUrl,
-      'Volunteer'
+      volunteerUrl
     );
   }
 
@@ -2909,12 +2863,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(partnerTab, {
       visible: true,
     });
-    await this.clickOn(partnerTab);
+    await this.clickOnElementWithSelector(partnerTab);
     await this.clickButtonToNavigateToNewPage(
       partnerLearnMoreButtonInAboutPage,
-      'Learn More button of Partner tab',
-      partnershipsUrl,
-      'Partnerships'
+      partnershipsUrl
     );
   }
 
@@ -2934,7 +2886,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(partnerTab, {
       visible: true,
     });
-    await this.clickOn(partnerTab);
+    await this.clickOnElementWithSelector(partnerTab);
     await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
       partnershipsFormUrl
@@ -2984,7 +2936,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(partnerTab, {
       visible: true,
     });
-    await this.clickOn(partnerTab);
+    await this.clickOnElementWithSelector(partnerTab);
     await this.openExternalLink(
       partnerWithUsButtonInAboutPage,
       partnershipsFormInPortugueseUrl
@@ -3009,8 +2961,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(donorTab, {
       visible: true,
     });
-    await this.clickOn(donorTab);
-    await this.clickOn(donateButtonInAboutPage);
+    await this.clickOnElementWithSelector(donorTab);
+    await this.clickOnElementWithSelector(donateButtonInAboutPage);
 
     const donorBox = await this.page.waitForSelector(donorBoxIframe);
     if (!donorBox) {
@@ -3091,6 +3043,7 @@ export class LoggedOutUser extends BaseUser {
 
   /**
    * This function verifies that the user is on the correct classroom page.
+   * @param statusCode The status code of the error page.
    */
   async expectToBeOnErrorPage(statusCode: number): Promise<void> {
     await this.page.waitForSelector(errorPageHeading);
@@ -3116,29 +3069,146 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Function to navigate to the next card in the preview tab.
+   * Click on the submit answer button.
+   * @param skipVerification - If true, skips verification that the button is visible.
    */
-  async continueToNextCard(): Promise<void> {
+  async clickOnSubmitAnswerButton(): Promise<void> {
+    const feedbackSelector = '.e2e-test-conversation-feedback-latest';
+
+    await this.expectElementToBeClickable(submitAnswerButton);
+
+    // Get current status of old and latest responses to use it later.
+    // Handle cases where elements might not exist.
+    const initialPreviousResponses = await this.page
+      .$eval(
+        previousConversationToggleSelector,
+        element => element?.textContent?.trim() || null
+      )
+      .catch(() => null);
+
+    const initialLatestResponse = await this.page
+      .$eval(feedbackSelector, element => element?.textContent?.trim() || null)
+      .catch(() => null);
+
+    // Wait for 1s to ensure the selected answer is updated in Angular component.
+    await this.page.waitForTimeout(1000);
+    // Click on Submit Answer button.
+    await this.clickOnElementWithSelector(submitAnswerButton);
+
+    // Wait for either element to change content.
+    await this.page.waitForFunction(
+      (
+        submitButtonSelector: string,
+        formErrorContainer: string,
+        selector1: string,
+        value1: string | null,
+        selector2: string,
+        value2: string | null
+      ) => {
+        const submitButton = document.querySelector(submitButtonSelector);
+        const element1 = document.querySelector(selector1);
+        const element2 = document.querySelector(selector2);
+
+        const currentValue1 = element1?.textContent?.trim() || null;
+        const currentValue2 = element2?.textContent?.trim() || null;
+
+        // Return true if either: submit button is disabled, or if number of
+        // previous responses has increased, or if there was no previous
+        // response and we got the first response.
+        return (
+          (submitButton as HTMLButtonElement)?.disabled ||
+          document.querySelector(formErrorContainer)?.textContent?.trim() !==
+            null ||
+          currentValue1 !== value1 ||
+          currentValue2 !== value2
+        );
+      },
+      {timeout: 10000},
+      submitAnswerButton,
+      formErrorContainer,
+      previousConversationToggleSelector,
+      initialPreviousResponses,
+      feedbackSelector,
+      initialLatestResponse
+    );
+  }
+
+  /**
+   * Continue to next practice question
+   */
+  async continueToNextPracticeQuestion(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.page.waitForSelector(currentCardContentSelector);
+
+    const initialHeading = await this.page.$eval(
+      practiceQuestionHeaderSelector,
+      el => el?.textContent?.trim() ?? ''
+    );
     try {
       await this.page.waitForSelector(nextCardButton, {timeout: 7000});
-      await this.clickOn(nextCardButton);
+      await this.clickOnElementWithSelector(nextCardButton);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
-        await this.clickOn(nextCardArrowButton);
+        await this.clickOnElementWithSelector(nextCardArrowButton);
       } else {
         throw error;
       }
     }
+
+    await this.page.waitForFunction(
+      (selector: string, heading: string) => {
+        const element = document.querySelector(selector);
+        // In case of last question, the element should be hidden,
+        // else it should have different heading.
+        return !element || element.textContent?.trim() !== heading;
+      },
+      {},
+      practiceQuestionHeaderSelector,
+      initialHeading
+    );
+  }
+
+  /**
+   * Function to navigate to the next card in the preview tab.
+   */
+  async continueToNextCard(): Promise<void> {
+    const currentCardContentSelector = `${stateConversationContent} p`;
+    await this.page.waitForSelector(currentCardContentSelector);
+    const currentCardContent = await this.page.$eval(
+      currentCardContentSelector,
+      el => el.textContent
+    );
+    try {
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
+      await this.clickOnElementWithSelector(nextCardButton);
+    } catch (error) {
+      if (error instanceof puppeteer.errors.TimeoutError) {
+        await this.clickOnElementWithSelector(nextCardArrowButton);
+      } else {
+        throw error;
+      }
+    }
+
+    // Wait until card content changes.
+    await this.page.waitForFunction(
+      (selector: string, value: string) => {
+        const element = document.querySelector(selector);
+        return element?.textContent !== value;
+      },
+      {},
+      currentCardContentSelector,
+      currentCardContent
+    );
   }
 
   /**
    * Clicks on continue button in continue button interaction.
    */
   async clickOnContinueButtonInInteractionCard(): Promise<void> {
-    await this.isElementVisible(nextCardButton);
-    await this.clickOn(nextCardButton);
+    await this.expectElementToBeVisible(nextCardButton);
+    await this.clickOnElementWithSelector(nextCardButton);
 
-    await this.isElementVisible(nextCardButton, false);
+    await this.expectElementToBeVisible(nextCardButton, false);
   }
 
   /**
@@ -3150,14 +3220,18 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForTimeout(1000);
     await this.waitForElementToBeClickable(submitResponseToInteractionInput);
     await this.clearAllTextFrom(submitResponseToInteractionInput);
-    await this.type(submitResponseToInteractionInput, answer);
-    await this.clickOn(submitAnswerButton);
+    await this.typeInInputField(submitResponseToInteractionInput, answer);
+    await this.clickOnSubmitAnswerButton();
   }
 
+  /**
+   * Submits the answer in the text area.
+   * @param answer - The answer to submit.
+   */
   async submitAnswerInTextArea(answer: string): Promise<void> {
     await this.waitForElementToBeClickable(submitResponseToInteractionTextArea);
-    await this.type(submitResponseToInteractionTextArea, answer);
-    await this.clickOn(submitAnswerButton);
+    await this.typeInInputField(submitResponseToInteractionTextArea, answer);
+    await this.clickOnSubmitAnswerButton();
   }
 
   /**
@@ -3165,7 +3239,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} value - The value to check.
    */
   async expectAnswerInputValueToBe(value: string): Promise<void> {
-    await this.expectInputValueToBe(floatFormInput, value);
+    await this.expectElementValueToBe(floatFormInput, value);
   }
 
   /**
@@ -3198,8 +3272,8 @@ export class LoggedOutUser extends BaseUser {
    */
   async submitEmailForNewsletter(email: string): Promise<void> {
     await this.waitForElementToBeClickable(newsletterEmailInputField);
-    await this.type(newsletterEmailInputField, email);
-    await this.clickOn(newsletterSubscribeButton);
+    await this.typeInInputField(newsletterEmailInputField, email);
+    await this.clickOnElementWithSelector(newsletterSubscribeButton);
     await this.expectElementToBeVisible(newsletterSubscriptionThanksMessage);
   }
 
@@ -3232,9 +3306,10 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Watch a video') {
       throw new Error('The Watch A Video button does not exist!');
     }
-    await Promise.all([
-      this.clickAndWaitForNavigation(watchAVideoButtonInThanksForSubscribe),
-    ]);
+    await this.clickAndWaitForNavigation(
+      watchAVideoButtonInThanksForSubscribe,
+      true
+    );
     await this.waitForPageToFullyLoad();
 
     const url = this.page.url();
@@ -3259,7 +3334,10 @@ export class LoggedOutUser extends BaseUser {
     if (buttonText !== 'Read our blog') {
       throw new Error('The Read Our Blog button does not exist!');
     }
-    await this.clickAndWaitForNavigation(readOurBlogButtonInThanksForSubscribe);
+    await this.clickAndWaitForNavigation(
+      readOurBlogButtonInThanksForSubscribe,
+      true
+    );
 
     if (this.page.url() !== readBlogUrl) {
       throw new Error(
@@ -3362,8 +3440,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(searchInputSelector, {
       visible: true,
     });
-    await this.clickOn(searchInputSelector);
-    await this.type(searchInputSelector, lessonName);
+    await this.clickOnElementWithSelector(searchInputSelector);
+    await this.typeInInputField(searchInputSelector, lessonName);
 
     await this.page.keyboard.press('Enter');
     await this.page.waitForNavigation({waitUntil: ['load', 'networkidle0']});
@@ -3377,7 +3455,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(categoryFilterDropdownToggler, {
       visible: true,
     });
-    await this.clickOn(categoryFilterDropdownToggler);
+    await this.clickOnElementWithSelector(categoryFilterDropdownToggler);
     await this.waitForStaticAssetsToLoad();
 
     await this.page.waitForSelector(unselectedFilterOptionsSelector);
@@ -3403,7 +3481,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.clickOn(searchInputSelector);
+    await this.clickOnElementWithSelector(searchInputSelector);
     await this.page.keyboard.press('Enter');
 
     await this.page.waitForFunction(
@@ -3471,7 +3549,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.clickOn(searchInputSelector);
+    await this.clickOnElementWithSelector(searchInputSelector);
     await this.page.keyboard.press('Enter');
 
     const buttonTextContent =
@@ -3696,7 +3774,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToLessonsTabInTopic(): Promise<void> {
     await this.expectElementToBeVisible(lessonsTabButtonSelector);
-    await this.clickOn(lessonsTabButtonSelector);
+    await this.clickOnElementWithSelector(lessonsTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(lessonsTabContainerSelector);
@@ -3707,7 +3785,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async navigateToPracticeTabInTopic(): Promise<void> {
     await this.expectElementToBeVisible(practiceTabButtonSelector);
-    await this.clickOn(practiceTabButtonSelector);
+    await this.clickOnElementWithSelector(practiceTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(practiceTabContainerSelector);
@@ -3719,8 +3797,8 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the revision tab in the topic page.
    */
   async navigateToRevisionTabInTopic(): Promise<void> {
-    await this.isElementVisible(revisionTabButtonSelector);
-    await this.clickOn(revisionTabButtonSelector);
+    await this.expectElementToBeVisible(revisionTabButtonSelector);
+    await this.clickOnElementWithSelector(revisionTabButtonSelector);
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(revisionTabSelector);
@@ -3733,10 +3811,10 @@ export class LoggedOutUser extends BaseUser {
     const selector = this.isViewportAtMobileWidth()
       ? backToClassroomBreadcrumbSelectorMobile
       : backToClassroomLinkSelector;
-    await this.isElementVisible(selector);
-    await this.clickOn(selector);
+    await this.expectElementToBeVisible(selector);
+    await this.clickOnElementWithSelector(selector);
 
-    await this.isElementVisible(selector, false);
+    await this.expectElementToBeVisible(selector, false);
   }
 
   async expectToBeInClassroomPage(classroomURLFragment: string): Promise<void> {
@@ -3753,30 +3831,33 @@ export class LoggedOutUser extends BaseUser {
    * Clicks on the start here button in the classroom page.
    */
   async clickOnStartHereButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(startHereButtonSelector);
+    await this.expectElementToBeVisible(startHereButtonSelector);
 
-    await this.clickAndWaitForNavigation(startHereButtonSelector);
-    await this.isElementVisible(startHereButtonSelector, false);
+    await this.clickAndWaitForNavigation(startHereButtonSelector, true);
+    await this.expectElementToBeVisible(startHereButtonSelector, false);
   }
 
   /**
    * Clicks on the take quiz button in the classroom page.
    */
   async clickOnTakeQuizButtonInClassroomPage(): Promise<void> {
-    await this.isElementVisible(takeQuizButtonSelector);
+    await this.expectElementToBeVisible(takeQuizButtonSelector);
 
-    await this.clickOn(takeQuizButtonSelector);
-    await this.isElementVisible(takeQuizButtonSelector, false);
+    await this.clickOnElementWithSelector(takeQuizButtonSelector);
+    await this.expectElementToBeVisible(takeQuizButtonSelector, false);
   }
 
   /**
    * Starts a diagnostic test.
    */
   async startDiagnosticTest(): Promise<void> {
-    await this.isElementVisible(startDiagnosticTestButtonSelector);
+    await this.expectElementToBeVisible(startDiagnosticTestButtonSelector);
 
-    await this.clickOn(startDiagnosticTestButtonSelector);
-    await this.isElementVisible(startDiagnosticTestButtonSelector, false);
+    await this.clickOnElementWithSelector(startDiagnosticTestButtonSelector);
+    await this.expectElementToBeVisible(
+      startDiagnosticTestButtonSelector,
+      false
+    );
   }
 
   /**
@@ -3787,9 +3868,9 @@ export class LoggedOutUser extends BaseUser {
       (await this.page.$eval(currentProgessSelector, el =>
         el.textContent?.trim()
       )) ?? '';
-    await this.isElementVisible(skipQuestionButton);
+    await this.expectElementToBeVisible(skipQuestionButton);
 
-    await this.clickOn(skipQuestionButton);
+    await this.clickOnElementWithSelector(skipQuestionButton);
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
@@ -3946,7 +4027,7 @@ export class LoggedOutUser extends BaseUser {
     const isLoginPromptContainerPresent =
       await this.page.$(loginPromptContainer);
     if (isLoginPromptContainerPresent) {
-      await this.clickOn('SKIP');
+      await this.clickOnElementWithText('SKIP');
     }
 
     await this.page.waitForSelector(loginPromptContainer, {
@@ -3960,14 +4041,23 @@ export class LoggedOutUser extends BaseUser {
   async returnToTopicPageAfterCompletingExploration(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickAndWaitForNavigation('Return to Story');
-      await this.clickAndWaitForNavigation(NavbarBackButton);
+      await this.clickAndWaitForNavigation(NavbarBackButton, true);
     } else {
-      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector);
+      await this.clickAndWaitForNavigation(oppiaTopicTitleSelector, true);
     }
 
     await this.page.waitForSelector(topicDescriptionSelector, {
       visible: true,
     });
+  }
+
+  /**
+   * Navigates to the study tab on the topic page.
+   * @param {string} topicUrlFragment - The url fragment of the current topic
+   */
+  async navigateToPracticeTabUsingURL(topicUrlFragment: string): Promise<void> {
+    await this.goto(`${mathClassroomUrl}/${topicUrlFragment}/practice`);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -4119,10 +4209,21 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Click on the expand workedexample button.
+   */
+  async clickOnExpandWorkedexampleButton(): Promise<void> {
+    await this.expectElementToBeVisible(expandWorkedExampleButton);
+    await this.clickOnElementWithSelector(expandWorkedExampleButton);
+    await this.page.waitForSelector(collapseWorkedExampleButton, {
+      visible: true,
+    });
+  }
+
+  /**
    * Click on the next study guide button.
    */
   async clickOnNextStudyGuideButton(): Promise<void> {
-    await this.clickOn(goToNextStudyGuideButton);
+    await this.clickOnElementWithSelector(goToNextStudyGuideButton);
     await this.waitForPageToFullyLoad();
   }
 
@@ -4130,7 +4231,7 @@ export class LoggedOutUser extends BaseUser {
    * Click on the study guide menu button.
    */
   async clickOnStudyGuideMenuButton(): Promise<void> {
-    await this.clickOn(goToStudyGuideMenuButton);
+    await this.clickOnElementWithSelector(goToStudyGuideMenuButton);
     await this.waitForPageToFullyLoad();
   }
 
@@ -4138,7 +4239,7 @@ export class LoggedOutUser extends BaseUser {
    * Click on the practice button
    */
   async clickOnPracticeButton(): Promise<void> {
-    await this.clickOn(goToPracticeSectionButton);
+    await this.clickOnElementWithSelector(goToPracticeSectionButton);
     await this.waitForPageToFullyLoad();
   }
 
@@ -4146,7 +4247,7 @@ export class LoggedOutUser extends BaseUser {
    * Click on the back to topic button
    */
   async clickOnBackToTopicButton(): Promise<void> {
-    await this.clickOn(goBackToTopicButton);
+    await this.clickOnElementWithSelector(goBackToTopicButton);
     await this.waitForPageToFullyLoad();
   }
 
@@ -4165,7 +4266,7 @@ export class LoggedOutUser extends BaseUser {
       hidden: true,
     });
 
-    await this.clickAndWaitForNavigation(nextLessonButton);
+    await this.clickAndWaitForNavigation(nextLessonButton, true);
 
     await this.page.waitForSelector(nextLessonButton, {
       hidden: true,
@@ -4239,16 +4340,16 @@ export class LoggedOutUser extends BaseUser {
       return;
     }
     await this.page.waitForSelector('nav-options', {visible: true});
-    await this.clickOn(feedbackPopupSelector);
+    await this.clickOnElementWithSelector(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
-      await this.clickOn(stayAnonymousCheckbox);
+      await this.clickOnElementWithSelector(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     try {
       await this.page.waitForFunction(
@@ -4268,7 +4369,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(generateAttributionSelector, {
       visible: true,
     });
-    await this.clickOn(generateAttributionSelector);
+    await this.clickOnElementWithSelector(generateAttributionSelector);
 
     await this.page.waitForSelector(attributionHtmlSectionSelector, {
       visible: true,
@@ -4329,7 +4430,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(closeAttributionModalButton, {
       visible: true,
     });
-    await this.clickOn(closeAttributionModalButton);
+    await this.clickOnElementWithSelector(closeAttributionModalButton);
     showMessage('Attribution modal closed successfully');
 
     await this.page.waitForSelector(closeAttributionModalButton, {
@@ -4349,7 +4450,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(shareExplorationButtonSelector, {
       visible: true,
     });
-    await this.clickOn(shareExplorationButtonSelector);
+    await this.clickOnElementWithSelector(shareExplorationButtonSelector);
 
     await this.waitForStaticAssetsToLoad();
     await this.page.waitForSelector(
@@ -4397,7 +4498,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(shareExplorationButtonSelector, {
       visible: true,
     });
-    await this.clickOn(shareExplorationButtonSelector);
+    await this.clickOnElementWithSelector(shareExplorationButtonSelector);
 
     await this.expectEmbedClassroomLinkToWorkProperly(expectedCode);
   }
@@ -4410,7 +4511,7 @@ export class LoggedOutUser extends BaseUser {
     expectedCode: string
   ): Promise<void> {
     await this.waitForStaticAssetsToLoad();
-    await this.clickOn(embedLessonButton);
+    await this.clickOnElementWithSelector(embedLessonButton);
     await this.page.waitForSelector(embedCodeSelector);
     const embedCode = await this.page.$eval(
       embedCodeSelector,
@@ -4424,6 +4525,8 @@ export class LoggedOutUser extends BaseUser {
           embedCode
       );
     }
+
+    await this.waitForElementToStabilize(closeButtonSelector);
     await this.page.click(closeButtonSelector);
     await this.page.waitForSelector(embedCodeSelector, {hidden: true});
   }
@@ -4489,7 +4592,7 @@ export class LoggedOutUser extends BaseUser {
       });
       showMessage('Checkpoint modal found.');
       // Closing the checkpoint modal.
-      await this.clickOn(closeLessonInfoTooltipSelector);
+      await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
       await this.page.waitForSelector(checkpointModalSelector, {hidden: true});
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
@@ -4523,7 +4626,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async goBackToPreviousCard(): Promise<void> {
     await this.page.waitForSelector(previousCardButton, {visible: true});
-    await this.clickOn(previousCardButton);
+    await this.clickOnElementWithSelector(previousCardButton);
 
     await this.page.waitForSelector(nextCardArrowButton, {
       visible: true,
@@ -4550,7 +4653,7 @@ export class LoggedOutUser extends BaseUser {
       // Hint is shown after one minute.
       timeout: 80000,
     });
-    await this.clickOn(hintButtonSelector);
+    await this.clickOnElementWithSelector(hintButtonSelector);
 
     await this.page.waitForSelector(gotItButtonSelector, {
       visible: true,
@@ -4596,7 +4699,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeHintModal(): Promise<void> {
     await this.page.waitForSelector(gotItButtonSelector, {visible: true});
-    await this.clickOn(gotItButtonSelector);
+    await this.clickOnElementWithSelector(gotItButtonSelector);
     await this.page.waitForSelector(gotItButtonSelector, {hidden: true});
   }
 
@@ -4608,8 +4711,8 @@ export class LoggedOutUser extends BaseUser {
       visible: true,
       timeout: timeout,
     });
-    await this.clickOn(viewSolutionButton);
-    await this.clickOn(continueToSolutionButton);
+    await this.clickOnElementWithSelector(viewSolutionButton);
+    await this.clickOnElementWithSelector(continueToSolutionButton);
     await this.page.waitForSelector(closeSolutionModalButton, {
       visible: true,
     });
@@ -4642,7 +4745,7 @@ export class LoggedOutUser extends BaseUser {
       divs => divs.length
     );
 
-    await this.clickOn(responsesDropdownSelector);
+    await this.clickOnElementWithSelector(responsesDropdownSelector);
 
     const newDivCounts = await this.page.$$eval(
       `${learnerViewCardSelector} div`,
@@ -4747,7 +4850,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(lessonInfoButton, {
       visible: true,
     });
-    await this.clickOn(lessonInfoButton);
+    await this.clickOnElementWithSelector(lessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {visible: true});
   }
 
@@ -4756,7 +4859,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeLessonInfoModal(): Promise<void> {
     await this.page.waitForSelector(closeLessonInfoButton, {visible: true});
-    await this.clickOn(closeLessonInfoButton);
+    await this.clickOnElementWithSelector(closeLessonInfoButton);
     await this.page.waitForSelector(lessonInfoCardSelector, {hidden: true});
   }
 
@@ -4781,7 +4884,7 @@ export class LoggedOutUser extends BaseUser {
           closeLessonInfoTooltipSelector
         );
         if (closeLessonInfoTooltipElement) {
-          await this.clickOn(closeLessonInfoTooltipSelector);
+          await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
         }
         if (shouldBeFound) {
           throw new Error(
@@ -4808,15 +4911,15 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(resumeExplorationButton, {visible: true});
 
     if (action === 'Restart') {
-      await this.clickAndWaitForNavigation(restartExplorationButton);
+      await this.clickAndWaitForNavigation(restartExplorationButton, true);
     } else if (action === 'Resume') {
-      await this.clickOn(resumeExplorationButton);
+      await this.clickOnElementWithSelector(resumeExplorationButton);
       // Closing checkpoint modal if appears.
       const closeLessonInfoTooltipElement = await this.page.$(
         closeLessonInfoTooltipSelector
       );
       if (closeLessonInfoTooltipElement) {
-        await this.clickOn(closeLessonInfoTooltipSelector);
+        await this.clickOnElementWithSelector(closeLessonInfoTooltipSelector);
       }
     } else {
       throw new Error(
@@ -4830,7 +4933,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async saveProgress(): Promise<void> {
     await this.page.waitForSelector(saveProgressButton, {visible: true});
-    await this.clickOn(saveProgressButton);
+    await this.clickOnElementWithSelector(saveProgressButton);
 
     await this.page.waitForSelector(signInBoxInSaveProressModalSelector, {
       visible: true,
@@ -4915,8 +5018,8 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(contributorIconInLessonInfoSelctor, {
       visible: true,
     });
-
-    await this.clickOn(contributorIconInLessonInfoSelctor);
+    await this.waitForElementToStabilize(contributorIconInLessonInfoSelctor);
+    await this.clickOnElementWithSelector(contributorIconInLessonInfoSelctor);
     await this.expectElementToBeVisible(profileContainerSelector);
 
     expect(this.page.url()).toContain('/profile');
@@ -5063,15 +5166,17 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(testConstants.SignInDetails.inputField, {
       visible: true,
     });
-    await this.type(testConstants.SignInDetails.inputField, email);
-    await this.clickOn('Sign In');
+    await this.typeInInputField(testConstants.SignInDetails.inputField, email);
+    await this.clickOnElementWithText('Sign In');
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
-    await this.type('input.e2e-test-username-input', username);
-    await this.clickOn('input.e2e-test-agree-to-terms-checkbox');
+    await this.typeInInputField('input.e2e-test-username-input', username);
+    await this.clickOnElementWithSelector(
+      'input.e2e-test-agree-to-terms-checkbox'
+    );
     await this.page.waitForSelector(
       'button.e2e-test-register-user:not([disabled])'
     );
-    await this.clickOn(LABEL_FOR_SUBMIT_BUTTON);
+    await this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON);
     await this.page.waitForNavigation({waitUntil: 'networkidle0'});
     await this.page.waitForSelector('button.e2e-test-register-user', {
       hidden: true,
@@ -5090,7 +5195,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(loginButtonSelector, {
       visible: true,
     });
-    await this.clickOn('Sign in');
+    await this.clickOnElementWithText('Sign in');
 
     await this.goThoroughSignUpProcess(email, username);
   }
@@ -5121,7 +5226,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNavbarButtonsToHaveText(expectedText: string[]): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickOn(openMobileNavbarMenuButton, true);
+      await this.clickOnElementWithSelector(openMobileNavbarMenuButton);
     }
 
     const isMobileViewport = this.isViewportAtMobileWidth();
@@ -5283,18 +5388,37 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Expands the voiceover bar by clicking on the dropdown.
+   */
+  async expandVoiceoverBar(): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverDropdown);
+    await this.clickOnElementWithSelector(voiceoverDropdown);
+    await this.expectElementToBeVisible(voiceoverDropdown, false);
+  }
+
+  /**
+   * Checks if the current voiceover language matches the expected language.
+   * @param language - The expected language.
+   */
+  async expectCurrentVoiceoverLanguageToBe(language: string): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverSelectSelector);
+    await this.expectElementValueToBe(voiceoverSelectSelector, language);
+  }
+
+  /**
    * Starts the voiceover by clicking on the audio bar (dropdown) and the play circle.
    */
   async startVoiceover(): Promise<void> {
     await this.waitForPageToFullyLoad();
-    const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
-    if (voiceoverDropdownElement) {
-      await this.clickOn(voiceoverDropdown);
+
+    const isDropdownVisible = await this.isElementVisible(voiceoverDropdown);
+    if (isDropdownVisible) {
+      await this.expandVoiceoverBar();
     }
     await this.page.waitForSelector(playVoiceoverButton, {
       visible: true,
     });
-    await this.clickOn(playVoiceoverButton);
+    await this.clickOnElementWithSelector(playVoiceoverButton);
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
 
     showMessage('Started playing the voiceover.');
@@ -5306,6 +5430,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyVoiceoverIsPlaying(shouldBePlaying: boolean): Promise<void> {
     try {
+      await this.page.waitForSelector(audioSliderSelector);
       const currentSliderValue = await this.page.$eval(
         audioSliderSelector,
         el => parseInt(el.textContent?.trim() ?? '', 10)
@@ -5329,9 +5454,9 @@ export class LoggedOutUser extends BaseUser {
       }
     } catch (error) {
       if (shouldBePlaying) {
-        throw new Error(
-          'Voiceover is not playing, expected to be playing.' + error
-        );
+        error.message =
+          'Voiceover is not playing, expected to be playing.\n' + error.message;
+        throw error;
       } else {
         showMessage('Voiceover is not playing, as expected.');
       }
@@ -5345,12 +5470,12 @@ export class LoggedOutUser extends BaseUser {
     await this.waitForPageToFullyLoad();
     const voiceoverDropdownElement = await this.page.$(voiceoverDropdown);
     if (voiceoverDropdownElement) {
-      await this.clickOn(voiceoverDropdown);
+      await this.clickOnElementWithSelector(voiceoverDropdown);
     }
 
     // Start playing the voiceover.
     await this.page.waitForSelector(playVoiceoverButton);
-    await this.clickOn(playVoiceoverButton);
+    await this.clickOnElementWithSelector(playVoiceoverButton);
 
     // Check voiceover current time and compare.
     await this.page.waitForFunction(
@@ -5390,7 +5515,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async pauseVoiceover(): Promise<void> {
     await this.page.waitForSelector(pauseVoiceoverButton, {visible: true});
-    await this.clickOn(pauseVoiceoverButton);
+    await this.clickOnElementWithSelector(pauseVoiceoverButton);
     await this.page.waitForSelector(playVoiceoverButton, {visible: true});
     showMessage('Voiceover paused successfully.');
   }
@@ -5438,7 +5563,7 @@ export class LoggedOutUser extends BaseUser {
       });
 
       // Report error / success based on playable flag.
-      await this.clickOn(playVoiceoverButton);
+      await this.clickOnElementWithSelector(playVoiceoverButton);
       if (playable) {
         throw new Error(
           'Voiceover expected to be playable, but is not playable' + error
@@ -5479,7 +5604,7 @@ export class LoggedOutUser extends BaseUser {
   async openFeedbackPopup(): Promise<void> {
     await this.page.waitForSelector('nav-options', {visible: true});
     await this.page.waitForSelector(feedbackPopupSelector, {visible: true});
-    await this.clickOn(feedbackPopupSelector);
+    await this.clickOnElementWithSelector(feedbackPopupSelector);
     await this.page.waitForSelector(feedbackTextarea, {visible: true});
   }
 
@@ -5497,14 +5622,14 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(feedbackTextarea, {
       visible: true,
     });
-    await this.type(feedbackTextarea, feedback);
+    await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
     if (stayAnonymous) {
-      await this.clickOn(stayAnonymousCheckbox);
+      await this.clickOnElementWithSelector(stayAnonymousCheckbox);
     }
 
-    await this.clickOn('Submit');
+    await this.clickOnElementWithText('Submit');
 
     if (verifyFeedbackPopup) {
       await this.verifyFeedbackSubmissionSuccess();
@@ -5571,7 +5696,7 @@ export class LoggedOutUser extends BaseUser {
       );
     }
 
-    await this.clickOn(collapsibleRTEHeaderSelector);
+    await this.clickOnElementWithSelector(collapsibleRTEHeaderSelector);
     await this.page.waitForSelector(collapsibleRTEContentSelector, {
       visible: true,
     });
@@ -5679,13 +5804,13 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectDropdownsInNavbarToWorkProperly(): Promise<void> {
     await this.expectElementToBeVisible(navbarLearnTab);
-    await this.clickOn(navbarLearnTab);
+    await this.clickOnElementWithSelector(navbarLearnTab);
     await this.expectElementToBeVisible(navbarLearnDropdownContainerSelector);
 
-    await this.clickOn(navbarAboutTab);
+    await this.clickOnElementWithSelector(navbarAboutTab);
     await this.expectElementToBeVisible(navbarAboutDropdownConatinaerSelector);
 
-    await this.clickOn(navbarGetInvolvedTab);
+    await this.clickOnElementWithSelector(navbarGetInvolvedTab);
     await this.expectElementToBeVisible(
       navbarGetInvolvedDropdownContainerSelector
     );
@@ -5700,20 +5825,20 @@ export class LoggedOutUser extends BaseUser {
   ): Promise<void> {
     await this.expectElementToBeVisible(conceptCardLinkSelector);
 
-    await this.clickOn(conceptCardLinkSelector);
-    const conceptCardContent: string =
-      (await this.page.$eval(
-        conceptCardViewerSelector,
-        el => (el as HTMLElement).textContent
-      )) ?? '';
-
-    if (!conceptCardContent.includes(content)) {
-      throw new Error(
-        `Expected concept card content to be ${content}, but it was ${conceptCardContent}`
-      );
+    const conceptCard = await this.page.$(conceptCardLinkSelector);
+    if (!conceptCard) {
+      throw new Error('Concept card link not found.');
     }
+    await this.waitForElementToStabilize(conceptCard);
 
-    await this.clickOn('Close');
+    await this.clickOnElementWithSelector(conceptCardLinkSelector);
+    await this.expectElementContentToContain(
+      conceptCardViewerSelector,
+      content
+    );
+
+    await this.waitForElementToStabilize(conceptCardCloseButtonSelector);
+    await this.clickOnElementWithSelector(conceptCardCloseButtonSelector);
     await this.expectElementToBeVisible(conceptCardViewerSelector, false);
   }
 
@@ -5739,7 +5864,7 @@ export class LoggedOutUser extends BaseUser {
 
     const selector = `${nonInteractiveTabsHeaderSelector} .e2e-test-element-${tabIndex}`;
     await this.page.waitForSelector(selector);
-    await this.clickOn(selector);
+    await this.clickOnElementWithSelector(selector);
 
     const contentSelector = `.e2e-test-tab-content-${tabIndex}`;
     await this.page.waitForSelector(contentSelector);
@@ -5752,9 +5877,9 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Checks if audio expand button is visible in lesson player.
+   * Checks if audio expand button is visible in lesson player and in exploration preview.
    */
-  async expectAudioExpandButtonToBeVisibleInLP(): Promise<void> {
+  async expectAudioExpandButtonToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(audioExpandButtonInLPSelector);
     showMessage('Audio Expand button is visible in lesson player.');
   }
@@ -5785,7 +5910,6 @@ export class LoggedOutUser extends BaseUser {
   async expectErrorMessageForWrongInputToBe(
     errorMessage: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(wrongInputErrorContainerSelector);
     await this.expectTextContentToContain(
       wrongInputErrorContainerSelector,
       errorMessage
@@ -5825,7 +5949,7 @@ export class LoggedOutUser extends BaseUser {
     value: string,
     exactMatch: boolean = false
   ): Promise<void> {
-    await this.isElementVisible(selector);
+    await this.expectElementToBeVisible(selector);
 
     const actualTextContent = await this.page.$eval(
       selector,
@@ -5886,7 +6010,9 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partner with us button is visible at the top of the partnerships page.
    */
   async expectPartnerWithUsButtonIsVisible(): Promise<void> {
-    await this.isElementVisible(partnerWithUsButtonAtTheTopOfPartnershipsPage);
+    await this.expectElementToBeVisible(
+      partnerWithUsButtonAtTheTopOfPartnershipsPage
+    );
   }
 
   /**
@@ -5914,7 +6040,7 @@ export class LoggedOutUser extends BaseUser {
    * Checks if the partnerships page contains the expected image.
    */
   async expectPartneringWithUsImageToBePresent(): Promise<void> {
-    await this.isElementVisible(partneringWithUsImageSelector);
+    await this.expectElementToBeVisible(partneringWithUsImageSelector);
   }
 
   /**
@@ -5966,14 +6092,16 @@ export class LoggedOutUser extends BaseUser {
    * Checks if explore button is visible in about page.
    */
   async expectExploreLessonsButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(exploreLessonsButtonInAboutUsPageSelector);
+    await this.expectElementToBeVisible(
+      exploreLessonsButtonInAboutUsPageSelector
+    );
   }
 
   /**
    * Checks if android app button is visible in about page.
    */
   async expectAndroidAppButtonInAboutPageToBePresent(): Promise<void> {
-    await this.isElementVisible(androidAppButtonInAboutUsPageSelector);
+    await this.expectElementToBeVisible(androidAppButtonInAboutUsPageSelector);
   }
 
   /**
@@ -6033,14 +6161,14 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Impact" section is visible in donation page.
    */
   async expectOurImpactSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourImpactSectionSelector);
+    await this.expectElementToBeVisible(ourImpactSectionSelector);
   }
 
   /**
    * Checks if "Our Learners" section is visible in donation page.
    */
   async expectOurLearnersSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourLearnersSectionSelector);
+    await this.expectElementToBeVisible(ourLearnersSectionSelector);
   }
 
   /**
@@ -6068,22 +6196,22 @@ export class LoggedOutUser extends BaseUser {
    * Checks if "Our Network" section is visible in donation page.
    */
   async expectOurNetworkSectionInDonationPageToBePresent(): Promise<void> {
-    await this.isElementVisible(ourNetworkHeadingSelector);
+    await this.expectElementToBeVisible(ourNetworkHeadingSelector);
 
     await this.expectTextContentInElementWithSelectorToBe(
       ourNetworkHeadingSelector,
       'Our Network'
     );
 
-    await this.isElementVisible(ourNetworkSectionSelector);
-    await this.isElementVisible(donationHighlightsSelector);
+    await this.expectElementToBeVisible(ourNetworkSectionSelector);
+    await this.expectElementToBeVisible(donationHighlightsSelector);
   }
 
   /**
    * Checks that the "View Report" button on the About page is visible.
    */
   async expectViewReportButtonInAboutPageToBeVisible(): Promise<void> {
-    await this.isElementVisible(impactReportButtonInAboutPage);
+    await this.expectElementToBeVisible(impactReportButtonInAboutPage);
   }
 
   /**
@@ -6105,7 +6233,7 @@ export class LoggedOutUser extends BaseUser {
    * to the correct Google Play Store URL for the Oppia Android app.
    */
   async clickOnPlayStoreImageInAndroidPageAndVerifyNavigation(): Promise<void> {
-    await this.isElementVisible(redirectToPlayStoreImageSelector);
+    await this.expectElementToBeVisible(redirectToPlayStoreImageSelector);
 
     await this.clickLinkButtonToNewTab(
       redirectToPlayStoreImageSelector,
@@ -6198,7 +6326,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async verifyLearnerStoriesCarouselInPartnershipPageWorksProperly(): Promise<void> {
     const activeItemSelector = `${learnerStoriesCarouselContainerSelector} .carousel-item.active`;
-    await this.isElementVisible(learnerStoriesHeadingSelector);
+    await this.expectElementToBeVisible(learnerStoriesHeadingSelector);
 
     // Verify Coursal Heading.
     const subHeading = await this.page.$eval(
@@ -6369,7 +6497,7 @@ export class LoggedOutUser extends BaseUser {
    * @param {string} classroomName - The name of the classroom.
    */
   async clickOnClassroomTileInLearnPage(classroomName: string): Promise<void> {
-    await this.isElementVisible(classroomTileContainerSelector);
+    await this.expectElementToBeVisible(classroomTileContainerSelector);
 
     const classroomTiles = await this.page.$$(classroomTileContainerSelector);
 
@@ -6516,7 +6644,7 @@ export class LoggedOutUser extends BaseUser {
     }
 
     await this.page.waitForSelector(startPracticeButtonSelector);
-    await this.clickOn(startPracticeButtonSelector);
+    await this.clickOnElementWithSelector(startPracticeButtonSelector);
     await this.page.waitForSelector(startPracticeButtonSelector, {
       hidden: true,
     });
@@ -6568,7 +6696,7 @@ export class LoggedOutUser extends BaseUser {
    * Expects the user to be in the diagnostic test player.
    */
   async expectToBeInDiagnosticTestPlayer(): Promise<void> {
-    await this.isElementVisible(diagnosticTestPlayerSelector);
+    await this.expectElementToBeVisible(diagnosticTestPlayerSelector);
 
     await this.isTextPresentOnPage('Learner Diagnostic Test');
   }
@@ -6578,7 +6706,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async closeSaveProgressMenu(): Promise<void> {
     await this.page.waitForSelector(saveProgressCloseButtonSelector);
-    await this.clickOn(saveProgressCloseButtonSelector);
+    await this.clickOnElementWithSelector(saveProgressCloseButtonSelector);
 
     await this.page.waitForSelector(saveProgressCloseButtonSelector, {
       hidden: true,
@@ -6590,7 +6718,7 @@ export class LoggedOutUser extends BaseUser {
    */
   async continueToNextRecommendedLesson(): Promise<void> {
     await this.page.waitForSelector(recommendedNextChapterSelector);
-    await this.clickOn(recommendedNextChapterSelector);
+    await this.clickOnElementWithSelector(recommendedNextChapterSelector);
 
     await this.page.waitForSelector(recommendedNextChapterSelector, {
       hidden: true,
@@ -6714,6 +6842,57 @@ export class LoggedOutUser extends BaseUser {
         }
       `,
     });
+  }
+
+  /**
+   * Checks if the blog post is present.
+   * @param {string} expectedBlog - the title of the expected blog post.
+   */
+  async expectBlogPostToBePresent(expectedBlog: string): Promise<void> {
+    await this.navigateToBlogPage();
+
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    const blogTitles = await this.page.$$eval(blogPostTitleSelector, elements =>
+      elements.map(element => element.textContent)
+    );
+    for (const title of blogTitles) {
+      if (!title) {
+        continue;
+      }
+      if (title.includes(expectedBlog)) {
+        showMessage('The blog post is present on the blog dashboard.');
+        return;
+      }
+    }
+
+    throw new Error(
+      `The blog post "${expectedBlog}" was not found on the blog dashboard.\n` +
+        `Found blog posts: "${blogTitles.join('", "')}"`
+    );
+  }
+
+  /**
+   * Checks if the promo bar is visible and if the promotion content is correct.
+   * @param {boolean} visible - Whether the promo bar should be visible or not.
+   * @param {string} promotionContent - The expected promotion content.
+   */
+  async expectPromoBarToBeVisible(
+    visible: boolean = true,
+    promotionContent?: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(promoBarTextSelector, visible);
+
+    if (visible && promotionContent) {
+      await this.expectTextContentToBe(promoBarTextSelector, promotionContent);
+    }
+  }
+
+  /**
+   * Compares the text content of next button in lesson player.
+   * @param buttonText - Expected button text.
+   */
+  async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
+    await this.expectTextContentToBe(nextCardButton, buttonText);
   }
 }
 

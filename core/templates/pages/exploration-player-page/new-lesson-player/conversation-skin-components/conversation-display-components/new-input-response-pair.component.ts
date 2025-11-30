@@ -26,7 +26,7 @@ import {
 } from 'pages/interaction-specs.constants';
 import {AudioPlayerService} from 'services/audio-player.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {ExplorationPlayerConstants} from '../../../current-lesson-player/exploration-player-page.constants';
+import {NewLessonPlayerConstants} from '../../../new-lesson-player/lesson-player-page.constants';
 import {PlayerPositionService} from '../../../services/player-position.service';
 import {PlayerTranscriptService} from '../../../services/player-transcript.service';
 import {Interaction} from 'domain/exploration/interaction.model';
@@ -37,11 +37,48 @@ import isString from 'lodash/isString';
 import './new-input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'oppia-new-input-response-pair',
   templateUrl: './new-input-response-pair.component.html',
   styleUrls: ['./new-input-response-pair.component.css'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({
+          opacity: 0,
+          height: '0px',
+          marginTop: '0px',
+          marginBottom: '0px',
+          overflow: 'hidden',
+        }),
+        animate(
+          '500ms ease',
+          style({
+            opacity: 1,
+            height: '*',
+            marginTop: '*',
+            marginBottom: '*',
+          })
+        ),
+      ]),
+      transition(':leave', [
+        style({
+          overflow: 'hidden',
+        }),
+        animate(
+          '500ms ease',
+          style({
+            opacity: 0,
+            height: '0px',
+            marginTop: '0px',
+            marginBottom: '0px',
+          })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class NewInputResponsePairComponent {
   // This property is initialized using component interactions
@@ -149,7 +186,7 @@ export class NewInputResponsePairComponent {
         AppConstants.COMPONENT_NAME_FEEDBACK &&
       this.audioPlayerService.isPlaying()
     ) {
-      return ExplorationPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
+      return NewLessonPlayerConstants.AUDIO_HIGHLIGHT_CSS_CLASS;
     }
     return '';
   }

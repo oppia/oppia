@@ -24,7 +24,7 @@
 import {EventEmitter, Injectable} from '@angular/core';
 
 import {AppConstants} from 'app.constants';
-import {State} from 'domain/state/StateObjectFactory';
+import {State} from 'domain/state/state.model';
 import {StateCard} from 'domain/state_card/state-card.model';
 import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
 import {InteractionAnswer} from 'interactions/answer-defs';
@@ -38,11 +38,7 @@ import {PageContextService} from 'services/page-context.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {
-  Question,
-  QuestionBackendDict,
-  QuestionObjectFactory,
-} from 'domain/question/QuestionObjectFactory';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
 import {PlayerTranscriptService} from './player-transcript.service';
 
@@ -95,8 +91,7 @@ export class QuestionPlayerEngineService {
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
-    private playerTranscriptService: PlayerTranscriptService,
-    private questionObjectFactory: QuestionObjectFactory
+    private playerTranscriptService: PlayerTranscriptService
   ) {}
 
   /**
@@ -699,7 +694,7 @@ export class QuestionPlayerEngineService {
     errorCallback: () => void
   ): void {
     let questionObjects = questionDicts.map(questionDict => {
-      return this.questionObjectFactory.createFromBackendDict(questionDict);
+      return Question.createFromBackendDict(questionDict);
     });
     this.init(questionObjects, successCallback, errorCallback);
   }

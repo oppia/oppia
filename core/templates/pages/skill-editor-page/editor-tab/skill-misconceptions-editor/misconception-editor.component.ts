@@ -28,7 +28,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import {AppConstants} from 'app.constants';
 import {SkillUpdateService} from 'domain/skill/skill-update.service';
 import {SkillEditorStateService} from 'pages/skill-editor-page/services/skill-editor-state.service';
-import {Skill} from 'domain/skill/SkillObjectFactory';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {Misconception} from 'domain/skill/misconception.model';
 
 interface MisconceptionFormSchema {
@@ -67,14 +67,14 @@ export class MisconceptionEditorComponent implements OnInit {
   NOTES_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_component_config_id: 'ALL_COMPONENTS',
     },
   };
 
   FEEDBACK_FORM_SCHEMA: MisconceptionFormSchema = {
     type: 'html',
     ui_config: {
-      rte_components: 'ALL_COMPONENTS',
+      rte_component_config_id: 'ALL_COMPONENTS',
       hide_complex_extensions: 'true',
     },
   };

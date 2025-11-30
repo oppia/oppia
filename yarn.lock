@@ -280,13 +280,6 @@
   dependencies:
     tslib "^2.0.0"
 
-"@angular/upgrade@^11.2.10":
-  version "11.2.14"
-  resolved "https://registry.yarnpkg.com/@angular/upgrade/-/upgrade-11.2.14.tgz#aef6f9f392fd0fb795f8e1bb6031cad783da9a39"
-  integrity sha512-43Ul2WrXaP35MNM0yekX11qp2HSFU9ShzVlOXvLx11Kesg+iw4HQ5TbQtUuOOO7BqxbInL3InV2MIM1ng31WmA==
-  dependencies:
-    tslib "^2.0.0"
-
 "@angular/youtube-player@^11.2.10":
   version "11.2.13"
   resolved "https://registry.yarnpkg.com/@angular/youtube-player/-/youtube-player-11.2.13.tgz#017b8f5fc17975a190d88659cb86d4801b5313c6"
@@ -2661,39 +2654,6 @@
     mkdirp "^3.0.1"
     path-browserify "^1.0.1"
 
-"@types/angular-animate@^1.5.10":
-  version "1.5.11"
-  resolved "https://registry.yarnpkg.com/@types/angular-animate/-/angular-animate-1.5.11.tgz#17d9611f8175ab73e528a72f0d50a16891c7429a"
-  integrity sha512-JJL2BM9pTLz00oqXh09knxHOjKLBbMyb9k9/DNWWvQome42iMGD+R9+iKaFX6nnvmlMnhoO1wOGWvnOFHhkujg==
-  dependencies:
-    "@types/angular" "*"
-
-"@types/angular-mocks@^1.7.0":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@types/angular-mocks/-/angular-mocks-1.7.1.tgz#0f18066f8e6f327493aad0c280a43801ffa09464"
-  integrity sha512-44kaQL8sMGUIDV76zbJ3MX6aqPng7Wmfz91uds+WcNQFHTdSu6KDZNIypIZVAdrWnJfqrfL5VysaCejTW3JVIw==
-  dependencies:
-    "@types/angular" "*"
-
-"@types/angular-translate@^2.16.2":
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/@types/angular-translate/-/angular-translate-2.19.0.tgz#cb83396c232dd8e89d4ad9a4110aafd36f57f1ef"
-  integrity sha512-BkDM5nlnxbZ1I8mmxGU+zhwR9X/yrYwj7rDNpM9Icb6Hyy1SoTwX8x6K4RK71pwoSoaVsmTKuSlW/wWz+gO/Kg==
-  dependencies:
-    "@types/angular" "*"
-
-"@types/angular-ui-bootstrap@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/angular-ui-bootstrap/-/angular-ui-bootstrap-1.0.1.tgz#ed824f8e6ab65f0e9fb059e637204935669c8070"
-  integrity sha512-hxr+LpMs8wPVt4wjaZat2qd+XmSf5HlwfG3wQSXebbKX4Eh16eU0pIDKc9tvqv9dHKMrqk/u+HKq7XktoiH33w==
-  dependencies:
-    "@types/angular" "*"
-
-"@types/angular@*", "@types/angular@^1.6.54":
-  version "1.8.4"
-  resolved "https://registry.yarnpkg.com/@types/angular/-/angular-1.8.4.tgz#a2cc163e508389c51d4c4119ebff6b9395cec472"
-  integrity sha512-wPS/ncJWhyxJsndsW1B6Ta8D4mi97x1yItSu+rkLDytU3oRIh2CFAjMuJceYwFAh9+DIohndWM0QBA9OU2Hv0g==
-
 "@types/archiver@^5.1.0":
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@types/archiver/-/archiver-5.3.1.tgz#02991e940a03dd1a32678fead4b4ca03d0e387ca"
@@ -4239,27 +4199,12 @@ alphanum-sort@^1.0.0:
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
   integrity sha512-0FcBfdcmaumGPQ0qPn7Q5qTgz/ooXgIyp1rf8ik5bGX8mpE2YHjC0P/eyQvxu1GURYQgq9ozf2mteQ5ZD9YiyQ==
 
-angular-cookies@^1.8.2:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.8.3.tgz#180a41e938926790630245d22c02a8d33d1409cc"
-  integrity sha512-uRd+zWgqiVnly7+YFRosM8E9tUQeY82dAZdtvonh/CeD/sf5SKN/BNIlMlHxZtoAk72ahTIjqUQGfeHdYcSsRQ==
-
-angular-route@^1.8.2:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.8.3.tgz#f24a700ebd462454ca83a8b765df55c87a4edde1"
-  integrity sha512-kpIcRmDR2+o1FxDVVYy8Rvfab86/7LDbOgTRb9T+X9ewPQiBRuDEnZtM3oJYBiQLvAXDYTJXHV48n/bGE9Mv2g==
-
 angular2-template-loader@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/angular2-template-loader/-/angular2-template-loader-0.6.2.tgz#c0d44e90fff0fac95e8b23f043acda7fd1c51d7c"
   integrity sha512-jBSrm2yDsTA48GG0H57upn8rmTfJS3/R7EhUeAL/3ryWS8deT9You8UQKWpW4eVSEY7uMJ52iFwpOYXc8QEtGg==
   dependencies:
     loader-utils "^0.2.15"
-
-angular@^1.8.2:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/angular/-/angular-1.8.3.tgz#851ad75d5163c105a7e329555ef70c90aa706894"
-  integrity sha512-5qjkWIQQVsHj4Sb5TcEs4WZWpFeVFHXwxEBHUhrny41D8UrBAd6T/6nPPAsLngJCReIOqi95W3mxdveveutpZw==
 
 ansi-align@^3.0.0:
   version "3.0.1"
@@ -8441,11 +8386,6 @@ eslint-config-prettier@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/eslint-config-prettier/-/eslint-config-prettier-9.1.0.tgz#31af3d94578645966c082fcb71a5846d3c94867f"
   integrity sha512-NSWl5BFQWEPi1j4TjVNItzYV7dZXZ+wP6I6ZhrBGpChQhZRUaElihE9uRRkcbRnNb76UMKDF3r+WTmNcGPKsqw==
-
-eslint-plugin-angular@^4.0.1:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-angular/-/eslint-plugin-angular-4.1.0.tgz#53d03d829edff50d517e81f862782e3efa591953"
-  integrity sha512-dacledMPxVOZA3T0xcYFuvrMCy5dHxg0ZTMWUaHqSBQef3/XLyXJ9s1LNj0NikJ/dYx6OhqlnnNpKmrJhEUB+Q==
 
 eslint-plugin-html@^6.0.0:
   version "6.2.0"
@@ -12836,11 +12776,6 @@ karma-json-fixtures-preprocessor@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/karma-json-fixtures-preprocessor/-/karma-json-fixtures-preprocessor-0.0.6.tgz#4f78a2ebcd34387f8e55ababff634655164c4c76"
   integrity sha512-weEt31YeOgui3Lmw1KYWgvkcjOb3Mr8xvB3SgjKg0wDlAGqCDhhXkff6UHaK5J0fIZzJMur18PqHMgzulM5bzA==
-
-karma-ng-html2js-preprocessor@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/karma-ng-html2js-preprocessor/-/karma-ng-html2js-preprocessor-1.0.0.tgz#10d8c8cfaa4136f1c8a76d91a4cbceedebec4a31"
-  integrity sha512-Ho7VxRglFeIsRDimaC0ZFdwb4P5FS3o36o4PpuEAkIdhb6BrucGGpUuVWEB4KQIOtZISJaN6eTcXTfCX3kbEHw==
 
 karma-source-map-support@1.4.0:
   version "1.4.0"

@@ -21,16 +21,12 @@ from __future__ import annotations
 import contextlib
 import logging
 import pprint
+import traceback
 
 from core import feconf
-from core.domain import beam_job_services
-from core.domain import caching_services
-from core.domain import platform_parameter_list
-from core.domain import platform_parameter_services
-from core.jobs import base_jobs
-from core.jobs import job_options
-from core.jobs.io import cache_io
-from core.jobs.io import job_io
+from core.domain import beam_job_services, caching_services
+from core.jobs import base_jobs, job_options
+from core.jobs.io import cache_io, job_io
 from core.platform import models
 from core.storage.beam_job import gae_models as beam_job_models
 
@@ -40,9 +36,10 @@ from google.cloud import dataflow
 from typing import Iterator, Optional, Type
 
 MYPY = False
-if MYPY: # pragma: no cover
-    from mypy_imports import datastore_services
+if MYPY:  # pragma: no cover
+    from mypy_imports import app_identity_services, datastore_services
 
+app_identity_services = models.Registry.import_app_identity_services()
 datastore_services = models.Registry.import_datastore_services()
 
 # This is a mapping from the Google Cloud Dataflow JobState enum to our enum.
@@ -65,7 +62,8 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
     # job state. This state may only be set via a Cloud Dataflow jobs.update
     # call, and only if the job has not yet reached another terminal state.
     dataflow.JobState.JOB_STATE_CANCELLED: (
-        beam_job_models.BeamJobState.CANCELLED),
+        beam_job_models.BeamJobState.CANCELLED
+    ),
     # Indicates that the job was successfully updated, meaning that this job was
     # stopped and another job was started, inheriting state from this one. This
     # is a terminal job state. This state may only be set by the Cloud Dataflow
@@ -95,7 +93,8 @@ _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE = {
     # of stopping. Jobs that are cancelling may only transition to
     # JOB_STATE_CANCELLED or JOB_STATE_FAILED.
     dataflow.JobState.JOB_STATE_CANCELLING: (
-        beam_job_models.BeamJobState.CANCELLING),
+        beam_job_models.BeamJobState.CANCELLING
+    ),
 }
 
 
@@ -103,7 +102,7 @@ def run_job(
     job_class: Type[base_jobs.JobBase],
     sync: bool,
     namespace: Optional[str] = None,
-    pipeline: Optional[beam.Pipeline] = None
+    pipeline: Optional[beam.Pipeline] = None,
 ) -> beam_job_models.BeamJobRunModel:
     """Runs the specified job synchronously.
 
@@ -127,7 +126,8 @@ def run_job(
     if pipeline is None:
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
-            options=job_options.JobOptions(namespace=namespace))
+            options=job_options.JobOptions(namespace=namespace),
+        )
 
     job = job_class(pipeline)
     job_name = job_class.__name__
@@ -136,13 +136,10 @@ def run_job(
     # does not affect the job.
     caching_services.flush_memory_caches()
 
-    # NOTE: Exceptions raised within this context are logged and suppressed.
+    # NOTE: Exceptions raised within this context are logged to the job's
+    # stderr and suppressed.
     with _job_bookkeeping_context(job_name) as run_model:
-        _ = (
-            job.run()
-            | job_io.PutResults(run_model.id)
-            | cache_io.FlushCache()
-        )
+        _ = job.run() | job_io.PutResults(run_model.id) | cache_io.FlushCache()
 
         run_result = pipeline.run()
 
@@ -157,7 +154,8 @@ def run_job(
         else:
             raise RuntimeError(
                 'Failed to deploy %s to the Dataflow service. Please try again '
-                'after a few minutes.' % job_name)
+                'after a few minutes.' % job_name
+            )
 
     # NDB operations in Beam do not properly update the context cache
     # (this cache is separate for every application thread), thus we clear
@@ -169,7 +167,7 @@ def run_job(
 
 
 def refresh_state_of_beam_job_run_model(
-    beam_job_run_model: beam_job_models.BeamJobRunModel
+    beam_job_run_model: beam_job_models.BeamJobRunModel,
 ) -> None:
     """Refreshs the state of the given BeamJobRunModel.
 
@@ -179,18 +177,20 @@ def refresh_state_of_beam_job_run_model(
     job_id = beam_job_run_model.dataflow_job_id
     if job_id is None:
         beam_job_run_model.latest_job_state = (
-            beam_job_models.BeamJobState.UNKNOWN.value)
+            beam_job_models.BeamJobState.UNKNOWN.value
+        )
         beam_job_run_model.update_timestamps(update_last_updated_time=False)
         return
 
     try:
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
-        job = dataflow.JobsV1Beta3Client().get_job(dataflow.GetJobRequest(
-            job_id=job_id, project_id=oppia_project_id,
-            location=feconf.GOOGLE_APP_ENGINE_REGION))
+        oppia_project_id = app_identity_services.get_application_id()
+        job = dataflow.JobsV1Beta3Client().get_job(
+            dataflow.GetJobRequest(
+                job_id=job_id,
+                project_id=oppia_project_id,
+                location=feconf.GOOGLE_APP_ENGINE_REGION,
+            )
+        )
 
     except Exception as e:
         job_state = beam_job_models.BeamJobState.UNKNOWN.value
@@ -200,20 +200,21 @@ def refresh_state_of_beam_job_run_model(
 
     else:
         job_state = _GCLOUD_DATAFLOW_JOB_STATE_TO_OPPIA_BEAM_JOB_STATE.get(
-            job.current_state, beam_job_models.BeamJobState.UNKNOWN).value
+            job.current_state, beam_job_models.BeamJobState.UNKNOWN
+        ).value
         job_state_updated = job.current_state_time.replace(tzinfo=None)
 
         if (
-                beam_job_run_model.latest_job_state == (
-                    beam_job_models.BeamJobState.CANCELLING.value) and
-                job_state != beam_job_models.BeamJobState.CANCELLED.value
+            beam_job_run_model.latest_job_state
+            == (beam_job_models.BeamJobState.CANCELLING.value)
+            and job_state != beam_job_models.BeamJobState.CANCELLED.value
         ):
             job_state = beam_job_run_model.latest_job_state
             job_state_updated = beam_job_run_model.last_updated
 
         if (
-                beam_job_run_model.latest_job_state != job_state and
-                job_state == beam_job_models.BeamJobState.FAILED.value
+            beam_job_run_model.latest_job_state != job_state
+            and job_state == beam_job_models.BeamJobState.FAILED.value
         ):
             _put_job_stderr(beam_job_run_model.id, pprint.pformat(job))
 
@@ -236,26 +237,29 @@ def cancel_job(beam_job_run_model: beam_job_models.BeamJobRunModel) -> None:
         raise ValueError('dataflow_job_id must not be None')
 
     try:
-        oppia_project_id = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.OPPIA_PROJECT_ID.value))
-        assert isinstance(oppia_project_id, str)
-        dataflow.JobsV1Beta3Client().update_job(dataflow.UpdateJobRequest(
-            job_id=job_id, project_id=oppia_project_id,
-            location=feconf.GOOGLE_APP_ENGINE_REGION,
-            job=dataflow.Job(
-                requested_state=dataflow.JobState.JOB_STATE_CANCELLED)))
+        oppia_project_id = app_identity_services.get_application_id()
+        dataflow.JobsV1Beta3Client().update_job(
+            dataflow.UpdateJobRequest(
+                job_id=job_id,
+                project_id=oppia_project_id,
+                location=feconf.GOOGLE_APP_ENGINE_REGION,
+                job=dataflow.Job(
+                    requested_state=dataflow.JobState.JOB_STATE_CANCELLED
+                ),
+            )
+        )
     except Exception:
         logging.exception('Failed to cancel job_id="%s"!' % job_id)
     else:
         beam_job_run_model.latest_job_state = (
-            beam_job_models.BeamJobState.CANCELLING.value)
+            beam_job_models.BeamJobState.CANCELLING.value
+        )
         beam_job_run_model.update_timestamps()
 
 
 @contextlib.contextmanager
 def _job_bookkeeping_context(
-    job_name: str
+    job_name: str,
 ) -> Iterator[beam_job_models.BeamJobRunModel]:
     """Returns a context manager which commits failure details if an exception
     occurs.
@@ -271,9 +275,9 @@ def _job_bookkeeping_context(
     try:
         yield run_model
 
-    except Exception as exception:
+    except Exception:
         run_model.latest_job_state = beam_job_models.BeamJobState.FAILED.value
-        _put_job_stderr(run_model.id, str(exception))
+        _put_job_stderr(run_model.id, traceback.format_exc())
 
     finally:
         run_model.put()
@@ -286,6 +290,7 @@ def _put_job_stderr(job_id: str, stderr: str) -> None:
         job_id: str. The ID of the job that failed.
         stderr: str. The error output for the given job.
     """
-    result_model = (
-        beam_job_services.create_beam_job_run_result_model(job_id, '', stderr))
+    result_model = beam_job_services.create_beam_job_run_result_model(
+        job_id, '', stderr
+    )
     result_model.put()
