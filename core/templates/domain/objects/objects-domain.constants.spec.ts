@@ -16,8 +16,7 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {MathJsStatic, all, create} from 'mathjs';
-import * as math from 'mathjs';
+import {MathJsStatic, create, all} from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
@@ -25,7 +24,7 @@ describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
   let mathjsUnits: string[] = [];
-  //const math = create(all) as MathJsStatic;
+  const math = create(all) as MathJsStatic;
 
   const isValidUnit = (unit: string): boolean => {
     return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
@@ -56,7 +55,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return Object.keys((math as MathJsStatic).Unit.units);
+    return math.Units.getUnits();
   };
 
   beforeEach(() => {
