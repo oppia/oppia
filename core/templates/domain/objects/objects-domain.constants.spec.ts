@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {MathJsStatic, create, all} from 'mathjs';
+import {create, all} from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
@@ -24,10 +24,15 @@ describe('ObjectsDomainConstants', () => {
   let unitPrefixes: string[] = [];
   let currencyUnits: string[] = [];
   let mathjsUnits: string[] = [];
-  const math = create(all) as MathJsStatic;
+  const math = create(all);
+  const unitObj = math.Unit as unknown as {
+    UNITS: Record<string, unknown>;
+    PREFIXES: Record<string, Record<string, unknown>>;
+    isValuelessUnit: (unit: string) => boolean;
+  };
 
   const isValidUnit = (unit: string): boolean => {
-    return currencyUnits.includes(unit) || math.Unit.isValuelessUnit(unit);
+    return currencyUnits.includes(unit) || unitObj.isValuelessUnit(unit);
   };
 
   const isValidPrefix = (prefix: string): boolean => {
@@ -35,7 +40,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getUnitPrefixes = (): string[] => {
-    const prefixes = math.Unit.PREFIXES;
+    const prefixes = unitObj.PREFIXES;
     let prefixSet = new Set<string>();
     for (const name in prefixes) {
       // Skip if prefix type is 'NONE'.
@@ -55,7 +60,7 @@ describe('ObjectsDomainConstants', () => {
   };
 
   const getAllMathjsUnits = (): string[] => {
-    return math.Unit.getUnits();
+    return Object.keys(unitObj.UNITS)
   };
 
   beforeEach(() => {
