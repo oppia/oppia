@@ -3,6 +3,18 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
+.home-tab .oppia-loading-fullpage {
+  width: 80vw !important;
+}
+
+.home-tab .loading-content {
+  opacity: 0;
+  pointer-events: none;
+  position: relative;
+  transition: opacity 0.3s ease-in-out;
+}
+
 .home-tab .greeting {
   color: #00645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;

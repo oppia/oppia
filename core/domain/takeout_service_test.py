@@ -62,7 +62,6 @@ if MYPY:  # pragma: no cover
         suggestion_models,
         topic_models,
         user_models,
-        voiceover_models,
     )
 
 (
@@ -83,7 +82,6 @@ if MYPY:  # pragma: no cover
     suggestion_models,
     topic_models,
     user_models,
-    voiceover_models,
 ) = models.Registry.import_models(
     [
         models.Names.APP_FEEDBACK_REPORT,
@@ -103,7 +101,6 @@ if MYPY:  # pragma: no cover
         models.Names.SUGGESTION,
         models.Names.TOPIC,
         models.Names.USER,
-        models.Names.VOICEOVER,
     ]
 )
 
@@ -490,7 +487,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         20) Creates new BlogPostModel and BlogPostRightsModel.
         21) Creates a TranslationContributionStatsModel.
         22) Creates new LearnerGroupModel and LearnerGroupsUserModel.
-        23) Creates a VoiceArtistMetadataModel.
         """
         # Setup for UserStatsModel.
         user_models.UserStatsModel(
@@ -1061,13 +1057,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             id=self.USER_ID_1, parent_user_id=self.PROFILE_ID_1
         ).put()
 
-        language_code_to_accent: Dict[str, str] = {'en': 'en-US', 'hi': 'hi-IN'}
-        # Setup for VoiceArtistMetadataModel.
-        voiceover_models.VoiceArtistMetadataModel.create_model(
-            voice_artist_id=self.USER_ID_1,
-            language_code_to_accent=language_code_to_accent,
-        )
-
         # Set-up for AppFeedbackReportModel scrubbed by user.
         report_id = '%s.%s.%s' % (
             self.PLATFORM_ANDROID,
@@ -1334,7 +1323,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_blog_author_details: Dict[str, Dict[str, str]] = {}
         expected_learner_group_model_data: Dict[str, str] = {}
         expected_learner_grp_user_model_data: Dict[str, str] = {}
-        expected_voice_artist_data: Dict[str, str] = {}
 
         # Here we use type Any because this dictionary contains other
         # different types of dictionaries whose values can vary from int
@@ -1395,7 +1383,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'platform_parameter_snapshot_metadata': expected_platform_parameter_sm,
             'user_auth_details': expected_user_auth_details,
             'user_email_preferences': expected_user_email_preferences,
-            'voice_artist_metadata': expected_voice_artist_data,
         }
 
         # Perform export and compare.
@@ -2251,10 +2238,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         expected_translation_coordinator_stats_data = {
             'coordinated_language_ids': ['es', 'hi']
         }
-        expected_language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN',
-        }
         expected_user_data = {
             'user_stats': expected_stats_data,
             'user_group': expected_user_group_data,
@@ -2310,7 +2293,6 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_post': expected_blog_post_data,
             'blog_post_rights': expected_blog_post_rights,
             'blog_author_details': expected_blog_author_details,
-            'voice_artist_metadata': expected_language_code_to_accent,
         }
 
         with utils.open_file(

@@ -112,7 +112,7 @@ export class AboutPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   partnershipsFormLink: string = '';
   volunteerFormLink = AppConstants.VOLUNTEER_FORM_LINK;
-  IMPACT_REPORT_LINK_2023 = AppConstants.IMPACT_REPORT_LINK_2023;
+  IMPACT_REPORT_LINK_2024 = AppConstants.IMPACT_REPORT_LINK_2024;
   // Volunteer CTA is the default tab.
   selectedTabIndex = 1;
   volunteerRolesDetails = [

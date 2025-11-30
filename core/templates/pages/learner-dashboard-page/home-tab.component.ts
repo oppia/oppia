@@ -28,6 +28,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {LoaderService} from 'services/loader.service';
 
 import './home-tab.component.css';
 
@@ -69,9 +70,14 @@ export class HomeTabComponent {
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
   hasMultipleUnfinishedPublished: boolean = false;
+  totalLessonCards: number = 0;
+  loadedLessonCards: number = 0;
+  allCardsLoaded: boolean = false;
+  loadingMessage: string = 'Loading';
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private loaderService: LoaderService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
@@ -84,6 +90,7 @@ export class HomeTabComponent {
   }
 
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
     this.width = this.widthConst * this.currentGoals.length;
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -134,12 +141,51 @@ export class HomeTabComponent {
       }
     }
 
+    this.totalLessonCards =
+      (this.incompleteExplorationsList?.length || 0) +
+      (this.incompleteCollectionsList?.length || 0) +
+      this.partiallyLearntTopicsList.reduce(
+        (acc, topic) => acc + topic.getCanonicalStorySummaryDicts().length,
+        0
+      );
+    if (
+      this.hasMultipleUnfinishedPublished &&
+      this.storySummariesWithAvailableNodes.size > 0
+    ) {
+      this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
+    }
+
+    this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
+
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
       this.windowDimensionService.getResizeEvent().subscribe(() => {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       })
     );
+
+    if (this.totalLessonCards === 0) {
+      this.allCardsLoaded = true;
+      this.loadingMessage = '';
+      this.loaderService.hideLoadingScreen();
+    } else {
+      setTimeout(() => {
+        if (!this.allCardsLoaded) {
+          this.allCardsLoaded = true;
+          this.loadingMessage = '';
+          this.loaderService.hideLoadingScreen();
+        }
+      }, 10000);
+    }
+  }
+
+  onLessonLoaded(): void {
+    this.loadedLessonCards++;
+    if (this.loadedLessonCards >= this.totalLessonCards) {
+      this.allCardsLoaded = true;
+      this.loadingMessage = '';
+      this.loaderService.hideLoadingScreen();
+    }
   }
 
   getTimeOfDay(): string {
