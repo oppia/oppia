@@ -38,7 +38,7 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
     """Beam job that removes story references in TopicModel which no longer exist,
     and logs only the removed references."""
 
-    class RemoveHangingStoriesDoFn(beam.DoFn):  # type: ignore[misc]
+    class RemoveHangingStoriesDoFn(beam.DoFn):
         """DoFn to remove invalid story references and log only if something was removed."""
 
         def process(
@@ -59,7 +59,7 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
                 else:
                     removed_refs.append(story_id)
 
-            # Only log if there were removed references
+            # Only log if there were removed references.
             if removed_refs:
                 topic_model.canonical_story_references = cleaned_refs
                 topic_model.update_timestamps()
@@ -68,13 +68,13 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
                 )
                 yield topic_model, log
             else:
-                # Nothing removed → skip logging and returning model
+                # Nothing removed skip logging and returning model.
                 yield topic_model, None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         topic_models_pcoll = (
             self.pipeline
-            | "Load all TopicModels"
+            | 'Load all TopicModels'
             >> ndb_io.GetModels(
                 topic_models.TopicModel.get_all(include_deleted=False)
             )
@@ -82,23 +82,22 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
 
         all_story_ids_pcoll = (
             self.pipeline
-            | "Load all StoryModels"
+            | 'Load all StoryModels'
             >> ndb_io.GetModels(
                 story_models.StoryModel.get_all(include_deleted=False)
             )
-            | "Extract Story IDs" >> beam.Map(lambda m: m.id)
+            | 'Extract Story IDs' >> beam.Map(lambda m: m.id)
         )
 
         cleaned_and_logged = (
             topic_models_pcoll
-            | "Remove Hanging Story References"
+            | 'Remove Hanging Story References'
             >> beam.ParDo(
                 self.RemoveHangingStoriesDoFn(),
                 all_story_ids=beam.pvalue.AsList(all_story_ids_pcoll),
             )
         )
 
-        # Split outputs
         cleaned_topics = cleaned_and_logged | beam.Map(lambda t: t[0])
         logs = (
             cleaned_and_logged
@@ -106,15 +105,13 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
             | beam.Filter(lambda log: log is not None)
         )
 
-        # Save updated TopicModels
-        _ = cleaned_topics | "Save Updated Topics" >> ndb_io.PutModels()
+        _ = cleaned_topics | 'Save Updated Topics' >> ndb_io.PutModels()
 
-        # Count and emit logs
         _ = (
             logs
-            | "Count Topics with Removed References"
+            | 'Count Topics with Removed References'
             >> job_result_transforms.CountObjectsToJobRunResult(
-                "TOPICS WITH HANGING STORY REFERENCES REMOVED"
+                'TOPICS WITH HANGING STORY REFERENCES REMOVED'
             )
         )
 
