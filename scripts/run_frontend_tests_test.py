@@ -581,25 +581,28 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.assertIsNone(result)
 
     def test_main_with_skip_install_flag(self) -> None:
-        install_called: list[bool] = []
+        install_calls = 0
 
         def mock_install_third_party_libs() -> None:
-            install_called.append(True)
+            nonlocal install_calls
+            install_calls += 1
 
         def mock_build_main(
             args: list[str],  # pylint: disable=unused-argument
         ) -> None:
             pass
 
-        with self.swap(
-            install_third_party_libs, 'main', mock_install_third_party_libs
-        ), self.swap(
-            build, 'main', mock_build_main
-        ), self.swap_success_Popen, self.print_swap:
+        with (
+            self.swap(
+                install_third_party_libs, 'main', mock_install_third_party_libs
+            ),
+            self.swap(build, 'main', mock_build_main),
+            self.swap_success_Popen,
+            self.print_swap,
+        ):
             run_frontend_tests.main(args=[])
 
-        self.assertEqual(len(install_called), 0)
-
+        self.assertEqual(install_calls, 0)
         self.assertTrue(len(self.cmd_token_list) > 0)
 
         self.assertIn(

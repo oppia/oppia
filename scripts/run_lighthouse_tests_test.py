@@ -779,56 +779,53 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     ) -> None:
         mock_dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
 
-        calls: list[str] = []
+        exists_calls = 0
+        mkdir_calls = 0
 
         def mock_exists(path: str) -> bool:
+            nonlocal exists_calls
             if path == mock_dir_path:
-                calls.append('exists_checked')
+                exists_calls += 1
                 return False
             return True
 
         def mock_mkdir(path: str) -> None:
+            nonlocal mkdir_calls
             if path == mock_dir_path:
-                calls.append('mkdir_called')
+                mkdir_calls += 1
 
+        # Here we use object because subprocess.Popen can receive arbitrary arguments.
         class MockProcess:
             """Mock subprocess.Popen for testing."""
 
-            # Here we use object because subprocess.Popen can receive arbitrary arguments.
-            def __init__(  # pylint: disable=unused-argument
+            def __init__(
                 self,
                 *args: object,
-                **kwargs: object,
+                **kwargs: object,  # pylint: disable=unused-argument
             ) -> None:
-                self.returncode: int = 0
+                self.returncode = 0
 
             def communicate(  # pylint: disable=missing-docstring
                 self,
             ) -> tuple[bytes, bytes]:
                 return (b'topic:123\n', b'')
 
-        swap_exists = self.swap(os.path, 'exists', mock_exists)
-        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
-        swap_popen = self.swap(subprocess, 'Popen', MockProcess)
-        swap_get_entity = self.swap(
-            run_lighthouse_tests,
-            'get_entity',
-            lambda line: ('topic', '123') if 'topic' in line else None,
-        )
-        swap_node_bin = self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node')
-
         with (
             self.print_swap,
-            swap_exists,
-            swap_mkdir,
-            swap_popen,
-            swap_get_entity,
-            swap_node_bin,
+            self.swap(os.path, 'exists', mock_exists),
+            self.swap(os, 'mkdir', mock_mkdir),
+            self.swap(subprocess, 'Popen', MockProcess),
+            self.swap(
+                run_lighthouse_tests,
+                'get_entity',
+                lambda line: ('topic', '123') if 'topic' in line else None,
+            ),
+            self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node'),
         ):
             entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(
                 record=True
             )
 
-        self.assertIn('exists_checked', calls)
-        self.assertIn('mkdir_called', calls)
+        self.assertEqual(exists_calls, 1)
+        self.assertEqual(mkdir_calls, 1)
         self.assertEqual(entities, {'topic': '123'})
