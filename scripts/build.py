@@ -28,8 +28,13 @@ import subprocess
 import sys
 import threading
 
-from core import feconf, utils
-from scripts import common
+from core import utils
+from scripts import (
+    common,
+    install_python_dev_dependencies,
+    install_third_party_libs,
+    servers,
+)
 
 import rcssmin
 from typing import (
@@ -42,13 +47,6 @@ from typing import (
     Tuple,
     TypedDict,
 )
-
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import (
-        install_python_dev_dependencies,
-        install_third_party_libs,
-        servers,
-    )
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -158,9 +156,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = (
-    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
-)
+APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 
 APP_YAML_FILEPATH = 'app.yaml'
 
@@ -261,8 +257,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            run_webpack_compilation(source_maps=source_maps)
+        run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -1481,13 +1476,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            generate_python_package()
-            if options.source_maps:
-                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-            else:
-                build_using_webpack(WEBPACK_PROD_CONFIG)
-            build_using_ng()
+        generate_python_package()
+        if options.source_maps:
+            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+        else:
+            build_using_webpack(WEBPACK_PROD_CONFIG)
+        build_using_ng()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 
