@@ -16,11 +16,10 @@
 }
 .mat-checkbox.item-selection-input-checkbox.mat-accent .mat-checkbox-background {
   border-color: #0d48a1;
-  top: 2px;
 }
 
 .mat-checkbox.item-selection-input-checkbox.mat-accent.mat-checkbox-checked .mat-checkbox-background {
-  background-color: rgba(102, 187, 106, 0.87);
+  background-color: #666;
 }
 
 .mat-checkbox.item-selection-input-checkbox .mat-checkbox-label {

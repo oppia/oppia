@@ -8,6 +8,7 @@
   color: #0d48a1;
   direction: ltr;
   text-align: left;
+  width: 100%;
 }
 
 .multiple-choice-radio-button-container {
@@ -45,6 +46,14 @@
   border-color: #115fd4;
 }
 
+button:focus {
+  outline: none;
+}
+
+button:focus-visible {
+  outline: 5px auto -webkit-focus-ring-color;
+}
+
 /* Hover pseudo-class should only be used in desktops because it
  * breaks functionality on mobile.
  */
@@ -54,7 +63,7 @@
   }
 
   .multiple-choice-option:hover .multiple-choice-inner-radio-button {
-    background-color: #115fd4;
+    background-color: #fff;
     border-radius: 50%;
     display: block;
     height: 8px;
@@ -64,5 +73,14 @@
 
   .multiple-choice-option:hover .multiple-choice-outer-radio-button {
     border-color: #115fd4;
+    box-shadow: 0 0 0 8px rgba(80, 80, 200, 0.2);
+  }
+  
+  .multiple-choice-option.selected:hover .multiple-choice-outer-radio-button {
+    box-shadow: none;
+  }
+
+  .multiple-choice-option.selected:hover .multiple-choice-inner-radio-button {
+    background-color: #115fd4;
   }
 }

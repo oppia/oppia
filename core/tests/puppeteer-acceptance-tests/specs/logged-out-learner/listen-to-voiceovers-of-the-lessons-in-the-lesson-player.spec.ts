@@ -68,9 +68,6 @@ describe('Logged-Out Learner', function () {
       await releaseCoordinator.enableFeatureFlag(
         'exploration_editor_can_modify_translations'
       );
-      await releaseCoordinator.enableFeatureFlag(
-        'enable_voiceover_contribution'
-      );
 
       // Enable Voiceover Contributions.
       await voiceoverAdmin.addSupportedLanguageAccentPair('Hindi (India)');

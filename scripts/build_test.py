@@ -25,12 +25,11 @@ import io
 import os
 import pathlib
 import re
-import subprocess
 import sys
 import tempfile
 import threading
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
@@ -96,44 +95,6 @@ class BuildTests(test_utils.GenericTestBase):
                 INVALID_OUTPUT_FILEPATH,
                 INVALID_FILENAME,
             )
-
-    def test_minify_and_create_sourcemap(self) -> None:
-        """Tests _minify_and_create_sourcemap with an invalid filepath."""
-        with self.assertRaisesRegex(
-            subprocess.CalledProcessError, 'returned non-zero exit status 1'
-        ) as called_process:
-            build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH
-            )
-        # Here we use MyPy ignore because the stubs of 'assertRaisesRegex' do
-        # not contain any returncode attribute, so because of this MyPy throws
-        # an '"Exception" has no attribute "returncode"' error. Thus to avoid
-        # the error, we used ignore here.
-        # `returncode` is the exit status of the child process.
-        self.assertEqual(called_process.exception.returncode, 1)  # type: ignore[attr-defined]
-
-    def test_minify_and_create_sourcemap_under_docker_environment(self) -> None:
-        """Tests _minify_and_create_sourcemap with an invalid filepath."""
-
-        def mock_subprocess_check_call(  # pylint: disable=unused-argument
-            command: str, **kwargs: bool
-        ) -> None:
-            """Mock method for replacing subprocess.check_call()."""
-            excepted_cmd = (
-                'node /app/oppia/node_modules/uglify-js/bin/uglifyjs '
-                '/app/oppia/third_party/generated/js/third_party.js -c -m'
-                ' --source-map includeSources,url=\'third_party.min.js.map\' '
-                '-o /app/oppia/third_party/generated/js/third_party.min.js'
-            )
-            self.assertEqual(command, excepted_cmd)
-
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap(
-                subprocess, 'check_call', mock_subprocess_check_call
-            ):
-                build._minify_and_create_sourcemap(  # pylint: disable=protected-access
-                    INVALID_INPUT_FILEPATH, INVALID_OUTPUT_FILEPATH
-                )
 
     def test_join_files(self) -> None:
         """Determine third_party.js contains the content of the first 10 JS
@@ -381,12 +342,7 @@ class BuildTests(test_utils.GenericTestBase):
         with self.swap(
             build,
             'FILEPATHS_NOT_TO_RENAME',
-            (
-                '*.py',
-                'path/to/fonts/*',
-                'path/to/third_party.min.js.map',
-                'path/to/third_party.min.css.map',
-            ),
+            ('*.py', 'path/to/fonts/*', 'path/to/third_party.min.css.map'),
         ):
             self.assertFalse(
                 build.hash_should_be_inserted(
@@ -395,9 +351,6 @@ class BuildTests(test_utils.GenericTestBase):
             )
             self.assertFalse(
                 build.hash_should_be_inserted('path/to/third_party.min.css.map')
-            )
-            self.assertFalse(
-                build.hash_should_be_inserted('path/to/third_party.min.js.map')
             )
             self.assertTrue(
                 build.hash_should_be_inserted('path/to/wrongFonts/fonta.eot')
@@ -558,7 +511,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with utils.open_file(hashes_path, 'r') as hashes_file:
@@ -883,10 +836,9 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                tmp.write('Some content in mock_app_dev.yaml\n')
-                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
-                tmp.write('version: default')
+            tmp.write('Some content in mock_app_dev.yaml\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
@@ -932,16 +884,9 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        # TODO(#18260): Change this when we permanently move to
-        # the Dockerized Setup.
-        firebase_host = (
-            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
-        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write(
-                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host
-            )
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -1006,14 +951,6 @@ class BuildTests(test_utils.GenericTestBase):
                 'core/tests/data/third_party/css/third_party.min.css'
             )
         )
-        self.assertFalse(
-            os.path.isfile('core/tests/data/third_party/js/third_party.min.js')
-        )
-        self.assertFalse(
-            os.path.isfile(
-                'core/tests/data/third_party/js/third_party.min.js.map'
-            )
-        )
 
         with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
             build.minify_third_party_libs('core/tests/data/third_party')
@@ -1023,14 +960,6 @@ class BuildTests(test_utils.GenericTestBase):
                 'core/tests/data/third_party/css/third_party.min.css'
             )
         )
-        self.assertTrue(
-            os.path.isfile('core/tests/data/third_party/js/third_party.min.js')
-        )
-        self.assertTrue(
-            os.path.isfile(
-                'core/tests/data/third_party/js/third_party.min.js.map'
-            )
-        )
 
         self.assertLess(
             os.path.getsize(
@@ -1038,21 +967,9 @@ class BuildTests(test_utils.GenericTestBase):
             ),
             os.path.getsize('core/tests/data/third_party/css/third_party.css'),
         )
-        self.assertLess(
-            os.path.getsize(
-                'core/tests/data/third_party/js/third_party.min.js'
-            ),
-            os.path.getsize('core/tests/data/third_party/js/third_party.js'),
-        )
 
         build.safe_delete_file(
             'core/tests/data/third_party/css/third_party.min.css'
-        )
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js'
-        )
-        build.safe_delete_file(
-            'core/tests/data/third_party/js/third_party.min.js.map'
         )
 
     def test_clean(self) -> None:
@@ -1471,53 +1388,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                servers,
-                'managed_webpack_compiler',
-                error=subprocess.CalledProcessError(return_code, []),
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys,
-                'exit',
-                lambda _: None,
-                expected_args=[
-                    # When the code under test runs, the first sys.exit call halts
-                    # execution. However, when this test runs, sys.exit is mocked
-                    # and so does not interrupt the execution flow. Therefore we
-                    # call sys.exit with the error code from the webpack compilation
-                    # process (2) 5 times (the maximum number of attempts allowed to
-                    # compile webpack) and then exit with code 1 after giving up
-                    # trying to compile webpack.
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (1,),
-                ],
-            )
         )
 
         build.build_js_files(True)

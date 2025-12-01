@@ -119,7 +119,9 @@ export class StoryCreationBackendApiService {
 
         let body = new FormData();
         body.append('payload', JSON.stringify(postData));
-        body.append('image', imagesData[0].imageBlob);
+        if (imagesData[0].imageBlob) {
+          body.append('image', imagesData[0].imageBlob);
+        }
 
         this.createStoryAsync(createStoryUrl, body).then(
           response => {

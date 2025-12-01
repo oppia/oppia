@@ -26,7 +26,6 @@ import subprocess
 import sys
 import tarfile
 
-from core import feconf
 from core.tests import test_utils
 
 from typing import Final, List, Tuple
@@ -130,11 +129,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             common, 'ensure_directory_exists', mock_ensure_directory_exists
         )
 
-    def test_install_third_party_main_under_docker(self) -> None:
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.check_call_swap:
-                install_third_party_libs.main()
-
     def test_install_third_party_main_also_installs_hooks(self) -> None:
         check_function_calls = {
             'pre_commit_hook_main_is_called': False,
@@ -219,14 +213,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             pre_push_hook, 'main', mock_main_for_pre_push_hook
         )
 
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', False):
-            with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
-                with swap_install_gcloud_sdk, swap_install_python_prod_main:
-                    with pre_commit_hook_main_swap, pre_push_hook_main_swap:
-                        with swap_isdir, swap_mkdir, swap_copytree:
-                            with swap_install_elasticsearch_dev_server:
-                                with swap_install_json_deps_main:
-                                    install_third_party_libs.main()
+        with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
+            with swap_install_gcloud_sdk, swap_install_python_prod_main:
+                with pre_commit_hook_main_swap, pre_push_hook_main_swap:
+                    with swap_isdir, swap_mkdir, swap_copytree:
+                        with swap_install_elasticsearch_dev_server:
+                            with swap_install_json_deps_main:
+                                install_third_party_libs.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 

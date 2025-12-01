@@ -17,7 +17,6 @@
  */
 
 import {Injectable, Pipe, PipeTransform} from '@angular/core';
-// SortBy pipe is a replica of angular js orderBy filter.
 // The first check of this pipe is to filter out whether the
 // received 'value' is a single dimensional array or a multidimensional array.
 // If it is a single dimensional array, the pipe will sort out

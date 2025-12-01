@@ -344,7 +344,7 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
                     yield clazz
 
 
-def generate_random_hexa_str() -> str:  # docker: no cover
+def generate_random_hexa_str() -> str:
     """Generate 32 character random string that looks like hex number.
 
     Returns:
