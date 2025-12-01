@@ -245,18 +245,27 @@
     font-size: 24px;
     z-index: 100;
   }
-  .oppia-short-contributor-username-container,
-  .oppia-long-contributor-username-container {
-    color: #009688;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 24px;
-    height: 30%;
-    padding-top: 10px;
-    position: relative;
-  }
-  .oppia-short-contributor-username-container {
-    min-width: 100px;
-  }
+ /* FIXED: Prevent long usernames from overlapping review rights */
+.oppia-short-contributor-username-container,
+.oppia-long-contributor-username-container {
+  color: #009688;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 24px;
+  height: 30%;
+  padding-top: 20px; /* increased spacing */
+  position: relative;
+
+  /* Fix overlap */
+  max-width: 200px;        /* restrict width */
+  white-space: nowrap;     /* avoid multiple lines */
+  overflow: hidden;        /* prevent spilling */
+  text-overflow: ellipsis; /* show ... for long usernames */
+}
+
+.oppia-short-contributor-username-container {
+  min-width: 130px; /* expanded from 100px */
+}
+
   .oppia-review-right-details-container {
     font-size: 18px;
     margin-left: 20px;
