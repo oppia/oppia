@@ -36,7 +36,6 @@ import subprocess
 import sys
 import tarfile
 
-from core import feconf
 from scripts import (
     install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
@@ -432,19 +431,13 @@ def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
 
-    if not feconf.OPPIA_IS_DOCKERIZED:
-        # This ensures dev dependencies are present and compiled before we
-        # proceed to other setup tasks that require them.
-        install_python_dev_dependencies.main(['--assert_compiled'])
-        # Import the hook scripts here (after dev deps are installed) so that
-        # they are only loaded when running the installer.
-        from . import pre_commit_hook  # pylint: disable=wrong-import-position
-        from . import pre_push_hook  # pylint: disable=wrong-import-position
-    else:
-        make_google_module_importable_by_python(
-            google_module_path='/app/oppia/third_party/python_libs/google'
-        )
-        return
+    # This ensures dev dependencies are present and compiled before we
+    # proceed to other setup tasks that require them.
+    install_python_dev_dependencies.main(['--assert_compiled'])
+    # Import the hook scripts here (after dev deps are installed) so that
+    # they are only loaded when running the installer.
+    from . import pre_commit_hook  # pylint: disable=wrong-import-position
+    from . import pre_push_hook  # pylint: disable=wrong-import-position
 
     if common.is_windows_os():
         raise Exception(
