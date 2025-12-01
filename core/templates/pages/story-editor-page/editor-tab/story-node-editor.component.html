@@ -128,7 +128,7 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             Outline Finalized
-            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i *ngIf="!outlineIsFinalized" [class.disabled-icon]="!editableOutline || editableOutline.trim().length === 0" (click)="canFinalize() && finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
             <div class="e2e-test-chapter-outline-editor-container" tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
@@ -362,6 +362,11 @@
             <i class="fa fa-check todo-completed" *ngIf="plannedPublicationDate"></i>
             <span class="checklist-item-name">Planned Publication Date</span>
           </div>
+          <div class="todo-item-container">
+            <i class="fa fa-exclamation-triangle" *ngIf="!acquiredSkillIds || acquiredSkillIds.length === 0"></i>
+            <i class="fa fa-check todo-completed" *ngIf="acquiredSkillIds && acquiredSkillIds.length > 0"></i>
+            <span class="checklist-item-name">Acquired Skill</span>
+          </div>
         </div>
       </mat-card>
     </div>
@@ -452,6 +457,11 @@
     font-weight: bold;
     margin-top: 12px;
     text-align: left;
+  }
+  .disabled-icon {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
   }
   .skill-header {
     border-bottom: 2px solid #000;

@@ -2183,6 +2183,70 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(len(story.story_contents.nodes), 3)
         self.logout()
 
+    def test_chapter_linkage_after_dummy_generation(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
+
+        story = story_fetchers.get_story_by_id('story_id')
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        contents = updated_story.story_contents
+
+        def node(node_id: str) -> story_domain.StoryNode:
+            idx = contents.get_node_index(node_id)
+            return contents.nodes[idx]
+
+        node_1 = node('node_1')
+        node_2 = node('node_2')
+        node_3 = node('node_3')
+        node_4 = node('node_4')
+        node_5 = node('node_5')
+
+        self.assertEqual(node_1.destination_node_ids, ['node_2'])
+        self.assertEqual(node_2.destination_node_ids, ['node_3'])
+        self.assertEqual(node_3.destination_node_ids, ['node_4'])
+        self.assertEqual(node_4.destination_node_ids, ['node_5'])
+        self.assertEqual(node_5.destination_node_ids, [])
+        self.logout()
+
     def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
         self,
     ) -> None:
