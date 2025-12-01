@@ -1,0 +1,18 @@
+{
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.defaultInterpreterPath": "${workspaceFolder}/.direnv/python-3.10.16/bin/python",
+    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.pytestArgs": [
+        "-v"
+    ],
+    "python.terminal.activateEnvironment": true,
+    "python.envFile": "${workspaceFolder}/.env",
+    "karmaTestExplorer.projectWorkspaces": [
+        {
+            "rootPath": "${workspaceFolder}",
+            "karmaConfFilePath": "${workspaceFolder}/karma.conf.js"
+        }
+    ],
+    "testExplorer.codeLens": true
+}
