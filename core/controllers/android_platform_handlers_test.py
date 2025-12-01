@@ -52,7 +52,6 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
 
         mapping = {item['name']: item['value'] for item in response}
 
-        # Direct explicit assertion, no logic.
         self.assertEqual(mapping, self.expected_platform_defaults)
 
     def test_platform_parameters_override(self) -> None:
@@ -62,7 +61,6 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
 
         mapping = {item['name']: item['value'] for item in response}
 
-        # Explicit assertion — no logic.
         self.assertEqual(mapping, {
             'android_min_version_code_for_recommending_app_update': 0,
             'android_min_supported_version_code': 0,

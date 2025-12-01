@@ -133,33 +133,6 @@ class ActivityDataResponseDict(
     language_code: Optional[str]
 
 
-# TypedDicts for handler arg entries. These are top-level so mypy can
-# strictly type each field: `schema` is always a mapping and
-# `default_value` is an `Optional[int]` or `Optional[bool]` respectively.
-class HandlerArgEntryInt(TypedDict):
-    """TypedDict for handler argument entries whose value is an int.
-
-    Fields:
-        schema: A JSON schema mapping for the argument.
-        default_value: Optional integer default for the argument.
-    """
-
-    schema: Dict[str, str]
-    default_value: Optional[int]
-
-
-class HandlerArgEntryBool(TypedDict):
-    """TypedDict for handler argument entries whose value is a bool.
-
-    Fields:
-        schema: A JSON schema mapping for the argument.
-        default_value: Optional boolean default for the argument.
-    """
-
-    schema: Dict[str, str]
-    default_value: Optional[bool]
-
-
 class AndroidActivityHandlerHandlerNormalizedRequestDict(TypedDict):
     """Dict representation of AndroidActivityHandler's normalized_request
     dictionary.
@@ -545,7 +518,10 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, HandlerArgEntryInt]] = {
+    # Here we use object because `HANDLER_ARGS_SCHEMAS` may contain
+    # schema mappings of different shapes (ints, bools, custom objects),
+    # and defining a precise TypedDict for each case is impractical.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
                 'schema': {'type': 'int'},
@@ -600,7 +576,10 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, HandlerArgEntryBool]] = {
+    # Here we use object because `HANDLER_ARGS_SCHEMAS` may contain
+    # schema mappings of different shapes (ints, bools, custom objects),
+    # and defining a precise TypedDict for each case is impractical.
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
                 'schema': {'type': 'bool'},
