@@ -1092,3 +1092,111 @@ class UtilsTests(test_utils.GenericTestBase):
             'mathImg.svg&amp;quot;}\'></oppia-noninteractive-math>'
         )
         self.assertEqual(utils.unescape_html(html_data), expected_html_data)
+
+
+class SingletonMetaTests(test_utils.GenericTestBase):
+    """Tests for SingletonMeta metaclass."""
+
+    def test_singleton_returns_same_instance(self) -> None:
+        """Test that SingletonMeta returns the same instance."""
+
+        # Create a test class using SingletonMeta.
+        class TestSingleton(metaclass=utils.SingletonMeta):
+            """Test singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize test singleton."""
+                self.value = 42
+
+        # Create two instances.
+        instance1 = TestSingleton()
+        instance2 = TestSingleton()
+
+        # They should be the exact same object.
+        self.assertIs(instance1, instance2)
+        self.assertEqual(instance1.value, 42)
+        self.assertEqual(instance2.value, 42)
+
+        # Modifying one affects the other since they're the same object.
+        instance1.value = 100
+        self.assertEqual(instance2.value, 100)
+
+    def test_singleton_works_with_different_classes(self) -> None:
+        """Test that different classes get different singleton instances."""
+
+        class SingletonA(metaclass=utils.SingletonMeta):
+            """First singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize singleton A."""
+                self.name = 'A'
+
+        class SingletonB(metaclass=utils.SingletonMeta):
+            """Second singleton class."""
+
+            def __init__(self) -> None:
+                """Initialize singleton B."""
+                self.name = 'B'
+
+        # Each class should have its own singleton instance.
+        instance_a1 = SingletonA()
+        instance_a2 = SingletonA()
+        instance_b1 = SingletonB()
+        instance_b2 = SingletonB()
+
+        # Same class instances should be identical.
+        self.assertIs(instance_a1, instance_a2)
+        self.assertIs(instance_b1, instance_b2)
+
+        # Different class instances should be different.
+        self.assertIsNot(instance_a1, instance_b1)
+
+        # Each should maintain its own value.
+        self.assertEqual(instance_a1.name, 'A')
+        self.assertEqual(instance_b1.name, 'B')
+
+    def test_singleton_respects_init_arguments_on_first_call(self) -> None:
+        """Test that singleton uses arguments from first instantiation."""
+
+        class ConfigurableSingleton(metaclass=utils.SingletonMeta):
+            """Singleton with configurable initialization."""
+
+            def __init__(self, value: int = 0) -> None:
+                """Initialize with a value."""
+                self.value = value
+
+        # First call with value=10.
+        instance1 = ConfigurableSingleton(10)
+        self.assertEqual(instance1.value, 10)
+
+        # Second call without arguments should return the same instance.
+        instance2 = ConfigurableSingleton()
+        self.assertIs(instance1, instance2)
+        self.assertEqual(instance2.value, 10)
+
+        # Second call with different arguments should raise an error.
+        with self.assertRaisesRegex(
+            ValueError,
+            'Singleton instance of ConfigurableSingleton already exists',
+        ):
+            ConfigurableSingleton(20)
+
+    def test_singleton_raises_error_on_reinit_with_kwargs(self) -> None:
+        """Test that singleton raises error when reinitialized with kwargs."""
+
+        class KeywordSingleton(metaclass=utils.SingletonMeta):
+            """Singleton with keyword arguments."""
+
+            def __init__(self, name: str = 'default') -> None:
+                """Initialize with a name."""
+                self.name = name
+
+        # First call.
+        instance1 = KeywordSingleton(name='first')
+        self.assertEqual(instance1.name, 'first')
+
+        # Second call with different kwargs should raise an error.
+        with self.assertRaisesRegex(
+            ValueError, 'Singleton instance of KeywordSingleton already exists'
+        ):
+            KeywordSingleton(name='second')
