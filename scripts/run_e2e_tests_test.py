@@ -875,6 +875,23 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                     )
                 )
 
+            self.exit_stack.enter_context(
+                self.swap_with_checks(
+                    servers,
+                    'managed_firebase_auth_emulator',
+                    lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                    called=False,
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap_with_checks(
+                    servers,
+                    'managed_cloud_datastore_emulator',
+                    lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                    called=False,
+                )
+            )
+
             args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
                 args=[]
             )
