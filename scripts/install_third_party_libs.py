@@ -36,21 +36,13 @@ import subprocess
 import sys
 import tarfile
 
-from core import feconf
 from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
     install_python_dev_dependencies,
 )
 
 from typing import Final
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    install_python_dev_dependencies.main(['--assert_compiled'])
-    from . import (
-        pre_commit_hook,
-    )  # pylint: disable=wrong-import-position, wrong-import-order
-    from . import (
-        pre_push_hook,
-    )  # pylint: disable=wrong-import-position, wrong-import-order
+install_python_dev_dependencies.main(['--assert_compiled'])
 
 from core import (  # pylint: disable=wrong-import-position, wrong-import-order
     utils,
@@ -63,6 +55,8 @@ from scripts import (  # pylint: disable=wrong-import-position, wrong-import-ord
 from . import (  # pylint: disable=wrong-import-position, wrong-import-order
     clean,
     common,
+    pre_commit_hook,
+    pre_push_hook,
 )
 
 # Place to download zip files for temporary storage.
@@ -445,12 +439,6 @@ def install_elasticsearch_dev_server() -> None:
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
-
-    if feconf.OPPIA_IS_DOCKERIZED:
-        make_google_module_importable_by_python(
-            google_module_path='/app/oppia/third_party/python_libs/google'
-        )
-        return
 
     if common.is_windows_os():
         raise Exception(
