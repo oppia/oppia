@@ -1,0 +1,11 @@
+{
+  "id": "ChatbotInput",
+  "name": "Chatbot Interaction",
+  "description": "Allows learner to chat with a simple chatbot inside an exploration.",
+  "customization_args": {},
+  "is_terminal": false,
+  "is_trainable": false,
+  "can_have_solution": false,
+  "show_generic_submit_button": false,
+  "needs_summary": false
+}

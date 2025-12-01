@@ -1,4 +1,15 @@
 {
+  "ChatbotInput": {
+    "id": "ChatbotInput",
+    "name": "Chatbot Interaction",
+    "description": "Chat with an AI assistant.",
+    "customization_arg_specs": {},
+    "is_terminal": false,
+    "is_trainable": false,
+    "can_have_solution": false,
+    "is_linear": false,
+    "show_generic_submit_button": false
+  },
   "ImageClickInput": {
     "can_have_solution": false,
     "show_generic_submit_button": false,

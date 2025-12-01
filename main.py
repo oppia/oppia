@@ -204,6 +204,7 @@ def get_redirect_route(
 
 # Register the URLs with the classes responsible for handling them.
 URLS = [
+    webapp2.Route(r'/chatbot-api', chatbot.ChatbotHandler),
     get_redirect_route(
         '/<firebase_path:__/auth(?:/.*)?>', firebase.FirebaseProxyPage
     ),
@@ -1597,3 +1598,4 @@ class NdbWsgiMiddleware:
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
 firebase_auth_services.establish_firebase_connection()
+from core.controllers import chatbot

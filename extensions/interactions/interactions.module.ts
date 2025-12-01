@@ -1,3 +1,4 @@
+import { ChatbotInputComponent } from './ChatbotInput/ChatbotInput.component';
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -69,7 +70,9 @@ import {PencilCodeEditorModule} from './PencilCodeEditor/pencil-code-editor-inte
     TranslateModule,
   ],
   declarations: [],
+    ChatbotInputComponent,
   entryComponents: [],
+    ChatbotInputComponent,
   exports: [
     AlgebraicExpressionInputExtensionsModule,
     CodeReplInteractionModule,
