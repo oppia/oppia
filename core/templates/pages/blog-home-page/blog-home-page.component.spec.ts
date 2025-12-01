@@ -179,7 +179,7 @@ describe('Blog home page component', () => {
   it('should make sure that filterWasUsed flag is set true if there is a query parameter in the url', () => {
     const mockUrlParams = {
       q: 'search query',
-      tags: '["Community"]'
+      tags: '["Community"]',
     };
     spyOn(urlService, 'getUrlParams').and.returnValue(mockUrlParams);
     spyOn(component, 'updateSearchFieldsBasedOnUrlQuery');
@@ -195,16 +195,18 @@ describe('Blog home page component', () => {
     component.filterWasUsed = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
-    component.blogPostSummaries = [{
-      _id: '1',
-      _authorUsername: 'user1',
-      _displayedAuthorName: 'User One',
-      _title: 'Test Post Title',
-      _summary: 'A short summary.',
-      _tags: ['test', 'dev'],
-      _thumbnailFilename: 'thumb1.svg',
-      _urlFragment: 'test-post',
-    }] as BlogPostSummary[];
+    component.blogPostSummaries = [
+      {
+        _id: '1',
+        _authorUsername: 'user1',
+        _displayedAuthorName: 'User One',
+        _title: 'Test Post Title',
+        _summary: 'A short summary.',
+        _tags: ['test', 'dev'],
+        _thumbnailFilename: 'thumb1.svg',
+        _urlFragment: 'test-post',
+      },
+    ] as BlogPostSummary[];
     component.totalBlogPosts = 50;
     component.showBlogPostCardsLoadingScreen = true;
 

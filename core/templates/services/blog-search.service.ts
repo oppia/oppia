@@ -76,10 +76,10 @@ export class BlogPostSearchService {
     this._lastQuery = value;
   }
 
-  get searchOffset(): number|null {
+  get searchOffset(): number | null {
     return this._searchOffset;
   }
-  set searchOffset(value: number|null) {
+  set searchOffset(value: number | null) {
     this._searchOffset = value;
   }
 
@@ -129,12 +129,12 @@ export class BlogPostSearchService {
 
     return items;
   }
-      resetSearchState(): void {
-      this._searchOffset = 0;
-      this._lastQuery = '';
-      this._lastSelectedTags = [];
-      this._isCurrentlyFetchingResults = false;
-      }
+  resetSearchState(): void {
+    this._searchOffset = 0;
+    this._lastQuery = '';
+    this._lastSelectedTags = [];
+    this._isCurrentlyFetchingResults = false;
+  }
 
   getQueryUrl(searchUrlQueryString: string): string {
     return '?q=' + searchUrlQueryString;

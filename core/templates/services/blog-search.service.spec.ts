@@ -110,7 +110,7 @@ describe('Blog Post Search Service', () => {
     });
   });
 
-    describe('lastQuery accessor', () => {
+  describe('lastQuery accessor', () => {
     const testQuery = 'test query string';
 
     it('should correctly get the value of lastQuery (getter)', () => {
@@ -124,9 +124,9 @@ describe('Blog Post Search Service', () => {
 
       expect(searchService.lastQuery).toBe(testQuery);
     });
-    });
+  });
 
-    describe('searchOffset accessors', () => {
+  describe('searchOffset accessors', () => {
     const testOffset = 25;
     const nullOffset = null;
 
@@ -141,9 +141,9 @@ describe('Blog Post Search Service', () => {
 
       expect(searchService.searchOffset).toBe(nullOffset);
     });
-    });
+  });
 
-    describe('lastSelectedtags accessors', () => {
+  describe('lastSelectedtags accessors', () => {
     const testTags = ['tag1', 'tag2', 'tag3'];
 
     it('should correctly get the array of lastSelectedtags', () => {
@@ -158,9 +158,9 @@ describe('Blog Post Search Service', () => {
 
       expect(searchService.lastSelectedtags).toEqual(newTags);
     });
-    });
+  });
 
-    describe('isCurrentlyFetchingResults accessors', () => {
+  describe('isCurrentlyFetchingResults accessors', () => {
     it('should correctly get and set the value to true', () => {
       searchService.isCurrentlyFetchingResults = true;
 
@@ -172,7 +172,7 @@ describe('Blog Post Search Service', () => {
 
       expect(searchService.isCurrentlyFetchingResults).toBe(false);
     });
-    });
+  });
 
   describe('resetSearchState', () => {
     it('should reset all search service state properties', () => {
