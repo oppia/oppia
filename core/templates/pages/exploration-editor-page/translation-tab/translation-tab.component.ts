@@ -88,6 +88,29 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
     private translationLanguageService: TranslationLanguageService
   ) {}
 
+  // Adding the smoothScrollTo helper function for the translation tab.
+  private smoothScrollTo(targetY: number, duration: number): void {
+    const startY = window.scrollY;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    const step = (currentTime: number) => {
+      const elapsedTime = currentTime - startTime;
+      if (elapsedTime < duration) {
+        const progress = elapsedTime / duration;
+        const easeProgress =
+          progress < 0.5
+            ? 2 * progress * progress
+            : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        window.scrollTo(0, startY + difference * easeProgress);
+        requestAnimationFrame(step);
+      } else {
+        window.scrollTo(0, targetY);
+      }
+    };
+    requestAnimationFrame(step);
+  }
+
   initTranslationTab(): void {
     this.stateTutorialFirstTimeService.initTranslation(
       this.pageContextService.getExplorationId()
@@ -128,13 +151,27 @@ export class TranslationTabComponent implements OnInit, OnDestroy {
           themeColor: '#212f23',
         })
         .subscribe(
-          () => {
+          value => {
             let element = document.querySelector<HTMLElement>(
               '.joyride-step__holder'
             ) as HTMLElement;
             // This code make the joyride visible over navbar
             // by overriding the properties of joyride-step__holder class.
             element.style.zIndex = '1020';
+
+            // Scroll to top for steps 1, 2, and 4.
+            if (
+              value.number === 1 ||
+              value.number === 2 ||
+              value.number === 4
+            ) {
+              this.smoothScrollTo(0, 1000);
+            }
+
+            // Custom "partial" scroll for step 3.
+            if (value.number === 3) {
+              this.smoothScrollTo(250, 1000);
+            }
           },
           () => {},
           () => {
