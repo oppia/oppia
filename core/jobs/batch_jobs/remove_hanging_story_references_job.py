@@ -38,7 +38,11 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
     """Beam job that removes story references in TopicModel which no longer exist,
     and logs only the removed references."""
 
-    class RemoveHangingStoriesDoFn(beam.DoFn):
+    # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+    # apache_beam library and absences of stubs in Typeshed, forces MyPy to
+    # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+    # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
+    class RemoveHangingStoriesDoFn(beam.DoFn):  # type: ignore[misc]
         """DoFn to remove invalid story references and log only if something was removed."""
 
         def process(
