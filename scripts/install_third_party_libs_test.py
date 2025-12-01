@@ -80,8 +80,8 @@ class Ret:
 
     def communicate(
         self,
-        _input_data: Optional[bytes] = None,
-        _timeout: Optional[float] = None,
+        input: Optional[bytes] = None,
+        timeout: Optional[float] = None,
     ) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val
@@ -141,7 +141,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
-        self.Popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
+
+        def mock_popen(*args, **kwargs):
+            return Ret()
+
+        self.Popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.check_call_error_swap = self.swap(
             subprocess, 'check_call', mock_check_call_error
         )
