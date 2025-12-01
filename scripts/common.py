@@ -34,7 +34,6 @@ from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from core import feconf
 from scripts import servers
 
 import certifi
@@ -81,12 +80,8 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
-GOOGLE_CLOUD_SDK_HOME = (
-    '/app/vm_deps/google-cloud-sdk'
-    if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(
-        OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
-    )
+GOOGLE_CLOUD_SDK_HOME = os.path.join(
+    OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
 )
 GOOGLE_APP_ENGINE_SDK_HOME = os.path.join(
     GOOGLE_CLOUD_SDK_HOME, 'platform', 'google_appengine'
@@ -98,11 +93,7 @@ WEBPACK_BIN_PATH = os.path.join(
 NG_BIN_PATH = os.path.join(CURR_DIR, 'node_modules', '.bin', 'ng')
 DEV_APPSERVER_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'dev_appserver.py')
 GCLOUD_PATH = os.path.join(GOOGLE_CLOUD_SDK_BIN, 'gcloud')
-NODE_PATH = (
-    '/usr'
-    if feconf.OPPIA_IS_DOCKERIZED
-    else os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
-)
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
@@ -400,7 +391,9 @@ def get_current_branch_name() -> str:
     )
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
-    assert git_status_first_line.startswith(branch_message_prefix)
+    assert git_status_first_line.startswith(
+        branch_message_prefix
+    ), git_status_first_line
     # Standard output is in bytes, we need to decode the line to print it.
     return git_status_first_line[len(branch_message_prefix) :]
 
@@ -970,9 +963,6 @@ def modify_constants(
         enable_maintenance_mode_variable,
         expected_number_of_replacements=1,
     )
-
-    if feconf.OPPIA_IS_DOCKERIZED:
-        return
 
     if prod_env or version_info_must_be_set is False:
         branch_name_variable = '"BRANCH_NAME": "%s"' % (
