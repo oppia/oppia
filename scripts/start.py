@@ -90,14 +90,13 @@ _PARSER.add_argument(
     action='store_true',
 )
 
-PORT_NUMBER_FOR_GAE_SERVER = 8181
 BROWSER_LAUNCH_TIMEOUT_SECS = 10.0
 BROWSER_RETRY_INTERVAL_SECS = 0.5
 SERVER_READY_MESSAGE = [
     'INFORMATION',
     'Local development server is ready! You can access it by '
     'navigating to http://localhost:%s/ in a web '
-    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
+    'browser.' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
 ]
 
 
@@ -200,7 +199,7 @@ def start_services(
             enable_host_checking=not parsed_args.disable_host_checking,
             automatic_restart=not parsed_args.no_auto_restart,
             skip_sdk_update_check=True,
-            port=PORT_NUMBER_FOR_GAE_SERVER,
+            port=feconf.GAE_DEVELOPMENT_SERVER_PORT,
             env=env,
         )
     )
@@ -221,14 +220,16 @@ def attempt_launch_browser(
     while True:
         try:
             enter_context_fn(
-                servers.create_managed_web_browser(PORT_NUMBER_FOR_GAE_SERVER)
+                servers.create_managed_web_browser(
+                    feconf.GAE_DEVELOPMENT_SERVER_PORT
+                )
             )
             common.print_each_string_after_two_new_lines(
                 [
                     'INFORMATION',
                     'Local development server is ready! Opening a default web '
                     'browser window pointing to it: '
-                    'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
+                    'http://localhost:%s/' % feconf.GAE_DEVELOPMENT_SERVER_PORT,
                 ]
             )
             return
@@ -276,8 +277,8 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # which could lead to unexpected errors. If a port is in use, print an
     # error and exit.
     required_ports: list[tuple[int, str]] = [
-        (PORT_NUMBER_FOR_GAE_SERVER, 'GAE dev appserver'),
-        (8000, 'GAE dev appserver admin port'),
+        (feconf.GAE_DEVELOPMENT_SERVER_PORT, 'GAE dev appserver'),
+        (feconf.GAE_ADMIN_SERVER_PORT, 'GAE dev appserver admin port'),
         (feconf.REDISPORT, 'Redis server'),
         (feconf.ES_LOCALHOST_PORT, 'ElasticSearch server'),
         (feconf.FIREBASE_EMULATOR_PORT, 'Firebase auth emulator'),

@@ -74,7 +74,6 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
         parsed_args = argparse.Namespace(prod_env=True)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app.yaml')
-        self.assertIn('PIP_NO_DEPS', env)
         self.assertEqual(env['PIP_NO_DEPS'], 'True')
 
     @mock.patch.dict('os.environ', {'TEST': 'value'})
@@ -82,7 +81,6 @@ class MakeDevAppserverEnvTests(unittest.TestCase):
         parsed_args = argparse.Namespace(prod_env=False)
         env, app_yaml_path = start.make_dev_appserver_env(parsed_args)
         self.assertEqual(app_yaml_path, 'app_dev.yaml')
-        self.assertIn('PIP_NO_DEPS', env)
         self.assertEqual(env['PIP_NO_DEPS'], 'True')
 
 
