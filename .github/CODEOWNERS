@@ -193,10 +193,6 @@
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
-/app_dev_docker.yaml @oppia/dev-workflow-reviewers
-/docker-compose.yml @oppia/dev-workflow-reviewers
-/docker/ @oppia/dev-workflow-reviewers
-/Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /pyproject.toml @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
@@ -535,9 +531,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /redis.conf @oppia/dev-workflow-reviewers
-/redis_docker.conf @oppia/dev-workflow-reviewers
 /.firebase.json @oppia/dev-workflow-reviewers
-/.firebase_docker.json @oppia/dev-workflow-reviewers
 
 
 # Miscellaneous.

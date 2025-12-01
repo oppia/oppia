@@ -28,7 +28,7 @@ import tempfile
 import threading
 import unittest.mock
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 from scripts import (
     common,
@@ -606,36 +606,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     run_backend_tests.main(
                         args=['--test_targets', 'scripts.run_backend_tests.py']
                     )
-
-        self.assertIn(
-            'WARNING : each test_target should point to the test file.',
-            self.print_arr,
-        )
-        self.assertIn(
-            'Redirecting to its corresponding test file...', self.print_arr
-        )
-
-    def test_invalid_test_targets_message_is_displayed_docker(self) -> None:
-        swap_check_results = self.swap(
-            run_backend_tests,
-            'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
-        )
-        swapcheck_coverage = self.swap(
-            run_backend_tests,
-            'check_coverage',
-            lambda *unused_args, **unused_kwargs: ('', 100.00),
-        )
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap_execute_task, swapcheck_coverage:
-                with self.swap_cloud_datastore_emulator, swap_check_results:
-                    with self.print_swap, self.swap_redis_server:
-                        run_backend_tests.main(
-                            args=[
-                                '--test_targets',
-                                'scripts.run_backend_tests.py',
-                            ]
-                        )
 
         self.assertIn(
             'WARNING : each test_target should point to the test file.',

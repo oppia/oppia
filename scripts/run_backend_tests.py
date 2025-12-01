@@ -59,7 +59,7 @@ import sys
 import threading
 import time
 
-from core import feconf, utils
+from core import utils
 
 import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
@@ -584,14 +584,10 @@ def main(args: Optional[List[str]] = None) -> None:
     # If --use_pytest flag is set, delegate to pytest and return early.
     if parsed_args.use_pytest:
         with contextlib.ExitStack() as stack:
-            # Same emulator setup as the regular path.
-            if not feconf.OPPIA_IS_DOCKERIZED:  # docker: no cover
-                stack.enter_context(
-                    servers.managed_cloud_datastore_emulator(
-                        clear_datastore=True
-                    )
-                )
-                stack.enter_context(servers.managed_redis_server())
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
+            stack.enter_context(servers.managed_redis_server())
 
             # Run tests with pytest.
             exit_code = run_tests_with_pytest(parsed_args)
@@ -604,13 +600,10 @@ def main(args: Optional[List[str]] = None) -> None:
         return
 
     with contextlib.ExitStack() as stack:
-        # TODO(#18260): Remove this when we permanently move to the
-        # Dockerized Setup.
-        if not feconf.OPPIA_IS_DOCKERIZED:  # docker: no cover
-            stack.enter_context(
-                servers.managed_cloud_datastore_emulator(clear_datastore=True)
-            )
-            stack.enter_context(servers.managed_redis_server())
+        stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True)
+        )
+        stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_targets:
             all_test_targets = []
             test_targets = parsed_args.test_targets.split(',')
@@ -651,24 +644,6 @@ def main(args: Optional[List[str]] = None) -> None:
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard
             )
-            # TODO(#18260): Remove this when we permanently move to the
-            # Dockerized Setup.
-            if feconf.OPPIA_IS_DOCKERIZED:  # docker: no cover
-                # The following tests are excluded from running in the Docker
-                # since they will be removed after the Dockerized setup is
-                # permanently moved to.
-                docker_exclude_tests = [
-                    'scripts.install_third_party_libs_test',
-                    'scripts.install_python_dev_dependencies_test',
-                    'scripts.install_python_prod_dependencies_test',
-                    'scripts.build_test',
-                    'scripts.run_acceptance_tests_test',
-                ]
-                all_test_targets = [
-                    test
-                    for test in all_test_targets
-                    if test not in docker_exclude_tests
-                ]
         elif parsed_args.run_on_changed_files_in_branch:
             all_test_targets = list(
                 git_changes_utils.get_changed_python_test_files()

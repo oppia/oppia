@@ -4,7 +4,6 @@
     "python.defaultInterpreterPath": "${workspaceFolder}/.direnv/python-3.10.16/bin/python",
     "python.testing.cwd": "${workspaceFolder}",
     "python.testing.pytestArgs": [
-        "core",
         "-v"
     ],
     "python.terminal.activateEnvironment": true,
