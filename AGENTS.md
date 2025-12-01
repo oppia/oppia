@@ -39,10 +39,6 @@ environment setup and troubleshooting.
   python -m scripts.linters.run_lint_checks
   npx prettier --check .
 
-The `Makefile` refers to an old Docker installation process that is no longer
-maintained. Prefer the wiki instructions and the "Python setup" workflow for
-everyday development.
-
 Project-specific conventions and patterns (discoverable in the tree):
 
 - Backend structure: controllers provide request handlers; business logic lives

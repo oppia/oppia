@@ -60,8 +60,6 @@ from scripts import (  # pylint: disable=wrong-import-position
     install_python_prod_dependencies,
 )
 
-from core import feconf  # isort:skip # pylint: disable=wrong-import-position
-
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT: Final = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
@@ -72,9 +70,7 @@ FILE_DIR: Final = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG: Final = '--files'
 
-# Path to currently running python interpreter,
-# it is required to resolve python version conflict in docker.
-PYTHON_CMD: Final = sys.executable if feconf.OPPIA_IS_DOCKERIZED else 'python'
+PYTHON_CMD: Final = 'python'
 
 OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
@@ -368,17 +364,14 @@ def main(args: Optional[List[str]] = None) -> None:
                     )
                     sys.exit(1)
 
-            # When using Docker, we run MYPY checks in docker/pre_push_hook.sh
-            # itself.
-            if not feconf.OPPIA_IS_DOCKERIZED:
-                print('Running mypy checks...')
-                mypy_check_status = execute_mypy_checks()
-                if mypy_check_status != 0:
-                    print(
-                        'Push failed, please correct the mypy type annotation '
-                        'issues above.'
-                    )
-                    sys.exit(mypy_check_status)
+            print('Running mypy checks...')
+            mypy_check_status = execute_mypy_checks()
+            if mypy_check_status != 0:
+                print(
+                    'Push failed, please correct the mypy type annotation '
+                    'issues above.'
+                )
+                sys.exit(mypy_check_status)
 
             print('Running backend-associated-test-file checks ...')
             backend_associated_test_file_check_status = (

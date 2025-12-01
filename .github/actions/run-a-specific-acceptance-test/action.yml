@@ -1,0 +1,98 @@
+name: Run a specific acceptance test
+description: Runs a specific acceptance test suite that is given as an input.
+
+inputs:
+  test-suite:
+    description: 'The acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
+    required: true
+  viewport-type:
+    description: "The viewport type to use for running the tests."
+    required: true
+    type: choice
+    options:
+      - mobile
+      - desktop
+  enable-screen-recording:
+    description: Whether to record the screen during the test.
+    required: true
+    type: boolean
+  modified-suite-name-for-uploads:
+    description: A unique suite name without spaces and forward-slashes to use for the artifacts uploads. If not provided, the test data will not be uploaded.
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check if modified-suite-name-for-uploads contains invalid characters.
+      shell: bash
+      run: |
+        if [[ ! "${{ inputs.modified-suite-name-for-uploads }}" =~ ^[a-zA-Z0-9_-]*$ ]]; then
+          echo "The modified suite name should contain only the following characters: letters, digits, underscore and hyphen."
+          exit 1
+        fi
+    - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
+      id: run-acceptance-test
+      shell: bash
+      # We use xvfb-run to create a virtual screen to run tests without headless mode.
+      # Numbers in 1920x1080x24 represent screen width, height and color depth respectively.
+      run: >
+        set -o pipefail;
+        VIDEO_RECORDING_IS_ENABLED=${{ inputs.enable-screen-recording && '1' || '0' }}
+        xvfb-run -a --server-args="-screen 0, 1920x1080x24"
+        python -m scripts.run_acceptance_tests
+        --skip-build
+        --suite=${{ inputs.test-suite }}
+        ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
+        --prod_env
+        --server_log_level=info
+        | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
+
+    - name: Upload test logs
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs_${{ inputs.modified-suite-name-for-uploads }}
+        path: acceptance_test_${{ inputs.modified-suite-name-for-uploads }}.log
+
+    - name: Upload screenshots taken on test failure
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: failure-point-snapshots_${{ inputs.modified-suite-name-for-uploads }}
+        path: /home/runner/work/oppia/oppia_full_stack_test_failure_screenshots/acceptance
+
+    - name: Upload test diff screenshots
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
+        # Note: The path must be kept in sync with the one specified in
+        # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+
+    - name: Check for video recordings
+      shell: bash
+      run: |
+        ls /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/**
+
+    - name: Upload test recordings
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: video-recordings_${{ inputs.modified-suite-name-for-uploads }}
+        path: /home/runner/work/oppia/oppia_full_stack_test_video_recordings/acceptance/${{ inputs.viewport-type == 'mobile' && 'mobile' || 'desktop' }}-*
