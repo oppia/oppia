@@ -56,6 +56,10 @@ import {PageContextService} from 'services/page-context.service';
 import {CkEditorCopyContentService} from './ck-editor-copy-content.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {Subscription} from 'rxjs';
+import {
+  RteHelperService,
+  RteComponentSpecs,
+} from './ck-editor-4-widgets.initializer';
 
 interface UiConfig {
   (): UiConfig;
@@ -83,12 +87,12 @@ export interface RteConfig extends CKEDITOR.config {
 export class CkEditor4RteComponent
   implements AfterViewInit, OnChanges, OnDestroy, OnInit
 {
-  @Input() uiConfig: UiConfig;
-  @Input() value;
+  @Input() uiConfig!: UiConfig;
+  @Input() value: string = '';
   @Output() valueChange: EventEmitter<string> = new EventEmitter();
-  rteHelperService;
-  ck: CKEDITOR.editor;
-  currentValue: string;
+  rteHelperService: RteHelperService;
+  ck!: CKEDITOR.editor;
+  currentValue: string = '';
   connectedToInternet = true;
   headersEnabled = false;
   windowIsNarrow = false;
@@ -103,7 +107,7 @@ export class CkEditor4RteComponent
   pendingPasteValidContent: string | null = null;
   showPasteConfirmation: boolean = false;
 
-  @ViewChild('oppiaRTE') oppiaRTE: ElementRef;
+  @ViewChild('oppiaRTE') oppiaRTE!: ElementRef;
 
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
@@ -112,7 +116,8 @@ export class CkEditor4RteComponent
     private internetConnectivityService: InternetConnectivityService,
     private renderer: Renderer2
   ) {
-    this.rteHelperService = OppiaAngularRootComponent.rteHelperService;
+    this.rteHelperService =
+      OppiaAngularRootComponent.rteHelperService as RteHelperService;
     this.subscriptions = new Subscription();
   }
 
@@ -141,8 +146,11 @@ export class CkEditor4RteComponent
       return;
     }
 
+    // Get component list from AppConstants.
     const rteComponents = this.uiConfig.rte_component_config_id;
-    const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
+    const componentList = (
+      AppConstants.RTE_COMPONENT_CONFIGS as Record<string, readonly string[]>
+    )[rteComponents];
 
     if (!componentList) {
       this.configError = `Component set "${rteComponents}" is not defined in AppConstants.RTE_COMPONENT_CONFIGS.`;
@@ -479,24 +487,27 @@ export class CkEditor4RteComponent
     if (html === undefined) {
       return html;
     }
-    return html.replace(this.componentRe, (match, p1, p2, p3) => {
-      // Here we remove the 'ckeditor' part of the string p3 to get the name
-      // of the RTE Component.
-      let rteComponentName = p3.split('-')[1];
+    return html.replace(
+      this.componentRe,
+      (match: string, p1: string, p2: string, p3: string) => {
+        // Here we remove the 'ckeditor' part of the string p3 to get the name
+        // of the RTE Component.
+        let rteComponentName = p3.split('-')[1] || p3;
 
-      if (this.rteHelperService.isInlineComponent(rteComponentName)) {
-        return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
-      } else {
-        return (
-          '<div type="oppia-noninteractive-' +
-          p3 +
-          '"' +
-          'class="oppia-rte-component-container">' +
-          match +
-          '</div>'
-        );
+        if (this.rteHelperService.isInlineComponent(rteComponentName)) {
+          return `<span type="oppia-noninteractive-${p3}">${match}</span>`;
+        } else {
+          return (
+            '<div type="oppia-noninteractive-' +
+            p3 +
+            '"' +
+            'class="oppia-rte-component-container">' +
+            match +
+            '</div>'
+          );
+        }
       }
-    });
+    );
   }
 
   // Determine which components should be displayed based on the UI configuration.
@@ -506,7 +517,11 @@ export class CkEditor4RteComponent
     componentsThatRequireInternet: string[];
   } {
     const _RICH_TEXT_COMPONENTS = this.rteHelperService.getRichTextComponents();
-    const result = {
+    const result: {
+      names: string[];
+      icons: string[];
+      componentsThatRequireInternet: string[];
+    } = {
       names: [],
       icons: [],
       componentsThatRequireInternet: [],
@@ -518,10 +533,16 @@ export class CkEditor4RteComponent
 
     // Get component list from AppConstants.
     const rteComponents = this.uiConfig.rte_component_config_id;
-    const componentList = AppConstants.RTE_COMPONENT_CONFIGS[rteComponents];
+    const componentList = (
+      AppConstants.RTE_COMPONENT_CONFIGS as Record<string, readonly string[]>
+    )[rteComponents];
+
+    if (!componentList) {
+      return result;
+    }
 
     // Filter components based on the defined list and other criteria.
-    _RICH_TEXT_COMPONENTS.forEach(componentDefn => {
+    _RICH_TEXT_COMPONENTS.forEach((componentDefn: RteComponentSpecs) => {
       // Check if component is in the specified component list.
       const isInComponentList = componentList.includes(componentDefn.id);
 
@@ -593,7 +614,7 @@ export class CkEditor4RteComponent
         return 'oppia' + name;
       })
       .join(',');
-    var buttonNames = [];
+    var buttonNames: string[] = [];
     if (this.pageContextService.canAddOrEditComponents()) {
       names.forEach(name => {
         buttonNames.push('Oppia' + name);
@@ -689,7 +710,7 @@ export class CkEditor4RteComponent
       const buttonIcons =
         this.elementRef.nativeElement.querySelectorAll('.cke_button_icon');
 
-      buttonIcons.forEach(buttonIcon => {
+      buttonIcons.forEach((buttonIcon: HTMLElement) => {
         this.renderer.setStyle(buttonIcon, 'height', '24px');
         this.renderer.setStyle(buttonIcon, 'width', '24px');
       });
@@ -785,9 +806,12 @@ export class CkEditor4RteComponent
         if (event.data === undefined) {
           return;
         }
-        event.data = event.data.replace(this.componentRe, (match, p1, p2) => {
-          return p1 + '</' + p2 + '>';
-        });
+        event.data = event.data.replace(
+          this.componentRe,
+          (match: string, p1: string, p2: string) => {
+            return p1 + '</' + p2 + '>';
+          }
+        );
       },
       null,
       null,
@@ -814,7 +838,9 @@ export class CkEditor4RteComponent
           const node = parent.childNodes[j - 1];
           if (
             node.nodeName === 'BR' ||
-            (node.nodeName === '#text' && node.nodeValue.trim() === '')
+            (node.nodeName === '#text' &&
+              node.nodeValue &&
+              node.nodeValue.trim() === '')
           ) {
             node.remove();
           } else {
@@ -824,7 +850,9 @@ export class CkEditor4RteComponent
         if (parent.childNodes.length === 0) {
           if (
             parent.nodeName === 'BR' ||
-            (parent.nodeName === '#text' && parent.nodeValue.trim() === '') ||
+            (parent.nodeName === '#text' &&
+              parent.nodeValue &&
+              parent.nodeValue.trim() === '') ||
             parent.nodeName === 'P'
           ) {
             parent.remove();
