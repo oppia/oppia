@@ -18,16 +18,16 @@ from __future__ import annotations
 
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
+from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-from core.jobs.transforms import job_result_transforms
 
 import apache_beam as beam
 from typing import List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import topic_models, story_models
+    from mypy_imports import story_models, topic_models
 
 (topic_models, story_models) = models.Registry.import_models(
     [models.Names.TOPIC, models.Names.STORY]
@@ -64,7 +64,7 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
                 topic_model.canonical_story_references = cleaned_refs
                 topic_model.update_timestamps()
                 log = job_run_result.JobRunResult.as_stdout(
-                    f"Topic with ID {topic_model.id} removed hanging story references: {', '.join(removed_refs)}"
+                    f'Topic with ID {topic_model.id} removed hanging story references: {", ".join(removed_refs)}'
                 )
                 yield topic_model, log
             else:
