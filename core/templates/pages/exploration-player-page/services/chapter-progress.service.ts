@@ -37,18 +37,18 @@ export class ChapterProgressService {
   async updateCompletedChaptersCount(
     checkForFirstTimeCompletion: boolean = false
   ): Promise<void> {
-  try {
-    const data = await this.learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync();
-    const newCount = data.completedChaptersCount;
-    if (checkForFirstTimeCompletion) {
-     this.chapterIsCompletedForTheFirstTime = true;
+    try {
+      const data =
+        await this.learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync();
+      const newCount = data.completedChaptersCount;
+      if (checkForFirstTimeCompletion) {
+        this.chapterIsCompletedForTheFirstTime = true;
+      }
+      this.completedChaptersCount = newCount;
+    } catch (error) {
+      console.error('Error while updating chapter complete count', error);
+      throw error;
     }
-    this.completedChaptersCount = newCount;
-  }
-  catch (error) {
-    console.error('Error while updating chapter complete count', error);
-    throw error;
-  }
   }
 
   getCompletedChaptersCount(): number {

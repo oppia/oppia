@@ -229,8 +229,13 @@ describe('Tutor card component', () => {
       false
     );
     spyOn(urlService, 'isIframed').and.returnValue(isIframed);
-    spyOn(chapterProgressService, 'updateCompletedChaptersCount').and.returnValue(Promise.resolve());
-    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue('1');
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.resolve());
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      '1'
+    );
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValues(
@@ -280,16 +285,21 @@ describe('Tutor card component', () => {
   }));
 
   it('should set the chapterCount = 0 and throw error when user is unauthorized', fakeAsync(() => {
-    const error401 = {status:401, message:'Unauthorized'}
-    spyOn(chapterProgressService,'updateCompletedChaptersCount').and.returnValue(Promise.reject(error401))
-    spyOn(console,'error').and.stub()
+    const error401 = {status: 401, message: 'Unauthorized'};
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.reject(error401));
+    spyOn(console, 'error').and.stub();
 
-    componentInstance.ngOnInit()
-    tick()
+    componentInstance.ngOnInit();
+    tick();
 
-    expect(componentInstance.completedChaptersCount).toBe(0)
-    expect(console.error).toHaveBeenCalledWith('User is logged out setting default chapters count')
-  }))
+    expect(componentInstance.completedChaptersCount).toBe(0);
+    expect(console.error).toHaveBeenCalledWith(
+      'User is logged out setting default chapters count'
+    );
+  }));
 
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
@@ -596,38 +606,52 @@ describe('Tutor card component', () => {
 
   it('should correctly show milestone progress bar', fakeAsync(() => {
     spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
-    spyOn(chapterProgressService, 'updateCompletedChaptersCount').and.returnValue(Promise.resolve());
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.resolve());
 
-    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(2); 
-    spyOn(componentInstance,'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
-    spyOn(componentInstance,'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
-    spyOn(componentInstance,'shouldShowProgressBar').and.returnValue(false);
-    
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      2
+    );
+    spyOn(
+      componentInstance,
+      'isCompletedChaptersCountGreaterThanLastMilestone'
+    ).and.returnValue(false);
+    spyOn(
+      componentInstance,
+      'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
+    ).and.returnValue(false);
+    spyOn(componentInstance, 'shouldShowProgressBar').and.returnValue(false);
+
     const targetSpy = spyOn(
       componentInstance,
       'setNextMilestoneAndCheckIfProgressBarIsShown'
-      ).and.callThrough();
+    ).and.callThrough();
 
     componentInstance.ngOnInit();
     tick();
-    
-    expect(
-      targetSpy
-    ).toHaveBeenCalledTimes(1);
+
+    expect(targetSpy).toHaveBeenCalledTimes(1);
     expect(componentInstance.shouldShowProgressBar).toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
   }));
 
-  it("should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone", fakeAsync(() => {
-    componentInstance.completedChaptersCount = 55
-    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(55);
+  it('should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone', fakeAsync(() => {
+    componentInstance.completedChaptersCount = 55;
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      55
+    );
 
-    spyOn(componentInstance,'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
+    spyOn(
+      componentInstance,
+      'isCompletedChaptersCountGreaterThanLastMilestone'
+    ).and.returnValue(false);
 
     expect(
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
     ).toBe(false);
-  }))
+  }));
 
   it(
     'should not show milestone progress bar if completed chapters count ' +
