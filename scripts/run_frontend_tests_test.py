@@ -583,7 +583,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_main_with_skip_install_flag(self) -> None:
         install_called: list[bool] = []
 
-        def mock_install_main() -> None:
+        def mock_install_third_party_libs() -> None:
             install_called.append(True)
 
         def mock_build_main(
@@ -592,7 +592,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             pass
 
         with self.swap(
-            install_third_party_libs, 'main', mock_install_main
+            install_third_party_libs, 'main', mock_install_third_party_libs
         ), self.swap(
             build, 'main', mock_build_main
         ), self.swap_success_Popen, self.print_swap:

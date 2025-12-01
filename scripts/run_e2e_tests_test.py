@@ -828,7 +828,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             with self.swap_mock_set_constants_to_default:
                 run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
 
-    def test_run_tests_skips_emulator_block_when_emulator_mode_false(
+    def test_run_tests_skips_emulator_block_when_not_in_emulator_mode(
         self,
     ) -> None:
         class FakeProc:

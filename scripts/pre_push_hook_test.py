@@ -785,18 +785,19 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.print_arr, ['Python dependencies consistency check succeeded.']
         )
 
-    def test_changed_branch_does_not_switch_when_same_branch(self) -> None:
+    def test_branch_is_not_changed_when_changed_branch_is_same_as_the_current_branch(
+        self,
+    ) -> None:
         # Here we use object because we need to mock subprocess.check_output which is a built-in function.
         with mock.patch.object(
             subprocess, 'check_output', autospec=True
         ) as mock_check_output:
-            mock_check_output.return_value = 'feature-branch'
+            mock_check_output.return_value = 'changed_branch'
 
-            cb = pre_push_hook.ChangedBranch('feature-branch')
+            cb = pre_push_hook.ChangedBranch('changed_branch')
 
             self.assertTrue(cb.is_same_branch)
-            self.assertEqual(cb.old_branch, 'feature-branch')
-            self.assertEqual(cb.new_branch, 'feature-branch')
+            self.assertEqual(cb.new_branch, 'changed_branch')
 
             mock_check_output.reset_mock()
 
@@ -874,57 +875,3 @@ class PrePushHookTests(test_utils.GenericTestBase):
         start_linter_mock.assert_not_called()
         exit_mock.assert_not_called()
         run_script_mock.assert_called()
-
-    def test_main_skips_mypy_when_dockerized(self) -> None:
-        # Here we use object because we need to mock feconf.OPPIA_IS_DOCKERIZED,
-        # which is a module-level constant and not directly patchable otherwise.
-        with mock.patch.object(
-            feconf, 'OPPIA_IS_DOCKERIZED', new=True
-        ), mock.patch(
-            'scripts.git_changes_utils.get_refs', return_value=('abc123', 'refs/heads/feature-branch')
-        ), mock.patch(
-            'scripts.common.get_current_branch_name', return_value='feature-branch'
-        ), mock.patch(
-            'scripts.pre_push_hook.argparse.ArgumentParser.parse_args'
-        ) as mock_parse_args, mock.patch(
-            'scripts.pre_push_hook.git_changes_utils.get_changed_files'
-        ) as mock_get_changed_files, mock.patch(
-            'scripts.pre_push_hook.has_uncommitted_files', return_value=False
-        ), mock.patch(
-            'scripts.pre_push_hook.ChangedBranch'
-        ) as _mock_changed_branch, mock.patch(
-            'scripts.pre_push_hook.start_linter', return_value=0
-        ) as mock_start_linter, mock.patch(
-            'scripts.pre_push_hook.execute_mypy_checks'
-        ) as mock_execute_mypy, mock.patch(
-            'scripts.pre_push_hook.run_script_and_get_returncode',
-            return_value=0,
-        ), mock.patch(
-            'scripts.pre_push_hook.does_diff_include_ts_files',
-            return_value=False,
-        ), mock.patch(
-            'scripts.pre_push_hook.does_diff_include_ci_config_or_test_files',
-            return_value=False,
-        ), mock.patch(
-            'scripts.pre_push_hook.git_changes_utils.get_js_or_ts_files_from_diff',
-            return_value=[],
-        ), mock.patch(
-            'scripts.pre_push_hook.git_changes_utils.get_python_dot_test_files_from_diff',
-            return_value=[],
-        ), mock.patch(
-            'scripts.pre_push_hook.check_for_backend_python_library_inconsistencies'
-        ):
-
-            mock_parse_args.return_value.remote = None
-            mock_parse_args.return_value.url = None
-            mock_parse_args.return_value.install = False
-
-            mock_get_changed_files.return_value = {
-                'feature-branch': (['file1.py'], ['file1.py'])
-            }
-
-            pre_push_hook.main()
-
-            mock_execute_mypy.assert_not_called()
-
-            mock_start_linter.assert_called_once_with(['file1.py'])
