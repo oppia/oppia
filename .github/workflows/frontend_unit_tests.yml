@@ -63,7 +63,7 @@ jobs:
         id: run_frontend_tests
         run: python -m scripts.run_frontend_tests --check_coverage
       - name: Upload frontend coverage reports as an artifact
-        if: ${{ steps.run_frontend_tests.outputs.WORKFLOW_STATUS == 'failure' }}
+        if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
           name: frontend-coverage-${{ matrix.num_runs }}
