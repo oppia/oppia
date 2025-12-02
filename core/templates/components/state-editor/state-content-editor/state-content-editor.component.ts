@@ -33,7 +33,8 @@ import {StateContentService} from 'components/state-editor/state-editor-properti
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {Subscription} from 'rxjs';
+import {Subscription, Subject} from 'rxjs';
+import {debounceTime} from 'rxjs/operators';
 
 interface HTMLSchema {
   type: string;
@@ -61,6 +62,8 @@ export class StateContentEditorComponent implements OnInit {
   HTML_SCHEMA!: HTMLSchema;
 
   cardHeightLimitReached = false;
+  private contentChanged$ = new Subject<void>();
+  private readonly AUTO_SAVE_DELAY_MS = 3000;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -93,6 +96,16 @@ export class StateContentEditorComponent implements OnInit {
         }
       })
     );
+
+    // Setup auto-save on content changes.
+    this.directiveSubscriptions.add(
+      this.contentChanged$
+        .pipe(debounceTime(this.AUTO_SAVE_DELAY_MS))
+        .subscribe(() => {
+          this.autoSaveContent();
+        })
+    );
+
     this.stateEditorService.updateStateContentEditorInitialised();
   }
 
@@ -145,6 +158,16 @@ export class StateContentEditorComponent implements OnInit {
   cancelEdit(): void {
     this.stateContentService.restoreFromMemento();
     this.contentEditorIsOpen = false;
+  }
+
+  onContentChange(): void {
+    if (this.contentEditorIsOpen) {
+      this.contentChanged$.next();
+    }
+  }
+
+  autoSaveContent(): void {
+    // Placeholder for auto-save logic - will be implemented in next commit.
   }
 
   isContentEditable(): boolean {
