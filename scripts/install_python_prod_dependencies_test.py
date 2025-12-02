@@ -1004,6 +1004,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ('backports.tarfile', 'backports-tarfile'),
             ('backports_tarfile', 'backports-tarfile'),
             ('backports-tarfile-2', 'backports-tarfile-2'),
+            (
+                'keyrings.google_artifactregistry_auth',
+                'keyrings-google-artifactregistry-auth',
+            ),
             ('apache-beam[gcp]', 'apache-beam'),
             ('Pillow', 'pillow'),
             ('pylatexenc', 'pylatexenc'),
