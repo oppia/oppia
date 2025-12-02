@@ -38,9 +38,12 @@ oppia-checkpoint-celebration-footer .inner-container {
 }
 
 oppia-checkpoint-celebration-footer .inner-container-alignment {
-  margin-bottom: 20px;
+  bottom: 60px;
+  left: 50%;
   padding-left: 30px;
   padding-right: 30px;
+  position: fixed;
+  transform: translateX(-50%);
 }
 oppia-checkpoint-celebration-footer .tick-symbol {
   font-size: 42px;
@@ -395,11 +398,6 @@ oppia-checkpoint-celebration-footer .dot18 {
 }
 
 @media(max-width: 959px) {
-  oppia-checkpoint-celebration-footer .inner-container-alignment {
-    padding-left: 30px;
-    padding-right: 30px;
-  }
-
   oppia-checkpoint-celebration-footer .inner-container {
     max-width: 650px;
   }

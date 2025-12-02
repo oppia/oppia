@@ -80,8 +80,6 @@ def check_dev_mode_is_true() -> None:
 
 check_dev_mode_is_true()
 
-# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -540,7 +538,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.4.7'
+OPPIA_VERSION = '3.4.8'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1067,10 +1065,12 @@ VOICEOVER_ADMIN_DATA_HANDLER_URL = '/voiceover_admin_data_handler'
 VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL = (
     '/voiceover_language_codes_mapping'
 )
-VOICE_ARTIST_METADATA_HANDLER = '/voice_artist_metadata_handler'
-GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST = '/get_sample_voiceovers'
 REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
     '/regenerate_automatic_voiceover/<exploration_id>'
+)
+REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
+    '/regenerate_voiceover_on_exp_update/<exploration_id>/'
+    '<exploration_version>/<exploration_title>'
 )
 
 # Event types.
@@ -1361,8 +1361,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-CLOUD_DATASTORE_EMULATOR_HOST = os.environ.get('DATASTORE_HOST', 'localhost')
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
@@ -1770,7 +1769,10 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
     'FUNCTION_ID_REMOVE_USER_FROM_RIGHTS_MODELS': (
         'remove_user_from_rights_models'
     ),
-    'FUNCTION_ID_REGENERATE_VOICEOVER_ON_EXP_UPDATE': (
-        'regenerate_voiceover_for_updated_exploration'
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': (
+        'regenerate_voiceovers_for_updated_exploration'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
+        'regenerate_voiceovers_on_exploration_curation'
     ),
 }

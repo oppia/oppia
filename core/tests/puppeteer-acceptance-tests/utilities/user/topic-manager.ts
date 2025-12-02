@@ -3516,6 +3516,7 @@ export class TopicManager extends BaseUser {
    * @returns {Promise<void>}
    */
   async addAcquiredSkill(skillName: string): Promise<void> {
+    await this.scrollToBottomOfPage();
     await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(addAcquiredSkillButton);
     const elements = await this.page.$$(addAcquiredSkillButton);

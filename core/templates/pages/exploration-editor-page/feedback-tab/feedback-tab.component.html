@@ -1,8 +1,8 @@
 <mat-card class="oppia-editor-card oppia-feedback-card e2e-test-exploration-feedback-card">
   <div *ngIf="!activeThread">
-    <div class="float-right">
+    <div class="float-end">
       <button *ngIf="userIsLoggedIn"
-              class="btn btn-success float-right oppia-thread-button oppia-autofocus e2e-test-start-new-thread-button"
+              class="btn btn-success float-end oppia-thread-button oppia-autofocus e2e-test-start-new-thread-button"
               (click)="showCreateThreadModal()"
               (focus)="newThreadButton">
         Start new thread
@@ -49,9 +49,9 @@
         </span>
       </div>
 
-      <div class="col-lg-4 col-md-4 col-sm-4 float-right">
-        <div class="float-right">
-          <span *ngIf="activeThread.stateName" class="badge badge-info">
+      <div class="col-lg-4 col-md-4 col-sm-4 float-end">
+        <div class="float-end">
+          <span *ngIf="activeThread.stateName" class="badge text-bg-info">
             state: {{ activeThread.stateName }}
           </span>
           <span [ngClass]="getLabelClass(activeThread.status)"
@@ -162,7 +162,7 @@
   /* Overwrite the default "success" color to a darker shade of green in order
   to prevent this overshadowing the active action buttons (like "Create New
   Thread"). */
-  .oppia-feedback-card span.badge.badge-success {
+  .oppia-feedback-card span.badge.bg-success {
     background-color: #038603;
   }
   .activeThreadView {

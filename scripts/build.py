@@ -28,8 +28,13 @@ import subprocess
 import sys
 import threading
 
-from core import feconf, utils
-from scripts import common
+from core import utils
+from scripts import (
+    common,
+    install_python_dev_dependencies,
+    install_third_party_libs,
+    servers,
+)
 
 import rcssmin
 from typing import (
@@ -43,13 +48,6 @@ from typing import (
     TypedDict,
 )
 
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import (
-        install_python_dev_dependencies,
-        install_third_party_libs,
-        servers,
-    )
-
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
@@ -57,11 +55,6 @@ THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
 THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
     'build', 'third_party', 'generated', ''
-)
-
-THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join('js', 'third_party.js')
-MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH = os.path.join(
-    'js', 'third_party.min.js'
 )
 
 THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
@@ -127,7 +120,6 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 # need cache invalidation.
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
-    'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
     '*.bundle.js.map',
@@ -164,9 +156,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = (
-    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
-)
+APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 
 APP_YAML_FILEPATH = 'app.yaml'
 
@@ -228,7 +218,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in range(max_tries):
+    for index in range(max_tries):
         try:
             managed_webpack_compiler = servers.managed_webpack_compiler(
                 use_source_maps=source_maps
@@ -236,6 +226,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
+            print('Webpack compilation failed (Attempt #%d)' % (index + 1))
             print(error.output)
             sys.exit(error.returncode)
         if os.path.isdir(webpack_bundles_dir_name):
@@ -266,8 +257,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            run_webpack_compilation(source_maps=source_maps)
+        run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -340,39 +330,6 @@ def _join_files(source_paths: List[str], target_file_stream: TextIO) -> None:
     for source_path in source_paths:
         with utils.open_file(source_path, 'r') as source_file:
             write_to_file_stream(target_file_stream, source_file.read())
-
-
-def _minify_and_create_sourcemap(
-    source_path: str, target_file_path: str
-) -> None:
-    """Minifies and generates source map for a JS file. This function is only
-    meant to be used with third_party.min.js.
-
-    Args:
-        source_path: str. Path to JS file to minify.
-        target_file_path: str. Path to location of the minified file.
-    """
-    print('Minifying and creating sourcemap for %s' % source_path)
-    source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
-    # TODO(#18260): Change this when we permanently move to
-    # the Dockerized Setup.
-    if feconf.OPPIA_IS_DOCKERIZED:
-        subprocess.check_call(
-            'node /app/oppia/node_modules/uglify-js/bin/uglifyjs'
-            ' /app/oppia/third_party/generated/js/third_party.js'
-            ' -c -m --source-map includeSources,url=\'third_party.min.js.map\''
-            ' -o /app/oppia/third_party/generated/js/third_party.min.js',
-            shell=True,
-        )
-    else:
-        cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-            common.NODE_BIN_PATH,
-            UGLIFY_FILE,
-            source_path,
-            source_map_properties,
-            target_file_path,
-        )
-        subprocess.check_call(cmd, shell=True)
 
 
 def _generate_copy_tasks_for_fonts(
@@ -662,26 +619,17 @@ def minify_third_party_libs(third_party_directory_path: str) -> None:
     """Minify third_party.js and third_party.css and remove un-minified
     files.
     """
-    third_party_js_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
+
     third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
 
-    minified_third_party_js_filepath = os.path.join(
-        third_party_directory_path, MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
     minified_third_party_css_filepath = os.path.join(
         third_party_directory_path, MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
 
-    _minify_and_create_sourcemap(
-        third_party_js_filepath, minified_third_party_js_filepath
-    )
     _minify_css(third_party_css_filepath, minified_third_party_css_filepath)
     # Clean up un-minified third_party.js and third_party.css.
-    safe_delete_file(third_party_js_filepath)
     safe_delete_file(third_party_css_filepath)
 
 
@@ -692,9 +640,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     print('Building third party libs at %s' % third_party_directory_path)
 
-    third_party_js_filepath = os.path.join(
-        third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH
-    )
     third_party_css_filepath = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH
     )
@@ -703,9 +648,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     )
 
     dependency_filepaths = get_dependencies_filepaths()
-    common.ensure_directory_exists(os.path.dirname(third_party_js_filepath))
-    with utils.open_file(third_party_js_filepath, 'w+') as third_party_js_file:
-        _join_files(dependency_filepaths['js'], third_party_js_file)
 
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
     with utils.open_file(
@@ -976,7 +918,7 @@ def filter_hashes(file_hashes: Dict[str, str]) -> Dict[str, str]:
 
 
 def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
-    """Return JS code that loads hashes needed for frontend into variable.
+    """Filters and saves hashes needed for frontend to hashes.json file.
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -984,13 +926,7 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     """
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
-
-    common.ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
-    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
-        hashes_json_file.write(
-            str(json.dumps(filtered_hashes, ensure_ascii=False))
-        )
-        hashes_json_file.write('\n')
+    common.write_hashes_json_file(filtered_hashes)
 
 
 def minify_func(source_path: str, target_path: str, filename: str) -> None:
@@ -1362,10 +1298,6 @@ def _verify_hashes(
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME]
     )
-    third_party_js_final_filename = _insert_hash(
-        MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH],
-    )
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH],
@@ -1374,9 +1306,6 @@ def _verify_hashes(
     _ensure_files_exist(
         [
             os.path.join(ASSETS_OUT_DIR, hash_final_filename),
-            os.path.join(
-                THIRD_PARTY_GENERATED_OUT_DIR, third_party_js_final_filename
-            ),
             os.path.join(
                 THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename
             ),
@@ -1547,13 +1476,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            generate_python_package()
-            if options.source_maps:
-                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-            else:
-                build_using_webpack(WEBPACK_PROD_CONFIG)
-            build_using_ng()
+        generate_python_package()
+        if options.source_maps:
+            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+        else:
+            build_using_webpack(WEBPACK_PROD_CONFIG)
+        build_using_ng()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 

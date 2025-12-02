@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
+from core import feconf, utils
 from core.domain import caching_domain, redis_services
 from core.platform import models
 
@@ -39,39 +39,6 @@ class RedisClient:
         self._redishost: Optional[str] = None
         self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
         self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
-
-    def _update_clients_if_needed(self) -> None:
-        """Recreates and updates clients if the redis host has changed."""
-        with datastore_services.get_ndb_context():
-            new_redishost = redis_services.get_redis_host()
-
-        if new_redishost != self._redishost:
-            self._redishost = new_redishost
-            if self._redishost:
-                # Redis client for our own implementation of caching.
-                # Here we use MyPy ignore because our stubs define StrictRedis as a
-                # generic (e.g., StrictRedis[str]) to represent the runtime behavior
-                # controlled by the `decode_responses` argument, and mypy 1.0+ now
-                # requires these explicit type arguments.
-                self._oppia_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
-                    host=self._redishost,
-                    port=feconf.REDISPORT,
-                    db=feconf.OPPIA_REDIS_DB_INDEX,
-                    decode_responses=True,
-                )
-                # Redis client for the Cloud NDB cache.
-                # Here we use MyPy ignore because our stubs define StrictRedis as a
-                # generic (e.g., StrictRedis[str]) to represent the runtime behavior
-                # controlled by the `decode_responses` argument, and mypy 1.0+ now
-                # requires these explicit type arguments.
-                self._cloud_ndb_redis_client = redis.StrictRedis(  # type: ignore[type-arg]
-                    host=self._redishost,
-                    port=feconf.REDISPORT,
-                    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
-                )
-            else:
-                self._oppia_redis_client = None
-                self._cloud_ndb_redis_client = None
 
     def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
         """Fetches redis model and obtains oppia redis client.
@@ -95,6 +62,114 @@ class RedisClient:
 REDIS_CLIENT = RedisClient()
 
 
+class OppiaRedisClient(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the Oppia Redis client."""
+
+    def __init__(self) -> None:
+        """Initialize the Oppia Redis client."""
+        self._redishost: Optional[str] = None
+        self._client: Optional[redis.StrictRedis[str]] = None
+
+    def _update_client_if_needed(self) -> None:
+        """Recreates and updates client if the redis host has changed."""
+        with datastore_services.get_ndb_context():
+            new_redishost = redis_services.get_redis_host()
+
+        if new_redishost != self._redishost:
+            self._redishost = new_redishost
+            if self._redishost:
+                # Here we use MyPy ignore because redis.StrictRedis is a generic
+                # type but the redis-py library's type stubs don't properly
+                # specify the type arguments, leading to type-arg errors that
+                # we cannot fix without modifying the library.
+                self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+                    host=self._redishost,
+                    port=feconf.REDISPORT,
+                    db=feconf.OPPIA_REDIS_DB_INDEX,
+                    decode_responses=True,
+                )
+            else:
+                self._client = None
+
+    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
+    # the redis-py library's type stubs don't properly specify the type
+    # arguments, leading to type-arg errors that we cannot fix without
+    # modifying the library.
+    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+        """Return the Redis client instance.
+
+        Returns:
+            redis.StrictRedis. The Redis client instance.
+        """
+        self._update_client_if_needed()
+        return self._client
+
+
+class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the Cloud NDB Redis client."""
+
+    def __init__(self) -> None:
+        """Initialize the Cloud NDB Redis client."""
+        self._redishost: Optional[str] = None
+        self._client: Optional[redis.StrictRedis[str]] = None
+
+    def _update_client_if_needed(self) -> None:
+        """Recreates and updates client if the redis host has changed."""
+        with datastore_services.get_ndb_context():
+            new_redishost = redis_services.get_redis_host()
+
+        if new_redishost != self._redishost:
+            self._redishost = new_redishost
+            if self._redishost:
+                # Here we use MyPy ignore because redis.StrictRedis is a generic
+                # type but the redis-py library's type stubs don't properly
+                # specify the type arguments, leading to type-arg errors that
+                # we cannot fix without modifying the library.
+                self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+                    host=self._redishost,
+                    port=feconf.REDISPORT,
+                    db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
+                )
+            else:
+                self._client = None
+
+    # Here we use MyPy ignore because redis.StrictRedis is a generic type but
+    # the redis-py library's type stubs don't properly specify the type
+    # arguments, leading to type-arg errors that we cannot fix without
+    # modifying the library.
+    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+        """Return the Redis client instance.
+
+        Returns:
+            redis.StrictRedis. The Redis client instance.
+        """
+        return self._client
+
+
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
+def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+    """Get or create the Oppia Redis client lazily.
+
+    Returns:
+        redis.StrictRedis. The Oppia Redis client instance.
+    """
+    return OppiaRedisClient().get_client()
+
+
+# Here we use MyPy ignore because redis.StrictRedis is a generic type but the
+# redis-py library's type stubs don't properly specify the type arguments,
+# leading to type-arg errors that we cannot fix without modifying the library.
+def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+    """Get or create the Cloud NDB Redis client lazily.
+
+    Returns:
+        redis.StrictRedis. The Cloud NDB Redis client instance.
+    """
+    return CloudNdbRedisClient().get_client()
+
+
 def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     """Returns a memory profile of the redis cache. Visit
     https://redis.io/commands/memory-stats for more details on what exactly is
@@ -105,10 +180,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if not oppia_redis_client:
-        return caching_domain.MemoryCacheStats(0, 0, 0)
-    redis_full_profile = oppia_redis_client.memory_stats()
+    redis_full_profile = get_oppia_redis_client().memory_stats()
     return caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
@@ -118,13 +190,8 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if oppia_redis_client:
-        oppia_redis_client.flushdb()
-
-    cloud_ndb_redis_client = REDIS_CLIENT.get_cloud_ndb_redis_client()
-    if cloud_ndb_redis_client:
-        cloud_ndb_redis_client.flushdb()
+    get_oppia_redis_client().flushdb()
+    get_cloud_ndb_redis_client().flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -138,10 +205,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if not oppia_redis_client:
-        return [None] * len(keys)
-    return oppia_redis_client.mget(keys)
+    return get_oppia_redis_client().mget(keys)
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -156,10 +220,7 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if not oppia_redis_client:
-        return False
-    return oppia_redis_client.mset(key_value_mapping)
+    return get_oppia_redis_client().mset(key_value_mapping)
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -173,7 +234,4 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
-    oppia_redis_client = REDIS_CLIENT.get_oppia_redis_client()
-    if not oppia_redis_client:
-        return 0
-    return oppia_redis_client.delete(*keys)
+    return get_oppia_redis_client().delete(*keys)
