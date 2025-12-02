@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Run Current Test File",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "scripts.run_backend_tests",
+            "args": [
+                "--test_targets=${relativeFileDirname}.${fileBasenameNoExtension}",
+                "--verbose"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
