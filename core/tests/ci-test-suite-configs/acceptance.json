@@ -500,6 +500,5 @@
       "name": "logged-out-user/select-and-play-topic-from-classroom-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/select-and-play-topic-from-classroom-page.spec.ts"
     }
-  ],
-  "docker_suites": []
+  ]
 }

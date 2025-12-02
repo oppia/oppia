@@ -1,7 +1,7 @@
 <div *ngIf="canShowExploreVersionHistoryButton();" class="explore-version-history-container">
   <div tabindex="0">
     This card was last edited by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }}</strong> of the exploration.
-    <a class="text-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()">See commit history</a>.
+    <a class="link-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()">See commit history</a>.
   </div>
 </div>
 <div *ngIf="!canShowExploreVersionHistoryButton()" class="explore-version-history-container">

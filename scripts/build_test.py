@@ -25,12 +25,11 @@ import io
 import os
 import pathlib
 import re
-import subprocess
 import sys
 import tempfile
 import threading
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
@@ -512,7 +511,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with utils.open_file(hashes_path, 'r') as hashes_file:
@@ -837,10 +836,9 @@ class BuildTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                tmp.write('Some content in mock_app_dev.yaml\n')
-                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
-                tmp.write('version: default')
+            tmp.write('Some content in mock_app_dev.yaml\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
@@ -886,16 +884,9 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        # TODO(#18260): Change this when we permanently move to
-        # the Dockerized Setup.
-        firebase_host = (
-            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
-        )
         with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write(
-                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host
-            )
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
@@ -1397,53 +1388,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                servers,
-                'managed_webpack_compiler',
-                error=subprocess.CalledProcessError(return_code, []),
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys,
-                'exit',
-                lambda _: None,
-                expected_args=[
-                    # When the code under test runs, the first sys.exit call halts
-                    # execution. However, when this test runs, sys.exit is mocked
-                    # and so does not interrupt the execution flow. Therefore we
-                    # call sys.exit with the error code from the webpack compilation
-                    # process (2) 5 times (the maximum number of attempts allowed to
-                    # compile webpack) and then exit with code 1 after giving up
-                    # trying to compile webpack.
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (1,),
-                ],
-            )
         )
 
         build.build_js_files(True)
