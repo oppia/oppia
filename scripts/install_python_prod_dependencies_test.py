@@ -787,6 +787,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 Distribution('dependency-1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
                 Distribution('dependency3-hyphenated', '3.4.0', {}),
+                Distribution('dependency4.multi-word-suffix', '1.1.2', {}),
                 Distribution('dependency-5', '0.5.3', {}),
                 Distribution(
                     'dependency6',
@@ -810,6 +811,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
                 'dependency3.hyphenated-3.4.0.dist-info',
+                'dependency4.multi_word_suffix-1.1.2.dist-info',
                 'dependency-5-0.5.3-py3.10.egg-info',
                 'dependency_6-0.5.3-py3.10.egg-info',
             ]

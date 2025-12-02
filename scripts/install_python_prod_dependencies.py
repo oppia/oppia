@@ -444,7 +444,7 @@ def _get_possible_normalized_metadata_directory_names(
         library_name,
         library_name.replace('-', '_'),
         library_name.replace('-', '.'),
-        library_name.replace('-', '.', 1),
+        library_name.replace('-', '.', 1).replace('-', '_'),
     ]
 
     possible_names = set()
