@@ -38,6 +38,7 @@ from core.tests import test_utils
 
 from typing import Dict, Final, List, Union
 
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models, skill_models
@@ -1765,6 +1766,431 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             ),
             [],
         )
+
+    def test_filter_skills_by_status_returns_only_unassigned_skills(
+        self,
+    ) -> None:
+        """Test that the UNASSIGNED status in _filter_skills_by_status
+        correctly filters skills with empty topic_names."""
+
+        # Create one unassigned skill (empty topic_names)
+        unassigned_skill = skill_domain.AugmentedSkillSummary(
+            skill_id='skill_unassigned',
+            description='Unassigned skill',
+            topic_names=[],
+            skill_model_last_updated=None,
+            skill_model_created_on=None,
+            misconception_count=0,
+            language_code='en',
+            version=1,
+            classroom_names=[],
+        )
+
+        # Create one assigned skill (non-empty topic_names)
+        assigned_skill = skill_domain.AugmentedSkillSummary(
+            skill_id='skill_assigned',
+            description='Assigned skill',
+            topic_names=['Topic 1'],
+            skill_model_last_updated=None,
+            skill_model_created_on=None,
+            misconception_count=0,
+            language_code='en',
+            version=1,
+            classroom_names=[],
+        )
+
+        augmented_skills = [unassigned_skill, assigned_skill]
+
+        # Call the function with UNASSIGNED filter
+        unassigned_results = skill_services._filter_skills_by_status(
+            augmented_skill_summaries=augmented_skills,
+            status=constants.SKILL_STATUS_OPTIONS['UNASSIGNED'],
+        )
+
+        # Only the unassigned skill should be returned
+        self.assertEqual(len(unassigned_results), 1)
+        self.assertEqual(unassigned_results[0].id, 'skill_unassigned')
+
+    def test_get_rubrics_of_skills_with_missing_skill(self) -> None:
+        """Test the branch where get_multi_skills returns None for a skill."""
+        # Use a fake skill ID that does not exist
+        missing_skill_id = 'non_existent_skill'
+
+        # Temporarily patch get_multi_skills to include None
+        original_fetcher = skill_fetchers.get_multi_skills
+        skill_fetchers.get_multi_skills = lambda ids, strict=False: [None]
+
+        try:
+            # Call get_rubrics_of_skills with the missing skill ID
+            skill_rubrics, deleted_skill_ids = (
+                skill_services.get_rubrics_of_skills([missing_skill_id])
+            )
+
+            # Since the skill is None, the rubrics dict should be None
+            self.assertEqual(skill_rubrics, {missing_skill_id: None})
+            # The deleted_skill_ids list should include the missing skill
+            self.assertEqual(deleted_skill_ids, [missing_skill_id])
+        finally:
+            # Restore original fetcher to avoid affecting other tests
+            skill_fetchers.get_multi_skills = original_fetcher
+
+    def test_get_descriptions_of_skills_with_none_summary(self) -> None:
+        """Test the branch where get_multi_skill_summaries returns None for a skill summary."""
+        # Use a fake skill ID that does not exist
+        missing_skill_id = 'non_existent_skill'
+
+        # Temporarily patch get_multi_skill_summaries to return [None]
+        original_getter = skill_services.get_multi_skill_summaries
+        skill_services.get_multi_skill_summaries = lambda ids: [None]
+
+        try:
+            # Call get_descriptions_of_skills with the missing skill ID
+            skill_descriptions, deleted_skill_ids = (
+                skill_services.get_descriptions_of_skills([missing_skill_id])
+            )
+
+            # Since the summary is None, the description dict should be empty
+            self.assertEqual(skill_descriptions, {})
+            # The deleted_skill_ids list should include the missing skill
+            self.assertEqual(deleted_skill_ids, [missing_skill_id])
+        finally:
+            # Restore the original function
+            skill_services.get_multi_skill_summaries = original_getter
+
+    def test_get_all_topic_assignment_subtopic_id_when_skill_not_in_subtopic(
+        self,
+    ) -> None:
+        # Create a topic ID
+        topic_id = topic_fetchers.get_new_topic_id()
+
+        # Create a subtopic that does NOT include the skill
+        subtopic = topic_domain.Subtopic(
+            1,
+            'Subtopic Title',
+            skill_ids=[],  # <- empty so branch is False
+            thumbnail_filename='image.svg',
+            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'subtopic'
+            ][0],
+            thumbnail_size_in_bytes=123,
+            url_fragment='subtopic-url',
+        )
+
+        # Save a topic with the skill in uncategorized_skill_ids
+        self.save_new_topic(
+            topic_id,
+            self.USER_ID,
+            name='Topic 1',
+            abbreviated_name='topic-1',
+            url_fragment='topic-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.SKILL_ID],  # <- skill present here
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+
+        assignments = skill_services.get_all_topic_assignments_for_skill(
+            self.SKILL_ID
+        )
+
+        # The subtopic_id should be None because skill isn't in subtopic
+        self.assertEqual(assignments[0].subtopic_id, None)
+
+    def test_replace_skill_id_in_all_topics_updates_only_topics_containing_old_skill(
+        self,
+    ) -> None:
+        user_id = self.USER_ID
+        old_skill_id = 'old_skill'
+        new_skill_id = 'new_skill'
+
+        # Create two skills
+        self.save_new_skill(
+            old_skill_id,
+            user_id,
+            description='Old',
+        )
+        self.save_new_skill(
+            new_skill_id,
+            user_id,
+            description='New',
+        )
+
+        # Create a topic containing the old skill
+        topic_with_skill = topic_domain.Topic.create_default_topic(
+            'topic_with', 'Topic With', 'tw', 'desc', 'frag-one'
+        )
+        topic_with_skill.uncategorized_skill_ids = [old_skill_id]
+        topic_with_skill.subtopics = []
+        topic_with_skill.skill_ids_for_diagnostic_test = []
+        topic_services.save_new_topic(user_id, topic_with_skill)
+
+        # Create a topic that does not contain the old skill
+        topic_without_skill = topic_domain.Topic.create_default_topic(
+            'topic_without', 'Topic Without', 'two', 'desc', 'frag-two'
+        )
+        topic_without_skill.uncategorized_skill_ids = []
+        topic_without_skill.subtopics = []
+        topic_without_skill.skill_ids_for_diagnostic_test = []
+        topic_services.save_new_topic(user_id, topic_without_skill)
+
+        # Execute replace_skill_id_in_all_topics
+        skill_services.replace_skill_id_in_all_topics(
+            user_id, old_skill_id, new_skill_id
+        )
+
+        updated_topic_with = topic_fetchers.get_topic_by_id('topic_with')
+        updated_topic_without = topic_fetchers.get_topic_by_id('topic_without')
+
+        # topic_with: old replaced with new (Topic containing old skill should have it replaced)
+        self.assertIn(new_skill_id, updated_topic_with.get_all_skill_ids())
+        self.assertNotIn(old_skill_id, updated_topic_with.get_all_skill_ids())
+
+        # topic_without: untouched (Topic without old skill should remain unchanged)
+        self.assertEqual(updated_topic_without.get_all_skill_ids(), [])
+
+    def test_replace_skill_id_in_all_topics_replaces_uncategorized_subtopics_do_not_contain_skill(
+        self,
+    ) -> None:
+        user_id = self.USER_ID
+        old_skill_id = 'old_skill'
+        new_skill_id = 'new_skill'
+
+        # Create skills
+        self.save_new_skill(old_skill_id, user_id, description='old')
+        self.save_new_skill(new_skill_id, user_id, description='new')
+
+        # Topic where old_skill_id is ONLY in uncategorized
+        # (not in any subtopic)
+        topic_id = 'topic_subtopic_false'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'T', 't', 'desc', 'frag-t'
+        )
+        # Old skill present in uncategorized
+        topic.uncategorized_skill_ids = [old_skill_id]
+
+        # Add a subtopic that does not contain old_skill_id
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Sub',
+                ['some_other_skill'],
+                'img.svg',
+                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                12345,
+                'frag-sub',
+            )
+        ]
+        topic.next_subtopic_id = 2
+
+        topic_services.save_new_topic(user_id, topic)
+
+        # Run replace_skill_id_in_all_topics
+        skill_services.replace_skill_id_in_all_topics(
+            user_id, old_skill_id, new_skill_id
+        )
+
+        updated = topic_fetchers.get_topic_by_id(topic_id)
+
+        # Old skill removed, new added
+        self.assertIn(new_skill_id, updated.uncategorized_skill_ids)
+        self.assertNotIn(old_skill_id, updated.uncategorized_skill_ids)
+
+        # Subtopic remained unchanged (no moves)
+        self.assertEqual(updated.subtopics[0].skill_ids, ['some_other_skill'])
+
+    def test_remove_skill_from_all_topics_topic_without_skill(self) -> None:
+        user_id = self.USER_ID
+        skill_id = 'skill_to_remove'
+
+        # Create a topic without the skill to be removed
+        topic_id = 'topic_without_skill'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'title', 'abbrev', 'desc', 'frag-url'
+        )
+        topic.uncategorized_skill_ids = []
+        topic.subtopics = []
+        topic_services.save_new_topic(user_id, topic)
+
+        # Run replace_skill_id_in_all_topics
+        skill_services.remove_skill_from_all_topics(user_id, skill_id)
+
+        # Topic should remain unchanged
+        updated_topic = topic_fetchers.get_topic_by_id(topic_id)
+        self.assertEqual(updated_topic.get_all_skill_ids(), [])
+
+    def test_remove_skill_from_all_topics_does_not_modify_subtopics_when_skill_absent(
+        self,
+    ) -> None:
+        user_id = self.USER_ID
+        skill_id = 'skill_to_remove'
+
+        # Save the skill (so get_skill_summary_by_id works)
+        self.save_new_skill(skill_id, user_id, description='Skill description')
+
+        # Create a topic that has the skill only in uncategorized, not in subtopics
+        topic_id = 'topic_without_subtopic_skill'
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'title', 'abbrev', 'desc', 'url-frag'
+        )
+        topic.uncategorized_skill_ids = [skill_id]
+
+        # Add a subtopic that does NOT include the skill
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Subtopic Title',
+                skill_ids=['some_other_skill'],  # <- skill_id not here
+                thumbnail_filename='image.svg',
+                thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                    'subtopic'
+                ][0],
+                thumbnail_size_in_bytes=123,
+                url_fragment='subtopic-url',
+            )
+        ]
+        topic.next_subtopic_id = 2
+
+        topic_services.save_new_topic(user_id, topic)
+
+        # Call remove_skill_from_all_topics
+        skill_services.remove_skill_from_all_topics(user_id, skill_id)
+
+        updated_topic = topic_fetchers.get_topic_by_id(topic_id)
+
+        # Skill removed from uncategorized
+        self.assertNotIn(skill_id, updated_topic.uncategorized_skill_ids)
+
+        # Subtopic remains unchanged (skill not in subtopic)
+        self.assertEqual(
+            updated_topic.subtopics[0].skill_ids, ['some_other_skill']
+        )
+
+    def test_apply_change_list_ignores_unrecognized_contents_property_change(
+        self,
+    ) -> None:
+        """Test that apply_change_list continues without error when
+        a SkillChange has a property_name that does not match any handled branch.
+        This ensures the 'contents property' branch is skipped safely.
+        """
+        user_id = self.USER_ID
+        skill_id = 'skill_contents_branch_false'
+
+        # Create a skill
+        self.save_new_skill(skill_id, user_id, description='Original')
+
+        # Mock SkillChange class
+        class MockSkillChange:
+            def __init__(
+                self,
+                cmd: str,
+                property_name: str,
+                new_value: dict,
+                old_value: dict,
+            ) -> None:
+                self.cmd = cmd
+                self.property_name = property_name
+                self.new_value = new_value
+                self.old_value = old_value
+
+        # Create a "change" with a property_name that won't match the real branch
+        mocked_change = MockSkillChange(
+            skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+            'mocked_property',
+            {'html': '', 'content_id': 'exp'},
+            {'html': '', 'content_id': 'exp'},
+        )
+
+        updated_skill = skill_services.apply_change_list(
+            skill_id, [mocked_change], user_id
+        )
+
+        # The loop should continue without error and return the skill
+        self.assertIsNotNone(updated_skill)
+
+    def test_update_skill_applies_multiple_commands_correctly(self) -> None:
+        """Ensure update_skill correctly applies a delete-misconception command
+        followed by an update-property command in a single changelist."""
+
+        # Create a changelist that mixes different types of updates.
+        delete_misconception_change = skill_domain.SkillChange(
+            {
+                'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
+                'misconception_id': self.MISCONCEPTION_ID_1,
+            }
+        )
+        update_language_change = skill_domain.SkillChange(
+            {
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': skill_domain.SKILL_PROPERTY_LANGUAGE_CODE,
+                'old_value': 'en',
+                'new_value': 'bn',
+            }
+        )
+
+        changelist = [delete_misconception_change, update_language_change]
+
+        # Perform the update operation.
+        skill_services.update_skill(
+            self.USER_ID,
+            self.SKILL_ID,
+            changelist,
+            'Perform delete + language update.',
+        )
+
+        # Fetch updated skill for verification.
+        updated_skill = skill_fetchers.get_skill_by_id(self.SKILL_ID)
+
+        # Confirm the misconception deletion occurred.
+        self.assertEqual(
+            updated_skill.misconceptions,
+            [],
+            msg="Misconception should be deleted but still exists.",
+        )
+
+        # Confirm the language code was updated.
+        self.assertEqual(
+            updated_skill.language_code,
+            'bn',
+            msg="Language code was not updated to 'bn'.",
+        )
+
+    def test_get_untriaged_skill_summaries_excludes_assigned_skills(self):
+        # Create mock skill summaries
+        skill1 = skill_domain.SkillSummary(
+            skill_id='skill1',
+            description='Skill 1',
+            language_code='en',
+            version=1,
+            misconception_count=0,
+            skill_model_created_on=0,
+            skill_model_last_updated=0,
+        )
+        skill2 = skill_domain.SkillSummary(
+            skill_id='skill2',
+            description='Skill 2',
+            language_code='en',
+            version=1,
+            misconception_count=0,
+            skill_model_created_on=0,
+            skill_model_last_updated=0,
+        )
+
+        skill_summaries = [skill1, skill2]
+
+        # Setup sets so that the condition evaluates False for skill1
+        skill_ids_assigned_to_some_topic = {'skill1'}  # skill1 is assigned
+        merged_skill_ids = []  # skill2 is not merged
+
+        # Call the function
+        untriaged = skill_services.get_untriaged_skill_summaries(
+            skill_summaries, skill_ids_assigned_to_some_topic, merged_skill_ids
+        )
+
+        # Only skill2 should appear in untriaged
+        self.assertEqual(len(untriaged), 1)
+        self.assertEqual(untriaged[0].id, 'skill2')
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

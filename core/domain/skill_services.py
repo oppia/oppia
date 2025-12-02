@@ -874,10 +874,11 @@ def apply_change_list(
                     skill.update_superseding_skill_id(
                         update_superseding_skill_id_cmd.new_value
                     )
-                elif (
-                    change.property_name
-                    == skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED
-                ):
+                else:
+                    assert (
+                        change.property_name
+                        == skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED
+                    )
                     # Here we use cast because this 'elif'
                     # condition forces change to have type
                     # UpdateSkillPropertyAllQuestionsMergedCmd.
@@ -1015,11 +1016,12 @@ def apply_change_list(
                     )
                 else:
                     raise Exception('Invalid change dict.')
-            elif change.cmd in (
-                skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
-                skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,  # pylint: disable=line-too-long
-                skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
-            ):
+            else:
+                assert change.cmd in (
+                    skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+                    skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,  # pylint: disable=line-too-long
+                    skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION,
+                )
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
