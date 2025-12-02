@@ -1023,7 +1023,7 @@ def _regenerate_voiceovers_for_given_contents(
             )
         )
 
-    if voiceover_regeneration_task is None:
+    if task_run_id is not None and voiceover_regeneration_task is None:
         voiceover_regeneration_task = (
             create_voiceover_regeneration_task_with_status_generating(
                 exploration_id,
@@ -1031,6 +1031,10 @@ def _regenerate_voiceovers_for_given_contents(
                 language_code_to_contents_mapping,
                 language_code_to_autogeneratable_accent_codes,
             )
+        )
+
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task
         )
 
     for language_code in language_codes:

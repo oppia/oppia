@@ -112,6 +112,15 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
             )
         )
 
+        if (
+            voiceover_regeneration_task_domain_object.are_all_voiceovers_generated()
+        ):
+            delete_voiceover_regeneration_task_run_mapping(
+                voiceover_regeneration_task_domain_object.exploration_id,
+                voiceover_regeneration_task_domain_object.task_run_id,
+            )
+            continue
+
         voiceover_regeneration_task_domain_objects.append(
             voiceover_regeneration_task_domain_object
         )
@@ -133,17 +142,43 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
 
 
 def delete_voiceover_regeneration_task_run_mapping(
+    exploration_id: str,
     cloud_task_run_id: str,
 ) -> None:
     """Deletes the VoiceoverRegenerationTaskMappingModel entry for the given
     cloud task run id.
 
     Args:
+        exploration_id: str. The id of the exploration.
         cloud_task_run_id: str. The id of the cloud task run.
     """
+    model_id = '%s:%s' % (exploration_id, cloud_task_run_id)
     cloud_task_models.VoiceoverRegenerationTaskMappingModel.delete_by_id(
-        cloud_task_run_id
+        model_id
     )
+
+
+def update_voiceover_regeneration_task_run_mapping_for_content(
+    exploration_id, language_accent_code, content_id, regeneration_status
+):
+    voiceover_regeneration_task_requests = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
+        exploration_id
+    )
+
+    for task_mapping_model in voiceover_regeneration_task_requests:
+        if (
+            language_accent_code
+            in task_mapping_model.language_accent_to_content_status_map
+            and content_id
+            in task_mapping_model.language_accent_to_content_status_map[
+                language_accent_code
+            ]
+        ):
+            task_mapping_model.language_accent_to_content_status_map[
+                language_accent_code
+            ][content_id] = regeneration_status
+            task_mapping_model.update_timestamps()
+            task_mapping_model.put()
 
 
 def resolve_multiple_cloud_task_runs_for_exploration(

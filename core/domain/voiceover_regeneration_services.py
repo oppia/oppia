@@ -29,6 +29,7 @@ import uuid
 
 from core import feconf, utils
 from core.domain import (
+    cloud_task_services,
     exp_fetchers,
     fs_services,
     html_cleaner,
@@ -305,8 +306,6 @@ def synthesize_voiceover_for_html_string(
 
     parsed_text = parse_html(content_html)
 
-    time.sleep(10)
-
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
             parsed_text
@@ -520,6 +519,10 @@ def regenerate_voiceover_for_exploration_content(
     )
 
     voiceover = fetch_voiceover_by_filename(exploration_id, voiceover_filename)
+
+    cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
+        exploration_id, language_accent_code, content_id, 'SUCCEEDED'
+    )
 
     entity_voiceovers = (
         voiceover_services.get_voiceovers_for_given_language_accent_code(
