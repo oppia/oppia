@@ -950,9 +950,11 @@ export class MusicNotesInputComponent
     this.directiveSubscriptions.unsubscribe();
   }
 
-  getDragData(note: Note) {
+  getDragData(note: Note): DraggedNoteData {
     return {
-      ...note,
+      id: note.id,
+      type: note.type.toString(),
+      noteType: note.type,
       isPalette: false,
     };
   }
