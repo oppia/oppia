@@ -481,7 +481,7 @@ describe('screenreader and keyboard user accessibility features', function () {
     await explorationPlayerPage.expectExplorationToNotBeOver();
 
     // Should test the skip to main content shortcut.
-    var mainContent = $('.e2e-test-main-content');
+    var mainContent = await $('.e2e-test-main-content');
     await checkActionShortcuts('s', mainContent);
   });
 
@@ -512,7 +512,7 @@ describe('screenreader and keyboard user accessibility features', function () {
     await browser.keys('Enter');
 
     // Should safely exit out of the exploration.
-    var oppiaLogo = $('.e2e-test-oppia-main-logo');
+    var oppiaLogo = await $('.e2e-test-oppia-main-logo');
     await action.click('Oppia Logo', oppiaLogo);
   });
 
