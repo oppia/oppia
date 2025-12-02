@@ -637,6 +637,39 @@ describe('Tutor card component', () => {
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
   }));
 
+  it('should make sure the nextMilestoneChapterCount is to be 5 when completed chapters count is 4', fakeAsync(() => {
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.resolve());
+
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      4
+    );
+    spyOn(
+      componentInstance,
+      'isCompletedChaptersCountGreaterThanLastMilestone'
+    ).and.returnValue(false);
+    spyOn(
+      componentInstance,
+      'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
+    ).and.returnValue(false);
+    spyOn(componentInstance, 'shouldShowProgressBar').and.returnValue(false);
+
+    const targetSpy = spyOn(
+      componentInstance,
+      'setNextMilestoneAndCheckIfProgressBarIsShown'
+    ).and.callThrough();
+
+    componentInstance.ngOnInit();
+    tick();
+
+    expect(targetSpy).toHaveBeenCalledTimes(1);
+    expect(componentInstance.shouldShowProgressBar).toBe(true);
+    expect(componentInstance.nextMilestoneChapterCount).toBe(5);
+  }));
+
   it('should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone', fakeAsync(() => {
     componentInstance.completedChaptersCount = 55;
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
