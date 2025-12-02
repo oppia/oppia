@@ -20,25 +20,17 @@ server.
 from __future__ import annotations
 
 import argparse
-import contextlib
-import os
-import time
+import sys
 
 from core.constants import (  # pylint: disable=wrong-import-position, wrong-import-order
     constants,
 )
+from scripts import start_utils
 
-from typing import Iterator, Optional, Sequence
+from typing import Optional, Sequence
 
 # Do not import any Oppia modules here,
 # import them below the "install_third_party_libs.main()" line.
-from . import (  # pylint: disable=wrong-import-position, wrong-import-order
-    build,
-    common,
-    extend_index_yaml,
-    install_third_party_libs,
-    servers,
-)
 
 _PARSER = argparse.ArgumentParser(
     description="""
@@ -93,63 +85,50 @@ _PARSER.add_argument(
     'third party libraries',
     action='store_true',
 )
+_PARSER.add_argument(
+    '--verify-imports',
+    help='optional; if specified, verifies that all dependencies can be '
+    'imported and then exits.',
+    action='store_true',
+)
 
 PORT_NUMBER_FOR_GAE_SERVER = 8181
-
-
-@contextlib.contextmanager
-def alert_on_exit() -> Iterator[None]:
-    """Context manager that alerts developers to wait for a graceful shutdown.
-
-    Yields:
-        None. Nothing.
-    """
-    try:
-        yield
-    finally:
-        print(
-            '\n\n'
-            # ANSI escape sequence for bright yellow text color.
-            '\033[93m'
-            # ANSI escape sequence for bold font.
-            '\033[1m'
-            'Servers are shutting down, please wait for them to end gracefully!'
-            # ANSI escape sequence for resetting formatting.
-            '\033[0m'
-            '\n\n'
-        )
-        # Give developers an opportunity to read the alert.
-        time.sleep(5)
-
-
-def notify_about_successful_shutdown() -> None:
-    """Notifies developers that the servers have shutdown gracefully."""
-    print(
-        '\n\n'
-        # ANSI escape sequence for bright green text color.
-        '\033[92m'
-        # ANSI escape sequence for bold font.
-        '\033[1m'
-        # The notification.
-        'Done! Thank you for waiting.'
-        # ANSI escape sequence for resetting formatting.
-        '\033[0m'
-        '\n\n'
-    )
-
-
-def call_extend_index_yaml() -> None:
-    """Calls the extend_index_yaml.py script."""
-    print('\033[94mExtending index.yaml...\033[0m')
-    extend_index_yaml.main()
 
 
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Starts up a development server running Oppia."""
     parsed_args = _PARSER.parse_args(args=args)
 
-    if common.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
-        common.print_each_string_after_two_new_lines(
+    if parsed_args.verify_imports:
+        # This flag is used to verify that all dependencies can be imported
+        # correctly. This is useful for CI to catch missing dependencies
+        # without starting the full server.
+        # IMPORTANT: We must NOT import _start_main here as it has top-level
+        # imports that may have side effects.
+        print('Verifying imports...')
+        try:
+            # Import core dependencies that start.py needs
+            start_utils.lazy_import('scripts.install_third_party_libs')
+            
+            # Import heavy modules that would normally be needed
+            # These are the ones that caused issues previously
+            start_utils.lazy_import('scripts.build')
+            start_utils.lazy_import('scripts.common')
+            start_utils.lazy_import('scripts.servers')
+            start_utils.lazy_import('scripts.extend_index_yaml')
+            start_utils.lazy_import('core.utils')
+            start_utils.lazy_import('filetype')
+            start_utils.lazy_import('certifi')
+            start_utils.lazy_import('xmltodict')
+            
+            print('Imports verified successfully.')
+            sys.exit(0)
+        except Exception as e:
+            print(f'Import verification failed: {e}')
+            sys.exit(1)
+
+    if start_utils.is_port_in_use(PORT_NUMBER_FOR_GAE_SERVER):
+        start_utils.print_each_string_after_two_new_lines(
             [
                 'WARNING',
                 'Could not start new server. There is already an existing server '
@@ -157,115 +136,16 @@ def main(args: Optional[Sequence[str]] = None) -> None:
             ]
         )
 
-    # NOTE: The ordering of alert_on_exit() is important because we want the
-    # alert to be printed _before_ the ExitStack unwinds, hence its placement as
-    # the "latter" context (context managers exit in reverse-order).
-    with contextlib.ExitStack() as stack, alert_on_exit():
-        # ExitStack unwinds in reverse-order, so this will be the final action.
-        stack.callback(notify_about_successful_shutdown)
-        stack.callback(call_extend_index_yaml)
+    if not parsed_args.skip_install:
+        # This installs third party libraries before
+        # importing other files or importing
+        # libraries that use the builtins python module (e.g. build).
+        from . import install_third_party_libs
+        install_third_party_libs.main()
 
-        if not parsed_args.skip_install:
-            # This installs third party libraries before
-            # importing other files or importing
-            # libraries that use the builtins python module (e.g. build).
-            install_third_party_libs.main()
-
-        build_args = []
-        if parsed_args.prod_env:
-            build_args.append('--prod_env')
-        if parsed_args.maintenance_mode:
-            build_args.append('--maintenance_mode')
-        if parsed_args.source_maps:
-            build_args.append('--source_maps')
-        build.main(args=build_args)
-        stack.callback(common.set_constants_to_default)
-
-        stack.enter_context(servers.managed_redis_server())
-        stack.enter_context(servers.managed_elasticsearch_dev_server())
-
-        if constants.EMULATOR_MODE:
-            stack.enter_context(
-                servers.managed_firebase_auth_emulator(
-                    recover_users=parsed_args.save_datastore
-                )
-            )
-            stack.enter_context(
-                servers.managed_cloud_datastore_emulator(
-                    clear_datastore=not parsed_args.save_datastore
-                )
-            )
-
-        # NOTE: When prod_env=True the Webpack compiler is run by build.main().
-        if not parsed_args.prod_env:
-            # We need to create an empty hashes.json file for the build so that
-            # we don't get the error "assets/hashes.json file doesn't exist".
-            common.write_hashes_json_file({})
-            stack.enter_context(servers.managed_ng_build(watch_mode=True))
-            stack.enter_context(
-                servers.managed_webpack_compiler(
-                    use_prod_env=False,
-                    use_source_maps=parsed_args.source_maps,
-                    watch_mode=True,
-                )
-            )
-
-        env = os.environ.copy()
-        env['PIP_NO_DEPS'] = 'True'
-        app_yaml_path = 'app.yaml' if parsed_args.prod_env else 'app_dev.yaml'
-        dev_appserver = stack.enter_context(
-            servers.managed_dev_appserver(
-                app_yaml_path,
-                enable_host_checking=not parsed_args.disable_host_checking,
-                automatic_restart=not parsed_args.no_auto_restart,
-                skip_sdk_update_check=True,
-                port=PORT_NUMBER_FOR_GAE_SERVER,
-                env=env,
-            )
-        )
-
-        if parsed_args.no_browser:
-            common.print_each_string_after_two_new_lines(
-                [
-                    'INFORMATION',
-                    'Local development server is ready! You can access it by '
-                    'navigating to http://localhost:%s/ in a web '
-                    'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                ]
-            )
-        else:
-            try:
-                stack.enter_context(
-                    servers.create_managed_web_browser(
-                        PORT_NUMBER_FOR_GAE_SERVER
-                    )
-                )
-                common.print_each_string_after_two_new_lines(
-                    [
-                        'INFORMATION',
-                        'Local development server is ready! Opening a default web '
-                        'browser window pointing to it: '
-                        'http://localhost:%s/' % PORT_NUMBER_FOR_GAE_SERVER,
-                    ]
-                )
-            except Exception as error:
-                common.print_each_string_after_two_new_lines(
-                    [
-                        'ERROR',
-                        'Error occurred while attempting to automatically launch '
-                        'the web browser: %s' % error,
-                    ]
-                )
-                common.print_each_string_after_two_new_lines(
-                    [
-                        'INFORMATION',
-                        'Local development server is ready! You can access it by '
-                        'navigating to http://localhost:%s/ in a web '
-                        'browser.' % PORT_NUMBER_FOR_GAE_SERVER,
-                    ]
-                )
-
-        dev_appserver.wait()
+    # Import the main logic after installation
+    from . import _start_main
+    _start_main.main(parsed_args)
 
 
 if __name__ == '__main__':  # pragma: no cover

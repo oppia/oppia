@@ -34,9 +34,12 @@ from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from scripts import servers
 
-import certifi
+
+
+from scripts import start_utils
+
+
 from typing import Dict, Final, Generator, List, Optional, Tuple, Union
 
 # Add third_party to path. Some scripts access feconf even before
@@ -484,10 +487,7 @@ def is_port_in_use(port: int) -> bool:
     Returns:
         bool. True if port is open else False.
     """
-    with contextlib.closing(
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ) as s:
-        return bool(not s.connect_ex(('localhost', port)))
+    return start_utils.is_port_in_use(port)
 
 
 def recursive_chown(path: str, uid: int, gid: int) -> None:
@@ -528,8 +528,7 @@ def print_each_string_after_two_new_lines(strings: List[str]) -> None:
     Args:
         strings: list(str). The strings to print.
     """
-    for string in strings:
-        print('%s\n' % string)
+    start_utils.print_each_string_after_two_new_lines(strings)
 
 
 def install_npm_library(library_name: str, version: str, path: str) -> None:
@@ -795,6 +794,7 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
+    certifi = start_utils.lazy_import('certifi')
     context = ssl.create_default_context(cafile=certifi.where())
     return urlrequest.urlopen(source_url, context=context)
 
@@ -900,6 +900,7 @@ def run_ng_compilation() -> None:
     ng_bundles_dir_name = 'dist/oppia-angular'
     for _ in range(max_tries):
         try:
+            servers = start_utils.lazy_import('scripts.servers')
             with servers.managed_ng_build() as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:

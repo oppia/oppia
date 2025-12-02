@@ -35,7 +35,7 @@ import urllib.parse
 from core import feconf
 from core.constants import constants
 
-import filetype
+
 import yaml
 from PIL import Image
 from typing import (
@@ -479,6 +479,8 @@ def convert_image_binary_to_data_url(content: bytes, file_type: str) -> str:
         Exception. The given binary string does not represent a PNG image.
         Exception. The given binary string does not represent a WEBP image.
     """
+    from scripts import start_utils
+    filetype = start_utils.lazy_import('filetype')
     file_details = filetype.guess(content)
     if file_details is None or file_details.extension != file_type:
         raise Exception(
