@@ -27,6 +27,8 @@ import {Subscription} from 'rxjs';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {LoaderService} from 'services/loader.service';
 
 import './home-tab.component.css';
 
@@ -68,15 +70,27 @@ export class HomeTabComponent {
   communityLibraryUrl =
     '/' + AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE;
   hasMultipleUnfinishedPublished: boolean = false;
+  totalLessonCards: number = 0;
+  loadedLessonCards: number = 0;
+  allCardsLoaded: boolean = false;
+  loadingMessage: string = 'Loading';
 
   constructor(
     private i18nLanguageCodeService: I18nLanguageCodeService,
+    private loaderService: LoaderService,
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
-    private siteAnalyticsService: SiteAnalyticsService
+    private siteAnalyticsService: SiteAnalyticsService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
   ngOnInit(): void {
+    this.loaderService.showLoadingScreen('Loading');
     this.width = this.widthConst * this.currentGoals.length;
     var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
     this.currentGoalsLength = this.currentGoals.length;
@@ -96,29 +110,52 @@ export class HomeTabComponent {
     }
 
     // TODO(#18384): Test cases - current lesson is last lesson.
-    for (let i = 0; i < this.continueWhereYouLeftOffList.length; i++) {
-      let currentStorySummary =
-        this.continueWhereYouLeftOffList[i].getCanonicalStorySummaryDicts();
-      for (let j = 0; j < currentStorySummary.length; j++) {
-        const publishedNodes = currentStorySummary[j]
-          .getAllNodes()
-          .filter(node => node.getPublishedStatus());
+    for (const topic of this.partiallyLearntTopicsList) {
+      const storySummaries = topic.getCanonicalStorySummaryDicts();
 
-        const completedNodes = currentStorySummary[j].getCompletedNodeTitles();
-        const remainingPublished =
-          publishedNodes.length - completedNodes.length;
-        if (this.hasMultipleUnfinishedPublished !== true) {
-          this.hasMultipleUnfinishedPublished =
-            publishedNodes.length > 1 && remainingPublished > 0;
+      for (const story of storySummaries) {
+        let publishedNodesCount: number;
+        if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+          const publishedNodes = story
+            .getAllNodes()
+            .filter(node => node.getPublishedStatus());
+          publishedNodesCount = publishedNodes.length;
+        } else {
+          publishedNodesCount = story.getAllNodes().length;
         }
 
-        if (publishedNodes.length - 1 > completedNodes.length) {
-          this.storySummariesWithAvailableNodes.add(
-            currentStorySummary[j].getId()
-          );
+        const completedNodes = story.getCompletedNodeTitles();
+        const remainingPublished =
+          publishedNodesCount - completedNodes.length - 1;
+
+        if (
+          remainingPublished > 0 &&
+          remainingPublished < publishedNodesCount
+        ) {
+          this.storySummariesWithAvailableNodes.add(story.getId());
+        }
+        if (!this.hasMultipleUnfinishedPublished) {
+          this.hasMultipleUnfinishedPublished =
+            publishedNodesCount > 1 && remainingPublished > 0;
         }
       }
     }
+
+    this.totalLessonCards =
+      (this.incompleteExplorationsList?.length || 0) +
+      (this.incompleteCollectionsList?.length || 0) +
+      this.partiallyLearntTopicsList.reduce(
+        (acc, topic) => acc + topic.getCanonicalStorySummaryDicts().length,
+        0
+      );
+    if (
+      this.hasMultipleUnfinishedPublished &&
+      this.storySummariesWithAvailableNodes.size > 0
+    ) {
+      this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
+    }
+
+    this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -126,6 +163,29 @@ export class HomeTabComponent {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       })
     );
+
+    if (this.totalLessonCards === 0) {
+      this.allCardsLoaded = true;
+      this.loadingMessage = '';
+      this.loaderService.hideLoadingScreen();
+    } else {
+      setTimeout(() => {
+        if (!this.allCardsLoaded) {
+          this.allCardsLoaded = true;
+          this.loadingMessage = '';
+          this.loaderService.hideLoadingScreen();
+        }
+      }, 10000);
+    }
+  }
+
+  onLessonLoaded(): void {
+    this.loadedLessonCards++;
+    if (this.loadedLessonCards >= this.totalLessonCards) {
+      this.allCardsLoaded = true;
+      this.loadingMessage = '';
+      this.loaderService.hideLoadingScreen();
+    }
   }
 
   getTimeOfDay(): string {

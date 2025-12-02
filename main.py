@@ -593,15 +593,6 @@ URLS = [
         voiceover.VoiceoverLanguageCodesMappingHandler,
     ),
     get_redirect_route(
-        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
-        voiceover.VoiceArtistMetadataHandler,
-    ),
-    get_redirect_route(
-        r'%s/<voice_artist_id>/<language_code>'
-        % feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-        voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler,
-    ),
-    get_redirect_route(
         r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
         r'<entity_version>/<language_code>',
         voiceover.EntityVoiceoversBulkHandler,
@@ -1601,7 +1592,7 @@ class NdbWsgiMiddleware:
         self, environ: Dict[str, str], start_response: webapp2.Response
     ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT
+            cache_services.get_cloud_ndb_redis_client()
         )
         with datastore_services.get_ndb_context(global_cache=global_cache):
             return self.wsgi_app(environ, start_response)
@@ -1609,4 +1600,8 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()
+
+# Only establish Firebase connection when not running backend tests. This allows
+# test discovery and collection without requiring Google Cloud credentials.
+if 'pytest' not in __import__('sys').modules:
+    firebase_auth_services.establish_firebase_connection()

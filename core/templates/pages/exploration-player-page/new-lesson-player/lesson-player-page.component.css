@@ -12,14 +12,15 @@
 .oppia-new-player-content {
   background-color: #cadbda;
   display: flex;
-  min-height: calc(100vh - 104px);
+  justify-content: flex-end;
+  min-height: calc(100vh - 96px);
 }
 
 .oppia-new-player-main-content {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  width: 100%;
+  width: calc(100% - 83px);
 }
 
 .conversation-wrapper {
@@ -41,6 +42,10 @@
   z-index: -1;
 }
 
+.expanded-sidebar {
+  width: calc(100% - 243px);
+}
+
 oppia-new-conversation-skin {
   width: 100%;
 }
@@ -55,4 +60,22 @@ oppia-new-audio-bar {
 
 oppia-player-header {
   z-index: 2;
+}
+
+oppia-lesson-player-sidebar {
+  z-index: 3;
+}
+
+attribution-guide {
+  opacity: 0;
+}
+
+@media(max-width: 767px) {
+  .oppia-new-player-main-content {
+    width: 100vw;
+  }
+
+  .expanded-sidebar {
+    width: 100vw;
+  }
 }
