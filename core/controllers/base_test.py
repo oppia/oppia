@@ -2415,14 +2415,17 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
                 expected_status_int=400,
             )
 
-    def test_post_request_with_None_payload_raise_error(self) -> None:
+    def test_post_request_when_payload_arg_a_is_None_raise_error(self) -> None:
         testapp_swap = self.swap(self, 'testapp', self.testapp)
         payload_swap = self.swap(self, 'payload', None)
+
         with testapp_swap, payload_swap:
             self.post_json(
-                '/mock?arg_a=arg_in_request', None,
+                '/mock?arg_a=arg_in_request',
+                None,
                 csrf_token=self.csrf_token,
-                expected_status_int=400)
+                expected_status_int=400,
+            )
 
     def test_post_request_with_valid_source_do_not_raise_error(self) -> None:
         with self.swap(self, 'testapp', self.testapp):

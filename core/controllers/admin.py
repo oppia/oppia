@@ -1548,8 +1548,7 @@ class AdminHandler(
                 )
 
             story_node_index = 0
-            story_node_index = int(
-                story.story_contents.next_node_id[5:]) - 1
+            story_node_index = int(story.story_contents.next_node_id[5:]) - 1
             if story_node_index > 0:
                 story.update_node_destination_node_ids(
                     '%s%d' % (story_domain.NODE_ID_PREFIX, story_node_index),
@@ -2323,14 +2322,13 @@ class AdminHandler(
                         )
                     )
 
-            if graph_change_list:
-                topic_services.update_story_and_topic_summary(
-                    self.user_id,
-                    story_id,
-                    graph_change_list,
-                    'add node links',
-                    story.corresponding_topic_id,
-                )
+            topic_services.update_story_and_topic_summary(
+                self.user_id,
+                story_id,
+                graph_change_list,
+                'add node links',
+                story.corresponding_topic_id,
+            )
 
             # Ensure the story is published at the end of chapter generation.
             story = story_fetchers.get_story_by_id(story_id)

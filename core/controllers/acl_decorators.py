@@ -4890,7 +4890,8 @@ def can_update_suggestion(
             # Suggestion type must be SUGGESTION_TYPE_ADD_QUESTION.
             # Invalid suggestion type exception above guarantees this behavior.
             assert suggestion.suggestion_type == (
-                feconf.SUGGESTION_TYPE_ADD_QUESTION)
+                feconf.SUGGESTION_TYPE_ADD_QUESTION
+            )
             if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, suggestion_id, **kwargs)
 
