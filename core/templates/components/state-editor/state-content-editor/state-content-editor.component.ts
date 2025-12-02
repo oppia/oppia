@@ -167,7 +167,20 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   autoSaveContent(): void {
-    // Placeholder for auto-save logic - will be implemented in next commit.
+    if (!this.contentEditorIsOpen || !this.isContentEditable()) {
+      return;
+    }
+
+    // Check if content has actually changed from the saved state.
+    const currentContent = this.stateContentService.displayed;
+    const savedContent = this.stateContentService.savedMemento;
+
+    if (currentContent && savedContent && 
+        currentContent.html !== savedContent.html) {
+      // Save the content without closing the editor.
+      this.stateContentService.saveDisplayedValue();
+      this.saveStateContent.emit(this.stateContentService.displayed);
+    }
   }
 
   isContentEditable(): boolean {
