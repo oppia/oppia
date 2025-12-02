@@ -80,7 +80,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             return (
                 '# Just a comment',
                 '# Third party files:',
-                '- third_party/static/bootstrap-4.3.1/',
+                '- third_party/static/bootstrap-5.3.3/',
             )
 
         readlines_swap = self.swap(
@@ -103,7 +103,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         ) -> Tuple[str, ...]:
             return (
                 '# Third party files:',
-                '- third_party/static/bootstrap-4.3/',
+                '- third_party/static/bootstrap-5.3/',
             )
 
         readlines_swap = self.swap(

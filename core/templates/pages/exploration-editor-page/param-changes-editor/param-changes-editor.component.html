@@ -61,7 +61,7 @@
       </span>
       <span>
         Change
-        <select class="form-control e2e-test-history-version-dropdown-first"
+        <select class="form-select e2e-test-history-version-dropdown-first"
                 [(ngModel)]="paramChange.generatorId"
                 (change)="onChangeGeneratorType(paramChange)">
           <option *ngFor="let choice of PREAMBLE_TEXT | keyvalue; index as index" [value]="choice.key">{{ choice.value }}</option>
@@ -92,12 +92,12 @@
   </div>
 
   <button type="button"
-          class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-param-changes-button"
+          class="btn btn-success oppia-save-state-item-button float-end e2e-test-save-param-changes-button"
           (click)="saveParamChanges()"
           [disabled]="!areDisplayedParamChangesValid()">
     Save Changes
   </button>
-  <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
+  <button type="button" class="btn btn-secondary float-end" (click)="cancelEdit()">Cancel</button>
   <div class="oppia-clear"></div>
 </div>
 
@@ -113,7 +113,7 @@
       <em>No parameter changes.</em>
     </span>
     <div class="oppia-param-display-row" *ngFor="let paramChange of paramChangesService.savedMemento; index as index">
-      {{ index + 1 }}. Change <span class="badge badge-info">{{ paramChange.name }}</span>
+      {{ index + 1 }}. Change <span class="badge text-bg-info">{{ paramChange.name }}</span>
       {{ HUMAN_READABLE_ARGS_RENDERERS[paramChange.generatorId](paramChange.customizationArgs) }}
     </div>
   </div>
