@@ -518,10 +518,7 @@ class AndroidPlatformParametersHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because `HANDLER_ARGS_SCHEMAS` may contain
-    # schema mappings of different shapes (ints, bools, custom objects),
-    # and defining a precise TypedDict for each case is impractical.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'android_min_version_code_for_recommending_app_update': {
                 'schema': {'type': 'int'},
@@ -576,10 +573,7 @@ class AndroidFeatureFlagsHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    # Here we use object because `HANDLER_ARGS_SCHEMAS` may contain
-    # schema mappings of different shapes (ints, bools, custom objects),
-    # and defining a precise TypedDict for each case is impractical.
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, object]] = {
+    HANDLER_ARGS_SCHEMAS = {
         'GET': {
             'android_enable_fast_language_switching_in_lesson': {
                 'schema': {'type': 'bool'},
