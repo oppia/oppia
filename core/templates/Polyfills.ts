@@ -30,8 +30,13 @@ if (typeof String.prototype.trim !== 'function') {
 // Add an Object.create() polyfill for IE8.
 if (typeof Object.create !== 'function') {
   (function () {
-    var F = function () {};
-    Object.create = function (o) {
+    // Using interface to define a constructable function for IE8 polyfill.
+    interface Constructor {
+      new (): object;
+      prototype: object;
+    }
+    var F = function () {} as unknown as Constructor;
+    Object.create = function (o: object) {
       if (arguments.length > 1) {
         throw new Error('Second argument for Object.create() is not supported');
       }
@@ -61,7 +66,7 @@ Number.isInteger =
 // Add Array.fill() polyfill for IE.
 if (!Array.prototype.fill) {
   Object.defineProperty(Array.prototype, 'fill', {
-    value: function (value) {
+    value: function <T>(this: T[], value: T) {
       // Steps 1-2.
       if (this === null) {
         throw new TypeError('this is null or not defined');
@@ -165,14 +170,17 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
 
 // Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
-  Object.entries = (obj: Object) => {
+  Object.entries = <T>(obj: {[s: string]: T} | ArrayLike<T>): [string, T][] => {
     let objectProperties = Object.keys(obj);
     let i = objectProperties.length;
-    let objectEntriesArray = new Array(i); // Preallocate the array.
+    let objectEntriesArray = new Array(i) as [string, T][]; // Preallocate the array.
 
     while (i--) {
-      objectEntriesArray[i] = [objectProperties[i], obj[objectProperties[i]]];
-      return objectEntriesArray;
+      objectEntriesArray[i] = [
+        objectProperties[i],
+        (obj as {[key: string]: T})[objectProperties[i]],
+      ];
     }
+    return objectEntriesArray;
   };
 }

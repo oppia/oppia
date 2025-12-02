@@ -1,14 +1,13 @@
 {
   "RUN_NO_TESTS_ROOT_FILES": [
-    "AUTHORS",
-    "CONTRIBUTORS",
+    "AGENTS.md",
     ".github/CODEOWNERS",
     ".github/CODE_OF_CONDUCT.md",
     ".github/CONTRIBUTING.md",
     ".github/PULL_REQUEST_TEMPLATE.md",
     ".github/README.md",
     ".github/SECURITY.md",
-    ".github/ISSUE_TEMPLATE/4_server_error_template.md",
+    ".github/ISSUE_TEMPLATE/5_server_error_template.md",
     ".github/workflows/README.md",
     "core/tests/test-modules-mappings/README.md",
     "core/tests/README.md",

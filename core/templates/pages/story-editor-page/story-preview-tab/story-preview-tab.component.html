@@ -17,7 +17,7 @@
     <div *ngFor="let node of storyContents?._nodes let i = index;"
          target="_blank" rel="noopener">
       <div class="oppia-story-viewer-desktop">
-        <div [ngStyle]="(i > 0 && {'opacity': '0.5', 'display': 'flex'}) || { 'display': 'flex' }">
+        <div [class.node-disabled]="!node.getPublishedStatus()">
           <a class="oppia-story-viewer-card" [href]="getExplorationUrl(node)" tabindex="0">
             <span class="oppia-chapter-title" aria-live="assertive">
               <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span> {{i + 1}}: {{ node.getTitle() }}
@@ -61,7 +61,7 @@
           </a>
         </div>
       </div>
-      <div class="oppia-story-viewer-mobile-card-content" >
+      <div class="oppia-story-viewer-mobile-card-content" [class.node-disabled]="!node.getPublishedStatus()">
         <div class="story-thumbnail-image">
           <svg xmlns="http://www.w3.org/1600/svg"
                xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -188,6 +188,11 @@
 
   .oppia-description-text {
     font-size: 20px;
+  }
+
+  .node-disabled {
+    opacity: .5;
+    pointer-events: none;
   }
 
   @media screen and (max-width: 768px) {

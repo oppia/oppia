@@ -204,12 +204,12 @@ describe('Base Content Component', () => {
     mockPlatformFeatureService.status.NewLessonPlayer.isEnabled = true;
     spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
     const result = componentInstance.isNewLessonPlayerEnabled();
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
   });
 
   it('should get sidebar status', () => {
     spyOn(sidebarStatusService, 'isSidebarShown').and.returnValue(false);
-    expect(componentInstance.isSidebarShown()).toBeFalse();
+    expect(componentInstance.isSidebarShown()).toBe(false);
     expect(sidebarStatusService.isSidebarShown).toHaveBeenCalled();
   });
 
@@ -217,7 +217,7 @@ describe('Base Content Component', () => {
     spyOn(bottomNavbarStatusService, 'isBottomNavbarEnabled').and.returnValue(
       false
     );
-    expect(componentInstance.isBottomNavbarShown()).toBeFalse();
+    expect(componentInstance.isBottomNavbarShown()).toBe(false);
     expect(bottomNavbarStatusService.isBottomNavbarEnabled).toHaveBeenCalled();
   });
 
@@ -230,12 +230,12 @@ describe('Base Content Component', () => {
   it('should toggle mobile nav options', () => {
     componentInstance.mobileNavOptionsAreShown = false;
     componentInstance.toggleMobileNavOptions();
-    expect(componentInstance.mobileNavOptionsAreShown).toBeTrue();
+    expect(componentInstance.mobileNavOptionsAreShown).toBe(true);
   });
 
   it('should get background mask status', () => {
     spyOn(backgroundMaskService, 'isMaskActive').and.returnValue(false);
-    expect(componentInstance.isBackgroundMaskActive()).toBeFalse();
+    expect(componentInstance.isBackgroundMaskActive()).toBe(false);
     expect(backgroundMaskService.isMaskActive).toHaveBeenCalled();
   });
 
@@ -257,7 +257,7 @@ describe('Base Content Component', () => {
 
   it('should show the cookie banner if there is no cookie set', () => {
     spyOn(cookieService, 'get').and.returnValue('');
-    expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+    expect(componentInstance.hasAcknowledgedCookies()).toBe(false);
   });
 
   it(
@@ -267,7 +267,7 @@ describe('Base Content Component', () => {
       spyOn(cookieService, 'get').and.returnValue(
         String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS - 100000)
       );
-      expect(componentInstance.hasAcknowledgedCookies()).toBeFalse();
+      expect(componentInstance.hasAcknowledgedCookies()).toBe(false);
     }
   );
 
@@ -275,21 +275,13 @@ describe('Base Content Component', () => {
     spyOn(cookieService, 'get').and.returnValue(
       String(AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS + 100000)
     );
-    expect(componentInstance.hasAcknowledgedCookies()).toBeTrue();
+    expect(componentInstance.hasAcknowledgedCookies()).toBe(true);
   });
 
   it('should be able to acknowledge cookies', () => {
     spyOn(window, 'Date')
       .withArgs()
-      // This throws "Argument of type 'Date' is not assignable to parameter of
-      // type 'string'.". We need to suppress this error because DateConstructor
-      // cannot be mocked without it.
-      // @ts-expect-error
       .and.returnValue(new oldDate(NOW_MILLIS))
-      // This throws "Expected 0 arguments, but got 1.". We need to suppress
-      // this error because we pass an argument to the Date constructor in the
-      // component code.
-      // @ts-expect-error
       .withArgs(ONE_YEAR_FROM_NOW_MILLIS)
       .and.callThrough();
     spyOn(cookieService, 'put');
