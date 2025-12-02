@@ -80,7 +80,6 @@ FRONTEND_TEST_CMDS: Final = [
     '-m',
     'scripts.run_frontend_tests',
     '--check_coverage',
-    '--skip_install',
 ]
 BACKEND_TEST_CMDS: Final = [
     PYTHON_CMD,
