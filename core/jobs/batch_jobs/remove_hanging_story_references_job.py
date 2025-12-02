@@ -23,7 +23,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Tuple, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -48,7 +48,9 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
         def process(
             self, topic_model: topic_models.TopicModel, all_story_ids: List[str]
         ) -> Iterable[
-            Tuple[topic_models.TopicModel, job_run_result.JobRunResult]
+            Tuple[
+                topic_models.TopicModel, Optional[job_run_result.JobRunResult]
+            ]
         ]:
             all_story_ids_set = set(all_story_ids)
             original_refs = topic_model.canonical_story_references
