@@ -1792,15 +1792,25 @@ export class ExplorationEditor extends BaseUser {
         );
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
+        /* eslint-disable no-console */
         console.log('[FLAKY-DEBUG] Clicking add response option button...');
-        await this.clickOnElementWithSelector(addResponseOptionButton);
+        /* eslint-disable no-console */
 
+        /* eslint-disable no-console */
+        await this.clickOnElementWithSelector(addResponseOptionButton);
+        /* eslint-disable no-console */
+
+        /* eslint-disable no-console */
         console.log(
           '[FLAKY-DEBUG] Waiting for text input interaction option...'
         );
+        /* eslint-disable no-console */
         await this.page.waitForSelector(textInputInteractionOption);
 
+        /* eslint-disable no-console */
         console.log('[FLAKY-DEBUG] Element appeared! Typing answer...');
+        /* eslint-disable no-console */
+
         await this.page.type(textInputInteractionOption, answer);
 
         break;
