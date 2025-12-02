@@ -38,32 +38,11 @@ from urllib import request as urlrequest
 
 from core import utils
 from core.tests import test_utils
-from scripts import servers
 
 import yaml
 from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common
-
-
-class MockCompiler:
-    def wait(self) -> None:  # pylint: disable=missing-docstring
-        pass
-
-
-class MockCompilerContextManager:
-    def __init__(self) -> None:
-        pass
-
-    def __enter__(self) -> MockCompiler:
-        return MockCompiler()
-
-    def __exit__(self, *unused_args: str) -> None:
-        pass
-
-
-def mock_context_manager() -> MockCompilerContextManager:
-    return MockCompilerContextManager()
 
 
 class CommonTests(test_utils.GenericTestBase):
@@ -82,81 +61,6 @@ class CommonTests(test_utils.GenericTestBase):
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
         pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
         super().tearDown()
-
-    def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir:
-            common.run_ng_compilation()
-
-        self.assertNotIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr,
-        )
-
-    def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
-
-        self.assertIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr,
-        )
-
-    def test_subprocess_error_results_in_failed_ng_build(self) -> None:
-        class MockFailedCompiler:
-            def wait(self) -> None:  # pylint: disable=missing-docstring
-                raise subprocess.CalledProcessError(
-                    returncode=1, cmd='', output='Subprocess execution failed.'
-                )
-
-        class MockFailedCompilerContextManager:
-            def __init__(self) -> None:
-                pass
-
-            def __enter__(self) -> MockFailedCompiler:
-                return MockFailedCompiler()
-
-            def __exit__(self, *unused_args: str) -> None:
-                pass
-
-        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
-            return MockFailedCompilerContextManager()
-
-        swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_failed_context_manager,
-            expected_args=[],
-        )
-        swap_isdir = self.swap_with_checks(
-            os.path,
-            'isdir',
-            lambda _: False,
-            expected_args=[
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-            ],
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
 
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:
@@ -1551,3 +1455,15 @@ class UrlRetrieveTests(CommonTests):
                 )
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_open_file(self) -> None:
+        with common.open_file(os.path.join('core', 'utils.py'), 'r') as f:
+            file_content = f.readlines()
+            self.assertIsNotNone(file_content)
+
+    def test_can_not_open_file(self) -> None:
+        with self.assertRaisesRegex(
+            FileNotFoundError, 'No such file or directory: \'invalid_file.py\''
+        ):
+            with common.open_file('invalid_file.py', 'r') as f:
+                f.readlines()

@@ -22,8 +22,8 @@ import os
 import subprocess
 import sys
 
-from core import utils
 from core.tests import test_utils
+from scripts import common
 
 from typing import List
 
@@ -59,7 +59,7 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
                 run_typescript_checks.TSCONFIG_FILEPATH
             )
             out_dir = ''
-            with utils.open_file(
+            with common.open_file(
                 run_typescript_checks.TSCONFIG_FILEPATH, 'r'
             ) as f:
                 config_data = json.load(f)

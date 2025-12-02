@@ -59,8 +59,6 @@ import sys
 import threading
 import time
 
-from core import utils
-
 from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import (
@@ -287,7 +285,7 @@ def get_all_test_targets_from_shard(shard_name: str) -> List[str]:
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with common.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         # Here we use cast because we are narrowing down the type
         # since we know the type of shards_spec as it is the content
         # of the file backend_test_shards.json.
@@ -308,7 +306,7 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
     Raises:
         Exception. Failed to find duplicated module in shards.
     """
-    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with common.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted(
         [module for shard in shards_spec.values() for module in shard]
@@ -633,7 +631,7 @@ def main(args: Optional[List[str]] = None) -> None:
             raise Exception('Backend test coverage is not 100%')
 
     if parsed_args.generate_time_report:
-        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
+        with common.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
             time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')

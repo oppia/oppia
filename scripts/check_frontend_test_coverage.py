@@ -23,7 +23,7 @@ import os
 import re
 import sys
 
-from core import utils
+from scripts import common
 
 from typing import List, Optional
 
@@ -140,7 +140,7 @@ def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = utils.open_file(LCOV_FILE_PATH, 'r')
+    f = common.open_file(LCOV_FILE_PATH, 'r')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 

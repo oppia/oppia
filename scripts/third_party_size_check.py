@@ -25,7 +25,7 @@ import fnmatch
 import os
 import sys
 
-from core import utils
+from scripts import common
 
 from typing import List
 
@@ -45,7 +45,7 @@ def get_skip_files_list() -> List[str]:
         IOError. If failed to open .gcloudignore in read mode.
     """
     try:
-        with utils.open_file('.gcloudignore', 'r') as gcloudignore:
+        with common.open_file('.gcloudignore', 'r') as gcloudignore:
             gcloudignore_lines = gcloudignore.read().split('\n')
 
             skip_files_list = [

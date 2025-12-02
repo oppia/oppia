@@ -23,7 +23,7 @@ import json
 import os
 import re
 
-from core import utils
+from scripts import common
 
 from typing import List, TypedDict
 
@@ -96,7 +96,7 @@ def read_webdriverio_config_file() -> str:
     Returns:
         str. The contents of wdio.conf.js, as a string.
     """
-    webdriverio_config_file_content = utils.open_file(
+    webdriverio_config_file_content = common.open_file(
         E2E_WEBDRIVERIO_CONFIG_FILE_PATH, 'r'
     ).read()
     return webdriverio_config_file_content

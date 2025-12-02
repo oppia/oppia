@@ -23,7 +23,7 @@ import json
 import os
 import re
 
-from core import utils
+from scripts import common
 
 import yaml
 from typing import Any, Dict, Final, List, Tuple, TypedDict
@@ -164,7 +164,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        package = json.load(utils.open_file(PACKAGE_JSON_FILE_PATH, 'r'))[
+        package = json.load(common.open_file(PACKAGE_JSON_FILE_PATH, 'r'))[
             'dependencies'
         ]
 

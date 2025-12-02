@@ -25,9 +25,8 @@ import os
 import socket
 import sys
 
-from core import utils
 from core.tests import test_utils
-from scripts import run_portserver
+from scripts import common, run_portserver
 
 from typing import List, Optional, Union, cast
 
@@ -112,7 +111,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             mock_open,
             expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
@@ -129,7 +128,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
@@ -147,7 +146,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             mock_open,
             expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),
@@ -163,7 +162,7 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),

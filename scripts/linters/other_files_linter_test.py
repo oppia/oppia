@@ -22,8 +22,8 @@ import io
 import multiprocessing
 import os
 
-from core import utils
 from core.tests import test_utils
+from scripts import common
 
 from typing import Final, List, Tuple
 
@@ -70,7 +70,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
 
-        self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)
+        self.open_file_swap = self.swap(common, 'open_file', mock_open_file)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self) -> None:

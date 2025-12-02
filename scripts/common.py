@@ -34,17 +34,28 @@ from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from scripts import servers
+from typing import (
+    BinaryIO,
+    Dict,
+    Final,
+    Generator,
+    List,
+    Literal,
+    Optional,
+    TextIO,
+    Tuple,
+    Union,
+    cast,
+    overload,
+)
 
-import certifi
-from typing import Dict, Final, Generator, List, Optional, Tuple, Union
+TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
+BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 # Add third_party to path. Some scripts access feconf even before
 # python_libs is added to path.
 _THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party', 'python_libs')
 sys.path.insert(0, _THIRD_PARTY_PATH)
-
-from core import utils  # pylint: disable=wrong-import-position
 
 AFFIRMATIVE_CONFIRMATIONS = ['y', 'ye', 'yes']
 
@@ -598,7 +609,7 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
@@ -633,7 +644,7 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with utils.open_file(filename, 'r') as old_file:
+        with open_file(filename, 'r') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line
@@ -641,7 +652,7 @@ def inplace_replace_file(
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with utils.open_file(new_filename, 'w') as new_file:
+        with open_file(new_filename, 'w') as new_file:
             for line in new_contents:
                 new_file.write(line)
 
@@ -795,7 +806,7 @@ def url_open(
     Returns:
         urlopen. The 'urlopen' object.
     """
-    context = ssl.create_default_context(cafile=certifi.where())
+    context = ssl.create_default_context()
     return urlrequest.urlopen(source_url, context=context)
 
 
@@ -892,24 +903,6 @@ def setup_chrome_bin_env_variable() -> None:
     else:
         print('Chrome is not found, stopping...')
         raise Exception('Chrome not found.')
-
-
-def run_ng_compilation() -> None:
-    """Runs angular compilation."""
-    max_tries = 2
-    ng_bundles_dir_name = 'dist/oppia-angular'
-    for _ in range(max_tries):
-        try:
-            with servers.managed_ng_build() as proc:
-                proc.wait()
-        except subprocess.CalledProcessError as error:
-            print(error.output)
-            sys.exit(error.returncode)
-        if os.path.isdir(ng_bundles_dir_name):
-            break
-    if not os.path.isdir(ng_bundles_dir_name):
-        print('Failed to complete ng build compilation, exiting...')
-        sys.exit(1)
 
 
 def set_constants_to_default() -> None:
@@ -1037,6 +1030,53 @@ def write_hashes_json_file(file_hashes: Dict[str, str]) -> None:
             an empty hashes file.
     """
     ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
-    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
+    with open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
         hashes_json_file.write(str(json.dumps(file_hashes, ensure_ascii=False)))
         hashes_json_file.write('\n')
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: TextModeTypes,
+    encoding: str = 'utf-8',
+    newline: Union[str, None] = None,
+) -> TextIO: ...
+
+
+@overload
+def open_file(
+    filename: str,
+    mode: BinaryModeTypes,
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None,
+) -> BinaryIO: ...
+
+
+def open_file(
+    filename: str,
+    mode: Union[TextModeTypes, BinaryModeTypes],
+    encoding: Union[str, None] = 'utf-8',
+    newline: Union[str, None] = None,
+) -> Union[BinaryIO, TextIO]:
+    """Open file and return a corresponding file object.
+
+    Args:
+        filename: str. The file to be opened.
+        mode: Literal. Mode in which the file is opened.
+        encoding: str. Encoding in which the file is opened.
+        newline: None|str. Controls how universal newlines work.
+
+    Returns:
+        IO[Any]. The file object.
+
+    Raises:
+        FileNotFoundError. The file cannot be found.
+    """
+    # Here we use cast because we are narrowing down the type from IO[Any]
+    # to Union[BinaryIO, TextIO].
+    file = cast(
+        Union[BinaryIO, TextIO],
+        open(filename, mode, encoding=encoding, newline=newline),
+    )
+    return file

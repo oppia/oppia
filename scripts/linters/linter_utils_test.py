@@ -22,8 +22,8 @@ import builtins
 import os
 import tempfile
 
-from core import utils
 from core.tests import test_utils
+from scripts import common
 
 from . import linter_utils
 
@@ -34,7 +34,7 @@ class RedirectStoutTest(test_utils.GenericTestBase):
     def test_redirect_stdout(self) -> None:
         temp_file = tempfile.NamedTemporaryFile()
 
-        with utils.open_file(temp_file.name, 'r+') as temp_file_contents:
+        with common.open_file(temp_file.name, 'r+') as temp_file_contents:
             with linter_utils.redirect_stdout(temp_file_contents):
                 print('This is a test')
             temp_file_contents.seek(0)

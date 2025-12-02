@@ -44,9 +44,6 @@ from typing import Final
 
 install_python_dev_dependencies.main(['--assert_compiled'])
 
-from core import (  # pylint: disable=wrong-import-position, wrong-import-order
-    utils,
-)
 from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
     install_dependencies_json_packages,
     install_python_prod_dependencies,
@@ -84,7 +81,7 @@ def make_google_module_importable_by_python(google_module_path: str) -> None:
     for path_list in os.walk(google_module_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with utils.open_file(os.path.join(root_path, '__init__.py'), 'a'):
+            with common.open_file(os.path.join(root_path, '__init__.py'), 'a'):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass

@@ -21,9 +21,8 @@ import os
 import shutil
 import sys
 
-from core import utils
 from core.tests import test_utils
-from scripts import third_party_size_check
+from scripts import common, third_party_size_check
 
 
 class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
@@ -70,7 +69,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
     def test_get_skip_files_list(self) -> None:
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             lambda *unused_args, **unused_kwargs: self.dummy_file_object,
             expected_args=(('.gcloudignore', 'r'),),
@@ -95,7 +94,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
             raise err
 
         swap_open = self.swap_with_checks(
-            utils,
+            common,
             'open_file',
             mock_open_file,
             expected_args=(('.gcloudignore', 'r'),),
