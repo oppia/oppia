@@ -375,24 +375,6 @@ describe('Auth service', function () {
       expect(firebaseConfig).toEqual(defaultFirebaseConfig);
     });
 
-    it('should return default config if request returns empty string', async () => {
-      const defaultFirebaseConfig = {
-        FIREBASE_CONFIG_API_KEY: 'fake-api-key',
-        FIREBASE_CONFIG_AUTH_DOMAIN: '',
-        FIREBASE_CONFIG_PROJECT_ID: 'dev-project-id',
-        FIREBASE_CONFIG_STORAGE_BUCKET: '',
-        FIREBASE_CONFIG_MESSAGING_SENDER_ID: '',
-        FIREBASE_CONFIG_APP_ID: '',
-      };
-      fetchSpy.and.resolveTo({
-        ok: true,
-        text: () => Promise.resolve(")]}'" + JSON.stringify('')),
-      } as Response);
-
-      const firebaseConfig = await AuthService.fetchConfigFromBackend();
-      expect(firebaseConfig).toEqual(defaultFirebaseConfig);
-    });
-
     it('should return default config if parsed JSON is empty', async () => {
       const defaultFirebaseConfig = {
         FIREBASE_CONFIG_API_KEY: 'fake-api-key',

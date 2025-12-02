@@ -128,6 +128,11 @@ export class AuthService {
       const response = await fetch('/firebase_config');
       if (response.ok) {
         let jsonResponse = await response.text();
+        // The server may prepend )]}' to the JSON response as a security
+        // measure to prevent it from being executed as JavaScript if loaded
+        // via a <script> tag. This client-side if block strips that security
+        // prefix if present so the remaining string can be successfully parsed
+        // as JSON.
         if (jsonResponse.startsWith(")]}'")) {
           jsonResponse = jsonResponse.substring(4);
         }
@@ -138,20 +143,16 @@ export class AuthService {
       return defaultFirebaseConfig;
     }
 
-    if (config === '') {
-      return defaultFirebaseConfig;
-    } else {
-      try {
-        const parsedConfig = JSON.parse(config);
-        if (Object.keys(parsedConfig).length === 0) {
-          return defaultFirebaseConfig;
-        } else {
-          return parsedConfig;
-        }
-      } catch (e) {
-        console.error('Unable to parse firebase config : ', e);
+    try {
+      const parsedConfig = JSON.parse(config);
+      if (Object.keys(parsedConfig).length === 0) {
         return defaultFirebaseConfig;
+      } else {
+        return parsedConfig;
       }
+    } catch (e) {
+      console.error('Unable to parse firebase config : ', e);
+      return defaultFirebaseConfig;
     }
   }
 
