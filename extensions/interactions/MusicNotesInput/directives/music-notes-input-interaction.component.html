@@ -27,7 +27,7 @@
            class="placed-note"
            [ngClass]="getNoteClass(note.type)"
            cdkDrag
-           [cdkDragData]="{ ...note, isPalette: false }"
+           [cdkDragData]="getDragData(note)"
            (cdkDragEnded)="onPlacedNoteDragEnd($event, note)">
       </div>
     </div>

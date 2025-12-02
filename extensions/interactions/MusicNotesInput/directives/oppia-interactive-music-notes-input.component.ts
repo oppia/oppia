@@ -949,4 +949,11 @@ export class MusicNotesInputComponent
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
+  getDragData(note: Note) {
+    return {
+      ...note,
+      isPalette: false,
+    };
+  }
 }
