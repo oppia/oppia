@@ -16,9 +16,11 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import subprocess
+import sys
 
 from core import utils
 from core.tests import test_utils
@@ -264,3 +266,93 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
 
         with compile_and_check_typescript_swap:
             run_typescript_checks.main(args=['--strict_checks'])
+
+    def test_run_typescript_type_tests_passed(self) -> None:
+        """Test that type tests pass successfully without exiting."""
+
+        class MockFile:
+            def read(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
+
+        class MockTask:
+            def __init__(
+                self,
+                returncode: int,
+                stdout_output: bytes,  # pylint: disable=unused-argument
+            ) -> None:
+                self.returncode = returncode
+                self.stdout = MockFile()
+                self.stderr = MockFile()
+
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                return None
+
+        def mock_popen(  # pylint: disable=unused-argument
+            cmd: str, stdout: int, stderr: int
+        ) -> MockTask:
+            return MockTask(0, b'')
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        print_arr: List[str] = []
+
+        def mock_print(
+            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+        ) -> None:
+            print_arr.append(msg)
+
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        with popen_swap, print_swap:
+            run_typescript_checks.run_typescript_type_tests()
+
+        self.assertIn('Running TypeScript type tests.', print_arr)
+        self.assertIn('Done!', print_arr)
+
+    def test_run_typescript_type_tests_failed(self) -> None:
+        """Test that type tests exit with error on failure."""
+
+        class MockFile:
+            def read(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
+
+        class MockTask:
+            def __init__(
+                self,
+                returncode: int,
+                stdout_output: bytes,  # pylint: disable=unused-argument
+            ) -> None:
+                self.returncode = returncode
+                self.stdout = MockFile()
+                self.stderr = MockFile()
+
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                return None
+
+        def mock_popen(  # pylint: disable=unused-argument
+            cmd: str, stdout: int, stderr: int
+        ) -> MockTask:
+            return MockTask(1, b'')
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        print_arr: List[str] = []
+
+        def mock_print(
+            msg: str, end: str = '\n'  # pylint: disable=unused-argument
+        ) -> None:
+            print_arr.append(msg)
+
+        print_swap = self.swap(builtins, 'print', mock_print)
+
+        def mock_exit(code: int) -> None:
+            raise SystemExit(code)
+
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=[(1,)]
+        )
+
+        with popen_swap, print_swap, exit_swap:
+            with self.assertRaisesRegex(SystemExit, '1'):
+                run_typescript_checks.run_typescript_type_tests()
+
+        self.assertIn('Running TypeScript type tests.', print_arr)
+        self.assertNotIn('Done!', print_arr)

@@ -39,10 +39,6 @@ environment setup and troubleshooting.
   python -m scripts.linters.run_lint_checks
   npx prettier --check .
 
-The `Makefile` refers to an old Docker installation process that is no longer
-maintained. Prefer the wiki instructions and the "Python setup" workflow for
-everyday development.
-
 Project-specific conventions and patterns (discoverable in the tree):
 
 - Backend structure: controllers provide request handlers; business logic lives
@@ -93,6 +89,9 @@ What to watch out for / common pitfalls:
 - Tests or pre-commit hooks may run scripts that expect CI-like environments;
   if a local run fails, consult the wiki or run the failing script in a clean
   venv to see the detailed error.
+- When writing comments, follow Oppia comment style: start with a capital
+  letter, end with a period. See custom rule in
+  `scripts/linters/custom_eslint_checks/rules/comment-style.js` as well.
 
 Files to open first when exploring code paths:
 

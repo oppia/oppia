@@ -31,7 +31,6 @@ import string
 import time
 import unicodedata
 import urllib.parse
-import urllib.request
 
 from core import feconf
 from core.constants import constants
@@ -69,6 +68,50 @@ T = TypeVar('T')
 
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
+
+class SingletonMeta(type):
+    """Metaclass for creating singleton classes.
+
+    This metaclass ensures that only one instance of a class is created. It is
+    thread-safe and uses a dictionary to store instances per class type. This
+    is useful for managing shared resources like database connections, cache
+    clients, or configuration objects.
+    """
+
+    # Here we use object because the metaclass needs to store instances of any
+    # class type that uses it, and we cannot know the specific types at the
+    # metaclass definition level.
+    _instances: Dict[type, object] = {}
+
+    # Here we use object because the metaclass needs to work with any class
+    # type that uses it as a metaclass, and we cannot know the specific return
+    # type at the metaclass level.
+    def __call__(cls, *args: object, **kwargs: Dict[str, object]) -> object:
+        """Create or return the singleton instance of the class.
+
+        Args:
+            *args: list(*). Positional arguments for class initialization.
+            **kwargs: dict. Keyword arguments for class initialization.
+
+        Returns:
+            object. The singleton instance of the class.
+
+        Raises:
+            ValueError. If the singleton instance already exists and new
+                initialization arguments are provided.
+        """
+        if cls not in cls._instances:
+            cls._instances[cls] = super(SingletonMeta, cls).__call__(
+                *args, **kwargs
+            )
+        elif args or kwargs:
+            raise ValueError(
+                f'Singleton instance of {cls.__name__} already exists. '
+                f'Cannot reinitialize with new arguments: args={args}, '
+                f'kwargs={kwargs}'
+            )
+        return cls._instances[cls]
 
 
 class InvalidInputException(Exception):

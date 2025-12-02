@@ -1,8 +1,8 @@
 <div class="oppia-same-row-container">
   <form class="search-bar-float-start oppia-search-bar-form" role="search">
-    <div class="form-group">
+    <div class="mb-3">
       <div class="input-group oppia-input-group inptcls" [ngClass]="{'classroom-page-input-group': isSearchButtonActive()}">
-        <div class="input-group-addon oppia-search-bar-icon">
+        <div class="input-group-text oppia-search-bar-icon">
           <i class="fas fa-search oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()"></i>
           <span *ngIf="isSearchInProgress()">
             <i class="fas fa-sync oppia-animate-spin"></i>
@@ -52,7 +52,7 @@
               {{ item.text | translate }}
             </span>
             <i *ngIf="selectionDetails.categories.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a (click)="toggleSelection('categories', item.id)"
@@ -63,7 +63,7 @@
              (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
           </a>
           <a (click)="toggleSelection('categories', item.id)"
              (keydown.enter)="toggleSelection('categories', item.id)"
@@ -73,7 +73,7 @@
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -98,13 +98,13 @@
               {{ item.text | translate }}
             </span>
             <i *ngIf="selectionDetails.categories.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0" (keydown.enter)="toggleSelection('categories', item.id)" (click)="toggleSelection('categories', item.id)" *ngIf="first" (keydown)="onMenuKeypress($event, 'category', {shiftTab: ACTION_CLOSE})" class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.categories.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0"
@@ -114,7 +114,7 @@
              (keydown)="onMenuKeypress($event, 'category', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
+            <i *ngIf="selectionDetails.categories.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -150,7 +150,7 @@
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0"
@@ -162,7 +162,7 @@
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0"
@@ -173,7 +173,7 @@
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-selected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -199,7 +199,7 @@
               {{ item.text | translate }}
             </span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0"
@@ -213,7 +213,7 @@
               {{ item.text | translate }}
             </span>
             <i *ngIf="selectionDetails.languageCodes.selections[item.id]"
-               class="fas fa-check float-right oppia-search-bar-category-selection-symbol">
+               class="fas fa-check float-end oppia-search-bar-category-selection-symbol">
             </i>
           </a>
           <a tabindex="0"
@@ -224,7 +224,7 @@
              (keydown)="onMenuKeypress($event, 'language', {tab: ACTION_CLOSE})"
              class="dropdown-item">
             <span class="e2e-test-deselected">{{ item.text | translate }}</span>
-            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-right oppia-search-bar-category-selection-symbol"></i>
+            <i *ngIf="selectionDetails.languageCodes.selections[item.id]" class="fas fa-check float-end oppia-search-bar-category-selection-symbol"></i>
           </a>
         </li>
       </ng-container>
@@ -245,7 +245,7 @@
 </div>
 <style>
   :lang(ar) .oppia-search-bar-dropdown-toggle-button:after {
-      margin-right: 30px;
+     margin-right: 30px;
   }
   :lang(ar) .oppia-search-bar-dropdown-toggle:after {
     margin-right: 2px;

@@ -3527,6 +3527,31 @@ class ExceptionalTypesCommentCheckerTests(unittest.TestCase):
             )
         temp_file.close()
 
+    def test_no_error_raised_for_mock_patch_object_usage(self) -> None:
+        node_with_mock_patch_object = astroid.scoped_nodes.Module(
+            name='test', doc='Custom test'
+        )
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                """
+                from unittest import mock
+
+                def test_something() -> None:
+                    with mock.patch.object(SomeClass, 'method'):
+                        pass
+                """
+            )
+        node_with_mock_patch_object.file = filename
+
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_module(
+                node_with_mock_patch_object
+            )
+        temp_file.close()
+
 
 class SingleLineCommentCheckerTests(unittest.TestCase):
 
