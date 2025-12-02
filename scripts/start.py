@@ -200,7 +200,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         if not parsed_args.prod_env:
             # We need to create an empty hashes.json file for the build so that
             # we don't get the error "assets/hashes.json file doesn't exist".
-            build.save_hashes_to_file({})
+            common.write_hashes_json_file({})
             stack.enter_context(servers.managed_ng_build(watch_mode=True))
             stack.enter_context(
                 servers.managed_webpack_compiler(

@@ -80,8 +80,6 @@ def check_dev_mode_is_true() -> None:
 
 check_dev_mode_is_true()
 
-# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -1362,8 +1360,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-CLOUD_DATASTORE_EMULATOR_HOST = os.environ.get('DATASTORE_HOST', 'localhost')
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'
