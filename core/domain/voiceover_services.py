@@ -22,8 +22,7 @@ import datetime
 import json
 import os
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     email_manager,
     exp_domain,
@@ -547,14 +546,12 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         language-accent pairs that Oppia may support for
         voiceovers (manual and auto).
     """
-    file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
+    file_path = os.path.join('voiceovers', 'language_accent_master_list.json')
+
+    language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
+        constants.get_package_file_contents('data', file_path)
     )
-    with utils.open_file(file_path, 'r') as f:
-        language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
-            f.read()
-        )
-        return language_accent_master_list
+    return language_accent_master_list
 
 
 def get_language_accent_codes_to_descriptions() -> Dict[str, str]:
@@ -616,13 +613,13 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         voice type.
     """
     file_path = os.path.join(
-        feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
+        'voiceovers', 'autogeneratable_language_accent_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
-        autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-            json.loads(f.read())
-        )
-        return autogeneratable_language_accent_list
+
+    autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
+        json.loads(constants.get_package_file_contents('data', file_path))
+    )
+    return autogeneratable_language_accent_list
 
 
 def get_autogeneratable_language_accent_codes() -> List[str]:
@@ -1205,7 +1202,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     exploration_version = exploration.version
     exploration_title = exploration.title
 
-    if language_code == constants.DEFAULT_LANGUAGE_CODE:
+    if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
         language_code_to_contents_mapping.update(
             extract_english_voiceover_texts_from_exploration(exploration)

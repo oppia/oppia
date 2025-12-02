@@ -772,7 +772,7 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
 
     def test_get_language_accent_master_list_works_correctly(self) -> None:
         file_path = os.path.join(
-            feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
+            'data', 'voiceovers', 'language_accent_master_list.json'
         )
         with utils.open_file(file_path, 'r') as f:
             language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
@@ -791,7 +791,8 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         file_path = os.path.join(
-            feconf.VOICEOVERS_DATA_DIR,
+            'data',
+            'voiceovers',
             'autogeneratable_language_accent_list.json',
         )
         with utils.open_file(file_path, 'r') as f:
