@@ -64,6 +64,8 @@ export class StateContentEditorComponent implements OnInit {
   cardHeightLimitReached = false;
   private contentChanged$ = new Subject<void>();
   private readonly AUTO_SAVE_DELAY_MS = 3000;
+  autoSaveStatus: 'idle' | 'saving' | 'saved' = 'idle';
+  private autoSaveStatusTimeout?: ReturnType<typeof setTimeout>;
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
@@ -162,6 +164,10 @@ export class StateContentEditorComponent implements OnInit {
 
   onContentChange(): void {
     if (this.contentEditorIsOpen) {
+      this.autoSaveStatus = 'idle';
+      if (this.autoSaveStatusTimeout) {
+        clearTimeout(this.autoSaveStatusTimeout);
+      }
       this.contentChanged$.next();
     }
   }
@@ -177,9 +183,18 @@ export class StateContentEditorComponent implements OnInit {
 
     if (currentContent && savedContent && 
         currentContent.html !== savedContent.html) {
+      // Show saving status.
+      this.autoSaveStatus = 'saving';
+      
       // Save the content without closing the editor.
       this.stateContentService.saveDisplayedValue();
       this.saveStateContent.emit(this.stateContentService.displayed);
+      
+      // Show saved status briefly.
+      this.autoSaveStatus = 'saved';
+      this.autoSaveStatusTimeout = setTimeout(() => {
+        this.autoSaveStatus = 'idle';
+      }, 2000);
     }
   }
 
@@ -189,5 +204,9 @@ export class StateContentEditorComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    this.contentChanged$.complete();
+    if (this.autoSaveStatusTimeout) {
+      clearTimeout(this.autoSaveStatusTimeout);
+    }
   }
 }

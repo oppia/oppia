@@ -55,7 +55,14 @@
 
 <div *ngIf="contentEditorIsOpen" class="e2e-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-  <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
+  <div class="d-flex justify-content-between align-items-center">
+    <p class="oppia-rte-keyboard-accessibility-text mb-0" tabindex="0">Alt+0 for keyboard accessibility</p>
+    <div *ngIf="autoSaveStatus !== 'idle'" class="oppia-auto-save-status">
+      <i *ngIf="autoSaveStatus === 'saving'" class="fas fa-circle-notch fa-spin"></i>
+      <i *ngIf="autoSaveStatus === 'saved'" class="fas fa-check-circle text-success"></i>
+      <span class="ms-1">{{ autoSaveStatus === 'saving' ? 'Saving...' : 'Saved' }}</span>
+    </div>
+  </div>
   <schema-based-editor [schema]="HTML_SCHEMA"
                        [(localValue)]="stateContentService.displayed._html"
                        (localValueChange)="onContentChange()">
@@ -112,6 +119,10 @@
     max-width: 560px;
     position: fixed;
     top: -30000px;
+  }
+  .oppia-auto-save-status {
+    color: #666;
+    font-size: 0.875rem;
   }
   .oppia-editor-edit-icon-position {
     border: 0;

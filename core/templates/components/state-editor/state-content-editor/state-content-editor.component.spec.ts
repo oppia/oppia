@@ -181,4 +181,142 @@ describe('StateHintsEditorComponent', () => {
 
     expect(result).toBeFalse();
   });
+
+  describe('Auto-save functionality', () => {
+    beforeEach(() => {
+      stateContentService.displayed = _getContent('content', 'Initial content');
+      stateContentService.savedMemento = _getContent('content', 'Initial content');
+    });
+
+    it('should trigger content change when onContentChange is called with editor open', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      spyOn(component, 'autoSaveContent');
+
+      component.onContentChange();
+      
+      expect(component.autoSaveStatus).toBe('idle');
+      
+      tick(3000); // Wait for debounce delay.
+
+      expect(component.autoSaveContent).toHaveBeenCalled();
+    }));
+
+    it('should not trigger auto-save when editor is closed', fakeAsync(() => {
+      component.contentEditorIsOpen = false;
+      spyOn(component, 'autoSaveContent');
+
+      component.onContentChange();
+      tick(3000); // Wait for debounce delay.
+
+      // Auto-save should still be called, but will return early.
+      expect(component.autoSaveContent).toHaveBeenCalled();
+    }));
+
+    it('should debounce multiple rapid content changes', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      spyOn(component, 'autoSaveContent');
+
+      // Trigger multiple changes rapidly.
+      component.onContentChange();
+      tick(1000);
+      component.onContentChange();
+      tick(1000);
+      component.onContentChange();
+      tick(3000); // Wait for debounce delay.
+
+      // Should only trigger once after debounce period.
+      expect(component.autoSaveContent).toHaveBeenCalledTimes(1);
+    }));
+
+    it('should auto-save when content has changed', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      stateContentService.displayed = _getContent('content', 'New content');
+      stateContentService.savedMemento = _getContent('content', 'Old content');
+      spyOn(component.saveStateContent, 'emit');
+      spyOn(stateContentService, 'saveDisplayedValue');
+
+      expect(component.autoSaveStatus).toBe('idle');
+
+      component.autoSaveContent();
+
+      expect(component.autoSaveStatus).toBe('saved');
+      expect(stateContentService.saveDisplayedValue).toHaveBeenCalled();
+      expect(component.saveStateContent.emit).toHaveBeenCalledWith(
+        stateContentService.displayed
+      );
+
+      tick(2000); // Wait for status reset.
+      expect(component.autoSaveStatus).toBe('idle');
+    }));
+
+    it('should not auto-save when content has not changed', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      stateContentService.displayed = _getContent('content', 'Same content');
+      stateContentService.savedMemento = _getContent('content', 'Same content');
+      spyOn(component.saveStateContent, 'emit');
+      spyOn(stateContentService, 'saveDisplayedValue');
+
+      component.autoSaveContent();
+
+      expect(stateContentService.saveDisplayedValue).not.toHaveBeenCalled();
+      expect(component.saveStateContent.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should not auto-save when editor is closed', fakeAsync(() => {
+      component.contentEditorIsOpen = false;
+      stateContentService.displayed = _getContent('content', 'New content');
+      stateContentService.savedMemento = _getContent('content', 'Old content');
+      spyOn(component.saveStateContent, 'emit');
+
+      component.autoSaveContent();
+
+      expect(component.saveStateContent.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should not auto-save when content is not editable', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      stateContentService.displayed = _getContent('content', 'New content');
+      stateContentService.savedMemento = _getContent('content', 'Old content');
+      spyOn(component, 'isContentEditable').and.returnValue(false);
+      spyOn(component.saveStateContent, 'emit');
+
+      component.autoSaveContent();
+
+      expect(component.saveStateContent.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should not auto-save when displayed content is null', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      // @ts-ignore: Testing null case.
+      stateContentService.displayed = null;
+      stateContentService.savedMemento = _getContent('content', 'Old content');
+      spyOn(component.saveStateContent, 'emit');
+
+      component.autoSaveContent();
+
+      expect(component.saveStateContent.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should not auto-save when saved memento is null', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      stateContentService.displayed = _getContent('content', 'New content');
+      // @ts-ignore: Testing null case.
+      stateContentService.savedMemento = null;
+      spyOn(component.saveStateContent, 'emit');
+
+      component.autoSaveContent();
+
+      expect(component.saveStateContent.emit).not.toHaveBeenCalled();
+    }));
+
+    it('should preserve editor open state after auto-save', fakeAsync(() => {
+      component.contentEditorIsOpen = true;
+      stateContentService.displayed = _getContent('content', 'New content');
+      stateContentService.savedMemento = _getContent('content', 'Old content');
+
+      component.autoSaveContent();
+
+      expect(component.contentEditorIsOpen).toBeTrue();
+    }));
+  });
 });
