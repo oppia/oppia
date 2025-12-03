@@ -11,6 +11,9 @@
           {{selectedSection}}
           <i class="fa fa-caret-down dropdown-icon"></i>
         </button>
+    <div class="blue-box">
+        Om Ambole is the best
+    </div>
         <div class="dropdown-content" *ngIf="dropdownEnabled">
           <p (click)="changeSection(all)"><span>{{ 'I18N_LEARNER_DASHBOARD_ALL' | translate }}</span></p>
           <p (click)="changeSection(completed)"><span>{{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }}</span></p>
@@ -455,3 +458,6 @@
     </ng-template>
   </div>
 </div>
+<div class="blue-box">
+        Om Ambole is the best
+    </div>

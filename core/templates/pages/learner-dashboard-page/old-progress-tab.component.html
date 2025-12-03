@@ -1,448 +1,709 @@
 <div class="progress-tab e2e-test-learner-dash-progress-tab">
-  <div tabindex="0"
-       class="skill-proficiency"
-       [ngClass]="{'empty-section': emptySkillProficiency}"
-       [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
-       *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
-    <div class="skill-proficiency-heading">
-      <p class="skill-proficiency-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILL_PROGRESS_SECTION' | translate">
-      </p>
-      <a aria-label="Progress" class="info-tooltip" href="#/" tabindex="-1">
-        <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
-        <span>
-          <div class="badge-info">
-            <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate">
-            </p>
-            <p class="badge-percent">
-              100%
-            </p>
+  <div tabindex="0" class="skill-proficiency" [ngClass]="{'empty-section': emptySkillProficiency}"
+    [ngStyle]="{'margin-top': windowIsNarrow? '35px': '64px'}"
+    *ngIf="!windowIsNarrow || (windowIsNarrow && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.SKILL_PROFICIENCY)">
+
+    <div class="container">
+      <h1>🎓 Lecture Badge System</h1>
+      <p class="subtitle">Watch lectures to unlock achievements!</p>
+
+      <div class="progress-section">
+        <div class="progress-info">
+          <div>
+            <strong>Lectures Watched:</strong>
+            <span class="lectures-count">{{ watchedLecturesCount }}</span>
           </div>
-          <div class="badge-info">
-            <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate">
-            </p>
-            <p class="badge-percent">
-              80-99%
-            </p>
+          <div>
+            <strong>Total Lectures:</strong> <span>{{ TOTAL_LECTURES }}</span>
           </div>
-          <div class="badge-info">
-            <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
-            <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate">
-            </p>
-            <p class="badge-percent">
-              60-79%
-            </p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progressPercentage">{{ progressPercentage | number:'1.0-0' }}%
           </div>
-        </span>
-      </a>
+        </div>
+      </div>
+
+      <!-- Lecture buttons are removed as they are now driven by actual progress (completedStoriesList) -->
+
+      <div class="current-badge">
+        <div class="current-badge-title">Current Badge</div>
+        <div class="current-badge-name">
+          <span *ngIf="currentBadge">{{ currentBadge.icon }}</span>
+          <span *ngIf="!currentBadge">🔒</span>
+          <span>{{ currentBadge ? currentBadge.name : 'No Badge Yet' }}</span>
+        </div>
+      </div>
+
+      <div class="badges-section">
+        <h2 class="badges-title">All Badges</h2>
+        <div class="badges-grid">
+          <div *ngFor="let badge of badges" class="badge"
+            [ngClass]="{'unlocked': watchedLecturesCount >= badge.minLectures, 'locked': watchedLecturesCount < badge.minLectures}">
+            <div class="badge-icon">{{ badge.icon }}</div>
+            <div class="badge-name">{{ badge.name }}</div>
+            <div class="badge-requirement">
+              {{ badge.maxLectures === Infinity ? badge.minLectures + '+ lectures' : (badge.minLectures ===
+              badge.maxLectures ? badge.minLectures + ' lectures' : badge.minLectures + '-' + badge.maxLectures + '
+              lectures') }}
+            </div>
+            <div *ngIf="watchedLecturesCount >= badge.minLectures"
+              style="color: #28a745; font-weight: bold; margin-top: 10px;">✓ UNLOCKED</div>
+            <div *ngIf="watchedLecturesCount < badge.minLectures" style="color: #999; margin-top: 10px;">🔒 Locked</div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div *ngIf="emptySkillProficiency" class="empty-skill-proficiency-section">
-      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY' | translate">
-      </p>
-      <a id="setting-a-goal-link" (click)="changeActiveSection()" tabindex="0" (keydown.enter)="changeActiveSection()">
-        <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_SET_A_GOAL' | translate"
-           class="empty-skill-proficiency">
-        </p>
-      </a>
-      <p class="empty-skill-proficiency" [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_SKILL_PROFICIENCY_REASON_FOR_SETTING_A_GOAL' | translate">
-      </p>
-    </div>
-    <div *ngIf="!emptySkillProficiency">
-      <div *ngFor="let tile of topicMastery; index as i" class="skill-proficiency-content">
-        <div class="skill-proficiency-topic-tile" [ngStyle]="displaySkills[i] && {'border-bottom': 'none', 'margin-bottom': '0'}" *ngIf="tile[1].practiceTabIsDisplayed">
-          <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] === 100">
-          <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 80 && tile[0] <= 99">
-          <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] >= 60 && tile[0] <= 79">
-          <img [src]="emptyBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image-for-topic" *ngIf="tile[0] > 0 && tile[0] <= 59">
-          <span class="skill-proficiency-topic-title e2e-test-skill-proficiency-topic-title">
-          {{tile[1].name}}
-          </span>
-          <img [src]="getStaticImageUrl('/learner_dashboard/dropdown.svg')"
-               alt="dropdown button"
-               class="oppia-svg-dropdown-image"
-               role="button" tabindex="0"
-               (keydown.enter)="showSkills(i)"
-               (click)="showSkills(i)"
-               *ngIf="!displaySkills[i]">
-          <img [src]="getStaticImageUrl('/learner_dashboard/up.svg')"
-               alt="up button"
-               class="oppia-svg-up-image"
-               role="button"
-               tabindex="0"
-               (keydown.enter)="showSkills(i)"
-               (click)="showSkills(i)"
-               *ngIf="displaySkills[i]">
-          <div *ngIf="tile[0] > 0">
-            <div class="circle-border" [ngStyle]="{'background-image': calculateCircularProgress(i)}">
-              <div class="circle">
+    <div>
+      <div class="dashboard-sections">
+
+        <!-- Leaderboard Section -->
+        <section class="dashboard-section leaderboard-section">
+          <h2>🏆 Leaderboard</h2>
+          <div class="leaderboard-container">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Learner</th>
+                  <th>Badges</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let entry of leaderboardData" [class.current-user]="entry.username === 'You'">
+                  <td class="rank-cell">
+                    <span *ngIf="entry.rank === 1">🥇</span>
+                    <span *ngIf="entry.rank === 2">🥈</span>
+                    <span *ngIf="entry.rank === 3">🥉</span>
+                    <span *ngIf="entry.rank > 3">{{entry.rank}}</span>
+                  </td>
+                  <td class="user-cell">{{entry.username}}</td>
+                  <td>{{entry.badges}}</td>
+                  <td>{{entry.points}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Achievement Stats Section -->
+        <section class="dashboard-section stats-section">
+          <h2>Achievement Statistics</h2>
+          <div class="stats-container">
+            <div class="stats-summary">
+              <ul id="stats-list">
+                <li>Total Badges: {{ totalBadges }}</li>
+                <li>Unlocked Badges: {{ unlockedBadges }}</li>
+                <li>Progress: {{ progressInPercent }}%</li>
+              </ul>
+            </div>
+            <div class="charts-container">
+              <div class="chart-box">
+                <h3>Unlock Progress</h3>
+                <div id="pie-chart"></div>
+              </div>
+              <div class="chart-box">
+                <h3>Badge Distribution</h3>
+                <div id="bar-chart"></div>
               </div>
             </div>
-            <span class="progress-text">
-              <p class="progress-translate" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUBTOPIC_PROGRESS' | translate">
-              </p>
-              {{tile[0]}}%
-            </span>
           </div>
-        </div>
-        <div class="skill-proficiency-skill-content" *ngIf="displaySkills[i]">
-          <p class="skills-text" [innerHTML]="'I18N_LEARNER_DASHBOARD_SKILLS' | translate">
-          </p>
-          <practice-tab [topicName]="tile[1].name"
-                        [subtopicsList]="tile[1].subtopics"
-                        [topicUrlFragment]="tile[1].urlFragment"
-                        [classroomUrlFragment]="tile[1].classroomUrlFragment"
-                        [subtopicMastery]="subtopicMastery[tile[1].id]"
-                        [displayArea]="progressTab">
-          </practice-tab>
-        </div>
+        </section>
+
+        <!-- Social Share Section -->
+        <section class="dashboard-section share-section">
+          <h3>Share Your Achievements</h3>
+          <div class="social-share">
+            <button class="facebook" (click)="shareBadge('facebook')">Facebook</button>
+            <button class="twitter" (click)="shareBadge('twitter')">Twitter</button>
+            <button class="linkedin" (click)="shareBadge('linkedin')">LinkedIn</button>
+          </div>
+        </section>
       </div>
-    </div>
-  </div>
-  <div tabindex="0" class="completed-stories e2e-test-compeleted-stories-section" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
-       *ngIf="(!windowIsNarrow && completedStoriesList.length !== 0) || (windowIsNarrow && completedStoriesList.length !== 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES)">
-    <div class="completed-stories-heading">
-      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
-      </p>
-      <span class="completed-stories-length">
-        {{completedStoriesList.length}}
-      </span>
-      <img [src]="getStaticImageUrl('/learner_dashboard/star.svg')" alt="star image" class="oppia-svg-star-image">
-    </div>
-    <div class="scroll-content">
-      <div class="completed-stories-content" [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
-        <div *ngFor="let tile of completedStoriesList" class="story-tile">
-          <oppia-learner-story-summary-tile [storySummary]="tile"
-                                            [displayArea]="progressTab">
-          </oppia-learner-story-summary-tile>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div tabindex="0" class="empty-completed-stories" [ngStyle]="windowIsNarrow && {'margin-top': '35px'}"
-    *ngIf="windowIsNarrow && completedStoriesList.length === 0 && activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.STORIES">
-    <div class="completed-stories-heading">
-      <p class="completed-stories-title" [innerHTML]="'I18N_LEARNER_DASHBOARD_STORIES_COMPLETED_SECTION' | translate">
-      </p>
-    </div>
-    <div class="empty-completed-stories-content">
-      <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_COMPLETED_STORIES_SECTION' | translate">
-      </p>
+
+      <div id="achievement-notification" [class.show]="notificationVisible">{{notificationMessage}}</div>
+
+      <style>
+        /* General Section Styling */
+        .dashboard-sections {
+          display: flex;
+          flex-direction: column;
+          gap: 30px;
+          margin-top: 30px;
+          font-family: 'Roboto', sans-serif;
+        }
+
+        .dashboard-section {
+          background: #ffffff;
+          border-radius: 16px;
+          padding: 30px;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          /* Stronger shadow to match new section */
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          border: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .dashboard-section:hover {
+          box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+          color: #00645c;
+          /* Oppia primary color */
+          font-weight: 800;
+          margin-bottom: 25px;
+          font-size: 1.8rem;
+          letter-spacing: -0.5px;
+          border-bottom: 2px solid #f0f0f0;
+          padding-bottom: 15px;
+        }
+
+        h3 {
+          color: #333;
+          font-weight: 700;
+          margin-bottom: 15px;
+          font-size: 1.4rem;
+        }
+
+        /* Badge Section */
+        #badge-path-container {
+          display: flex;
+          gap: 30px;
+          flex-wrap: wrap;
+          margin-bottom: 30px;
+          justify-content: center;
+          /* Center badges */
+        }
+
+        .badge {
+          flex: 0 1 160px;
+          /* Fixed width for consistency */
+          padding: 20px;
+          background: linear-gradient(145deg, #ffffff, #f5f7fa);
+          border-radius: 24px;
+          box-shadow: 5px 5px 15px #d1d9e6, -5px -5px 15px #ffffff;
+          /* Neumorphic touch */
+          text-align: center;
+          cursor: pointer;
+          user-select: none;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          /* Bouncy transition */
+          border: 2px solid transparent;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .badge:hover {
+          transform: translateY(-8px);
+          border-color: #00645c;
+        }
+
+        .badge.unlocked {
+          background: #fff;
+          box-shadow: 0 10px 30px rgba(255, 193, 7, 0.3);
+          border-color: #ffca28;
+        }
+
+        .badge-icon {
+          width: 90px;
+          height: 90px;
+          margin: 0 auto 15px auto;
+          border-radius: 50%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 42px;
+          color: white;
+          box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+          transition: transform 0.5s ease;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Premium Gradients */
+        .badge-rookie .badge-icon {
+          background: linear-gradient(135deg, #4fc3f7, #0288d1);
+        }
+
+        .badge-contributor .badge-icon {
+          background: linear-gradient(135deg, #aed581, #558b2f);
+        }
+
+        .badge-achiever .badge-icon {
+          background: linear-gradient(135deg, #ffb74d, #f57c00);
+        }
+
+        .badge-master .badge-icon {
+          background: linear-gradient(135deg, #ef5350, #b71c1c);
+        }
+
+        .badge.unlocked .badge-icon {
+          background: linear-gradient(135deg, #ffd54f, #ff6f00);
+          box-shadow: 0 0 25px rgba(255, 193, 7, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
+          animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+          0% {
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+          }
+
+          50% {
+            box-shadow: 0 0 35px rgba(255, 193, 7, 0.8);
+          }
+
+          100% {
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+          }
+        }
+
+        .badge-name {
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: #444;
+          letter-spacing: 0.5px;
+        }
+
+        .badge.unlocked .badge-name {
+          color: #ff6f00;
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Leaderboard Styling */
+        .leaderboard-container {
+          overflow-x: auto;
+        }
+
+        .leaderboard-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0 8px;
+          /* Spacing between rows */
+          margin-top: 10px;
+        }
+
+        .leaderboard-table th {
+          padding: 15px 20px;
+          text-align: left;
+          color: #777;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          letter-spacing: 1px;
+          border-bottom: 2px solid #eee;
+        }
+
+        .leaderboard-table td {
+          padding: 15px 20px;
+          background: #f9f9f9;
+          border-top: 1px solid #eee;
+          border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-table td:first-child {
+          border-left: 1px solid #eee;
+          border-top-left-radius: 10px;
+          border-bottom-left-radius: 10px;
+        }
+
+        .leaderboard-table td:last-child {
+          border-right: 1px solid #eee;
+          border-top-right-radius: 10px;
+          border-bottom-right-radius: 10px;
+        }
+
+        .leaderboard-table tr:hover td {
+          background: #f0f4f8;
+          transform: scale(1.01);
+          transition: transform 0.2s ease;
+        }
+
+        .leaderboard-table tr.current-user td {
+          background: #e0f2f1;
+          /* Light teal */
+          border-color: #b2dfdb;
+          color: #004d40;
+          font-weight: 700;
+        }
+
+        .rank-cell {
+          font-size: 1.4rem;
+        }
+
+        /* Stats & Charts Styling */
+        .stats-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 40px;
+          align-items: flex-start;
+        }
+
+        .stats-summary {
+          flex: 1;
+          min-width: 280px;
+          background: linear-gradient(135deg, #00645c, #004d40);
+          padding: 25px;
+          border-radius: 16px;
+          color: white;
+          box-shadow: 0 8px 20px rgba(0, 100, 92, 0.3);
+        }
+
+        #stats-list li {
+          font-weight: 500;
+          margin: 15px 0;
+          font-size: 1.2rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+          padding-bottom: 10px;
+          display: flex;
+          justify-content: space-between;
+        }
+
+        #stats-list li:last-child {
+          border-bottom: none;
+        }
+
+        .charts-container {
+          flex: 2;
+          display: flex;
+          gap: 25px;
+          flex-wrap: wrap;
+        }
+
+        .chart-box {
+          flex: 1;
+          min-width: 220px;
+          background: #fff;
+          border-radius: 16px;
+          padding: 20px;
+          border: 1px solid #eee;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        /* Share Buttons */
+        .social-share {
+          display: flex;
+          gap: 15px;
+        }
+
+        .social-share button {
+          flex: 1;
+          border: none;
+          border-radius: 12px;
+          color: white;
+          font-weight: 700;
+          padding: 14px 20px;
+          cursor: pointer;
+          transition: transform 0.2s ease, filter 0.2s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1rem;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .social-share button.facebook {
+          background: linear-gradient(to right, #3b5998, #4c70ba);
+        }
+
+        .social-share button.twitter {
+          background: linear-gradient(to right, #1da1f2, #40a9f3);
+        }
+
+        .social-share button.linkedin {
+          background: linear-gradient(to right, #0077b5, #008cc9);
+        }
+
+        .social-share button:hover {
+          transform: translateY(-3px);
+          filter: brightness(110%);
+        }
+
+        /* Add Badge Button */
+        #addBadgeBtn {
+          background: linear-gradient(to right, #4caf50, #43a047);
+          border: none;
+          padding: 14px 28px;
+          border-radius: 30px;
+          color: white;
+          font-weight: 700;
+          font-size: 1.1rem;
+          cursor: pointer;
+          box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+          transition: all 0.3s ease;
+          display: block;
+          margin: 20px auto 0 auto;
+          /* Center button */
+        }
+
+        #addBadgeBtn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+        }
+
+        /* Notification */
+        #achievement-notification {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          max-width: 350px;
+          background: rgba(33, 33, 33, 0.95);
+          backdrop-filter: blur(10px);
+          color: #fff;
+          padding: 20px 30px;
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+          font-weight: 600;
+          font-size: 1.1rem;
+          opacity: 0;
+          pointer-events: none;
+          transform: translateY(30px) scale(0.9);
+          transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          z-index: 2000;
+          border-left: 5px solid #ffca28;
+        }
+
+        #achievement-notification.show {
+          opacity: 1;
+          pointer-events: auto;
+          transform: translateY(0) scale(1);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          min-height: 100vh;
+          padding: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .container {
+          background: white;
+          border-radius: 16px;
+          padding: 30px;
+          width: 100%;
+          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+          margin-bottom: 30px;
+        }
+
+        h1 {
+          text-align: center;
+          color: #333;
+          margin-bottom: 10px;
+          font-size: 2.5em;
+        }
+
+        .subtitle {
+          text-align: center;
+          color: #666;
+          margin-bottom: 30px;
+          font-size: 1.1em;
+        }
+
+        .progress-section {
+          background: #f8f9fa;
+          padding: 25px;
+          border-radius: 15px;
+          margin-bottom: 30px;
+        }
+
+        .progress-info {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+        }
+
+        .lectures-count {
+          font-size: 2em;
+          font-weight: bold;
+          color: #667eea;
+        }
+
+        .progress-bar {
+          background: #e0e0e0;
+          height: 30px;
+          border-radius: 15px;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .progress-fill {
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+          height: 100%;
+          border-radius: 15px;
+          transition: width 0.5s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+        }
+
+        .lecture-buttons {
+          display: flex;
+          gap: 10px;
+          margin-bottom: 30px;
+          flex-wrap: wrap;
+        }
+
+        .lecture-btn {
+          flex: 1;
+          min-width: 150px;
+          padding: 15px;
+          border: none;
+          border-radius: 10px;
+          font-size: 1em;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 600;
+        }
+
+        .lecture-btn.watched {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+        }
+
+        .lecture-btn.unwatched {
+          background: #e0e0e0;
+          color: #666;
+        }
+
+        .lecture-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .reset-btn {
+          width: 100%;
+          padding: 12px;
+          background: #ff6b6b;
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-size: 1em;
+          cursor: pointer;
+          margin-bottom: 30px;
+          font-weight: 600;
+          transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+          background: #ee5a52;
+          transform: translateY(-2px);
+        }
+
+        .badges-section {
+          margin-top: 30px;
+        }
+
+        .badges-title {
+          font-size: 1.8em;
+          color: #333;
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .badges-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 20px;
+        }
+
+        .badge {
+          background: #f8f9fa;
+          padding: 20px;
+          border-radius: 15px;
+          text-align: center;
+          transition: all 0.3s ease;
+          border: 3px solid transparent;
+        }
+
+        .badge.unlocked {
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          border-color: #28a745;
+          transform: scale(1.05);
+          box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .badge.locked {
+          opacity: 0.5;
+          filter: grayscale(100%);
+        }
+
+        .badge-icon {
+          font-size: 3em;
+          margin-bottom: 10px;
+        }
+
+        .badge-name {
+          font-size: 1.2em;
+          font-weight: bold;
+          color: #333;
+          margin-bottom: 5px;
+        }
+
+        .badge-requirement {
+          font-size: 0.9em;
+          color: #666;
+        }
+
+        .current-badge {
+          background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+          padding: 25px;
+          border-radius: 15px;
+          text-align: center;
+          margin-bottom: 30px;
+          box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .current-badge-title {
+          font-size: 1.2em;
+          color: #333;
+          margin-bottom: 10px;
+        }
+
+        .current-badge-name {
+          font-size: 2.5em;
+          font-weight: bold;
+          color: #333;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 15px;
+        }
+
+        .unlock-animation {
+          animation: unlock 0.6s ease;
+        }
+
+        @keyframes unlock {
+          0% {
+            transform: scale(0.8) rotate(-10deg);
+            opacity: 0;
+          }
+
+          50% {
+            transform: scale(1.1) rotate(5deg);
+          }
+
+          100% {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+          }
+        }
+      </style>
     </div>
   </div>
 </div>
-<style>
-  .progress-tab .completed-stories {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    margin-top: 15px;
-    min-height: 342px;
-    opacity: 1;
-    padding: 0 0 30px 40px;
-    width: 736px;
-  }
-  .progress-tab .empty-completed-stories {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    margin-top: 15px;
-    min-height: 206px;
-    opacity: 1;
-    padding: 0 0 30px 40px;
-    width: 360px;
-  }
-  .progress-tab .skill-proficiency {
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 0 4px #0000001a;
-    min-height: 220px;
-    opacity: 1;
-    padding: 0 30px 30px 40px;
-    width: 736px;
-  }
-  #setting-a-goal-link {
-    color: #00645c;
-    font-weight: bold;
-  }
-  .progress-tab .empty-section {
-    padding: 0 113px 30px 40px;
-  }
-  .progress-tab .completed-stories .completed-stories-title,
-  .progress-tab .empty-completed-stories .completed-stories-title,
-  .progress-tab .skill-proficiency-title {
-    color: #00645c;
-    display: inline-block;
-    font-family: "Capriola", "Roboto", Arial, sans-serif;
-    font-size: 24px;
-    letter-spacing: 0;
-    opacity: 1;
-    text-align: left;
-  }
-  .progress-tab .empty-section .skill-proficiency-title {
-    margin-bottom: 0;
-  }
-  .progress-tab .empty-skill-proficiency-section {
-    font-size: 18px;
-  }
-  .progress-tab .empty-skill-proficiency {
-    display: inline;
-    font-size: 18px;
-    margin-bottom: 0;
-    text-align: left;
-  }
-  .oppia-badge-image {
-    margin-right: 12px;
-    width: 32px;
-  }
-  .oppia-badge-image-for-topic {
-    bottom: 6px;
-    float: left;
-    margin-right: 20px;
-    position: relative;
-    width: 31px;
-  }
-  .progress-tab .skill-proficiency-topic-tile {
-    border-bottom: 1px solid;
-    height: 43px;
-    margin-bottom: 16px;
-    width: 656px;
-  }
-  .progress-tab .skill-proficiency-topic-title {
-    color: #333;
-    font-size: 19px;
-    font-weight: 500;
-    letter-spacing: 0;
-    opacity: 1;
-    position: relative;
-    text-align: left;
-  }
-  .progress-tab .progress-text {
-    bottom: 20px;
-    color: #00645c;
-    float: right;
-    font-size: 14px;
-    letter-spacing: 0;
-    opacity: 1;
-    position: relative;
-    right: 20px;
-    text-align: left;
-  }
-  .progress-tab .circle {
-    background-color: #fff;
-    border-radius: 100%;
-    height: 16px;
-    left: 6px;
-    position: relative;
-    text-align: center;
-    top: 6px;
-    width: 16px;
-  }
-  .progress-tab .circle-border {
-    background-color: #00645c;
-    border-radius: 100%;
-    bottom: 24px;
-    display: inline-block;
-    height: 28px;
-    left: 230px;
-    margin-left: 30%;
-    position: relative;
-    text-align: center;
-    width: 28px;
-  }
-  .progress-tab .info-tooltip {
-    display: inline-block;
-    opacity: 1;
-    position: relative;
-    text-decoration: none;
-  }
-  .progress-tab .info-tooltip span {
-    background: white;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    border-radius: 6px;
-    color: black;
-    display: none;
-  }
-  .progress-tab .progress-translate {
-    display: inline-block;
-  }
-  .progress-tab .info-tooltip span img {
-    float: left;
-    margin: 0 8px 8px 0;
-  }
-  .progress-tab .info-tooltip:hover span {
-    border: 0.5px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 3px 6px #00000029;
-    display: block;
-    height: 155px;
-    margin-left: 32px;
-    padding: 9px 16px;
-    position: absolute;
-    top: -37px;
-    width: 157px;
-    z-index: 2;
-  }
-  .progress-tab .badge-type {
-    color: #333;
-    font-size: 16px;
-    margin-bottom: 0;
-    text-align: left;
-  }
-  .progress-tab .badge-percent {
-    color: #555;
-    font-size: 12px;
-    font-style: italic;
-    text-align: left;
-  }
-  .progress-tab .badge-info {
-    background-color: #fff;
-    color: #000;
-    margin-bottom: 16px;
-  }
-  .progress-tab .completed-stories-content {
-    display: inline-block;
-  }
-  .progress-tab .story-tile {
-    display: inline-block;
-    padding: 0 30px 0 0;
-  }
-  .progress-tab .empty-completed-stories-content {
-    font-size: 16px;
-    padding: 0 32px 0 0;
-  }
-  .progress-tab .completed-stories .completed-stories-heading,
-  .progress-tab .empty-completed-stories .completed-stories-heading,
-  .progress-tab .skill-proficiency-heading {
-    padding: 32px 0;
-  }
-  .progress-tab .completed-stories-length {
-    bottom: 3px;
-    font-size: 18px;
-    margin: 0 4px 0 12px;
-    position: relative;
-  }
-  .progress-tab .oppia-svg-star-image {
-    bottom: 4px;
-    filter: invert(95%) sepia(49%) saturate(2374%) hue-rotate(320deg) brightness(91%) contrast(89%);
-    position: relative;
-    width: 20px;
-  }
-  .progress-tab .skills-text {
-    color: #333;
-    font-size: 18px;
-    margin-bottom: 0;
-    text-align: left;
-    text-transform: uppercase;
-  }
-  .progress-tab .oppia-svg-dropdown-image,
-  .progress-tab .oppia-svg-up-image {
-    bottom: 5px;
-    float: right;
-    position: relative;
-    top: 2px;
-    width: 30px;
-  }
-  .progress-tab .oppia-svg-info-image {
-    bottom: 3px;
-    left: 10px;
-    position: relative;
-    width: 20px;
-  }
-  @media screen and (min-width: 768px) and (max-width: 950px) {
-    .progress-tab .completed-stories {
-      margin-top: 35px;
-      padding: 0 0 30px 25px;
-      position: relative;
-      right: 20px;
-      width: 555px;
-    }
-    .progress-tab .empty-completed-stories {
-      position: relative;
-      right: 25px;
-      width: 555px;
-    }
-    .progress-tab .circle-border {
-      left: 88px;
-    }
-    .progress-tab .scroll-content {
-      overflow: scroll;
-    }
-    .progress-tab .oppia-story-completion {
-      overflow: hidden;
-    }
-    .progress-tab .skill-proficiency {
-      position: relative;
-      right: 21px;
-      width: 555px;
-    }
-    .progress-tab .skill-proficiency-topic-tile {
-      width: 455px;
-    }
-    .progress-tab .skills-text {
-      font-size: 18px;
-    }
-    .progress-tab .skill-proficiency-title {
-      font-size: 20px;
-      margin-bottom: 0;
-    }
-  }
-  @media screen and (max-width: 767px) {
-    .progress-tab .empty-completed-stories {
-      margin: auto;
-    }
-    .progress-tab .completed-stories {
-      margin: auto;
-      margin-top: 35px;
-      padding: 0 0 30px 25px;
-      width: 360px;
-    }
-    .progress-tab .skill-proficiency {
-      margin: auto;
-      width: 360px;
-    }
-    .progress-tab .skill-proficiency-topic-tile {
-      height: 52px;
-      width: 280px;
-    }
-    .progress-tab .circle-border {
-      display: none;
-    }
-    .progress-tab .skill-proficiency-topic-title {
-      font-size: 16px;
-    }
-    .progress-tab .skills-text {
-      display: none;
-    }
-    .progress-tab .progress-text {
-      display: contents;
-      font-style: italic;
-    }
-    .progress-tab .skill-proficiency-title,
-    .progress-tab .completed-stories-title {
-      font-size: 20px;
-      margin-bottom: 0;
-    }
-    .progress-tab .story-tile {
-      padding: 0 14px 0 0;
-    }
-    .progress-tab .scroll-content {
-      overflow: scroll;
-    }
-    .progress-tab .skill-proficiency-heading {
-      padding: 23px 0;
-    }
-    .progress-tab .oppia-story-completion {
-      overflow: hidden;
-    }
-    .progress-tab .empty-section {
-      padding: 0 50px 30px 40px;
-    }
-  }
-  @media(max-width: 430px) {
-    .progress-tab .empty-completed-stories {
-      width: 355px;
-    }
-  }
-</style>
+</div>
