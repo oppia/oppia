@@ -212,9 +212,15 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    var explorationCardElement = $(
-      `.e2e-test-exp-summary-tile-title:has-text("${explorationName}")`
-    );
+    var allExplorationCards = await $$('.e2e-test-exp-summary-tile-title');
+    var explorationCardElement = (
+      await Promise.all(
+        allExplorationCards.map(async tile => {
+          const text = await tile.getText();
+          return {tile, text};
+        })
+      )
+    ).find(({text}) => text.trim() === explorationName)?.tile;
     await waitFor.visibilityOf(
       explorationCardElement,
       'Unable to find exploration ' + explorationName
