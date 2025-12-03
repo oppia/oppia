@@ -1,4 +1,4 @@
-<div class="progress-nav-bar row space-between center">
+<div class="progress-nav-bar d-flex justify-content-between align-items-center">
   <!-- Wrapping div on first button keeps the second button right-aligned
     even when the first button is not present. -->
   <div class="row-item row-item-previous-card">
@@ -12,7 +12,7 @@
       </button>
     </div>
   </div>
-  <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
+  <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card ms-auto">
     <button mat-raised-button
             (click)="moveForwardByOneCard()"
             aria-label="Next Card"
@@ -20,10 +20,10 @@
       <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
     </button>
   </div>
-  <div *ngIf="!hasNext">
+  <div *ngIf="!hasNext" class="ms-auto">
     <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button">
       <button mat-button
-              class="btn btn-secondary  oppia-skip-button e2e-test-skip-question-button"
+              class="btn btn-secondary oppia-skip-button e2e-test-skip-question-button"
               *ngIf="skipButtonIsShown"
               (click)="skipCurrentQuestion()">
         I don't know
