@@ -354,7 +354,7 @@ export class MusicNotesInputComponent
                       $(innerDiv).position().left
                     );
                   },
-                  containment: '.oppia-music-input-valid-note-area' as any, // FIX: Cast to any
+                  containment: '.oppia-music-input-valid-note-area' as any, 
                   cursor: 'pointer',
                   grid: [this.HORIZONTAL_GRID_SPACING, 1],
                   // Stops helper clone from being cloned again.
@@ -407,7 +407,7 @@ export class MusicNotesInputComponent
           top:
             (this.getVerticalPosition(
               this.noteSequence[i].note.baseNoteMidiNumber
-            ) as number) - // FIX: Assert as number
+            ) as number) -
             this.VERTICAL_GRID_SPACING / 2.0,
           left: this.getHorizontalPosition(
             this.getNoteStartAsFloat(this.noteSequence[i].note)
@@ -417,7 +417,7 @@ export class MusicNotesInputComponent
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
-          containment: validNoteArea as any, // FIX: Cast to any
+          containment: validNoteArea as any, 
           cursor: 'pointer',
           stack: '.oppia-music-input-note-choices div',
           grid: [this.HORIZONTAL_GRID_SPACING, 1],
@@ -531,7 +531,7 @@ export class MusicNotesInputComponent
           return;
         }
 
-        const note: MusicNote = { // FIX: Explicit type casting
+        const note: MusicNote = { 
           baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
           offset: parseInt(noteType, 10),
           noteId,
@@ -620,7 +620,7 @@ export class MusicNotesInputComponent
         (a.note.noteStart.den * b.note.noteStart.den)
       );
     }
-    return 0; // FIX: Added default return
+    return 0; 
   }
 
   // If a note position is taken, return true,
@@ -654,9 +654,9 @@ export class MusicNotesInputComponent
       // This gives some wiggle room for rounding differences.
       if (Math.abs(leftPos - this.getHorizontalPosition(i)) < 2) {
         let note: MusicNote = { 
-          baseNoteMidiNumber: 0, // Placeholder
-          offset: 0, // Placeholder
-          noteId: '', // Placeholder
+          baseNoteMidiNumber: 0, 
+          offset: 0, 
+          noteId: '', 
           noteStart: {
             num: i,
             den: 1,
@@ -772,7 +772,7 @@ export class MusicNotesInputComponent
   _getCorrespondingNoteName(midiNumber: string | number): string {
     let correspondingNoteName: string | null = null; 
     for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
-      // FIX: Use 'as any' for indexing
+     
       if ((this.NOTE_NAMES_TO_MIDI_VALUES as any)[noteName] === midiNumber) {
         correspondingNoteName = noteName;
         break;
@@ -780,7 +780,7 @@ export class MusicNotesInputComponent
     }
     if (correspondingNoteName === null) {
       console.error('Invalid MIDI pitch: ' + midiNumber);
-      // FIX: Should return a value or throw error here
+     
       return '';
     }
     return correspondingNoteName;
@@ -797,7 +797,7 @@ export class MusicNotesInputComponent
   _convertNoteToReadableNote(note: MusicNote): ReadableMusicNote {
     if (note.offset !== -1 && note.offset !== 0 && note.offset !== 1) {
       console.error('Invalid note offset: ' + note.offset);
-      // FIX: Should return a value here
+     
       return { readableNoteName: '' };
     }
 
