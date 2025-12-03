@@ -28,10 +28,10 @@
       }
     },
     "bootstrap": {
-      "version": "4.3.1",
+      "version": "5.3.3",
       "downloadFormat": "zip",
-      "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
-      "rootDir": "bootstrap-4.3.1-dist",
+      "url": "https://github.com/twbs/bootstrap/releases/download/v5.3.3/bootstrap-5.3.3-dist.zip",
+      "rootDir": "bootstrap-5.3.3-dist",
       "targetDirPrefix": "bootstrap-",
       "bundle": {
         "css": ["css/bootstrap.css"],
