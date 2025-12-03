@@ -14,21 +14,28 @@
 
 /**
  * @fileoverview Custom Jest environment for enhanced test failure handling.
- *
- * This custom Jest environment extends NodeEnvironment to detect test failures
- * in real-time and trigger actions like capturing screenshots for debugging.
  */
 
 const fs = require('fs');
 const path = require('path');
-const {showMessage} = require('./utilities/common/show-message');
-const {TestEnvironment} = require('jest-environment-node');
+const NodeEnvironment = require('jest-environment-node').TestEnvironment;
 
 const CONFIG_FILE = path.resolve(__dirname, 'jest-runtime-config.json');
 
-class CustomJestEnvironment extends TestEnvironment {
+class CustomJestEnvironment extends NodeEnvironment {
+  async setup() {
+    await super.setup();
+  }
+
+  async teardown() {
+    await super.teardown();
+  }
+
   async handleTestEvent(event) {
+    await super.handleTestEvent?.(event);
+
     if (event.name === 'test_done' && event.test.errors.length > 0) {
+      const {showMessage} = require('./utilities/common/show-message');
       showMessage('Test failed: Capturing screenshots...');
       fs.writeFileSync(
         CONFIG_FILE,
