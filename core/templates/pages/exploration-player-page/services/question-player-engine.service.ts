@@ -79,8 +79,8 @@ export class QuestionPlayerEngineService {
   private _resultsPageIsLoadedEventEmitter = new EventEmitter<boolean>();
   private answerIsBeingProcessed: boolean = false;
   private questions: Question[] = [];
-  private nextIndex!: number; // FIX: Added '!'
-  currentIndex!: number; // FIX: Added '!'
+  private nextIndex!: number; 
+  currentIndex!: number; 
   questionPlayerState: QuestionPlayerState = {};
 
   constructor(
@@ -175,7 +175,7 @@ export class QuestionPlayerEngineService {
     }
     if (!this.questions || this.questions.length === 0) {
       this.alertsService.addWarning('There are no questions to display.');
-      errorCallback?.(); // FIX: Added '?' for optional callback invoke
+      errorCallback?.(); 
       return;
     }
     this.loadInitialQuestion(successCallback, errorCallback);
@@ -302,17 +302,17 @@ export class QuestionPlayerEngineService {
     answer: InteractionAnswer,
     interactionRulesService: InteractionRulesService,
     successCallback: (
-      nextCard: StateCard | null, // FIX: nextCard can be null
+      nextCard: StateCard | null, 
       refreshInteraction: boolean,
       feedbackHtml: string,
-      refresherExplorationId: any, // FIX: using any
-      missingPrerequisiteSkillId: any, // FIX: using any
+      refresherExplorationId: any, 
+      missingPrerequisiteSkillId: any, 
       remainOnCurrentCard: boolean,
-      taggedSkillMisconceptionId: string | null, // FIX: can be null
-      wasOldStateInitial: any, // FIX: using any
-      isFirstHit: any, // FIX: using any
+      taggedSkillMisconceptionId: string | null, 
+      wasOldStateInitial: any, 
+      isFirstHit: any, 
       isFinalQuestion: boolean,
-      nextCardIfReallyStuck: any, // FIX: using any
+      nextCardIfReallyStuck: any, 
       focusLabel: string
     ) => void
   ): boolean {
@@ -332,7 +332,7 @@ export class QuestionPlayerEngineService {
       );
     const answerGroupIndex = classificationResult.answerGroupIndex;
     const answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
-    let taggedSkillMisconceptionId: string | null = null; // FIX: Declared as string | null
+    let taggedSkillMisconceptionId: string | null = null;
     if (oldState.interaction.answerGroups[answerGroupIndex]) {
       taggedSkillMisconceptionId =
         oldState.interaction.answerGroups[answerGroupIndex]
@@ -386,7 +386,7 @@ export class QuestionPlayerEngineService {
     const onSameCard = !answerIsCorrect;
 
     const _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextCard: StateCard | null = null; // FIX: Declared as StateCard | null
+    let nextCard: StateCard | null = null; 
     let nextCardIfReallyStuck = null;
     if (!isFinalQuestion) {
       let nextInteractionHtml = this.getNextInteractionHtml(_nextFocusLabel);
@@ -394,23 +394,23 @@ export class QuestionPlayerEngineService {
       questionHtml = questionHtml + this.getRandomSuffix();
       nextInteractionHtml = nextInteractionHtml + this.getRandomSuffix();
       nextCard = StateCard.createNewCard(
-        'true', // FIX: Should be string | null
+        'true', 
         questionHtml,
         nextInteractionHtml,
         this.getNextStateData().interaction,
-        this.getNextStateData().content.contentId! // FIX: Added '!'
+        this.getNextStateData().content.contentId! 
       );
     }
     successCallback(
       nextCard,
       refreshInteraction,
       feedbackHtml,
-      null, // refresherExplorationId
-      null, // missingPrerequisiteSkillId
+      null, 
+      null, 
       onSameCard,
       taggedSkillMisconceptionId,
-      null, // wasOldStateInitial
-      null, // isFirstHit
+      null, 
+      null, 
       isFinalQuestion,
       nextCardIfReallyStuck,
       _nextFocusLabel
@@ -476,7 +476,7 @@ export class QuestionPlayerEngineService {
   recordAnswerSubmitted(
     question: Question,
     isCorrect: boolean,
-    taggedSkillMisconceptionId: string | null // FIX: Can be null
+    taggedSkillMisconceptionId: string | null 
   ): void {
     let questionId = question.getId() as string;
     if (!this.questionPlayerState[questionId]) {
@@ -493,7 +493,7 @@ export class QuestionPlayerEngineService {
     this.questionPlayerState[questionId].answers.push({
       isCorrect: isCorrect,
       timestamp: this._getCurrentTime(),
-      taggedSkillMisconceptionId: taggedSkillMisconceptionId!, // FIX: Added '!'
+      taggedSkillMisconceptionId: taggedSkillMisconceptionId!,
     });
   }
 
@@ -524,7 +524,7 @@ export class QuestionPlayerEngineService {
     feedbackHtml: string,
     envs: Record<string, string>[]
   ): string {
-    return this.expressionInterpolationService.processHtml(feedbackHtml, envs)!; // FIX: Added '!'
+    return this.expressionInterpolationService.processHtml(feedbackHtml, envs)!; 
   }
 
   /**
@@ -545,7 +545,7 @@ export class QuestionPlayerEngineService {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
-    )!; // FIX: Added '!'
+    )!; 
   }
 
   /**
@@ -611,7 +611,7 @@ export class QuestionPlayerEngineService {
     const questionHtml = this.makeQuestion(initialState, []);
     if (questionHtml === null) {
       this.alertsService.addWarning('Question name should not be empty.');
-      errorCallback?.(); // FIX: Added '?'
+      errorCallback?.(); 
       return;
     }
 
@@ -622,7 +622,7 @@ export class QuestionPlayerEngineService {
     const nextFocusLabel = this.focusManagerService.generateFocusLabel();
 
     const interactionId = interaction.id;
-    let interactionHtml: string | null = null; // FIX: Explicitly set type
+    let interactionHtml: string | null = null; 
 
     if (interactionId) {
       interactionHtml = this.explorationHtmlFormatterService.getInteractionHtml(
@@ -638,7 +638,7 @@ export class QuestionPlayerEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId! // FIX: Added '!'
+      initialState.content.contentId! 
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -671,14 +671,14 @@ export class QuestionPlayerEngineService {
    * @returns {string} The HTML string representing the interaction.
    */
   private getNextInteractionHtml(labelForFocusTarget: string): string {
-    const interactionId = this.getNextStateData().interaction.id!; // FIX: Added '!'
+    const interactionId = this.getNextStateData().interaction.id!; 
     return this.explorationHtmlFormatterService.getInteractionHtml(
       interactionId,
       this.getNextStateData().interaction.customizationArgs,
       true,
       labelForFocusTarget,
       null
-    )!; // FIX: Added '!'
+    )!; 
   }
 
   /**
