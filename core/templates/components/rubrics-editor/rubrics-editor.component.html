@@ -6,9 +6,9 @@
       </i>
     </span>
   </div>
-  <div class="form-group">
+  <div class="mb-3">
     <span>
-      <select class="form-control rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
+      <select class="form-select rubric-options e2e-test-select-rubric-difficulty" [(ngModel)]="this.selectedRubricIndex"
               (change)="this.onRubricSelectionChange()">
         <option *ngFor="let option of this.rubricsOptions" [value]="option.id">{{ option.difficulty }}</option>
       </select>
@@ -23,7 +23,7 @@
           <div class="oppia-rule-preview">
             <div class="oppia-click-to-start-editing" (click)="this.openExplanationEditor(this.rubric.getDifficulty(), idx)">
               <i *ngIf="this.isEditable()"
-                 class="fas fa-pen oppia-editor-edit-icon float-right e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
+                 class="fas fa-pen oppia-editor-edit-icon float-end e2e-test-edit-rubric-explanation-{{this.rubric.getDifficulty()}}"
                  title="Edit Rubric Explanation">
               </i>
             </div>
