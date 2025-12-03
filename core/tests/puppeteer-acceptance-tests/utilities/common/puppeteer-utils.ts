@@ -589,6 +589,8 @@ export class BaseUser {
    * @param value The value of the mat-option to select.
    */
   async selectMatOption(value: string): Promise<void> {
+    // eslint-disable-next-line no-console
+    console.log('[FLAKY-DEBUG] Waiting for mat-option elements to appear...');
     await this.page.waitForSelector('mat-option');
     const matOptionElements = await this.page.$$('mat-option');
     for (const matOptionElement of matOptionElements) {
@@ -596,11 +598,18 @@ export class BaseUser {
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
+        // eslint-disable-next-line no-console
+        console.log('[FLAKY-DEBUG] Clicking mat-option with value:', value);
+
         await matOptionElement.click();
         break;
       }
     }
 
+    // eslint-disable-next-line no-console
+    console.log(
+      '[FLAKY-DEBUG] Waiting for mat-option dropdown to disappear...'
+    );
     await this.page.waitForSelector('mat-option', {
       hidden: true,
     });
