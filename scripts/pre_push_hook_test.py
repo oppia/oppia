@@ -792,16 +792,16 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with mock.patch.object(
             subprocess, 'check_output', autospec=True
         ) as mock_check_output:
-            mock_check_output.return_value = 'changed_branch'
+            mock_check_output.return_value = 'feature-branch'
 
-            cb = pre_push_hook.ChangedBranch('changed_branch')
+            changed_branch = pre_push_hook.ChangedBranch('feature-branch')
 
-            self.assertTrue(cb.is_same_branch)
-            self.assertEqual(cb.new_branch, 'changed_branch')
+            self.assertTrue(changed_branch.is_same_branch)
+            self.assertEqual(changed_branch.new_branch, 'feature-branch')
 
             mock_check_output.reset_mock()
 
-            with cb:
+            with changed_branch:
                 pass
 
             mock_check_output.assert_not_called()
