@@ -176,14 +176,14 @@ export class ObjectEditorComponent
   ControlValueAccessor,
   Validator {
   private _value: SchemaDefaultValue;
-  // FIX: Added '!' for TS2564 and ': any' or '!: any' for TS7008 errors
+  
   @Input() alwaysEditable!: string;
   @Input() initArgs!: SchemaDefaultValue;
-  @Input() isEditable!: string; // FIX for TS2564
-  @Input() modalId!: symbol;     // FIX for TS2564
-  @Input() objType!: string;     // FIX for TS2564
-  @Input() schema!: any;          // FIX for TS7008
-  @Input() form!: any;            // FIX for TS7008
+  @Input() isEditable!: string; 
+  @Input() modalId!: symbol;     
+  @Input() objType!: string;     
+  @Input() schema!: any;          
+  @Input() form!: any;            
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
 
   get value(): SchemaDefaultValue {
@@ -193,8 +193,7 @@ export class ObjectEditorComponent
   @Input() set value(val: SchemaDefaultValue) {
     const previousValue = this._value;
     this._value = val;
-    // Angular can call writeValue before we create the component. Hence a
-    // check to see if component has been created.
+    
     if (this.componentRef) {
       this.componentRef.instance.value = this._value;
       this.onChange(this._value);
@@ -257,7 +256,7 @@ export class ObjectEditorComponent
     ) {
       throw new Error('\nProvided initArgs: ' + this.initArgs);
     }
-    // FIX: Added 'as any' for TS7053 (Element implicitly has an 'any' type)
+    
     if ((EDITORS as any).hasOwnProperty(editorName)) {
       if (
         editorName === 'list-of-sets-of-translatable-html-content-ids' &&
@@ -267,12 +266,10 @@ export class ObjectEditorComponent
       }
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          (EDITORS as any)[editorName] // FIX for TS7053 (Line 266)
+          (EDITORS as any)[editorName] 
         );
       this.viewContainerRef.clear();
-      // Unknown is type is used because it is default property of
-      // createComponent. This is used to access the instance of the
-      // component created. The type of the instance is not known.
+      
       const componentRef = this.viewContainerRef.createComponent<unknown>(
         componentFactory
       ) as ComponentRef<ObjectEditor>;
@@ -283,20 +280,17 @@ export class ObjectEditorComponent
       componentRef.instance.modalId = this.modalId;
       componentRef.instance.objType = this.objType;
 
-      // Some Object editors have a schema predefined. In order to not
-      // replace it with an undefined value, we check if "this.schema" is
-      // defined and component doesn't have its own schema property.
+      
       if (this.schema && !componentRef.instance.schema) {
         componentRef.instance.schema = this.schema;
       }
       componentRef.instance.value = this.value;
 
-      // Listening to @Output events (valueChanged and validityChange).
+      
       if (componentRef.instance.valueChanged) {
         this.componentSubscriptions.add(
           componentRef.instance.valueChanged.subscribe(newValue => {
-            // Changes to array are not caught if the array reference doesn't
-            // change. This is a hack for change detection.
+            
             if (Array.isArray(newValue)) {
               this.value = [...newValue];
               return;
@@ -309,9 +303,7 @@ export class ObjectEditorComponent
         this.componentSubscriptions.add(
           componentRef.instance.validityChange.subscribe(errorsMap => {
             for (const errorKey of Object.keys(errorsMap)) {
-              // Errors map contains true for a key if valid state and false
-              // for an error state. We remove the key from componentErrors
-              // when it is valid and add it when it is reported as error.
+              
               const errorState = errorsMap[errorKey];
               if (errorState !== true) {
                 if (this.componentErrors[errorKey] === undefined) {
@@ -345,7 +337,7 @@ export class ObjectEditorComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // This is left empty on purpose. See NOTE at the top.
+   
   }
 
   ngOnDestroy(): void {
