@@ -206,7 +206,8 @@ oppia-search-bar .oppia-input-group {
     color: #fff;
     height: 40px;
     margin-left: 3px;
-    margin-top: -60px;
+    margin-top: 0px;
+    position: relative;
     max-width: none;
     padding: 8px 7px 0 6px;
     text-align: center;
