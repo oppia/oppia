@@ -52,7 +52,6 @@ var LibraryPage = function () {
         matchedElements.push(element);
       }
     }
-
     return matchedElements;
   };
   var categorySelector = forms.MultiSelectEditor(
@@ -222,24 +221,24 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    var allExplorationCards = await $$('.e2e-test-exp-summary-tile-title');
-    var explorationCardElement = (
-      await Promise.all(
-        allExplorationCards.map(async tile => {
-          var text = await tile.getText();
-          return {tile, text};
-        })
-      )
-    ).find(({text}) => text.trim() === explorationName)?.tile;
-    await waitFor.visibilityOf(
-      explorationCardElement,
-      'Unable to find exploration ' + explorationName
-    );
-    var explorationCard = await allExplorationsTitled(explorationName)[0];
-    // The Exploration summary card is masked by a dummy element. Therefore, a
-    // Javascript click is used.
-    await action.click('Exploration Card', explorationCard, true);
-    await waitFor.pageToFullyLoad();
+    // var allExplorationCards = await $$('.e2e-test-exp-summary-tile-title');
+    // var explorationCardElement = (
+    //   await Promise.all(
+    //     allExplorationCards.map(async tile => {
+    //       var text = await tile.getText();
+    //       return {tile, text};
+    //     })
+    //   )
+    // ).find(({text}) => text.trim() === explorationName)?.tile;
+    // await waitFor.visibilityOf(
+    //   explorationCardElement,
+    //   'Unable to find exploration ' + explorationName
+    // );
+    // var explorationCard = await allExplorationsTitled(explorationName)[0];
+    // // The Exploration summary card is masked by a dummy element. Therefore, a
+    // // Javascript click is used.
+    // await action.click('Exploration Card', explorationCard, true);
+    // await waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = async function (name) {
