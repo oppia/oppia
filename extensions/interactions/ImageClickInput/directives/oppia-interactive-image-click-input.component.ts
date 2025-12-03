@@ -108,7 +108,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     };
   }
 
-  // FIX: Added type for regionArea (number[][]) for TS7006
+  
   private _isMouseInsideRegion(regionArea: number[][]): boolean {
     return (
       this.mouseX >= regionArea[0][0] &&
@@ -176,7 +176,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         );
         const mimeType = base64Url.split(';')[0];
         if (mimeType === AppConstants.SVG_MIME_TYPE) {
-          // FIX: Assertion to string type (TS2345)
+          
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
             base64Url
           ) as string;
@@ -216,11 +216,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   loadImage(): void {
     this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
-      // FIX: Changed objectUrl type to string | null (TS2345)
+     
       (objectUrl: string | null) => {
         this.isTryAgainShown = false;
         this.isLoadingIndicatorShown = false;
-        this.imageUrl = objectUrl!; // FIX: Assert non-null (TS2322)
+        this.imageUrl = objectUrl!;
       },
       () => {
         this.isTryAgainShown = true;
@@ -230,11 +230,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   updateCurrentlyHoveredRegions(): void {
-    // FIX: Assert imageAndRegions is non-null/defined (TS2531)
+    
     for (let i = 0; i < this.imageAndRegions.labeledRegions.length; i++) {
       const labeledRegion = this.imageAndRegions.labeledRegions[i];
       const regionArea = labeledRegion.region.area;
-      if (this._isMouseInsideRegion(regionArea as number[][])) { // FIX: Cast regionArea type
+      if (this._isMouseInsideRegion(regionArea as number[][])) { 
         this.currentlyHoveredRegions.push(labeledRegion.label);
       }
     }
@@ -249,10 +249,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const regionArea = labeledRegion.region.area;
     const leftDelta =
       image.getBoundingClientRect().left -
-      image.parentElement!.getBoundingClientRect().left; // FIX: Assert parentElement non-null
+      image.parentElement!.getBoundingClientRect().left; 
     const topDelta =
       image.getBoundingClientRect().top -
-      image.parentElement!.getBoundingClientRect().top; // FIX: Assert parentElement non-null
+      image.parentElement!.getBoundingClientRect().top; 
     const returnValue = {
       left: regionArea[0][0] * image.width + leftDelta,
       top: regionArea[0][1] * image.height + topDelta,
@@ -279,7 +279,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return 'inline';
   }
 
-  getDotLocation(): { left: number | null; top: number | null } { // FIX: Changed return type to allow null
+  getDotLocation(): { left: number | null; top: number | null } {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
     );
@@ -289,8 +289,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       top: null,
     };
 
-    if (this.lastAnswer) { // FIX: Added null check
-      // FIX: Asserted parentElement non-null and dotLocation members are number for calculations
+    if (this.lastAnswer) { 
       dotLocation.left =
         this.lastAnswer.clickPosition[0] * image.width +
         image.getBoundingClientRect().left -
@@ -330,9 +329,9 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         event.clientY - imageRect.top + parseFloat(imageStyles.marginTop) + 8;
     }
 
-    dot!.style.top = this.dotCursorCoordinateY + 'px'; // FIX: Assert dot is non-null
-    dot!.style.left = this.dotCursorCoordinateX + 'px'; // FIX: Assert dot is non-null
-    const dotRect = dot!.getBoundingClientRect(); // FIX: Assert dot is non-null
+    dot!.style.top = this.dotCursorCoordinateY + 'px'; 
+    dot!.style.left = this.dotCursorCoordinateX + 'px'; 
+    const dotRect = dot!.getBoundingClientRect(); 
     this.mouseX =
       (dotRect.left - image.getBoundingClientRect().left) / image.width;
     this.mouseY =
