@@ -61,7 +61,7 @@ interface ImagePoint {
   styleUrls: [],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
-  // FIX: Added '!' for TS2564 initializer errors
+  
   @Input() imageAndRegionsWithValue!: string;
   @Input() highlightRegionsOnHoverWithValue!: string;
   @Input() lastAnswer!: ImageClickAnswer;
