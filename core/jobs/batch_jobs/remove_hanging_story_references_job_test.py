@@ -23,6 +23,10 @@ from core.jobs.batch_jobs import remove_hanging_story_references_job
 from core.jobs.types import job_run_result
 from core.platform import models
 
+MYPY = False
+if MYPY:
+    from mypy_imports import story_models, topic_models
+
 (topic_models, story_models) = models.Registry.import_models(
     [models.Names.TOPIC, models.Names.STORY]
 )
@@ -34,7 +38,9 @@ class RemoveHangingStoryReferencesJobTests(job_test_utils.JobTestBase):
         remove_hanging_story_references_job.RemoveHangingStoryReferencesJob
     )
 
-    def _create_story(self, story_id: str, topic_id: str = 'topic_1'):
+    def _create_story(
+        self, story_id: str, topic_id: str = 'topic_1'
+    ) -> story_models.StoryModel:
         """Creates and returns a StoryModel instance."""
         return self.create_model(
             story_models.StoryModel,
@@ -49,10 +55,10 @@ class RemoveHangingStoryReferencesJobTests(job_test_utils.JobTestBase):
     def _create_topic(
         self,
         topic_id: str,
-        canonical_story_refs,
+        canonical_story_refs: list[dict[str, str]],
         name: str = 'Topic',
         language_code: str = 'en',
-    ):
+    ) -> topic_models.TopicModel:
         """Creates and returns a TopicModel instance."""
         return self.create_model(
             topic_models.TopicModel,
