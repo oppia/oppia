@@ -212,7 +212,7 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    var explorationCardElement = $(
+    var explorationCardElement = await $(
       `.e2e-test-exp-summary-tile-title=${explorationName}`
     );
     await waitFor.visibilityOf(

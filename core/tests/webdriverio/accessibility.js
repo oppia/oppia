@@ -512,7 +512,7 @@ describe('screenreader and keyboard user accessibility features', function () {
     await browser.keys('Enter');
 
     // Should safely exit out of the exploration.
-    var oppiaLogo = await $('.e2e-test-oppia-main-logo');
+    var oppiaLogo = $('.e2e-test-oppia-main-logo');
     await action.click('Oppia Logo', oppiaLogo);
   });
 
