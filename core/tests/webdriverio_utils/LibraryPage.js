@@ -46,11 +46,13 @@ var LibraryPage = function () {
     var allTitleElements = $$('.e2e-test-exp-summary-tile-title');
     var matchedElements = [];
 
-    allTitleElements.forEach(function (element) {
+    for (var i = 0; i < allTitleElements.length; i++) {
+      var element = allTitleElements[i];
       if (element.getText().trim() === explorationName) {
         matchedElements.push(element);
       }
-    });
+    }
+
     return matchedElements;
   };
   var categorySelector = forms.MultiSelectEditor(
