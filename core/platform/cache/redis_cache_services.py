@@ -68,7 +68,11 @@ class OppiaRedisClient(metaclass=utils.SingletonMeta):
     def __init__(self) -> None:
         """Initialize the Oppia Redis client."""
         self._redishost: Optional[str] = None
-        self._client: Optional[redis.StrictRedis[str]] = None
+        # Here we use MyPy ignore because redis.StrictRedis is a generic
+        # type but the redis-py library's type stubs don't properly
+        # specify the type arguments, leading to type-arg errors that
+        # we cannot fix without modifying the library.
+        self._client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
 
     def _update_client_if_needed(self) -> None:
         """Recreates and updates client if the redis host has changed."""
@@ -95,7 +99,7 @@ class OppiaRedisClient(metaclass=utils.SingletonMeta):
     # the redis-py library's type stubs don't properly specify the type
     # arguments, leading to type-arg errors that we cannot fix without
     # modifying the library.
-    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+    def get_client(self) -> Optional[redis.StrictRedis]:  # type: ignore[type-arg]
         """Return the Redis client instance.
 
         Returns:
@@ -111,7 +115,11 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
     def __init__(self) -> None:
         """Initialize the Cloud NDB Redis client."""
         self._redishost: Optional[str] = None
-        self._client: Optional[redis.StrictRedis[str]] = None
+        # Here we use MyPy ignore because redis.StrictRedis is a generic
+        # type but the redis-py library's type stubs don't properly
+        # specify the type arguments, leading to type-arg errors that
+        # we cannot fix without modifying the library.
+        self._client: Optional[redis.StrictRedis] = None  # type: ignore[type-arg]
 
     def _update_client_if_needed(self) -> None:
         """Recreates and updates client if the redis host has changed."""
@@ -137,7 +145,7 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
     # the redis-py library's type stubs don't properly specify the type
     # arguments, leading to type-arg errors that we cannot fix without
     # modifying the library.
-    def get_client(self) -> redis.StrictRedis:  # type: ignore[type-arg]
+    def get_client(self) -> Optional[redis.StrictRedis]:  # type: ignore[type-arg]
         """Return the Redis client instance.
 
         Returns:
@@ -149,7 +157,7 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
 # Here we use MyPy ignore because redis.StrictRedis is a generic type but the
 # redis-py library's type stubs don't properly specify the type arguments,
 # leading to type-arg errors that we cannot fix without modifying the library.
-def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+def get_oppia_redis_client() -> Optional[redis.StrictRedis]:  # type: ignore[type-arg]
     """Get or create the Oppia Redis client lazily.
 
     Returns:
@@ -161,7 +169,7 @@ def get_oppia_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
 # Here we use MyPy ignore because redis.StrictRedis is a generic type but the
 # redis-py library's type stubs don't properly specify the type arguments,
 # leading to type-arg errors that we cannot fix without modifying the library.
-def get_cloud_ndb_redis_client() -> redis.StrictRedis:  # type: ignore[type-arg]
+def get_cloud_ndb_redis_client() -> Optional[redis.StrictRedis]:  # type: ignore[type-arg]
     """Get or create the Cloud NDB Redis client lazily.
 
     Returns:
@@ -180,6 +188,10 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
         memory in bytes, peak memory usage in bytes, and the total number of
         keys stored as values.
     """
+    oppia_redis_client = get_oppia_redis_client()
+    if oppia_redis_client is None:
+        return caching_domain.MemoryCacheStats(0, 0, 0)
+
     redis_full_profile = get_oppia_redis_client().memory_stats()
     return caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
@@ -190,8 +202,13 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
 
 def flush_caches() -> None:
     """Wipes the Redis caches clean."""
-    get_oppia_redis_client().flushdb()
-    get_cloud_ndb_redis_client().flushdb()
+    oppia_redis_client = get_oppia_redis_client()
+    if oppia_redis_client:
+        oppia_redis_client.flushdb()
+
+    cloud_ndb_redis_client = get_cloud_ndb_redis_client()
+    if cloud_ndb_redis_client:
+        cloud_ndb_redis_client().flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -205,6 +222,10 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
         that are passed in.
     """
     assert isinstance(keys, list)
+    oppia_redis_client = get_oppia_redis_client()
+    if oppia_redis_client is None:
+        return [None]
+
     return get_oppia_redis_client().mget(keys)
 
 
@@ -220,6 +241,10 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
         bool. Whether the set action succeeded.
     """
     assert isinstance(key_value_mapping, dict)
+    oppia_redis_client = get_oppia_redis_client()
+    if oppia_redis_client is None:
+        return False
+
     return get_oppia_redis_client().mset(key_value_mapping)
 
 
@@ -234,4 +259,8 @@ def delete_multi(keys: List[str]) -> int:
     """
     for key in keys:
         assert isinstance(key, str)
+    oppia_redis_client = get_oppia_redis_client()
+    if oppia_redis_client is None:
+        return 0
+
     return get_oppia_redis_client().delete(*keys)
