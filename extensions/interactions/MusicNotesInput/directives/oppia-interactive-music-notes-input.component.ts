@@ -43,7 +43,7 @@ import { AlertsService } from 'services/alerts.service';
 import { MusicNotesInputRulesService } from './music-notes-input-rules.service';
 import { MusicPhrasePlayerService } from './music-phrase-player.service';
 
-// FIX: Added '| null' to handle initialization errors (TS2322)
+
 interface MusicNote {
   baseNoteMidiNumber: number;
   offset: number;
@@ -68,7 +68,7 @@ interface Sequence {
 })
 export class MusicNotesInputComponent
   implements OnInit, OnDestroy, AfterViewInit {
-  // FIX: Added '!' to fix TS2564 initializer errors
+  
   @Input() lastAnswer!: string;
   @Input() sequenceToGuessWithValue!: string;
   @Input() initialSequenceWithValue!: string;
@@ -99,7 +99,7 @@ export class MusicNotesInputComponent
   NOTE_NAMES_TO_MIDI_VALUES =
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
-  staffContainerElt: HTMLElement | null = null; // FIX: Initialized to null
+  staffContainerElt: HTMLElement | null = null; 
 
   constructor(
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -131,7 +131,7 @@ export class MusicNotesInputComponent
 
     this.initialSequence = this.interactionIsActive
       ? initialSequence
-      : (this.lastAnswer as unknown as Sequence); // FIX: Cast string|null to Sequence|string, then to Sequence (safe assertion)
+      : (this.lastAnswer as unknown as Sequence); 
     this.staffContainerElt = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-staff'
     );
@@ -149,7 +149,7 @@ export class MusicNotesInputComponent
       null
     );
     // Initialization code.
-    this.initializeNoteSequence(this.initialSequence as Sequence); // FIX: Explicit cast
+    this.initializeNoteSequence(this.initialSequence as Sequence);
     this.init();
   }
 
@@ -186,7 +186,7 @@ export class MusicNotesInputComponent
     for (let i = 0; i < this.noteSequence.length; i++) {
       if (this.noteSequence[i].note.noteId === noteId) {
         this.noteSequence.splice(i, 1);
-        break; // FIX: Add break after splice
+        break; 
       }
     }
   }
@@ -253,7 +253,7 @@ export class MusicNotesInputComponent
       let { baseNoteMidiNumber, offset } = this._convertReadableNoteToNote(
         initialNotesToAdd.value[i]
       );
-      let initialNote: MusicNote = { // FIX: Explicit type casting
+      let initialNote: MusicNote = { 
         baseNoteMidiNumber: baseNoteMidiNumber,
         offset: offset,
         noteId: this.generateNoteId(),
@@ -304,7 +304,7 @@ export class MusicNotesInputComponent
       staffLinePositionsArray.push(el.offsetTop);
     });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
-      (staffLinePositions as any)[this.verticalGridKeys[i]] = staffLinePositionsArray[i]; // FIX: Use 'as any'
+      (staffLinePositions as any)[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
     }
     return staffLinePositions as Object;
   }
@@ -334,12 +334,12 @@ export class MusicNotesInputComponent
       if (this.interactionIsActive) {
         innerDiv.draggable({
           // Keeps note from being placed on top of the clef.
-          containment: validNoteArea as any, // FIX: Cast to any
+          containment: validNoteArea as any,
           cursor: 'pointer',
           helper: 'clone',
           stack: '.oppia-music-input-note-choices div',
           grid: [this.HORIZONTAL_GRID_SPACING, 1],
-          stop: (evt: Event, ui: any) => { // FIX: Added types for evt, ui
+          stop: (evt: Event, ui: any) => { 
             if (!this.isCloneOffStaff($(ui.helper))) {
               // This makes the helper clone a new draggable note.
               $(ui.helper)
@@ -628,7 +628,7 @@ export class MusicNotesInputComponent
   checkIfNotePositionTaken(leftPos: number): boolean {
     const noteStartInfo = this.getNoteStartFromLeftPos(leftPos);
     if (noteStartInfo) {
-      if (noteStartInfo.note.noteStart !== null) { // FIX: Changed undefined to null check
+      if (noteStartInfo.note.noteStart !== null) { 
         for (let i = 0; i < this.noteSequence.length; i++) {
           let noteComparison = this.compareNoteStarts(
             this.noteSequence[i],
@@ -653,7 +653,7 @@ export class MusicNotesInputComponent
       // is less than 2, then they are close enough to set a position.
       // This gives some wiggle room for rounding differences.
       if (Math.abs(leftPos - this.getHorizontalPosition(i)) < 2) {
-        let note: MusicNote = { // FIX: Explicit type
+        let note: MusicNote = { 
           baseNoteMidiNumber: 0, // Placeholder
           offset: 0, // Placeholder
           noteId: '', // Placeholder
@@ -692,7 +692,7 @@ export class MusicNotesInputComponent
   // Converts the midiValue of a droppable line that a note is on
   // into a top position.
   getVerticalPosition(baseNoteMidiNumber: number): number {
-    return (this.getStaffLinePositions() as any)[baseNoteMidiNumber]; // FIX: Use 'as any'
+    return (this.getStaffLinePositions() as any)[baseNoteMidiNumber];
   }
 
   /**
@@ -770,7 +770,7 @@ export class MusicNotesInputComponent
   }
 
   _getCorrespondingNoteName(midiNumber: string | number): string {
-    let correspondingNoteName: string | null = null; // FIX: Explicitly typed as string | null
+    let correspondingNoteName: string | null = null; 
     for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
       // FIX: Use 'as any' for indexing
       if ((this.NOTE_NAMES_TO_MIDI_VALUES as any)[noteName] === midiNumber) {
@@ -828,12 +828,12 @@ export class MusicNotesInputComponent
     if (readableNoteName.length === 2) {
       // This is a natural note.
       return {
-        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[readableNoteName], // FIX: Use 'as any'
+        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[readableNoteName], 
         offset: 0,
       };
     } else if (readableNoteName.length === 3) {
       // This is a note with an accidental.
-      let offset: number | null = // FIX: Added | null type
+      let offset: number | null = 
         readableNoteName[1] === '#'
           ? 1
           : readableNoteName[1] === 'b'
@@ -841,12 +841,12 @@ export class MusicNotesInputComponent
             : null;
       if (offset === null) {
         console.error('Invalid readable note: ' + readableNoteName);
-        // FIX: Should return a value here
+        
         return { baseNoteMidiNumber: 0, offset: 0 };
       }
 
       return {
-        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[ // FIX: Use 'as any'
+        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[ 
           readableNoteName[0] + readableNoteName[2]
         ],
         offset: offset,
@@ -854,7 +854,7 @@ export class MusicNotesInputComponent
     } else {
       // This is not a valid readableNote.
       console.error('Invalid readable note: ' + readableNote);
-      // FIX: Should return a value here
+      
       return { baseNoteMidiNumber: 0, offset: 0 };
     }
   }
@@ -930,7 +930,7 @@ export class MusicNotesInputComponent
   playSequence(midiSequence: number[][]): void {
     // TODO(#7892): Move this check to music-phrase-player.service.ts
     // once AlertsService has been successfully migrated.
-    if (window.AudioContext || (window as any).Audio) { // FIX: window.Audio is implicit any
+    if (window.AudioContext || (window as any).Audio) { 
       let notes = [];
       for (let i = 0; i < midiSequence.length; i++) {
         for (let j = 0; j < midiSequence[i].length; j++) {
@@ -958,11 +958,11 @@ export class MusicNotesInputComponent
   // Return the MIDI value for each note in the sequence.
   // TODO(#15177): Add more features to Music-Notes-Input Interaction.
   // Add chord functionality.
-  convertSequenceToGuessToMidiSequence(sequence: { baseNoteMidiNumber: number, offset: number }[]): number[][] { // FIX: Explicitly type sequence array
+  convertSequenceToGuessToMidiSequence(sequence: { baseNoteMidiNumber: number, offset: number }[]): number[][] { 
     let midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
       if (sequence[i].hasOwnProperty('baseNoteMidiNumber')) {
-        midiSequence.push([this._convertNoteToMidiPitch(sequence[i] as MusicNote)]); // FIX: Cast to MusicNote
+        midiSequence.push([this._convertNoteToMidiPitch(sequence[i] as MusicNote)]); 
       } else {
         console.error('Invalid note: ' + sequence[i]);
       }
