@@ -208,10 +208,10 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
-  componentRef!: ComponentRef<ObjectEditor>; // FIX for TS2564
+  componentRef!: ComponentRef<ObjectEditor>; 
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => { };
-  onTouch!: () => void; // FIX for TS2564
+  onTouch!: () => void; 
   onValidatorChange: () => void = () => { };
 
   // A hashmap is used instead of an array for faster lookup.
