@@ -672,7 +672,7 @@ export class MusicNotesInputComponent
   }
 
   getNoteStartAsFloat(note: MusicNote): number {
-    // FIX: Added null check
+    
     return note.noteStart ? note.noteStart.num / note.noteStart.den : 0;
   }
 
