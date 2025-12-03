@@ -163,7 +163,7 @@ describe('Pretest question backend API service', function () {
     sampleDataResultsObjects = {
       pretest_question_objects: [
         Question.createFromBackendDict(
-          responseDictionaries.pretest_question_dicts[0] as unknown as QuestionBackendDict
+          responseDictionaries.pretest_question_dicts[0] as QuestionBackendDict
         ),
       ],
     };
