@@ -569,7 +569,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
 
     def test_get_file_spec_with_non_ts_js_file(self) -> None:
         def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
-            return False
+            return True
 
         with self.swap(os.path, 'exists', mock_exists):
             file_path = 'some_file.txt'
