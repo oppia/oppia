@@ -549,6 +549,19 @@
             </div>
           </a>
         </li>
+        <li class="nav-item">
+          <a (click)="onGithubLoginButtonClicked()"
+             class="nav-link oppia-nav-link">
+            <div class="signin-dropdown oppia-nav-right-dropdown">
+              <div class="oppia-signin-g-icon">
+                <img [src]="githubSignInIconUrl" alt="GitHub signin icon">
+              </div>
+              <span class="oppia-signin-text">
+                Sign in with GitHub
+              </span>
+            </div>
+          </a>
+        </li>
       </ul>
     </li>
 

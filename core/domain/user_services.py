@@ -1256,6 +1256,151 @@ def _create_new_user_transactional(
     )
 
 
+def get_or_create_user_by_github_auth(
+    github_id: str, github_username: str, github_email: Optional[str]
+) -> user_domain.UserSettings:
+    """Gets existing user or creates new user from GitHub OAuth data.
+
+    Args:
+        github_id: str. The unique GitHub user ID.
+        github_username: str. The GitHub username.
+        github_email: str|None. The GitHub user's email (may be None if private).
+
+    Returns:
+        UserSettings. The user settings for the existing or newly created user.
+    """
+    # Check if user with this GitHub ID already exists
+    github_auth_model = auth_models.UserIdByGitHubAuthIdModel.get_by_id(
+        github_id
+    )
+
+    if github_auth_model is not None:
+        # User exists, return their settings
+        user_settings = get_user_settings(
+            github_auth_model.user_id, strict=True
+        )
+        return user_settings
+
+    # Create new user with GitHub auth
+    email = (
+        github_email if github_email else '%s@github.oauth' % github_username
+    )
+
+    # Generate a new user ID
+    user_id = user_models.UserSettingsModel.get_new_id('')
+
+    # Create user settings
+    user_settings = user_domain.UserSettings(
+        user_id,
+        email,
+        [feconf.ROLE_ID_FULL_USER],
+        False,
+        False,
+        preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+    )
+
+    # Save user and create GitHub auth association in a transaction
+    _create_new_github_user_transactional(
+        user_settings, github_id, github_username, github_email
+    )
+
+    return user_settings
+
+
+@transaction_services.run_in_transaction_wrapper
+def _create_new_github_user_transactional(
+    user_settings: user_domain.UserSettings,
+    github_id: str,
+    github_username: str,
+    github_email: Optional[str],
+) -> None:
+    """Save user models for new GitHub users as a transaction.
+
+    Args:
+        user_settings: UserSettings. The user settings domain object
+            corresponding to the newly created user.
+        github_id: str. The GitHub user ID.
+        github_username: str. The GitHub username.
+        github_email: str|None. The GitHub email (may be None).
+    """
+    # Save user settings
+    save_user_settings(user_settings)
+
+    # Create user contributions
+    user_contributions = get_or_create_new_user_contributions(
+        user_settings.user_id
+    )
+    save_user_contributions(user_contributions)
+
+    # Create GitHub auth association
+    github_auth_model = auth_models.UserIdByGitHubAuthIdModel(
+        id=github_id,
+        user_id=user_settings.user_id,
+        github_username=github_username,
+        github_email=github_email,
+    )
+    github_auth_model.update_timestamps()
+    github_auth_model.put()
+
+    # Also create UserAuthDetailsModel for consistency with other auth methods
+    user_auth_details_model = auth_models.UserAuthDetailsModel(
+        id=user_settings.user_id,
+        gae_id=None,
+        firebase_auth_id=None,
+        parent_user_id=None,
+    )
+    user_auth_details_model.update_timestamps()
+    user_auth_details_model.put()
+
+
+def get_user_id_from_github_auth_id(github_id: str) -> Optional[str]:
+    """Returns the user ID associated with the given GitHub ID.
+
+    Args:
+        github_id: str. The GitHub user ID.
+
+    Returns:
+        str|None. The user ID associated with the GitHub ID, or None if
+        no association exists.
+    """
+    github_auth_model = auth_models.UserIdByGitHubAuthIdModel.get_by_id(
+        github_id
+    )
+    return github_auth_model.user_id if github_auth_model else None
+
+
+def is_github_auth_linked(user_id: str) -> bool:
+    """Checks if a user has a GitHub account linked.
+
+    Args:
+        user_id: str. The Oppia user ID.
+
+    Returns:
+        bool. True if the user has a GitHub account linked, False otherwise.
+    """
+    github_auth_model = auth_models.UserIdByGitHubAuthIdModel.get_by_user_id(
+        user_id
+    )
+    return github_auth_model is not None
+
+
+def unlink_github_auth(user_id: str) -> None:
+    """Removes the GitHub auth link from a user account.
+
+    Args:
+        user_id: str. The Oppia user ID.
+
+    Raises:
+        Exception. No GitHub account is linked to this user.
+    """
+    github_auth_model = auth_models.UserIdByGitHubAuthIdModel.get_by_user_id(
+        user_id
+    )
+    if github_auth_model is None:
+        raise Exception('No GitHub account linked to user %s' % user_id)
+    github_auth_model.delete()
+
+
 def create_new_profiles(
     auth_id: str,
     email: str,

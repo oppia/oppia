@@ -179,6 +179,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   googleSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
     '/google_signin_buttons/google_signin.svg'
   );
+  githubSignInIconUrl = this.urlInterpolationService.getStaticImageUrl(
+    '/google_signin_buttons/github_signin.svg'
+  );
 
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -450,6 +453,21 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         this.siteAnalyticsService.registerStartLoginEvent('loginButton');
+        setTimeout(() => {
+          this.windowRef.nativeWindow.location.href = loginUrl;
+        }, 150);
+      } else {
+        this.windowRef.nativeWindow.location.reload();
+      }
+    });
+  }
+
+  onGithubLoginButtonClicked(): void {
+    this.userService.getLoginUrlAsync().then(loginUrl => {
+      if (loginUrl) {
+        this.siteAnalyticsService.registerStartLoginEvent('githubLoginButton');
+        // Redirect to login page - the emulator mode login page will show
+        // the provider selection where user can choose GitHub
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;
         }, 150);

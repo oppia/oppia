@@ -1,7 +1,27 @@
 <div class="login-page">
-  <mat-card class="login-card" *ngIf="emulatorModeIsEnabled">
+  <!-- Emulator Mode: Provider Selection -->
+  <mat-card class="login-card" *ngIf="emulatorModeIsEnabled && !selectedProvider">
     <mat-card-header>
       <mat-card-title>Emulator Mode Sign in</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p>Choose your sign-in method:</p>
+
+      <button mat-raised-button color="primary" class="sign-in-button" (click)="selectProvider('google')">
+        Sign in with Google
+      </button>
+
+      <button mat-raised-button class="sign-in-button github-button" (click)="selectProvider('github')">
+        Sign in with GitHub
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Emulator Mode: Google Email Form -->
+  <mat-card class="login-card" *ngIf="emulatorModeIsEnabled && selectedProvider === 'google'">
+    <mat-card-header>
+      <mat-card-title>Sign in with Google</mat-card-title>
     </mat-card-header>
 
     <form [formGroup]="formGroup" (ngSubmit)="onClickSignInButtonAsync(email.value)">
@@ -34,12 +54,81 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
+        <button mat-button type="button" (click)="goBack()">Back</button>
         <button color="primary" type="submit" class="e2e-test-sign-in-button"
                 mat-raised-button [disabled]="email.invalid || email.value === ''">
           Sign In
         </button>
       </mat-card-actions>
     </form>
+  </mat-card>
+
+  <!-- Emulator Mode: GitHub Username Form -->
+  <mat-card class="login-card" *ngIf="emulatorModeIsEnabled && selectedProvider === 'github'">
+    <mat-card-header>
+      <mat-card-title>Sign in with GitHub</mat-card-title>
+    </mat-card-header>
+
+    <form [formGroup]="githubFormGroup" (ngSubmit)="onClickGithubSignInButtonAsync(githubUsername.value)">
+      <mat-card-content>
+        <mat-form-field appearance="fill">
+          <mat-label>Enter a GitHub username</mat-label>
+
+          <input class="e2e-test-github-sign-in-username-input"
+                 matInput [formControl]="githubUsername" [matAutocomplete]="githubAuto">
+
+          <mat-autocomplete #githubAuto="matAutocomplete">
+            <mat-option value="testadmin"
+                        *ngIf="'testadmin'.startsWith(githubUsername.value)">
+              testadmin
+            </mat-option>
+          </mat-autocomplete>
+
+          <mat-error *ngIf="githubUsername.invalid">
+            Invalid username
+          </mat-error>
+
+          <mat-hint *ngIf="githubUsername.value !== 'testadmin'">
+            To grant super-admin privileges to an account, please refer to the <a href="https://github.com/oppia/oppia/wiki/Firebase-authentication#2-add-custom-claims-to-a-firebase-account" rel="noopener" target="_blank">Oppia Wiki</a>.
+          </mat-hint>
+
+          <mat-hint *ngIf="githubUsername.value === 'testadmin'">
+            This username has implicit super-admin privileges!
+          </mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" (click)="goBack()">Back</button>
+        <button color="primary" type="submit" class="e2e-test-github-sign-in-button"
+                mat-raised-button [disabled]="githubUsername.invalid || githubUsername.value === ''">
+          Sign In
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+
+  <!-- Production Mode Sign In (NEW) -->
+  <mat-card class="login-card" *ngIf="!emulatorModeIsEnabled">
+    <mat-card-header>
+      <mat-card-title>Sign In</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <p>Choose your sign-in method:</p>
+
+      <!-- Google Button -->
+      <button mat-raised-button color="primary" class="sign-in-button" (click)="onClickGoogleSignIn()">
+        <i class="fab fa-google" style="margin-right: 8px;"></i>
+        Sign in with Google
+      </button>
+
+      <!-- GitHub Button -->
+      <button mat-raised-button class="sign-in-button github-button" (click)="onClickGithubSignIn()">
+        <i class="fab fa-github" style="margin-right: 8px;"></i>
+        Sign in with GitHub
+      </button>
+    </mat-card-content>
   </mat-card>
 </div>
 
@@ -74,5 +163,20 @@
   .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple,
   .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
     background-color: #f44336;
+  }
+  
+  /* New styles for sign-in buttons */
+  .sign-in-button {
+    width: 100%;
+    margin: 10px 0;
+  }
+  
+  .github-button {
+    background-color: #333;
+    color: white;
+  }
+  
+  .github-button:hover {
+    background-color: #24292e;
   }
 </style>

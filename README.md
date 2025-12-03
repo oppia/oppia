@@ -161,90 +161,153 @@ This project adds **GitHub** and **LinkedIn** authentication to Oppia, an open-s
 
 ### **FRONTEND (Angular/TypeScript)**
 
-**1. oppia/core/templates/services/auth.service.ts**
+#### Modified Files
 
-- **What it is:** Main authentication service
-- **Current:** Handles Google Sign-In only
-- **Changes:**
-  - Add GitHub provider
-  - Update signInWithRedirectAsync() to accept provider type
-  - Add provider selection logic
+**1. `core/templates/services/auth.service.ts`**
 
-**2. oppia/core/templates/pages/oppia-root/oppia-root.module.ts**
+- **Location:** `oppia/core/templates/services/auth.service.ts`
+- **What it is:** Core authentication service for all sign-in providers
+- **Purpose:** Handles OAuth authentication flows using Firebase SDK
+- **Contains:**
+  - `signInWithGithubRedirectAsync()` - Initiates GitHub OAuth via Firebase redirect
+  - `signInWithGithubUsername()` - Emulator mode GitHub sign-in with username
+  - `handleRedirectResultAsync()` - Processes OAuth redirect callback
+  - `GithubAuthProvider` instance from Firebase
+  - Integration with `authBackendApiService.beginSessionAsync()` for session creation
 
-- **What it is:** Angular module registration
-- **Current:** Registers all components
-- **Changes:**
-  - Import SignInButtonsComponent
-  - Add to declarations array
+**2. `core/templates/pages/login-page/login-page.component.ts`**
 
----
+- **Location:** `oppia/core/templates/pages/login-page/login-page.component.ts`
+- **What it is:** TypeScript component logic for the login page
+- **Purpose:** Manages login UI interactions and routes to auth service
+- **Contains:**
+  - `onClickGithubSignIn()` - Production mode handler for GitHub sign-in button
+  - `onClickGithubSignInButtonAsync()` - Emulator mode handler with username input
+  - `githubUsername` FormControl for emulator testing
+  - Event handlers that call `authService` methods
 
-#### Files I Will Create
+**3. `core/templates/pages/login-page/login-page.component.html`**
 
-**3. oppia/core/templates/components/sign-in-buttons/sign-in-buttons.component.ts**
+- **Location:** `oppia/core/templates/pages/login-page/login-page.component.html`
+- **What it is:** HTML template for the login page
+- **Purpose:** Displays sign-in buttons and forms
+- **Contains:**
+  - "Sign in with GitHub" button for production mode
+  - GitHub username input field for emulator mode
+  - SVG icon references for GitHub branding
+  - Click handlers bound to component methods
 
-- **What it is:** New component for sign-in buttons
-- **Purpose:** Handle button clicks for different providers
-- **Will contain:**
-  - signInWithGoogle() method
-  - signInWithGitHub() method
-  - signInWithLinkedIn() method (future)
+**4. `core/templates/services/auth-backend-api.service.ts`**
 
-**4. oppia/core/templates/components/sign-in-buttons/sign-in-buttons.component.html**
-
-- **What it is:** UI template for buttons
-- **Purpose:** Display sign-in buttons
-- **Will contain:**
-  - Google button
-  - GitHub button
-  - LinkedIn button (future)
-
-**5. oppia/core/templates/components/sign-in-buttons/sign-in-buttons.component.css**
-
-- **What it is:** Styling for buttons
-- **Purpose:** Make buttons look good
-- **Will contain:**
-  - Button layout and spacing
-  - Provider-specific colors
-  - Hover effects
+- **Location:** `oppia/core/templates/services/auth-backend-api.service.ts`
+- **What it is:** API service for backend authentication communication
+- **Purpose:** Sends Firebase ID tokens to backend for session establishment
+- **Contains:**
+  - `beginSessionAsync(idToken)` - Sends GET request to `/session_begin` endpoint
+  - Authorization header with Bearer token
+  - Works universally for all Firebase auth providers (Google, GitHub, etc.)
 
 ---
 
-#### Frontend Tests
+#### Created Files
 
-**6. oppia/core/templates/services/auth.service.spec.ts**
+**5. `assets/images/google_signin_buttons/github_signin.svg`**
 
-- **What it is:** Test file for auth service
-- **Purpose:** Test authentication flows
-- **Will test:**
-  - GitHub sign-in flow
-  - Provider switching
-  - Redirect handling
-  - Error cases
-
----
-
-#### Frontend Files to Verify
-
-**7. oppia/core/templates/services/auth-backend-api.service.ts**
-
-- **What it is:** Backend API communication service
-- **Current:** Sends tokens to backend
-- **Action:** Verify it works with GitHub tokens (no changes needed)
+- **Location:** `oppia/assets/images/google_signin_buttons/github_signin.svg`
+- **What it is:** SVG graphic for GitHub sign-in button
+- **Purpose:** Visual branding for GitHub authentication option
+- **Contains:**
+  - GitHub logo SVG
+  - Styled for consistent button appearance
 
 ---
 
-#### Backend Tests
+### **BACKEND (Python)**
 
-**11. oppia/core/platform/auth/firebase_auth_services_test.py**
+#### Created Files
 
-- **What it is:** Backend authentication tests
-- **Purpose:** Test token validation
-- **Will test:**
-  - GitHub token validation
-  - Session creation with GitHub
-  - User association with GitHub auth ID
+**6. `core/controllers/github_auth.py`**
+
+- **Location:** `oppia/core/controllers/github_auth.py`
+- **What it is:** HTTP request handlers for GitHub OAuth flow
+- **Purpose:** Handle OAuth authorization and callback (NOT CURRENTLY USED)
+- **Contains:**
+  - `GitHubAuthHandler` - Initiates OAuth flow (INCOMPLETE)
+  - `GitHubCallbackHandler` - Processes OAuth callback (BROKEN - line 97 truncated)
+  - State token CSRF protection
+  - Token exchange logic
+  - User creation/retrieval calls
+- **Issues:**
+  - Syntax errors (incomplete lines, indentation problems)
+  - Not compatible with Firebase flow used by frontend
+  - Routes registered but never called
+
+**7. `core/domain/github_auth_services.py`**
+
+- **Location:** `oppia/core/domain/github_auth_services.py`
+- **What it is:** Domain services for GitHub authentication (EMPTY FILE)
+- **Purpose:** Should contain business logic for GitHub auth
+- **Contains:** Nothing (file is empty)
+
+---
+
+#### Modified Files
+
+**8. `core/domain/auth_services.py`**
+
+- **Location:** `oppia/core/domain/auth_services.py`
+- **What it is:** Core authentication domain services
+- **Purpose:** Manages auth sessions and tokens
+- **Contains:**
+  - `establish_auth_session_for_github_user()` - Creates authenticated session for GitHub users
+  - `_create_session_token()` - Generates secure session tokens
+  - `_store_github_session()` - Caches GitHub session data
+  - `get_user_id_from_github_session()` - Retrieves user ID from session
+  - `GITHUB_OAUTH_STATE_COOKIE_NAME` constant
+  - `GITHUB_AUTH_SESSION_COOKIE_NAME` constant
+
+**9. `core/domain/user_services.py`**
+
+- **Location:** `oppia/core/domain/user_services.py`
+- **What it is:** User management domain services
+- **Purpose:** Creates and manages user accounts
+- **Contains:**
+  - `get_or_create_user_by_github_auth()` (line 1259) - Gets existing user or creates new account from GitHub OAuth data
+  - Checks `UserIdByGitHubAuthIdModel` for existing associations
+  - Creates new user with GitHub email or synthetic email
+  - Stores GitHub ID → User ID mapping
+
+**10. `core/platform/auth/firebase_auth_services.py`**
+
+- **Location:** `oppia/core/platform/auth/firebase_auth_services.py`
+- **What it is:** Firebase authentication platform services
+- **Purpose:** Validates Firebase ID tokens and manages Firebase sessions
+- **Contains:**
+  - `establish_auth_session()` - Creates session from Firebase ID token
+  - `get_auth_claims_from_request()` - Extracts user info from Firebase token
+  - Token validation using `firebase_admin` SDK
+  - Works with all Firebase providers (Google, GitHub, etc.)
+
+**11. `main.py`**
+
+- **Location:** `oppia/main.py`
+- **What it is:** Main application routing configuration
+- **Purpose:** Maps URLs to handler classes
+- **Contains:**
+  - Import of `github_auth` module (line 21)
+  - Route registration for `/auth/github` → `GitHubAuthHandler` (line 1365)
+  - Route registration for `/auth/github/callback` → `GitHubCallbackHandler` (line 1366)
+- **Note:** Routes are registered but unused because frontend uses Firebase
+
+**12. `core/controllers/base.py`**
+
+- **Location:** `oppia/core/controllers/base.py`
+- **What it is:** Base HTTP request handlers
+- **Purpose:** Provides common handler functionality
+- **Contains:**
+  - `SessionBeginHandler` - Handles `/session_begin` endpoint
+  - Calls `auth_services.establish_auth_session()` to create session
+  - Works for all authentication providers
 
 ---
 

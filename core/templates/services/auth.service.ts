@@ -29,6 +29,7 @@ import {AuthBackendApiService} from 'services/auth-backend-api.service';
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;
   abstract signInWithRedirectAsync(): Promise<void>;
+  abstract signInWithGithubRedirectAsync(): Promise<void>;
   abstract signOutAsync(): Promise<void>;
 }
 
@@ -36,6 +37,10 @@ class NullAuthServiceImpl extends AuthServiceImpl {
   private error = new Error('AngularFireAuth is not available');
 
   async signInWithRedirectAsync(): Promise<void> {
+    throw this.error;
+  }
+
+  async signInWithGithubRedirectAsync(): Promise<void> {
     throw this.error;
   }
 
@@ -55,6 +60,8 @@ class DevAuthServiceImpl extends AuthServiceImpl {
 
   async signInWithRedirectAsync(): Promise<void> {}
 
+  async signInWithGithubRedirectAsync(): Promise<void> {}
+
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
     return null;
   }
@@ -65,20 +72,32 @@ class DevAuthServiceImpl extends AuthServiceImpl {
 }
 
 class ProdAuthServiceImpl extends AuthServiceImpl {
-  private provider: firebase.auth.GoogleAuthProvider;
+  private googleProvider: firebase.auth.GoogleAuthProvider;
+  private githubProvider: firebase.auth.GithubAuthProvider;
 
   constructor(private angularFireAuth: AngularFireAuth) {
     super();
-    this.provider = new firebase.auth.GoogleAuthProvider();
+    // Google provider setup
+    this.googleProvider = new firebase.auth.GoogleAuthProvider();
     // Oppia only needs an email address for account management.
-    this.provider.addScope('email');
+    this.googleProvider.addScope('email');
     // Always prompt the user to select an account, even when they only own one.
-    this.provider.setCustomParameters({prompt: 'select_account'});
+    this.googleProvider.setCustomParameters({prompt: 'select_account'});
+
+    // GitHub provider setup
+    this.githubProvider = new firebase.auth.GithubAuthProvider();
+    // Request user email from GitHub
+    this.githubProvider.addScope('user:email');
   }
 
   /** Returns a promise that never resolves or rejects. */
   async signInWithRedirectAsync(): Promise<void> {
-    return this.angularFireAuth.signInWithRedirect(this.provider);
+    return this.angularFireAuth.signInWithRedirect(this.googleProvider);
+  }
+
+  /** Returns a promise that never resolves or rejects. */
+  async signInWithGithubRedirectAsync(): Promise<void> {
+    return this.angularFireAuth.signInWithRedirect(this.githubProvider);
   }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential> {
@@ -192,6 +211,49 @@ export class AuthService {
 
   async signInWithRedirectAsync(): Promise<void> {
     return this.authServiceImpl.signInWithRedirectAsync();
+  }
+
+  async signInWithGithubRedirectAsync(): Promise<void> {
+    return this.authServiceImpl.signInWithGithubRedirectAsync();
+  }
+
+  async signInWithGithubUsername(username: string): Promise<void> {
+    if (!AuthService.firebaseEmulatorIsEnabled) {
+      throw new Error(
+        'signInWithGithubUsername can only be called in emulator mode'
+      );
+    }
+    // Convert username to lowercase for consistency
+    username = username.toLowerCase();
+    // Create an email from the GitHub username for Firebase emulator
+    // This follows the same pattern as Google sign-in but uses github.com domain
+    const email = `${username}@github.com`;
+    // Use md5 hash of the email as password (same pattern as Google sign-in)
+    const password = await md5(email);
+    try {
+      if (this.angularFireAuth !== null) {
+        this.creds = await this.angularFireAuth.signInWithEmailAndPassword(
+          email,
+          password
+        );
+      }
+    } catch (err: unknown) {
+      if ((err as firebase.auth.Error).code === 'auth/user-not-found') {
+        if (this.angularFireAuth !== null) {
+          this.creds =
+            await this.angularFireAuth.createUserWithEmailAndPassword(
+              email,
+              password
+            );
+        }
+      } else {
+        throw err;
+      }
+    }
+    if (this.creds?.user !== null) {
+      const idToken = await this.creds.user.getIdToken();
+      await this.authBackendApiService.beginSessionAsync(idToken);
+    }
   }
 
   async signOutAsync(): Promise<void> {

@@ -35,6 +35,16 @@ export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
   formGroup = new FormGroup({email: this.email});
 
+  // GitHub sign-in form controls
+  githubUsername = new FormControl('', [
+    Validators.required,
+    Validators.minLength(1),
+  ]);
+  githubFormGroup = new FormGroup({githubUsername: this.githubUsername});
+
+  // Track which provider is selected (null = show selection, 'google' or 'github' = show form)
+  selectedProvider: 'google' | 'github' | null = null;
+
   constructor(
     private alertsService: AlertsService,
     private authService: AuthService,
@@ -110,6 +120,45 @@ export class LoginPageComponent implements OnInit {
     }
 
     this.redirectToSignUp();
+  }
+
+  async onClickGithubSignInButtonAsync(username: string): Promise<void> {
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
+
+    try {
+      await this.authService.signInWithGithubUsername(username);
+    } catch (error: unknown) {
+      this.onSignInError(error as firebase.auth.Error);
+      return;
+    }
+
+    this.redirectToSignUp();
+  }
+
+  selectProvider(provider: 'google' | 'github'): void {
+    this.selectedProvider = provider;
+  }
+
+  goBack(): void {
+    this.selectedProvider = null;
+    this.email.setValue('');
+    this.githubUsername.setValue('');
+  }
+
+  // Production mode: Google sign-in via redirect
+  onClickGoogleSignIn(): void {
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
+    this.authService.signInWithRedirectAsync().catch((error: unknown) => {
+      this.onSignInError(error as firebase.auth.Error);
+    });
+  }
+
+  // Production mode: GitHub sign-in via redirect
+  onClickGithubSignIn(): void {
+    this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
+    this.authService.signInWithGithubRedirectAsync().catch((error: unknown) => {
+      this.onSignInError(error as firebase.auth.Error);
+    });
   }
 
   private onSignInError(error: firebase.auth.Error): void {

@@ -332,6 +332,88 @@ class FirebaseSeedModel(base_models.BaseModel):
         return False
 
 
+class UserIdByGitHubAuthIdModel(base_models.BaseModel):
+    """Stores the relationship between user ID and GitHub auth ID.
+
+    Instances of this class are keyed by GitHub user ID (as a string).
+    """
+
+    user_id = datastore_services.StringProperty(required=True, indexed=True)
+
+    # GitHub username for reference (not used for auth, just for display).
+    github_username = datastore_services.StringProperty()
+
+    # GitHub email (may be None if user has private email).
+    github_email = datastore_services.StringProperty()
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model has data to delete corresponding to users: id and user_id."""
+        return base_models.DELETION_POLICY.DELETE_AT_END
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Currently, the model holds IDs relevant only for backend that should
+        not be exported.
+        """
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user.
+        Currently, the model holds authentication details relevant only for
+        backend, and no exportable user data.
+        """
+        return dict(
+            super(UserIdByGitHubAuthIdModel, cls).get_export_policy(),
+            **{
+                'user_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'github_username': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'github_email': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id: str) -> None:
+        """Delete instances of UserIdByGitHubAuthIdModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        keys = cls.query(cls.user_id == user_id).fetch(keys_only=True)
+        datastore_services.delete_multi(keys)
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id: str) -> bool:
+        """Check whether UserIdByGitHubAuthIdModel exists for given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any UserIdByGitHubAuthIdModel refers to the given
+            user ID.
+        """
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @classmethod
+    def get_by_user_id(
+        cls, user_id: str
+    ) -> Optional['UserIdByGitHubAuthIdModel']:
+        """Fetch an entry by user ID.
+
+        Args:
+            user_id: str. The user ID.
+
+        Returns:
+            UserIdByGitHubAuthIdModel. The model with user_id field equal
+            to user_id argument, or None if not found.
+        """
+        return cls.query(cls.user_id == user_id).get()
+
+
 class CsrfSecretModel(base_models.BaseModel):
     """The value of the oppia's csrf secret value.
 
