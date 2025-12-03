@@ -800,8 +800,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
             def __init__(
                 self,
-                *args: object,
-                **kwargs: object,  # pylint: disable=unused-argument
+                *unused_args: object,
+                **unused_kwargs: object,
             ) -> None:
                 self.returncode = 0
 
