@@ -177,6 +177,8 @@
 /Stats_Report_Specification.md @H4CK3R01P
 /Fetching_and_Displaying_Learner_Data_on_Creator_Dashboard.md @H4CK3R01P
 /README_STATS_REPORT.md @H4CK3R01P
+/PR.md @H4CK3R01P
+/README.md @H4CK3R01P
 /AGENTS.md @oppia/dev-workflow-reviewers
 /.coderabbit.yaml @oppia/dev-workflow-reviewers
 /.eslintignore @oppia/dev-workflow-reviewers
@@ -801,3 +803,5 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
+/PR.md @H4CK3R01P
+/README.md @H4CK3R01P
