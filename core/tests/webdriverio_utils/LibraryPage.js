@@ -43,7 +43,7 @@ var LibraryPage = function () {
     return $$('.e2e-test-search-input');
   };
   var allExplorationsTitled = async function (explorationName) {
-    const tiles = await $$('.e2e-test-exp-summary-tile-title');
+    var tiles = await $$('.e2e-test-exp-summary-tile-title');
     return tiles.filter(async t => (await t.getText()) === explorationName);
   };
   var categorySelector = forms.MultiSelectEditor(
@@ -213,7 +213,7 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    const explorationCardElement = await (
+    var explorationCardElement = await (
       await $$('.e2e-test-exp-summary-tile-title')
     ).find(async el => (await el.getText()).trim() === explorationName);
     await waitFor.visibilityOf(
