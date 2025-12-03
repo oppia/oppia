@@ -39,7 +39,7 @@ import { SchemaValidators } from '../validators/schema-validators';
   ],
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators!: OppiaValidator[]; // FIX: Added '!' 
+  @Input() validators!: OppiaValidator[]; 
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
 
   validate(control: AbstractControl): ValidationErrors | null {
