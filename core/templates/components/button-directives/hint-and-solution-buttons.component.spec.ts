@@ -41,27 +41,27 @@ import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.com
 import { MockTranslatePipe } from 'tests/unit-test-utils';
 import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
 
-// FIX: Mocking the required function with correct signature to fix TS2416/TS2554 errors.
+
 class MockHintAndSolutionModalService extends HintAndSolutionModalService {
-  // Base class expects 5 arguments, but runtime needs 6+ for displaySolutionModal.
+
   displaySolutionModal(
     solution: any,
     isHint: any,
     answerIsExclusive: any,
     correctAnswer: any,
     displaySolutionExplanation: any,
-    ...args: any[] // FIX: Accepting 6th argument and others
+    ...args: any[] 
   ): NgbModalRef {
     return { result: Promise.resolve('success') } as NgbModalRef;
   }
 }
 
-// FIX: Mocking the required function with correct signature to fix TS2416/TS2554 errors.
+
 class MockStatsReportingService extends StatsReportingService {
-  // Base class expects one argument, but runtime needs more arguments for recordSolutionHit in the spec test.
+  
   recordSolutionHit(
     stateName: string,
-    ...args: any[] // FIX: Accepting all extra arguments for the test call
+    ...args: any[] 
   ): void { }
 }
 
@@ -143,7 +143,7 @@ describe('HintAndSolutionButtonsComponent', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
-        // FIX: Provide mocks with custom classes to fix TS2554 argument errors
+        
         {
           provide: HintAndSolutionModalService,
           useClass: MockHintAndSolutionModalService,
@@ -365,7 +365,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.isHintButtonVisible(0)).toBe(false);
 
-      // StateCard with EndExploration interaction, which does not supports hints.
+      
       component.displayedCard = StateCard.createNewCard(
         'State 1',
         '<p>Content</p>',
@@ -385,7 +385,6 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.isHintButtonVisible(0)).toBe(false);
 
-      // StateCard which supports hints.
       component.displayedCard = newCard;
 
       expect(component.isHintButtonVisible(0)).toBe(true);
@@ -470,7 +469,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.solutionModalIsActive).toBe(false);
 
-      // TS2554 errors occur on these lines when running checks.
+      
       component.onClickSolutionButton();
       tick();
 
