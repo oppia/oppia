@@ -216,7 +216,7 @@ var LibraryPage = function () {
     var explorationCardElement = (
       await Promise.all(
         allExplorationCards.map(async tile => {
-          const text = await tile.getText();
+          var text = await tile.getText();
           return {tile, text};
         })
       )
