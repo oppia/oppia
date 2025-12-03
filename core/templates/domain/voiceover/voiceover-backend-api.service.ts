@@ -103,15 +103,7 @@ export interface RegenerateVoiceoverResponse {
 }
 
 export interface ExplorationVoiceoverRegenerationStatusBackendResponse {
-  [voiceover_regeneration_task_run_mappings: string]: {
-    language_accent_to_content_status_map: LanguageAccentToContentStatusMapBackendDict;
-  };
-}
-
-export interface LanguageAccentToContentStatusMapBackendDict {
-  [language_accent_code: string]: {
-    [content_id: string]: string;
-  };
+  language_accent_to_content_status_map: LanguageAccentToContentStatusMap;
 }
 
 export interface LanguageAccentToContentStatusMap {
@@ -334,8 +326,7 @@ export class VoiceoverBackendApiService {
         .then(
           response => {
             let languageAccentToContentStatusMap =
-              response.voiceover_regeneration_task_run_mappings
-                .language_accent_to_content_status_map;
+              response.language_accent_to_content_status_map;
             resolve(languageAccentToContentStatusMap);
           },
           errorResponse => {

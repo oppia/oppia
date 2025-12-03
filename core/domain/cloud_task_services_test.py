@@ -18,12 +18,201 @@
 
 from __future__ import annotations
 
-import datetime
-import uuid
-
+from core import feconf
 from core.domain import cloud_task_domain, cloud_task_services
 from core.tests import test_utils
 
 
 class CloudTaskServicesTests(test_utils.GenericTestBase):
     """Unit tests for cloud task service functionalities."""
+
+    def test_should_get_voiceover_regeneration_task(self) -> None:
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id, task_run_id, {}
+            )
+        )
+
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+
+        retrieved_task = cloud_task_services.get_voiceover_regeneration_task(
+            exploration_id, task_run_id
+        )
+        self.assertEqual(
+            retrieved_task.exploration_id,
+            voiceover_regeneration_task_mapping.exploration_id,
+        )
+        self.assertEqual(
+            retrieved_task.task_run_id,
+            voiceover_regeneration_task_mapping.task_run_id,
+        )
+        self.assertEqual(
+            retrieved_task.language_accent_to_content_status_map,
+            voiceover_regeneration_task_mapping.language_accent_to_content_status_map,
+        )
+
+    def test_should_get_voiceover_regeneration_tasks_by_exploration_id(
+        self,
+    ) -> None:
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+
+        retrieved_language_accent_to_content_status_map = cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+            exploration_id
+        )[
+            'language_accent_to_content_status_map'
+        ]
+
+        self.assertEqual(
+            retrieved_language_accent_to_content_status_map,
+            language_accent_to_content_status_map,
+        )
+
+    def test_should_update_voiceover_regeneration_task_run_mapping_for_content(
+        self,
+    ) -> None:
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        initial_language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                initial_language_accent_to_content_status_map,
+            )
+        )
+
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+
+        updated_language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
+        }
+
+        cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
+            exploration_id, 'en-US', 'content_0', 'SUCCEEDED'
+        )
+
+        retrieved_task = cloud_task_services.get_voiceover_regeneration_task(
+            exploration_id, task_run_id
+        )
+
+        self.assertEqual(
+            retrieved_task.language_accent_to_content_status_map,
+            updated_language_accent_to_content_status_map,
+        )
+
+    def test_should_able_to_delete_voiceover_regeneration_task_run_mapping(
+        self,
+    ) -> None:
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        initial_language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                initial_language_accent_to_content_status_map,
+            )
+        )
+
+        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+
+        cloud_task_services.delete_voiceover_regeneration_task_run_mapping(
+            exploration_id, task_run_id
+        )
+
+        self.assertIsNone(
+            cloud_task_services.get_voiceover_regeneration_task(
+                exploration_id, task_run_id
+            )
+        )
+
+    def test_should_resolve_multiple_voiceover_regeneration_tasks(self) -> None:
+        task_run_id_1 = 'task_run_id_1'
+        task_run_id_2 = 'task_run_id_2'
+        exploration_id = 'exploration_id'
+        language_accent_to_content_status_map_1 = {
+            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+        }
+        language_accent_to_content_status_map_2 = {
+            'en-US': {'content_0': 'FAILED', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping_1 = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id_1,
+                language_accent_to_content_status_map_1,
+            )
+        )
+
+        voiceover_regeneration_task_mapping_2 = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id_2,
+                language_accent_to_content_status_map_2,
+            )
+        )
+
+        retrieved_language_accent_to_content_status_map = cloud_task_services.resolve_multiple_cloud_task_runs_for_exploration(
+            [
+                voiceover_regeneration_task_mapping_1,
+                voiceover_regeneration_task_mapping_2,
+            ]
+        )
+        language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'FAILED', 'content_1': 'SUCCEEDED'}
+        }
+
+        self.assertDictEqual(
+            retrieved_language_accent_to_content_status_map,
+            language_accent_to_content_status_map,
+        )
+
+    def test_verify_if_given_function_belongs_to_voiceover_regeneration_tasks(
+        self,
+    ) -> None:
+        function_name = feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
+        ]
+
+        self.assertTrue(
+            cloud_task_services.is_voiceover_regeneration_task_function(
+                function_name
+            )
+        )
+
+        function_name = feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_DELETE_EXPS_FROM_USER_MODELS'
+        ]
+
+        self.assertFalse(
+            cloud_task_services.is_voiceover_regeneration_task_function(
+                function_name
+            )
+        )
