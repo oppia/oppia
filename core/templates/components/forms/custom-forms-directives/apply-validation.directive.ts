@@ -52,16 +52,15 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      // FIX: Initialized as Record<string, unknown> to allow indexing (TS7053)
+    
       let filterArgs: Record<string, unknown> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
-          // FIX: Cast validatorSpec to 'any' for indexing (TS7053)
+          
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
             cloneDeep((validatorSpec as any)[key]);
         }
       }
-      // FIX: Cast SchemaValidators to 'any' for dynamic access (TS7053)
       if ((SchemaValidators as any)[validatorName]) {
         const error = (SchemaValidators as any)[validatorName](filterArgs)(
           control
@@ -71,7 +70,7 @@ export class ApplyValidationDirective implements Validator {
           allValidationErrors = { ...allValidationErrors, ...error };
         }
       } else {
-        // TODO(#15190): Throw an error if validator not found.
+        
       }
     }
     if (!errorsPresent) {
