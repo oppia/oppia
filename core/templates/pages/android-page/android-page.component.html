@@ -1,8 +1,8 @@
 <div class="oppia-android-page-container overflow-hidden">
   <div class="oppia-android-page">
-    <div class="container pl-0">
-      <div class="row">
-        <div class="col-sm-6 col-8">
+    <div class="container ps-0">
+      <div class="row gx-3">
+        <div class="col-sm-6 col-8 px-3">
           <div class="oppia-android-main-body">
             <div class="oppia-android-main-text oppia-android-text-color">
               <div>
@@ -24,8 +24,10 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-6 col-4">
-          <img class="oppia-android-hero-image" src="/assets/images/android/android-landing-0.svg" alt="Image showing the application in use">
+        <div class="col-sm-6 col-4 px-3">
+          <img class="oppia-android-hero-image"
+               src="/assets/images/android/android-landing-0.svg"
+               alt="Image showing the application in use">
         </div>
       </div>
     </div>
@@ -37,20 +39,20 @@
       <div class="oppia-android-review-section-5-star-container">
         <img class="oppia-android-5-star-image" src="/assets/images/android/android-reviews-5-star.svg" alt="Image of 5 stars">
       </div>
-      <div class="oppia-android-review-section">
-        <div class="oppia-android-review-component">
+      <div class="oppia-android-review-section row gx-3">
+        <div class="oppia-android-review-component col-md-4 px-3">
           <div class="oppia-android-review-text">
             {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_1' | translate }}
           </div>
           <div class="oppia-android-reviewer">{{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEWER_1' | translate }}</div>
         </div>
-        <div class="oppia-android-review-component">
+        <div class="oppia-android-review-component col-md-4 px-3">
           <div class="oppia-android-review-text">
             {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_2' | translate }}
           </div>
           <div class="oppia-android-reviewer">{{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEWER_2' | translate }}</div>
         </div>
-        <div class="oppia-android-review-component">
+        <div class="oppia-android-review-component col-md-4 px-3">
           <div class="oppia-android-review-text">
             {{ 'I18N_ANDROID_PAGE_REVIEWS_REVIEW_3' | translate }}
           </div>
@@ -63,7 +65,7 @@
          [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate">
       </p>
       <div class="container">
-        <div class="row">
+        <div class="row gx-0">
           <div class="oppia-android-key-feature-image-container">
             <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
             <img *ngIf="featuresShown === 1" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-2.svg" alt="Image showing a lesson being played">
@@ -71,18 +73,28 @@
             <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
           </div>
         </div>
-        <div class="oppia-android-key-feature-container row">
-          <div class="oppia-android-key-feature-description">
+        <div class="oppia-android-key-feature-container row gx-3">
+          <div class="oppia-android-key-feature-description col-12 px-3">
             <div *ngIf="featuresShown === 0" class="oppia-android-key-feature text-center">
-              <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
-              <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
+              <div class="oppia-android-key-feature-text oppia-android-text-color">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}
+              </div>
+              <div class="oppia-android-key-feature-subtext">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}
+              </div>
             </div>
             <div *ngIf="featuresShown === 1" class="oppia-android-key-feature text-center">
-              <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_2' | translate }}</div>
-              <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_2' | translate }}</div>
+              <div class="oppia-android-key-feature-text oppia-android-text-color">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_2' | translate }}
+              </div>
+              <div class="oppia-android-key-feature-subtext">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_2' | translate }}
+              </div>
             </div>
             <div *ngIf="featuresShown === 2" class="oppia-android-key-feature text-center">
-              <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}</div>
+              <div class="oppia-android-key-feature-text oppia-android-text-color">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_3' | translate }}
+              </div>
               <div class="oppia-android-key-feature-subtext mb-4"
                    [innerHTML]="'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_3' | translate">
               </div>
@@ -91,12 +103,16 @@
               </div>
             </div>
             <div *ngIf="featuresShown === 3" class="oppia-android-key-feature text-center">
-              <div class="oppia-android-key-feature-text oppia-android-text-color mb-5">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}</div>
-              <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_5' | translate }}</div>
+              <div class="oppia-android-key-feature-text oppia-android-text-color mb-5">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_4' | translate }}
+              </div>
+              <div class="oppia-android-key-feature-subtext">
+                {{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_5' | translate }}
+              </div>
             </div>
           </div>
         </div>
-        <div class="oppia-android-carousel-item-container row">
+        <div class="oppia-android-carousel-item-container row gx-3">
           <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 0}" (click)="changeFeaturesShown(0)"></button>
           <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 1}" (click)="changeFeaturesShown(1)"></button>
           <button class="oppia-android-carousel-item" [ngClass]="{'oppia-android-carousel-item-active': featuresShown === 2}" (click)="changeFeaturesShown(2)"></button>
@@ -104,14 +120,13 @@
         </div>
       </div>
     </div>
-
     <div class="oppia-android-features-web oppia-android-empty-div"></div>
     <div class="oppia-android-features oppia-android-features-web oppia-web-only container mb-5">
       <span [innerHTML]="'I18N_ANDROID_PAGE_FEATURES_SECTION_HEADER' | translate"
             class="oppia-android-features-main-text row">
       </span>
       <div class="oppia-android-key-feature-container row">
-        <div class="oppia-android-key-feature-description col-md-5 pl-0">
+        <div class="oppia-android-key-feature-description col-md-5 ps-0 px-3">
           <div class="oppia-android-key-feature">
             <div class="oppia-android-key-feature-text oppia-android-text-color">{{ 'I18N_ANDROID_PAGE_FEATURE_TEXT_1' | translate }}</div>
             <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_1' | translate }}</div>
@@ -134,10 +149,10 @@
             <div class="oppia-android-key-feature-subtext">{{ 'I18N_ANDROID_PAGE_FEATURE_SUBTEXT_5' | translate }}</div>
           </div>
         </div>
-        <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7">
+        <div class="oppia-android-key-feature-image-container oppia-web-only col-md-7 px-3">
           <div class="row oppia-android-carousel-direction">
-            <button class="col-md-2 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
-              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-right "></i>
+            <button class="col-md-2 px-3 align-self-center oppia-android-carousel-button" (click)="changeFeaturesShown((3 + featuresShown) % 4)">
+              <i class="fas fa-chevron-left oppia-android-carousel-chevron float-end "></i>
             </button>
             <div class="oppia-android-key-feature-image-container col-md-8">
               <img *ngIf="featuresShown === 0" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-1.svg" alt="Image showing the story page">
@@ -145,7 +160,7 @@
               <img *ngIf="featuresShown === 2" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-3.svg" alt="Image showing the lesson in different languages">
               <img *ngIf="featuresShown === 3" class="oppia-android-key-feature-image" src="/assets/images/android/android-landing-4.svg" alt="Image showing that maintaining different profiles are possible">
             </div>
-            <div class="col-md-2 align-self-center" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
+            <div class="col-md-2 px-3 align-self-center" (click)="changeFeaturesShown((5 + featuresShown) % 4)">
               <i class="fas fa-chevron-right oppia-android-carousel-chevron"></i>
             </div>
           </div>
@@ -161,16 +176,16 @@
     <div class="oppia-android-app-updates-container oppia-android-app-updates-background">
       <div class="container oppia-android-app-updates-content">
         <div class="row">
-          <div class="oppia-android-updates-text-container col-md-6 col-12">
+          <div class="oppia-android-updates-text-container col-md-6 px-3 col-12">
             <div class="oppia-android-updates-main-text"
                  [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_MAIN_TEXT' | translate">
             </div>
-            <div class="oppia-android-sub-text oppia-android-updates-sub-text mb-5 pr-5"
+            <div class="oppia-android-sub-text oppia-android-updates-sub-text mb-5 pe-5"
                  [innerHTML]="'I18N_ANDROID_PAGE_UPDATES_SUBTEXT' | translate">
             </div>
           </div>
           <div *ngIf="!userHasSubscribed"
-               class="oppia-android-updates-input-container col-md-6 col-12">
+               class="oppia-android-updates-input-container col-md-6 px-3 col-12">
             <div>
               <div class="oppia-android-updates-input-label">{{ 'I18N_ANDROID_PAGE_NAME_FIELD_LABEL' | translate }}</div>
               <input class="oppia-android-updates-input w-100"
@@ -213,7 +228,7 @@
             </div>
           </div>
           <div *ngIf="userHasSubscribed"
-               class="oppia-android-updates-input-container col-md-6 col-12 oppia-android-sub-text">
+               class="oppia-android-updates-input-container col-md-6 px-3 col-12 oppia-android-sub-text">
             You have subscribed to receive updates!
           </div>
         </div>
