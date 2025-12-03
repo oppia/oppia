@@ -42,9 +42,16 @@ var LibraryPage = function () {
   var searchInputsSelector = function () {
     return $$('.e2e-test-search-input');
   };
-  var allExplorationsTitled = async function (explorationName) {
-    var tiles = await $$('.e2e-test-exp-summary-tile-title');
-    return tiles.filter(async t => (await t.getText()) === explorationName);
+  var allExplorationsTitled = function (explorationName) {
+    var allTitleElements = $$('.e2e-test-exp-summary-tile-title');
+    var matchedElements = [];
+
+    allTitleElements.forEach(function (element) {
+      if (element.getText().trim() === explorationName) {
+        matchedElements.push(element);
+      }
+    });
+    return matchedElements;
   };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector')
@@ -213,9 +220,15 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    var explorationCardElement = await (
-      await $$('.e2e-test-exp-summary-tile-title')
-    ).find(async el => (await el.getText()).trim() === explorationName);
+    var allExplorationCards = await $$('.e2e-test-exp-summary-tile-title');
+    var explorationCardElement = (
+      await Promise.all(
+        allExplorationCards.map(async tile => {
+          var text = await tile.getText();
+          return {tile, text};
+        })
+      )
+    ).find(({text}) => text.trim() === explorationName)?.tile;
     await waitFor.visibilityOf(
       explorationCardElement,
       'Unable to find exploration ' + explorationName
