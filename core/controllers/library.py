@@ -85,16 +85,61 @@ def get_matching_activity_dicts(
             query_string, categories, language_codes, offset=search_offset
         )
     )
+
+    # If both collections and explorations are empty and we have a non-empty
+    # query, try token-level fallbacks to catch partial-word matches.
+    if (not collection_ids and not exp_ids) and query_string.strip():
+        # Split into tokens (split on whitespace) and try each token that
+        # looks useful (length >= 2).
+        tokens = [t for t in query_string.split() if len(t) >= 2]
+        # Collect unique ids found by token searches.
+        token_exp_ids: List[str] = []
+        token_collection_ids: List[str] = []
+
+        for token in tokens:
+            try:
+                t_coll_ids, _ = (
+                    collection_services.get_collection_ids_matching_query(
+                        token, categories, language_codes
+                    )
+                )
+                for cid in t_coll_ids:
+                    if cid not in token_collection_ids:
+                        token_collection_ids.append(cid)
+            except Exception:
+                logging.exception(
+                    'Collection token-search failed for %r', token
+                )
+
+            try:
+                t_exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+                    token, categories, language_codes, offset=search_offset
+                )
+                for eid in t_exp_ids:
+                    if eid not in token_exp_ids:
+                        token_exp_ids.append(eid)
+            except Exception:
+                logging.exception(
+                    'Exploration token-search failed for %r', token
+                )
+
+        # Only adopt tokens results if any were found.
+        if token_collection_ids or token_exp_ids:
+            collection_ids = token_collection_ids
+            exp_ids = token_exp_ids
+            # new_search_offset: leave unchanged
+
     activity_list: List[UnionSummaryDictType] = []
     for (
         collection_summary_dict
-    ) in summary_services.get_displayable_collection_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    ) in summary_services.get_displayable_collection_summary_dicts_matching_ids(
         collection_ids
     ):
         activity_list.append(collection_summary_dict)
+
     for (
         exp_summary_dict
-    ) in summary_services.get_displayable_exp_summary_dicts_matching_ids(  # pylint: disable=line-too-long
+    ) in summary_services.get_displayable_exp_summary_dicts_matching_ids(
         exp_ids
     ):
         activity_list.append(exp_summary_dict)
