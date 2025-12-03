@@ -1,8 +1,8 @@
 <div class="blog-admin-navbar">
   <nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-blog-admin" role="navigation">
     <div class="navbar-container oppia-navbar-container">
-      <div class="navbar-header e2e-test-navbar-header float-left">
-        <a class="oppia-navbar-brand-name oppia-transition-200 float-left"
+      <div class="navbar-header e2e-test-navbar-header float-start">
+        <a class="oppia-navbar-brand-name oppia-transition-200 float-start"
            href="/community-library"
            [routerLink]="'/' + PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE">
           <picture>
@@ -20,13 +20,13 @@
           </li>
         </ul>
       </div>
-      <div class="navbar-header float-right">
+      <div class="navbar-header float-end">
         <ul class="nav oppia-navbar-nav oppia-navbar-profile-blog-admin">
           <li>
             <ul class="nav oppia-navbar-tabs-blog-admin">
-              <li ngbDropdown class="nav-item dropdown float-right" [ngClass]="{'open' : profileDropdownIsActive}">
+              <li ngbDropdown class="nav-item dropdown float-end" [ngClass]="{'open' : profileDropdownIsActive}">
                 <a ngbDropdownToggle class="nav-link oppia-navbar-dropdown-toggle e2e-test-navbar-dropdown-toggle"
-                   data-toggle="dropdown"
+                   data-bs-toggle="dropdown"
                    (mouseenter)="activateProfileDropdown()"
                    (mouseleave)="deactivateProfileDropdown()">
                   <picture *ngIf="profilePicturePngDataUrl">
