@@ -22,7 +22,7 @@
             Topic:
           </strong>
           <select *ngIf="getAssignedSkillTopicData()"
-                  class="form-control"
+                  class="form-select"
                   [(ngModel)]="topicName"
                   (change)="changeSelectedTopic(topicName)"
                   [disabled]="!isTopicDropdownEnabled()">

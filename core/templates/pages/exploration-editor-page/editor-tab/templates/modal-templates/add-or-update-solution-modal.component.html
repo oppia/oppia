@@ -3,7 +3,7 @@
 </div>
 
 <div class="modal-body">
-  <div class="form-inline">
+  <div class="d-flex align-items-center">
     <div class="oppia-rule-details-header">
       <select class="e2e-test-answer-is-exclusive-select"
               [(ngModel)]="tempAnsOption"
@@ -53,6 +53,9 @@
 </div>
 
 <style>
+  schema-based-editor schema-based-float-editor .form-control {
+    width: auto;
+  }
   .oppia-learner-submit-answer-button:focus {
     border: 2px solid #000;
   }
