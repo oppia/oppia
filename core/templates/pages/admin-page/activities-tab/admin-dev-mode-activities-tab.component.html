@@ -1,15 +1,15 @@
 <div class="admin-dev-mode-activities-tab">
   <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Reload a single exploration</h3>
       <div *ngFor="let exploration of DEMO_EXPLORATIONS"
            class="row oppia-reload-exploration-row e2e-test-reload-exploration-row">
         <span class="col-lg-4 col-md-4 col-sm-4 e2e-test-reload-exploration-title">
           {{ exploration[1] }}
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary e2e-test-reload-exploration-button float-right"
+                  class="btn btn-secondary e2e-test-reload-exploration-button float-end"
                   (click)="reloadExploration(exploration[0])">
           Reload
           </button>
@@ -31,17 +31,17 @@
         Use this form to generate dummy explorations with random titles.
       </p>
       <span class="row">
-        <label for="label-target-explorations-to-generate">Number of explorations to generate</label>
-        <input class="form-control form-inline oppia-form-inline"
+        <label for="label-target-explorations-to-generate" class="form-label">Number of explorations to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
                [(ngModel)]="numDummyExpsToGenerate"
                placeholder="Explorations to generate" type="number" min="0"
                id="label-target-explorations-to-generate">
-        <label for="label-target-explorations-to-publish">Number of explorations to publish</label>
+        <label for="label-target-explorations-to-publish" class="form-label">Number of explorations to publish</label>
         <em *ngIf="numDummyExpsToGenerate"
             class="oppia-publish-exploration-text">
           (Publish {{ numDummyExpsToPublish }} out of {{ numDummyExpsToGenerate }} explorations)
         </em>
-        <input class="form-control form-inline"
+        <input class="form-control d-flex align-items-center"
                [(ngModel)]="numDummyExpsToPublish"
                placeholder="Explorations to Publish"
                [disabled]="!numDummyExpsToGenerate" type="number" min="0"
@@ -63,8 +63,8 @@
         Use this form to generate dummy translation opportunities.
       </p>
       <span class="row">
-        <label for="label-target-translation-opportunities-to-generate">Number of translation opportunities to generate</label>
-        <input class="form-control form-inline oppia-form-inline"
+        <label for="label-target-translation-opportunities-to-generate" class="form-label">Number of translation opportunities to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
                [(ngModel)]="numDummyTranslationOpportunitiesToGenerate"
                placeholder="Translation Opportunities to generate" type="number" min="0"
                id="label-target-translation-opportunities-to-generate">
@@ -79,16 +79,16 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Reload a single collection</h3>
       <div *ngFor="let collection of DEMO_COLLECTIONS"
            class="row oppia-reload-collection-row e2e-test-reload-collection-row">
         <span class="col-lg-4 col-md-4 col-sm-4 e2e-test-reload-collection-title">
           {{ collection[1] }}
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary e2e-test-reload-collection-button float-right"
+                  class="btn btn-secondary e2e-test-reload-collection-button float-end"
                   (click)="reloadCollection(collection[0])">
             Reload
           </button>
@@ -98,7 +98,7 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Load dummy new structures data (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-8">
@@ -108,9 +108,9 @@
           skill. Translation and practice question opportunities are populated on the Contributor
           Dashboard.
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary float-right load-dummy-new-structures-data-button"
+                  class="btn btn-secondary float-end load-dummy-new-structures-data-button"
                   (click)="loadNewStructuresData()">
             Load Data
           </button>
@@ -123,15 +123,15 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Generate dummy skill with questions (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-4 col-md-4 col-sm-4">
           Generate a skill with 15 questions linked to it.
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary float-right"
+                  class="btn btn-secondary float-end"
                   (click)="generateNewSkillData()">
             Generate Data
           </button>
@@ -144,16 +144,16 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Generate a dummy math classroom (only curriculum admins)</h3>
       <div class="row">
         <span class="col-lg-8 col-md-8 col-sm-4">
           Generate a dummy math classroom with 5 published topics containing 1
           skill per topic and 3 questions linked per skill.
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary float-right load-dummy-math-classroom"
+                  class="btn btn-secondary float-end load-dummy-math-classroom"
                   (click)="generateNewClassroom()">
             Generate Data
           </button>
@@ -169,14 +169,14 @@
     <div class="container">
       <h3>Generate dummy suggestion questions (only question admins)</h3>
       <span class="row">
-        <label for="label-target-suggestion-questions-to-generate">Number of suggestion questions to generate</label>
-        <input class="form-control form-inline oppia-form-inline"
+        <label for="label-target-suggestion-questions-to-generate" class="form-label">Number of suggestion questions to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
                [(ngModel)]="numDummySuggestionQuesToGenerate"
                placeholder="Suggestion questions to generate" type="number" min="0"
                id="label-target-suggestion-questions-to-generate">
 
-        <label for="label-target-skill-selection">Select skill for suggestion questions</label>
-        <select id="label-target-skill-selection" class="form-control" (change)="selectedOption=$event.target.value">
+        <label for="label-target-skill-selection" class="form-label">Select skill for suggestion questions</label>
+        <select id="label-target-skill-selection" class="form-select" (change)="selectedOption=$event.target.value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let skill of skillList; let i = index" [value]="i">{{skill.description}}</option>
         </select>
@@ -199,14 +199,14 @@
     <div class="container">
       <h3>Generate Stories (only curriculum admins)</h3>
       <span class="row">
-        <label for="label-stories-to-generate">Number of stories to generate</label>
-        <input class="form-control form-inline oppia-form-inline"
+        <label for="label-stories-to-generate" class="form-label">Number of stories to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
                [(ngModel)]="numDummyStoriesToGenerate"
                placeholder="Stories to generate" type="number" min="0"
                id="label-stories-to-generate">
 
-        <label for="label-target-topic-selection">Select topic for stories</label>
-        <select id="label-target-topic-selection" class="form-control" (change)="selectedTopicForStory=$event.target.value">
+        <label for="label-target-topic-selection" class="form-label">Select topic for stories</label>
+        <select id="label-target-topic-selection" class="form-select" (change)="selectedTopicForStory=$event.target.value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let topic of topicList; let i = index" [value]="i">{{topic.name}}</option>
         </select>
@@ -229,14 +229,14 @@
     <div class="container">
       <h3>Generate dummy chapters (only curriculum admins)</h3>
       <span class="row">
-        <label for="label-target-chapters-to-generate">Number of chapters to generate</label>
-        <input class="form-control form-inline oppia-form-inline"
+        <label for="label-target-chapters-to-generate" class="form-label">Number of chapters to generate</label>
+        <input class="form-control d-inline-flex align-items-center oppia-form-inline"
                [(ngModel)]="numDummyChaptersToGenerate"
                placeholder="Chapters to generate" type="number" min="0"
                id="label-target-chapters-to-generate">
 
-        <label for="label-target-story-selection">Select story for chapters</label>
-        <select id="label-target-story-selection" class="form-control" (change)="selectedStoryForChapter=$event.target.value">
+        <label for="label-target-story-selection" class="form-label">Select story for chapters</label>
+        <select id="label-target-story-selection" class="form-select" (change)="selectedStoryForChapter=$event.target.value">
           <option selected [value]="''">Choose...</option>
           <option *ngFor=" let story of storyList; let i = index" [value]="i">{{story.getTitle()}}</option>
         </select>
@@ -256,15 +256,15 @@
   </mat-card>
 
   <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
-    <div class="container ml-0">
+    <div class="container ms-0">
       <h3>Generate dummy blog post.</h3>
       <div class="row" *ngFor="let title of DUMMY_BLOG_POST_TITLES">
         <span class="col-lg-4 col-md-4 col-sm-4">
           {{title}}
         </span>
-        <span class="col-lg-2 col-md-2 col-sm-2 ml-auto">
+        <span class="col-lg-2 col-md-2 col-sm-2 ms-auto">
           <button type="button"
-                  class="btn btn-secondary float-right e2e-test-generate-blog-post"
+                  class="btn btn-secondary float-end e2e-test-generate-blog-post"
                   (click)="generateNewBlogPost(title)">
             Generate
           </button>
