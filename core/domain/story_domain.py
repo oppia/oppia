@@ -764,22 +764,24 @@ class StoryNode:
             node_dict['exploration_id'],
             node_dict['status'] if 'status' in node_dict else None,
             (
-                utils.convert_millisecs_time_to_datetime_object(
-                    planned_publication_date_msecs
+                datetime.datetime.fromtimestamp(
+                    planned_publication_date_msecs / 1000.0,
+                    tz=datetime.timezone.utc,
                 )
                 if planned_publication_date_msecs
                 else None
             ),
             (
-                utils.convert_millisecs_time_to_datetime_object(
-                    last_modified_msecs
+                datetime.datetime.fromtimestamp(
+                    last_modified_msecs / 1000.0, tz=datetime.timezone.utc
                 )
                 if last_modified_msecs
                 else None
             ),
             (
-                utils.convert_millisecs_time_to_datetime_object(
-                    first_publication_date_msecs
+                datetime.datetime.fromtimestamp(
+                    first_publication_date_msecs / 1000.0,
+                    tz=datetime.timezone.utc,
                 )
                 if first_publication_date_msecs
                 else None
@@ -2282,8 +2284,9 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].planned_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_planned_publication_date_msecs
+            datetime.datetime.fromtimestamp(
+                new_planned_publication_date_msecs / 1000.0,
+                tz=datetime.timezone.utc,
             )
             if new_planned_publication_date_msecs
             else None
@@ -2302,8 +2305,8 @@ class Story:
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].last_modified = (
             (
-                utils.convert_millisecs_time_to_datetime_object(
-                    new_last_modified_msecs
+                datetime.datetime.fromtimestamp(
+                    new_last_modified_msecs / 1000.0, tz=datetime.timezone.utc
                 )
             )
             if new_last_modified_msecs
@@ -2322,8 +2325,8 @@ class Story:
         """
         node_index = self.story_contents.get_node_index(node_id)
         self.story_contents.nodes[node_index].first_publication_date = (
-            utils.convert_millisecs_time_to_datetime_object(
-                new_publication_date_msecs
+            datetime.datetime.fromtimestamp(
+                new_publication_date_msecs / 1000.0, tz=datetime.timezone.utc
             )
             if new_publication_date_msecs
             else None
