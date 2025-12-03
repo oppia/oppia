@@ -15,6 +15,7 @@
 # limitations under the License.
 
 "Unit tests for jobs.batch_jobs.remove_hanging_story_references_job." ""
+
 from __future__ import annotations
 
 from core.jobs import job_test_utils
