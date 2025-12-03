@@ -70,8 +70,8 @@ export class ApplyValidationDirective implements Validator {
           allValidationErrors = { ...allValidationErrors, ...error };
         }
       } else {
-        
-      }
+
+                // TODO(#15190): Throw an error if validator not found
     }
     if (!errorsPresent) {
       return null;
