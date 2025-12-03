@@ -803,5 +803,3 @@
 /core/templates/pages/license-page/license-page.component.html @oppia/core-reviewers
 /core/domain/takeout_*.py @oppia/core-reviewers
 /core/domain/wipeout_*.py @oppia/core-reviewers
-/PR.md @H4CK3R01P
-/README.md @H4CK3R01P
