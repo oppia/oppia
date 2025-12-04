@@ -208,6 +208,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(exists_arr, [False, True])
 
     def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
+        # This test checks the early-return case: when the target directory already exists,
+        # the function should skip all work and avoid calling any helper functions.
+        # In other execution paths, download, unzip, or file operations can raise errors
+        # like OSError or BadZipFile, but those cases are not exercised here.
         def mock_exists(path: str) -> bool:
             if path == os.path.join('target dir', 'target root'):
                 return True
@@ -236,6 +240,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_download_and_unzip_files_with_exception_and_tmp_unzip_missing(
         self,
     ) -> None:
+        # This test checks the retry path: the first ZipFile open raises an exception,
+        # and the temp unzip directory does not exist. The function should retry once,
+        # call url_open, and avoid calling remove(). Other paths can raise download
+        # errors, BadZipFile, or OSError, but those are not exercised here.
         exists_arr = []
         self.check_function_calls['url_open_is_called'] = False
         self.expected_check_function_calls['url_open_is_called'] = True
