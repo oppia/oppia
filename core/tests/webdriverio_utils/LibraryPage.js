@@ -42,16 +42,15 @@ var LibraryPage = function () {
   var searchInputsSelector = function () {
     return $$('.e2e-test-search-input');
   };
-  var allExplorationsTitled = function (explorationName) {
-    var allTitleElements = $$('.e2e-test-exp-summary-tile-title');
-    var matchedElements = [];
-
-    for (var i = 0; i < allTitleElements.length; i++) {
-      var element = allTitleElements[i];
-      if (element.getText().trim() === explorationName) {
-        matchedElements.push(element);
-      }
-    }
+  var allExplorationsTitled = async function (explorationName) {
+    var matchedElements = (
+      await Promise.all(
+        (await $$('.e2e-test-exp-summary-tile-title')).map(async el => {
+          const text = await el.getText();
+          return text.trim() === explorationName ? el : null;
+        })
+      )
+    ).filter(Boolean);
     return matchedElements;
   };
   var categorySelector = forms.MultiSelectEditor(
@@ -221,24 +220,24 @@ var LibraryPage = function () {
       'Library Page does not have any explorations'
     );
 
-    // var allExplorationCards = await $$('.e2e-test-exp-summary-tile-title');
-    // var explorationCardElement = (
-    //   await Promise.all(
-    //     allExplorationCards.map(async tile => {
-    //       var text = await tile.getText();
-    //       return {tile, text};
-    //     })
-    //   )
-    // ).find(({text}) => text.trim() === explorationName)?.tile;
-    // await waitFor.visibilityOf(
-    //   explorationCardElement,
-    //   'Unable to find exploration ' + explorationName
-    // );
-    // var explorationCard = await allExplorationsTitled(explorationName)[0];
-    // // The Exploration summary card is masked by a dummy element. Therefore, a
-    // // Javascript click is used.
-    // await action.click('Exploration Card', explorationCard, true);
-    // await waitFor.pageToFullyLoad();
+    var explorationCardElement = (
+      await Promise.all(
+        (await $$('.e2e-test-exp-summary-tile-title')).map(async el => ({
+          el,
+          text: (await el.getText()).trim(),
+        }))
+      )
+    ).find(({text}) => text === explorationName)?.el;
+
+    await waitFor.visibilityOf(
+      explorationCardElement,
+      'Unable to find exploration ' + explorationName
+    );
+    var explorationCard = await allExplorationsTitled(explorationName)[0];
+    // The Exploration summary card is masked by a dummy element. Therefore, a
+    // Javascript click is used.
+    await action.click('Exploration Card', explorationCard, true);
+    await waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = async function (name) {
