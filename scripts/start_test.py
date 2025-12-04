@@ -493,3 +493,12 @@ class MainTests(unittest.TestCase):
         with self.assertRaises(KeyboardInterrupt):
             start.main(['--no_browser', '--skip-install'])
         self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])
+
+    def test_main_calls_attempt_launch_browser_when_no_browser_flag_not_set(
+        self,
+    ) -> None:
+        """Test that main calls attempt_launch_browser when --no-browser is not
+        set.
+        """
+        start.main(['--skip-install'])
+        self.mock_attempt_launch.assert_called_once()
