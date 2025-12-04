@@ -321,7 +321,9 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
       this.explorationId &&
       (this.editableThumbnailBgColor || this.editableThumbnailFilename) &&
       this.outlineIsFinalized &&
-      this.plannedPublicationDate
+      this.plannedPublicationDate &&
+      this.acquiredSkillIds &&
+      this.acquiredSkillIds.length > 0
     ) {
       this.storyEditorStateService.setCurrentNodeAsPublishable(true);
     } else {
@@ -333,9 +335,21 @@ export class StoryNodeEditorComponent implements OnInit, OnDestroy {
     this.storyEditorStateService.onViewStoryNodeEditor.emit(nodeId);
   }
 
+  canFinalize(): boolean {
+    return this.editableOutline?.trim().length > 0;
+  }
+
   finalizeOutline(): void {
-    this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
-    this.outlineIsFinalized = true;
+    if (!this.editableOutline || this.editableOutline.trim().length === 0) {
+      this.storyUpdateService.unfinalizeStoryNodeOutline(
+        this.story,
+        this.nodeId
+      );
+      this.outlineIsFinalized = false;
+    } else {
+      this.storyUpdateService.finalizeStoryNodeOutline(this.story, this.nodeId);
+      this.outlineIsFinalized = true;
+    }
     this.updateCurrentNodeIsPublishable();
   }
 

@@ -993,10 +993,10 @@ class AndroidDeviceSystemContext(DeviceSystemContext):
             code: str. The device's country locale code that sent the report.
 
         Returns:
-            bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
+            bool. Whether the given code is valid. Valid codes contain only
+            letters, digits, and hyphens.
         """
-        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
+        regex_string = r'^[a-zA-Z0-9-]+$'
         return re.compile(regex_string).match(code.lower())
 
     @classmethod
@@ -1274,10 +1274,10 @@ class AndroidAppContext(AppContext):
             code: str. The language code set on the app.
 
         Returns:
-            bool. Whether the given code is valid. Valid codes are alphabetic
-            string that may contain a number of single hyphens.
+            bool. Whether the given code is valid. Valid codes contain only
+            letters, digits, and hyphens.
         """
-        regex_string = r'^([a-z]+[-]?[a-z]+)+$'
+        regex_string = r'^[a-zA-Z0-9-]+$'
         return re.compile(regex_string).match(code)
 
     @classmethod

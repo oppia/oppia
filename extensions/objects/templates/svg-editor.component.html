@@ -63,7 +63,7 @@
           </div>
         </div>
         <div *ngFor="let inputTag of pieChartDataInput; let idx = index">
-          <div class="form-row form-group">
+          <div class="row mb-3">
             <div class="col-md-5 col-sm-5 col-4">
               <input type="text" class="form-control" name="input_0_{{idx}}" [(ngModel)]="inputTag.name">
             </div>
@@ -292,7 +292,7 @@
   </div>
   <div *ngIf="isDiagramCreated()" class="diagram-editor-save-box mt-4 d-flex justify-content-end">
     <button type="button"
-            class="btn btn-secondary mr-3"
+            class="btn btn-secondary me-3"
             (click)="discardSvgFile()">
       Discard
     </button>
