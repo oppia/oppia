@@ -26,7 +26,7 @@ import socket
 import sys
 
 from core.tests import test_utils
-from scripts import common, run_portserver
+from scripts import run_portserver
 
 from typing import List, Optional, Union, cast
 

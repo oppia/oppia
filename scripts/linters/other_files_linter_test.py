@@ -59,7 +59,9 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         ]
 
         def mock_open(
-            path: str, _: List[str], encoding: str = 'utf-8'
+            path: str,
+            _: List[str],
+            encoding: str = 'utf-8',  # pylint: disable=unused-argument
         ) -> io.StringIO:
             if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
                 file = self.dependencies_file
