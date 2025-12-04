@@ -56,7 +56,7 @@ class OppiaRedisClient(metaclass=utils.SingletonMeta):
                 # type but the redis-py library's type stubs don't properly
                 # specify the type arguments, leading to type-arg errors that
                 # we cannot fix without modifying the library.
-                self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+                self._client = redis.StrictRedis(  # type: ignore[type-arg]
                     host=self._redishost,
                     port=feconf.REDISPORT,
                     db=feconf.OPPIA_REDIS_DB_INDEX,
@@ -103,7 +103,7 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
                 # type but the redis-py library's type stubs don't properly
                 # specify the type arguments, leading to type-arg errors that
                 # we cannot fix without modifying the library.
-                self._client: redis.StrictRedis = redis.StrictRedis(  # type: ignore[type-arg]
+                self._client = redis.StrictRedis(  # type: ignore[type-arg]
                     host=self._redishost,
                     port=feconf.REDISPORT,
                     db=feconf.CLOUD_NDB_REDIS_DB_INDEX,
