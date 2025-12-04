@@ -128,4 +128,3 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )
-
