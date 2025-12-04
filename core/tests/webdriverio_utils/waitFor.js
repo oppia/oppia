@@ -83,8 +83,9 @@ var invisibilityOf = async function (element, errorMessage) {
  * on that page.
  */
 var pageToFullyLoad = async function () {
-  // Wait for the document to be fully parsed, so that static HTML elements
-  // (like meta tags in <head>) can be queried.
+  // Wait for the document to be fully loaded, including all sub-resources.
+  // This ensures static HTML elements (like meta tags in <head>) can be
+  // queried reliably.
   await browser.waitUntil(
     async () => {
       var readyState = await browser.execute(() => document.readyState);
