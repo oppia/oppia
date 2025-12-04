@@ -224,7 +224,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
     assert isinstance(keys, list)
     oppia_redis_client = get_oppia_redis_client()
     if oppia_redis_client is None:
-        return [None]
+        return [None] * len(keys)
 
     return get_oppia_redis_client().mget(keys)
 
