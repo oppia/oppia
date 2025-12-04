@@ -111,8 +111,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            common,
-            'open_file',
+            builtins,
+            'open',
             mock_open,
             expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
         )
@@ -128,8 +128,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            common,
-            'open_file',
+            builtins,
+            'open',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
         )
@@ -146,8 +146,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            common,
-            'open_file',
+            builtins,
+            'open',
             mock_open,
             expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),
         )
@@ -162,8 +162,8 @@ class RunPortserverTests(test_utils.GenericTestBase):
         pid = 12345
 
         swap_open = self.swap_with_checks(
-            common,
-            'open_file',
+            builtins,
+            'open',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
             expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),
         )
