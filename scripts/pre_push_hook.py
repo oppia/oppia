@@ -86,7 +86,7 @@ BACKEND_TEST_CMDS: Final = [
     '-m',
     'scripts.run_backend_tests',
     '--ignore_coverage',
-    '--skip-install',
+    '--skip_install',
 ]
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD,

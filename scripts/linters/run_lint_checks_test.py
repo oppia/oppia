@@ -293,7 +293,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 run_lint_checks.main(
                     args=[
                         '--path=%s' % VALID_TS_FILEPATH,
-                        '--only-check-file-extensions=ts',
+                        '--only_check_file_extensions=ts',
                     ]
                 )
         self.assertFalse(all_checks_passed(self.linter_stdout))
@@ -305,7 +305,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             run_lint_checks.main(
                 args=[
                     '--path=%s' % VALID_TS_FILEPATH,
-                    '--only-check-file-extensions',
+                    '--only_check_file_extensions',
                     'ts',
                     'js',
                 ]
@@ -325,7 +325,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 run_lint_checks.main(
                     args=[
                         '--path=scripts/linters/',
-                        '--only-check-file-extensions=ts',
+                        '--only_check_file_extensions=ts',
                     ]
                 )
 
