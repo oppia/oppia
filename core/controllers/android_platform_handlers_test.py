@@ -52,6 +52,21 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
             'android_min_supported_api_level': 40,
         })
 
+    def test_platform_parameters_multiple_overrides(self) -> None:
+        response = self.get_json(
+            '/android_platform_parameters'
+            '?android_min_supported_api_level=33'
+            '&android_min_supported_version_code=120'
+        )
+
+        mapping = {item['name']: item['value'] for item in response}
+
+        self.assertEqual(mapping, {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 120,
+            'android_min_supported_api_level': 33,
+        })
+
     def test_platform_parameters_parse_error(self) -> None:
         self.get_json(
             '/android_platform_parameters?android_min_supported_api_level=notanint',
