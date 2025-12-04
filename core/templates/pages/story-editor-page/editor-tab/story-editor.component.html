@@ -105,7 +105,7 @@
                   <label class="form-heading">Notes</label>
                   <div *ngIf="!notesEditorIsShown">
                     <div (click)="openNotesEditor()" class="oppia-editable-section e2e-test-open-story-notes-editor-button">
-                      <i class="fas fa-pen oppia-editor-edit-icon float-right story-editor-notes-edit-icon"
+                      <i class="fas fa-pen oppia-editor-edit-icon float-end story-editor-notes-edit-icon"
                          title="Edit Story Notes">
                       </i>
                       <div class="oppia-state-content-display oppia-transition-200 oppia-prevent-selection"
@@ -130,12 +130,12 @@
                     </div>
                     <div class="editor-buttons">
                       <button type="button"
-                              class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-story-notes-button"
+                              class="btn btn-success oppia-save-state-item-button float-end e2e-test-save-story-notes-button"
                               [disabled]="!editableNotes || editableNotes.length > 4000"
                               (click)="updateNotes(editableNotes)">
                         Save
                       </button>
-                      <button type="button" class="btn btn-secondary float-right" (click)="closeNotesEditor()">Cancel</button>
+                      <button type="button" class="btn btn-secondary float-end" (click)="closeNotesEditor()">Cancel</button>
                     </div>
                   </div>
                 </div>
@@ -144,13 +144,13 @@
           </div>
           <div *ngIf="story.getThumbnailFilename() && mainStoryCardIsShown">
             <div *ngIf="!storyPreviewCardIsShown" >
-              <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
+              <button class="btn btn-secondary show-story-preview-button" (click)="togglePreview()">
                 Expand Preview
                 <i class="fa fa-angle-down"></i>
               </button>
             </div>
             <div *ngIf="storyPreviewCardIsShown">
-              <button class="btn btn-default show-story-preview-button" (click)="togglePreview()">
+              <button class="btn btn-secondary show-story-preview-button" (click)="togglePreview()">
                 Collapse Preview
                 <i class="fa fa-angle-up"></i>
               </button>

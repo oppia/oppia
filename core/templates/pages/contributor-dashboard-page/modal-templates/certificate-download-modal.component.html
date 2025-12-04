@@ -5,10 +5,9 @@
         Select the time range
       </div>
       <button type="button"
-              class="close oppia-close-button-position"
+              class="btn-close oppia-close-button-position"
               (click)="close()"
               attr.aria-label="Close">
-        <span aria-hidden="true">&times;</span>
       </button>
     </div>
   </div>
@@ -33,7 +32,7 @@
   </div>
 </div>
 <div class="oppia-certificate-download-modal-footer modal-footer">
-  <button class="btn btn-default" (click)="close()">
+  <button class="btn btn-secondary" (click)="close()">
     Cancel
   </button>
   <button [disabled]="certificateDownloading || disableDownloadButton() || errorsFound"

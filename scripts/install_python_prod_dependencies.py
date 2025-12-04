@@ -438,11 +438,13 @@ def _get_possible_normalized_metadata_directory_names(
     # Metadata folders can use different separators: hyphens, underscores, or
     # dots. We need to check all possible combinations since different packages
     # use different conventions (e.g., jaraco.classes, jaraco-classes,
-    # jaraco_classes).
+    # jaraco_classes). We also need to handle the case where only the first
+    # delimiter is replaced (e.g. keyrings.google_artifactregistry_auth-1.1.2).
     name_variations = [
         library_name,
         library_name.replace('-', '_'),
         library_name.replace('-', '.'),
+        library_name.replace('-', '.', 1).replace('-', '_'),
     ]
 
     possible_names = set()
