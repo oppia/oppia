@@ -166,6 +166,8 @@ def _create_index(index_name: str) -> None:
     Raises:
         elasticsearch.RequestError. The index already exists.
     """
+    es_client = ES.get_client()
+    ensure_disk_space_sufficient(es_client)
     assert isinstance(index_name, str)
     ES.get_client().indices.create(index=index_name)
 
@@ -191,6 +193,8 @@ def add_documents_to_index(
     Raises:
         SearchException. A document cannot be added to the index.
     """
+    es_client = ES.get_client()
+    ensure_disk_space_sufficient(es_client)
     assert isinstance(index_name, str)
 
     for document in documents:
@@ -426,3 +430,44 @@ def blog_post_summaries_search(
     )
 
     return result_ids, resulting_offset
+
+
+def ensure_disk_space_sufficient(es_client) -> None:
+    """
+    Check Elasticsearch disk usage and raise an error if it exceeds the high watermark.
+
+    This function fetches cluster statistics from the given Elasticsearch client and calculates
+    the percentage of disk space used. If the used space exceeds the high watermark defined
+    in `feconf.ES_DISK_WATERMARK_HIGH`, it raises a RuntimeError to prevent further writes
+    to the cluster.
+
+    Args:
+        es_client: An instance of Elasticsearch client (e.g., Elasticsearch from elasticsearch-py)
+                   used to query cluster statistics.
+
+    Raises:
+        RuntimeError: If filesystem statistics cannot be read from the cluster, or if disk
+                      usage exceeds the configured high watermark.
+    """
+    try:
+        stats = es_client.cluster.stats()
+        fs = stats.get('nodes', {}).get('fs', {})
+        total = fs.get('total_in_bytes')
+        free = fs.get('available_in_bytes')
+
+        if total is None or free is None:
+            raise RuntimeError(
+                'Cannot read filesystem stats from Elasticsearch cluster.'
+            )
+
+        used_percent = (total - free) / total * 100
+
+        if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
+            raise RuntimeError(
+                f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
+                f'which exceeds the high watermark of {feconf.ES_DISK_WATERMARK_HIGH}%. '
+                'Please free some disk space before adding more documents or updating documents.'
+            )
+
+    except Exception as e:
+        raise RuntimeError(f'Failed to add document : {e}') from e

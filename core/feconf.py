@@ -497,6 +497,8 @@ ES_LOCALHOST_PORT = 9200
 ES_CLOUD_ID = None
 ES_USERNAME = None
 
+ES_DISK_WATERMARK_HIGH = 95
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
