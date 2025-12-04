@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to fetch EntityVoiceovers for the given entity in a
- * given langauge code.
+ * @fileoverview Service to fetch voiceover regeneration task status mapping for
+ * the given exploration.
  */
 
 import {Injectable} from '@angular/core';
@@ -58,8 +58,29 @@ export class VoiceoverRegenerationTaskMappingService {
     this.statusSubject.next(status);
   }
 
+  getContentRegenerationStatus(
+    languageAccentCode: string,
+    contentId: string
+  ): string {
+    return this.languageAccentToContentStatusMap[languageAccentCode]?.[
+      contentId
+    ];
+  }
+
+  updateContentRegenerationStatus(
+    languageAccentCode: string,
+    contentId: string,
+    status: string
+  ): void {
+    if (!this.languageAccentToContentStatusMap[languageAccentCode]) {
+      this.languageAccentToContentStatusMap[languageAccentCode] = {};
+    }
+    this.languageAccentToContentStatusMap[languageAccentCode][contentId] =
+      status;
+    this.statusSubject.next(this.languageAccentToContentStatusMap);
+  }
+
   private startPolling(): void {
-    console.log('Starting Polling for Voiceover Regeneration Status');
     if (this.pollingSub) {
       this.pollingSub.unsubscribe();
     }
