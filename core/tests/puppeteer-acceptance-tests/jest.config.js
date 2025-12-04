@@ -29,5 +29,5 @@ module.exports = {
   testTimeout: 300000,
   bail: 0,
   transformIgnorePatterns: ['node_modules/(?!expect/)'],
-  moduleDirectories: ['node_modules', '<rootDir>'],
+  moduleDirectories: ['node_modules', __dirname],
 };
