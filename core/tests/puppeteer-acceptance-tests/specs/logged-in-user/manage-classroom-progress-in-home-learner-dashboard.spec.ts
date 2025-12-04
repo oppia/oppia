@@ -31,7 +31,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
-  jest.setTimeout(600000000);
+  jest.setTimeout(6000000);
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
@@ -104,8 +104,11 @@ describe('Logged-in User', function () {
     ];
 
     for (const chapter of placeValueChapters) {
-      const exp_id =
-        await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
+      const exp_id = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
+      );
       chapterIds.push(exp_id ?? '');
     }
 
@@ -179,8 +182,8 @@ describe('Logged-in User', function () {
   it(
     'should display in-progress and recommended lessons after starting a lesson',
     async function () {
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
+      await loggedInUser.expectToBeOnPage('learn/math/place-values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'What are the Place Values'
