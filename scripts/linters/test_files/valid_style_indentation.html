@@ -1,21 +1,31 @@
-<!-- This properties in style tag is properly indented -->
+<!-- This file contains properties in the style tag with valid indentation -->
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
     @require('../../base-components/header.template.html', {"title": "Oppia"})
     <style>
-      body { background-color: powderblue; } /* This line is now properly indented */
+      body {
+        background-color: powderblue;
+      }
+
+      .container {
+        width: 100%;
+        padding: 16px;
+      }
+
+      .title {
+        font-size: 18px;
+        color: #333;
+      }
     </style>
   </head>
   <body>
     <service-bootstrap></service-bootstrap>
     <div ng-controller="Base">
       <base-content>
-
         <content>
           <classroom-page></classroom-page>
         </content>
-
         <page-footer></page-footer>
       </base-content>
     </div>
