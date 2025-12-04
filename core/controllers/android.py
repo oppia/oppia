@@ -57,7 +57,6 @@ class InitializeAndroidTestDataHandler(
     """Handler to initialize android specific structures."""
 
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
 
     @acl_decorators.open_access
