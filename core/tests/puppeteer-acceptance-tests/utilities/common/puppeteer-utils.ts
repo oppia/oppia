@@ -998,6 +998,7 @@ export class BaseUser {
     newPage: Page | undefined = undefined,
     screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
+    const specName = process.env.SPEC_NAME;
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
     // To wait for all images to load and the page to be stable.
@@ -1049,29 +1050,38 @@ export class BaseUser {
          */
         customDiffDir: __dirname.startsWith('/home/runner')
           ? path.join(
-              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
-              path.basename(dirName)
+              testConstants.TEST_SNAPSHOTS_DIR,
+              specName,
+              path.basename(dirName),
+              'diff-snapshots'
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
-        storeReceivedOnFailure: true,
+        storeReceivedOnFailure: true, // Store the new screenshots seperately from the composed diff screenshots on failure.
         customReceivedPostfix: '',
         customReceivedDir: __dirname.startsWith('/home/runner')
           ? path.join(
-              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
-              path.basename(dirName)
+              testConstants.TEST_SNAPSHOTS_DIR,
+              specName,
+              path.basename(dirName),
+              'new-snapshots'
             )
-          : path.join(testPath, dirName, 'diff-snapshots'),
+          : path.join(testPath, dirName, 'new-snapshots'),
       });
     } catch (error) {
       var errorMessage = error.message;
       if (__dirname.startsWith('/home/runner')) {
         errorMessage +=
-          '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).';
+          '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the difference between the old screenshot(s)' +
+          ' and the new one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
+          ' folder name should be something like tests/puppeteer-acceptance-tests/(suite-name)/prod-desktop-screenshots/diff-snapshots';
       }
       errorMessage +=
-        '\r\nPlease update the screenshots if the UI changed. If the screenshot(s) is failing constantly with ' +
-        'the same percentage, consider updating the screenshot(s).\r\nTo update the screenshots(s), delete the old screenshot(s)' +
-        ' and replace it with the screenshot(s) from the folder diff-snapshot. The new screenshot(s) should not end with "-diff".';
+        '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference percentage across ' +
+        'multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshots(s), you should ' +
+        'run the test in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to  ' +
+        'replace the old one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
+        ' folder name should be something like tests/puppeteer-acceptance-tests/(suite-name)/prod-desktop-screenshots/new-snapshots.' +
+        ' The new screenshot(s) should not end with "-diff".';
       throw new Error(errorMessage);
     }
   }
