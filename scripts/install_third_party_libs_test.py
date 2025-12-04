@@ -80,8 +80,8 @@ class Ret:
 
     def communicate(
         self,
-        _: Optional[bytes] = None,  # pylint: disable=unused-argument
-        __: Optional[float] = None,  # pylint: disable=unused-argument
+        _input: Optional[bytes] = None,  # pylint: disable=unused-argument
+        timeout: Optional[float] = None,  # pylint: disable=unused-argument
     ) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val

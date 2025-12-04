@@ -868,8 +868,8 @@ class TestUtilsTests(test_utils.GenericTestBase):
         """Test that mock_set_constants_to_default raises an exception."""
         with self.assertRaisesRegex(
             Exception,
-            'Tests should mock common.set_constants_to_default() to avoid '
-            'modifying the constants file during tests.',
+            r'Tests should mock common\.set_constants_to_default\(\) to avoid '
+            r'modifying the constants file during tests\.',
         ):
             self.mock_set_constants_to_default()
 
