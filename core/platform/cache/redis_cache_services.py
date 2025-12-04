@@ -32,36 +32,6 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-class RedisClient:
-    """Redis client for our own implementation of caching."""
-
-    def __init__(self) -> None:
-        self._redishost: Optional[str] = None
-        self._oppia_redis_client: Optional[redis.StrictRedis[str]] = None
-        self._cloud_ndb_redis_client: Optional[redis.StrictRedis[str]] = None
-
-    def get_oppia_redis_client(self) -> Optional[redis.StrictRedis[str]]:
-        """Fetches redis model and obtains oppia redis client.
-
-        Returns:
-            redis.StrictRedis[str]. The oppia redis client.
-        """
-        self._update_clients_if_needed()
-        return self._oppia_redis_client
-
-    def get_cloud_ndb_redis_client(self) -> Optional[redis.StrictRedis[str]]:
-        """Fetches redis model and obtains cloud ndb redis client.
-
-        Returns:
-            redis.StrictRedis[str]. The cloud ndb redis client.
-        """
-        self._update_clients_if_needed()
-        return self._cloud_ndb_redis_client
-
-
-REDIS_CLIENT = RedisClient()
-
-
 class OppiaRedisClient(metaclass=utils.SingletonMeta):
     """Singleton wrapper for the Oppia Redis client."""
 
@@ -192,7 +162,7 @@ def get_memory_cache_stats() -> caching_domain.MemoryCacheStats:
     if oppia_redis_client is None:
         return caching_domain.MemoryCacheStats(0, 0, 0)
 
-    redis_full_profile = get_oppia_redis_client().memory_stats()
+    redis_full_profile = oppia_redis_client.memory_stats()
     return caching_domain.MemoryCacheStats(
         redis_full_profile['total.allocated'],
         redis_full_profile['peak.allocated'],
@@ -208,7 +178,7 @@ def flush_caches() -> None:
 
     cloud_ndb_redis_client = get_cloud_ndb_redis_client()
     if cloud_ndb_redis_client:
-        cloud_ndb_redis_client().flushdb()
+        cloud_ndb_redis_client.flushdb()
 
 
 def get_multi(keys: List[str]) -> List[Optional[str]]:
@@ -226,7 +196,7 @@ def get_multi(keys: List[str]) -> List[Optional[str]]:
     if oppia_redis_client is None:
         return [None] * len(keys)
 
-    return get_oppia_redis_client().mget(keys)
+    return oppia_redis_client.mget(keys)
 
 
 def set_multi(key_value_mapping: Dict[str, str]) -> bool:
@@ -245,7 +215,7 @@ def set_multi(key_value_mapping: Dict[str, str]) -> bool:
     if oppia_redis_client is None:
         return False
 
-    return get_oppia_redis_client().mset(key_value_mapping)
+    return oppia_redis_client.mset(key_value_mapping)
 
 
 def delete_multi(keys: List[str]) -> int:
@@ -263,4 +233,4 @@ def delete_multi(keys: List[str]) -> int:
     if oppia_redis_client is None:
         return 0
 
-    return get_oppia_redis_client().delete(*keys)
+    return oppia_redis_client.delete(*keys)
