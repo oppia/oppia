@@ -93,6 +93,48 @@
 </mat-card>
 
 <mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Generate Study Guide Models:</h3>
+  <p>
+    Generates new Study Guide Models by using the content of the existing Subtopic Page Models.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="generateStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Generate" class="e2e-test-generate-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Delete Study Guide Models:</h3>
+  <p>
+    Deletes all Study Guide Models and their corresponding StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels.
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="deleteStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Delete All" class="e2e-test-delete-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
+  <h3>Verify Study Guide Models:</h3>
+  <p>
+    Verifies all Study Guide Models. This will check that the StudyGuideSnapshotMetadataModels, StudyGuideSnapshotContentModels, StudyGuideCommitLogEntryModels and their quantities for each of the StudyGuideModels is accurate. (If a StudyGuideModel has version 4, there should be 4 of each of these models - 1 for each version)
+  </p>
+  <div class="oppia-query-form">
+    <form class="form" (submit)="verifyStudyGuideModels()">
+      <div class="form-group row">
+        <input type="submit" value="Verify All" class="e2e-test-verify-study-guide-models-button">
+      </div>
+    </form>
+  </div>
+</mat-card>
+
+<mat-card class="oppia-admin-page-card oppia-page-card oppia-long-text">
   <h3>Rollback exploration to latest known safe state:</h3>
   <em>
     Here, a "safe state" refers to the latest version of the exploration for
