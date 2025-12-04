@@ -445,7 +445,7 @@ def ensure_disk_space_sufficient(es_client) -> None:
 
     Raises:
         RuntimeError. If filesystem statistics cannot be read from the cluster,
-                    or if disk usage exceeds the configured high watermark.
+                      or if disk usage exceeds the configured high watermark.
     """
     try:
         stats = es_client.cluster.stats()
