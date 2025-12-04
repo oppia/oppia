@@ -1061,7 +1061,7 @@ class TopicEditorTests(
         self.assertEqual(
             {
                 'subtitled_html': {
-                    'html': '<p>New Data</p>',
+                    'html': '<p><strong>new heading</strong></p>\n\n<p>New Data</p>',
                     'content_id': 'content',
                 },
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},
