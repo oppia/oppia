@@ -76,7 +76,8 @@
     <div class="automatic-voiceovers" *ngIf="isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
       <h4 class="voiceover-type-heading">Automatic Voiceover (generated using Azure)</h4>
       <div *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
-        <div class="voiceovers-component" *ngIf="automaticVoiceover">
+        <div class="voiceovers-component"
+             *ngIf="automaticVoiceover && automaticVoiceover.needsUpdate === false">
           <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
             <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
             <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
@@ -104,31 +105,34 @@
             </button>
           </div>
         </div>
-        <!-- <div class="voiceovers-component" *ngIf="automaticVoiceover">
-          <mat-progress-bar mode="indeterminate"
-                            [value]="automaticVoiceoverProgress"
-                            class="voiceover-progress-loading">
-          </mat-progress-bar>
-          <span class="voiceover-timer">
-            -- / --
-          </span>
-          <div class="voiceover-action-buttons">
-            <button (click)="generateVoiceover()"
-                    mat-icon-button
-                    mat-button
-                    [disabled]="true"
-                    class="regenerate-voiceover-button">
-              <mat-icon matTooltip="Regenerate voiceover">
-                sync
-              </mat-icon>
-            </button>
+        <div *ngIf="automaticVoiceoverGenerationStatus === 'GENERATING'">
+          <div class="voiceovers-component">
+            <mat-progress-bar mode="indeterminate"
+                              [value]="automaticVoiceoverProgress"
+                              class="voiceover-progress-loading">
+            </mat-progress-bar>
+            <span class="voiceover-timer">
+              -- / --
+            </span>
+            <div class="voiceover-action-buttons">
+              <button (click)="generateVoiceover()"
+                      mat-icon-button
+                      mat-button
+                      [disabled]="true"
+                      class="regenerate-voiceover-button">
+                <mat-icon matTooltip="Regenerate voiceover">
+                  sync
+                </mat-icon>
+              </button>
+            </div>
           </div>
-        </div> -->
-        <!-- <div class="automatic-voiceover-enable-instruction">
-          <span>
-            Automatic voiceover for this content is currently being generated in the background. Please wait until the process is complete.
-          </span>
-        </div> -->
+          <div class="automatic-voiceover-enable-instruction">
+            <span>
+              Automatic voiceover for this content is currently being generated
+              in the background. Please wait until the process is complete.
+            </span>
+          </div>
+        </div>
         <div class="add-voiceover-button-container" *ngIf="!automaticVoiceover">
           <button (click)="generateVoiceover()"
                   class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
@@ -143,11 +147,14 @@
             </span>
           </button>
         </div>
-        <!-- <div class="automatic-voiceover-enable-instruction">
+        <div class="automatic-voiceover-enable-instruction"
+             *ngIf="automaticVoiceoverGenerationStatus === 'FAILED'">
           <span>
-            Automatic voiceover regeneration for this content has failed. Please contact voiceover admin for more details, or try regenerating the voiceover manually.
+            Automatic voiceover regeneration for this content has failed.
+            Please contact voiceover admin for more details, or try regenerating
+            the voiceover manually.
           </span>
-        </div> -->
+        </div>
         <div class="automatic-voiceover-enable-instruction"
              *ngIf="!isGenerateAutomaticVoiceoverOptionEnabled">
           <i>Save all the draft changes to activate the Generate Automatic Voiceover button.</i>

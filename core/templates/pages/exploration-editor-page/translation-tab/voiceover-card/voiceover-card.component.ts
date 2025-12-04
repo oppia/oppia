@@ -45,7 +45,6 @@ import {GraphDataService} from 'pages/exploration-editor-page/services/graph-dat
 import {
   LanguageAccentToDescription,
   VoiceoverBackendApiService,
-  LanguageAccentToContentStatusMap,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -106,8 +105,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   manualVoiceoverIsLoading: boolean = false;
   automaticVoiceoverIsLoading: boolean = false;
 
+  automaticVoiceoverGenerationStatus: string = '';
+
   private pollingSub!: Subscription;
-  voiceoverStatus: LanguageAccentToContentStatusMap = {};
 
   constructor(
     private audioPlayerService: AudioPlayerService,
@@ -203,8 +203,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       });
 
     this.pollingSub =
-      this.voiceoverRegenerationTaskMappingService.status$.subscribe(status => {
-        this.voiceoverStatus = status;
+      this.voiceoverRegenerationTaskMappingService.status$.subscribe(() => {
+        this.automaticVoiceoverGenerationStatus =
+          this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+            this.languageAccentCode,
+            this.activeContentId
+          );
+        this.updateAutomaticVoiceoversWithRegenerationStatus();
       });
 
     setInterval(() => {
@@ -311,6 +316,18 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     });
   }
 
+  updateAutomaticVoiceoversWithRegenerationStatus(): void {
+    // Note: No action is needed if voiceover generation succeeded.
+    if (this.automaticVoiceoverGenerationStatus === 'FAILED') {
+      this.automaticVoiceover = undefined;
+    } else if (
+      this.automaticVoiceoverGenerationStatus === 'GENERATING' &&
+      this.automaticVoiceover
+    ) {
+      this.automaticVoiceover.needsUpdate = true;
+    }
+  }
+
   updateActiveContent(): void {
     this.activeContentId =
       this.translationTabActiveContentIdService.getActiveContentId() as string;
@@ -327,6 +344,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.entityVoiceoversService.setActiveLanguageAccentCode(
         languageAccentCode
       );
+
+      this.automaticVoiceoverGenerationStatus =
+        this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+          this.languageAccentCode,
+          this.activeContentId
+        );
     }
 
     this.updateContentAvailabilityStatusForVoiceovers();
@@ -366,6 +389,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
               ?.automatedVoiceoversAudioOffsetsMsecs || {}
           );
           this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+
+          this.automaticVoiceoverGenerationStatus =
+            this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+              this.languageAccentCode,
+              this.activeContentId
+            );
         }
       });
     }
@@ -422,6 +451,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.setActiveContentManualVoiceover();
     this.setActiveContentAutomaticVoiceover();
     this.updateStatusGraph();
+
+    this.automaticVoiceoverGenerationStatus =
+      this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+        this.languageAccentCode,
+        this.activeContentId
+      );
   }
 
   setActiveContentManualVoiceover(): void {
@@ -820,6 +855,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         this.entityVoiceoversService.addEntityVoiceovers(
           this.languageAccentCode,
           this.activeEntityVoiceoversInstance
+        );
+
+        this.voiceoverRegenerationTaskMappingService.updateContentRegenerationStatus(
+          this.languageAccentCode,
+          this.activeContentId,
+          'SUCCEEDED'
         );
 
         this.updateStatusGraph();
