@@ -211,7 +211,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_duplicate_test_files_in_shards_throws_error(self) -> None:
 
-        with common.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+        with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append(shards_spec['1'][0])
@@ -229,7 +229,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
 
     def test_module_in_shards_not_found_throws_error(self) -> None:
 
-        with common.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+        with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append('scripts.new_script_test')

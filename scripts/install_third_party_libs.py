@@ -81,7 +81,9 @@ def make_google_module_importable_by_python(google_module_path: str) -> None:
     for path_list in os.walk(google_module_path):
         root_path = path_list[0]
         if not root_path.endswith('__pycache__'):
-            with common.open_file(os.path.join(root_path, '__init__.py'), 'a'):
+            with open(
+                os.path.join(root_path, '__init__.py'), 'a', encoding='utf-8'
+            ):
                 # If the file doesn't exist, it is created. If it does exist,
                 # this open does nothing.
                 pass

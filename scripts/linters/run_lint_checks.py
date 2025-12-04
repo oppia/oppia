@@ -179,7 +179,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with common.open_file(filepath, mode, newline='') as f:
+            with open(filepath, mode, newline='', encoding='utf-8') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]

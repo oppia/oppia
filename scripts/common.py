@@ -34,20 +34,7 @@ from http import client
 from urllib import error as urlerror
 from urllib import request as urlrequest
 
-from typing import (
-    BinaryIO,
-    Dict,
-    Final,
-    Generator,
-    List,
-    Literal,
-    Optional,
-    TextIO,
-    Tuple,
-    Union,
-    cast,
-    overload,
-)
+from typing import Dict, Final, Generator, List, Literal, Optional, Tuple, Union
 
 TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
 BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
@@ -609,7 +596,7 @@ def create_readme(dir_path: str, readme_content: str) -> None:
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+    with open(os.path.join(dir_path, 'README.md'), 'w', encoding='utf-8') as f:
         f.write(readme_content)
 
 
@@ -644,7 +631,7 @@ def inplace_replace_file(
     total_number_of_replacements = 0
     try:
         regex = re.compile(regex_pattern)
-        with open_file(filename, 'r') as old_file:
+        with open(filename, 'r', encoding='utf-8') as old_file:
             for line in old_file:
                 new_line, number_of_replacements = regex.subn(
                     replacement_string, line
@@ -652,7 +639,7 @@ def inplace_replace_file(
                 new_contents.append(new_line)
                 total_number_of_replacements += number_of_replacements
 
-        with open_file(new_filename, 'w') as new_file:
+        with open(new_filename, 'w', encoding='utf-8') as new_file:
             for line in new_contents:
                 new_file.write(line)
 
@@ -867,7 +854,7 @@ def url_retrieve(
             with urlrequest.urlopen(
                 url, context=ssl.create_default_context()
             ) as response:
-                with open(output_path, 'wb') as output_file:
+                with open(output_path, 'wb', encoding=None) as output_file:
                     output_file.write(response.read())
         except (
             urlerror.URLError,
@@ -1030,53 +1017,6 @@ def write_hashes_json_file(file_hashes: Dict[str, str]) -> None:
             an empty hashes file.
     """
     ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
-    with open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
+    with open(HASHES_JSON_FILEPATH, 'w+', encoding='utf-8') as hashes_json_file:
         hashes_json_file.write(str(json.dumps(file_hashes, ensure_ascii=False)))
         hashes_json_file.write('\n')
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: TextModeTypes,
-    encoding: str = 'utf-8',
-    newline: Union[str, None] = None,
-) -> TextIO: ...
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: BinaryModeTypes,
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> BinaryIO: ...
-
-
-def open_file(
-    filename: str,
-    mode: Union[TextModeTypes, BinaryModeTypes],
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> Union[BinaryIO, TextIO]:
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: Literal. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        IO[Any]. The file object.
-
-    Raises:
-        FileNotFoundError. The file cannot be found.
-    """
-    # Here we use cast because we are narrowing down the type from IO[Any]
-    # to Union[BinaryIO, TextIO].
-    file = cast(
-        Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline),
-    )
-    return file

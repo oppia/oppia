@@ -895,7 +895,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         library_name_pattern = re.compile(
             r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
         )
-        with common.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -1040,7 +1042,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with common.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(common.REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -1061,7 +1063,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with common.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
