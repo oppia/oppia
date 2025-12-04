@@ -1600,8 +1600,10 @@ class NdbWsgiMiddleware:
         self, environ: Dict[str, str], start_response: webapp2.Response
     ) -> webapp2.Response:
         cloud_ndb_redis_client = cache_services.get_cloud_ndb_redis_client()
-        assert cloud_ndb_redis_client is not None
-        global_cache = datastore_services.RedisCache(cloud_ndb_redis_client)
+        if cloud_ndb_redis_client:
+            global_cache = datastore_services.RedisCache(cloud_ndb_redis_client)
+        else:
+            global_cache = None
         with datastore_services.get_ndb_context(global_cache=global_cache):
             return self.wsgi_app(environ, start_response)
 
