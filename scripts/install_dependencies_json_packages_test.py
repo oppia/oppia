@@ -384,10 +384,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                         'targetDirPrefix': 'bleach-',
                     },
                     'bootstrap': {
-                        'version': '4.3.1',
+                        'version': '5.3.3',
                         'downloadFormat': 'zip',
-                        'url': 'https://bootstrap/bootstrap-4.3.1-dist.zip',
-                        'rootDir': 'bootstrap-4.3.1-dist',
+                        'url': 'https://bootstrap/bootstrap-5.3.3-dist.zip',
+                        'rootDir': 'bootstrap-5.3.3-dist',
                         'targetDir': 'bootstrap',
                     },
                     'jqueryUI': {

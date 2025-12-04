@@ -1,5 +1,5 @@
 <p [ngClass]="{'has-error': (explorationObjective.dirty || explorationObjective.touched) && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
-  <span [attr.aria-label]="'Add a goal: what does the exploration help people to do? In a complete sentence, tell people what they\'ll learn from this exploration.'" tabindex="0" class="sr-only"></span>
+  <span [attr.aria-label]="'Add a goal: what does the exploration help people to do? In a complete sentence, tell people what they\'ll learn from this exploration.'" tabindex="0" class="visually-hidden"></span>
   <mat-form-field class="example-full-width" appearance="fill">
     <mat-label>{{ labelText }}</mat-label>
     <input matInput
@@ -13,7 +13,7 @@
            width="100%"
            #explorationObjective="ngModel">
     <mat-hint>
-      <span class="form-text e2e-test-exploration-objective-warning">
+      <span class="form-text d-block e2e-test-exploration-objective-warning">
         <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
         <span *ngIf="explorationObjectiveService.displayed.length > 0">
           <em>Characters used: {{explorationObjectiveService.displayed.length}}/100</em>
