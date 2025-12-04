@@ -1078,8 +1078,8 @@ export class BaseUser {
       errorMessage +=
         '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference percentage across ' +
         'multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshots(s), you should ' +
-        'run the test in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to  ' +
-        'replace the old one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
+        'run the tests in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to ' +
+        'replace the old one(s).\r\nTo download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
         ' folder name should be something like tests/puppeteer-acceptance-tests/(suite-name)/prod-desktop-screenshots/new-snapshots.' +
         ' The new screenshot(s) should not end with "-diff".';
       throw new Error(errorMessage);
