@@ -28,8 +28,13 @@ import subprocess
 import sys
 import threading
 
-from core import feconf, utils
-from scripts import common
+from core import utils
+from scripts import (
+    common,
+    install_python_dev_dependencies,
+    install_third_party_libs,
+    servers,
+)
 
 import rcssmin
 from typing import (
@@ -42,13 +47,6 @@ from typing import (
     Tuple,
     TypedDict,
 )
-
-if not feconf.OPPIA_IS_DOCKERIZED:
-    from scripts import (
-        install_python_dev_dependencies,
-        install_third_party_libs,
-        servers,
-    )
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -158,9 +156,7 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 
 HASH_BLOCK_SIZE = 2**20
 
-APP_DEV_YAML_FILEPATH = (
-    'app_dev_docker.yaml' if feconf.OPPIA_IS_DOCKERIZED else 'app_dev.yaml'
-)
+APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 
 APP_YAML_FILEPATH = 'app.yaml'
 
@@ -222,7 +218,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
     max_tries = 5
     webpack_bundles_dir_name = 'webpack_bundles'
 
-    for _ in range(max_tries):
+    for index in range(max_tries):
         try:
             managed_webpack_compiler = servers.managed_webpack_compiler(
                 use_source_maps=source_maps
@@ -230,6 +226,7 @@ def run_webpack_compilation(source_maps: bool = False) -> None:
             with managed_webpack_compiler as proc:
                 proc.wait()
         except subprocess.CalledProcessError as error:
+            print('Webpack compilation failed (Attempt #%d)' % (index + 1))
             print(error.output)
             sys.exit(error.returncode)
         if os.path.isdir(webpack_bundles_dir_name):
@@ -260,8 +257,7 @@ def build_js_files(dev_mode: bool, source_maps: bool = False) -> None:
     else:
         main(args=[])
         common.run_ng_compilation()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            run_webpack_compilation(source_maps=source_maps)
+        run_webpack_compilation(source_maps=source_maps)
 
 
 def generate_app_yaml(deploy_mode: bool = False) -> None:
@@ -922,7 +918,7 @@ def filter_hashes(file_hashes: Dict[str, str]) -> Dict[str, str]:
 
 
 def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
-    """Return JS code that loads hashes needed for frontend into variable.
+    """Filters and saves hashes needed for frontend to hashes.json file.
 
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
@@ -930,13 +926,7 @@ def save_hashes_to_file(file_hashes: Dict[str, str]) -> None:
     """
     # Only some of the hashes are needed in the frontend.
     filtered_hashes = filter_hashes(file_hashes)
-
-    common.ensure_directory_exists(os.path.dirname(HASHES_JSON_FILEPATH))
-    with utils.open_file(HASHES_JSON_FILEPATH, 'w+') as hashes_json_file:
-        hashes_json_file.write(
-            str(json.dumps(filtered_hashes, ensure_ascii=False))
-        )
-        hashes_json_file.write('\n')
+    common.write_hashes_json_file(filtered_hashes)
 
 
 def minify_func(source_path: str, target_path: str, filename: str) -> None:
@@ -1486,13 +1476,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
-        if not feconf.OPPIA_IS_DOCKERIZED:
-            generate_python_package()
-            if options.source_maps:
-                build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
-            else:
-                build_using_webpack(WEBPACK_PROD_CONFIG)
-            build_using_ng()
+        generate_python_package()
+        if options.source_maps:
+            build_using_webpack(WEBPACK_PROD_SOURCE_MAPS_CONFIG)
+        else:
+            build_using_webpack(WEBPACK_PROD_CONFIG)
+        build_using_ng()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 
