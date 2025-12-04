@@ -885,13 +885,13 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         ) in voiceover_services.get_language_accent_master_list().values():
             for lang_accent_code in accent_code_to_description.keys():
                 language_accent_master_list.append(lang_accent_code)
-        autogeneratable_langauge_accent_codes = list(
+        autogeneratable_language_accent_codes = list(
             voiceover_services.get_autogeneratable_language_accent_list().keys()
         )
 
         self.assertTrue(
             set(language_accent_master_list).issuperset(
-                set(autogeneratable_langauge_accent_codes)
+                set(autogeneratable_language_accent_codes)
             )
         )
 
