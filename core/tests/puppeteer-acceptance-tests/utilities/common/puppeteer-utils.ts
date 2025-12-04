@@ -1870,8 +1870,13 @@ export class BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToastMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
+    // Note that the toast message disappears after a few seconds, so we need
+    // to process the toastMessageElement as soon as we receive it. Otherwise,
+    // the text within it may no longer be showing at the time of evaluation.
+    const toastMessageElement = await this.page.waitForSelector(
+      toastMessageSelector,
+      {visible: true}
+    );
     const toastMessage = await this.page.evaluate(
       el => el.textContent.trim(),
       toastMessageElement
