@@ -121,6 +121,7 @@ class CloudNdbRedisClient(metaclass=utils.SingletonMeta):
         Returns:
             redis.StrictRedis. The Redis client instance.
         """
+        self._update_client_if_needed()
         return self._client
 
 
