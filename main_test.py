@@ -21,6 +21,7 @@ import importlib
 
 import main
 from core.constants import constants
+from core.domain import redis_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -119,3 +120,12 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )
+
+        # Verify that NdbWsgiMiddleware keeps the test_response the same
+        # with redis cache initialized.
+        redis_services.update_redis_host('localhost')
+        with get_ndb_context_swap:
+            self.assertEqual(
+                middleware({'key': 'value'}, test_response), test_response
+            )
+
