@@ -250,8 +250,8 @@ describe('Auth service', function () {
     });
 
     beforeEach(() => {
-      AuthService.firebaseConfigPromise = undefined;
-      AuthService.firebaseConfigDict = undefined;
+      (AuthService as any).firebaseConfigPromise = undefined;
+      (AuthService as any).firebaseConfigDict = undefined;
 
       sessionStorage.clear();
     });
@@ -358,10 +358,13 @@ describe('Auth service', function () {
         text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
       } as Response);
 
+      // Mock storage miss so it hits the backend the first time
       spyOn(sessionStorage, 'getItem').and.returnValue(null);
 
+      // First call: hits backend
       const firebaseConfig1 = await AuthService.getFirebaseConfigAsync();
 
+      // Second call: hits static variable (memory)
       const firebaseConfig2 = await AuthService.getFirebaseConfigAsync();
 
       expect(firebaseConfig1).toBe(firebaseConfig2);
@@ -472,7 +475,7 @@ describe('Auth service', function () {
 
   describe('firebaseConfig getter', () => {
     it('should throw an error if config is not initialized', () => {
-      AuthService.firebaseConfigDict = undefined;
+      (AuthService as any).firebaseConfigDict = undefined;
       expect(() => AuthService.firebaseConfig).toThrowError(
         'Firebase config has not been initialized.'
       );
