@@ -120,11 +120,9 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )
-
-        # Verify that NdbWsgiMiddleware keeps the test_response the same
-        # with redis cache initialized.
-        redis_services.update_redis_host('localhost')
-        with get_ndb_context_swap:
+            # Verify with redis cache initialized.
+            redis_services.update_redis_host('localhost')
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )
+            
