@@ -183,6 +183,7 @@ describe('Logged-in User', function () {
   it(
     'should display in-progress and recommended lessons after starting a lesson',
     async function () {
+      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTopicPageByCard('Place Values');
       await loggedInUser.expectToBeOnPage('learn/math/place-values');
       await loggedInUser.selectChapterWithinStoryToLearn(
@@ -235,6 +236,7 @@ describe('Logged-in User', function () {
   it(
     'should not recommend any lessons if currently on last lesson',
     async function () {
+      await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToTopicPageByCard('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
