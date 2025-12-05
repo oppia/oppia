@@ -55,14 +55,7 @@
 
 <div *ngIf="contentEditorIsOpen" class="e2e-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-  <div class="d-flex justify-content-between align-items-center">
-    <p class="oppia-rte-keyboard-accessibility-text mb-0" tabindex="0">Alt+0 for keyboard accessibility</p>
-    <div *ngIf="autoSaveStatus !== 'idle'" class="oppia-auto-save-status">
-      <i *ngIf="autoSaveStatus === 'saving'" class="fas fa-circle-notch fa-spin"></i>
-      <i *ngIf="autoSaveStatus === 'saved'" class="fas fa-check-circle text-success"></i>
-      <span class="ms-1">{{ autoSaveStatus === 'saving' ? 'Saving...' : 'Saved' }}</span>
-    </div>
-  </div>
+  <p class="oppia-rte-keyboard-accessibility-text" tabindex="0">Alt+0 for keyboard accessibility</p>
   <schema-based-editor [schema]="HTML_SCHEMA"
                        [(localValue)]="stateContentService.displayed._html"
                        (localValueChange)="onContentChange()">
@@ -75,6 +68,11 @@
     <div *ngIf="isCardContentLengthLimitReached()" class="oppia-card-content-limit-error e2e-test-card-height-limit-warning mt-2">
       <i class="fas fa-exclamation-triangle oppia-hide-card-content-error-icon e2e-test-hide-card-height-warning-icon" ngbTooltip="Hide warning" (click)="hideCardHeightLimitWarning()"></i>
       <span [innerHTML]="'I18N_CARD_CONTENT_LIMIT_ERROR_MESSAGE' | translate"></span>
+    </div>
+    <div *ngIf="autoSaveStatus !== 'idle'" class="oppia-auto-save-status float-start">
+      <i *ngIf="autoSaveStatus === 'saving'" class="fas fa-circle-notch fa-spin"></i>
+      <i *ngIf="autoSaveStatus === 'saved'" class="fas fa-check-circle text-success"></i>
+      <span class="ms-1">{{ autoSaveStatus === 'saving' ? 'Saving...' : 'Saved' }}</span>
     </div>
     <button type="button"
             [disabled]="isCardContentLengthLimitReached()"
