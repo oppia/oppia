@@ -29,8 +29,6 @@ from scripts import common
 import yaml
 from typing import List, Optional, Sequence
 
-from . import build
-
 # Contains the name of all files that are not strictly typed.
 # This list must be kept up-to-date; the changes (only remove) should be done
 # manually.
@@ -333,6 +331,7 @@ COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
 TSCONFIG_FILEPATH = 'tsconfig.json'
 STRICT_TSCONFIG_FILEPATH = 'tsconfig-strict.json'
 TEMP_STRICT_TSCONFIG_FILEPATH = 'temp-tsconfig-strict.json'
+TYPE_TESTS_TSCONFIG_FILEPATH = os.path.join('typings', 'tests', 'tsconfig.json')
 PREFIXES = ('core', 'extensions', 'typings')
 
 
@@ -432,7 +431,7 @@ def compile_and_check_typescript(config_path: str) -> None:
     """
     # We need to create an empty hashes.json file for the build so that
     # we don't get the error "assets/hashes.json file doesn't exist".
-    build.save_hashes_to_file({})
+    common.write_hashes_json_file({})
     # Set strict TS config include property to ["core", "extensions", "typings"]
     # This make sure to restore include property to its original value after the
     # checks get aborted mid-way.
@@ -472,9 +471,43 @@ def compile_and_check_typescript(config_path: str) -> None:
             print('Compilation successful!')
 
 
+def run_typescript_type_tests() -> None:
+    """Runs the TypeScript type tests in typings/tests."""
+    print('Running TypeScript type tests.')
+
+    # Use the TypeScript compiler to check types in the test directory.
+    cmd = [
+        './node_modules/.bin/tsc',
+        '--project',
+        TYPE_TESTS_TSCONFIG_FILEPATH,
+    ]
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # The value of `process.stdout` should not be None since we passed
+    # the `stdout=subprocess.PIPE` argument to `Popen`.
+    assert task.stdout is not None
+    assert task.stderr is not None
+    # Reads and prints realtime output from the subprocess until it terminates.
+    stdout_output = task.stdout.read()
+    stderr_output = task.stderr.read()
+    task.wait()
+
+    print(stdout_output.decode('utf-8'), end='')
+    print(stderr_output.decode('utf-8'), end='')
+
+    if task.returncode != 0:
+        sys.exit(1)
+
+    print('Done!')
+
+
 def main(args: Optional[Sequence[str]] = None) -> None:
     """Run the typescript checks."""
     parsed_args = _PARSER.parse_args(args=args)
+
+    # Run the type tests first (they're fast, around ~3 seconds).
+    run_typescript_type_tests()
+
+    # Then run the main TypeScript compilation checks.
     compile_and_check_typescript(
         STRICT_TSCONFIG_FILEPATH
         if parsed_args.strict_checks

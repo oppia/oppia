@@ -51,7 +51,7 @@
                      (focus)="toggleExplorationInputButtons()">
               <div class="save-button-container" *ngIf="explorationInputButtonsAreShown">
                 <span *ngIf="!isStoryPublished()" (click)="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
-                <button class="btn btn-default" (click)="toggleExplorationInputButtons()">Cancel</button>
+                <button class="btn btn-secondary" (click)="toggleExplorationInputButtons()">Cancel</button>
                 <button type="submit"
                         class="e2e-test-exploration-id-save-button btn btn-success btn-sm"
                         (click)="updateExplorationId(explorationId)"
@@ -91,13 +91,13 @@
         </div>
         <div *ngIf="mainChapterCardIsShown">
           <div *ngIf="!chapterPreviewCardIsShown">
-            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+            <button class="btn btn-secondary show-chapter-preview-button" (click)="togglePreview()">
               Preview Chapter Card
               <i class="fa fa-angle-down"></i>
             </button>
           </div>
           <div *ngIf="chapterPreviewCardIsShown">
-            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+            <button class="btn btn-secondary show-chapter-preview-button" (click)="togglePreview()">
               Collapse Chapter Card
               <i class="fa fa-angle-up"></i>
             </button>
@@ -137,7 +137,7 @@
                                    (localValueChange)="updateLocalEditableOutline($event)">
               </schema-based-editor>
               <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
-                <button class="btn btn-default">Cancel</button>
+                <button class="btn btn-secondary">Cancel</button>
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"

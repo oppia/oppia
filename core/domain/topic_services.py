@@ -705,12 +705,14 @@ def apply_change_list(
                 assert isinstance(change.subtopic_id, int)
                 study_guide_id = (
                     study_guide_domain.StudyGuide.get_study_guide_id(
-                        topic_id, change.subtopic_id
-                    )
-                )
-                if (modified_study_guides[study_guide_id] is None) or (
-                    change.subtopic_id in deleted_subtopic_ids
-                ):
+                        topic_id, change.subtopic_id))
+                subtopic_page_id = (
+                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.subtopic_id))
+                if (
+                        (modified_study_guides[study_guide_id] is None) or
+                        (change.subtopic_id in deleted_subtopic_ids)
+                    ):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist'
                         % (change.subtopic_id)
@@ -729,10 +731,15 @@ def apply_change_list(
                     new_sections_dict_list: List[
                         study_guide_domain.StudyGuideSectionDict
                     ] = update_study_guide_sections_cmd.new_value
-                    new_sections: List[study_guide_domain.StudyGuideSection] = (
-                        []
-                    )
+                    new_sections: List[
+                        study_guide_domain.StudyGuideSection
+                    ] = []
+
+                    # For updating the page_contents of the subtopic page corresponding to the study guide.
+                    concatenated_html_parts: List[str] = []
+
                     for section_dict in new_sections_dict_list:
+                        # For the study guide.
                         section = (
                             study_guide_domain.StudyGuideSection.from_dict(
                                 section_dict
@@ -740,13 +747,59 @@ def apply_change_list(
                         )
                         section.validate()
                         new_sections.append(section)
+
+                        # For the subtopic page. (To be deprecated once study guides become standard.)
+                        heading_html = (
+                            '<p><strong>' +
+                            f'{section_dict["heading"]["unicode_str"]}' +
+                            '</strong></p>'
+                        )
+                        concatenated_html_parts.append(heading_html)
+                        concatenated_html_parts.append(section_dict['content']['html'])
+
+                    # Updating study guide.
                     modified_study_guides[study_guide_id].update_sections(
                         new_sections
                     )
-            elif (
-                change.cmd
-                == subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY
-            ):
+
+                    # For subtopic page. (To be deprecated once study guides become standard.)
+                    # Transforming all sections to a single html field.
+                    concatenated_html = '\n\n'.join(concatenated_html_parts)
+                    page_contents = state_domain.SubtitledHtml(
+                        'content', concatenated_html
+                    )
+                    page_contents.validate()
+                    temporary_subtopic_page: Union[subtopic_page_domain.SubtopicPage, None] = (
+                        subtopic_page_services.get_subtopic_page_by_id(
+                            topic_id, change.subtopic_id, False
+                        )
+                    )
+                    if temporary_subtopic_page is not None:
+                        modified_subtopic_pages[subtopic_page_id] = temporary_subtopic_page
+                        old_value = temporary_subtopic_page.page_contents.subtitled_html.html
+                        update_subtopic_page_property_cmd = (
+                            subtopic_page_domain.SubtopicPageChange
+                        )({
+                            'cmd': 'update_subtopic_page_property',
+                            'property_name': 'page_contents_html',
+                            'new_value': (
+                                concatenated_html
+                            ),
+                            'old_value': old_value,
+                            'subtopic_id': (
+                                # We use update_subtopic_page_property_cmd
+                                # here to avoid mypy errors. We will replace
+                                # this with a study guide alternative once
+                                # we start using study guides exclusively.
+                                change.subtopic_id
+                            )
+                        })
+                        modified_subtopic_change_cmds[subtopic_page_id].append(
+                            update_subtopic_page_property_cmd)
+                        temporary_subtopic_page.update_page_contents_html(
+                                page_contents)
+            elif (change.cmd ==
+                  subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 # Ruling out the possibility of any other type for mypy
                 # type checking.
                 assert isinstance(change.subtopic_id, int)
@@ -1067,29 +1120,19 @@ def update_topic_and_subtopic_pages(
                 committer_id, topic_id, subtopic_id
             )
 
-    if not feature_flag_services.is_feature_flag_enabled(
-        feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES.value,
-        committer_id,
-    ):
-        for (
-            subtopic_page_id,
-            subtopic_page,
-        ) in (
-            updated_subtopic_pages_dict.items()
-        ):  # pylint: disable=line-too-long
-            subtopic_page_change_list = updated_subtopic_pages_change_cmds_dict[
-                subtopic_page_id
-            ]
-            subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
-            # The following condition prevents the creation of
-            # subtopic pages that were deleted above.
-            if subtopic_id not in deleted_subtopic_ids:
-                subtopic_page_services.save_subtopic_page(
-                    committer_id,
-                    subtopic_page,
-                    commit_message,
-                    subtopic_page_change_list,
-                )
+    for subtopic_page_id, subtopic_page in updated_subtopic_pages_dict.items(): # pylint: disable=line-too-long
+        subtopic_page_change_list = (
+            updated_subtopic_pages_change_cmds_dict[
+            subtopic_page_id]
+        )
+        subtopic_id = (
+            subtopic_page.get_subtopic_id_from_subtopic_page_id())
+        # The following condition prevents the creation of
+        # subtopic pages that were deleted above.
+        if subtopic_id not in deleted_subtopic_ids:
+            subtopic_page_services.save_subtopic_page(
+                committer_id, subtopic_page, commit_message,
+                subtopic_page_change_list)
 
     for study_guide_id, study_guide in updated_study_guides_dict.items():
         study_guide_change_list = updated_study_guides_change_cmds_dict[
