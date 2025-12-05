@@ -263,7 +263,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
           let sentence = nextSentenceOffset + currentText;
 
-          // Remove spaces to avoid ambiguity in sentence matching.
+          // Removing spaces to avoid ambiguity in sentence matching.
           sentence = sentence.split(' ').join('').trim();
           currentSentenceToMatch = currentSentenceToMatch
             ?.split(' ')
@@ -380,9 +380,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return;
     }
     // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
-    // To the HTML (e.g. '<p> Text &nbsp; &nbsp; &nbsp;</p>'), which can
+    // to the HTML (eg: '<p> Text &nbsp; &nbsp; &nbsp;</p>'), which can
     // lead to UI issues when displaying it. Hence, the following block
-    // Replaces the trailing '&nbsp;' occurrences followed by '</p>' with just '</p>'.
+    // // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
     // We can't just find and replace '&nbsp;' here since, those in the
     // middle may actually be required. Only the trailing ones need to be
     // replaced.
@@ -422,14 +422,14 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     };
     dfs(this.node);
     this.cdRef.detectChanges();
-    // The following logic is to remove comment tags (used by Angular for
+    // The following logic is to remove comment tags (used by angular for
     // bindings). New lines and spaces inside the pre-tags are treated
-    // Differently when compared to other tags. So with the comments come new
-    // Line inside pre tags. These cause the rte output to look differently than
-    // What it was shown in CKEditor. So we remove all the comments and empty
-    // TextNode. An empty TextNode is a TextNode whose nodeValue only consists
-    // Of whiteSpace characters and new lines. The setTimeout is needed to run
-    // It in the next clock cycle so that the view has been rendered.
+    // differently when compared to other tags. So with the comments come new
+    // line inside pre tags. These cause the rte output to look differently than
+    // what it was shown in ck-editor. So we remove all the comments and empty
+    // TextNode. Am empty TextNode is a TextNode whose nodeValue only consists
+    // of whiteSpace characters and new lines. The setTimeout is needed to run
+    // it in the next clock cycle so that the view has been rendered.
     setTimeout(() => {
       (this.elementRef.nativeElement as HTMLElement)
         .querySelectorAll('pre')
@@ -472,7 +472,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    // If the feature flag below is not enabled then the sentence highlighting
+    // If the below feature flag is not enabld then the sentence highlighting
     // feature will not work.
     if (!this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
       return;
@@ -642,24 +642,26 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       changes.rteString.previousValue !== changes.rteString.currentValue
     ) {
       /**
-       * The following serves as an example of why we shouldn't use
-       * JavaScript and `elementRef.nativeElement` to manipulate the DOM.
-       * When doing so, Angular has no reference to the node we create and
-       * attach to the DOM, so Angular cannot clear those nodes during change
-       * detection runs. Relying on Angular to clear nodes that we created
-       * manually can create memory leaks and leave stale elements in the DOM.
-       * To work around this, the `show` variable is used as an `ngIf` expression.
-       * Whenever `show` is false, all children inside it will be destroyed
-       * (irrespective of whether Angular created them or we did). The
-       * `setTimeout` ensures a change detection cycle runs before we show the
-       * content again: without it, Angular may not register the change in
-       * `show` when it is toggled off and back on in the same cycle.
+      * The following serves as an excellent example of why we shouldn't use
+       * js and elementRef.nativeElement to manipulate the DOM. When doing so
+       * angular has no reference to the node we create and attach to the DOM.
+       * So angular won't be able to clear the nodes out during change detection
+       * runs. And since we were relying on angular to do so and not manually
+       * deleting, this creates a memory leak. We will still have stale elements
+       * in the dom. To get around this, there is variable called show, that is
+       * used as an expression of ngIf. Whenever this is false, all the children
+       * inside it will be destroyed (irrespective of whether angular created it
+       * or us). The setTimeout is to make sure that a changeDetection cycle
+       * runs and we only start showing the content after it. If the setTimeout
+       * is removed, angular won't register a change in this.show as this.show
+       * is set to false and then back to true on the same change detection
+       * cycle and hence, we will still have the problem.
        */
       this.show = false;
       this.wrapped = false;
-      // The RTE text node is inserted outside the bounds of the ng container.
-      // Hence, it needs to be removed manually; otherwise residual text will
-      // appear when the RTE text changes.
+      // The rte text node is inserted outside the bounds of ng container.
+      // Hence, it needs to be removed manually otherwise resdiual text will
+      // appear when rte text changes.
       const textNodes: Text[] = [];
 
       for (const node of this.elementRef.nativeElement.childNodes) {
@@ -672,8 +674,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
       this._updateNode();
 
-      // If the feature flag below is not enabled then the sentence highlighting
-      // feature will not work.
+      // If the below feature flag is not enabld then the sentence highlighting
       if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
         const activeContentId = this.getActiveContentId();
         this.automaticVoiceoverHighlightService.setActiveContentId(
