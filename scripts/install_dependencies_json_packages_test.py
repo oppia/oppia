@@ -208,7 +208,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(exists_arr, [False, True])
 
     def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
-        # This test checks the early-return case: when the target directory already exists,
+        # This test checks the early-return case : when the target directory already exists,
         # the function should skip all work and avoid calling any helper functions.
         # In other execution paths, download, unzip, or file operations can raise errors
         # like OSError or BadZipFile, but those cases are not exercised here.
