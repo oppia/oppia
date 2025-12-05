@@ -19,8 +19,6 @@
 from __future__ import annotations
 
 import datetime
-import json
-import os
 
 from core import constants, feconf
 from core.domain import (
@@ -546,10 +544,8 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
         language-accent pairs that Oppia may support for
         voiceovers (manual and auto).
     """
-    file_path = os.path.join('voiceovers', 'language_accent_master_list.json')
-
-    language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
-        constants.get_package_file_contents('data', file_path)
+    language_accent_master_list: Dict[str, Dict[str, str]] = (
+        constants.language_accent_master_list_constants
     )
     return language_accent_master_list
 
@@ -612,12 +608,8 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
         for voiceover generation, while 'voice_code' signifies the desired
         voice type.
     """
-    file_path = os.path.join(
-        'voiceovers', 'autogeneratable_language_accent_list.json'
-    )
-
     autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-        json.loads(constants.get_package_file_contents('data', file_path))
+        constants.autogeneratable_language_accent_constants
     )
     return autogeneratable_language_accent_list
 

@@ -21,8 +21,6 @@ speech-service/index-text-to-speech.
 
 from __future__ import annotations
 
-import json
-import os
 import re
 
 from core import constants, feconf
@@ -102,12 +100,8 @@ def get_azure_voicecode_from_language_accent_code(
         str. The Azure voice code associated with the given language accent
         code.
     """
-    file_path = os.path.join(
-        'voiceovers', 'autogeneratable_language_accent_list.json'
-    )
-
     autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
-        json.loads(constants.get_package_file_contents('data', file_path))
+        constants.autogeneratable_language_accent_constants
     )
 
     voice_code: str = autogeneratable_language_accent_list[

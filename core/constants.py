@@ -170,3 +170,27 @@ constants = Constants(
 release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
+
+autogeneratable_language_accent_constants = (
+    Constants(  # pylint:disable=invalid-name
+        json.loads(
+            get_package_file_contents(
+                'data',
+                os.path.join(
+                    'voiceovers', 'autogeneratable_language_accent_list.json'
+                ),
+            )
+        )
+    )
+)
+
+language_accent_master_list_constants = (
+    Constants(  # pylint:disable=invalid-name
+        json.loads(
+            get_package_file_contents(
+                'data',
+                os.path.join('voiceovers', 'language_accent_master_list.json'),
+            )
+        )
+    )
+)
