@@ -277,7 +277,6 @@ const firebaseConfigInitializerFactory =
 
   providers: [
     AngularFireAuth,
-    AuthService,
     {
       provide: APP_INITIALIZER,
       useFactory: firebaseConfigInitializerFactory,

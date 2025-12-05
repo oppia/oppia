@@ -30,7 +30,16 @@ from typing import Dict
 class FirebaseConfigValuesHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
-    """Handler for getting the Firebase config variables."""
+    """Handler for getting the Firebase config variables.
+
+    This handler is invoked by the frontend AuthService to bootstrap the
+    Firebase configuration.
+
+    The frontend caches the response in `sessionStorage`. This ensures that
+    the handler is called exactly once per browser tab life-cycle, enabling
+    persistence across page reloads and internal navigation, regardless of
+    the user's authentication state.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
@@ -38,8 +47,6 @@ class FirebaseConfigValuesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        print("hello world")
-        print("firebase config handler called again")
         """Retrieves the Firebase config values."""
         firebase_config_values: Dict[str, str] = {}
         secret_response = firebase_services.get_firebase_config()

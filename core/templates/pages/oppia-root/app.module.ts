@@ -120,7 +120,6 @@ const firebaseConfigInitializerFactory =
       deps: [PlatformFeatureService],
       multi: true,
     },
-    AuthService,
     {
       provide: APP_INITIALIZER,
       useFactory: firebaseConfigInitializerFactory,

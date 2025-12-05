@@ -161,6 +161,20 @@ export class AuthService {
   }
 
   static async getFirebaseConfigAsync(): Promise<FirebaseOptions> {
+    if (AuthService.firebaseConfigPromise !== undefined) {
+      return AuthService.firebaseConfigPromise;
+    }
+
+    const storedConfig = sessionStorage.getItem('firebase_config_cache');
+
+    if (storedConfig) {
+      const parsedConfig = JSON.parse(storedConfig);
+      AuthService.firebaseConfigDict = parsedConfig;
+      AuthService.firebaseConfigPromise = Promise.resolve(parsedConfig);
+
+      return AuthService.firebaseConfigPromise;
+    }
+
     if (AuthService.firebaseConfigPromise === undefined) {
       AuthService.firebaseConfigPromise =
         AuthService.fetchConfigFromBackend().then(config => {
@@ -172,6 +186,10 @@ export class AuthService {
             messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
             appId: config.FIREBASE_CONFIG_APP_ID,
           };
+          sessionStorage.setItem(
+            'firebase_config_cache',
+            JSON.stringify(AuthService.firebaseConfigDict)
+          );
           return AuthService.firebaseConfigDict;
         });
     }
