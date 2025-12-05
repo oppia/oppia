@@ -22,7 +22,6 @@ import os
 import shutil
 import subprocess
 import sys
-import time
 
 from core.constants import constants
 from scripts import build, common, servers
@@ -166,9 +165,6 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         )
 
         print('Servers have come up.\n')
-
-        # Force a timeout to recreate failure.
-        # time.sleep(9999999)
 
         output_lines = []
         while True:
