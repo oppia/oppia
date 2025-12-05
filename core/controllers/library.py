@@ -30,9 +30,6 @@ from core.domain import (
 )
 
 # Shared types.
-
-
-# Shared types.
 UnionSummaryDictType = Union[
     summary_services.DisplayableExplorationSummaryDict,
     summary_services.DisplayableCollectionSummaryDict,
