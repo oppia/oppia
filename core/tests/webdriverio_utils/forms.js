@@ -737,13 +737,12 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       // This is used to match and scroll the text in codemirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
-      await browser.execute(
-        "$('.CodeMirror-vscrollbar')." +
-          codeMirrorPaneToScroll +
-          '().scrollTop(' +
-          String(scrollTo) +
-          ');'
-      );
+      await browser.execute(scrollTo => {
+        const el = document.querySelector('.CodeMirror-vscrollbar');
+        if (el) {
+          el.scrollTop = scrollTo;
+        }
+      }, scrollTo);
       var lineHeight = await elem
         .$(codeMirrorLineNumberLocator)
         .getAttribute('clientHeight');
