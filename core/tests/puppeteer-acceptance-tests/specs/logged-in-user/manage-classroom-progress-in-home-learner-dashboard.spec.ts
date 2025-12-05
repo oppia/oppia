@@ -62,36 +62,36 @@ describe('Logged-in User', function () {
       'In this course, you will learn the following topics: Place Values.'
     );
 
-    // await curriculumAdmin.createAndPublishTopic(
-    //   'Addition',
-    //   'Addition subtopics',
-    //   'Addition skills'
-    // );
-    // await curriculumAdmin.createAndPublishTopic(
-    //   'Subtraction',
-    //   'Subtraction subtopics',
-    //   'Subtraction skills'
-    // );
-    // await curriculumAdmin.createAndPublishTopic(
-    //   'Multiplication',
-    //   'Multiplication subtopics',
-    //   'Multiplication skills'
-    // );
-    // await curriculumAdmin.createAndPublishTopic(
-    //   'Division',
-    //   'Division subtopics',
-    //   'Division skills'
-    // );
+    await curriculumAdmin.createAndPublishTopic(
+      'Addition',
+      'Addition subtopics',
+      'Addition skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Subtraction',
+      'Subtraction subtopics',
+      'Subtraction skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Multiplication',
+      'Multiplication subtopics',
+      'Multiplication skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Division',
+      'Division subtopics',
+      'Division skills'
+    );
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values subtopics',
       'Place Values skills'
     );
-    // await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-    // await curriculumAdmin.addTopicToClassroom('Math', 'Subtraction');
-    // await curriculumAdmin.addTopicToClassroom('Math', 'Multiplication');
-    // await curriculumAdmin.addTopicToClassroom('Math', 'Division');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Subtraction');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Multiplication');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Division');
     await curriculumAdmin.publishClassroom('Math');
 
     const placeValueChapters = [
@@ -153,7 +153,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectNumberOfElementsToBe(
         '.e2e-test-learer-topic-summary-tile',
-        1
+        5
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -238,17 +238,21 @@ describe('Logged-in User', function () {
       );
 
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 2: Find the Value of a Number',
-      ]);
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 3: Comparing Numbers',
-      ]);
 
-      await loggedInUser.navigateToTopicPageByCard('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'Find the Value of a Number'
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 2: Find the Value of a Number'],
+        0
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Recommended for you',
+        ['Chapter 3: Comparing Numbers'],
+        0
+      );
+
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 2: Find the Value of a Number'
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
@@ -258,17 +262,20 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLearnerDashboard();
 
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 3: Comparing Numbers',
-      ]);
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 4: Rounding Numbers part 1',
-      ]);
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 3: Comparing Numbers'],
+        0
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Recommended for you',
+        ['Chapter 4: Rounding Numbers part 1'],
+        0
+      );
 
-      await loggedInUser.navigateToTopicPageByCard('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'Rounding Numbers part 1'
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 3: Comparing Numbers'
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
@@ -278,11 +285,22 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLearnerDashboard();
 
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'Rounding Numbers part 2'
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 4: Rounding Numbers part 1'],
+        0
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Recommended for you',
+        ['Chapter 5: Rounding Numbers part 2'],
+        0
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 4: Rounding Numbers part 1'
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
@@ -292,9 +310,34 @@ describe('Logged-in User', function () {
 
       await loggedInUser.navigateToLearnerDashboard();
 
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 6: Extra chapter',
-      ]);
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 5: Rounding Numbers part 2'],
+        0
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Recommended for you',
+        ['Chapter 6: Extra chapter'],
+        0
+      );
+
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 5: Rounding Numbers part 2'
+      );
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 6: Extra chapter'],
+        0
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
