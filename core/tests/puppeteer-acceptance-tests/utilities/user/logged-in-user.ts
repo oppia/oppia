@@ -3240,7 +3240,10 @@ export class LoggedInUser extends BaseUser {
    * @param {string} selector - The selector to match elements.
    * @param {number} count - The expected number of elements.
    */
-  async expectNumberOfElementsToBe(selector: string, count: number) {
+  async expectNumberOfElementsToBe(
+    selector: string,
+    count: number
+  ): Promise<void> {
     const elements = await this.page.$$(selector);
     expect(elements.length).toBe(count);
   }

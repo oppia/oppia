@@ -104,12 +104,12 @@ describe('Logged-in User', function () {
     ];
 
     for (const chapter of placeValueChapters) {
-      const exp_id = await curriculumAdmin.createAndPublishExplorationWithCards(
+      const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
         chapter,
         'Algebra',
         3
       );
-      chapterIds.push(exp_id ?? '');
+      chapterIds.push(expId ?? '');
     }
 
     await curriculumAdmin.addStoryToTopic(
@@ -192,7 +192,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.navigateToLearnerDashboard();
-      //Did not finish the chapter,So still in  In-progress section.
+      // Did not finish the chapter,So still in  In-progress section.
       await loggedInUser.expectElementsToBePresent(
         ['Continue where you left off'],
         'tabSection'
