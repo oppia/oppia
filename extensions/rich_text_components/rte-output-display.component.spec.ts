@@ -353,13 +353,13 @@ describe('RTE display component', () => {
 
     const output = component.wrapSentencesInSpansForHighlighting(rteString);
 
-    // BR presence as literal tags is not guaranteed after processing. Check
-    // semantics: both sentences are present and highlight ids exist.
+    // Verify both sentences are wrapped in highlight spans.
     expect(output).toContain('id="highlightBlock1"');
     expect(output).toContain('id="highlightBlock2"');
-    // Ensure highlightBlock1 contains "Hello" and highlightBlock2 contains "World".
     expect(output).toContain('<span id="highlightBlock1">Hello.</span>');
     expect(output).toContain('<span id="highlightBlock2">World.</span>');
+    // Verify <br> tags are preserved in the output.
+    expect(output).toContain('<br>');
   }));
 
   it('should correctly set data for sentence highlighting during voiceover playback in ngOnInit', fakeAsync(() => {
