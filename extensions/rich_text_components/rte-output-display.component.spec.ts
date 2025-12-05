@@ -339,6 +339,8 @@ describe('RTE display component', () => {
     expect(html).toContain('Hello');
     expect(html).toContain('World');
     expect(html.indexOf('Hello') < html.indexOf('World')).toBeTrue();
+
+    discardPeriodicTasks();
   }));
 
   it('should not treat <br> as text when wrapping sentences for highlighting', fakeAsync(() => {

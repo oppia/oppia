@@ -67,6 +67,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
   @ViewChild('blockquote') blockquoteTagPortal: TemplateRef<unknown>;
   @ViewChild('em') emTagPortal: TemplateRef<unknown>;
   @ViewChild('text') textTagPortal: TemplateRef<unknown>;
+  @ViewChild('br') brTagPortal: TemplateRef<unknown>;
   // Oppia Non interactive.
   @ViewChild('collapsible') collapsibleTagPortal: TemplateRef<unknown>;
   @ViewChild('image') imageTagPortal: TemplateRef<unknown>;
@@ -172,7 +173,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       const latexText = JSON.parse(decodedMathContent)?.raw_latex;
       return this.parseAndConvertLatex(latexText);
     }
-    // Default: return textContent or empty string to avoid undefined values
+    // Default: return textContent or empty string to avoid undefined values.
     return node.textContent || '';
   }
 
