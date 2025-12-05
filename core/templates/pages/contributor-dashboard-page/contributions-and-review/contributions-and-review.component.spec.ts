@@ -73,7 +73,7 @@ class MockNgbModal {
 
 class MockWindowRef {
   nativeWindow = {
-    scrollTo: (x, y) => {}
+    scrollTo: (x, y) => {},
   };
 }
 
