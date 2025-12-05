@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, List, Optional, Sequence, Tuple, TypedDict, Union
 
+
 from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
