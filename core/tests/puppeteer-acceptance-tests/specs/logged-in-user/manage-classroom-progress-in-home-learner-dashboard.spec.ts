@@ -132,9 +132,10 @@ describe('Logged-in User', function () {
   });
 
   it(
-    'should have the correct tab title and available sections on landing',
+    'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectSidebarTabToBeActive('Home');
 
       await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
 
@@ -190,6 +191,7 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.navigateToLearnerDashboard();
+      //Did not finish the chapter,So still in  In-progress section.
       await loggedInUser.expectElementsToBePresent(
         ['Continue where you left off'],
         'tabSection'
@@ -199,9 +201,23 @@ describe('Logged-in User', function () {
         'Chapter 1: What are the Place Values',
       ]);
 
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Continue where you left off',
+        ['Chapter 1: What are the Place Values'],
+        'Lessons in progress',
+        50
+      );
+
       await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
         'Chapter 2: Find the Value of a Number',
       ]);
+
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Continue where you left off',
+        ['Chapter 1: What are the Place Values'],
+        'Lessons in progress',
+        0
+      );
 
       await loggedInUser.navigateToLessonByCard(
         'Lessons in progress',
@@ -219,12 +235,12 @@ describe('Logged-in User', function () {
   it(
     'should not recommend any lessons if currently on last lesson',
     async function () {
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'What are the Place Values'
       );
+      await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
@@ -238,12 +254,12 @@ describe('Logged-in User', function () {
         'Chapter 3: Comparing Numbers',
       ]);
 
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'Find the Value of a Number'
       );
+      await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
@@ -258,12 +274,12 @@ describe('Logged-in User', function () {
         'Chapter 4: Rounding Numbers part 1',
       ]);
 
-      await loggedInUser.navigateToClassroomPage('math');
-      await loggedInUser.selectAndOpenTopic('Place Values');
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
       await loggedInUser.selectChapterWithinStoryToLearn(
         "Jamie's Adventures in the Arcade",
         'Rounding Numbers part 1'
       );
+      await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
@@ -277,6 +293,7 @@ describe('Logged-in User', function () {
         "Jamie's Adventures in the Arcade",
         'Rounding Numbers part 2'
       );
+      await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();
       await loggedInUser.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'

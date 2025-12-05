@@ -251,7 +251,8 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
   lessonCard: {
     content: '.e2e-test-lesson-card',
     heading: '.e2e-test-lesson-card-title',
-    button: '.e2e-test-lesson-card-button',
+    button: '.e2e-test-resume-lesson-btn',
+    progress: '.e2e-test-progress-lesson',
   },
 };
 
@@ -3179,6 +3180,38 @@ export class LoggedInUser extends BaseUser {
     );
   }
   /**
+   * Verifies that the desktop sidebar is visible and the given tab is active.
+   * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
+   */
+  async expectSidebarTabToBeActive(
+    activeTab: 'Home' | 'Goals' | 'Progress'
+  ): Promise<void> {
+    const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
+
+    await this.page.waitForSelector(sidebarSelector, {visible: true});
+
+    const buttonTexts = await this.page.$$eval(
+      `${sidebarSelector} .e2e-test-sidebar-button`,
+      els => els.map(el => el.textContent?.trim() || '')
+    );
+
+    expect(buttonTexts).toEqual(['Home', 'Goals', 'Progress']);
+
+    const tabSelectorMap: Record<string, string> = {
+      Home: '.e2e-test-sidebar-button-home',
+      Goals: '.e2e-test-sidebar-button-goals',
+      Progress: '.e2e-test-sidebar-button-progress',
+    };
+
+    const activeSelector = `${sidebarSelector} ${tabSelectorMap[activeTab]}`;
+
+    const isActive = await this.page.$eval(activeSelector, el =>
+      el.classList.contains('oppia-learner-dash-sidebar_btn--active')
+    );
+
+    expect(isActive).toBe(true);
+  }
+  /**
    * Function to verify the number of elements matching a selector.
    * @param {string} selector - The selector to match elements.
    * @param {number} count - The expected number of elements.
@@ -3336,6 +3369,52 @@ export class LoggedInUser extends BaseUser {
       'lessonCard',
       subsectionElement
     );
+  }
+
+  /**
+   * Verifies lesson card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   * @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   */
+  async expectLessonCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    section: string = 'N/A',
+    progress: number
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresent(
+      expectedTitles,
+      'lessonCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const lessonCardElement = await this.findElement(
+        subsectionElement,
+        learnerDashSelectors.lessonCard,
+        title
+      );
+      if (!lessonCardElement) {
+        throw new Error(`Lesson card with title "${title}" was not found.`);
+      }
+
+      const progressText = await lessonCardElement.$eval(
+        learnerDashSelectors.lessonCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
   }
 
   /**
