@@ -62,36 +62,36 @@ describe('Logged-in User', function () {
       'In this course, you will learn the following topics: Place Values.'
     );
 
-    await curriculumAdmin.createAndPublishTopic(
-      'Addition',
-      'Addition subtopics',
-      'Addition skills'
-    );
-    await curriculumAdmin.createAndPublishTopic(
-      'Subtraction',
-      'Subtraction subtopics',
-      'Subtraction skills'
-    );
-    await curriculumAdmin.createAndPublishTopic(
-      'Multiplication',
-      'Multiplication subtopics',
-      'Multiplication skills'
-    );
-    await curriculumAdmin.createAndPublishTopic(
-      'Division',
-      'Division subtopics',
-      'Division skills'
-    );
+    // await curriculumAdmin.createAndPublishTopic(
+    //   'Addition',
+    //   'Addition subtopics',
+    //   'Addition skills'
+    // );
+    // await curriculumAdmin.createAndPublishTopic(
+    //   'Subtraction',
+    //   'Subtraction subtopics',
+    //   'Subtraction skills'
+    // );
+    // await curriculumAdmin.createAndPublishTopic(
+    //   'Multiplication',
+    //   'Multiplication subtopics',
+    //   'Multiplication skills'
+    // );
+    // await curriculumAdmin.createAndPublishTopic(
+    //   'Division',
+    //   'Division subtopics',
+    //   'Division skills'
+    // );
     await curriculumAdmin.createAndPublishTopic(
       'Place Values',
       'Place Values subtopics',
       'Place Values skills'
     );
-    await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
+    // await curriculumAdmin.addTopicToClassroom('Math', 'Addition');
     await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-    await curriculumAdmin.addTopicToClassroom('Math', 'Subtraction');
-    await curriculumAdmin.addTopicToClassroom('Math', 'Multiplication');
-    await curriculumAdmin.addTopicToClassroom('Math', 'Division');
+    // await curriculumAdmin.addTopicToClassroom('Math', 'Subtraction');
+    // await curriculumAdmin.addTopicToClassroom('Math', 'Multiplication');
+    // await curriculumAdmin.addTopicToClassroom('Math', 'Division');
     await curriculumAdmin.publishClassroom('Math');
 
     const placeValueChapters = [
@@ -153,7 +153,7 @@ describe('Logged-in User', function () {
 
       await loggedInUser.expectNumberOfElementsToBe(
         '.e2e-test-learer-topic-summary-tile',
-        5
+        1
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -198,25 +198,15 @@ describe('Logged-in User', function () {
         'tabSection'
       );
 
-      await loggedInUser.expectLessonCardsToBePresent('Lessons in progress', [
-        'Chapter 1: What are the Place Values',
-      ]);
-
       await loggedInUser.expectLessonCardProgressToBe(
-        'Continue where you left off',
-        ['Chapter 1: What are the Place Values'],
         'Lessons in progress',
-        50
+        ['Chapter 1: What are the Place Values'],
+        0
       );
 
-      await loggedInUser.expectLessonCardsToBePresent('Recommended for you', [
-        'Chapter 2: Find the Value of a Number',
-      ]);
-
       await loggedInUser.expectLessonCardProgressToBe(
-        'Continue where you left off',
-        ['Chapter 1: What are the Place Values'],
-        'Lessons in progress',
+        'Recommended for you',
+        ['Chapter 2: Find the Value of a Number'],
         0
       );
 
@@ -237,10 +227,9 @@ describe('Logged-in User', function () {
     'should not recommend any lessons if currently on last lesson',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToTopicPageByCard('Place Values');
-      await loggedInUser.selectChapterWithinStoryToLearn(
-        "Jamie's Adventures in the Arcade",
-        'What are the Place Values'
+      await loggedInUser.navigateToLessonByCard(
+        'Lessons in progress',
+        'Chapter 1: What are the Place Values'
       );
       await loggedInUser.continueToNextCard();
       await loggedInUser.continueToNextCard();

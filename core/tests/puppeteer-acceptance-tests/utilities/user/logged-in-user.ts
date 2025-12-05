@@ -3219,12 +3219,15 @@ export class LoggedInUser extends BaseUser {
       els => els.map(el => el.textContent?.trim() || '')
     );
 
-    expect(buttonTexts).toEqual(['Home', 'Goals', 'Progress']);
+    expect(buttonTexts).toHaveLength(3);
+    expect(buttonTexts[0]).toBe('Home');
+    expect(buttonTexts[1]).toBe('Goals');
+    expect(buttonTexts[2]).toBe('Progress');
 
     const tabSelectorMap: Record<string, string> = {
-      Home: '.e2e-test-sidebar-button-home',
-      Goals: '.e2e-test-sidebar-button-goals',
-      Progress: '.e2e-test-sidebar-button-progress',
+      Home: '.e2e-test-home-section',
+      Goals: '.e2e-test-goals-section',
+      Progress: '.e2e-test-progress-section',
     };
 
     const activeSelector = `${sidebarSelector} ${tabSelectorMap[activeTab]}`;
@@ -3375,41 +3378,17 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies lesson cards are in correct section.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {string} criteria - Subsection title value to match.
-   * @param {string[]} expectedTitles - Lesson card titles expected.
-   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
-   */
-  async expectLessonCardsToBePresent(
-    criteria: string,
-    expectedTitles: string[],
-    section: string = 'N/A'
-  ): Promise<void> {
-    const subsectionElement = await this.findSubsectionElement(
-      criteria,
-      section
-    );
-
-    await this.expectElementsToBePresent(
-      expectedTitles,
-      'lessonCard',
-      subsectionElement
-    );
-  }
-
-  /**
    * Verifies lesson card titles and their progress inside a subsection.
    * @param {string} criteria - Subsection title value to match.
    * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
    * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
-   * @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
    */
   async expectLessonCardProgressToBe(
     criteria: string,
     expectedTitles: string[],
-    section: string = 'N/A',
-    progress: number
+    progress: number,
+    section: string = 'N/A'
   ): Promise<void> {
     const subsectionElement = await this.findSubsectionElement(
       criteria,
