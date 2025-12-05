@@ -1,0 +1,18 @@
+<div class="badge-progression-container">
+  <h3>Badges</h3>
+  <div class="badges-row">
+    <div class="badge" *ngFor="let badge of badges" [ngClass]="getBadgeClass(badge.level)">
+      <div class="badge-icon" [ngClass]="{'unlocked': badge.unlocked}">
+        <!-- Simple circular progress representation -->
+        <div class="progress-container">
+          <div class="progress-mask" [style.backgroundImage]="'conic-gradient(#00645C ' + badge.progress + '%, #CCCCCC ' + badge.progress + '%)'">
+          </div>
+        </div>
+        <div class="badge-name">{{ badge.name }}</div>
+      </div>
+      <div class="badge-actions">
+        <button class="btn btn-link" *ngIf="badge.unlocked" (click)="shareBadge(badge)">Share</button>
+      </div>
+    </div>
+  </div>
+</div>

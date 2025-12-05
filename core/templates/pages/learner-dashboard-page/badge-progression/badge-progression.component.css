@@ -1,0 +1,69 @@
+.badge-progression-container {
+  margin-bottom: 1rem;
+}
+
+.badges-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150px;
+}
+
+.badge-icon {
+  width: 110px;
+  height: 110px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.badge-icon.unlocked {
+  animation: badge-unlock 1s ease-out;
+}
+
+.badge-name {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.badge-actions {
+  margin-top: 0.25rem;
+}
+
+.progress-container {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-mask {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background-color: #CCCCCC;
+}
+
+/* Badge levels */
+.oppia-badge-gold .badge-icon { border: 2px solid #D4AF37; }
+.oppia-badge-silver .badge-icon { border: 2px solid #C0C0C0; }
+.oppia-badge-bronze .badge-icon { border: 2px solid #CD7F32; }
+
+@keyframes badge-unlock {
+  0% { transform: scale(0.6); opacity: 0; }
+  70% { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); }
+}

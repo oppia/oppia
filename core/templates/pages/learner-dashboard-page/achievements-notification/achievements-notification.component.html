@@ -1,0 +1,9 @@
+<div *ngIf="achievements && achievements.length && showNotifications" class="achievements-notification">
+  <div class="notification-header">
+    <strong>Achievements</strong>
+    <button (click)="markAllViewed()" class="btn btn-sm btn-outline-secondary">Dismiss</button>
+  </div>
+  <ul>
+    <li *ngFor="let a of achievements">{{ a.title }} - {{ a.description }}</li>
+  </ul>
+</div>

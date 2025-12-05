@@ -1,0 +1,25 @@
+<div class="achievements-stats">
+  <h3>Achievements Overview</h3>
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number">{{stats?.total_badges || 0}}</div>
+      <div class="stat-label">Total Badges</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{stats?.total_achievements || 0}}</div>
+      <div class="stat-label">Achievements</div>
+    </div>
+    <div class="stat-card" *ngIf="stats?.badges_by_level">
+      <div class="stat-number">{{stats.badges_by_level.gold || 0}}</div>
+      <div class="stat-label">Gold</div>
+    </div>
+    <div class="stat-card" *ngIf="stats?.badges_by_level">
+      <div class="stat-number">{{stats.badges_by_level.silver || 0}}</div>
+      <div class="stat-label">Silver</div>
+    </div>
+    <div class="stat-card" *ngIf="stats?.badges_by_level">
+      <div class="stat-number">{{stats.badges_by_level.bronze || 0}}</div>
+      <div class="stat-label">Bronze</div>
+    </div>
+  </div>
+</div>

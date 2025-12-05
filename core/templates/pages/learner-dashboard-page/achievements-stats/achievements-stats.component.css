@@ -1,0 +1,5 @@
+.achievements-stats { margin: 1rem 0; }
+.stats-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+.stat-card { width: 100px; height: 80px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.06); display:flex; flex-direction:column; justify-content:center; align-items:center; }
+.stat-number { font-size: 1.25rem; font-weight: 700; }
+.stat-label { font-size: 0.85rem; color: #666; }
