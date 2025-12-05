@@ -168,7 +168,7 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
         print('Servers have come up.\n')
 
         # Force a timeout to recreate failure.
-        time.sleep(9999999)
+        # time.sleep(9999999)
 
         output_lines = []
         while True:
