@@ -21,9 +21,6 @@ var action = require('./action.js');
 var waitFor = require('./waitFor.js');
 var forms = require('./forms.js');
 var general = require('./general.js');
-const {
-  default: waitUntil,
-} = require('webdriverio/build/commands/browser/waitUntil.js');
 
 var LibraryPage = function () {
   var LIBRARY_URL_SUFFIX = '/community-library';
@@ -45,8 +42,8 @@ var LibraryPage = function () {
   var searchInputsSelector = function () {
     return $$('.e2e-test-search-input');
   };
-  var allExplorationsTitled = async function (explorationName) {
-    return await $$(`.e2e-test-exp-summary-tile-title=${explorationName}`);
+  var allExplorationsTitled = function (explorationName) {
+    return $$(`.e2e-test-exp-summary-tile-title=${explorationName}`);
   };
   var categorySelector = forms.MultiSelectEditor(
     $('.e2e-test-search-bar-category-selector')
@@ -210,16 +207,14 @@ var LibraryPage = function () {
 
   this.playExploration = async function (explorationName) {
     await waitFor.pageToFullyLoad();
-    browser.pause(5000);
     await waitFor.visibilityOf(
       allExplorationSummaryTile,
       'Library Page does not have any explorations'
     );
 
-    var explorationCardElement = await $(
+    var explorationCardElement = $(
       `.e2e-test-exp-summary-tile-title=${explorationName}`
     );
-    browser.pause(5000);
     await waitFor.visibilityOf(
       explorationCardElement,
       'Unable to find exploration ' + explorationName
@@ -227,7 +222,7 @@ var LibraryPage = function () {
     var explorationCard = await allExplorationsTitled(explorationName)[0];
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
-    await action.click('Exploration Card', explorationCard, true);
+    await action.click('Exploration Card', explorationCard);
     await waitFor.pageToFullyLoad();
   };
 
