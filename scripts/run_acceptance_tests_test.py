@@ -453,7 +453,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
 
         with self.compile_test_ts_files_swap:
             run_acceptance_tests.main(
-                args=['--suite', 'testSuite', '--skip-build']
+                args=['--suite', 'testSuite', '--skip_build']
             )
 
     def test_start_tests_in_jasmine(self) -> None:

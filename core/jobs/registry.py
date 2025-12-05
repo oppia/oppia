@@ -55,7 +55,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     math_interactions_audit_jobs,
     model_validation_jobs,
     opportunity_management_jobs,
-    populate_study_guide_models_jobs,
     question_migration_jobs,
     skill_inspection_jobs,
     skill_migration_jobs,
