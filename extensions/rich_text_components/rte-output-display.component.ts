@@ -380,9 +380,9 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       return;
     }
     // When there are trailing spaces in the HTML, CKEditor adds &nbsp;
-    // to the HTML (eg: '<p> Text &nbsp; &nbsp; &nbsp;</p>'), which can
+    // to the HTML (eg: '<p> Text &nbsp; &nbsp; %nbsp;</p>'), which can
     // lead to UI issues when displaying it. Hence, the following block
-    // // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
+    // replaces the trailing ' &nbsp; &nbsp; %nbsp;</p>' with just '</p>'.
     // We can't just find and replace '&nbsp;' here since, those in the
     // middle may actually be required. Only the trailing ones need to be
     // replaced.
@@ -642,7 +642,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       changes.rteString.previousValue !== changes.rteString.currentValue
     ) {
       /**
-      * The following serves as an excellent example of why we shouldn't use
+       * The following serves as an excellent example of why we shouldn't use
        * js and elementRef.nativeElement to manipulate the DOM. When doing so
        * angular has no reference to the node we create and attach to the DOM.
        * So angular won't be able to clear the nodes out during change detection
@@ -675,6 +675,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
       this._updateNode();
 
       // If the below feature flag is not enabld then the sentence highlighting
+      // feature will not work.
       if (this.isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()) {
         const activeContentId = this.getActiveContentId();
         this.automaticVoiceoverHighlightService.setActiveContentId(
@@ -694,7 +695,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
 
 /**
  * The directive below is required because we have &nbsp; in the string. String
- * interpolation is a very safe operation in Angular and these values are
+ * interpolation is a very safe operation in angular and these values are
  * changed to show the characters &nbsp; (they actually show &#160, the machine
  * code for &nbsp;) instead of whitespace. In order to get around this, the
  * directive is used instead of `{{}}` and `[innerHtml]`. This is a very safe
