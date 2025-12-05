@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     exp_domain,
     exp_services,
@@ -117,7 +116,7 @@ class VoiceoverSynthesisBaseClass(
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -155,7 +154,7 @@ class VoiceoverSynthesisBaseClass(
                 'Title subtopic',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-sub',
             )
@@ -187,7 +186,7 @@ class VoiceoverSynthesisBaseClass(
             self.CURATED_EXPLORATION_ID_1,
             self.owner_id,
             title='title1',
-            category=constants.ALL_CATEGORIES[0],
+            category=constants.constants.ALL_CATEGORIES[0],
             end_state_name='End State',
         )
 
@@ -251,7 +250,7 @@ class VoiceoverSynthesisBaseClass(
             self.CURATED_EXPLORATION_ID_2,
             self.owner_id,
             title='title2',
-            category=constants.ALL_CATEGORIES[0],
+            category=constants.constants.ALL_CATEGORIES[0],
             end_state_name='End State',
         )
         self.publish_exploration(self.owner_id, exploration_2.id)
@@ -315,7 +314,7 @@ class VoiceoverSynthesisBaseClass(
             self.NON_CURATED_EXPLORATION_ID,
             self.owner_id,
             title='title3',
-            category=constants.ALL_CATEGORIES[0],
+            category=constants.constants.ALL_CATEGORIES[0],
             end_state_name='End State',
         )
         self.publish_exploration(self.owner_id, exploration_3.id)
@@ -598,4 +597,27 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
             job_run_result.JobRunResult(stdout=expected_output_1, stderr=''),
             job_run_result.JobRunResult(stdout=expected_output_2, stderr=''),
         ]
+        self.assert_job_output_is(expected_output)
+
+
+class VoiceoverConstantsAuditJobTests(VoiceoverSynthesisBaseClass):
+
+    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverConstantsAuditJob] = (
+        voiceover_synthesis_jobs.VoiceoverConstantsAuditJob
+    )
+
+    def test_should_audit_voiceover_constants_successfully(self) -> None:
+        autogeneratable_language_accent_codes = sorted(
+            constants.autogeneratable_language_accent_constants.keys()
+        )
+
+        expected_output = []
+
+        for language_accent_code in autogeneratable_language_accent_codes:
+            expected_output.append(
+                job_run_result.JobRunResult(
+                    stdout=f'{language_accent_code}', stderr=''
+                )
+            )
+
         self.assert_job_output_is(expected_output)
