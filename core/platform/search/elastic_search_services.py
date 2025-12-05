@@ -27,6 +27,8 @@ from core.domain import (
     search_services,
 )
 from core.platform import models
+from core.controllers.base import UserFacingExceptions
+import logging
 
 import elasticsearch
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
@@ -444,28 +446,31 @@ def ensure_disk_space_sufficient(es_client) -> None:
         es_client: Elasticsearch. Instance used to query cluster statistics.
 
     Raises:
-        RuntimeError. If filesystem statistics cannot be read from the cluster,
+        InternalErrorException. If filesystem statistics cannot be read from the cluster,
                       or if disk usage exceeds the configured high watermark.
     """
-    try:
-        stats = es_client.cluster.stats()
-        fs = stats.get('nodes', {}).get('fs', {})
-        total = fs.get('total_in_bytes')
-        free = fs.get('available_in_bytes')
+    stats = es_client.cluster.stats()
+    fs = stats.get('nodes', {}).get('fs', {})
+    total = fs.get('total_in_bytes')
+    free = fs.get('available_in_bytes')
 
-        if total is None or free is None:
-            raise RuntimeError(
-                'Cannot read filesystem stats from Elasticsearch cluster.'
-            )
+    if total is None or free is None:
+        raise RuntimeError(
+            'Cannot read filesystem stats from Elasticsearch cluster.'
+        )
 
-        used_percent = (total - free) / total * 100
+    used_percent = (total - free) / total * 100
 
-        if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
-            raise RuntimeError(
-                f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
-                f'which exceeds the high watermark of {feconf.ES_DISK_WATERMARK_HIGH}%. '
-                'Please free some disk space before adding more documents or updating documents.'
-            )
+    if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
+        logging.info(
+            'Elasticsearch disk usage has reached the low watermark: '
+            f'{used_percent:.2f}% used. Consider freeing up space.'
+        )
 
-    except Exception as e:
-        raise RuntimeError(f'Failed to add document : {e}') from e
+    if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
+        raise UserFacingExceptions.InternalErrorException(
+            f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
+            f'which exceeds the high watermark of '
+            f'{feconf.ES_DISK_WATERMARK_HIGH}%. '
+            'Please free some disk space before adding or updating documents.'
+        )
