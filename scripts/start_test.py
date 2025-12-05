@@ -373,7 +373,7 @@ class MainTests(unittest.TestCase):
     def test_main_successful_startup_with_no_install(
         self, mock_attempt_launch: mock.Mock
     ) -> None:
-        start.main(['--no_browser', '--skip-install'])
+        start.main(['--no_browser', '--skip_install'])
         self.mock_install.assert_not_called()
         self.mock_build.assert_called_once_with(args=[])
         mock_attempt_launch.assert_not_called()
@@ -393,21 +393,21 @@ class MainTests(unittest.TestCase):
     def test_main_build_failure_resets_constants(self, _: mock.Mock) -> None:
         self.mock_build.side_effect = Exception('build failed')
         with self.assertRaises(Exception):
-            start.main(['--no_browser', '--skip-install'])
+            start.main(['--no_browser', '--skip_install'])
         self.mock_set_constants.assert_called_once()
 
     def test_main_correctly_passes_build_flags_to_build_script(self) -> None:
-        start.main(['--prod_env', '--no_browser', '--skip-install'])
+        start.main(['--prod_env', '--no_browser', '--skip_install'])
         self.mock_build.assert_called_once_with(args=['--prod_env'])
 
         self.mock_build.reset_mock()
-        start.main(['--maintenance_mode', '--no_browser', '--skip-install'])
+        start.main(['--maintenance_mode', '--no_browser', '--skip_install'])
         self.mock_build.assert_called_once_with(args=['--maintenance_mode'])
 
     def test_main_correctly_passes_save_datastore_flags_to_emulators(
         self,
     ) -> None:
-        start.main(['--save_datastore', '--no_browser', '--skip-install'])
+        start.main(['--save_datastore', '--no_browser', '--skip_install'])
         self.mock_firebase.assert_called_once_with(recover_users=True)
         self.mock_datastore.assert_called_once_with(clear_datastore=False)
 
@@ -417,7 +417,7 @@ class MainTests(unittest.TestCase):
                 '--disable_host_checking',
                 '--no_auto_restart',
                 '--no_browser',
-                '--skip-install',
+                '--skip_install',
             ]
         )
         self.mock_dev_appserver.assert_called_once_with(
@@ -447,7 +447,7 @@ class MainTests(unittest.TestCase):
             side_effect=mock_get_ports,
         ):
             with self.assertRaises(KeyboardInterrupt):
-                start.main(['--no_browser', '--skip-install'])
+                start.main(['--no_browser', '--skip_install'])
 
         mock_print.assert_called_with(
             [
@@ -491,7 +491,7 @@ class MainTests(unittest.TestCase):
 
         self.dev_appserver_mock.wait.side_effect = KeyboardInterrupt
         with self.assertRaises(KeyboardInterrupt):
-            start.main(['--no_browser', '--skip-install'])
+            start.main(['--no_browser', '--skip_install'])
         self.assertEqual(order, ['alert', 'set_constants', 'extend', 'notify'])
 
     def test_main_calls_attempt_launch_browser_when_no_browser_flag_not_set(
@@ -500,5 +500,5 @@ class MainTests(unittest.TestCase):
         """Test that main calls attempt_launch_browser when --no-browser is not
         set.
         """
-        start.main(['--skip-install'])
+        start.main(['--skip_install'])
         self.mock_attempt_launch.assert_called_once()
