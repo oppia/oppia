@@ -2183,6 +2183,70 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(len(story.story_contents.nodes), 3)
         self.logout()
 
+    def test_chapter_linkage_after_dummy_generation(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        topic = topic_domain.Topic.create_default_topic(
+            'topic', 'topic_name', 'topicurl', 'description', 'fragm'
+        )
+        topic_services.save_new_topic(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
+        )
+
+        story = story_domain.Story.create_default_story(
+            'story_id', 'story_title', 'description', 'topic', 'storyurl'
+        )
+        story_services.save_new_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), story
+        )
+        topic_services.add_canonical_story(
+            self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL),
+            'topic',
+            'story_id',
+        )
+
+        story = story_fetchers.get_story_by_id('story_id')
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_chapters',
+                'story_id': 'story_id',
+                'num_dummy_chapters_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_story = story_fetchers.get_story_by_id('story_id')
+        contents = updated_story.story_contents
+
+        def node(node_id: str) -> story_domain.StoryNode:
+            idx = contents.get_node_index(node_id)
+            return contents.nodes[idx]
+
+        node_1 = node('node_1')
+        node_2 = node('node_2')
+        node_3 = node('node_3')
+        node_4 = node('node_4')
+        node_5 = node('node_5')
+
+        self.assertEqual(node_1.destination_node_ids, ['node_2'])
+        self.assertEqual(node_2.destination_node_ids, ['node_3'])
+        self.assertEqual(node_3.destination_node_ids, ['node_4'])
+        self.assertEqual(node_4.destination_node_ids, ['node_5'])
+        self.assertEqual(node_5.destination_node_ids, [])
+        self.logout()
+
     def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
         self,
     ) -> None:
@@ -2794,6 +2858,157 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
                 feconf.REGENERATE_TOPIC_SUMMARIES_URL,
                 {},
                 csrf_token=csrf_token,
+                expected_status_int=200,
+            )
+
+
+class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for GenerateStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_generate_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'generate_study_guide_models',
+            study_guide_services.generate_study_guide_models,
+        ):
+            self.post_json(
+                feconf.GENERATE_STUDY_GUIDE_MODELS_URL,
+                {},
+                csrf_token=csrf_token,
+                expected_status_int=200,
+            )
+
+
+class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for DeleteStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_delete_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'delete_study_guide_models',
+            study_guide_services.delete_study_guide_models,
+        ):
+            self.delete_json(
+                feconf.DELETE_STUDY_GUIDE_MODELS_URL,
+                {},
+                expected_status_int=200,
+            )
+
+
+class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for VerifyStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_verify_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'verify_study_guide_models',
+            study_guide_services.verify_study_guide_models,
+        ):
+            self.get_json(
+                feconf.VERIFY_STUDY_GUIDE_MODELS_URL,
+                {},
                 expected_status_int=200,
             )
 

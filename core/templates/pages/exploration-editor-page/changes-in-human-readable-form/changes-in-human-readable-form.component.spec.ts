@@ -37,15 +37,19 @@ describe('Changes in Human Readable Form Component', () => {
   // This is a helper function to clean the compiled html
   // for each test, in order to make a cleaner assertion.
   const removeComments = (HTML: {toString: () => string}) => {
-    return (
-      HTML.toString()
-        // Removes Unecessary white spaces and new lines.
-        .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2')
-        // Removes Comments.
-        .replace(/<\!--.*?-->/gm, '')
-        // Removes marker.
-        .replace(/::marker/, '')
-    );
+    let htmlStr = HTML.toString()
+      // Removes unnecessary white spaces and new lines.
+      .replace(/^\s+|\r\n|\n|\r|(>)\s+(<)|\s+$/gm, '$1$2');
+
+    // Repeatedly remove comments until none remain.
+    let prev;
+    do {
+      prev = htmlStr;
+      htmlStr = htmlStr.replace(/<\!--[\s\S]*?-->/gm, '');
+    } while (htmlStr !== prev);
+
+    // Remove marker.
+    return htmlStr.replace(/::marker/, '');
   };
 
   beforeEach(waitForAsync(() => {

@@ -90,7 +90,9 @@ describe('Translation tab component', () => {
           value2: () => void,
           value3: () => void
         ) => {
+          value1({number: 1});
           value1({number: 2});
+          value1({number: 3});
           value1({number: 4});
           value1({number: 6});
           value1({number: 8});
