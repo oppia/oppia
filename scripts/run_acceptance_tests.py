@@ -22,7 +22,6 @@ import os
 import shutil
 import subprocess
 import sys
-
 import time
 
 from core.constants import constants
