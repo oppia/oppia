@@ -1925,7 +1925,10 @@ export class LoggedInUser extends BaseUser {
         async card => await card.evaluate(el => el.textContent?.trim())
       )
     );
-    expect(sectionHeadingTexts).toEqual(expectedTexts);
+    expect(sectionHeadingTexts).toHaveLength(expectedTexts.length);
+    for (let i = 0; i < expectedTexts.length; i++) {
+      expect(sectionHeadingTexts[i]).toBe(expectedTexts[i]);
+    }
   }
 
   /**
