@@ -252,6 +252,8 @@ describe('Auth service', function () {
     beforeEach(() => {
       AuthService.firebaseConfigPromise = undefined;
       AuthService.firebaseConfigDict = undefined;
+
+      sessionStorage.clear();
     });
 
     it('should not delegate to signInWithRedirectAsync', async () => {
@@ -275,7 +277,7 @@ describe('Auth service', function () {
       expect(authBackendApiService.beginSessionAsync).not.toHaveBeenCalled();
     });
 
-    it('should return firebase config', async () => {
+    it('should return firebase config and save to session storage on cache miss', async () => {
       const mockConfig = {
         FIREBASE_CONFIG_API_KEY: 'sample-api-key',
         FIREBASE_CONFIG_AUTH_DOMAIN: 'sample-auth-domain',
@@ -284,29 +286,61 @@ describe('Auth service', function () {
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
       };
+
+      const expectedParsedConfig = {
+        apiKey: 'sample-api-key',
+        authDomain: 'sample-auth-domain',
+        projectId: 'sample-project-id',
+        storageBucket: 'sample-storage-bucket',
+        messagingSenderId: 'sample-sender-id',
+        appId: 'sample-app-id',
+      };
+
       fetchSpy.and.resolveTo({
         ok: true,
         text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
       } as Response);
 
+      const setItemSpy = spyOn(sessionStorage, 'setItem');
+      const getItemSpy = spyOn(sessionStorage, 'getItem').and.returnValue(null);
+
       const firebaseConfig = await AuthService.getFirebaseConfigAsync();
 
-      expect(firebaseConfig).toEqual({
-        apiKey: 'sample-api-key',
-        authDomain: 'sample-auth-domain',
-        projectId: 'sample-project-id',
-        storageBucket: 'sample-storage-bucket',
-        messagingSenderId: 'sample-sender-id',
-        appId: 'sample-app-id',
-      });
-      expect(AuthService.firebaseConfig).toEqual({
-        apiKey: 'sample-api-key',
-        authDomain: 'sample-auth-domain',
-        projectId: 'sample-project-id',
-        storageBucket: 'sample-storage-bucket',
-        messagingSenderId: 'sample-sender-id',
-        appId: 'sample-app-id',
-      });
+      expect(firebaseConfig).toEqual(expectedParsedConfig);
+      expect(AuthService.firebaseConfig).toEqual(expectedParsedConfig);
+
+      expect(fetchSpy).toHaveBeenCalledTimes(1);
+
+      expect(getItemSpy).toHaveBeenCalledWith('firebase_config_cache');
+
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'firebase_config_cache',
+        JSON.stringify(expectedParsedConfig)
+      );
+    });
+
+    it('should fetch from session storage if static variable is empty', async () => {
+      const cachedConfig = {
+        apiKey: 'cached-api-key',
+        authDomain: 'cached-auth-domain',
+        projectId: 'cached-project-id',
+        storageBucket: 'cached-storage-bucket',
+        messagingSenderId: 'cached-sender-id',
+        appId: 'cached-app-id',
+      };
+
+      const getItemSpy = spyOn(sessionStorage, 'getItem').and.returnValue(
+        JSON.stringify(cachedConfig)
+      );
+
+      const firebaseConfig = await AuthService.getFirebaseConfigAsync();
+
+      expect(firebaseConfig).toEqual(cachedConfig);
+      expect(AuthService.firebaseConfig).toEqual(cachedConfig);
+
+      expect(fetchSpy).not.toHaveBeenCalled();
+
+      expect(getItemSpy).toHaveBeenCalledWith('firebase_config_cache');
     });
 
     it('should return the same config if called multiple times', async () => {
@@ -318,12 +352,16 @@ describe('Auth service', function () {
         FIREBASE_CONFIG_MESSAGING_SENDER_ID: 'sample-sender-id',
         FIREBASE_CONFIG_APP_ID: 'sample-app-id',
       };
+
       fetchSpy.and.resolveTo({
         ok: true,
         text: () => Promise.resolve(")]}'" + JSON.stringify(mockConfig)),
       } as Response);
 
+      spyOn(sessionStorage, 'getItem').and.returnValue(null);
+
       const firebaseConfig1 = await AuthService.getFirebaseConfigAsync();
+
       const firebaseConfig2 = await AuthService.getFirebaseConfigAsync();
 
       expect(firebaseConfig1).toBe(firebaseConfig2);
@@ -434,6 +472,7 @@ describe('Auth service', function () {
 
   describe('firebaseConfig getter', () => {
     it('should throw an error if config is not initialized', () => {
+      AuthService.firebaseConfigDict = undefined;
       expect(() => AuthService.firebaseConfig).toThrowError(
         'Firebase config has not been initialized.'
       );

@@ -175,24 +175,22 @@ export class AuthService {
       return AuthService.firebaseConfigPromise;
     }
 
-    if (AuthService.firebaseConfigPromise === undefined) {
-      AuthService.firebaseConfigPromise =
-        AuthService.fetchConfigFromBackend().then(config => {
-          AuthService.firebaseConfigDict = {
-            apiKey: config.FIREBASE_CONFIG_API_KEY,
-            authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
-            projectId: config.FIREBASE_CONFIG_PROJECT_ID,
-            storageBucket: config.FIREBASE_CONFIG_STORAGE_BUCKET,
-            messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
-            appId: config.FIREBASE_CONFIG_APP_ID,
-          };
-          sessionStorage.setItem(
-            'firebase_config_cache',
-            JSON.stringify(AuthService.firebaseConfigDict)
-          );
-          return AuthService.firebaseConfigDict;
-        });
-    }
+    AuthService.firebaseConfigPromise =
+      AuthService.fetchConfigFromBackend().then(config => {
+        AuthService.firebaseConfigDict = {
+          apiKey: config.FIREBASE_CONFIG_API_KEY,
+          authDomain: config.FIREBASE_CONFIG_AUTH_DOMAIN,
+          projectId: config.FIREBASE_CONFIG_PROJECT_ID,
+          storageBucket: config.FIREBASE_CONFIG_STORAGE_BUCKET,
+          messagingSenderId: config.FIREBASE_CONFIG_MESSAGING_SENDER_ID,
+          appId: config.FIREBASE_CONFIG_APP_ID,
+        };
+        sessionStorage.setItem(
+          'firebase_config_cache',
+          JSON.stringify(AuthService.firebaseConfigDict)
+        );
+        return AuthService.firebaseConfigDict;
+      });
     return AuthService.firebaseConfigPromise;
   }
 
