@@ -1,5 +1,16 @@
-# Copyright...
-# (license header unchanged)
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """Controllers for the library page."""
 
@@ -18,18 +29,14 @@ from core.domain import (
     user_services,
 )
 
-
-# ----------------------- Shared Types -----------------------
-
+# Shared types.
 UnionSummaryDictType = Union[
     summary_services.DisplayableExplorationSummaryDict,
     summary_services.DisplayableCollectionSummaryDict,
 ]
 
 
-# ----------------------- Utility Function -----------------------
-
-
+# Utility function.
 def get_matching_activity_dicts(
     query_string: str,
     categories: List[str],
@@ -66,18 +73,19 @@ def get_matching_activity_dicts(
 
     if len(results) == feconf.DEFAULT_QUERY_LIMIT:
         logging.exception(
-            "%s results fetched — possible query limit edge-case.",
+            '%s results fetched - possible query limit edge-case.',
             feconf.DEFAULT_QUERY_LIMIT,
         )
 
     return results, new_offset
 
 
-# ----------------------- Redirect Handlers -----------------------
-
-
+# Redirect handlers.
 class OldLibraryRedirectPage(base.BaseHandler):
     """Redirects old /library URL to the new community library."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
     @acl_decorators.open_access
     def get(self) -> None:
@@ -87,17 +95,20 @@ class OldLibraryRedirectPage(base.BaseHandler):
 class LibraryRedirectPage(base.BaseHandler):
     """Redirects old /gallery URL to /community-library."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
     @acl_decorators.open_access
     def get(self) -> None:
         self.redirect('/community-library')
 
 
-# ----------------------- Library Index Page -----------------------
-
-
+# Library index page.
 class LibraryIndexHandler(base.BaseHandler):
     """Provides data for the main community library page."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
@@ -155,9 +166,7 @@ class LibraryIndexHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-# ----------------------- Library Group Page -----------------------
-
-
+# Library group page.
 class LibraryGroupIndexHandlerNormalizedRequestDict(TypedDict):
     """Normalized request format for LibraryGroupIndexHandler."""
 
@@ -169,8 +178,9 @@ class LibraryGroupIndexHandler(
         Dict[str, str], LibraryGroupIndexHandlerNormalizedRequestDict
     ]
 ):
-    """Returns lists of activities for 'top rated' or 'recently published' groups."""
+    """Returns activities for top rated or recently published groups."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -199,7 +209,7 @@ class LibraryGroupIndexHandler(
             )
             header = feconf.LIBRARY_CATEGORY_RECENTLY_PUBLISHED
 
-        else:  # top rated
+        else:
             activity_list = (
                 summary_services.get_top_rated_exploration_summary_dicts(
                     [constants.DEFAULT_LANGUAGE_CODE],
@@ -221,13 +231,10 @@ class LibraryGroupIndexHandler(
                 'preferred_language_codes': preferred_langs,
             }
         )
-
         self.render_json(self.values)
 
 
-# ----------------------- Exploration Summaries -----------------------
-
-
+# Exploration summaries.
 class ExplorationSummariesHandlerNormalizedRequestDict(TypedDict):
     """Normalized request dictionary for ExplorationSummariesHandler."""
 
@@ -240,8 +247,9 @@ class ExplorationSummariesHandler(
         Dict[str, str], ExplorationSummariesHandlerNormalizedRequestDict
     ]
 ):
-    """Returns summaries for exploration IDs (public and optional private)."""
+    """Returns summaries for exploration IDs."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -286,9 +294,7 @@ class ExplorationSummariesHandler(
         self.render_json(self.values)
 
 
-# ----------------------- Collection Summaries -----------------------
-
-
+# Collection summaries.
 class CollectionSummariesHandlerNormalizedRequestDict(TypedDict):
     """Normalized request dictionary for CollectionSummariesHandler."""
 
@@ -302,6 +308,7 @@ class CollectionSummariesHandler(
 ):
     """Returns summaries for collections."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -325,9 +332,7 @@ class CollectionSummariesHandler(
         self.render_json(self.values)
 
 
-# ----------------------- Search Handler (Your Missing Class) -----------------------
-
-
+# Search handler.
 class SearchHandlerNormalizedRequestDict(TypedDict):
     """Normalized request dict for SearchHandler."""
 
@@ -342,6 +347,7 @@ class SearchHandler(
 ):
     """Provides search results for explorations and collections."""
 
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -405,5 +411,4 @@ class SearchHandler(
                 'search_cursor': new_offset,
             }
         )
-
         self.render_json(self.values)
