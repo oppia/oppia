@@ -23,7 +23,7 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.controllers.base import UserFacingExceptions
+from core.controllers import base
 from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
@@ -436,7 +436,8 @@ def blog_post_summaries_search(
 
 
 def ensure_disk_space_sufficient(es_client) -> None:
-    """Check Elasticsearch disk usage and raise an error if it exceeds the high watermark.
+    """Check Elasticsearch disk usage and raise an error if it exceeds the high
+    watermark.
 
     This function fetches cluster statistics from the given Elasticsearch client and calculates
     the percentage of disk space used. If the used space exceeds the high watermark defined
@@ -459,12 +460,13 @@ def ensure_disk_space_sufficient(es_client) -> None:
 
     if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
         logging.info(
-            'Elasticsearch disk usage has reached the low watermark: '
-            f'{used_percent:.2f}% used. Consider freeing up space.'
+            'Elasticsearch disk usage has reached the low watermark: %.2f%% used. '
+            'Consider freeing up space.',
+            used_percent,
         )
 
     if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
-        raise UserFacingExceptions.InternalErrorException(
+        raise base.UserFacingExceptions.InternalErrorException(
             f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
             f'which exceeds the high watermark of '
             f'{feconf.ES_DISK_WATERMARK_HIGH}%. '
