@@ -20,15 +20,16 @@ API.
 
 from __future__ import annotations
 
+import logging
+
 from core import feconf
+from core.controllers.base import UserFacingExceptions
 from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
     search_services,
 )
 from core.platform import models
-from core.controllers.base import UserFacingExceptions
-import logging
 
 import elasticsearch
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
