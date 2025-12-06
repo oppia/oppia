@@ -435,7 +435,7 @@ def blog_post_summaries_search(
     return result_ids, resulting_offset
 
 
-def ensure_disk_space_sufficient(es_client) -> None:
+def ensure_disk_space_sufficient(es_client: Any) -> None:
     """Check Elasticsearch disk usage and raise an error if it exceeds the high
     watermark.
 
