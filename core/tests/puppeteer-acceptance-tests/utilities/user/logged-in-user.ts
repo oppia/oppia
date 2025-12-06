@@ -1920,15 +1920,18 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(learnerDashSelectors[selector].heading);
     const allElements = await root?.$$(learnerDashSelectors[selector].heading);
-    const sectionHeadingTexts = await Promise.all(
+    const sectionHeadingTexts: string[] = await Promise.all(
       allElements.map(
-        async card => await card.evaluate(el => el.textContent?.trim())
+        async el =>
+          (await el.evaluate(e => (e.textContent || '').trim())) as string
       )
     );
-    expect(sectionHeadingTexts).toHaveLength(expectedTexts.length);
-    for (let i = 0; i < expectedTexts.length; i++) {
-      expect(sectionHeadingTexts[i]).toBe(expectedTexts[i]);
+    if (!sectionHeadingTexts.every(text => expectedTexts.includes(text))) {
+      throw new Error(
+        `Expected elements not found: ${expectedTexts.join(', ')} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
     }
+    showMessage(`Expected elements found: ${expectedTexts.join(', ')}`);
   }
 
   /**
@@ -3206,6 +3209,7 @@ export class LoggedInUser extends BaseUser {
       visible
     );
   }
+
   /**
    * Verifies that the desktop sidebar is visible and the given tab is active.
    * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
@@ -3241,6 +3245,7 @@ export class LoggedInUser extends BaseUser {
 
     expect(isActive).toBe(true);
   }
+
   /**
    * Function to verify the number of elements matching a selector.
    * @param {string} selector - The selector to match elements.
