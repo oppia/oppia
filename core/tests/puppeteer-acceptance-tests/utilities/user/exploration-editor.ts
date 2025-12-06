@@ -614,6 +614,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
     const optionElementSelector = '.e2e-test-item-selection-input-item';
+    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
 
     await this.expectElementToBeVisible(optionElementSelector);
     const optionElements = await this.page.$$(optionElementSelector);
@@ -626,16 +627,30 @@ export class ExplorationEditor extends BaseUser {
         continue;
       }
       if (options.includes(optionText)) {
-        await optionElement.click();
+        // Click on the mat-checkbox element inside the label.
+        const checkboxElement = await optionElement.$(checkboxSelector);
+        if (!checkboxElement) {
+          throw new Error(`Checkbox not found for option: ${optionText}`);
+        }
 
-        const inputElement = await optionElement.$('input');
-        await this.page.waitForFunction(
-          (element: HTMLInputElement) => {
-            return element.checked;
-          },
-          {},
-          inputElement
+        // Check if the checkbox is already checked.
+        const isAlreadyChecked = await checkboxElement.evaluate(el =>
+          el.classList.contains('mat-checkbox-checked')
         );
+
+        // Only click if the checkbox is not already checked.
+        if (!isAlreadyChecked) {
+          await checkboxElement.click();
+
+          // Wait for the mat-checkbox to have the checked class.
+          await this.page.waitForFunction(
+            (element: Element) => {
+              return element.classList.contains('mat-checkbox-checked');
+            },
+            {},
+            checkboxElement
+          );
+        }
       }
     }
   }

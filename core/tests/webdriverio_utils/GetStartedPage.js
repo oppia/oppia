@@ -31,6 +31,8 @@ var GetStartedPage = function () {
     // to wait for this update to complete before the test checks the content.
     await browser.waitUntil(
       async () => {
+        // We can't use a classname selector here.
+        // eslint-disable-next-line oppia/e2e-practices
         var metaTag = await $('meta[itemprop="description"]');
         var content = await metaTag.getAttribute('content');
         return content === EXPECTED_META_DESCRIPTION;
