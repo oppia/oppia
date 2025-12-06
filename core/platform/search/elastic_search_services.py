@@ -454,11 +454,6 @@ def ensure_disk_space_sufficient(es_client) -> None:
     total = fs.get('total_in_bytes')
     free = fs.get('available_in_bytes')
 
-    if total is None or free is None:
-        raise RuntimeError(
-            'Cannot read filesystem stats from Elasticsearch cluster.'
-        )
-
     used_percent = (total - free) / total * 100
 
     if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
