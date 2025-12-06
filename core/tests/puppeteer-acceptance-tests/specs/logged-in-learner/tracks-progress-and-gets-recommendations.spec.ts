@@ -64,16 +64,19 @@ describe('Logged-In Learner', function () {
       await loggedInLearner.reloadPage();
 
       // Create explorations with continue button and end exploration interactions.
+      // Each exploration will have 3 cards: 2 with Continue button, 1 with End Exploration.
       explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Positive Numbers'
+        await curriculumAdmin.createAndPublishExplorationWithCards(
+          'Positive Numbers',
+          'Algebra',
+          3
         );
 
       explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
+        await curriculumAdmin.createAndPublishExplorationWithCards(
           'Negative Numbers',
           'Algebra',
-          false
+          3
         );
 
       // Create topic, subtopic, and skill.
