@@ -222,7 +222,7 @@ var LibraryPage = function () {
     var explorationCard = await allExplorationsTitled(explorationName)[0];
     // The Exploration summary card is masked by a dummy element. Therefore, a
     // Javascript click is used.
-    await action.click('Exploration Card', explorationCard);
+    await action.click('Exploration Card', explorationCard, true);
     await waitFor.pageToFullyLoad();
   };
 

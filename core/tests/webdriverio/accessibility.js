@@ -481,7 +481,7 @@ describe('screenreader and keyboard user accessibility features', function () {
     await explorationPlayerPage.expectExplorationToNotBeOver();
 
     // Should test the skip to main content shortcut.
-    var mainContent = await $('.e2e-test-main-content');
+    var mainContent = $('.e2e-test-main-content');
     await checkActionShortcuts('s', mainContent);
   });
 
