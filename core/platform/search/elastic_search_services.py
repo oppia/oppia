@@ -439,17 +439,17 @@ def ensure_disk_space_sufficient(es_client) -> None:
     """Check Elasticsearch disk usage and raise an error if it exceeds the high
     watermark.
 
-    This function fetches cluster statistics from the given Elasticsearch client and calculates
-    the percentage of disk space used. If the used space exceeds the high watermark defined
-    in `feconf.ES_DISK_WATERMARK_HIGH`, it raises a RuntimeError to prevent further writes
-    to the cluster.
+    This function fetches cluster statistics from the given Elasticsearch client
+    and calculates the percentage of disk space used. If the used space exceeds
+    the high watermark defined in `feconf.ES_DISK_WATERMARK_HIGH`, it raises a
+    RuntimeError to prevent further writes to the cluster.
 
     Args:
         es_client: Elasticsearch. Instance used to query cluster statistics.
 
     Raises:
-        InternalErrorException. If filesystem statistics cannot be read from the cluster,
-                      or if disk usage exceeds the configured high watermark.
+        InternalErrorException. If filesystem statistics cannot be read from the
+            cluster, or if disk usage exceeds the configured high watermark.
     """
     stats = es_client.cluster.stats()
     fs = stats.get('nodes', {}).get('fs', {})
