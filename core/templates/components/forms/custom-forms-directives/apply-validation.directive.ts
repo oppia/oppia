@@ -16,17 +16,17 @@
  * @fileoverview Directive for applying validation.
  */
 
-import {Directive, Input} from '@angular/core';
+import { Directive, Input } from '@angular/core';
 import {
   NG_VALIDATORS,
   Validator,
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
-import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
+import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {SchemaValidators} from '../validators/schema-validators';
+import { SchemaValidators } from '../validators/schema-validators';
 
 @Directive({
   selector: '[applyValidation]',
@@ -39,8 +39,9 @@ import {SchemaValidators} from '../validators/schema-validators';
   ],
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators: OppiaValidator[];
+  @Input() validators!: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
+
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
       return null;
@@ -51,26 +52,30 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      const filterArgs = {};
+
+      let filterArgs: Record<string, unknown> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
+
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
-            cloneDeep(validatorSpec[key]);
+            cloneDeep((validatorSpec as any)[key]);
         }
       }
-      if (SchemaValidators[validatorName]) {
-        const error = SchemaValidators[validatorName](filterArgs)(control);
+      if ((SchemaValidators as any)[validatorName]) {
+        const error = (SchemaValidators as any)[validatorName](filterArgs)(
+          control
+        );
         if (error !== null) {
           errorsPresent = true;
-          allValidationErrors = {...allValidationErrors, ...error};
+          allValidationErrors = { ...allValidationErrors, ...error };
         }
       } else {
-        // TODO(#15190): Throw an error if validator not found.
+
+        // TODO(#15190): Throw an error if validator not found
       }
+      if (!errorsPresent) {
+        return null;
+      }
+      return allValidationErrors;
     }
-    if (!errorsPresent) {
-      return null;
-    }
-    return allValidationErrors;
   }
-}

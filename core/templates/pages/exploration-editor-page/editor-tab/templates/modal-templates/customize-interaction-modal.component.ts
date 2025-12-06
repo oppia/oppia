@@ -25,48 +25,48 @@ import {
   ElementRef,
   ViewChild,
 } from '@angular/core';
-import {NgbActiveModal, NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
-import {SchemaConstants} from 'components/forms/schema-based-editors/schema.constants';
-import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
-import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
-import {EditorFirstTimeEventsService} from 'pages/exploration-editor-page/services/editor-first-time-events.service';
-import {PageContextService} from 'services/page-context.service';
-import {Schema} from 'services/schema-default-value.service';
+import { NgbActiveModal, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ConfirmOrCancelModal } from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import { SchemaConstants } from 'components/forms/schema-based-editors/schema.constants';
+import { StateCustomizationArgsService } from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
+import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledUnicode } from 'domain/exploration/subtitled-unicode.model';
+import { EditorFirstTimeEventsService } from 'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { PageContextService } from 'services/page-context.service';
+import { Schema } from 'services/schema-default-value.service';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {ConfirmLeaveModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
-import {InteractionDetailsCacheService} from '../../services/interaction-details-cache.service';
-import {Interaction} from 'domain/exploration/interaction.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AppConstants} from 'app.constants';
-import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
-import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
-import {AlgebraicExpressionInputValidationService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
-import {ImageClickInputValidationService} from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
-import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
-import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
-import {NumericExpressionInputValidationService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
-import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
-import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
-import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
-import {MathEquationInputValidationService} from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
-import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
-import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
-import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
-import {Warning} from 'interactions/base-interaction-validation.service';
+import { ConfirmLeaveModalComponent } from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
+import { InteractionDetailsCacheService } from '../../services/interaction-details-cache.service';
+import { Interaction } from 'domain/exploration/interaction.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { AppConstants } from 'app.constants';
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { ContinueValidationService } from 'interactions/Continue/directives/continue-validation.service';
+import { EndExplorationValidationService } from 'interactions/EndExploration/directives/end-exploration-validation.service';
+import { AlgebraicExpressionInputValidationService } from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
+import { ImageClickInputValidationService } from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import { ItemSelectionInputValidationService } from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import { NumberWithUnitsValidationService } from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
+import { NumericExpressionInputValidationService } from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
+import { NumericInputValidationService } from 'interactions/NumericInput/directives/numeric-input-validation.service';
+import { DragAndDropSortInputValidationService } from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
+import { GraphInputValidationService } from 'interactions/GraphInput/directives/graph-input-validation.service';
+import { SetInputValidationService } from 'interactions/SetInput/directives/set-input-validation.service';
+import { CodeReplValidationService } from 'interactions/CodeRepl/directives/code-repl-validation.service';
+import { MathEquationInputValidationService } from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import { MultipleChoiceInputValidationService } from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import { PencilCodeEditorValidationService } from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
+import { TextInputValidationService } from 'interactions/TextInput/directives/text-input-validation.service';
+import { InteractiveMapValidationService } from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
+import { MusicNotesInputValidationService } from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+import { FractionInputValidationService } from 'interactions/FractionInput/directives/fraction-input-validation.service';
+import { RatioExpressionInputValidationService } from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import { Warning } from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {ImageWithRegions} from 'interactions/customization-args-defs';
-import {GenerateContentIdService} from 'services/generate-content-id.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
+import { ImageWithRegions } from 'interactions/customization-args-defs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
 
 type DefaultCustomizationArg =
   | DefaultValueHtml[]
@@ -151,15 +151,15 @@ const INTERACTION_SERVICE_MAPPING = {
 })
 export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal
-  implements OnInit, AfterContentChecked
-{
-  customizationArgSpecs: CustomizationArgSpecsInterface[];
-  originalContentIdToContent: object;
-  hasCustomizationArgs: boolean;
-  allowedInteractionCategories: AllowedInteractionCategories[];
-  explorationIsLinkedToStory: boolean;
-  customizationModalReopened: boolean;
-  isinteractionOpen: boolean;
+  implements OnInit, AfterContentChecked {
+  // Fixed: Added '!' for definite assignment assertion
+  customizationArgSpecs!: CustomizationArgSpecsInterface[];
+  originalContentIdToContent!: object;
+  hasCustomizationArgs!: boolean;
+  allowedInteractionCategories!: AllowedInteractionCategories[];
+  explorationIsLinkedToStory!: boolean;
+  customizationModalReopened!: boolean;
+  isinteractionOpen!: boolean;
 
   @ViewChild('customizeInteractionHeader')
   customizeInteractionHeader!: ElementRef;
@@ -183,11 +183,13 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].name;
+    // Fixed: Added 'as any' to handle index access
+    return (INTERACTION_SPECS as any)[interactionId].name;
   }
 
   getDescription(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].description;
+    // Fixed: Added 'as any'
+    return (INTERACTION_SPECS as any)[interactionId].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -197,12 +199,14 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningsList(): Warning[] {
+    // Fixed: Added 'as any' for INTERACTION_SPECS access
     const validationServiceName: string =
-      INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
+      (INTERACTION_SPECS as any)[this.stateInteractionIdService.displayed].id +
       'ValidationService';
 
+    // Fixed: Added 'as any' for INTERACTION_SERVICE_MAPPING access
     let validationService = this.injector.get(
-      INTERACTION_SERVICE_MAPPING[validationServiceName]
+      (INTERACTION_SERVICE_MAPPING as any)[validationServiceName]
     );
     let warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed
@@ -223,7 +227,8 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
 
-    let interactionSpec = INTERACTION_SPECS[newInteractionId];
+    // Fixed: Added 'as any'
+    let interactionSpec = (INTERACTION_SPECS as any)[newInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
     this.stateCustomizationArgsService.displayed = {};
@@ -237,7 +242,8 @@ export class CustomizeInteractionModalComponent
           name: string | number;
           default_value: DefaultCustomizationArg;
         }) => {
-          customizationArgsBackendDict[caSpec.name] = {
+          // Fixed: Added 'as any' to allow indexing with caSpec.name
+          (customizationArgsBackendDict as any)[caSpec.name] = {
             value: caSpec.default_value,
           };
         }
@@ -352,7 +358,8 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    // Fixed: Added 'as any'
+    const caSpecs = (INTERACTION_SPECS as any)[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
@@ -389,11 +396,13 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        contentIdToContent[subtitledHtmlValue.contentId] =
+        // Fixed: Added 'as any' for indexing
+        (contentIdToContent as any)[subtitledHtmlValue.contentId] =
           subtitledHtmlValue.html;
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        contentIdToContent[subtitledUnicodeValue.contentId] =
+        // Fixed: Added 'as any' for indexing
+        (contentIdToContent as any)[subtitledUnicodeValue.contentId] =
           subtitledUnicodeValue.unicode;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (let i = 0; i < (value as Object[]).length; i++) {
@@ -402,7 +411,8 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    // Fixed: Added 'as any'
+    const caSpecs = (INTERACTION_SPECS as any)[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
@@ -489,8 +499,9 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
+      // Fixed: Added 'as any'
       let interactionSpec =
-        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
+        (INTERACTION_SPECS as any)[this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       this.stateInteractionIdService.displayed = cloneDeep(

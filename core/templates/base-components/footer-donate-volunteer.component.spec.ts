@@ -23,12 +23,12 @@ import {
   fakeAsync,
   tick,
 } from '@angular/core/testing';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {FooterDonateVolunteerComponent} from './footer-donate-volunteer.component';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
-import {Renderer2, ElementRef} from '@angular/core';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { FooterDonateVolunteerComponent } from './footer-donate-volunteer.component';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { NavbarAndFooterGATrackingPages } from 'app.constants';
+import { Renderer2, ElementRef } from '@angular/core';
 
 class MockWindowRef {
   nativeWindow = {
@@ -36,12 +36,12 @@ class MockWindowRef {
       pathname: '/learn/math',
       href: '',
     },
-    gtag: () => {},
+    gtag: () => { },
   };
 }
 
 class MockSiteAnalyticsService {
-  registerClickFooterButtonEvent(page: string): void {}
+  registerClickFooterButtonEvent(page: string): void { }
 }
 
 describe('FooterDonateVolunteerComponent', () => {
@@ -65,11 +65,11 @@ describe('FooterDonateVolunteerComponent', () => {
         },
         {
           provide: Renderer2,
-          useValue: {listen: () => () => {}},
+          useValue: { listen: () => () => { } },
         },
         {
           provide: ElementRef,
-          useValue: {nativeElement: document.createElement('div')},
+          useValue: { nativeElement: document.createElement('div') },
         },
       ],
     }).compileComponents();
@@ -125,7 +125,7 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Donate link', fakeAsync(() => {
     const donateLink = document.createElement('a');
     donateLink.setAttribute('href', '/donate');
-    component.el.nativeElement.appendChild(donateLink);
+    component['el'].nativeElement.appendChild(donateLink);
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -143,7 +143,7 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Volunteer link', fakeAsync(() => {
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(volunteerLink);
+    component['el'].nativeElement.appendChild(volunteerLink);
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -163,10 +163,10 @@ describe('FooterDonateVolunteerComponent', () => {
     donateLink.setAttribute('href', '/donate');
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(donateLink);
-    component.el.nativeElement.appendChild(volunteerLink);
+    component['el'].nativeElement.appendChild(donateLink);
+    component['el'].nativeElement.appendChild(volunteerLink);
     const rendererListenSpy = spyOn(
-      component.renderer,
+      component['renderer'],
       'listen'
     ).and.callThrough();
     component.ngAfterViewInit();

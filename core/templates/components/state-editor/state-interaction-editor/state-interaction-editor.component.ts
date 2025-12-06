@@ -26,35 +26,36 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
-import {ResponsesService} from 'pages/exploration-editor-page/editor-tab/services/responses.service';
-import {CustomizeInteractionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
-import {DeleteInteractionModalComponent} from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
-import {Subscription} from 'rxjs';
-import {AlertsService} from 'services/alerts.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {EditabilityService} from 'services/editability.service';
-import {StateCustomizationArgsService} from '../state-editor-properties-services/state-customization-args.service';
-import {StateEditorService} from '../state-editor-properties-services/state-editor.service';
-import {StateInteractionIdService} from '../state-editor-properties-services/state-interaction-id.service';
-import {StateSolutionService} from '../state-editor-properties-services/state-solution.service';
-import {StateContentService} from '../state-editor-properties-services/state-content.service';
-import {PageContextService} from 'services/page-context.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { InteractionDetailsCacheService } from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
+import { ResponsesService } from 'pages/exploration-editor-page/editor-tab/services/responses.service';
+import { CustomizeInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/customize-interaction-modal.component';
+import { DeleteInteractionModalComponent } from 'pages/exploration-editor-page/editor-tab/templates/modal-templates/delete-interaction-modal.component';
+import { Subscription } from 'rxjs';
+import { AlertsService } from 'services/alerts.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { EditabilityService } from 'services/editability.service';
+import { StateCustomizationArgsService } from '../state-editor-properties-services/state-customization-args.service';
+import { StateEditorService } from '../state-editor-properties-services/state-editor.service';
+import { StateInteractionIdService } from '../state-editor-properties-services/state-interaction-id.service';
+import { StateSolutionService } from '../state-editor-properties-services/state-solution.service';
+import { StateContentService } from '../state-editor-properties-services/state-content.service';
+import { PageContextService } from 'services/page-context.service';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
 import {
   InteractionCustomizationArgs,
   InteractionData,
 } from 'interactions/customization-args-defs';
-import {Solution} from 'domain/exploration/solution.model';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import { Solution } from 'domain/exploration/solution.model';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {State} from 'domain/state/state.model';
-import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {Outcome} from 'domain/exploration/outcome.model';
-import {InteractionAnswer} from 'interactions/answer-defs';
-import {GenerateContentIdService} from 'services/generate-content-id.service';
+import { State } from 'domain/state/state.model';
+import { AnswerGroup } from 'domain/exploration/answer-group.model';
+import { Outcome } from 'domain/exploration/outcome.model';
+import { InteractionAnswer } from 'interactions/answer-defs';
+import { GenerateContentIdService } from 'services/generate-content-id.service';
+import { AnswerChoice } from 'interactions/answer-defs';
 
 export interface InitializeAnswerGroups {
   interactionId: string;
@@ -74,7 +75,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
 
   @Output() onSaveInteractionData = new EventEmitter<InteractionData>();
   @Output() onSaveNextContentIdIndex = new EventEmitter<number>();
-  @Output() onSaveSolution = new EventEmitter<Solution>();
+  @Output() onSaveSolution = new EventEmitter<Solution | null>();
   @Output() onSaveStateContent = new EventEmitter<SubtitledHtml>();
   @Output() recomputeGraph = new EventEmitter<void>();
 
@@ -84,15 +85,16 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
   @ViewChild('collapseAnswersAndResponsesButton')
   collapseAnswersAndResponsesButton!: ElementRef;
 
-  customizationModalReopened: boolean;
-  DEFAULT_TERMINAL_STATE_CONTENT: string;
+  // Added '!' to fix TS2564 errors
+  customizationModalReopened!: boolean;
+  DEFAULT_TERMINAL_STATE_CONTENT!: string;
   directiveSubscriptions = new Subscription();
-  hasLoaded: boolean;
-  interactionEditorIsShown: boolean;
-  interactionId: string;
-  interactionIsDisabled: boolean;
-  interactionPreviewHtml: string;
-  windowIsNarrow: boolean;
+  hasLoaded!: boolean;
+  interactionEditorIsShown!: boolean;
+  interactionId!: string;
+  interactionIsDisabled!: boolean;
+  interactionPreviewHtml!: string;
+  windowIsNarrow!: boolean;
 
   constructor(
     private alertsService: AlertsService,
@@ -110,11 +112,11 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
     private stateSolutionService: StateSolutionService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService
-  ) {}
+  ) { }
 
   getCurrentInteractionName(): string {
     return this.stateInteractionIdService.savedMemento
-      ? INTERACTION_SPECS[this.stateInteractionIdService.savedMemento].name
+      ? (INTERACTION_SPECS as any)[this.stateInteractionIdService.savedMemento].name
       : '';
   }
 
@@ -152,7 +154,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) as AnswerChoice[]
     );
   }
 
@@ -201,7 +203,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateInteractionIdService.savedMemento;
     if (hasInteractionIdChanged) {
       if (
-        INTERACTION_SPECS[this.stateInteractionIdService.displayed].is_terminal
+        (INTERACTION_SPECS as any)[this.stateInteractionIdService.displayed].is_terminal
       ) {
         this.updateDefaultTerminalStateContentIfEmpty();
       }
@@ -235,7 +237,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       this.stateEditorService.getAnswerChoices(
         this.interactionId,
         this.stateCustomizationArgsService.savedMemento
-      )
+      ) as AnswerChoice[]
     );
   }
 
@@ -273,7 +275,7 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
       })
       .result.then(
         () => {
-          this.stateInteractionIdService.displayed = null;
+          this.stateInteractionIdService.displayed = null as any;
           this.stateCustomizationArgsService.displayed = {};
           this.stateSolutionService.displayed = null;
           this.interactionDetailsCacheService.removeDetails(
@@ -336,9 +338,9 @@ export class StateInteractionEditorComponent implements OnInit, OnDestroy {
         this.hasLoaded = false;
         this.interactionDetailsCacheService.reset();
         this.responsesService.onInitializeAnswerGroups.emit({
-          interactionId: stateData.interaction.id,
+          interactionId: stateData.interaction.id!,
           answerGroups: stateData.interaction.answerGroups,
-          defaultOutcome: stateData.interaction.defaultOutcome,
+          defaultOutcome: stateData.interaction.defaultOutcome!,
           confirmedUnclassifiedAnswers:
             stateData.interaction.confirmedUnclassifiedAnswers,
         });

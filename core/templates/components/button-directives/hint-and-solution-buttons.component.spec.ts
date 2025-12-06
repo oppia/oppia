@@ -4,7 +4,7 @@
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-//      http://www.apache.org/licenses/LICENSE-2.0
+//      http://www.apache.org/licenses/LICENSE-20.0
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for HintAndSolutionButtonsComponent
  */
 
-import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {ChangeDetectorRef, EventEmitter} from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ChangeDetectorRef, EventEmitter } from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -25,21 +25,45 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {TranslateService} from '@ngx-translate/core';
-import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import {Interaction} from 'domain/exploration/interaction.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {StateCard} from 'domain/state_card/state-card.model';
-import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
-import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
-import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
-import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
-import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
-import {HintAndSolutionButtonsComponent} from './hint-and-solution-buttons.component';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { TranslateService } from '@ngx-translate/core';
+import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import { Interaction } from 'domain/exploration/interaction.model';
+import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
+import { StateCard } from 'domain/state_card/state-card.model';
+import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
+import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
+import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
+import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
+import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
+import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+
+
+class MockHintAndSolutionModalService extends HintAndSolutionModalService {
+
+  displaySolutionModal(
+    solution: any,
+    isHint: any,
+    answerIsExclusive: any,
+    correctAnswer: any,
+    displaySolutionExplanation: any,
+    ...args: any[]
+  ): NgbModalRef {
+    return { result: Promise.resolve('success') } as NgbModalRef;
+  }
+}
+
+
+class MockStatsReportingService extends StatsReportingService {
+
+  recordSolutionHit(
+    stateName: string,
+    ...args: any[]
+  ): void { }
+}
 
 describe('HintAndSolutionButtonsComponent', () => {
   let component: HintAndSolutionButtonsComponent;
@@ -47,9 +71,9 @@ describe('HintAndSolutionButtonsComponent', () => {
   let playerPositionService: PlayerPositionService;
   let hintsAndSolutionManagerService: HintsAndSolutionManagerService;
   let playerTranscriptService: PlayerTranscriptService;
-  let hintAndSolutionModalService: HintAndSolutionModalService;
+  let hintAndSolutionModalService: MockHintAndSolutionModalService;
   let explorationModeService: ExplorationModeService;
-  let statsReportingService: StatsReportingService;
+  let statsReportingService: MockStatsReportingService;
   let i18nLanguageCodeService: I18nLanguageCodeService;
 
   let newCard: StateCard;
@@ -119,6 +143,15 @@ describe('HintAndSolutionButtonsComponent', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+
+        {
+          provide: HintAndSolutionModalService,
+          useClass: MockHintAndSolutionModalService,
+        },
+        {
+          provide: StatsReportingService,
+          useClass: MockStatsReportingService,
+        }
       ],
     }).compileComponents();
   }));
@@ -132,9 +165,9 @@ describe('HintAndSolutionButtonsComponent', () => {
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService);
+    hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService) as MockHintAndSolutionModalService;
     explorationModeService = TestBed.inject(ExplorationModeService);
-    statsReportingService = TestBed.inject(StatsReportingService);
+    statsReportingService = TestBed.inject(StatsReportingService) as MockStatsReportingService;
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
@@ -253,12 +286,12 @@ describe('HintAndSolutionButtonsComponent', () => {
   );
 
   it('should get RTL language status correctly', () => {
-    expect(component.isLanguageRTL()).toBeTrue();
+    expect(component.isLanguageRTL()).toBe(true);
   });
 
   it(
     'should reset local hints array if active card is' +
-      ' changed to the last one',
+    ' changed to the last one',
     fakeAsync(() => {
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
       spyOn(component, 'resetLocalHintsArray');
@@ -274,7 +307,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should not reset local hints array if new active card is' +
-      ' not the last one',
+    ' not the last one',
     fakeAsync(() => {
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
       spyOn(component, 'resetLocalHintsArray');
@@ -322,7 +355,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     "should show hint button if hint is viewable and displayed card's" +
-      ' interaction supports hints',
+    ' interaction supports hints',
     () => {
       spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValues(
         false,
@@ -332,7 +365,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.isHintButtonVisible(0)).toBe(false);
 
-      // StateCard with EndExploration interaction, which does not supports hints.
+
       component.displayedCard = StateCard.createNewCard(
         'State 1',
         '<p>Content</p>',
@@ -352,7 +385,6 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.isHintButtonVisible(0)).toBe(false);
 
-      // StateCard which supports hints.
       component.displayedCard = newCard;
 
       expect(component.isHintButtonVisible(0)).toBe(true);
@@ -399,7 +431,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should close display hint modal and reset active hint index when modal' +
-      ' is closed',
+    ' is closed',
     fakeAsync(() => {
       spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
         result: Promise.reject('failure'),
@@ -437,6 +469,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.solutionModalIsActive).toBe(false);
 
+
       component.onClickSolutionButton();
       tick();
 
@@ -465,8 +498,8 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should open interstitial modal if solution has not' +
-      ' been consumed before and then display solution modal' +
-      ' after user confirms',
+    ' been consumed before and then display solution modal' +
+    ' after user confirms',
     fakeAsync(() => {
       spyOn(
         hintsAndSolutionManagerService,
@@ -478,7 +511,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       ).and.returnValue({
         result: Promise.resolve('success'),
       } as NgbModalRef);
-      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
+      spyOn(component, 'displaySolutionModal').and.callFake(() => { });
 
       component.onClickSolutionButton();
       tick();
@@ -489,7 +522,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should close interstitial modal if solution has not' +
-      ' been consumed before and user click cancel',
+    ' been consumed before and user click cancel',
     fakeAsync(() => {
       spyOn(
         hintsAndSolutionManagerService,
@@ -501,7 +534,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       ).and.returnValue({
         result: Promise.reject('failure'),
       } as NgbModalRef);
-      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
+      spyOn(component, 'displaySolutionModal').and.callFake(() => { });
 
       component.solutionModalIsActive = true;
       component.onClickSolutionButton();
