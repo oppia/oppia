@@ -3652,18 +3652,37 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileStateGraphResizeButton, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      // Check if the state graph modal is already open before clicking the
+      // resize button.
+      const isStateGraphModalOpen = await this.page.$(
+        explorationStateGraphModalSelector
+      );
+      if (!isStateGraphModalOpen) {
+        // Wait for any blocking modal to close first before clicking the
+        // resize button.
+        const blockingModal = await this.page.$('div.modal-content');
+        if (blockingModal) {
+          await this.page.waitForSelector('div.modal-content', {hidden: true});
+        }
+        await this.page.waitForSelector(mobileStateGraphResizeButton, {
+          visible: true,
+        });
+        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
+      }
     }
 
-    await this.page.waitForSelector(stateNodeSelector);
-    elements = await this.page.$$(stateNodeSelector);
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect which has the click handler.
+    const stateNodeGroupSelector = '.e2e-test-node';
+    await this.page.waitForSelector(stateNodeGroupSelector);
+    elements = await this.page.$$(stateNodeGroupSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
-        element.$eval('tspan', node => node.textContent?.trim() || '')
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() || ''
+        )
       )
     );
     const cardIndex = cardNames.indexOf(cardName);
@@ -3672,18 +3691,25 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let cardButton: ElementHandle<Element> | null = null;
+    let nodeGroup: ElementHandle<Element> | null = null;
     if (this.isViewportAtMobileWidth()) {
-      cardButton = elements[cardIndex + elements.length / 2];
+      nodeGroup = elements[cardIndex + elements.length / 2];
     } else {
-      cardButton = elements[cardIndex];
+      nodeGroup = elements[cardIndex];
     }
 
-    if (!cardButton) {
+    if (!nodeGroup) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    await cardButton.click();
+    // Click on the node background rect which has the click handler.
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    await nodeBackground.click();
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
