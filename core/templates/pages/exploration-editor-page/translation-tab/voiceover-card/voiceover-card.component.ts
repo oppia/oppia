@@ -209,7 +209,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             this.languageAccentCode,
             this.activeContentId
           );
-        this.updateAutomaticVoiceoversWithRegenerationStatus();
+        this.updateAutomaticVoiceoverWithRegenerationStatus();
       });
 
     setInterval(() => {
@@ -316,7 +316,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  updateAutomaticVoiceoversWithRegenerationStatus(): void {
+  updateAutomaticVoiceoverWithRegenerationStatus(): void {
     // Note: No action is needed if voiceover generation succeeded.
     if (this.automaticVoiceoverGenerationStatus === 'FAILED') {
       this.automaticVoiceover = undefined;

@@ -21,10 +21,10 @@ import datetime
 from core import feature_flag_list, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
-    cloud_task_services,
     feature_flag_services,
     opportunity_services,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
@@ -331,7 +331,7 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
         """
 
         self.values.update(
-            cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+            voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
                 exploration_id
             )
         )

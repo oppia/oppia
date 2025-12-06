@@ -28,7 +28,7 @@ from core.tests import test_utils
 class CloudTaskDomainTests(test_utils.GenericTestBase):
     """Unit tests for CloudTaskRun domain object."""
 
-    def test_that_domain_object_is_created_correctly(self) -> None:
+    def test_should_create_domain_object_correctly(self) -> None:
         cloud_task_run_id = 'cloud_task_run_id'
         project_id = 'dev-project-id'
         location_id = 'us-central'
@@ -109,13 +109,13 @@ class CloudTaskDomainTests(test_utils.GenericTestBase):
 class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
     """Unit tests for VoiceoverRegenerationTaskMapping domain object."""
 
-    def test_that_domain_object_is_created_correctly(self) -> None:
+    def test_should_create_domain_object_correctly(self) -> None:
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'succeeded',
-                'content_1': 'failed',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
             }
         }
 
@@ -143,8 +143,8 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'succeeded',
-                'content_1': 'failed',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
             }
         }
 
@@ -188,17 +188,17 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
             {},
         )
 
-    def test_should_verify_all_voiceovers_are_generated(self) -> None:
+    def test_should_verify_if_all_voiceovers_are_generated(self) -> None:
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'succeeded',
-                'content_1': 'succeeded',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'SUCCEEDED',
             },
             'hi-IN': {
-                'content_0': 'succeeded',
-                'content_1': 'succeeded',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'SUCCEEDED',
             },
         }
 
@@ -216,8 +216,8 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
 
         voiceover_regeneration_task_mapping.language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'succeeded',
-                'content_1': 'failed',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
             }
         }
 
@@ -232,9 +232,9 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
         task_run_id = 'task_run_id'
         language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'generating',
-                'content_1': 'generating',
-                'content_2': 'generating',
+                'content_0': 'GENERATING',
+                'content_1': 'GENERATING',
+                'content_2': 'GENERATING',
             }
         }
 
@@ -252,9 +252,9 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
 
         expected_language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'succeeded',
-                'content_1': 'failed',
-                'content_2': 'succeeded',
+                'content_0': 'SUCCEEDED',
+                'content_1': 'FAILED',
+                'content_2': 'SUCCEEDED',
             }
         }
 
@@ -282,8 +282,8 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
 
         expected_language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'generating',
-                'content_1': 'generating',
+                'content_0': 'GENERATING',
+                'content_1': 'GENERATING',
             }
         }
 

@@ -178,7 +178,8 @@ class VoiceoverRegenerationTaskMapping:
         cls,
         voiceover_regeneration_task_mapping_dict: VoiceoverRegenerationTaskMappingDict,
     ) -> VoiceoverRegenerationTaskMapping:
-        """Returns a domain object from the given dictionary.
+        """Returns an instance of VoiceoverRegenerationTaskMapping from the
+        given dictionary.
 
         Args:
             voiceover_regeneration_task_mapping_dict: dict. A dictionary
@@ -244,8 +245,8 @@ class VoiceoverRegenerationTaskMapping:
         self, language_accent_code: str, failed_content_ids: List[str]
     ) -> None:
         """Updates the content-status map for a given language-accent code by
-        marking the IDs in failed_content_ids as FAILED and all remaining IDs
-        as SUCCEEDED.
+        marking the content IDs in failed_content_ids as FAILED and all
+        remaining content IDs as SUCCEEDED.
 
         Args:
             language_accent_code: str. The language accent code.

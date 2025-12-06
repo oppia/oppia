@@ -498,7 +498,7 @@ describe('Voiceover backend API service', function () {
     expect(failHandler).not.toHaveBeenCalled();
   }));
 
-  it('should handle error callback while fetching voiceover regeneration records', fakeAsync(() => {
+  it('should handle error callback while fetching voiceover regeneration status', fakeAsync(() => {
     let successHandler = jasmine.createSpy('success');
     let failHandler = jasmine.createSpy('fail');
 

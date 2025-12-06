@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.]
 
-"""Service methods for Cloud task run."""
+"""Service methods for voiceover cloud task run."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ from core import feconf
 from core.domain import cloud_task_domain
 from core.platform import models
 
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -56,24 +56,14 @@ def get_voiceover_regeneration_task(
         )
     )
 
-    if voiceover_regeneration_task_run_model is not None:
-        voiceover_regeneration_task_run = cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(
-            {
-                'exploration_id': (
-                    voiceover_regeneration_task_run_model.exploration_id
-                ),
-                'task_run_id': (
-                    voiceover_regeneration_task_run_model.cloud_task_run_id
-                ),
-                'language_accent_to_content_status_map': (
-                    voiceover_regeneration_task_run_model.language_accent_to_content_status_map
-                ),
-            }
-        )
-    else:
-        voiceover_regeneration_task_run = None
+    if voiceover_regeneration_task_run_model is None:
+        return None
 
-    return voiceover_regeneration_task_run
+    return cloud_task_domain.VoiceoverRegenerationTaskMapping(
+        voiceover_regeneration_task_run_model.exploration_id,
+        voiceover_regeneration_task_run_model.cloud_task_run_id,
+        voiceover_regeneration_task_run_model.language_accent_to_content_status_map,
+    )
 
 
 def get_existing_voiceover_regeneration_requests_in_task_queue(
@@ -100,29 +90,23 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
     voiceover_regeneration_task_domain_objects = []
 
     for task_mapping_model in voiceover_regeneration_task_requests:
-        voiceover_regeneration_task_domain_object = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping.from_dict(
-                {
-                    'exploration_id': task_mapping_model.exploration_id,
-                    'task_run_id': task_mapping_model.cloud_task_run_id,
-                    'language_accent_to_content_status_map': (
-                        task_mapping_model.language_accent_to_content_status_map
-                    ),
-                }
+        voiceover_regeneration_task = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                task_mapping_model.exploration_id,
+                task_mapping_model.cloud_task_run_id,
+                task_mapping_model.language_accent_to_content_status_map,
             )
         )
 
-        if (
-            voiceover_regeneration_task_domain_object.are_all_voiceovers_generated()
-        ):
+        if voiceover_regeneration_task.are_all_voiceovers_generated():
             delete_voiceover_regeneration_task_run_mapping(
-                voiceover_regeneration_task_domain_object.exploration_id,
-                voiceover_regeneration_task_domain_object.task_run_id,
+                voiceover_regeneration_task.exploration_id,
+                voiceover_regeneration_task.task_run_id,
             )
             continue
 
         voiceover_regeneration_task_domain_objects.append(
-            voiceover_regeneration_task_domain_object
+            voiceover_regeneration_task
         )
 
     # If multiple voiceover-regeneration requests exist in the Cloud Task queue
@@ -159,8 +143,22 @@ def delete_voiceover_regeneration_task_run_mapping(
 
 
 def update_voiceover_regeneration_task_run_mapping_for_content(
-    exploration_id, language_accent_code, content_id, regeneration_status
-):
+    exploration_id: str,
+    language_accent_code: str,
+    content_id: str,
+    regeneration_status: str,
+) -> None:
+    """Updates the regeneration status of a specific content in all existing
+    voiceover regeneration task run mappings for the given exploration ID.
+
+    Args:
+        exploration_id: str. The id of the exploration.
+        language_accent_code: str. The language accent code of the content to be
+            updated.
+        content_id: str. The content ID of the content to be updated.
+        regeneration_status: str. The new regeneration status to be set for the
+            specified content.
+    """
     voiceover_regeneration_task_requests = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
         exploration_id
     )
@@ -303,3 +301,54 @@ def is_voiceover_regeneration_task_function(function_id: str) -> bool:
             'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
         ],
     ]
+
+
+def create_voiceover_regeneration_task_with_status_generating(
+    exploration_id: str,
+    task_run_id: str,
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+    language_code_to_autogeneratable_accent_codes: Dict[str, List[str]],
+):
+    """Creates a VoiceoverRegenerationTaskMapping object with all contents set
+    to 'GENERATING' status.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        task_run_id: str. The unique identifier for the voiceover regeneration
+            task.
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to their corresponding content IDs and HTML that require
+            voiceover regeneration.
+        language_code_to_autogeneratable_accent_codes: dict. A dictionary
+            mapping language codes to a list of accent codes that support
+            autogeneration.
+
+    Returns:
+        VoiceoverRegenerationTaskMapping. An instance of
+        VoiceoverRegenerationTaskMapping with all contents set to
+        'GENERATING' status.
+    """
+    language_accent_to_content_status_map = {}
+    for (
+        language_code,
+        content_ids_to_content_values,
+    ) in language_code_to_contents_mapping.items():
+        accent_codes = language_code_to_autogeneratable_accent_codes.get(
+            language_code, []
+        )
+        for accent_code in accent_codes:
+            language_accent_to_content_status_map[accent_code] = {
+                content_id: feconf.VoiceoverRegenerationState.GENERATING.value
+                for content_id in content_ids_to_content_values.keys()
+            }
+
+    voiceover_regeneration_task_map = cloud_task_domain.VoiceoverRegenerationTaskMapping.create_default_voiceover_regeneration_task_mapping(
+        exploration_id, task_run_id
+    )
+
+    voiceover_regeneration_task_map.language_accent_to_content_status_map = (
+        language_accent_to_content_status_map
+    )
+
+    return voiceover_regeneration_task_map

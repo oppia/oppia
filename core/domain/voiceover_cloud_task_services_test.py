@@ -14,17 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for cloud_task_services.py"""
+"""Unit tests for voiceover_cloud_task_services.py"""
 
 from __future__ import annotations
 
 from core import feconf
-from core.domain import cloud_task_domain, cloud_task_services
+from core.domain import cloud_task_domain, voiceover_cloud_task_services
 from core.tests import test_utils
 
 
 class CloudTaskServicesTests(test_utils.GenericTestBase):
-    """Unit tests for cloud task service functionalities."""
+    """Unit tests for voiceover cloud task service functionalities."""
 
     def test_should_get_voiceover_regeneration_task(self) -> None:
         task_run_id = 'task_run_id'
@@ -35,12 +35,14 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
             voiceover_regeneration_task_mapping
         )
 
-        retrieved_task = cloud_task_services.get_voiceover_regeneration_task(
-            exploration_id, task_run_id
+        retrieved_task = (
+            voiceover_cloud_task_services.get_voiceover_regeneration_task(
+                exploration_id, task_run_id
+            )
         )
         self.assertEqual(
             retrieved_task.exploration_id,
@@ -71,11 +73,11 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
             voiceover_regeneration_task_mapping
         )
 
-        retrieved_language_accent_to_content_status_map = cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+        retrieved_language_accent_to_content_status_map = voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
             exploration_id
         )[
             'language_accent_to_content_status_map'
@@ -102,7 +104,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
             voiceover_regeneration_task_mapping
         )
 
@@ -110,12 +112,14 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
         }
 
-        cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
+        voiceover_cloud_task_services.update_voiceover_regeneration_task_run_mapping_for_content(
             exploration_id, 'en-US', 'content_0', 'SUCCEEDED'
         )
 
-        retrieved_task = cloud_task_services.get_voiceover_regeneration_task(
-            exploration_id, task_run_id
+        retrieved_task = (
+            voiceover_cloud_task_services.get_voiceover_regeneration_task(
+                exploration_id, task_run_id
+            )
         )
 
         self.assertEqual(
@@ -139,16 +143,16 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
             voiceover_regeneration_task_mapping
         )
 
-        cloud_task_services.delete_voiceover_regeneration_task_run_mapping(
+        voiceover_cloud_task_services.delete_voiceover_regeneration_task_run_mapping(
             exploration_id, task_run_id
         )
 
         self.assertIsNone(
-            cloud_task_services.get_voiceover_regeneration_task(
+            voiceover_cloud_task_services.get_voiceover_regeneration_task(
                 exploration_id, task_run_id
             )
         )
@@ -179,7 +183,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        retrieved_language_accent_to_content_status_map = cloud_task_services.resolve_multiple_cloud_task_runs_for_exploration(
+        retrieved_language_accent_to_content_status_map = voiceover_cloud_task_services.resolve_multiple_cloud_task_runs_for_exploration(
             [
                 voiceover_regeneration_task_mapping_1,
                 voiceover_regeneration_task_mapping_2,
@@ -202,7 +206,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         ]
 
         self.assertTrue(
-            cloud_task_services.is_voiceover_regeneration_task_function(
+            voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
                 function_name
             )
         )
@@ -212,7 +216,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         ]
 
         self.assertFalse(
-            cloud_task_services.is_voiceover_regeneration_task_function(
+            voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
                 function_name
             )
         )

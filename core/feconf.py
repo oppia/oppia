@@ -1735,7 +1735,7 @@ class TranslatedContentDict(TypedDict):
 
 
 class VoiceoverRegenerationState(enum.Enum):
-    """Represents the possible states of voiceover regeneration for
+    """Represents the possible states of voiceover regeneration status for
     exploration content.
     """
 

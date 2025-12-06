@@ -21,7 +21,6 @@ import json
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
-    cloud_task_services,
     email_manager,
     exp_fetchers,
     exp_services,
@@ -30,6 +29,7 @@ from core.domain import (
     stats_services,
     suggestion_registry,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_services,
     wipeout_service,
 )
@@ -317,7 +317,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         # If the deferred task is a voiceover regeneration task, append the
         # cloud task model ID to the arguments list.
-        if cloud_task_services.is_voiceover_regeneration_task_function(
+        if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
             payload['fn_identifier']
         ):
             payload['args'].append(cloud_task_model_id)

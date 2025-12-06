@@ -507,7 +507,7 @@
 
 # Cloud task run.
 /core/domain/cloud_task_domain*.py @oppia/lace-backend-reviewers
-/core/domain/cloud_task_services*.py @oppia/lace-backend-reviewers
+/core/domain/voiceover_cloud_task_services*.py @oppia/lace-backend-reviewers
 /core/templates/domain/cloud-task/cloud-task-run.model*.ts @oppia/lace-frontend-reviewers
 
 # Infrastructure.
