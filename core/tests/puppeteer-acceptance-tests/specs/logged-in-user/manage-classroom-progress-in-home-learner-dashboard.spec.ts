@@ -295,12 +295,26 @@ describe('Logged-in User', function () {
       0
     );
 
+    await loggedInUser.navigateToLessonByCard(
+      'Lessons in progress',
+      'Chapter 4: Rounding Numbers part 1'
+    );
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6',
       __dirname
     );
 
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Lessons in progress',
+      ['Chapter 5: Rounding Numbers part 2'],
+      0
+    );
     await loggedInUser.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 5: Rounding Numbers part 2'
@@ -383,6 +397,7 @@ describe('Logged-in User', function () {
     await loggedInUser.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
+    showMessage('Completed final test');
   });
 
   afterAll(async function () {
