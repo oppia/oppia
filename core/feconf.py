@@ -153,6 +153,7 @@ class ValidModelNames(enum.Enum):
     ACTIVITY = 'activity'
     APP_FEEDBACK_REPORT = 'app_feedback_report'
     AUDIT = 'audit'
+    BADGE = 'badge'
     BASE_MODEL = 'base_model'
     BEAM_JOB = 'beam_job'
     BLOG = 'blog'
@@ -252,6 +253,14 @@ DEFAULT_QUERY_LIMIT = 1000
 # The maximum number of results to retrieve in a datastore query
 # for suggestions.
 DEFAULT_SUGGESTION_QUERY_LIMIT = 1000
+
+# Gamification Badge System Configuration
+BADGE_SYSTEM_ENABLED = True
+BADGE_CACHE_TIMEOUT_SECONDS = 300  # 5 minutes
+MAX_BADGE_ICON_SIZE_KB = 1024
+BADGE_LEADERBOARD_CACHE_TIMEOUT_SECONDS = 600  # 10 minutes
+MAX_BADGES_PER_PAGE = 20
+BADGE_AWARDING_ENABLED = True
 
 # The maximum number of results to retrieve in a datastore query
 # for top rated published explorations in /library page.
