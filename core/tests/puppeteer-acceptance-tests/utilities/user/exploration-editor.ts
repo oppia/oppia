@@ -1683,6 +1683,10 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1737,6 +1741,10 @@ export class ExplorationEditor extends BaseUser {
 
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2018,6 +2026,10 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
