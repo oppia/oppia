@@ -63,6 +63,7 @@ describe('ThemeService', () => {
 
   it('should initialize with system default when no local storage exists', () => {
     spyOn(localStorageService, 'getThemePreference').and.returnValue(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (themeService as any).init();
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.SYSTEM);
   });
@@ -71,6 +72,7 @@ describe('ThemeService', () => {
     spyOn(localStorageService, 'getThemePreference').and.returnValue(
       OppiaTheme.DARK
     );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (themeService as any).init();
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.DARK);
     expect(
@@ -139,7 +141,7 @@ describe('ThemeService', () => {
         add: addSpy,
         remove: removeSpy,
         forEach: (fn: (cls: string) => void) => classList.forEach(fn),
-      } as any;
+      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
 
       themeService.setThemeConfig({themePackId: 'ocean'});
       expect(classList.has('theme-pack-ocean')).toBe(true);
