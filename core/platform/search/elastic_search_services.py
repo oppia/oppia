@@ -457,7 +457,7 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
     used_percent = (total - free) / total * 100
 
     if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
-        logging.warning(
+        logging.info(
             'Elasticsearch disk usage has reached the low watermark: %.2f%% used. '
             'Consider freeing up space.',
             used_percent,
