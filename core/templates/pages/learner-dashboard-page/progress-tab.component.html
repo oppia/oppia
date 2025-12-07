@@ -410,7 +410,7 @@
             </ng-container>
           </oppia-card-display>
           <oppia-card-display *ngIf="totalIncompleteLessonsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalIncompleteLessonsList.length" [controlType]="'toggle'">
-            <ng-container *ngFor="let summaryTile of displayIncompleteLessonsList">
+            <ng-container *ngFor="let summaryTile of totalIncompleteLessonsList">
               <lesson-card [story]="summaryTile"> </lesson-card>
             </ng-container>
           </oppia-card-display>
@@ -434,7 +434,7 @@
           </ng-container>
         </oppia-card-display>
         <oppia-card-display *ngIf="totalCompletedLessonsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_COMMUNITY_LESSONS_SECTION'" [numCards]="totalCompletedLessonsList.length" [controlType]="'toggle'">
-          <ng-container *ngFor="let summaryTile of displayCompletedLessonsList">
+          <ng-container *ngFor="let summaryTile of totalCompletedLessonsList">
             <lesson-card [story]="summaryTile" [isCommunityLessonComplete]="true"> </lesson-card>
           </ng-container>
         </oppia-card-display>

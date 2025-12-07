@@ -121,6 +121,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-exploration-progress-in-learner-dashboard.spec.ts"
     },
     {
+      "name": "logged-in-user/manage-in-progress-and-completed-lessons-and-skill",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/manage-in-progress-and-completed-lessons-and-skill.spec.ts"
+    },
+    {
       "name": "logged-out-user/click-all-links-on-get-started-page",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/click-all-links-on-get-started-page.spec.ts"
     },

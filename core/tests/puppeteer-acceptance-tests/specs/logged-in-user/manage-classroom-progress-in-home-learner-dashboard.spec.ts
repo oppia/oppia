@@ -53,6 +53,7 @@ describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
+    await releaseCoordinator.closeBrowser();
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -114,6 +115,7 @@ describe('Logged-in User', function () {
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
+    await curriculumAdmin.closeBrowser();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
