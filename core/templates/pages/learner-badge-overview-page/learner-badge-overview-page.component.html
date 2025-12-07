@@ -1,0 +1,23 @@
+<div class="badge-overview">
+  <h2>Your Badges</h2>
+
+  <div class="earned-badges">
+    <h3>Earned Badges</h3>
+    <div class="badge-grid">
+      <div *ngFor="let badge of earnedBadges" class="badge earned">
+        <img [src]="badge.icon_url" alt="{{ badge.name }}">
+        <p>{{ badge.name }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="locked-badges">
+    <h3>Locked Badges</h3>
+    <div class="badge-grid">
+      <div *ngFor="let badge of lockedBadges" class="badge locked">
+        <img src="/assets/images/locked.svg" alt="Locked Badge">
+        <p>{{ badge.name }}</p>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+.badge-overview {
+  padding: 20px;
+}
+
+.badge-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.badge {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  width: 120px;
+}
+
+.badge img {
+  max-width: 100%;
+  height: auto;
+}
+
+.badge.earned {
+  background-color: #e0ffe0;
+}
+
+.badge.locked {
+  background-color: #ffe0e0;
+}
