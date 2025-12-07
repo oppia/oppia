@@ -16,43 +16,69 @@
  * @fileoverview Integration tests for schema based editors.
  */
 
+import { DebugElement } from '@angular/core';
 import {
   ComponentFixture,
-  TestBed,
   fakeAsync,
+  flush,
+  TestBed,
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from '@angular/common/http/testing';
-import { SchemaBasedEditorComponent } from '../schema-based-editor.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
-import {
-  NgbActiveModal,
-  NgbModal,
-  NgbModalModule,
-} from '@ng-bootstrap/ng-bootstrap';
-import {
-  MockTranslatePipe,
-  MockTranslateService,
-} from 'tests/unit-test-utils';
+import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { By } from '@angular/platform-browser';
+import { NgbTooltipModule, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
-import { RouterTestingModule } from '@angular/router/testing';
-import {
-  EditorCustomizationService,
-  RteHelperModalComponent,
-} from 'services/editor-customization.service';
-import { of } from 'rxjs';
+import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
+import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
+import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
+import { ApplyValidationDirective } from 'components/forms/custom-forms-directives/apply-validation.directive';
+import { CustomFormsComponentsModule } from 'components/forms/custom-forms-directives/custom-form-components.module';
+import { ObjectEditorComponent } from 'components/forms/custom-forms-directives/object-editor.directive';
+import { AudioSliderComponent } from 'components/forms/slider/audio-slider.component';
+import { DirectivesModule } from 'directives/directives.module';
+import { SharedPipesModule } from 'filters/shared-pipes.module';
+import { MaterialModule } from 'modules/material.module';
+import { DictSchema, UnicodeSchema } from 'services/schema-default-value.service';
+import { MockTranslateModule } from 'tests/unit-test-utils';
+import { SchemaBasedBoolEditorComponent } from '../schema-based-bool-editor.component';
+import { SchemaBasedChoicesEditorComponent } from '../schema-based-choices-editor.component';
+import { SchemaBasedCustomEditorComponent } from '../schema-based-custom-editor.component';
+import { SchemaBasedDictEditorComponent } from '../schema-based-dict-editor.component';
+import { SchemaBasedEditorComponent } from '../schema-based-editor.component';
+import { SchemaBasedFloatEditorComponent } from '../schema-based-float-editor.component';
+import { SchemaBasedHtmlEditorComponent } from '../schema-based-html-editor.component';
+import { SchemaBasedIntEditorComponent } from '../schema-based-int-editor.component';
+import { SchemaBasedListEditorComponent } from '../schema-based-list-editor.component';
+import { SchemaBasedUnicodeEditor } from '../schema-based-unicode-editor.component';
+import { RteHelperModalComponent } from 'services/editor-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 import { ImageUploadHelperService } from 'services/image-upload-helper.service';
 import { ImageLocalStorageService } from 'services/image-local-storage.service';
 import { CkEditorInitializerService } from 'components/forms/text-input/ck-editor-initializer.service';
+import { AlertsService } from 'services/alerts.service';
 import { AssetsBackendApiService } from 'services/assets-backend-api.service';
 
-describe('Schema Based Editor', () => {
+
+export function findComponent<T>(
+  fixture: ComponentFixture<T>,
+  selector: string
+): DebugElement {
+  return fixture.debugElement.query(By.css(selector));
+}
+
+export class MockTranslateService {
+  instant(val: string): string {
+    return val;
+  }
+
+  get(val: string): string {
+    return val;
+  }
+}
+
+describe('Schema based editor', () => {
   let fixture: ComponentFixture<SchemaBasedEditorComponent>;
   let component: SchemaBasedEditorComponent;
   let httpTestingController: HttpTestingController;
@@ -62,6 +88,7 @@ describe('Schema Based Editor', () => {
   let imageUploadHelperService: ImageUploadHelperService;
   let imageLocalStorageService: ImageLocalStorageService;
   let ckEditorInitializerService: CkEditorInitializerService;
+  let alertsService: AlertsService;
   let assetsBackendApiService: AssetsBackendApiService;
 
   class MockActiveModal {
@@ -84,7 +111,21 @@ describe('Schema Based Editor', () => {
         NgbModalModule,
         RouterTestingModule,
       ],
-      declarations: [SchemaBasedEditorComponent, MockTranslatePipe],
+      declarations: [
+        AudioSliderComponent,
+        ApplyValidationDirective,
+        SchemaBasedBoolEditorComponent,
+        SchemaBasedChoicesEditorComponent,
+        SchemaBasedCustomEditorComponent,
+        SchemaBasedDictEditorComponent,
+        SchemaBasedEditorComponent,
+        SchemaBasedFloatEditorComponent,
+        SchemaBasedHtmlEditorComponent,
+        SchemaBasedIntEditorComponent,
+        SchemaBasedListEditorComponent,
+        SchemaBasedUnicodeEditor,
+        ObjectEditorComponent,
+      ],
       providers: [
         {
           provide: NgbActiveModal,
@@ -94,7 +135,7 @@ describe('Schema Based Editor', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
-        EditorCustomizationService,
+        AlertsService,
         WindowRef,
         ImageUploadHelperService,
         ImageLocalStorageService,
@@ -115,6 +156,7 @@ describe('Schema Based Editor', () => {
     imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     ckEditorInitializerService = TestBed.inject(CkEditorInitializerService);
+    alertsService = TestBed.inject(AlertsService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
 
     spyOn(changeDetectorRef.constructor.prototype, 'detectChanges');
@@ -124,20 +166,99 @@ describe('Schema Based Editor', () => {
     httpTestingController.verify();
   });
 
-  it('should initialize component', () => {
-    component.schema = {
-      type: 'list',
-    };
-    component.localValue = ['hi', 'there'];
-    component.ngOnInit();
-    expect(component.isListType).toBe(true);
-  });
+  it('should follow the schema', fakeAsync(() => {
 
-  it('should call validate function', () => {
-    spyOn(component, 'validate').and.callThrough();
-    component.ngOnInit();
-    expect(component.validate).toHaveBeenCalled();
-  });
+    const schema: DictSchema = {
+      type: 'dict',
+      properties: [
+        {
+          name: 'fieldName',
+          schema: {
+            type: 'unicode',
+            validators: [
+              {
+                id: 'hasLengthAtLeast',
+                minValue: 4,
+              },
+              {
+                id: 'hasLengthAtMost',
+                maxValue: 10,
+              },
+            ],
+          } as UnicodeSchema,
+        },
+        { name: 'real', schema: { type: 'float' } },
+      ],
+    };
+    const schemaBasedEditorFixture = TestBed.createComponent(
+      SchemaBasedEditorComponent
+    );
+    const schemaBasedEditorComponent =
+      schemaBasedEditorFixture.componentInstance;
+    schemaBasedEditorComponent.schema = schema;
+    schemaBasedEditorComponent.localValue = {};
+    schemaBasedEditorFixture.detectChanges();
+    flush();
+    schemaBasedEditorFixture.detectChanges();
+    flush();
+
+    const changeValuesInUI = (fieldName?: string, real?: number) => {
+      if (fieldName !== undefined) {
+        schemaBasedUnicodeEditorInput.value = fieldName;
+        schemaBasedUnicodeEditorInput.dispatchEvent(new Event('input'));
+      }
+
+      if (real !== undefined) {
+        schemaBasedFloatEditorInput.value = real;
+        schemaBasedFloatEditorInput.dispatchEvent(new Event('input'));
+      }
+      schemaBasedEditorFixture.detectChanges();
+      tick();
+    };
+
+    // eslint-disable-next-line max-len
+    const expectTopLevelComponentValueToBe = (
+      fieldNameValue: string,
+      real: number
+    ) => {
+      const localValue = schemaBasedEditorComponent.localValue as {
+        fieldName: string;
+        real: number;
+      };
+      expect(localValue.fieldName).toBe(fieldNameValue);
+      expect(localValue.real).toBe(real);
+    };
+
+    // Check that the initial values for the UI fields are populated correctly.
+    const schemaBasedUnicodeEditorInput = findComponent(
+      schemaBasedEditorFixture,
+      'schema-based-unicode-editor'
+    ).query(By.css('input')).nativeElement;
+    const schemaBasedFloatEditorInput = findComponent(
+      schemaBasedEditorFixture,
+      'schema-based-float-editor'
+    ).query(By.css('input')).nativeElement;
+    const unicodeInputFormController = findComponent(
+      schemaBasedEditorFixture,
+      'schema-based-unicode-editor'
+    )
+      .query(By.css('input'))
+      .injector.get(NgModel);
+    expect(schemaBasedUnicodeEditorInput.value).toBe('');
+    expect(schemaBasedFloatEditorInput.value).toBe('');
+
+
+    changeValuesInUI('SomeName', 4);
+
+
+    expectTopLevelComponentValueToBe('SomeName', 4);
+
+
+    expect(unicodeInputFormController.invalid).toBeFalsy();
+    changeValuesInUI('SomeVeryLongName');
+    expectTopLevelComponentValueToBe('SomeVeryLongName', 4);
+    expect(unicodeInputFormController.invalid).toBe(true);
+  }));
 
   it('should get all warnings of local value', () => {
     component.schema = {
@@ -151,7 +272,7 @@ describe('Schema Based Editor', () => {
     };
     component.localValue = ['hi', 'there'];
     component.ngOnInit();
-    expect(component.get = "getLocalValueWarnings"()).toBe(
+    expect(component.getLocalValueWarnings()).toBe(
       'The length of this list is 2, which is less than the minimum required length of 5.'
     );
   });
@@ -201,28 +322,28 @@ describe('Schema Based Editor', () => {
       options: ['1', '2', '3'],
     };
     component.ngOnInit();
-    expect(component.get = "getSelectOptions"()).toEqual(['1', '2', '3']);
+    expect(component.getSelectOptions()).toEqual(['1', '2', '3']);
   });
 
   it('should return false for isEditable when not in question mode', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'exploration'
     );
-    expect(component.is = "isEditable"()).toBeFalse();
+    expect(component.isEditable()).toBeFalsy();
   });
 
   it('should return true for isEditable when in question mode', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'question_editor'
     );
-    expect(component.is = "isEditable"()).toBeTrue();
+    expect(component.isEditable()).toBe(true);
   });
 
   it('should return true for isEditable when in skill editor mode', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'skill_editor'
     );
-    expect(component.is = "isEditable"()).toBeTrue();
+    expect(component.isEditable()).toBe(true);
   });
 
   it('should open the RTE helper modal', fakeAsync(() => {
@@ -391,7 +512,8 @@ describe('Schema Based Editor', () => {
   }));
 
   it('should not set image data url when local storage is full', fakeAsync(() => {
-    spyOn(imageLocalStorageService, 'is =(isLocalStorageExceedsTotalStorage"()">.and.returnValue(
+
+    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
       true
     );
     spyOn(alertsService, 'addWarning');
@@ -407,7 +529,7 @@ describe('Schema Based Editor', () => {
       },
     };
     component.ngOnInit();
-    component.onFileChange(mockImageFile);
+    component.onFileChange(mockFile);
     tick();
 
     expect(alertsService.addWarning).toHaveBeenCalledWith(
@@ -447,7 +569,7 @@ describe('Schema Based Editor', () => {
       type: 'custom',
       obj_type: 'ImageWithRegions',
     };
-    expect(component.get = "getAssetTypeFromSchema"()).toBe(
+    expect(component.getAssetTypeFromSchema()).toBe(
       AppConstants.ASSET_TYPE_IMAGE
     );
   });
@@ -456,14 +578,15 @@ describe('Schema Based Editor', () => {
     component.schema = {
       type: 'custom',
     };
-    expect(component.get = "getAssetTypeFromSchema"()).toBe(null);
+    expect(component.getAssetTypeFromSchema()).toBe(null);
   });
 
   it('should not show warning for valid image file size when in blog post editor', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'blog_post_editor'
     );
-    spyOn(imageLocalStorageService, 'is="isLocalStorageExceedsTotalStorage"()').and.returnValue(
+
+    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
       false
     );
     spyOn(alertsService, 'addWarning');
@@ -488,7 +611,8 @@ describe('Schema Based Editor', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'blog_post_editor'
     );
-    spyOn(imageLocalStorageService, 'is="isLocalStorageExceedsTotalStorage"()').and.returnValue(
+
+    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
       true
     );
     spyOn(alertsService, 'addWarning');
@@ -519,7 +643,8 @@ describe('Schema Based Editor', () => {
       spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
         'exploration_editor'
       );
-      spyOn(imageLocalStorageService, 'is="isLocalStorageExceedsTotalStorage"()').and.returnValue(
+
+      spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
         false
       );
       spyOn(alertsService, 'addWarning');
@@ -548,7 +673,8 @@ describe('Schema Based Editor', () => {
       spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
         'exploration_editor'
       );
-      spyOn(imageLocalStorageService, 'is="isLocalStorageExceedsTotalStorage"()').and.returnValue(
+
+      spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
         true
       );
       spyOn(alertsService, 'addWarning');
@@ -583,7 +709,7 @@ describe('Schema Based Editor', () => {
       obj_type: 'SubtitledHtml',
     };
     component.ngOnInit();
-    component.initialize = "initializeEditor"('html');
+    component.initializeEditor('html');
 
     expect(ckEditorInitializerService.initialize).toHaveBeenCalledWith('html');
   });
@@ -598,7 +724,7 @@ describe('Schema Based Editor', () => {
       obj_type: 'ImageWithRegions',
     };
     component.ngOnInit();
-    component.initialize = "initializeEditor"('text');
+    component.initializeEditor('text');
 
     expect(ckEditorInitializerService.initialize).not.toHaveBeenCalled();
   });
@@ -607,7 +733,7 @@ describe('Schema Based Editor', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'blog_post_editor'
     );
-    expect(component.get = "getMaxImageSizeInKbs"()).toBe(
+    expect(component.getMaxImageSizeInKbs()).toBe(
       AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB_FOR_BLOG_POST
     );
   });
@@ -616,7 +742,7 @@ describe('Schema Based Editor', () => {
     spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
       'exploration_editor'
     );
-    expect(component.get = "getMaxImageSizeInKbs"()).toBe(
+    expect(component.getMaxImageSizeInKbs()).toBe(
       AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB
     );
   });
@@ -644,4 +770,4 @@ describe('Schema Based Editor', () => {
 
     expect(component.maxImageSizeInKbs).toBe(undefined);
   });
-}); 
+});
