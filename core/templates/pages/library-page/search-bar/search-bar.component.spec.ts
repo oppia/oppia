@@ -296,6 +296,14 @@ describe('Search bar component', () => {
     expect(component.refreshSearchBarLabels).toHaveBeenCalled();
   });
 
+  it('should trigger search query only when dropdown is closed', () => {
+    spyOn(component, 'onSearchQueryChangeExec');
+    component.triggerSearchOnDropdownClose(true);
+    expect(component.onSearchQueryChangeExec).not.toHaveBeenCalled();
+    component.triggerSearchOnDropdownClose(false);
+    expect(component.onSearchQueryChangeExec).toHaveBeenCalled();
+  });
+
   it('should deselectAll', () => {
     spyOn(component, 'updateSelectionDetails');
     spyOn(component, 'refreshSearchBarLabels');
