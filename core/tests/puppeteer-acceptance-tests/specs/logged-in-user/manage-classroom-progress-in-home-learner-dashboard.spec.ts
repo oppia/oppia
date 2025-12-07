@@ -28,6 +28,7 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-in User', function () {
   jest.setTimeout(6000000);
@@ -84,7 +85,7 @@ describe('Logged-in User', function () {
       'Extra chapter',
     ];
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       await curriculumAdmin.createAndPublishExplorationWithCards(
         `Explore Title ${i + 1}`,
         'Algebra',
@@ -120,52 +121,67 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectSidebarTabToBeActive('Home');
+  it(
+    'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectSidebarTabToBeActive('Home');
 
-    await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
+      await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
 
-    await loggedInUser.expectElementsToBePresent(
-      ['Learn Something New'],
-      'tabSection'
-    );
-    await loggedInUser.expectElementsToBePresent(
-      ["Topics available in Oppia's Classroom"],
-      'cardDisplay'
-    );
-    await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
-      true
-    );
+      await loggedInUser.expectElementsToBePresent(
+        ['Learn Something New'],
+        'tabSection'
+      );
+      await loggedInUser.expectElementsToBePresent(
+        ["Topics available in Oppia's Classroom"],
+        'cardDisplay'
+      );
+      await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+        true
+      );
 
-    await loggedInUser.expectNumberOfElementsToBe(
-      '.e2e-test-learer-topic-summary-tile',
-      2
-    );
+      await loggedInUser.expectNumberOfElementsToBe(
+        '.e2e-test-learer-topic-summary-tile',
+        2
+      );
 
-    await loggedInUser.expectScreenshotToMatch(
-      'learnerDashboardHomeTab',
-      __dirname
-    );
-  });
+      await loggedInUser.expectScreenshotToMatch(
+        'learnerDashboardHomeTab',
+        __dirname
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-  it('should navigate directly to math classroom', async function () {
-    await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
-    await loggedInUser.expectToBeOnPage('learn/math');
-    await loggedInUser.expectScreenshotToMatch('mathClassroomPage', __dirname);
-    showMessage('Navigated to math classroom from learner dashboard.');
-  });
+  it(
+    'should navigate directly to math classroom',
+    async function () {
+      await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
+      await loggedInUser.expectToBeOnPage('learn/math');
+      await loggedInUser.expectScreenshotToMatch(
+        'mathClassroomPage',
+        __dirname
+      );
+      showMessage('Navigated to math classroom from learner dashboard.');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-  it('should navigate directly to the Place Values topic in the math classroom', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToTopicPageByCard('Place Values');
-    await loggedInUser.expectToBeOnPage('learn/math/place-values');
-    await loggedInUser.expectScreenshotToMatch(
-      'placeValuesTopicPage',
-      __dirname
-    );
-    showMessage('Navigated to Place Values topic from learner dashboard.');
-  });
+  it(
+    'should navigate directly to the Place Values topic in the math classroom',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToTopicPageByCard('Place Values');
+      await loggedInUser.expectToBeOnPage('learn/math/place-values');
+      await loggedInUser.expectScreenshotToMatch(
+        'placeValuesTopicPage',
+        __dirname
+      );
+      showMessage('Navigated to Place Values topic from learner dashboard.');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   it('should display in-progress and recommended lessons after starting a lesson', async function () {
     await loggedInUser.navigateToLearnerDashboard();
@@ -338,26 +354,30 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('should be able to see community lessons in In Progress section if not completed fully', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
+  it(
+    'should be able to see community lessons in In Progress section if not completed fully',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
 
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 1');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 1');
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 1');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 1');
 
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
-      __dirname
-    );
-    await loggedInUser.expectLessonCardProgressToBe(
-      'Lessons in progress',
-      ['Chapter 6: Extra chapter', 'Explore Title 1'],
-      0
-    );
-  });
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.expectScreenshotToMatch(
+        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+        __dirname
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Chapter 6: Extra chapter', 'Explore Title 1'],
+        0
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
     await loggedInUser.navigateToLearnerDashboard();
@@ -402,5 +422,5 @@ describe('Logged-in User', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  });
+  }, DEFAULT_SPEC_TIMEOUT_MSECS);
 });
