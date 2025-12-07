@@ -167,3 +167,100 @@ def split_by_type(
             )
 
     return exploration_ids, collection_ids
+
+
+def award_badges_on_lesson_completion(
+    user_id: str,
+    exploration_id: str
+) -> None:
+    """Award badges to user for completing a lesson.
+    
+    Args:
+        user_id: str. User ID.
+        exploration_id: str. Exploration ID.
+    """
+    if not feconf.BADGE_SYSTEM_ENABLED:
+        return
+    
+    try:
+        from core.domain import badge_services
+        
+        event_data = {
+            'user_id': user_id,
+            'exploration_id': exploration_id,
+            'event_type': 'lesson_complete'
+        }
+        
+        badge_services.BadgeAwardingService.check_and_award_badges(
+            user_id,
+            'lesson_complete',
+            event_data
+        )
+    except Exception as e:
+        logging.error(
+            f'Error awarding badges for lesson completion: {str(e)}'
+        )
+
+
+def award_badges_on_quiz_completion(
+    user_id: str,
+    quiz_id: str,
+    score: int
+) -> None:
+    """Award badges to user for completing a quiz.
+    
+    Args:
+        user_id: str. User ID.
+        quiz_id: str. Quiz ID.
+        score: int. Quiz score.
+    """
+    if not feconf.BADGE_SYSTEM_ENABLED:
+        return
+    
+    try:
+        from core.domain import badge_services
+        
+        event_data = {
+            'user_id': user_id,
+            'quiz_id': quiz_id,
+            'score': score,
+            'event_type': 'quiz_submit'
+        }
+        
+        badge_services.BadgeAwardingService.check_and_award_badges(
+            user_id,
+            'quiz_submit',
+            event_data
+        )
+    except Exception as e:
+        logging.error(
+            f'Error awarding badges for quiz completion: {str(e)}'
+        )
+
+
+def award_badges_on_daily_login(user_id: str) -> None:
+    """Award badges to user for daily login.
+    
+    Args:
+        user_id: str. User ID.
+    """
+    if not feconf.BADGE_SYSTEM_ENABLED:
+        return
+    
+    try:
+        from core.domain import badge_services
+        
+        event_data = {
+            'user_id': user_id,
+            'event_type': 'daily_login'
+        }
+        
+        badge_services.BadgeAwardingService.check_and_award_badges(
+            user_id,
+            'daily_login',
+            event_data
+        )
+    except Exception as e:
+        logging.error(
+            f'Error awarding badges for daily login: {str(e)}'
+        )
