@@ -116,6 +116,10 @@ class _Gae(Platform):
                 from core.storage.audit import gae_models as audit_models
 
                 returned_models.append(audit_models)
+            elif name == Names.BADGE:
+                from core.storage.badge import gae_models as badge_models
+
+                returned_models.append(badge_models)
             elif name == Names.AUTH:
                 from core.storage.auth import gae_models as auth_models
 
