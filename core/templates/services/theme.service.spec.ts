@@ -28,7 +28,7 @@ class MockWindowRef {
         classList: {
           add: jasmine.createSpy('add'),
           remove: jasmine.createSpy('remove'),
-        },
+        } as unknown as DOMTokenList,
       },
     },
     matchMedia: jasmine.createSpy('matchMedia').and.returnValue({
@@ -53,18 +53,17 @@ describe('ThemeService', () => {
       ],
     });
 
-    themeService = TestBed.inject(ThemeService);
     localStorageService = TestBed.inject(LocalStorageService);
   });
 
   it('should be created', () => {
+    themeService = TestBed.inject(ThemeService);
     expect(themeService).toBeTruthy();
   });
 
   it('should initialize with system default when no local storage exists', () => {
     spyOn(localStorageService, 'getThemePreference').and.returnValue(null);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (themeService as any).init();
+    themeService = TestBed.inject(ThemeService);
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.SYSTEM);
   });
 
@@ -72,8 +71,7 @@ describe('ThemeService', () => {
     spyOn(localStorageService, 'getThemePreference').and.returnValue(
       OppiaTheme.DARK
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (themeService as any).init();
+    themeService = TestBed.inject(ThemeService);
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.DARK);
     expect(
       mockWindowRef.nativeWindow.document.body.classList.add
@@ -81,6 +79,7 @@ describe('ThemeService', () => {
   });
 
   it('should update theme and persistence when setTheme is called', () => {
+    themeService = TestBed.inject(ThemeService);
     const setSpy = spyOn(localStorageService, 'setThemePreference');
     themeService.setTheme(OppiaTheme.DARK);
 
@@ -91,6 +90,7 @@ describe('ThemeService', () => {
   });
 
   it('should respect system preference when set to SYSTEM', () => {
+    themeService = TestBed.inject(ThemeService);
     // Mock system is dark.
     (mockWindowRef.nativeWindow.matchMedia as jasmine.Spy).and.returnValue({
       matches: true,
@@ -104,6 +104,7 @@ describe('ThemeService', () => {
   });
 
   it('should respect system preference when set to SYSTEM (light)', () => {
+    themeService = TestBed.inject(ThemeService);
     // Mock system is light.
     (mockWindowRef.nativeWindow.matchMedia as jasmine.Spy).and.returnValue({
       matches: false,
@@ -118,38 +119,47 @@ describe('ThemeService', () => {
 
   describe('Theme Config', () => {
     it('should return default logo URL when no config is set', () => {
+      themeService = TestBed.inject(ThemeService);
       expect(themeService.getLogoUrl()).toBe('/logo/288x128_logo_white.png');
     });
 
     it('should return configured logo URL when set', () => {
+      themeService = TestBed.inject(ThemeService);
       themeService.setThemeConfig({logoUrl: '/assets/custom-logo.png'});
       expect(themeService.getLogoUrl()).toBe('/assets/custom-logo.png');
     });
 
     it('should apply theme pack class to body', () => {
-      // Need to mock forEach for classList.
-      const classList = new Set<string>();
-      const addSpy = jasmine.createSpy('add').and.callFake((cls: string) => {
-        classList.add(cls);
-      });
-      const removeSpy = jasmine
-        .createSpy('remove')
-        .and.callFake((cls: string) => {
-          classList.delete(cls);
-        });
-      mockWindowRef.nativeWindow.document.body.classList = {
-        add: addSpy,
-        remove: removeSpy,
-        forEach: (fn: (cls: string) => void) => classList.forEach(fn),
-      } as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      // Use createSpyObj to create a properly typed mock.
+      const classListSpy = jasmine.createSpyObj<DOMTokenList>('classList', [
+        'add',
+        'remove',
+        'forEach',
+      ]);
+      const classListSet = new Set<string>();
 
+      (classListSpy.add as jasmine.Spy).and.callFake((cls: string) =>
+        classListSet.add(cls)
+      );
+      (classListSpy.remove as jasmine.Spy).and.callFake((cls: string) =>
+        classListSet.delete(cls)
+      );
+      (classListSpy.forEach as jasmine.Spy).and.callFake(
+        (fn: (cls: string, index: number, list: DOMTokenList) => void) =>
+          classListSet.forEach(val => fn(val, 0, classListSpy))
+      );
+
+      mockWindowRef.nativeWindow.document.body.classList = classListSpy;
+
+      themeService = TestBed.inject(ThemeService);
       themeService.setThemeConfig({themePackId: 'ocean'});
-      expect(classList.has('theme-pack-ocean')).toBe(true);
+      expect(classListSet.has('theme-pack-ocean')).toBe(true);
     });
   });
 
   describe('getCurrentTheme', () => {
     it('should return current resolved theme', () => {
+      themeService = TestBed.inject(ThemeService);
       themeService.setTheme(OppiaTheme.DARK);
       expect(themeService.getCurrentTheme()).toBe(OppiaTheme.DARK);
     });
