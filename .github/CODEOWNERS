@@ -434,6 +434,7 @@
 
 
 # Readme
+/README.md @oppia/dev-workflow-reviewers
 /core/README.md @oppia/dev-workflow-reviewers
 /core/templates/css/README.md @oppia/dev-workflow-reviewers
 /extensions/README.md @oppia/dev-workflow-reviewers

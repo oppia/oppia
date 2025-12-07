@@ -1778,7 +1778,7 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'regenerate_voiceovers_on_exploration_curation'
     ),
 }
-# GitHub OAuth Configuration
+# GitHub OAuth Configuration.
 GITHUB_CLIENT_ID = os.environ.get('GITHUB_CLIENT_ID', '')
 GITHUB_CLIENT_SECRET = os.environ.get('GITHUB_CLIENT_SECRET', '')
 GITHUB_REDIRECT_URI = 'http://localhost:8181/auth/github/callback'

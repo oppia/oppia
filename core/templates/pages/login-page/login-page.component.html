@@ -119,13 +119,13 @@
 
       <!-- Google Button -->
       <button mat-raised-button color="primary" class="sign-in-button" (click)="onClickGoogleSignIn()">
-        <i class="fab fa-google" style="margin-right: 8px;"></i>
+        <i class="fab fa-google sign-in-icon"></i>
         Sign in with Google
       </button>
 
       <!-- GitHub Button -->
       <button mat-raised-button class="sign-in-button github-button" (click)="onClickGithubSignIn()">
-        <i class="fab fa-github" style="margin-right: 8px;"></i>
+        <i class="fab fa-github sign-in-icon"></i>
         Sign in with GitHub
       </button>
     </mat-card-content>
@@ -164,19 +164,23 @@
   .login-page /deep/ .mat-form-field.mat-form-field-invalid .mat-form-field-ripple.mat-accent {
     background-color: #f44336;
   }
-  
+
   /* New styles for sign-in buttons */
   .sign-in-button {
-    width: 100%;
     margin: 10px 0;
+    width: 100%;
   }
-  
+
   .github-button {
     background-color: #333;
     color: white;
   }
-  
+
   .github-button:hover {
     background-color: #24292e;
+  }
+
+  .sign-in-icon {
+    margin-right: 8px;
   }
 </style>

@@ -16,15 +16,15 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import {Injectable, Optional} from '@angular/core';
-import {FirebaseOptions} from '@angular/fire';
-import {AngularFireAuth} from '@angular/fire/auth';
+import { Injectable, Optional } from '@angular/core';
+import { FirebaseOptions } from '@angular/fire';
+import { AngularFireAuth } from '@angular/fire/auth';
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import {md5} from 'hash-wasm';
+import { md5 } from 'hash-wasm';
 
-import {AppConstants} from 'app.constants';
-import {AuthBackendApiService} from 'services/auth-backend-api.service';
+import { AppConstants } from 'app.constants';
+import { AuthBackendApiService } from 'services/auth-backend-api.service';
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;
@@ -58,9 +58,9 @@ class DevAuthServiceImpl extends AuthServiceImpl {
     super();
   }
 
-  async signInWithRedirectAsync(): Promise<void> {}
+  async signInWithRedirectAsync(): Promise<void> { }
 
-  async signInWithGithubRedirectAsync(): Promise<void> {}
+  async signInWithGithubRedirectAsync(): Promise<void> { }
 
   async getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null> {
     return null;
@@ -77,16 +77,16 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 
   constructor(private angularFireAuth: AngularFireAuth) {
     super();
-    // Google provider setup
+    // Google provider setup.
     this.googleProvider = new firebase.auth.GoogleAuthProvider();
     // Oppia only needs an email address for account management.
     this.googleProvider.addScope('email');
     // Always prompt the user to select an account, even when they only own one.
-    this.googleProvider.setCustomParameters({prompt: 'select_account'});
+    this.googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-    // GitHub provider setup
+    // GitHub provider setup.
     this.githubProvider = new firebase.auth.GithubAuthProvider();
-    // Request user email from GitHub
+    // Request user email from GitHub.
     this.githubProvider.addScope('user:email');
   }
 
@@ -223,10 +223,10 @@ export class AuthService {
         'signInWithGithubUsername can only be called in emulator mode'
       );
     }
-    // Convert username to lowercase for consistency
+    // Convert username to lowercase for consistency.
     username = username.toLowerCase();
     // Create an email from the GitHub username for Firebase emulator
-    // This follows the same pattern as Google sign-in but uses github.com domain
+    // This follows the same pattern as Google sign-in but uses github.com domain.
     const email = `${username}@github.com`;
     // Use md5 hash of the email as password (same pattern as Google sign-in)
     const password = await md5(email);

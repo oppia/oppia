@@ -20,7 +20,8 @@ from __future__ import annotations
 
 import base64
 import os
-import secrets
+import base64
+import os
 
 from core.constants import constants
 from core.domain import auth_domain, caching_services
@@ -28,7 +29,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import webapp2
-from typing import Dict, Final, List, Optional
+from typing import Final, List, Optional
 
 # Session expiry time in seconds (24 hours).
 SESSION_EXPIRY_SECONDS: Final = 24 * 60 * 60

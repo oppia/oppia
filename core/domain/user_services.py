@@ -1269,27 +1269,27 @@ def get_or_create_user_by_github_auth(
     Returns:
         UserSettings. The user settings for the existing or newly created user.
     """
-    # Check if user with this GitHub ID already exists
+    # Check if user with this GitHub ID already exists.
     github_auth_model = auth_models.UserIdByGitHubAuthIdModel.get_by_id(
         github_id
     )
 
     if github_auth_model is not None:
-        # User exists, return their settings
+        # User exists, return their settings.
         user_settings = get_user_settings(
             github_auth_model.user_id, strict=True
         )
         return user_settings
 
-    # Create new user with GitHub auth
+    # Create new user with GitHub auth.
     email = (
         github_email if github_email else '%s@github.oauth' % github_username
     )
 
-    # Generate a new user ID
+    # Generate a new user ID.
     user_id = user_models.UserSettingsModel.get_new_id('')
 
-    # Create user settings
+    # Create user settings.
     user_settings = user_domain.UserSettings(
         user_id,
         email,
@@ -1299,7 +1299,7 @@ def get_or_create_user_by_github_auth(
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
     )
 
-    # Save user and create GitHub auth association in a transaction
+    # Save user and create GitHub auth association in a transaction.
     _create_new_github_user_transactional(
         user_settings, github_id, github_username, github_email
     )
@@ -1323,16 +1323,16 @@ def _create_new_github_user_transactional(
         github_username: str. The GitHub username.
         github_email: str|None. The GitHub email (may be None).
     """
-    # Save user settings
+    # Save user settings.
     save_user_settings(user_settings)
 
-    # Create user contributions
+    # Create user contributions.
     user_contributions = get_or_create_new_user_contributions(
         user_settings.user_id
     )
     save_user_contributions(user_contributions)
 
-    # Create GitHub auth association
+    # Create GitHub auth association.
     github_auth_model = auth_models.UserIdByGitHubAuthIdModel(
         id=github_id,
         user_id=user_settings.user_id,
@@ -1342,7 +1342,7 @@ def _create_new_github_user_transactional(
     github_auth_model.update_timestamps()
     github_auth_model.put()
 
-    # Also create UserAuthDetailsModel for consistency with other auth methods
+    # Also create UserAuthDetailsModel for consistency with other auth methods.
     user_auth_details_model = auth_models.UserAuthDetailsModel(
         id=user_settings.user_id,
         gae_id=None,

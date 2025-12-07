@@ -16,16 +16,16 @@
  * @fileoverview Component for the login page.
  */
 
-import {Component, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase/app';
 
-import {AppConstants} from 'app.constants';
-import {AlertsService} from 'services/alerts.service';
-import {AuthService} from 'services/auth.service';
-import {LoaderService} from 'services/loader.service';
-import {UserService} from 'services/user.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
+import { AppConstants } from 'app.constants';
+import { AlertsService } from 'services/alerts.service';
+import { AuthService } from 'services/auth.service';
+import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Component({
   selector: 'login-page',
@@ -33,14 +33,14 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 })
 export class LoginPageComponent implements OnInit {
   email = new FormControl('', [Validators.email]);
-  formGroup = new FormGroup({email: this.email});
+  formGroup = new FormGroup({ email: this.email });
 
-  // GitHub sign-in form controls
+  // GitHub sign-in form controls.
   githubUsername = new FormControl('', [
     Validators.required,
     Validators.minLength(1),
   ]);
-  githubFormGroup = new FormGroup({githubUsername: this.githubUsername});
+  githubFormGroup = new FormGroup({ githubUsername: this.githubUsername });
 
   // Track which provider is selected (null = show selection, 'google' or 'github' = show form)
   selectedProvider: 'google' | 'github' | null = null;
@@ -51,7 +51,7 @@ export class LoginPageComponent implements OnInit {
     private loaderService: LoaderService,
     private userService: UserService,
     private windowRef: WindowRef
-  ) {}
+  ) { }
 
   get emulatorModeIsEnabled(): boolean {
     return AppConstants.EMULATOR_MODE;
@@ -145,7 +145,7 @@ export class LoginPageComponent implements OnInit {
     this.githubUsername.setValue('');
   }
 
-  // Production mode: Google sign-in via redirect
+  // Production mode: Google sign-in via redirect.
   onClickGoogleSignIn(): void {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     this.authService.signInWithRedirectAsync().catch((error: unknown) => {
@@ -153,7 +153,7 @@ export class LoginPageComponent implements OnInit {
     });
   }
 
-  // Production mode: GitHub sign-in via redirect
+  // Production mode: GitHub sign-in via redirect.
   onClickGithubSignIn(): void {
     this.loaderService.showLoadingScreen('I18N_SIGNIN_LOADING');
     this.authService.signInWithGithubRedirectAsync().catch((error: unknown) => {

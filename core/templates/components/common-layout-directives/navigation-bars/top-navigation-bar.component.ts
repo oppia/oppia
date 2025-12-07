@@ -18,8 +18,8 @@
  * the editor pages).
  */
 
-import {Subscription} from 'rxjs';
-import {PageContextService} from 'services/page-context.service';
+import { Subscription } from 'rxjs';
+import { PageContextService } from 'services/page-context.service';
 import {
   ChangeDetectorRef,
   Component,
@@ -27,32 +27,32 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {SidebarStatusService} from 'services/sidebar-status.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {UserService} from 'services/user.service';
-import {DeviceInfoService} from 'services/contextual/device-info.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
-import {AlertsService} from 'services/alerts.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SearchService} from 'services/search.service';
-import {EventToCodes, NavigationService} from 'services/navigation.service';
-import {AppConstants} from 'app.constants';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {I18nService} from 'i18n/i18n.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {UrlService} from 'services/contextual/url.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
-import {LanguageBannerService} from 'components/language-banner/language-banner.service';
+import { AlertsService } from 'services/alerts.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { SearchService } from 'services/search.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
+import { AppConstants } from 'app.constants';
+import { NavbarAndFooterGATrackingPages } from 'app.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { UrlService } from 'services/contextual/url.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { LanguageBannerService } from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 interface LanguageInfo {
   id: string;
@@ -208,7 +208,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
     private contentTranslationManagerService: ContentTranslationManagerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.currentUrl =
@@ -467,7 +467,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       if (loginUrl) {
         this.siteAnalyticsService.registerStartLoginEvent('githubLoginButton');
         // Redirect to login page - the emulator mode login page will show
-        // the provider selection where user can choose GitHub
+        // the provider selection where user can choose GitHub.
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;
         }, 150);
