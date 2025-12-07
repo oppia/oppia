@@ -292,14 +292,22 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-E',
         # Disable security for the local ElasticSearch server.
         'xpack.security.enabled=false',
-        # ES 8.x: single-node disk watermark setting changed
-        # `cluster.routing.allocation.disk.watermark.enable_for_single_data_node` is deprecated (ES 7.14)
-        # Only `true` is allowed in ES 8.x
-        # To keep old behavior (disable disk-based shard allocation), use:
+        # Elasticsearch 8 uses stricter default disk watermarks than ES 7.
+        # In ES 7, we could disable disk-based shard allocation with
+        # `cluster.routing.allocation.disk.threshold_enabled=false`.
+        # This flag is **deprecated in ES 8** and can only be true, so we cannot disable it anymore.
+        # To mimic the old ES 7 behavior (prevent unexpected shard relocation or read-only indices),
+        # we increase the disk watermarks for our local dev environment.
+        # See: https://www.elastic.co/guide/en/elasticsearch/reference/8.19/migrating-8.0.html
+        # Low watermark: prevents new shard allocations when disk usage exceeds this percentage.
         '-E',
-        'cluster.routing.allocation.disk.threshold_enabled=false',
-        # Prevents shard relocation or read-only indices due to disk usage
-        # https://www.elastic.co/guide/en/elasticsearch/reference/8.19/migrating-8.0.html?utm_source=chatgpt.com
+        'cluster.routing.allocation.disk.watermark.low=85%',
+        # High watermark: triggers shard relocation to nodes with more free space.
+        '-E',
+        'cluster.routing.allocation.disk.watermark.high=90%',
+        # Flood-stage: indices become read-only to prevent data loss if usage exceeds this threshold.
+        '-E',
+        'cluster.routing.allocation.disk.watermark.flood_stage=95%',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
