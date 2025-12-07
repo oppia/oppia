@@ -121,7 +121,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
@@ -136,6 +135,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -273,7 +273,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (

@@ -11,7 +11,7 @@
              tabindex="0"
              (keydown.enter)="openHintEditor()"
              aria-label="edit hint"
-             class="fas fa-pen oppia-editor-edit-icon float-right"
+             class="fas fa-pen oppia-editor-edit-icon float-end"
              title="Edit Hint">
           </i>
         </div>
@@ -27,7 +27,7 @@
   </div>
 
   <div *ngIf="isEditable && hintEditorIsOpen">
-    <div class="form-inline">
+    <div class="d-flex align-items-center">
       <div class="oppia-rule-details-header">
         <strong tabindex="0">Hint # {{indexPlusOne}} is...</strong>
         <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->

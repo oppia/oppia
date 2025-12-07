@@ -36,7 +36,6 @@ dist/*
 !.coveragerc
 coverage.xml
 .viminfo
-.vscode/*
 .nyc_output/*
 libpeerconnection.log
 readme_test_dir/*

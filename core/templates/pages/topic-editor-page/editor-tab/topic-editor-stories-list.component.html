@@ -8,7 +8,7 @@
   <tr>
     <th *ngFor="let key of STORY_TABLE_COLUMN_HEADINGS"
         class="dashboard-table-headings">
-      <p *ngIf="key === 'title'" class="text-left">Title</p>
+      <p *ngIf="key === 'title'" class="text-start">Title</p>
       <p *ngIf="key === 'node_count'" class="text-center">Chapters</p>
       <p *ngIf="key === 'publication_status'" class="text-center">Published?</p>
     </th>
@@ -19,7 +19,7 @@
         class="list-item e2e-test-list-view-item-item e2e-test-story-list-item"
         cdkDrag>
       <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" tabindex="0"  (keydown.enter)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" [attr.aria-label]="'Story title: ' + summary.getTitle()" class="list-summary text-left">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" tabindex="0"  (keydown.enter)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" [attr.aria-label]="'Story title: ' + summary.getTitle()" class="list-summary text-start">
           <span class="e2e-test-story-title"> {{ summary.getTitle() }} </span>
         </a>
       </td>
@@ -65,7 +65,7 @@
         class="story-list-item e2e-test-list-view-item-item e2e-test-story-list-item"
         cdkDrag>
       <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-start">
           <span class="e2e-test-story-title"> {{ summary.getTitle() }} </span>
         </a>
       </td>
@@ -89,7 +89,7 @@
         </a>
       </td>
       <td>
-        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-left">
+        <a (click)="topicRights.canEditTopic() && openStoryEditor(summary.getId())" class="story-list-summary text-start">
           <span *ngIf="summary.getUpcomingChaptersCount() == 1">
             {{ summary.getUpcomingChaptersCount() }} upcoming launch (next {{ summary.getUpcomingChaptersExpectedDays()[0] }}
             <span *ngIf="summary.getUpcomingChaptersExpectedDays()[0] > 1"> days</span>

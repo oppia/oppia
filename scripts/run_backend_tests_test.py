@@ -28,7 +28,7 @@ import tempfile
 import threading
 import unittest.mock
 
-from core import feconf, utils
+from core import utils
 from core.tests import test_utils
 from scripts import (
     common,
@@ -615,36 +615,6 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'Redirecting to its corresponding test file...', self.print_arr
         )
 
-    def test_invalid_test_targets_message_is_displayed_docker(self) -> None:
-        swap_check_results = self.swap(
-            run_backend_tests,
-            'check_test_results',
-            lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
-        )
-        swapcheck_coverage = self.swap(
-            run_backend_tests,
-            'check_coverage',
-            lambda *unused_args, **unused_kwargs: ('', 100.00),
-        )
-        with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-            with self.swap_execute_task, swapcheck_coverage:
-                with self.swap_cloud_datastore_emulator, swap_check_results:
-                    with self.print_swap, self.swap_redis_server:
-                        run_backend_tests.main(
-                            args=[
-                                '--test_targets',
-                                'scripts.run_backend_tests.py',
-                            ]
-                        )
-
-        self.assertIn(
-            'WARNING : each test_target should point to the test file.',
-            self.print_arr,
-        )
-        self.assertIn(
-            'Redirecting to its corresponding test file...', self.print_arr
-        )
-
     def test_error_in_matching_shards_with_tests_throws_error(self) -> None:
         swap_check_results = self.swap(
             run_backend_tests,
@@ -784,7 +754,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         args = [
-            '--skip-install',
+            '--skip_install',
             '--test_targets',
             test_target,
             '--generate_coverage_report',
@@ -821,7 +791,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
 
-        args = ['--skip-install', '--test_targets', test_targets]
+        args = ['--skip_install', '--test_targets', test_targets]
         with self.print_swap, self.swap_redis_server, swap_execute_task:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 run_backend_tests.main(args=args)
@@ -1127,7 +1097,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     with swap_coverage, self.swap_execute_task:
-                        run_backend_tests.main(args=['--skip-install'])
+                        run_backend_tests.main(args=['--skip_install'])
             mock_third_party_install.assert_not_called()
 
     def test_third_party_install_with_skip_flag_not_set(self) -> None:
@@ -1147,3 +1117,295 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     with swap_coverage, self.swap_execute_task:
                         run_backend_tests.main(args=[])
             mock_third_party_install.assert_called_once()
+
+    def test_convert_args_to_pytest_with_verbose_flag(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--verbose', '--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('-v', pytest_args)
+        self.assertNotIn('-q', pytest_args)
+
+    def test_convert_args_to_pytest_without_verbose_flag(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('-q', pytest_args)
+        self.assertNotIn('-v', pytest_args)
+
+    def test_convert_args_to_pytest_with_coverage_report(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--generate_coverage_report', '--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('--cov=.', pytest_args)
+        self.assertIn('--cov-report=term-missing', pytest_args)
+        self.assertIn('--cov-fail-under=100', pytest_args)
+
+    def test_convert_args_to_pytest_with_coverage_ignore(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            [
+                '--generate_coverage_report',
+                '--ignore_coverage',
+                '--skip_install',
+            ]
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('--cov=.', pytest_args)
+        self.assertIn('--cov-report=term-missing', pytest_args)
+        self.assertNotIn('--cov-fail-under=100', pytest_args)
+
+    def test_convert_args_to_pytest_with_different_test_targets(self) -> None:
+        """Test conversion of various --test_targets formats."""
+        test_data: List[Tuple[str, str]] = [
+            # Test module.
+            ('core.utils_test', 'core/utils_test.py'),
+            # Test class.
+            (
+                'core.utils_test.SingletonMetaTests',
+                'core/utils_test.py::SingletonMetaTests',
+            ),
+            # Test method.
+            (
+                'core.utils_test.SingletonMetaTests.test_singleton',
+                'core/utils_test.py::SingletonMetaTests::test_singleton',
+            ),
+            # Target without _test suffix.
+            ('core.utils', 'core/utils_test.py'),
+        ]
+
+        for test_target, expected_path in test_data:
+            parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+                [f'--test_targets={test_target}', '--skip_install']
+            )
+            pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+            self.assertIn(
+                expected_path,
+                pytest_args,
+                msg=f'\n\nTest target: {test_target}',
+            )
+
+    def test_convert_args_to_pytest_with_multiple_test_targets(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            [
+                '--test_targets=core.utils_test,core.feconf_test',
+                '--skip_install',
+            ]
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('core/utils_test.py', pytest_args)
+        self.assertIn('core/feconf_test.py', pytest_args)
+
+    def test_convert_args_to_pytest_with_test_path(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--test_path=core/controllers', '--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('core/controllers', pytest_args)
+
+    def test_convert_args_to_pytest_with_test_shard(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--test_shard=1', '--skip_install']
+        )
+
+        # Mock the shard contents.
+        mock_shard_tests = [
+            'core.controllers.base_test',
+            'core.controllers.editor_test',
+            'scripts.linters.run_lint_checks_test',
+        ]
+
+        def mock_check_shards_match_tests(
+            include_load_tests: bool = True,  # pylint: disable=unused-argument
+        ) -> str:
+            return ''
+
+        def mock_get_all_test_targets_from_shard(
+            shard_name: str,  # pylint: disable=unused-argument
+        ) -> List[str]:
+            return mock_shard_tests
+
+        swap_check_shards = self.swap(
+            run_backend_tests,
+            'check_shards_match_tests',
+            mock_check_shards_match_tests,
+        )
+        swap_get_shard_tests = self.swap(
+            run_backend_tests,
+            'get_all_test_targets_from_shard',
+            mock_get_all_test_targets_from_shard,
+        )
+
+        with swap_check_shards, swap_get_shard_tests:
+            pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+
+        # Verify that only the shard tests are included.
+        test_file_args = [arg for arg in pytest_args if arg.endswith('.py')]
+        self.assertEqual(len(test_file_args), 3)
+        self.assertEqual(
+            set(test_file_args),
+            {
+                'core/controllers/base_test.py',
+                'core/controllers/editor_test.py',
+                'scripts/linters/run_lint_checks_test.py',
+            },
+        )
+
+    def test_convert_args_to_pytest_with_exclude_load_tests(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--exclude_load_tests', '--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('--ignore=core/tests/load_tests', pytest_args)
+        self.assertIn('.', pytest_args)
+
+    def test_convert_args_to_pytest_default_runs_all_tests(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--skip_install']
+        )
+        pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+        self.assertIn('.', pytest_args)
+
+    def test_convert_args_to_pytest_with_test_shard_validation_error(
+        self,
+    ) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--test_shard=1', '--skip_install']
+        )
+
+        def mock_check_shards_match_tests(
+            include_load_tests: bool = True,  # pylint: disable=unused-argument
+        ) -> str:
+            return 'Shard validation error'
+
+        swap_check_shards = self.swap(
+            run_backend_tests,
+            'check_shards_match_tests',
+            mock_check_shards_match_tests,
+        )
+
+        with swap_check_shards:
+            with self.assertRaisesRegex(Exception, 'Shard validation error'):
+                run_backend_tests.convert_args_to_pytest(parsed_args)
+
+    def test_convert_args_to_pytest_with_run_on_changed_files(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--run_on_changed_files_in_branch', '--skip_install']
+        )
+
+        def mock_get_changed_files() -> Set[str]:
+            return {'core.utils_test', 'core.feconf_test'}
+
+        swap_changed_files = self.swap(
+            git_changes_utils,
+            'get_changed_python_test_files',
+            mock_get_changed_files,
+        )
+
+        with swap_changed_files:
+            pytest_args = run_backend_tests.convert_args_to_pytest(parsed_args)
+
+        # Verify exactly the changed files are included.
+        self.assertIn('core/utils_test.py', pytest_args)
+        self.assertIn('core/feconf_test.py', pytest_args)
+        # Verify no other test files are included.
+        test_file_args = [arg for arg in pytest_args if arg.endswith('.py')]
+        self.assertEqual(len(test_file_args), 2)
+        self.assertEqual(
+            set(test_file_args), {'core/utils_test.py', 'core/feconf_test.py'}
+        )
+
+    def test_run_tests_with_pytest_success(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--test_targets=core.utils_test', '--skip_install']
+        )
+
+        with unittest.mock.patch('pytest.main', return_value=0) as mock_pytest:
+            with self.print_swap:
+                exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
+
+        self.assertEqual(exit_code, 0)
+        mock_pytest.assert_called_once()
+        # Check that pytest was called with correct arguments.
+        call_args = mock_pytest.call_args[0][0]
+        self.assertIn('core/utils_test.py', call_args)
+
+    def test_run_tests_with_pytest_failure(self) -> None:
+        parsed_args = run_backend_tests._PARSER.parse_args(  # pylint: disable=protected-access
+            ['--test_targets=core.utils_test', '--skip_install']
+        )
+
+        with unittest.mock.patch('pytest.main', return_value=1) as mock_pytest:
+            with self.print_swap:
+                exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
+
+        self.assertEqual(exit_code, 1)
+        mock_pytest.assert_called_once()
+
+    def test_main_with_use_pytest_flag_success(self) -> None:
+        with unittest.mock.patch('pytest.main', return_value=0):
+            with self.swap_redis_server:
+                with self.swap_cloud_datastore_emulator:
+                    with self.print_swap:
+                        # Should not raise an exception.
+                        run_backend_tests.main(
+                            args=[
+                                '--use_pytest',
+                                '--test_targets=core.utils_test',
+                                '--skip_install',
+                            ]
+                        )
+        self.assertIn('Done!', self.print_arr)
+
+    def test_main_with_use_pytest_flag_failure(self) -> None:
+        with unittest.mock.patch('pytest.main', return_value=1):
+            with self.swap_redis_server:
+                with self.swap_cloud_datastore_emulator:
+                    with self.print_swap:
+                        with self.assertRaisesRegex(
+                            Exception, 'Tests failed with exit code 1'
+                        ):
+                            run_backend_tests.main(
+                                args=[
+                                    '--use_pytest',
+                                    '--test_targets=core.utils_test',
+                                    '--skip_install',
+                                ]
+                            )
+
+    def test_main_with_use_pytest_uses_correct_emulator_context(self) -> None:
+        emulator_context_entered = {'cloud_datastore': False, 'redis': False}
+
+        def mock_cloud_datastore_emulator(
+            **_: str,
+        ) -> MockCompilerContextManager:
+            emulator_context_entered['cloud_datastore'] = True
+            return MockCompilerContextManager()
+
+        def mock_redis_server(**_: str) -> MockCompilerContextManager:
+            emulator_context_entered['redis'] = True
+            return MockCompilerContextManager()
+
+        swap_redis = self.swap(
+            servers, 'managed_redis_server', mock_redis_server
+        )
+        swap_datastore = self.swap(
+            servers,
+            'managed_cloud_datastore_emulator',
+            mock_cloud_datastore_emulator,
+        )
+
+        with unittest.mock.patch('pytest.main', return_value=0):
+            with swap_redis, swap_datastore, self.print_swap:
+                run_backend_tests.main(
+                    args=[
+                        '--use_pytest',
+                        '--test_targets=core.utils_test',
+                        '--skip_install',
+                    ]
+                )
+
+        # Verify emulator contexts were entered.
+        self.assertTrue(emulator_context_entered['cloud_datastore'])
+        self.assertTrue(emulator_context_entered['redis'])

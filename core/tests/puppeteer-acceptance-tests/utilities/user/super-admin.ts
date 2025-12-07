@@ -1039,7 +1039,9 @@ export class SuperAdmin extends BaseUser {
       await platformParameter.waitForSelector(paramSaveChangesButton, {
         visible: true,
       });
-      const saveButton = await platformParameter.$(paramSaveChangesButton);
+      const saveButton = await platformParameter.$(
+        `${paramSaveChangesButton} button`
+      );
       if (!saveButton) {
         throw new Error(
           `Save button not found for platform parameter "${parameterName}".`

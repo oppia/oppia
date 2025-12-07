@@ -38,7 +38,7 @@ The root folder MUST be named 'oppia'.
 )
 
 _PARSER.add_argument(
-    '--skip-build',
+    '--skip_build',
     help='If true, skips building files. The default value is false.',
     action='store_true',
 )
