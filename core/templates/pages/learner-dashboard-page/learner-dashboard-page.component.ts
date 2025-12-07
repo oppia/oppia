@@ -16,7 +16,7 @@
  * @fileoverview Component for the learner dashboard.
  */
 
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import {
   trigger,
   state,
@@ -25,34 +25,35 @@ import {
   animate,
   group,
 } from '@angular/animations';
-import {TranslateService} from '@ngx-translate/core';
-import {Subscription} from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
-import {AppConstants} from 'app.constants';
-import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
-import {CollectionSummary} from 'domain/collection/collection-summary.model';
-import {ProfileSummary} from 'domain/user/profile-summary.model';
+import { AppConstants } from 'app.constants';
+import { LearnerExplorationSummary } from 'domain/summary/learner-exploration-summary.model';
+import { CollectionSummary } from 'domain/collection/collection-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
 import {
   LearnerDashboardBackendApiService,
   SubtopicMasterySummaryBackendDict,
 } from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import {SuggestionModalForLearnerDashboardService} from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
-import {LearnerDashboardPageConstants} from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
-import {AlertsService} from 'services/alerts.service';
-import {DateTimeFormatService} from 'services/date-time-format.service';
-import {LoaderService} from 'services/loader.service';
-import {UserService} from 'services/user.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {StorySummary} from 'domain/story/story-summary.model';
-import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {PageTitleService} from 'services/page-title.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {UrlService} from 'services/contextual/url.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { SuggestionModalForLearnerDashboardService } from 'pages/learner-dashboard-page/suggestion-modal/suggestion-modal-for-learner-dashboard.service';
+import { LearnerDashboardPageConstants } from 'pages/learner-dashboard-page/learner-dashboard-page.constants';
+import { AlertsService } from 'services/alerts.service';
+import { DateTimeFormatService } from 'services/date-time-format.service';
+import { LoaderService } from 'services/loader.service';
+import { UserService } from 'services/user.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { StorySummary } from 'domain/story/story-summary.model';
+import { LearnerTopicSummary } from 'domain/topic/learner-topic-summary.model';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { PageTitleService } from 'services/page-title.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { UrlService } from 'services/contextual/url.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerBadgeService } from 'services/learner-badge.service';
 
 import './learner-dashboard-page.component.css';
 
@@ -165,6 +166,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   collectionPlaylist!: CollectionSummary[];
   activeSection!: string;
   activeSubsection!: string;
+  activeSectionTitle: string = '';
 
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
@@ -186,6 +188,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     [];
   subtopicMasteries: Record<string, SubtopicMasterySummaryBackendDict> = {};
   curatedExplorationIds = new Set<string>();
+  badges: any[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -203,8 +206,9 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private urlService: UrlService,
-    private platFeatService: PlatformFeatureService
-  ) {}
+    private platFeatService: PlatformFeatureService,
+    private badgeService: LearnerBadgeService
+  ) { }
 
   populateCuratedExplorationIds(): void {
     this.curatedExplorationIds.clear();
@@ -384,6 +388,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         this.setPageTitle();
       })
     );
+
+    this.fetchBadges();
   }
 
   ngOnDestroy(): void {
@@ -472,6 +478,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .catch(errorResponse => {
           // This is placed here in order to satisfy Unit tests.
         });
+    } else if (
+      this.activeSection ===
+      LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS.BADGES
+    ) {
+      this.activeSectionTitle = 'Badges';
     }
   }
 
@@ -609,5 +620,11 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         ...this.partiallyLearntTopicsList.map(topic => topic.id),
         ...this.learntTopicsList.map(topic => topic.id),
       ]);
+  }
+
+  fetchBadges(): void {
+    this.badgeService.getUserBadges().subscribe((data) => {
+      this.badges = data.badge_details || [];
+    });
   }
 }
