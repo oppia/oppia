@@ -398,8 +398,8 @@
   </ng-container>
   <div *ngIf="learnerDashboardRedesignFeatureFlag">
     <ng-container *ngIf="!isLearnerStateEmpty(); else empty">
-      <div tabindex="0" class="oppia-learner-dash-section e2e-test-in-progress-community-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0 || partiallyLearntTopicsList.length !== 0">
-        <p class="oppia-learner-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
+      <div tabindex="0" class="oppia-learner-dash-section e2e-test-in-progress-lessons-section" *ngIf="totalIncompleteLessonsList.length !== 0 || partiallyLearntTopicsList.length !== 0">
+        <p class="oppia-learner-dash-section-heading e2e-test-in-progress-dash-section-heading">{{ 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION' | translate }}</p>
         <div class="incomplete-section e2e-test-incomplete-community-lessons-section w-100" >
           <!--TODO(#18384): Display all lessons in topic or just the most recent/last?-->
           <oppia-card-display *ngIf="partiallyLearntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM'" [numCards]="partialTopicMastery.length" [controlType]="'toggle'">
@@ -449,7 +449,7 @@
     </ng-container>
     <ng-template #empty>
       <div class="oppia-learner-dash-progress-empty-div e2e-test-empty-progress-section">
-        <p class="oppia-learner-dash-progress-empty-text"> {{ 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_EMPTY_DESC' | translate }} </p>
+        <p class="oppia-learner-dash-progress-empty-text e2e-test-empty-progress-message"> {{ 'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_EMPTY_DESC' | translate }} </p>
         <oppia-classroom-button [classroom]="'math'" [variant]="'default'"> </oppia-classroom-button>
       </div>
     </ng-template>

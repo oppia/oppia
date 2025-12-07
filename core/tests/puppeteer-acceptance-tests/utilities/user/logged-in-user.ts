@@ -216,6 +216,7 @@ const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
 const emptyProgressSectionContainerSelector =
   '.e2e-test-empty-progress-section';
+const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -239,6 +240,10 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     content: '.e2e-test-learner-dash-section',
     heading: '.e2e-test-learner-dash-section-heading',
   },
+  tabSectionInProgressTab: {
+    content: '.e2e-test-in-progress-lessons-section',
+    heading: '.e2e-test-in-progress-dash-section-heading',
+  },
   cardDisplay: {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
@@ -252,6 +257,12 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     heading: '.e2e-test-lesson-card-title',
     button: '.e2e-test-resume-lesson-btn',
     progress: '.e2e-test-progress-lesson',
+  },
+  skillCard: {
+    content: '.e2e-test-skill-card',
+    heading: '.e2e-test-skill-card-title',
+    button: '.e2e-test-skill-button',
+    progress: '.e2e-test-progress-skill',
   },
 };
 
@@ -3308,6 +3319,7 @@ export class LoggedInUser extends BaseUser {
       const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
         ele.textContent?.trim()
       );
+      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
       if (targetHeadingText === criteria) {
         targetElement = h;
         break;
@@ -3432,6 +3444,52 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies Skill card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectSkillCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    progress: number,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresent(
+      expectedTitles,
+      'skillCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const skillCardElement = await this.findElement(
+        subsectionElement,
+        learnerDashSelectors.skillCard,
+        title
+      );
+      if (!skillCardElement) {
+        throw new Error(`Skill card with title "${title}" was not found.`);
+      }
+
+      const progressText = await skillCardElement.$eval(
+        learnerDashSelectors.skillCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
+  }
+
+  /**
    * Verifies user is on correct lesson page.
    * @param {string} lessonTitle - Lesson card title expected.
    * @param {string} lessonId - Lesson card id expected.
@@ -3484,6 +3542,43 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} skillTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToSkillByCard(
+    criteria: string,
+    skillTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElement(
+      criteria,
+      section
+    );
+
+    const skillCardElement = await this.findElement(
+      subsectionElement,
+      learnerDashSelectors.skillCard,
+      skillTitle
+    );
+
+    if (skillCardElement) {
+      const skillCardButtonElement = await skillCardElement.$(
+        learnerDashSelectors.skillCard.button
+      );
+      if (skillCardButtonElement) {
+        await skillCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      }
+    } else {
+      throw new Error(
+        `${skillTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
+    }
+  }
+
+  /**
    * Function to verify the Or Explore All Lessons in Classroom section in the redesigned learner dashboard is present or not.
    * @param {boolean} visible - Whether the section should be visible or not.
    */
@@ -3494,6 +3589,18 @@ export class LoggedInUser extends BaseUser {
       classroomButtonOnRedesignedLearnerDashboard,
       visible
     );
+  }
+
+  /**
+   * Function to click on the Or Explore All Lessons in Classroom section in the redesigned learner dashboard
+   */
+  async navigateThroughClassroomButtonONRLD(): Promise<void> {
+    const goToClassroomButton = await this.page.$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    await goToClassroomButton?.click();
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
   }
 
   /**
@@ -3675,6 +3782,12 @@ export class LoggedInUser extends BaseUser {
    */
   async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
     await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
+    const expectedMessage =
+      "It looks like you don't have any lessons in progress or completed. Head over to Oppia's Classroom to start your first lesson!";
+    await this.expectTextContentToBe(
+      emptyProgressSectionMessage,
+      expectedMessage
+    );
   }
 
   /**

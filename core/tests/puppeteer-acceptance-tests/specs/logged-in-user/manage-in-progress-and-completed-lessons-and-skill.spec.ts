@@ -30,6 +30,7 @@ const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
 describe('Logged-in User', function () {
+  jest.setTimeout(6000000);
   let loggedInUser: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
@@ -50,49 +51,54 @@ describe('Logged-in User', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
+    await releaseCoordinator.closeBrowser();
 
-    //   await curriculumAdmin.createNewClassroom('Math', 'math');
-    //   await curriculumAdmin.updateClassroom(
-    //     'Math',
-    //     'Welcome to Math classroom!',
-    //     'This course covers basic operations.',
-    //     'In this course, you will learn the following topics: Place Values.'
-    //   );
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
+    );
 
-    //   await curriculumAdmin.createAndPublishTopic(
-    //     'Place Values',
-    //     'Place Values subtopics',
-    //     'Place Values skills'
-    //   );
-    //   await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
-    //   await curriculumAdmin.publishClassroom('Math');
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values',
+      'Place Values'
+    );
+    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+    await curriculumAdmin.publishClassroom('Math');
 
-    //   const placeValueChapters = [
-    //     'What are the Place Values',
-    //     'Find the Value of a Number',
-    //     'Comparing Numbers',
-    //   ];
+    const placeValueChapters = [
+      'What are the Place Values',
+      // 'Find the Value of a Number',
+      // 'Comparing Numbers',
+    ];
 
-    //   const chapterIds: (string | null)[] = [];
+    const chapterIds: (string | null)[] = [];
 
-    //   for (const chapter of placeValueChapters) {
-    //     const id =
-    //       await curriculumAdmin.createAndPublishExplorationWithCards(chapter);
-    //     chapterIds.push(id);
-    //   }
+    for (const chapter of placeValueChapters) {
+      const id = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
+      );
+      chapterIds.push(id);
+    }
 
-    //   await curriculumAdmin.addStoryToTopic(
-    //     "Jamie's Adventures in the Arcade",
-    //     'story',
-    //     'Place Values'
-    //   );
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
 
-    //   for (const [index, id] of chapterIds.entries()) {
-    //     await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
-    //   }
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
 
-    //   await curriculumAdmin.saveStoryDraft();
-    //   await curriculumAdmin.publishStoryDraft();
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+    await curriculumAdmin.closeBrowser();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
@@ -115,4 +121,63 @@ describe('Logged-in User', function () {
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+
+  it('should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math', async function () {
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+    await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+      true
+    );
+    await loggedInUser.navigateThroughClassroomButtonONRLD();
+    await loggedInUser.expectToBeOnPage('/learn/math');
+  });
+
+  it('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
+    await loggedInUser.selectAndOpenTopic('Place Values');
+    await loggedInUser.selectChapterWithinStoryToLearn(
+      "Jamie's Adventures in the Arcade",
+      'What are the Place Values'
+    );
+    await loggedInUser.continueToNextCard();
+
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.expectScreenshotToMatch(
+      'ProgressSectionInProgressWithOnlyChapter01',
+      __dirname
+    );
+    await loggedInUser.expectElementsToBePresent(
+      ['In Progress'],
+      'tabSectionInProgressTab'
+    );
+    await loggedInUser.expectElementsToBePresent(
+      ['Classroom Lessons', 'Skills'],
+      'cardDisplay'
+    );
+
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Classroom Lessons',
+      ['Chapter 1: What are the Place Values'],
+      0
+    );
+    await loggedInUser.expectSkillCardProgressToBe(
+      'Skills',
+      ['Place Values'],
+      0
+    );
+    await loggedInUser.navigateToLessonByCard(
+      'Classroom Lessons',
+      'Chapter 1: What are the Place Values'
+    );
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+    await loggedInUser.navigateToSkillByCard('Skills', 'Place Values');
+  });
+
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });
