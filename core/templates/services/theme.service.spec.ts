@@ -128,14 +128,22 @@ describe('ThemeService', () => {
     it('should apply theme pack class to body', () => {
       // Need to mock forEach for classList.
       const classList = new Set<string>();
+      const addSpy = jasmine.createSpy('add').and.callFake((cls: string) => {
+        classList.add(cls);
+      });
+      const removeSpy = jasmine
+        .createSpy('remove')
+        .and.callFake((cls: string) => {
+          classList.delete(cls);
+        });
       mockWindowRef.nativeWindow.document.body.classList = {
-        add: (cls: string) => classList.add(cls),
-        remove: (cls: string) => classList.delete(cls),
+        add: addSpy,
+        remove: removeSpy,
         forEach: (fn: (cls: string) => void) => classList.forEach(fn),
       } as unknown as DOMTokenList;
 
       themeService.setThemeConfig({themePackId: 'ocean'});
-      expect(classList.has('theme-pack-ocean')).toBeTrue();
+      expect(classList.has('theme-pack-ocean')).toBe(true);
     });
   });
 
