@@ -185,10 +185,10 @@ export class GoalsTabComponent implements OnInit {
     topic: LearnerTopicSummary,
     topicId: string,
     index: number,
-    event?: Event,
+    event?: Event
   ): Promise<void> {
-    if(event){
-      event.preventDefault()
+    if (event) {
+      event.preventDefault();
     }
     var activityId = topicId;
     var activityType = AppConstants.ACTIVITY_TYPE_LEARN_TOPIC;

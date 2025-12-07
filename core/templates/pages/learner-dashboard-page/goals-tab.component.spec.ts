@@ -21,7 +21,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  tick
+  tick,
 } from '@angular/core/testing';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
@@ -371,8 +371,8 @@ describe('Goals tab Component', () => {
     const checkbox = fixture.debugElement.query(
       By.css('.e2e-test-remove-topic-from-current-goals-button')
     );
-    if (!checkbox){
-      throw new Error("Unable to find the checkbox event")
+    if (!checkbox) {
+      throw new Error('Unable to find the checkbox event');
     }
 
     const addToLearnerGoalsSpy = spyOn(
@@ -380,8 +380,8 @@ describe('Goals tab Component', () => {
       'addToLearnerGoals'
     ).and.callThrough();
 
-    checkbox.triggerEventHandler('click', { preventDefault: () => {} } as Event)
-    fixture.detectChanges()
+    checkbox.triggerEventHandler('click', {preventDefault: () => {}} as Event);
+    fixture.detectChanges();
 
     expect(addToLearnerGoalsSpy).toHaveBeenCalled();
   });
@@ -407,7 +407,7 @@ describe('Goals tab Component', () => {
       learnerDashboardActivityBackendApiService,
       'addToLearnerGoals'
     ).and.returnValue(Promise.resolve(true));
-    tick()
+    tick();
     const removeTopicSpy = spyOn(component, 'removeFromLearnerGoals');
 
     component.addToLearnerGoals(component.editGoals[0], '2', 1);
