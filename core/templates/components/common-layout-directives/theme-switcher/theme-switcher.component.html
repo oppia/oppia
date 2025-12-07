@@ -1,0 +1,22 @@
+<button class="btn btn-default oppia-theme-switcher-button" (click)="toggleTheme()"
+    [matTooltip]="'I18N_THEME_SWITCH_TOOLTIP' | translate"
+    [attr.aria-label]="'Toggle theme: current is ' + (getIcon() === 'dark_mode' ? 'dark' : 'light')" role="switch"
+    [attr.aria-checked]="getIcon() === 'dark_mode'">
+    <span class="material-icons" aria-hidden="true">{{ getIcon() }}</span>
+</button>
+
+
+<style>
+    .oppia-theme-switcher-button {
+        color: var(--oppia-footer-text);
+        /* Matches navbar text */
+        background: transparent;
+        border: none;
+        margin-right: 15px;
+        padding: 6px;
+    }
+
+    .oppia-theme-switcher-button:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+</style>

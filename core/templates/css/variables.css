@@ -1,0 +1,189 @@
+:root {
+    /* =========================================
+     Base Logic & Defaults
+     ========================================= */
+
+    /* Brand Colors */
+    --oppia-primary-color: #00645c;
+    --oppia-primary-hover-color: #115fd4;
+
+    /* Text Colors */
+    --oppia-text-primary-color: rgba(0, 0, 0, 0.87);
+    --oppia-text-secondary-color: #555;
+    --oppia-link-color: #0d48a1;
+    --oppia-link-hover-color: #3f2c76;
+
+    /* Background Colors */
+    --oppia-body-bg: #e8e7e3;
+    --oppia-card-bg: #ffffff;
+    --oppia-light-bg: #fff;
+    --oppia-navbar-bg: var(--oppia-primary-color);
+    --oppia-sidebar-bg: var(--oppia-primary-color);
+
+    /* Footer */
+    --oppia-footer-bg: #094142;
+    --oppia-footer-text: #fff;
+
+    /* Form/Input */
+    --oppia-input-border: #ccc;
+    --oppia-input-border-error: #f44336;
+    --oppia-input-bg: #fff;
+    --oppia-input-text: #000;
+
+    /* Status Messages */
+    --oppia-status-message-bg: #fff;
+    --oppia-status-message-border: #00376d;
+    --oppia-status-message-text: #000;
+
+    /* Typography */
+    --oppia-font-family: "Roboto", Arial, sans-serif;
+    --oppia-heading-font-family: "Roboto", Arial, sans-serif;
+}
+
+/* =========================================
+   Dark Mode Definitions
+   ========================================= */
+body.dark-mode {
+    /* Backgrounds */
+    --oppia-body-bg: #121212;
+    --oppia-card-bg: #1e1e1e;
+    --oppia-light-bg: #1e1e1e;
+    --oppia-navbar-bg: #2d2d2d;
+    --oppia-sidebar-bg: #004d40;
+
+    /* Brand Adjustments for Dark Mode */
+    --oppia-primary-color: #4db6ac;
+    /* lighter teal for dark mode */
+    --oppia-primary-hover-color: #80cbc4;
+
+    /* Text */
+    --oppia-text-primary-color: #e0e0e0;
+    --oppia-text-secondary-color: #b0b0b0;
+
+    /* Links */
+    --oppia-link-color: #8ab4f8;
+    --oppia-link-hover-color: #d2e3fc;
+
+    /* Footer */
+    --oppia-footer-bg: #000000;
+    --oppia-footer-text: #e0e0e0;
+
+    /* Forms */
+    --oppia-input-border: #444;
+    --oppia-input-border-error: #ef5350;
+    --oppia-input-bg: #2d2d2d;
+    --oppia-input-text: #e0e0e0;
+
+    /* Status Messages */
+    --oppia-status-message-bg: #333;
+    --oppia-status-message-border: #8ab4f8;
+    --oppia-status-message-text: #e0e0e0;
+}
+
+/* =========================================
+   Theme Pack: Ocean (Blue-focused)
+   ========================================= */
+body.theme-pack-ocean {
+    --oppia-primary-color: #1565c0;
+    --oppia-primary-hover-color: #0d47a1;
+    --oppia-body-bg: #f0f4f8;
+    /* Soft Blue-Gray */
+    --oppia-navbar-bg: #0d47a1;
+    --oppia-sidebar-bg: #1565c0;
+    --oppia-footer-bg: #0a3d6e;
+    --oppia-link-color: #1976d2;
+    --oppia-link-hover-color: #0d47a1;
+}
+
+body.theme-pack-ocean.dark-mode {
+    --oppia-primary-color: #64b5f6;
+    --oppia-primary-hover-color: #90caf9;
+    --oppia-body-bg: #0d1b2a;
+    /* Deep Blue Black */
+    --oppia-navbar-bg: #1a237e;
+    --oppia-sidebar-bg: #283593;
+    --oppia-footer-bg: #050b16;
+    --oppia-link-color: #90caf9;
+    --oppia-link-hover-color: #bbdefb;
+}
+
+/* =========================================
+   Theme Pack: Forest (Green-focused)
+   ========================================= */
+body.theme-pack-forest {
+    --oppia-primary-color: #2e7d32;
+    --oppia-primary-hover-color: #1b5e20;
+    --oppia-body-bg: #f1f8e9;
+    /* Soft Green-Gray */
+    --oppia-navbar-bg: #1b5e20;
+    --oppia-sidebar-bg: #2e7d32;
+    --oppia-footer-bg: #1a4a1c;
+    --oppia-link-color: #388e3c;
+    --oppia-link-hover-color: #1b5e20;
+}
+
+body.theme-pack-forest.dark-mode {
+    --oppia-primary-color: #81c784;
+    --oppia-primary-hover-color: #a5d6a7;
+    --oppia-body-bg: #1b3a1d;
+    /* Deep Green Black */
+    --oppia-navbar-bg: #143516;
+    --oppia-sidebar-bg: #2e7d32;
+    --oppia-footer-bg: #0d2e0f;
+    --oppia-link-color: #a5d6a7;
+    --oppia-link-hover-color: #c8e6c9;
+}
+
+/* =========================================
+   Theme Pack: Sunset (Orange-Red)
+   ========================================= */
+body.theme-pack-sunset {
+    --oppia-primary-color: #d84315;
+    --oppia-primary-hover-color: #bf360c;
+    --oppia-body-bg: #fff8e1;
+    /* Warm Yellow-White */
+    --oppia-navbar-bg: #bf360c;
+    --oppia-sidebar-bg: #d84315;
+    --oppia-footer-bg: #5d1d0c;
+    --oppia-link-color: #e64a19;
+    --oppia-link-hover-color: #bf360c;
+}
+
+body.theme-pack-sunset.dark-mode {
+    --oppia-primary-color: #ffab91;
+    --oppia-primary-hover-color: #ffccbc;
+    --oppia-body-bg: #3e1c12;
+    /* Deep Brown-Red */
+    --oppia-navbar-bg: #4e261a;
+    --oppia-sidebar-bg: #d84315;
+    --oppia-footer-bg: #2d130a;
+    --oppia-link-color: #ffccbc;
+    --oppia-link-hover-color: #ffab91;
+}
+
+/* =========================================
+   Theme Pack: Lavender (Purple)
+   ========================================= */
+body.theme-pack-lavender {
+    --oppia-primary-color: #673ab7;
+    --oppia-primary-hover-color: #512da8;
+    --oppia-body-bg: #f3e5f5;
+    /* Soft Purple-White */
+    --oppia-navbar-bg: #512da8;
+    --oppia-sidebar-bg: #673ab7;
+    --oppia-footer-bg: #320b86;
+    --oppia-link-color: #7e57c2;
+    --oppia-link-hover-color: #512da8;
+}
+
+body.theme-pack-lavender.dark-mode {
+    --oppia-primary-color: #b39ddb;
+    --oppia-primary-hover-color: #d1c4e9;
+    --oppia-body-bg: #1f1130;
+    /* Deep Purple-Black */
+    --oppia-navbar-bg: #311b92;
+    --oppia-sidebar-bg: #4527a0;
+    --oppia-footer-bg: #120633;
+    --oppia-link-color: #d1c4e9;
+    --oppia-link-hover-color: #b39ddb;
+}
