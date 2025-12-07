@@ -75,6 +75,7 @@ class ParamName(enum.Enum):
     ES_CLOUD_ID = 'es_cloud_id'
     ES_USERNAME = 'es_username'
     OPPIA_SITE_URL_FOR_EMAILS = 'oppia_site_url_for_emails'
+    THEME_CUSTOMIZATION_CONFIG = 'theme_customization_config'
 
 
 ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
@@ -107,4 +108,5 @@ ALL_PLATFORM_PARAMS_LIST: List[ParamName] = [
     ParamName.ES_CLOUD_ID,
     ParamName.ES_USERNAME,
     ParamName.OPPIA_SITE_URL_FOR_EMAILS,
+    ParamName.THEME_CUSTOMIZATION_CONFIG,
 ]

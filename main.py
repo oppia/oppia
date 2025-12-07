@@ -721,6 +721,7 @@ URLS = [
         resources.ValueGeneratorHandler,
     ),
     get_redirect_route(r'/promo_bar_handler', resources.PromoBarHandler),
+    get_redirect_route(r'/theme_config_handler', resources.ThemeConfigHandler),
     get_redirect_route('/library', library.OldLibraryRedirectPage),
     get_redirect_route(
         r'%s' % feconf.LIBRARY_INDEX_DATA_URL, library.LibraryIndexHandler

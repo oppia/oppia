@@ -256,6 +256,29 @@ class PromoBarHandler(
         self.render_json({})
 
 
+class ThemeConfigHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Handler for theme customization config."""
+
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_UNFINISHED_SIGNUPS = False
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Retrieves the theme customization configuration."""
+        self.render_json(
+            {
+                'theme_customization_config': (
+                    platform_parameter_services.get_platform_parameter_value(
+                        'theme_customization_config'
+                    )
+                ),
+            }
+        )
+
+
 class FaviconHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
     """Handles favicon image redirection·"""
 

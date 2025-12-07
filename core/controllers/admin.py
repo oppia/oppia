@@ -249,6 +249,7 @@ class AdminHandlerNormalizePayloadDict(TypedDict):
     exp_id: Optional[str]
     blog_post_title: Optional[str]
     default_value: Dict[str, parameter_domain.PlatformDataTypes]
+    new_config_property_values: Optional[Dict[str, str]]
 
 
 class AdminHandler(
@@ -281,6 +282,7 @@ class AdminHandler(
                         'regenerate_topic_related_opportunities',
                         'update_platform_parameter_rules',
                         'rollback_exploration_to_safe_state',
+                        'save_config_properties',
                     ],
                 },
                 # TODO(#13331): Remove default_value when it is confirmed that,
@@ -369,6 +371,14 @@ class AdminHandler(
                     'validation_method': (
                         validation_method.validate_new_default_value_of_platform_parameter
                     ),
+                },
+                'default_value': None,
+            },
+            'new_config_property_values': {
+                'schema': {
+                    'type': 'variable_keys_dict',
+                    'keys': {'schema': {'type': 'basestring'}},
+                    'values': {'schema': {'type': 'basestring'}},
                 },
                 'default_value': None,
             },
@@ -646,6 +656,34 @@ class AdminHandler(
                     exp_id
                 )
                 result = {'version': version}
+            elif action == 'save_config_properties':
+                new_config_property_values = self.normalized_payload.get(
+                    'new_config_property_values'
+                )
+                if new_config_property_values is None:
+                    raise Exception(
+                        'The \'new_config_property_values\' '
+                        'must be provided when the action is '
+                        'save_config_properties.'
+                    )
+                for (
+                    param_name,
+                    param_value,
+                ) in new_config_property_values.items():
+                    param = registry.Registry.get_platform_parameter(param_name)
+                    rules = [
+                        parameter_domain.PlatformParameterRule.from_dict(
+                            {'filters': [], 'value_when_matched': param_value}
+                        )
+                    ]
+                    registry.Registry.update_platform_parameter(
+                        param_name,
+                        self.user_id,
+                        'Update %s property from admin page.' % param_name,
+                        rules,
+                        param.default_value,
+                    )
+                result = {}
             else:
                 # The handler schema defines the possible values of 'action'.
                 # If 'action' has a value other than those defined in the
