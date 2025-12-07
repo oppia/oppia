@@ -18,8 +18,8 @@
  * the editor pages).
  */
 
-import {Subscription} from 'rxjs';
-import {PageContextService} from 'services/page-context.service';
+import { Subscription } from 'rxjs';
+import { PageContextService } from 'services/page-context.service';
 import {
   ChangeDetectorRef,
   Component,
@@ -27,32 +27,32 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import {SidebarStatusService} from 'services/sidebar-status.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {UserService} from 'services/user.service';
-import {DeviceInfoService} from 'services/contextual/device-info.service';
+import { SidebarStatusService } from 'services/sidebar-status.service';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { UserService } from 'services/user.service';
+import { DeviceInfoService } from 'services/contextual/device-info.service';
 import debounce from 'lodash/debounce';
-import {AlertsService} from 'services/alerts.service';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {SearchService} from 'services/search.service';
-import {EventToCodes, NavigationService} from 'services/navigation.service';
-import {AppConstants} from 'app.constants';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
-import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {FocusManagerService} from 'services/stateful/focus-manager.service';
-import {I18nService} from 'i18n/i18n.service';
-import {CreatorTopicSummary} from 'domain/topic/creator-topic-summary.model';
-import {UrlService} from 'services/contextual/url.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
-import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
-import {LanguageBannerService} from 'components/language-banner/language-banner.service';
+import { AlertsService } from 'services/alerts.service';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import { SearchService } from 'services/search.service';
+import { EventToCodes, NavigationService } from 'services/navigation.service';
+import { AppConstants } from 'app.constants';
+import { NavbarAndFooterGATrackingPages } from 'app.constants';
+import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
+import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import { I18nService } from 'i18n/i18n.service';
+import { CreatorTopicSummary } from 'domain/topic/creator-topic-summary.model';
+import { UrlService } from 'services/contextual/url.service';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+import { LearnerGroupBackendApiService } from 'domain/learner_group/learner-group-backend-api.service';
+import { FeedbackUpdatesBackendApiService } from 'domain/feedback_updates/feedback-updates-backend-api.service';
+import { FeedbackThreadSummaryBackendDict } from 'domain/feedback_thread/feedback-thread-summary.model';
+import { LanguageBannerService } from 'components/language-banner/language-banner.service';
 
 import './top-navigation-bar.component.css';
-import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
+import { ContentTranslationManagerService } from 'pages/exploration-player-page/services/content-translation-manager.service';
 
 interface LanguageInfo {
   id: string;
@@ -179,6 +179,37 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   navElementsVisibilityStatus: Record<string, boolean> = {};
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
+  // 
+  isDarkModeEnabledFlag: boolean = false;
+
+  get isDarkModeEnabled(): boolean {
+    return this.isDarkModeEnabledFlag;
+  }
+
+  toggleTheme(): void {
+    this.isDarkModeEnabledFlag = !this.isDarkModeEnabledFlag;
+
+    const documentRef = this.windowRef.nativeWindow.document;
+    const rootEl: HTMLElement = documentRef.documentElement;
+    const storage = this.windowRef.nativeWindow.localStorage;
+
+    const newTheme = this.isDarkModeEnabledFlag ? 'dark' : 'light';
+
+    // Apply to <html data-theme="..."> so CSS can react.
+    rootEl.setAttribute('data-theme', newTheme);
+
+    try {
+      storage.setItem('OPPIA_THEME', newTheme);
+    } catch (e) {
+      // Swallow errors from disabled/blocked storage.
+    }
+
+    if (this.isCustomBackgroundEnabled) {
+      this.applyBackground(); // Refresh colors (especially dropdown text) for new theme
+    }
+  }
+  // 
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private pageContextService: PageContextService,
@@ -201,7 +232,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
     private contentTranslationManagerService: ContentTranslationManagerService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.currentUrl =
@@ -231,6 +262,18 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.KEYBOARD_EVENT_TO_KEY_CODES =
       this.navigationService.KEYBOARD_EVENT_TO_KEY_CODES;
     this.windowIsNarrow = this.windowDimensionsService.isWindowNarrow();
+
+    // 
+    // Initialize navbar theme toggle state from localStorage.
+    const storage = this.windowRef.nativeWindow.localStorage;
+    let savedTheme: string | null = null;
+    try {
+      savedTheme = storage.getItem('OPPIA_THEME');
+    } catch (e) {
+      // Ignore storage access errors.
+    }
+    this.isDarkModeEnabledFlag = savedTheme === 'dark';
+    // 
 
     if (this.currentUrl !== 'signup') {
       this.learnerGroupBackendApiService
@@ -262,6 +305,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     );
 
     this.i18nService.updateViewToUserPreferredSiteLanguage();
+
+    // Initialize custom background settings
+    this.initBackgroundCustomization();
 
     this.userService.getUserInfoAsync().then(userInfo => {
       this.isModerator = userInfo.isModerator();
@@ -624,5 +670,221 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable(): boolean {
     return this.platformFeatureService.status
       .ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled;
+  }
+
+  // Background Customization
+  backgroundColors = [
+    '#ffffff', // Separator / White
+    '#f8f9fa',
+    '#e9ecef',
+    '#dee2e6',
+    '#ced4da',
+    '#adb5bd',
+    '#6c757d',
+    '#495057',
+    '#343a40',
+    '#212529',
+    '#000000',
+    '#f8d7da', // Red-ish
+    '#d4edda', // Green-ish
+    '#d1ecf1', // Blue-ish
+    '#fff3cd', // Yellow-ish
+  ];
+  selectedBackgroundColor: string = '#ffffff';
+  backgroundBrightness: number = 100;
+  isCustomBackgroundEnabled: boolean = false;
+
+  // Initialize from LocalStorage in ngOnInit or constructor
+  // We'll add a separate init method called from ngOnInit
+
+  initBackgroundCustomization(): void {
+    const storage = this.windowRef.nativeWindow.localStorage;
+    try {
+      const savedEnabled = storage.getItem('custom_bg_enabled');
+      if (savedEnabled === 'true') {
+        this.isCustomBackgroundEnabled = true;
+        const savedColor = storage.getItem('custom_bg_color');
+        const savedBrightness = storage.getItem('custom_bg_brightness');
+
+        if (savedColor) this.selectedBackgroundColor = savedColor;
+        if (savedBrightness) this.backgroundBrightness = parseInt(savedBrightness, 10);
+
+        this.applyBackground();
+      }
+    } catch (e) {
+      console.warn('LocalStorage error', e);
+    }
+  }
+
+  toggleCustomBackground(isEnabled: boolean): void {
+    this.isCustomBackgroundEnabled = isEnabled;
+    const storage = this.windowRef.nativeWindow.localStorage;
+    try {
+      storage.setItem('custom_bg_enabled', String(isEnabled));
+    } catch (e) { }
+
+    if (isEnabled) {
+      this.applyBackground();
+    } else {
+      // Revert to theme default
+      this.revertBackground();
+    }
+  }
+
+  updateBackgroundColor(color: string): void {
+    if (!this.isCustomBackgroundEnabled) return;
+    this.selectedBackgroundColor = color;
+    this.savePreference('custom_bg_color', color);
+    this.applyBackground();
+  }
+
+  updateBrightness(value: number): void {
+    if (!this.isCustomBackgroundEnabled) return;
+    this.backgroundBrightness = value;
+    this.savePreference('custom_bg_brightness', String(value));
+    this.applyBackground();
+  }
+
+  savePreference(key: string, value: string): void {
+    try {
+      this.windowRef.nativeWindow.localStorage.setItem(key, value);
+    } catch (e) { }
+  }
+
+  applyBackground(): void {
+    if (!this.isCustomBackgroundEnabled) return;
+
+    const documentRef = this.windowRef.nativeWindow.document;
+    const rootEl: HTMLElement = documentRef.documentElement;
+
+    const newColor = this.adjustBrightness(this.selectedBackgroundColor, this.backgroundBrightness);
+    rootEl.style.setProperty('--oppia-bg-color', newColor);
+
+    // Adaptive Text Logic
+    const textColor = this.getContrastColor(newColor);
+    rootEl.style.setProperty('--oppia-primary-text-color', textColor);
+    // Assuming oppia.css uses --oppia-primary-text-color or similar for main text.
+    // If not, we might need to target specific variables. 
+    // Checking oppia.css, body color is rgba(0,0,0,0.87) or variable.
+    // Let's set standard vars found in modern Oppia or just override body text.
+    // In the viewed css, body color is rgba(0,0,0,0.87).
+    // Let's try to set a variable if it exists, or verify with grep search? 
+    // In Step 21, line 351: `color: rgba(0, 0, 0, 0.87);`. It does NOT seem to use a variable for main text in the snippet.
+    // Line 500 `h1` uses `--oppia-heading-text-color`.
+    // Let's set that too.
+
+    // We will set a few variables and also force body color if needed, but best to use variables.
+    // The previous css view didn't show all variables.
+    // Let's guess meaningful ones: --oppia-primary-text-color, --oppia-heading-text-color.
+
+    rootEl.style.setProperty('--oppia-heading-text-color', textColor);
+    rootEl.style.setProperty('--oppia-heading-text-color', textColor);
+    rootEl.style.setProperty('--oppia-text-color', textColor); // Fix for H1 visibility
+
+    // Fix for Dropdown Visibility - Match dropdown to custom background
+    // Set dropdown background to match custom background
+    rootEl.style.setProperty('--oppia-dropdown-bg', newColor);
+
+    // Set dropdown text based on the ACTUAL background color (newColor), not the theme
+    // textColor is already calculated as the contrast color for newColor
+    rootEl.style.setProperty('--oppia-dropdown-text', textColor);
+
+    // Set description color (subtext) based on actual background contrast  
+    // If the text is white (dark background), use light grey for subtext
+    // If the text is dark (light background), use dark grey for subtext
+    const dropdownSubTextColor = (textColor === '#ffffff') ? '#cccccc' : '#767676';
+    rootEl.style.setProperty('--oppia-dropdown-subtext-color', dropdownSubTextColor);
+
+    // Fix for Splash Page "Whole Page" coverage
+    // Override surface color to match background (or be transparent/same) to avoid stripes
+    rootEl.style.setProperty('--oppia-surface-color', newColor);
+
+    // Disable Splash Page background images to allow color to show
+    rootEl.style.setProperty('--splash-bg-5', 'none');
+    rootEl.style.setProperty('--splash-bg-7', 'none');
+    rootEl.style.setProperty('--splash-bg-5-mobile', 'none');
+    rootEl.style.setProperty('--splash-bg-7-mobile', 'none');
+
+    documentRef.body.style.color = textColor; // Direct override for body
+    documentRef.body.classList.add('oppia-custom-background-enabled');
+
+    // Toggle adaptive pattern classes
+    if (textColor === '#ffffff') {
+      documentRef.body.classList.add('oppia-custom-bg-dark');
+      documentRef.body.classList.remove('oppia-custom-bg-light');
+    } else {
+      documentRef.body.classList.add('oppia-custom-bg-light');
+      documentRef.body.classList.remove('oppia-custom-bg-dark');
+    }
+  }
+
+  revertBackground(): void {
+    const documentRef = this.windowRef.nativeWindow.document;
+    const rootEl: HTMLElement = documentRef.documentElement;
+
+    // Remove inline overrides
+    rootEl.style.removeProperty('--oppia-bg-color');
+    rootEl.style.removeProperty('--oppia-heading-text-color');
+    rootEl.style.removeProperty('--oppia-primary-text-color');
+    rootEl.style.removeProperty('--oppia-text-color');
+    rootEl.style.removeProperty('--oppia-dropdown-bg');
+    rootEl.style.removeProperty('--oppia-dropdown-text');
+    rootEl.style.removeProperty('--oppia-dropdown-subtext-color');
+
+    rootEl.style.removeProperty('--oppia-surface-color');
+    rootEl.style.removeProperty('--splash-bg-5');
+    rootEl.style.removeProperty('--splash-bg-7');
+    rootEl.style.removeProperty('--splash-bg-5-mobile');
+    rootEl.style.removeProperty('--splash-bg-7-mobile');
+
+    documentRef.body.style.removeProperty('color');
+    documentRef.body.classList.remove('oppia-custom-background-enabled');
+    documentRef.body.classList.remove('oppia-custom-bg-dark');
+    documentRef.body.classList.remove('oppia-custom-bg-light');
+
+    // Trigger theme toggle refresh if needed or just let CSS take over
+    // If we're in dark mode, it should revert to dark mode colors.
+    // Since we only modified the CSS variables on root/body specific to our feature (or standard ones), 
+    // removing them should let the stylesheet wins or class-based themes take over.
+    // Note: If we overwrote a variable that is used by the theme, removing it is correct.
+  }
+
+  adjustBrightness(col: string, amt: number): string {
+    let usePound = false;
+    if (col[0] === '#') {
+      col = col.slice(1);
+      usePound = true;
+    }
+    let num = parseInt(col, 16);
+    let r = (num >> 16);
+    let b = ((num >> 8) & 0x00FF);
+    let g = (num & 0x0000FF);
+
+    const factor = amt / 100;
+
+    r = Math.min(255, Math.max(0, Math.round(r * factor)));
+    g = Math.min(255, Math.max(0, Math.round(g * factor)));
+    b = Math.min(255, Math.max(0, Math.round(b * factor)));
+
+    return (usePound ? '#' : '') + (g | (b << 8) | (r << 16)).toString(16).padStart(6, '0');
+  }
+
+  getContrastColor(hexColor: string): string {
+    // Calculate luminance
+    let r = 0, g = 0, b = 0;
+    if (hexColor.length === 4) {
+      r = parseInt("0x" + hexColor[1] + hexColor[1]);
+      g = parseInt("0x" + hexColor[2] + hexColor[2]);
+      b = parseInt("0x" + hexColor[3] + hexColor[3]);
+    } else if (hexColor.length === 7) {
+      r = parseInt("0x" + hexColor[1] + hexColor[2]);
+      g = parseInt("0x" + hexColor[3] + hexColor[4]);
+      b = parseInt("0x" + hexColor[5] + hexColor[6]);
+    }
+
+    // YIQ equation
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    // Use Dark Green (#01645c) instead of Black (#000000) for better branding on light backgrounds
+    return (yiq >= 128) ? '#01645c' : '#ffffff';
   }
 }

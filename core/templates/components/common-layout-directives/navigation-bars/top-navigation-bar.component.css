@@ -4,15 +4,16 @@
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
 .oppia-top-navigation-bar .oppia-navbar-tab:focus {
-  background-color: #fff;
-  color: #00645c;
+  background-color: var(--oppia-dropdown-bg);
+  color: var(--oppia-primary-hover-color);
 }
 
 .oppia-top-navigation-bar .arrow-forward {
-  color: #00645c;
+  color: var(--oppia-primary-hover-color);
   font-size: 14px;
   margin-left: 4px;
 }
+
 .oppia-top-navigation-bar .launch {
   font-size: 12px;
   margin-left: 30px;
@@ -23,30 +24,36 @@
   border-bottom: 2px solid #333;
   transition: 50ms;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown a {
   text-decoration: none;
 }
+
 .oppia-top-navigation-bar .heading a {
-  color: #212121;
+  color: var(--oppia-dropdown-text);
 }
+
 .oppia-top-navigation-bar .nav-item-links a {
-  color: #212121;
+  color: var(--oppia-dropdown-text);
   text-decoration: none;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu a,
 .oppia-top-navigation-bar .about-dropdown-menu a,
 .oppia-top-navigation-bar .get-involved-dropdown a {
   text-decoration: none;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-top-link a {
-  color: #333;
+  color: var(--oppia-dropdown-text);
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 18.75px;
 }
+
 .oppia-top-navigation-bar .dropdown-menu .innvolved-item:hover a {
-  border-bottom: #333 solid 2px;
+  border-bottom: var(--oppia-dropdown-text) solid 2px;
   transition: 50ms;
 }
 
@@ -54,35 +61,42 @@
   min-width: 574px;
   padding: 0;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .nav-item {
   width: 100%;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .heading {
-  color: #333;
+  color: var(--oppia-dropdown-text);
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 18.75px;
   padding: 0;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .language {
   color: #f2994a;
   font-size: 18px;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .volunteer {
   color: #2d9cdb;
   font-size: 18px;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .contact {
   color: #b4bbc3;
   font-size: 18px;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .fav {
   color: #eb5757;
   font-size: 18px;
 }
+
 .oppia-top-navigation-bar .get-involved-dropdown .des {
-  color: #767676;
+  color: var(--oppia-dropdown-subtext-color);
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 400;
@@ -91,6 +105,7 @@
   padding-left: 36px;
   text-overflow: clip;
 }
+
 .oppia-top-navigation-bar .item-border {
   border-right: 1px solid rgba(33, 33, 33, 0.102);
 }
@@ -122,18 +137,22 @@
   padding: 32px;
   width: 287px;
 }
+
 .oppia-top-navigation-bar .item:hover,
 .oppia-top-navigation-bar .item:focus {
-  background-color: rgba(33, 33, 33, 0.027);
+  background-color: var(--oppia-dropdown-hover);
 }
+
 .oppia-top-navigation-bar .dropdown-menu .signin-dropdown {
   border-radius: 1px;
   height: 41px;
   width: 200px;
 }
+
 .oppia-top-navigation-bar .top-section .item {
   padding-bottom: 27px;
 }
+
 .oppia-top-navigation-bar .bottom-section .item {
   padding-top: 27px;
 }
@@ -155,33 +174,41 @@
   border-radius: 3px;
   padding: 0;
 }
+
 .oppia-top-navigation-bar .classroom-enabled {
   min-width: 688px;
 }
+
 .oppia-top-navigation-bar .classroom-disabled {
   min-width: 300px;
 }
+
 .oppia-top-navigation-bar .two-columns {
   min-width: 890px;
 }
+
 .oppia-top-navigation-bar .three-columns {
   min-width: 1200px;
 }
+
 .oppia-top-navigation-bar .language-dropdown {
   max-height: 60vh;
   overflow-y: auto;
   overscroll-behavior: contain;
   width: 300px;
 }
+
 .oppia-top-navigation-bar .learn {
   height: 66.5px;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-top-link {
   padding: 0;
   padding-bottom: 8px;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-right-head {
-  color: #333;
+  color: var(--oppia-dropdown-text);
   font-family: 'Roboto', sans-serif;
   font-size: 12px;
   font-weight: 500;
@@ -191,8 +218,9 @@
   padding-bottom: 8px;
   text-transform: uppercase;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-links {
-  color: #333;
+  color: var(--oppia-dropdown-text);
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -221,23 +249,27 @@
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-right:hover,
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-left:focus,
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-right:focus {
-  background-color: rgba(33, 33, 33, 0.027);
+  background-color: var(--oppia-dropdown-hover);
 }
+
 .oppia-top-navigation-bar .about-dropdown-menu .nav-item a:hover,
 .oppia-top-navigation-bar .about-dropdown-menu .nav-item a:focus {
-  background-color: rgba(33, 33, 33, 0.027);
+  background-color: var(--oppia-dropdown-hover);
 }
+
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:hover,
 .oppia-top-navigation-bar .about-dropdown-menu .about-link:focus {
-  color: #009688 !important;
+  color: var(--oppia-primary-color) !important;
 }
+
 .oppia-top-navigation-bar .nav-item-left-head {
-  color: #333;
+  color: var(--oppia-dropdown-text);
   font-family: 'Roboto', sans-serif;
   font-size: 16px;
   font-weight: 500;
   line-height: 18.75px;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-content {
   color: #767676;
   font-family: 'Roboto', sans-serif;
@@ -246,8 +278,9 @@
   line-height: 20px;
   width: 224px;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-bottom-link {
-  color: #00645c;
+  color: var(--oppia-primary-hover-color);
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -255,14 +288,16 @@
   padding: 0;
   padding-top: 16px;
 }
+
 .oppia-top-navigation-bar .learn-dropdown-menu .nav-item-bottom-link-logged {
-  color: #00645c;
+  color: var(--oppia-primary-hover-color);
   font-family: 'Inter', 'Roboto', sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 16.41px;
   padding: 0;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-nav .dropdown-menu {
   border-radius: 3px;
   border-top-left-radius: 0;
@@ -280,12 +315,13 @@
 .oppia-top-navigation-bar .language-padding-left {
   padding-left: 26px;
 }
+
 .oppia-top-navigation-bar .oppia-nav-right-dropdown {
-  background-color: #fff;
+  background-color: var(--oppia-dropdown-bg);
   border-radius: 5px;
   border-width: 0;
-  box-shadow: 1px 1px 0 1px rgba(0,0,0,0.05);
-  color: #737373;
+  box-shadow: 1px 1px 0 1px rgba(0, 0, 0, 0.05);
+  color: var(--oppia-dropdown-text);
   font-family: Roboto, arial, sans-serif;
   font-size: 14px;
   font-weight: bold;
@@ -300,30 +336,37 @@
   outline: 1px dotted #fff;
   outline: auto 5px -webkit-focus-ring-color;
 }
+
 .oppia-top-navigation-bar .language-element {
   border-radius: 0;
   box-shadow: 0 0;
-  color: #34665c;
+  color: var(--oppia-primary-hover-color);
   padding: 10px 0;
 }
+
 .oppia-top-navigation-bar .language-element:hover {
   background-color: rgb(52, 102, 92, 0.1);
 }
+
 .oppia-top-navigation-bar .language-element-selected {
   background-color: rgb(52, 102, 92, 0.1);
 }
+
 .oppia-top-navigation-bar .oppia-nav-right-dropdown:focus,
 .oppia-top-navigation-bar .oppia-nav-right-dropdown:hover {
-  box-shadow: 1px 4px 5px 1px rgba(0,0,0,0.1);
+  box-shadow: 1px 4px 5px 1px rgba(0, 0, 0, 0.1);
 }
+
 .oppia-top-navigation-bar .oppia-nav-right-dropdown:active {
-  background-color: #e5e5e5;
+  background-color: var(--oppia-dropdown-hover);
   box-shadow: none;
   transition-duration: 10ms;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-button-container.dropdown.oppia-navbar-button-container-extra-info {
   margin-left: 10px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-button-container .btn.oppia-navbar-button {
   margin-left: 5px;
   margin-right: 0;
@@ -333,6 +376,7 @@
   float: left;
   padding: 10px 15px 10px 0;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dashboard-indicator-text {
   bottom: 0;
   color: white;
@@ -341,6 +385,7 @@
   position: absolute;
   right: 4px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-role-text {
   bottom: 0;
   color: white;
@@ -349,6 +394,7 @@
   position: absolute;
   right: 3px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dashboard-indicator {
   background-color: #f7a541;
   border-radius: 20px;
@@ -358,15 +404,18 @@
   top: 8px;
   width: 15px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-menu {
   margin-left: 10px;
   opacity: 0.9;
   outline-color: transparent;
   padding-top: 20px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-profile {
   float: right;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-role-indicator {
   background-color: #f7a541;
   border-radius: 20px;
@@ -376,29 +425,36 @@
   right: 25px;
   width: 15px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-close-icon {
   color: #fff;
   font-size: 22px;
   margin-right: 4px;
   margin-top: -5px;
 }
+
 .oppia-top-navigation-bar .oppia-launch-icon {
-  color: #009688;
+  color: var(--oppia-primary-color);
   font-size: 22px;
 }
+
 .oppia-top-navigation-bar .oppia-user-avatar-icon {
   font-size: 36px;
 }
+
 .oppia-top-navigation-bar .oppia-admin-text {
   right: 4px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-button-container-extra-info {
   margin-right: 10px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dropdown-menu {
   margin-right: 15px;
   padding: 0;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dropdown {
   border: 0;
   border-top-left-radius: 0;
@@ -410,14 +466,16 @@
   margin: 4px;
   margin-left: 10px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-profile-picture-container {
   margin-left: 10px;
   text-align: right;
 }
 
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link {
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dropdown .nav-link:hover {
   color: #888;
 }
@@ -429,33 +487,40 @@
   letter-spacing: .21px;
   line-height: 41px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-menu-icon {
   color: #fff;
   font-size: 22px;
   margin-top: -5px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-clickable-dropdown:hover ul.dropdown-menu {
   display: block;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-menu:hover {
   opacity: 1;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-menu:focus {
-  outline: 1px dotted #212121;
+  outline: 1px dotted var(--oppia-dropdown-text);
   outline: 5px -webkit-focus-ring-color;
 }
+
 .oppia-top-navigation-bar .oppia-nav-link {
   padding: 0;
   width: 190px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dropdown-item {
   display: flex;
   flex-direction: column;
   gap: 2px;
   padding: 30px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-tab-content-heading {
-  color: #212121;
+  color: var(--oppia-dropdown-text);
   font-size: 16px;
   font-weight: 500;
   padding: 0;
@@ -476,12 +541,14 @@
   font-size: 22px;
   padding-right: 6px;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-tab-content-desc {
   color: #767676;
   line-height: 20px;
   margin-left: 28px;
   opacity: 0.9;
 }
+
 .oppia-top-navigation-bar .oppia-navbar-dropdown-right {
   left: 0;
   min-width: 285px;
@@ -490,18 +557,21 @@
 }
 
 .oppia-top-navigation-bar .oppia-navbar-nav.oppia-navbar-profile .profile-dropdown:hover {
-  background-color: #fff;
+  background-color: var(--oppia-dropdown-bg);
 }
+
 .oppia-top-navigation-bar .oppia-navbar-arrow-right {
   font-size: 14px;
   padding-left: 8px;
   padding-top: 1.5px;
 }
+
 .oppia-top-navigation-bar .oppia-tick-mark {
   font-size: 15px;
   margin-right: 5px;
   padding-left: 5px;
 }
+
 .oppia-top-navigation-bar .oppia-unread-feedback-indicator {
   background-color: #f7a541;
   border-radius: 20px;
@@ -513,6 +583,7 @@
   right: 25px;
   width: 15px;
 }
+
 .oppia-top-navigation-bar .oppia-unread-feedback-number {
   bottom: 0;
   color: white;
@@ -520,14 +591,17 @@
   font-weight: bold;
   position: absolute;
 }
+
 .oppia-top-navigation-bar .oppia-impact-report-btn {
   align-items: center;
   display: flex;
   justify-content: space-between;
 }
+
 .oppia-navbar-impactreport-tab-content {
   list-style-type: none;
 }
+
 .oppia-navbar-impactreport-submenu-tab-content {
   margin-left: -15px;
   width: 150px;
@@ -542,6 +616,7 @@
   .oppia-top-navigation-bar .two-columns {
     min-width: 890px;
   }
+
   .oppia-top-navigation-bar .three-columns {
     min-width: 890px;
   }
@@ -580,6 +655,7 @@
   .oppia-top-navigation-bar .nav-mobile-header-editor {
     display: none;
   }
+
   .oppia-top-navigation-bar .nav-mobile-header-text {
     display: none;
   }
@@ -594,12 +670,14 @@
     text-overflow: ellipsis;
     width: 50%;
   }
+
   .oppia-top-navigation-bar .nav-mobile-header-editor {
     color: #fff;
     display: block;
     font-family: Roboto, arial, sans-serif;
     font-size: 19px;
   }
+
   .oppia-top-navigation-bar .nav-mobile-header-text {
     color: #fff;
     display: inline-block;
@@ -610,9 +688,105 @@
     white-space: nowrap;
     width: 100%;
   }
+
   @media screen and (max-width: 600px) {
     .oppia-top-navigation-bar .oppia-logo {
       left: 0;
     }
   }
+}
+
+/* New Theme Toggle Switch Styles */
+.oppia-theme-toggle-new {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-top: 10px;
+  /* Align with other nav items */
+}
+
+.oppia-toggle-track {
+  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  /* Day Sky Gradient */
+  border-radius: 30px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  height: 26px;
+  position: relative;
+  transition: background 0.5s ease;
+  width: 54px;
+}
+
+.oppia-toggle-track.dark-mode {
+  background: linear-gradient(to right, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  /* Night Sky Gradient */
+  /* Add stars using radial gradients */
+  background-image:
+    radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
+    radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 2px),
+    radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px),
+    linear-gradient(to right, #0f2027 0%, #203a43 50%, #2c5364 100%);
+  background-size: 550px 550px, 350px 350px, 250px 250px, 100% 100%;
+  background-position: 0 0, 40px 60px, 130px 270px, 0 0;
+}
+
+.oppia-toggle-thumb {
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  height: 22px;
+  left: 2px;
+  position: absolute;
+  top: 2px;
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), width 0.2s;
+  /* Bouncy transition */
+  width: 22px;
+  z-index: 2;
+}
+
+/* Tactile click effect */
+.oppia-theme-toggle-new:active .oppia-toggle-thumb {
+  width: 26px;
+  /* Stretch slightly */
+}
+
+.oppia-toggle-track.dark-mode .oppia-toggle-thumb {
+  transform: translateX(28px);
+}
+
+.oppia-toggle-icon {
+  color: #fff;
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: opacity 0.3s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 1;
+}
+
+.oppia-toggle-icon.sun {
+  left: 6px;
+  opacity: 1;
+  transform: translateY(-50%) rotate(0deg);
+}
+
+.oppia-toggle-icon.moon {
+  opacity: 0;
+  right: 6px;
+  transform: translateY(-50%) rotate(-30deg) scale(0.5);
+}
+
+.oppia-toggle-track.dark-mode .oppia-toggle-icon.sun {
+  opacity: 0;
+  transform: translateY(-50%) rotate(180deg) scale(0.5);
+}
+
+.oppia-toggle-track.dark-mode .oppia-toggle-icon.moon {
+  opacity: 1;
+  transform: translateY(-50%) rotate(0deg) scale(1);
+}
+
+/* Hover effects */
+.oppia-theme-toggle-new:hover .oppia-toggle-track {
+  filter: brightness(1.1);
 }

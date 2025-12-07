@@ -15,46 +15,90 @@
   Animation keyframes. These must be placed at the top of the file
   in order to work in IE.
 */
+
+
 @-webkit-keyframes dot {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
+
 @-moz-keyframes dot {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
+
 @keyframes dot {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Firefox < 16 */
 @-moz-keyframes fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Safari, Chrome and Opera > 12.1 */
 @-webkit-keyframes fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Internet Explorer */
 @-ms-keyframes fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Opera < 12.1 */
 @-o-keyframes fadein {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @-webkit-viewport {
@@ -78,10 +122,11 @@
 }
 
 /* Angular material overrides. */
-mat-input-group.long > input {
+mat-input-group.long>input {
   height: 45px;
   width: 100%;
 }
+
 
 label {
   display: inline-block;
@@ -126,7 +171,8 @@ the <body> of every page:
 /* The following classes' styles are overriden by Guppy's OSK stylesheet and
 they end up rotating the tooltips which are placed on the left or right. This is
 why they need to be overriden.  */
-.left, .right {
+.left,
+.right {
   -webkit-transform: none !important;
   transform: none !important;
 }
@@ -152,19 +198,20 @@ why they need to be overriden.  */
 }
 
 .mat-button-success {
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 
-.mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
+.mat-shadow-bottom-z-1,
+.mat-button.mat-raised:not([disabled]),
 .mat-button.mat-fab {
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
 }
 
 .mat-button.mat-default-theme.mat-raised:not([disabled]):hover,
 .mat-button.mat-raised:not([disabled]):hover {
-  background-color: rgba(158,158,158,0.3);
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.4);
-  transform: translate3d(0,-1px,0);
+  background-color: rgba(158, 158, 158, 0.3);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
+  transform: translate3d(0, -1px, 0);
 }
 
 .mat-bottom-sheet-container {
@@ -181,7 +228,7 @@ why they need to be overriden.  */
 
 .oppia-learner-confirm-button.oppia-learner-submit-answer-button.mat-button[disabled] {
   background-color: transparent;
-  color: rgba(0,0,0,0.38);
+  color: rgba(0, 0, 0, 0.38);
   cursor: default;
 }
 
@@ -221,7 +268,7 @@ why they need to be overriden.  */
 }
 
 .mat-button.oppia-learner-reload-image-button {
-  background: #fff;
+  background: var(--oppia-surface-color);
   border: 2px solid;
   border-color: #0d48a1;
   color: #0d48a1;
@@ -233,7 +280,7 @@ why they need to be overriden.  */
 
 .mat-button.oppia-learner-reload-image-button:focus,
 .mat-button.oppia-learner-reload-image-button:hover {
-  background-color: rgba(224,242,241,1);
+  background-color: rgba(224, 242, 241, 1);
   text-decoration: none;
 }
 
@@ -261,25 +308,30 @@ why they need to be overriden.  */
   line-height: 1;
   vertical-align: middle;
 }
+
 .material-icons.md-18 {
   font-size: 18px;
 }
+
 .material-icons.md-32 {
   font-size: 32px;
 }
+
 .material-icons.md-40 {
   font-size: 40px;
 }
+
 .material-icons.md-100 {
   font-size: 100px;
 }
+
 .material-icons.md-dark {
   color: rgba(0, 0, 0, 0.54);
 }
 
 /* Bootstrap overrides and additions. */
 html {
-  background-color: #e8e7e3;
+  background-color: var(--oppia-bg-color);
   /*
     The HTML font-size is set to 62.5% in order to make 'em' units easier to
     work with. Modern browsers set their default font-size to 16px. This means
@@ -295,8 +347,8 @@ html {
 }
 
 body {
-  background-color: #e8e7e3;
-  color: rgba(0,0,0,0.87);
+  background-color: var(--oppia-bg-color);
+  color: rgba(0, 0, 0, 0.87);
   font-family: "Roboto", Arial, sans-serif;
   /*
     A font-size of 1.6em sets the default font-size on Oppia to 16px, though
@@ -337,18 +389,20 @@ legend {
 
 .has-error .form-control {
   border-color: #a94442;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075)
 }
+
 .has-error .form-control:focus {
   border-color: #843534;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 6px #ce8483
 }
 
 .oppia-search-bar-dropdown-menu {
   width: 170px;
 }
+
 .oppia-skip-to-content {
   left: -10000px;
   padding: 6px;
@@ -359,11 +413,12 @@ legend {
   transition-timing-function: ease-in;
   z-index: 99999;
 }
+
 .oppia-skip-to-content:active,
 .oppia-skip-to-content:hover,
 .oppia-skip-to-content:focus {
-  background-color: #e8e7e3;
-  border-bottom: 1px solid black;
+  background-color: var(--oppia-bg-color);
+  border-bottom: 1px solid var(--oppia-text-color);
   border-bottom-right-radius: 5px;
   border-right: 1px solid black;
   color: #23527e;
@@ -379,9 +434,12 @@ legend {
 .oppia-stop-scroll {
   overflow-y: hidden;
 }
+
 /* According to the Angular documentation - https://docs.angularjs.org/api/ng/directive/ngCloak -
    the following rule needs to be added to the css file in order for ng-cloak to work.  */
-[ng\:cloak], [ng-cloak], .ng-cloak {
+[ng\:cloak],
+[ng-cloak],
+.ng-cloak {
   display: none !important;
 }
 
@@ -439,12 +497,12 @@ legend {
 }
 
 h1 {
-  color: #000;
+  color: var(--oppia-heading-text-color);
   font-size: 2em;
 }
 
 h2 {
-  color: #000;
+  color: var(--oppia-heading-text-color);
   font-size: 1.5em;
   margin: .83em 0;
 }
@@ -471,29 +529,33 @@ a:focus {
 }
 
 /* Change all the borders of an input to red when there is validation errors. */
-input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, mat-form-field.ng-invalid .mat-form-field-outline {
+input.ng-dirty.ng-invalid,
+textarea.ng-dirty.ng-invalid,
+mat-form-field.ng-invalid .mat-form-field-outline {
   border-color: #f44336;
 }
 
 ::-webkit-input-placeholder {
   font-style: italic;
 }
+
 ::-moz-placeholder {
   font-style: italic;
 }
+
 ::-ms-input-placeholder {
   font-style: italic;
 }
 
 .oppia-issues-learner-action-table td,
 .oppia-issues-learner-action-table th {
-  border: 1px solid black;
+  border: 1px solid var(--oppia-border-color);
 }
 
 /* Change the color of odd-numbered lines in a table. */
-.table-striped > tbody > tr:nth-child(odd) > td,
-.table-striped > tbody > tr:nth-child(odd) > th {
-  background-color: #f0f0f0;
+.table-striped>tbody>tr:nth-child(odd)>td,
+.table-striped>tbody>tr:nth-child(odd)>th {
+  background-color: var(--oppia-bg-color);
 }
 
 .oppia-form-error {
@@ -510,7 +572,7 @@ input.ng-dirty.ng-invalid, textarea.ng-dirty.ng-invalid, mat-form-field.ng-inval
 }
 
 .oppia-disabled-contenteditable {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   cursor: not-allowed;
   opacity: 1;
   padding: 10px 5px;
@@ -533,15 +595,18 @@ p:last-child {
   /* The following should be the same as the line-height (1.4). */
   margin: 1.4em 0;
 }
+
 .oppia-dashboard-container a {
-  color: black;
+  color: var(--oppia-text-color);
 }
+
 .oppia-activity-summary-tile a,
 .oppia-activity-summary-tile-mobile a {
   color: inherit;
   text-decoration: none;
 }
-.open > a {
+
+.open>a {
   outline: 0;
 }
 
@@ -553,20 +618,23 @@ p:last-child {
   width: 100%;
 }
 
-.nav > li > a {
+.nav>li>a {
   display: block;
   padding: 10px 15px;
   position: relative;
 }
+
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
-  box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 6px 13px rgba(0, 0, 0, 0.17), 0 4px 6px rgba(0, 0, 0, 0.23);
 }
+
 .oppia-dashboard-container a:hover,
 .oppia-dashboard-container a:active,
 .oppia-dashboard-container a:visited {
-  color: black;
+  color: var(--oppia-text-color);
 }
+
 .oppia-activity-summary-tile a:hover,
 .oppia-activity-summary-tile-mobile a:hover,
 .oppia-activity-summary-tile a:active,
@@ -577,18 +645,20 @@ p:last-child {
   text-decoration: none;
 }
 
-.oppia-navbar-nav .open > a {
-  background-color: #fff;
-  color: #009688;
+.oppia-navbar-nav .open>a {
+  background-color: var(--oppia-surface-color);
+  color: var(--oppia-primary-color);
 }
+
 .oppia-dashboard-container a:hover {
   text-decoration: underline;
 }
 
-.oppia-navbar-tabs > li:hover > a {
-  background-color: #fff;
-  color: #009688;
+.oppia-navbar-tabs>li:hover>a {
+  background-color: var(--oppia-surface-color);
+  color: var(--oppia-primary-color);
 }
+
 .oppia-activity-summary-tile span {
   vertical-align: middle;
 }
@@ -624,7 +694,10 @@ p:last-child {
   margin-top: 0;
 }
 
-.oppia-rte ol, .oppia-rte ul, .oppia-rte-editor ol, .oppia-rte-editor ul {
+.oppia-rte ol,
+.oppia-rte ul,
+.oppia-rte-editor ol,
+.oppia-rte-editor ul {
   line-height: 1.846;
   margin-bottom: 18px;
 }
@@ -641,17 +714,24 @@ p:last-child {
   position: relative;
 }
 
-.label, .badge {
+.label,
+.badge {
   margin: auto 4px;
 }
-.label-default, .badge-default {
+
+.label-default,
+.badge-default {
   background-color: #888;
 }
-.label-info, .badge-info {
+
+.label-info,
+.badge-info {
   background-color: #18447e;
 }
-.label-success, .badge-success {
-  background-color: #009688;
+
+.label-success,
+.badge-success {
+  background-color: var(--oppia-primary-color);
 }
 
 /*
@@ -659,7 +739,9 @@ p:last-child {
   smaller, any media will scale down according to its
   container's width.
 */
-img, video, canvas {
+img,
+video,
+canvas {
   max-width: 100%;
 }
 
@@ -690,7 +772,7 @@ textarea {
   Styles for BackgroundMaskService.
 */
 .oppia-background-mask {
-  background: rgba(0,0,0,0.33);
+  background: rgba(0, 0, 0, 0.33);
   height: 100vh;
   left: 0;
   position: fixed;
@@ -742,9 +824,9 @@ textarea {
 }
 
 .oppia-footer {
-  background-color: #094142;
+  background-color: var(--oppia-navbar-bg);
   bottom: 0;
-  color: #fff;
+  color: var(--oppia-navbar-text);
   font-size: 13px;
   line-height: 20px;
   position: relative;
@@ -754,17 +836,21 @@ textarea {
 .oppia-navbar-nav {
   float: left;
 }
+
 .nav-link {
   display: block;
   font-size: 14px;
   position: relative;
 }
-.oppia-navbar-nav > .nav-link {
+
+.oppia-navbar-nav>.nav-link {
   padding: 10px 5px;
 }
+
 .oppia-same-row-container {
   float: left;
 }
+
 .modal-body .nav-link {
   color: #00609c;
   font-size: 16px;
@@ -777,6 +863,7 @@ textarea {
   max-width: 200px;
   text-align: center;
 }
+
 .oppia-help-dropdown .popover-inner {
   max-width: 140px;
 }
@@ -800,16 +887,19 @@ textarea {
     height: 270px;
   }
 }
+
 @media (max-width: 440px) {
   .oppia-footer-padding-below-banner {
     height: 270px;
   }
 }
+
 /*
   This is needed for proper display of tabs. See
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
-.navbar-nav, .pagination {
+.navbar-nav,
+.pagination {
   cursor: pointer;
 }
 
@@ -827,7 +917,7 @@ textarea {
   padding-right: 0;
 }
 
-.nav > li {
+.nav>li {
   display: block;
   position: relative;
 }
@@ -844,18 +934,20 @@ textarea {
   padding: 5px 0;
 }
 
-.open > .dropdown-menu {
+.open>.dropdown-menu {
   display: block;
 }
 
-.float-right > .dropdown-menu {
+.float-right>.dropdown-menu {
   left: auto;
   right: 0;
 }
 
-.dropdown-item.active, .dropdown-item:active {
+.dropdown-item.active,
+.dropdown-item:active {
   background-color: transparent;
 }
+
 .dropup .caret,
 .navbar-fixed-bottom .dropdown .caret {
   border-bottom: 4px solid;
@@ -871,7 +963,7 @@ textarea {
 }
 
 .navbar-light .dropdown-menu {
-  background: #fff;
+  background: var(--oppia-surface-color);
   margin-top: 0;
 }
 
@@ -881,6 +973,7 @@ textarea {
   margin-bottom: 2px;
   top: auto;
 }
+
 .nav-item {
   display: block;
   position: relative;
@@ -889,6 +982,7 @@ textarea {
 .nav-link.dropdown-item {
   padding: 3px 20px 2px 20px;
 }
+
 .navbar-nav.oppia-navbar-nav .nav-link {
   color: #fff;
   font-size: 16px;
@@ -896,40 +990,49 @@ textarea {
   height: 56px;
   padding-top: 13px;
 }
+
 .navbar-light .navbar-nav .nav-link {
   color: white;
   text-align: center;
 }
-.navbar-light .navbar-nav .show > .nav-link,
-.navbar-light .navbar-nav .active > .nav-link,
+
+.navbar-light .navbar-nav .show>.nav-link,
+.navbar-light .navbar-nav .active>.nav-link,
 .navbar-light .navbar-nav .nav-link.show,
 .navbar-light .navbar-nav .nav-link.active {
   color: white;
   text-align: center;
 }
+
 .navbar-light .navbar-nav .nav-link:focus {
   color: white;
 }
+
 .navbar-light .navbar-nav .nav-link:hover {
-  background-color: white;
+  background-color: var(--oppia-dropdown-bg);
   color: #06b9ac;
 }
-.navbar-fixed-top,.navbar-fixed-bottom {
+
+.navbar-fixed-top,
+.navbar-fixed-bottom {
   left: 0;
   position: fixed;
   right: 0;
   z-index: 1030;
 }
+
 .navbar-fixed-top {
   border-width: 0 0 1px;
   top: 0;
 }
+
 .navbar-fixed-bottom {
   border-width: 1px 0 0;
   bottom: 0;
   margin-bottom: 0;
 
 }
+
 .oppia-navbar-breadcrumb {
   color: #fff;
   cursor: default;
@@ -948,6 +1051,7 @@ textarea {
 .oppia-navbar-breadcrumb-separator {
   margin-right: 8px;
 }
+
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
 }
@@ -955,6 +1059,7 @@ textarea {
 .oppia-navbar-breadcrumb-rtl-separator {
   margin-left: 8px;
 }
+
 .oppia-navbar-breadcrumb-rtl-separator:after {
   content: "<";
 }
@@ -984,7 +1089,7 @@ textarea {
   min-width: 160px;
 }
 
-.nav .dropdown:hover > .dropdown-menu {
+.nav .dropdown:hover>.dropdown-menu {
   border: none;
 }
 
@@ -995,13 +1100,17 @@ textarea {
 }
 
 @media(max-width: 768px) {
-  .oppia-navbar-breadcrumb > li, .oppia-navbar-breadcrumb {
+
+  .oppia-navbar-breadcrumb>li,
+  .oppia-navbar-breadcrumb {
     float: left;
   }
+
   .oppia-navbar-breadcrumb {
     margin-left: 5px;
     margin-top: 0;
   }
+
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
     flex-direction: row;
@@ -1009,6 +1118,7 @@ textarea {
     margin: 0;
   }
 }
+
 @media (min-width: 767px) and (max-width: 992px) {
   ul.nav.navbar-nav.oppia-navbar-nav.float-right {
     display: flex;
@@ -1027,14 +1137,16 @@ textarea {
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
-  .nav .dropdown:hover > .dropdown-menu {
+  .nav .dropdown:hover>.dropdown-menu {
     display: block;
   }
-  .nav .dropdown:hover > .dropdown-menu > li > a {
+
+  .nav .dropdown:hover>.dropdown-menu>li>a {
     color: #009688;
   }
-  .nav .dropdown:hover > .dropdown-menu > li > a:hover {
-    background-color: #eee;
+
+  .nav .dropdown:hover>.dropdown-menu>li>a:hover {
+    background-color: var(--oppia-bg-color);
     color: #888;
   }
 }
@@ -1069,6 +1181,7 @@ textarea {
   width: 100%;
   z-index: 1000;
 }
+
 .oppia-loading-dot-one {
   -moz-animation: dot 1.5s infinite;
   -webkit-animation: dot 1.5s infinite;
@@ -1078,6 +1191,7 @@ textarea {
   animation-delay: 0.0s;
   opacity: 0;
 }
+
 .oppia-loading-dot-two {
   -moz-animation: dot 1.5s infinite;
   -webkit-animation: dot 1.5s infinite;
@@ -1087,6 +1201,7 @@ textarea {
   animation-delay: 0.3s;
   opacity: 0;
 }
+
 .oppia-loading-dot-three {
   -moz-animation: dot 1.5s infinite;
   -webkit-animation: dot 1.5s infinite;
@@ -1101,10 +1216,11 @@ textarea {
   border-radius: 0;
   margin-top: 10px;
 }
+
 /* In Bootstrap, white-space for dropdown list is no-wrap. Use this instead
    to align ticks and dropdown options.
 */
-.navbar-collapse > ul {
+.navbar-collapse>ul {
   float: right;
 }
 
@@ -1113,6 +1229,7 @@ textarea {
     display: none;
   }
 }
+
 @media (max-width: 1023px) {
   div.navbar-container .oppia-navbar-hide-on-medium-width {
     display: none;
@@ -1120,9 +1237,9 @@ textarea {
 }
 
 .btn.oppia-unresolved-answer-button {
-  background-color: white;
+  background-color: var(--oppia-surface-color);
   border-radius: 12px;
-  color: black;
+  color: var(--oppia-text-color);
   font-size: 14px;
   margin: 4px;
   padding: 8px 18px;
@@ -1131,7 +1248,7 @@ textarea {
 }
 
 .btn.oppia-unresolved-answer-button:hover {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
 }
 
 .oppia-story-tile {
@@ -1156,7 +1273,7 @@ textarea {
 }
 
 .oppia-fractions-landing-page-bubble {
-  background-color: #fdfdfd;
+  background-color: var(--oppia-surface-color);
   border: #faebcc solid 1px;
   border-color: rgb(250, 235, 204);
   -webkit-border-radius: 10px;
@@ -1189,10 +1306,11 @@ textarea {
 }
 
 .oppia-dashboard-aggregated-stats mat-card {
-  background: #fff;
+  background: var(--oppia-surface-color);
   margin: 0 7.5px 70px 7.5px;
   padding: 8px;
 }
+
 .stats-card h1 {
   margin-bottom: 24px;
 }
@@ -1203,6 +1321,7 @@ textarea {
   padding-left: 35px;
   width: 50%;
 }
+
 .oppia-dashboard-aggregated-stats .stats-card:last-child {
   border: none;
 }
@@ -1232,7 +1351,7 @@ span.sort-explorations-select .sort-by-text {
 }
 
 span.sort-explorations-select .sort-options {
-  background: #fff;
+  background: var(--oppia-surface-color);
   border-color: #ddd;
   height: 32px;
   margin: 7px 7px 0 0;
@@ -1257,6 +1376,7 @@ span.sort-explorations-select .sort-order {
   text-transform: uppercase;
   width: 200px;
 }
+
 .oppia-dashboard-intro-button:hover,
 .oppia-dashboard-intro-button:active {
   background-color: rgba(5, 190, 178, 1);
@@ -1286,6 +1406,7 @@ span.sort-explorations-select .sort-order {
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 .oppia-toast {
   background-position: 15px center;
   background-repeat: no-repeat;
@@ -1305,13 +1426,15 @@ span.sort-explorations-select .sort-order {
   top: 60px;
   width: 500px;
 }
-.oppia-toast-container > :hover {
+
+.oppia-toast-container> :hover {
   -moz-box-shadow: 0 0 12px #000;
   -webkit-box-shadow: 0 0 12px #000;
   box-shadow: 0 0 12px #000;
   cursor: pointer;
   opacity: 1;
 }
+
 .oppia-toast:before {
   align-items: center;
   bottom: 0;
@@ -1330,21 +1453,25 @@ span.sort-explorations-select .sort-order {
     padding: 8px 8px 8px 50px;
     width: 11em;
   }
+
   .oppia-toast-container .toast-close-button {
     right: -0.2em;
     top: -0.2em;
   }
 }
+
 @media all and (min-width: 241px) and (max-width: 480px) {
   .oppia-toast {
     padding: 8px 8px 8px 50px;
     width: 18em;
   }
+
   .oppia-toast-container .toast-close-button {
     right: -0.2em;
     top: -0.2em;
   }
 }
+
 @media all and (min-width: 481px) and (max-width: 768px) {
   .oppia-toast {
     padding: 15px 15px 15px 50px;
@@ -1396,6 +1523,7 @@ span.sort-explorations-select .sort-order {
   border-color: #24883e;
   color: #fff;
 }
+
 .oppia-save-draft-button.btn-success:hover,
 .oppia-save-changes-button.btn-success:hover,
 .oppia-editor-publish-button.btn-success:hover {
@@ -1404,15 +1532,18 @@ span.sort-explorations-select .sort-order {
   color: #fff;
 }
 
-.oppia-save-draft-button, .oppia-editor-publish-button {
+.oppia-save-draft-button,
+.oppia-editor-publish-button {
   height: 34px;
 }
 
-.oppia-save-changes-button, .oppia-editor-publish-button {
+.oppia-save-changes-button,
+.oppia-editor-publish-button {
   height: 34px;
 }
 
 @media(max-width: 1099px) {
+
   .oppia-editor-publish-button,
   .oppia-save-draft-button,
   .oppia-save-changes-button {
@@ -1421,6 +1552,7 @@ span.sort-explorations-select .sort-order {
 }
 
 @media(min-width: 1100px) {
+
   .material-icons.oppia-save-publish-button-icon,
   .oppia-save-publish-loading.oppia-save-publish-button-icon {
     display: none;
@@ -1456,7 +1588,7 @@ span.sort-explorations-select .sort-order {
 }
 
 .oppia-state-name-container {
-  background: #eee;
+  background: var(--oppia-bg-color);
   border-bottom-left-radius: 5px;
   margin: 2px 7px;
   padding: 6px;
@@ -1482,8 +1614,9 @@ span.sort-explorations-select .sort-order {
   margin: auto;
   max-width: 700px;
 }
+
 .oppia-editor-card-with-avatar {
-  background: rgb(255,255,255);
+  background: rgb(255, 255, 255);
   border: 1px solid #ccc;
   margin: 20px auto 0 auto;
   max-width: 700px;
@@ -1499,7 +1632,7 @@ span.sort-explorations-select .sort-order {
 }
 
 .oppia-editor-card {
-  background: rgb(255,255,255);
+  background: rgb(255, 255, 255);
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
@@ -1519,7 +1652,8 @@ span.sort-explorations-select .sort-order {
   line-height: 1.846;
 }
 
-.popover p, #pop-over-text {
+.popover p,
+#pop-over-text {
   font-size: 14px;
   line-height: 1.5;
   padding: 0 12px 0 12px;
@@ -1532,16 +1666,18 @@ pre.oppia-pre-wrapped-text {
 .oppia-editor-card-body {
   position: relative;
 }
+
 .oppia-editor-card-body h3 {
   font-size: 1.8em;
   margin: 0;
 }
+
 .oppia-editor-card-body form {
   margin: 0;
 }
 
 .oppia-editor-card-section-container {
-  background: rgba(5,140,166,0.1);
+  background: rgba(5, 140, 166, 0.1);
   padding-bottom: 1px;
 }
 
@@ -1556,7 +1692,8 @@ pre.oppia-pre-wrapped-text {
   padding: 5px 0 15px 10px;
 }
 
-.oppia-state-content-display, .oppia-param-changes-display {
+.oppia-state-content-display,
+.oppia-param-changes-display {
   max-width: 610px;
   text-align: left;
 }
@@ -1564,6 +1701,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-about-static-content p {
   margin: 1.5em 0;
 }
+
 .oppia-static-content p {
   line-height: 1.84;
   margin: 1.5em 0;
@@ -1575,25 +1713,31 @@ pre.oppia-pre-wrapped-text {
   font-size: 14px;
   padding: 6px 12px 6px 12px;
 }
-.btn-sm, .btn-group-sm > .btn {
+
+.btn-sm,
+.btn-group-sm>.btn {
   border-radius: 3px;
   font-size: 12px;
   line-height: 1.5;
   padding: 5px 10px;
 }
-.btn-lg, .btn-group-lg > .btn {
+
+.btn-lg,
+.btn-group-lg>.btn {
   border-radius: 6px;
   font-size: 18px;
   line-height: 1.3333333;
   padding: 10px 16px;
 }
-.btn-group > .btn + .dropdown-toggle {
+
+.btn-group>.btn+.dropdown-toggle {
   padding: 6px 6px 6px 3px;
 }
+
 .btn.oppia-navbar-button {
   background-color: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
-  color: rgba(255,255,255,1.0);
+  color: rgba(255, 255, 255, 1.0);
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -1603,61 +1747,75 @@ pre.oppia-pre-wrapped-text {
   padding: 6px 12px 6px 12px;
   text-transform: uppercase;
 }
+
 .oppia-language-dropdown-button {
   border: 2px solid white;
 }
+
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   color: #009688;
 }
-.btn:focus, .btn:active:focus {
+
+.btn:focus,
+.btn:active:focus {
   outline: 1px solid #000;
 }
+
 .skipBtn {
   height: 25px;
   width: 50px;
 }
+
 .btn-secondary {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   border-color: #ccc;
   color: #333;
 }
+
 .btn-secondary:hover {
   background-color: #e6e6e6;
   border-color: #adadad;
   color: #333;
 }
-.btn-secondary.disabled, .btn-secondary:disabled {
-  background-color: #fff;
+
+.btn-secondary.disabled,
+.btn-secondary:disabled {
+  background-color: var(--oppia-surface-color);
   border-color: #ccc;
   color: rgb(51, 51, 51);
 }
+
 .btn-secondary:not(:disabled):not(.disabled):active,
 .btn-secondary:not(:disabled):not(.disabled).active,
-.show > .btn-secondary.dropdown-toggle {
+.show>.btn-secondary.dropdown-toggle {
   background-color: #e6e6e6;
   border-color: #adadad;
   color: #333;
 }
+
 .btn-primary {
   background-color: #337ab7;
   border-color: #2e6da4;
   color: #fff
 }
-.oppia-back-arrow > .btn-sm {
+
+.oppia-back-arrow>.btn-sm {
   padding: 1px 5px 1px 5px;
 }
+
 .btn-primary:hover {
   background-color: #286090;
   border-color: #204d74
 }
 
 /* Bootstrap override for popovers & tooltip */
-.oppia-help-dropdown .popover.bottom > .arrow {
+.oppia-help-dropdown .popover.bottom>.arrow {
   border-bottom-color: #000;
 }
-.oppia-help-dropdown .popover.bottom > .arrow:after {
+
+.oppia-help-dropdown .popover.bottom>.arrow:after {
   border-bottom-color: #000;
 }
 
@@ -1678,10 +1836,12 @@ pre.oppia-pre-wrapped-text {
 .tooltip {
   font-size: 12px;
 }
+
 .tooltip.bottom {
   margin-top: 3px;
   padding: 5px 0;
 }
+
 .tooltip-arrow {
   border-color: transparent;
   border-style: solid;
@@ -1689,6 +1849,7 @@ pre.oppia-pre-wrapped-text {
   position: absolute;
   width: 0;
 }
+
 .tooltip.bottom .tooltip-arrow {
   border-bottom-color: #000;
   border-width: 0 5px 5px;
@@ -1703,15 +1864,16 @@ pre.oppia-pre-wrapped-text {
    /third_party/generated/css/third_party.css.
 */
 
-.oppia-rte-editor > p, .oppia-rte-viewer > p {
+.oppia-rte-editor>p,
+.oppia-rte-viewer>p {
   line-height: 1.846;
 }
 
-.oppia-rte-content > div > p {
+.oppia-rte-content>div>p {
   line-height: 1.846;
 }
 
-.oppia-shadow-preview-card .oppia-rte-viewer > p {
+.oppia-shadow-preview-card .oppia-rte-viewer>p {
   line-height: 1.846;
 }
 
@@ -1723,21 +1885,26 @@ pre.oppia-pre-wrapped-text {
 .popover-body.container-fluid {
   padding: 10px;
 }
-.popover-content .mat-button, .mat-button[disabled] {
+
+.popover-content .mat-button,
+.mat-button[disabled] {
   font-size: 13px;
 }
+
 /* The eight rules below should be in sync. */
-.oppia-rte-editor > p:first-child {
+.oppia-rte-editor>p:first-child {
   margin-top: 0;
 }
-.oppia-rte-editor > p:last-child {
+
+.oppia-rte-editor>p:last-child {
   margin-bottom: 0;
 }
 
-.oppia-rte-viewer > p:first-child {
+.oppia-rte-viewer>p:first-child {
   margin-top: 0;
 }
-.oppia-rte-viewer > p:last-child {
+
+.oppia-rte-viewer>p:last-child {
   margin-bottom: 0;
 }
 
@@ -1745,21 +1912,24 @@ pre.oppia-pre-wrapped-text {
   margin: 0;
 }
 
-.oppia-shadow-preview-card .oppia-rte-viewer > p:first-child {
+.oppia-shadow-preview-card .oppia-rte-viewer>p:first-child {
   margin-top: 0;
 }
-.oppia-shadow-preview-card .oppia-rte-viewer > p:last-child {
+
+.oppia-shadow-preview-card .oppia-rte-viewer>p:last-child {
   margin-bottom: 0;
 }
 
-.form-control.oppia-rte-content > div > p:first-child {
+.form-control.oppia-rte-content>div>p:first-child {
   margin-top: 0;
 }
-.form-control.oppia-rte-content > div > p:last-child {
+
+.form-control.oppia-rte-content>div>p:last-child {
   margin-bottom: 0;
 }
 
-.oppia-rte-viewer, .oppia-shadow-preview-card .oppia-rte-viewer {
+.oppia-rte-viewer,
+.oppia-shadow-preview-card .oppia-rte-viewer {
   border-radius: 2px;
   display: inline-block;
   max-width: 100%;
@@ -1797,7 +1967,7 @@ pre.oppia-pre-wrapped-text {
 
 .oppia-editable-section .oppia-rule-preview-section-mask,
 .oppia-editable-section .oppia-editable-section-mask {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   bottom: 0;
   height: 100%;
   opacity: 0;
@@ -1852,7 +2022,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-autofocus:focus {
   border: 1px solid #66afe9;
   -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
-  -moz-box-shadow: inset 0 1px 1px #00000013,0 0 8px #66afe999;
+  -moz-box-shadow: inset 0 1px 1px #00000013, 0 0 8px #66afe999;
   box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%), 0 0 8px rgb(102 175 233 / 60%);
 }
 
@@ -1901,7 +2071,7 @@ pre.oppia-pre-wrapped-text {
 /* Styles for the loading indicator or try again shown while image is loading or failed to load respectively */
 .oppia-image-container {
   align-items: center;
-  background-color: rgba(224,242,241,1);
+  background-color: rgba(224, 242, 241, 1);
   display: flex;
 }
 
@@ -1952,7 +2122,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-change-skill-button:hover,
 .oppia-change-skill-button:active,
 .oppia-change-skill-button:focus {
-  background-color: rgba(5,140,166,1);
+  background-color: rgba(5, 140, 166, 1);
   color: white;
   opacity: 1;
 }
@@ -1966,14 +2136,17 @@ pre.oppia-pre-wrapped-text {
   vertical-align: top;
   width: 20%;
 }
+
 @media screen and (max-width: 768px) {
   .oppia-interaction-tile {
     width: 42%;
   }
 }
+
 .oppia-interaction-tile:hover {
   outline: 2px solid #009688;
 }
+
 .oppia-interaction-tile-name {
   background-color: #e0f2f1;
   border: 1px solid #aaa;
@@ -1984,6 +2157,7 @@ pre.oppia-pre-wrapped-text {
   position: relative;
   text-align: center;
 }
+
 .oppia-interaction-customization-label {
   font-size: 1em;
   font-weight: bold;
@@ -1998,13 +2172,14 @@ pre.oppia-pre-wrapped-text {
 .oppia-close-popover-button {
   background: none;
   border: 0;
-  color: #000;
+  color: var(--oppia-text-color);
   cursor: pointer;
   height: 30px;
   opacity: 0.5;
   top: 8px;
   width: 30px;
 }
+
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover {
   opacity: 1;
@@ -2015,30 +2190,35 @@ pre.oppia-pre-wrapped-text {
     top: 60px;
   }
 }
+
 .oppia-close-popover-button:focus {
   outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
 }
 
-.nav-pills > li > a.oppia-rule-tab {
-  background: rgba(0,0,0,0.05);
+.nav-pills>li>a.oppia-rule-tab {
+  background: rgba(0, 0, 0, 0.05);
   border-bottom: 1px solid #f0f0f0;
   border-radius: 0;
   color: #444;
   padding: 7px 15px;
   width: 100%;
 }
-.nav-pills > li > a.oppia-rule-tab-disabled {
+
+.nav-pills>li>a.oppia-rule-tab-disabled {
   cursor: default;
 }
-.nav-pills > li:hover > a.oppia-rule-tab {
-  background: rgba(0,0,0,0.1);
+
+.nav-pills>li:hover>a.oppia-rule-tab {
+  background: rgba(0, 0, 0, 0.1);
 }
-.nav-pills > li:hover > a.oppia-rule-tab-disabled {
-  background: rgba(0,0,0,0.05);
+
+.nav-pills>li:hover>a.oppia-rule-tab-disabled {
+  background: rgba(0, 0, 0, 0.05);
 }
-.nav-pills > li.active > a.oppia-rule-tab-active {
-  background: rgba(5,140,166,0.1);
+
+.nav-pills>li.active>a.oppia-rule-tab-active {
+  background: rgba(5, 140, 166, 0.1);
   border-right: 0;
   color: #333;
 }
@@ -2060,7 +2240,8 @@ pre.oppia-pre-wrapped-text {
   padding: 4px;
 }
 
-.oppia-readonly-rule-tile img, .oppia-rule-tab img {
+.oppia-readonly-rule-tile img,
+.oppia-rule-tab img {
   max-height: 50px;
   object-fit: contain;
 }
@@ -2082,18 +2263,22 @@ pre.oppia-pre-wrapped-text {
 }
 
 .oppia-rule-block {
-  background-color: white;
+  background-color: var(--oppia-surface-color);
   border: 1px solid #ccc;
 }
 
 .oppia-rule-block.active {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   margin: -2px;
   position: relative;
   z-index: 100;
 }
 
-.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle, .oppia-worked-example-sort-handle {
+.oppia-rule-sort-handle,
+.oppia-fallback-sort-handle,
+.oppia-hint-sort-handle,
+.oppia-learner-playlist-sort-handle,
+.oppia-worked-example-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;
@@ -2115,7 +2300,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-rule-header-warning-style {
 
   background-color: yellow;
-  border: 1px solid black;
+  border: 1px solid var(--oppia-primary-color);
   color: firebrick;
   cursor: pointer;
   font-size: 20px;
@@ -2199,6 +2384,7 @@ oppia-parameter {
   margin-bottom: 18.7px;
   margin-top: 18.7px;
 }
+
 .modal-header {
   border-bottom: 1px solid #e5e5e5;
   min-height: 16.42857143px;
@@ -2208,24 +2394,28 @@ oppia-parameter {
 .fade.in {
   opacity: 1;
 }
+
 .modal-backdrop.fade {
   opacity: .5;
 }
 
 @media(min-width: 768px) {
-  .modal-content, .modal-dialog {
+
+  .modal-content,
+  .modal-dialog {
     min-width: 590px;
   }
 }
+
 .modal-content {
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   border: 1px solid #999;
-  border: 1px solid rgba(0,0,0,.2);
+  border: 1px solid rgba(0, 0, 0, .2);
   border-radius: 6px;
-  -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
-  box-shadow: 0 3px 9px rgba(0,0,0,.5);
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
   outline: 0;
   position: relative;
 }
@@ -2234,6 +2424,7 @@ oppia-parameter {
   padding: 15px;
   position: relative;
 }
+
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;
@@ -2258,6 +2449,7 @@ oppia-parameter {
 .skill-select-modal .modal-xl {
   width: 1000px;
 }
+
 @media (min-width: 768px) {
   .skill-select-modal .modal-xl {
     margin: 1.75rem auto;
@@ -2283,10 +2475,10 @@ oppia-parameter {
 }
 
 .modal.in .modal-dialog {
-  -webkit-transform: translate(0,0);
-  -ms-transform: translate(0,0);
-  -o-transform: translate(0,0);
-  transform: translate(0,0);
+  -webkit-transform: translate(0, 0);
+  -ms-transform: translate(0, 0);
+  -o-transform: translate(0, 0);
+  transform: translate(0, 0);
   -webkit-transition: -webkit-transform .3s ease-out;
   -o-transition: -o-transform .3s ease-out;
   transition: transform .3s ease-out;
@@ -2297,10 +2489,12 @@ oppia-parameter {
     margin: 30px auto;
     width: 1000px;
   }
+
   .modal-content {
-    -webkit-box-shadow: 0 5px 15px rgba(0,0,0,.5);
-    box-shadow: 0 5px 15px rgba(0,0,0,.5)
+    -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, .5);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .5)
   }
+
   .modal-sm {
     width: 300px
   }
@@ -2313,6 +2507,7 @@ oppia-parameter {
     width: 95vw;
   }
 }
+
 @media(min-width: 1024px) {
   .modal-lg {
     width: 900px;
@@ -2351,20 +2546,43 @@ oppia-parameter {
 
 /* CSS3 Animations */
 @-ms-keyframes spin {
-  from { -ms-transform: rotate(0deg); }
-  to { -ms-transform: rotate(360deg); }
+  from {
+    -ms-transform: rotate(0deg);
+  }
+
+  to {
+    -ms-transform: rotate(360deg);
+  }
 }
+
 @-moz-keyframes spin {
-  from { -moz-transform: rotate(0deg); }
-  to { -moz-transform: rotate(360deg); }
+  from {
+    -moz-transform: rotate(0deg);
+  }
+
+  to {
+    -moz-transform: rotate(360deg);
+  }
 }
+
 @-webkit-keyframes spin {
-  from { -webkit-transform: rotate(0deg); }
-  to { -webkit-transform: rotate(360deg); }
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+
+  to {
+    -webkit-transform: rotate(360deg);
+  }
 }
+
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .oppia-animate-spin {
@@ -2403,6 +2621,7 @@ oppia-expression-error-tag {
   vertical-align: baseline;
   white-space: nowrap;
 }
+
 oppia-expression-error-tag:after {
   content: "Expression parsing error!";
 }
@@ -2415,7 +2634,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar {
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   cursor: default;
   height: 56px;
   left: -2%;
@@ -2450,6 +2669,7 @@ div#ng-curtain {
   height: 40px;
   margin-top: 8px;
 }
+
 .oppia-logo-small {
   margin-left: 6px;
 }
@@ -2463,20 +2683,25 @@ div#ng-curtain {
 .oppia-navbar-tabs {
   white-space: nowrap;
 }
-.nav, .oppia-navbar-tabs > li, .oppia-navbar-tabs > create-activity-button {
+
+.nav,
+.oppia-navbar-tabs>li,
+.oppia-navbar-tabs>create-activity-button {
   vertical-align: top;
 }
 
 .oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
+
 .navbar-header {
   display: flex;
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
+
 .nav-link.oppia-navbar-tab,
-.nav-item > div.oppia-navbar-tab {
+.nav-item>div.oppia-navbar-tab {
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -2484,10 +2709,12 @@ div#ng-curtain {
   padding: 17px 12px 10px;
   text-transform: uppercase;
 }
+
 .oppia-option-list {
   display: block;
   vertical-align: initial;
 }
+
 .oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
   color: #fff;
@@ -2496,16 +2723,17 @@ div#ng-curtain {
 }
 
 .oppia-navbar-dropdown-toggle:focus {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   color: #00645c;
 }
+
 .oppia-navbar-profile-picture {
   height: 32px;
   width: 32px;
 }
 
 .oppia-select {
-  background: white;
+  background: var(--oppia-surface-color);
   border: #ddd solid 1px;
   border-radius: 4px;
   color: #555;
@@ -2520,29 +2748,35 @@ div#ng-curtain {
   top: 28px;
   width: 100%;
 }
+
 .oppia-editor-sidebar ngb-accordion .card {
   border-radius: 0;
 }
+
 .oppia-editor-sidebar ngb-accordion .card .card-heading {
   background-color: #ddd;
   border-radius: 0;
   padding: 3px 10px;
 }
+
 .oppia-editor-sidebar ngb-accordion .card .card-title {
   font-weight: bold;
 }
+
 .oppia-editor-sidebar ngb-accordion .card .card-body {
   border-radius: 0;
   padding-right: 25px;
 }
+
 .oppia-editor-sidebar-section-header {
   background-color: #ddd;
   font-size: 0.75em;
   font-weight: bold;
   padding: 3px 10px;
 }
+
 .oppia-editor-sidebar-section-body {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   margin-bottom: 5px;
   padding: 0 10px;
   padding-right: 25px;
@@ -2559,14 +2793,17 @@ div#ng-curtain {
   right: 5px;
   width: 0;
 }
+
 .oppia-editor-warnings-error-color {
   border-color: transparent transparent #fc0 transparent;
   color: #333;
 }
+
 .oppia-editor-warnings-critical-color {
-  border-color: transparent transparent rgb(231,15,15) transparent;
+  border-color: transparent transparent rgb(231, 15, 15) transparent;
   color: #fff;
 }
+
 .oppia-editor-warnings-count {
   display: flex;
   justify-content: center;
@@ -2580,16 +2817,19 @@ div#ng-curtain {
   background: #fcf8e3;
   overflow: hidden;
 }
+
 .oppia-editor-warnings-header {
   font-size: 0.8em;
   font-weight: bold;
   margin: 0 5px;
 }
+
 .oppia-editor-warnings-text {
   font-size: 0.9em;
   padding: 2px 5px;
   width: 250px;
 }
+
 .oppia-editor-warnings-separator {
   margin: 0;
 }
@@ -2601,7 +2841,7 @@ div#ng-curtain {
   position: relative;
 }
 
-.oppia-dropdown-submenu > a:after {
+.oppia-dropdown-submenu>a:after {
   border-color: transparent;
   border-left-color: #ccc;
   border-style: solid;
@@ -2615,7 +2855,7 @@ div#ng-curtain {
   width: 0;
 }
 
-.oppia-dropdown-submenu:hover > a:after {
+.oppia-dropdown-submenu:hover>a:after {
   border-left-color: #fff;
 }
 
@@ -2631,8 +2871,8 @@ div#ng-curtain {
 }
 
 .oppia-page-card {
-  background: rgb(255,255,255);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background: var(--oppia-surface-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   margin-bottom: 80px;
   margin-left: auto;
   margin-right: auto;
@@ -2686,7 +2926,8 @@ div#ng-curtain {
   width: 100%;
 }
 
-.ta-editor.form-control.oppia-rte-content, .ta-scroll-window.form-control.oppia-rte-content {
+.ta-editor.form-control.oppia-rte-content,
+.ta-scroll-window.form-control.oppia-rte-content {
   font-family: inherit;
   font-size: 100%;
   height: auto;
@@ -2699,7 +2940,7 @@ div#ng-curtain {
   font-size: 0.9em;
 }
 
-.form-control.oppia-rte-content > .ta-bind {
+.form-control.oppia-rte-content>.ta-bind {
   height: auto;
   min-height: 80px;
 }
@@ -2747,10 +2988,10 @@ div#ng-curtain {
 }
 
 mat-card.preview-conversation-skin-inline-interaction {
-  background-color: #f6f6f6;
+  background-color: var(--oppia-surface-color);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
-  border-top: 1px solid rgba(0,0,0,0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin: -20px auto;
@@ -2758,7 +2999,7 @@ mat-card.preview-conversation-skin-inline-interaction {
 }
 
 mat-card.preview-conversation-skin-supplemental-card {
-  background-color: #f6f6f6;
+  background-color: var(--oppia-surface-color);
   margin: -5px 0;
   max-width: 560px;
 }
@@ -2768,7 +3009,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   max-width: 560px;
 }
 
-.oppia-settings-container .form-group > label {
+.oppia-settings-container .form-group>label {
   padding-left: 0;
   padding-right: 0;
 }
@@ -2783,6 +3024,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   border-bottom: thin solid #eee;
   margin-bottom: 5px;
 }
+
 .trained-feedback-selection-container mat-form-field.mat-form-field-label {
   border-bottom: 0;
 }
@@ -2790,7 +3032,7 @@ mat-card.preview-conversation-skin-supplemental-card {
 .trained-feedback-selection {
   background: none;
   border: none;
-  color: rgba(0,0,0,0.5);
+  color: rgba(0, 0, 0, 0.5);
   margin: 0;
   padding-left: 9px;
   padding-top: 9px;
@@ -2809,7 +3051,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   color: #00897b;
 }
 
-.oppia-share-publish-modal > .modal-header {
+.oppia-share-publish-modal>.modal-header {
   align-items: center;
   flex-direction: column;
 }
@@ -2843,22 +3085,23 @@ mat-card.preview-conversation-skin-supplemental-card {
   text-align: right !important;
 }
 
-.oppia-lost-changes > li {
+.oppia-lost-changes>li {
   margin: 5px 0 5px 10px;
 }
 
-.oppia-lost-changes > li > .state-edit-desc {
+.oppia-lost-changes>li>.state-edit-desc {
   margin: 3px auto auto 25px;
 }
 
-.oppia-lost-changes > li .state-edit-desc .content > *,
-.oppia-lost-changes > li .state-edit-desc .feedback > * {
+.oppia-lost-changes>li .state-edit-desc .content>*,
+.oppia-lost-changes>li .state-edit-desc .feedback>* {
   padding: 4px 0 0 20px;
 }
 
-.oppia-lost-changes > li > .state-edit-desc > .sub-edit {
+.oppia-lost-changes>li>.state-edit-desc>.sub-edit {
   margin-left: 20px;
 }
+
 .oppia-activity-summary-tile .metrics li,
 .oppia-activity-summary-tile .metrics .row-three,
 .oppia-activity-summary-tile-mobile .metrics .row-three {
@@ -2866,15 +3109,18 @@ mat-card.preview-conversation-skin-supplemental-card {
   list-style-type: none;
   text-align: center;
 }
-.oppia-navbar-nav.oppia-navbar-profile > li:hover {
+
+.oppia-navbar-nav.oppia-navbar-profile>li:hover {
   background-color: #00645c
 }
+
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
   font-size: 0.7em;
   text-align: left;
 }
-.oppia-lost-changes > li > .state-edit-desc > .rules-list > li {
+
+.oppia-lost-changes>li>.state-edit-desc>.rules-list>li {
   margin-left: 20px;
 }
 
@@ -2908,8 +3154,8 @@ oppia-noninteractive-link {
 }
 
 .oppia-activity-summary-tile {
-  background-color: #fff;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,0.26);
+  background-color: var(--oppia-surface-color);
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
   cursor: pointer;
   display: inline-block;
   height: inherit;
@@ -2929,7 +3175,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-activity-summary-tile-mobile {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   cursor: pointer;
   display: inline-block;
   height: inherit;
@@ -2959,12 +3205,17 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile-mobile,
 .oppia-activity-summary-tile-mobile .title-section {
-  -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadein 1s; /* Firefox < 16 */
-  -ms-animation: fadein 1s; /* Internet Explorer */
-  -o-animation: fadein 1s; /* Opera < 12.1 */
+  -webkit-animation: fadein 1s;
+  /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 1s;
+  /* Firefox < 16 */
+  -ms-animation: fadein 1s;
+  /* Internet Explorer */
+  -o-animation: fadein 1s;
+  /* Opera < 12.1 */
   animation: fadein 1s;
 }
+
 .oppia-activity-summary-tile:hover,
 .oppia-activity-summary-tile-mobile:hover {
   /*
@@ -2973,7 +3224,7 @@ oppia-noninteractive-link {
     Level 2 seemed too subtle, but level 3 seemed too strong. This line
     therefore tries to average both of them.
   */
-  box-shadow: 0 6px 13px rgba(0,0,0,0.17), 0 4px 6px rgba(0,0,0,0.23);
+  box-shadow: 0 6px 13px rgba(0, 0, 0, 0.17), 0 4px 6px rgba(0, 0, 0, 0.23);
 }
 
 .oppia-activity-summary-tile .title-section {
@@ -3036,7 +3287,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-activity-summary-tile .exploration-summary-tile-mask {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   height: 258px;
   left: 0;
   opacity: 0.7;
@@ -3047,7 +3298,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-activity-summary-tile:hover .title-section-mask {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   height: 100%;
   left: 0;
   opacity: 0.4;
@@ -3056,9 +3307,10 @@ oppia-noninteractive-link {
   width: 100%;
   z-index: 10;
 }
+
 .oppia-activity-summary-tile-mobile:hover .title-section-mask,
 .oppia-activity-summary-tile-mobile a:focus .title-section-mask {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   height: 192px;
   left: 0;
   opacity: 0.4;
@@ -3131,13 +3383,15 @@ oppia-noninteractive-link {
   top: 15%;
   width: 100px;
 }
+
 .oppia-activity-summary-tile .objective {
   -webkit-box-orient: vertical;
   display: -webkit-box;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 0.85em;
   height: 70px;
-  -webkit-line-clamp: 3; /* Truncating to 3 lines. */
+  -webkit-line-clamp: 3;
+  /* Truncating to 3 lines. */
   line-height: 1.26;
   /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
   (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
@@ -3149,6 +3403,7 @@ oppia-noninteractive-link {
   text-overflow: ellipsis;
   word-break: break-word;
 }
+
 .oppia-activity-summary-tile-pre-hover-preview {
   margin-bottom: 35px;
 }
@@ -3193,6 +3448,7 @@ oppia-noninteractive-link {
   margin-right: 2px;
   vertical-align: initial;
 }
+
 /* Accessibility workaround for icon buttons and links
   Taken from:
   https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
@@ -3207,14 +3463,14 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile .recently-updated,
 .oppia-activity-summary-tile-mobile .recently-updated {
-  color: rgb(19,105,193);
+  color: rgb(19, 105, 193);
   font-size: 1.1em;
   font-weight: bold;
   padding: 5px 8px 4px 8px;
 }
 
 .oppia-subscription-card {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   display: inline-block;
   height: 90px;
   margin: 8px 4px;
@@ -3272,7 +3528,7 @@ oppia-noninteractive-link {
 
 .mobile-activity-card-summary-section {
   align-self: flex-end;
-  color: black;
+  color: var(--oppia-text-color);
   width: 100%;
 }
 
@@ -3354,7 +3610,7 @@ oppia-noninteractive-link {
 }
 
 .oppia-activity-summary-tile.small-width .recently-updated {
-  background-color: rgb(19,105,193);
+  background-color: rgb(19, 105, 193);
   border-radius: 8px;
   color: white;
   font-size: 0.6em;
@@ -3372,9 +3628,11 @@ oppia-noninteractive-link {
   .oppia-activity-summary-tile.small-width .metrics li {
     font-size: 0.6em;
   }
+
   .oppia-activity-summary-tile.small-width .recently-updated {
     display: none;
   }
+
   .oppia-activity-summary-tile.small-width .metrics li .fas {
     margin-bottom: 4px;
   }
@@ -3405,6 +3663,14 @@ oppia-noninteractive-link {
   transform: translateX(-50%);
   width: 80%;
   z-index: 1;
+}
+
+html[data-theme="dark"] .oppia-static-header h1 {
+  color: #fff;
+}
+
+body.oppia-custom-background-enabled .oppia-static-header h1 {
+  color: var(--oppia-heading-text-color);
 }
 
 .oppia-static-content {
@@ -3463,9 +3729,11 @@ oppia-noninteractive-link {
   position: relative;
   width: 70px;
 }
+
 .oppia-on-off-switch-checkbox {
   display: none;
 }
+
 .oppia-on-off-switch-label {
   border: 2px solid #999;
   border-radius: 20px;
@@ -3473,13 +3741,16 @@ oppia-noninteractive-link {
   display: block;
   overflow: hidden;
 }
+
 .oppia-on-off-switch-inner {
   display: block;
   margin-left: -100%;
   transition: margin 0.3s ease-in 0s;
   width: 200%;
 }
-.oppia-on-off-switch-inner:before, .oppia-on-off-switch-inner:after {
+
+.oppia-on-off-switch-inner:before,
+.oppia-on-off-switch-inner:after {
   box-sizing: border-box;
   color: white;
   display: block;
@@ -3492,21 +3763,24 @@ oppia-noninteractive-link {
   padding: 0;
   width: 50%;
 }
+
 .oppia-on-off-switch-inner:before {
   background-color: #04857c;
   color: #fff;
   content: "ON";
   padding-left: 10px;
 }
+
 .oppia-on-off-switch-inner:after {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   color: #999;
   content: "OFF";
   padding-right: 10px;
   text-align: right;
 }
+
 .oppia-on-off-switch-main {
-  background: #fff;
+  background: var(--oppia-surface-color);
   border: 2px solid #999;
   border-radius: 20px;
   bottom: 0;
@@ -3519,10 +3793,12 @@ oppia-noninteractive-link {
   transition: all 0.3s ease-in 0s;
   width: 18px;
 }
-.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-inner {
+
+.oppia-on-off-switch-checkbox:checked+.oppia-on-off-switch-label .oppia-on-off-switch-inner {
   margin-left: 0;
 }
-.oppia-on-off-switch-checkbox:checked + .oppia-on-off-switch-label .oppia-on-off-switch-main {
+
+.oppia-on-off-switch-checkbox:checked+.oppia-on-off-switch-label .oppia-on-off-switch-main {
   right: 0;
 }
 
@@ -3531,6 +3807,7 @@ oppia-noninteractive-link {
   display: inline-block;
   margin-top: 5px;
 }
+
 /* Styles for exploration settings */
 .oppia-settings-container .has-error .form-text {
   color: #a94442;
@@ -3540,7 +3817,8 @@ oppia-noninteractive-link {
   max-width: 100%;
   padding-right: 0;
 }
-.oppia-settings-container .col-sm-10  > select {
+
+.oppia-settings-container .col-sm-10>select {
   width: 85%;
 }
 
@@ -3549,7 +3827,9 @@ oppia-noninteractive-link {
 */
 
 @media only screen and (min-width: 1400px) {
-  .oppia-static-content, .oppia-static-extra-content {
+
+  .oppia-static-content,
+  .oppia-static-extra-content {
     width: 960px;
   }
 }
@@ -3557,27 +3837,35 @@ oppia-noninteractive-link {
 .oppia-mobile-back-to-parent {
   display: none;
 }
+
 @media only screen and (max-width: 768px) {
-  .oppia-static-content, .oppia-static-extra-content {
+
+  .oppia-static-content,
+  .oppia-static-extra-content {
     width: 90%;
   }
+
   .oppia-mobile-collapsible-card {
     margin: 40px 0 0;
     padding: 0;
   }
+
   .oppia-mobile-collapsible-card-header {
     padding: 18px 15px;
   }
+
   .oppia-mobile-collapsible-card-content {
     border-top: 1px solid #999;
     padding: 20px 26px 15px;
   }
+
   .oppia-mobile-back-to-parent {
     color: #015f9c;
     display: block;
     font-size: 18px;
     margin-left: 3%;
   }
+
   .oppia-mobile-back-to-parent i {
     color: #015f9c;
     font-size: 18px;
@@ -3589,7 +3877,9 @@ oppia-noninteractive-link {
   .oppia-static-header h1 {
     font-size: 2.5em;
   }
-  .oppia-static-card-content-wide, .oppia-static-card-content-narrow {
+
+  .oppia-static-card-content-wide,
+  .oppia-static-card-content-narrow {
     width: 80%;
   }
 }
@@ -3597,6 +3887,7 @@ oppia-noninteractive-link {
 .oppia-save-exploration-wide-modal .diff-graph {
   margin-top: 50px;
 }
+
 .oppia-save-exploration-wide-modal .legend-graph {
   right: -25px;
 }
@@ -3608,8 +3899,8 @@ oppia-noninteractive-link {
 .oppia-rte {
   border: 1px solid #ccc;
   border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
   height: auto;
   min-height: 80px;
   padding: 8px;
@@ -3621,9 +3912,9 @@ oppia-noninteractive-link {
 .oppia-rte:focus {
   border: 1px solid #66afe9;
   border-radius: 4px;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
-  -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);
-  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
   height: auto;
   min-height: 80px;
   padding: 8px;
@@ -3752,7 +4043,7 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-btn-arrow {
-  background-color: white;
+  background-color: var(--oppia-dropdown-bg);
   border: none;
   cursor: pointer;
   margin: auto;
@@ -3878,9 +4169,11 @@ div.oppia-issues-learner-action {
 .cke_widget_inline.cke_widget_oppiaskillreview {
   display: inline;
 }
+
 .cke_widget_inline.cke_widget_oppialink {
   display: inline;
 }
+
 /*
   When a modal is opened on top of another modal, after closing the second one,
   the first becomes unscrollable. This is required to fix that issue.
@@ -3943,7 +4236,7 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-profile-picture .oppia-profile-picture-mask {
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   bottom: 0;
   height: 100%;
   opacity: 0;
@@ -3952,6 +4245,7 @@ div.oppia-issues-learner-action {
   width: 100%;
   z-index: 10;
 }
+
 .oppia-profile-picture:hover .oppia-profile-picture-mask,
 .oppia-profile-preferences:focus .oppia-profile-picture-mask {
   border-radius: 4px;
@@ -3998,6 +4292,7 @@ div.oppia-issues-learner-action {
 .oppia-welcome-modal .oppia-welcome-modal-left-button {
   margin-right: 10px;
 }
+
 .oppia-welcome-modal .oppia-welcome-modal-button:hover,
 .oppia-welcome-modal .oppia-welcome-modal-button:focus,
 .oppia-welcome-modal .oppia-welcome-modal-button:active {
@@ -4021,6 +4316,7 @@ div.oppia-issues-learner-action {
 }
 
 @media (max-width: 780px) {
+
   /* Prevents misalignment of subtopic card in smaller screen sizes */
   .subtopics-list .subtopics-container .subtopic-card {
     width: 100%;
@@ -4039,6 +4335,7 @@ div.oppia-issues-learner-action {
 }
 
 @media (max-width: 400px) {
+
   /* Prevents overlapping with the mobile navbar elements. */
   oppia-mark-translations-as-needing-update-modal {
     margin-bottom: 25px;
@@ -4053,7 +4350,8 @@ div.oppia-issues-learner-action {
  * This ensures that when mat select is invoked from a modal, the mat options
  * are not covered by the it.
  */
-.cdk-global-overlay-wrapper, .cdk-overlay-container {
+.cdk-global-overlay-wrapper,
+.cdk-overlay-container {
   z-index: 10000 !important;
 }
 
@@ -4061,7 +4359,8 @@ div.oppia-issues-learner-action {
   margin-left: 10px;
 }
 
-.conversation-skin-oppia-avatar, .conversation-skin-user-avatar {
+.conversation-skin-oppia-avatar,
+.conversation-skin-user-avatar {
   height: 36px;
   position: absolute;
   top: 0;
@@ -4091,4 +4390,135 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 
 .hidden-element {
   outline: 0;
+}
+
+/*  */
+/* Global dark/light theme controlled via <html data-theme="..."> */
+
+:root {
+  /* Color Palette - Light Mode (Default) */
+  --oppia-primary-color: #009688;
+  --oppia-primary-hover-color: #00796b;
+  --oppia-bg-color: #e8e7e3;
+  --oppia-surface-color: #ffffff;
+  --oppia-text-color: #000000;
+  --oppia-heading-text-color: #000000;
+  --oppia-subtext-color: #555555;
+  --oppia-link-color: #0844aa;
+  --oppia-link-hover-color: #3f2c76;
+  --oppia-border-color: #d0d0d0;
+  --oppia-btn-primary-bg: #0d48a1;
+  --oppia-btn-primary-text: #ffffff;
+  --oppia-navbar-bg: #009688;
+  --oppia-navbar-text: #ffffff;
+  --oppia-input-bg: #ffffff;
+  --oppia-input-border: #ccc;
+  --oppia-input-text: #555;
+  --oppia-dropdown-bg: #ffffff;
+  --oppia-dropdown-hover: #f5f5f5;
+  --oppia-dropdown-text: #333;
+  --oppia-hover-color: #f5f5f5;
+  --oppia-disabled-color: #b7bbbf;
+  --oppia-primary-color-transparent: rgba(0, 150, 136, 0.5);
+
+  /* Splash Page Backgrounds - Light Mode */
+  --splash-bg-5: url(/assets/images/splash/dsk_testimonial_background.png);
+  --splash-bg-7: url(/assets/images/splash/dsk_community_background.png);
+  --splash-bg-5-mobile: url(/assets/images/splash/m_testimonial_background.png);
+  --splash-bg-5-mobile: url(/assets/images/splash/m_testimonial_background.png);
+  --splash-bg-7-mobile: url(/assets/images/splash/m_community_background.png);
+
+  /* Android Page */
+  --oppia-newsletter-bg: #ddedeb;
+}
+
+:root[data-theme='dark'] {
+  /* Color Palette - Dark Mode (Deep Dark Teal Theme) */
+  --oppia-primary-color: #00b5a5;
+  --oppia-primary-hover-color: #00897b;
+  --oppia-bg-color: #0d1f1f;
+  --oppia-surface-color: #142b2b;
+  --oppia-text-color: #e0e0e0;
+  --oppia-heading-text-color: #ffffff;
+  --oppia-subtext-color: #b0c4c4;
+  --oppia-link-color: #8ab4f8;
+  --oppia-link-hover-color: #aecbfa;
+  --oppia-border-color: #2a5050;
+  --oppia-btn-primary-bg: #8ab4f8;
+  --oppia-btn-primary-text: #0d1f1f;
+  --oppia-navbar-bg: #142b2b;
+  --oppia-navbar-text: #e0e0e0;
+  --oppia-input-bg: #1a3636;
+  --oppia-input-border: #2a5050;
+  --oppia-input-text: #e0e0e0;
+  --oppia-dropdown-bg: #1a3636;
+  --oppia-dropdown-hover: #264d4d;
+  --oppia-dropdown-text: #e0e0e0;
+  --oppia-hover-color: #264d4d;
+  --oppia-disabled-color: #666666;
+  --oppia-primary-color-transparent: rgba(0, 181, 165, 0.5);
+
+  /* Splash Page Backgrounds - Dark Mode */
+  --splash-bg-5: none;
+  --splash-bg-7: none;
+  --splash-bg-5-mobile: none;
+  --splash-bg-7-mobile: none;
+
+  /* Android Page */
+  --oppia-newsletter-bg: var(--oppia-surface-color);
+}
+
+body {
+  background-color: var(--oppia-bg-color);
+  color: var(--oppia-text-color);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Apply variables to common elements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--oppia-heading-text-color);
+}
+
+a {
+  color: var(--oppia-link-color);
+}
+
+a:hover {
+  color: var(--oppia-link-hover-color);
+}
+
+.oppia-navbar {
+  background-color: var(--oppia-navbar-bg);
+  color: var(--oppia-navbar-text);
+  border-bottom: 1px solid var(--oppia-border-color);
+}
+
+.oppia-content-container {
+  background-color: var(--oppia-bg-color);
+}
+
+.form-control {
+  background-color: var(--oppia-input-bg);
+  border-color: var(--oppia-input-border);
+  color: var(--oppia-input-text);
+}
+
+.dropdown-menu {
+  background-color: var(--oppia-dropdown-bg);
+  color: var(--oppia-dropdown-text);
+}
+
+.dropdown-item {
+  color: var(--oppia-dropdown-text);
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--oppia-dropdown-hover);
+  color: var(--oppia-dropdown-text);
 }

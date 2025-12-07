@@ -27,8 +27,17 @@
 .about-page .oppia-about-hero-section-content {
   background-color: #ffffffed;
   border-radius: 4px;
+  grid-column: 1 / span 1;
+  padding-left: 56px;
+  padding-right: 56px;
+  padding-top: 64px;
   padding: 48px 32px;
   width: 58%;
+}
+
+html[data-theme="dark"] .oppia-about-hero-section-content,
+body.oppia-custom-background-enabled .oppia-about-hero-section-content {
+  background-color: var(--oppia-surface-color);
 }
 
 .about-page .oppia-about-hero-title {
@@ -40,12 +49,22 @@
   text-align: start;
 }
 
+html[data-theme="dark"] .oppia-about-hero-title,
+body.oppia-custom-background-enabled .oppia-about-hero-title {
+  color: var(--oppia-heading-text-color);
+}
+
 .about-page .oppia-about-hero-subtext {
   color: #333;
   font-family: "Roboto", Arial, sans-serif;
-  font-size: 20px;
-  line-height: 27px;
+  font-size: 18px;
+  line-height: normal;
   margin: 8px 0 0;
+}
+
+html[data-theme="dark"] .oppia-about-hero-subtext,
+body.oppia-custom-background-enabled .oppia-about-hero-subtext {
+  color: var(--oppia-text-color);
 }
 
 @media only screen and (max-width: 901px) {
@@ -93,21 +112,24 @@
     height: 18em;
     padding: 0 12px 48px;
   }
+
   .about-page .oppia-about-hero-section-content {
     padding: 10px 16px;
     width: 77%;
   }
+
   .about-page .oppia-about-hero-title {
     font-size: 2rem;
     line-height: 25px;
   }
+
   .about-page .oppia-about-hero-subtext {
     display: none;
   }
 }
 
 .about-page .oppia-about-foundation-section {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   column-gap: 7.1vw;
   display: flex;
   flex-direction: row-reverse;
@@ -132,12 +154,19 @@
 .about-page .oppia-about-title-new {
   color: #00645c;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 3rem;
+  font-size: 40px;
+  margin-bottom: 30px;
+  text-align: center;
   line-height: 3.6rem;
   margin-bottom: 0;
 }
 
-.about-page .oppia-about-foundation-section  .oppia-about-title-new {
+html[data-theme="dark"] .oppia-about-title-new,
+body.oppia-custom-background-enabled .oppia-about-title-new {
+  color: var(--oppia-heading-text-color);
+}
+
+.about-page .oppia-about-foundation-section .oppia-about-title-new {
   margin-bottom: 16px;
 }
 
@@ -150,17 +179,33 @@
 
 .about-page .oppia-about-foundation-section-goal {
   background-color: #e3f1f1;
-  border-radius: 8px;
+  border-radius: 4px;
+  margin-bottom: 40px;
+  padding: 30px;
+  text-align: center;
+  width: 100%;
   display: flex;
   flex-direction: column;
   padding: 4.8rem;
   row-gap: 8px;
 }
 
+html[data-theme="dark"] .oppia-about-foundation-section-goal,
+body.oppia-custom-background-enabled .oppia-about-foundation-section-goal {
+  background-color: var(--oppia-bg-color);
+}
+
 .about-page .oppia-about-foundation-section-goal-title {
   color: #00645c;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 20px;
+  font-size: 19px;
+  letter-spacing: 0;
+  line-height: normal;
+}
+
+html[data-theme="dark"] .oppia-about-foundation-section-goal-title,
+body.oppia-custom-background-enabled .oppia-about-foundation-section-goal-title {
+  color: var(--oppia-heading-text-color);
 }
 
 .about-page .oppia-about-foundation-section-left {
@@ -179,10 +224,18 @@
 
 .about-page .oppia-about-foundation-section-timeline-subtitle {
   color: #717171;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 2rem;
-  line-height: 25px;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 24px;
+  text-transform: uppercase;
   margin-left: 1rem;
+}
+
+html[data-theme="dark"] .oppia-about-foundation-section-timeline-subtitle,
+body.oppia-custom-background-enabled .oppia-about-foundation-section-timeline-subtitle {
+  color: var(--oppia-subtext-color);
 }
 
 .about-page .oppia-about-foundation-section-timeline-item {
@@ -196,9 +249,15 @@
 .about-page .oppia-about-foundation-section-timeline-year {
   color: #000;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 2rem;
-  line-height: 24px;
+  font-size: 24px;
+  letter-spacing: 0;
+  line-height: normal;
   margin: 0;
+}
+
+html[data-theme="dark"] .oppia-about-foundation-section-timeline-year,
+body.oppia-custom-background-enabled .oppia-about-foundation-section-timeline-year {
+  color: var(--oppia-text-color);
 }
 
 .about-page .oppia-about-section-subtext-new {
@@ -208,8 +267,13 @@
   line-height: 21.6px;
 }
 
+html[data-theme="dark"] .oppia-about-section-subtext-new,
+body.oppia-custom-background-enabled .oppia-about-section-subtext-new {
+  color: var(--oppia-text-color);
+}
+
 .about-page .oppia-about-partnerships-section {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   padding: 0 0 120px;
   width: 100%;
 }
@@ -249,9 +313,23 @@
   background-color: #f5f9f9;
 }
 
+html[data-theme="dark"] .about-page .oppia-about-partnerships-card:nth-child(1),
+html[data-theme="dark"] .about-page .oppia-about-partnerships-card:nth-child(4),
+body.oppia-custom-background-enabled .about-page .oppia-about-partnerships-card:nth-child(1),
+body.oppia-custom-background-enabled .about-page .oppia-about-partnerships-card:nth-child(4) {
+  background-color: var(--oppia-bg-color);
+}
+
 .about-page .oppia-about-partnerships-card:nth-child(2),
 .about-page .oppia-about-partnerships-card:nth-child(3) {
   background-color: #fcfcfd;
+}
+
+html[data-theme="dark"] .about-page .oppia-about-partnerships-card:nth-child(2),
+html[data-theme="dark"] .about-page .oppia-about-partnerships-card:nth-child(3),
+body.oppia-custom-background-enabled .about-page .oppia-about-partnerships-card:nth-child(2),
+body.oppia-custom-background-enabled .about-page .oppia-about-partnerships-card:nth-child(3) {
+  background-color: var(--oppia-surface-color);
 }
 
 .about-page .oppia-about-partnerships-card-label {
@@ -261,6 +339,11 @@
 .about-page .oppia-about-partnerships-card-label span {
   color: #000;
   font-weight: 500;
+}
+
+html[data-theme="dark"] .about-page .oppia-about-partnerships-card-label span,
+body.oppia-custom-background-enabled .about-page .oppia-about-partnerships-card-label span {
+  color: var(--oppia-text-color);
 }
 
 .about-page .oppia-about-partnerships-card:nth-child(4) .oppia-about-section-subtext-new span {
@@ -289,21 +372,25 @@
 }
 
 @media only screen and (max-width: 884px) {
-  .about-page  .oppia-about-partnerships-section br {
+  .about-page .oppia-about-partnerships-section br {
     display: none;
   }
+
   .about-page .oppia-about-partnerships-top {
     gap: 8px;
     padding: 0 48px 16px;
   }
+
   .about-page .oppia-about-partnerships-cards-container-desktop {
     display: none;
   }
+
   .about-page .oppia-about-partnerships-cards-container-tablet {
     background-color: #f5f8f8;
     display: flex;
     padding: 48px 80px 80px;
   }
+
   .about-page .oppia-about-partnerships-card {
     display: flex;
     flex-direction: row-reverse;
@@ -311,20 +398,25 @@
     padding: 0;
     width: 100%;
   }
+
   .about-page .oppia-about-partnerships-cards-container-tablet .oppia-about-partnerships-card {
     background-color: #f5f8f8;
   }
+
   .about-page .oppia-about-partnerships-card-label {
     margin-bottom: 8px;
   }
+
   .about-page .oppia-about-partnerships-card-image-container {
     max-height: 162px;
     min-width: 37%;
   }
+
   .about-page .oppia-about-partnerships-section .carousel-indicators {
     bottom: -66px;
     gap: 16px;
   }
+
   .about-page .oppia-about-partnerships-section .carousel-indicators li {
     height: 16px;
     width: 16px;
@@ -336,58 +428,70 @@
     font-size: 1.8rem;
     line-height: 22.5px;
   }
-  .about-page  .oppia-about-partnerships-section br {
+
+  .about-page .oppia-about-partnerships-section br {
     display: none;
   }
+
   .about-page .oppia-about-partnerships-top {
     padding: 0 40px 16px;
   }
+
   .about-page .oppia-about-partnerships-cards-container-tablet {
     padding: 24px 40px 64px;
   }
+
   .about-page .oppia-about-partnerships-card {
     flex-direction: column;
     height: 100%;
     justify-content: space-between;
   }
+
   .about-page .oppia-about-partnerships-card-content-container {
     min-height: 118px;
   }
+
   .about-page .oppia-about-partnerships-card-image-container {
     max-height: none;
     min-height: 150px;
     min-width: 100%;
   }
+
   .about-page .oppia-about-partnerships-section .carousel-indicators {
     bottom: -58px;
   }
 }
+
 @media only screen and (max-width: 376px) {
-  .about-page  .oppia-about-partnerships-section br {
+  .about-page .oppia-about-partnerships-section br {
     display: none;
   }
+
   .about-page .oppia-about-partnerships-top {
     padding: 0 20px 16px;
   }
+
   .about-page .oppia-about-partnerships-cards-container-tablet {
     padding: 24px 20px 64px;
   }
+
   .about-page .oppia-about-partnerships-card-title {
     width: 92%;
   }
+
   .about-page .oppia-about-partnerships-card-content-container {
     min-height: 181px;
   }
 }
 
 .about-page .oppia-about-impact-section {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   display: flex;
   flex-direction: column;
   padding: 0 64px 80px 64px;
 }
 
-.about-page .oppia-about-impact-section  .oppia-about-title-new {
+.about-page .oppia-about-impact-section .oppia-about-title-new {
   margin-bottom: 8px;
 }
 
@@ -439,7 +543,7 @@
 
 .about-page .oppia-about-impact-section-button-container {
   align-items: center;
-  background-color: #eee;
+  background-color: var(--oppia-bg-color);
   border-radius: 4px;
   display: flex;
   flex-direction: column;
@@ -476,7 +580,7 @@
   width: 100%;
 }
 
-.about-page .oppia-impact-section-grey-bg-text, 
+.about-page .oppia-impact-section-grey-bg-text,
 .about-page .oppia-impact-section-yellow-bg-text {
   font-weight: 700;
   padding: 0 8px;
@@ -689,7 +793,7 @@
     gap: 0.8rem;
     width: 100%;
   }
-  
+
   .about-page .oppia-about-foundation-section-goal {
     padding: 3.2rem 3.2rem 3.2rem 1.6rem;
   }
@@ -724,7 +828,7 @@
     padding: 0 20px 56px;
   }
 
-  .about-page .oppia-about-foundation-section  .oppia-about-title-new {
+  .about-page .oppia-about-foundation-section .oppia-about-title-new {
     max-width: 92%;
   }
 
@@ -793,7 +897,7 @@
 }
 
 .about-page .oppia-about-cta-tabs {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
 }
 
 .about-page .oppia-cta-accordion {
@@ -1027,7 +1131,7 @@
 }
 
 .free-of-cost-panel,
-.free-of-cost-panel button, 
+.free-of-cost-panel button,
 .free-of-cost-panel .accordion-icon {
   background-color: #00645c;
   color: #fff;
@@ -1054,6 +1158,7 @@
   color: #00645c;
   font-size: 24px;
 }
+
 .about-page .oppia-cta-carousel-control-next-btn,
 .about-page .oppia-cta-carousel-control-prev-btn {
   background-color: transparent;
@@ -1072,7 +1177,7 @@
   outline: none;
 }
 
-.about-page .oppia-cta-carousel-container button, 
+.about-page .oppia-cta-carousel-container button,
 .about-page .oppia-cta-carousel-container button:focus,
 .about-page .oppia-cta-carousel-container button:hover,
 .about-page .oppia-cta-carousel-container button:active {
@@ -1100,7 +1205,7 @@
   .about-page .oppia-about-statement-type1 {
     width: calc((100% - 16px) / 2);
   }
-  
+
   .about-page .oppia-about-statement-type2 {
     width: 100%;
   }
@@ -1121,7 +1226,7 @@
     gap: 8px;
     justify-content: center;
   }
-  
+
   .about-page .oppia-about-cta-role-card {
     min-height: 356px;
     width: calc((100% - 8px) / 2);
@@ -1146,15 +1251,19 @@
     font-size: 16px;
     line-height: 19.2px;
   }
+
   .about-page .oppia-about-cta-section {
     padding: 32px 24px;
   }
+
   .about-page .oppia-about-statement-type1 {
     width: 100%;
   }
+
   .about-page .oppia-about-cta-partner-box {
     padding: 32px 15px;
   }
+
   .about-page .oppia-about-cta-role-card {
     min-height: 340px;
     padding: 24px 16px;
@@ -1166,9 +1275,11 @@
   .about-page .oppia-about-cta-partner {
     padding: 48px 16px;
   }
+
   .about-page .oppia-about-cta-partner-boxes-container {
     flex-direction: column;
   }
+
   .about-page .oppia-about-cta-partner-box {
     width: 100%;
   }
@@ -1178,25 +1289,29 @@
   .about-page .oppia-about-cta-tabs {
     display: none;
   }
+
   .about-page .oppia-cta-accordion {
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
+
   .about-page .oppia-cta-accordion .card-body {
     border-bottom: 4px solid #eee;
     border-top: 4px solid #00645c;
     padding: 0;
   }
-  .about-page .oppia-cta-accordion > .card .card-header {
-    background-color: #fff;
+
+  .about-page .oppia-cta-accordion>.card .card-header {
+    background-color: var(--oppia-surface-color);
     border-bottom: 4px solid #eee;
     display: flex;
     height: 75px;
     justify-content: center;
     padding: 0;
   }
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn {
+
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn {
     align-items: center;
     color: #00645c;
     display: flex;
@@ -1205,44 +1320,55 @@
     padding: 0 40px;
     width: 100%;
   }
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn,
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn:focus,
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn:hover,
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn:active {
+
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn,
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn:focus,
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn:hover,
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn:active {
     border: none;
     outline: none;
     text-decoration: none;
   }
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn.collapsed {
+
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn.collapsed {
     color: #333;
   }
-  .about-page .oppia-cta-accordion > .card .oppia-cta-accordion-toggle-btn.collapsed:focus {
+
+  .about-page .oppia-cta-accordion>.card .oppia-cta-accordion-toggle-btn.collapsed:focus {
     background-color: #f5f5f5;
   }
+
   .about-page .oppia-cta-accordion-chevron {
     font-size: 24px;
   }
+
   .about-page .oppia-about-cta-link {
     font-size: 16px;
   }
+
   .about-page .oppia-about-cta-section {
     padding: 32px 20px;
   }
+
   .about-page .oppia-about-cta-donor {
     padding: 48px 16px;
   }
+
   .about-page .oppia-about-cta-volunteer {
     padding: 32px 16px;
   }
+
   .about-page .oppia-about-cta-role-card {
     min-height: 300px;
     width: 100%;
   }
+
   .about-page .oppia-about-cta-volunteer-buttons-container {
     align-items: center;
     flex-direction: column;
     gap: 8px;
   }
+
   .about-page .about-page .oppia-cta-carousel-container {
     gap: 6px;
   }
@@ -1287,7 +1413,7 @@
 }
 
 .about-page .oppia-about-secondary-button {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   border: 1px solid #00645c;
   color: #00645c;
   letter-spacing: normal;
@@ -1303,7 +1429,7 @@
 }
 
 .about-page .oppia-about-platform-section {
-  background-color: #fff;
+  background-color: var(--oppia-surface-color);
   display: flex;
   flex-direction: row;
   gap: 68px;
@@ -1360,7 +1486,7 @@
 }
 
 
-.about-page  .oppia-about-non-desktop-content {
+.about-page .oppia-about-non-desktop-content {
   display: none;
 }
 
@@ -1369,43 +1495,51 @@
 }
 
 @media only screen and (max-width: 941px) {
-  .about-page  .oppia-about-non-desktop-content {
+  .about-page .oppia-about-non-desktop-content {
     display: block;
   }
-  .about-page  .oppia-about-desktop-content {
+
+  .about-page .oppia-about-desktop-content {
     display: none;
   }
+
   .about-page .oppia-about-subtitle {
     margin-left: 0;
   }
+
   .about-page .oppia-about-platform-section {
     flex-direction: column-reverse;
     gap: 56px;
     padding: 0 48px 48px;
   }
+
   .about-page .oppia-about-platform-section-right {
     width: 100%;
   }
+
   .about-page .oppia-about-platform-content {
     margin: 16px 0 32px;
   }
+
   .about-page .oppia-about-platform-section-left {
     padding: 0;
     width: 100%;
   }
+
   .about-page .oppia-about-features-list {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 16px;
   }
+
   .about-page .oppia-about-accordion-item {
     display: flex;
     height: 100%;
     width: calc((100% - 16px) / 2);
   }
 
-  .about-page .oppia-about-accordion-title-container > button {
+  .about-page .oppia-about-accordion-title-container>button {
     padding: 0;
   }
 
@@ -1427,7 +1561,7 @@
   .about-page .oppia-about-accordion-item p {
     margin: 0;
   }
-  
+
   .about-page .oppia-about-accordion-panel-title {
     font-weight: 700;
   }
@@ -1452,42 +1586,51 @@
     line-height: 19.2px;
   }
 }
+
 @media only screen and (max-width: 641px) {
-  
+
   .about-page .oppia-about-platform-section {
     gap: 48px;
     padding: 0 40px 40px;
   }
+
   .about-page .oppia-about-platform-content {
     margin: 16px 0 24px;
   }
+
   .about-page .oppia-about-features-list {
     column-gap: 8px;
     row-gap: 16px;
   }
+
   .about-page .feature-panel.free-of-cost-panel {
     padding-bottom: 46px;
   }
 }
+
 @media only screen and (max-width: 376px) {
   .about-page .oppia-about-platform-section {
     gap: 40px;
     padding: 0 20px 56px;
   }
+
   .about-page .oppia-about-platform-content {
     margin: 16px 0 32px;
   }
+
   .about-page .oppia-about-platform-button-container {
     align-items: baseline;
     flex-direction: column;
     gap: 8px;
     width: 100%;
   }
+
   .about-page .oppia-about-features-list {
     display: flex;
     flex-direction: column;
     row-gap: 8px;
   }
+
   .about-page .oppia-about-accordion-item {
     width: 100%;
   }

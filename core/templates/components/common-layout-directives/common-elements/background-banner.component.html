@@ -7,6 +7,30 @@
     overflow: hidden;
     position: absolute;
   }
+
+  :host-context(html[data-theme="dark"]) .oppia-background-banner {
+    background-color: #06141F;
+  }
+
+  :host-context(html[data-theme="dark"]) .oppia-background-image {
+    filter: brightness(0) invert(1);
+    opacity: 0.3;
+  }
+
+  :host-context(body.oppia-custom-background-enabled) .oppia-background-banner {
+    background-color: var(--oppia-bg-color);
+  }
+
+  :host-context(body.oppia-custom-bg-dark) .oppia-background-image {
+    filter: brightness(0) invert(1);
+    opacity: 0.3;
+  }
+
+  :host-context(body.oppia-custom-bg-light) .oppia-background-image {
+    filter: none;
+    opacity: 1;
+  }
+
   .oppia-background-banner .oppia-background-image {
     max-width: 3000px;
     top: 65px;
