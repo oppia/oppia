@@ -46,6 +46,7 @@ uploads/*
 env/
 venv/
 oppia-env/
+.mypy_cache/
 *.db
 .DS_Store
 .idea
