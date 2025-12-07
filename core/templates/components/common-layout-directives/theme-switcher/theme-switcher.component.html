@@ -1,6 +1,4 @@
-<button
-  class="oppia-theme-switcher"
-  (click)="toggleTheme()">
+<button class="oppia-theme-switcher" (click)="toggleTheme()">
   <span class="oppia-theme-switcher-label">
     {{ currentThemeLabel }}
   </span>
@@ -8,10 +6,10 @@
 
 <style>
   .oppia-theme-switcher {
+    color: var(--oppia-theme-switcher-text);
     background: var(--oppia-theme-switcher-bg);
     border: none;
     border-radius: 4px;
-    color: var(--oppia-theme-switcher-text);
     cursor: pointer;
     padding: 4px 8px;
   }
@@ -20,4 +18,3 @@
     font-size: 14px;
   }
 </style>
-

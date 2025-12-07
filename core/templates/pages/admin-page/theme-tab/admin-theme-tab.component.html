@@ -9,13 +9,8 @@
     <div class="row">
       <div class="col-lg-6 col-md-12">
         <h5>Theme Pack</h5>
-        <select
-          class="form-control"
-          [(ngModel)]="selectedThemePack"
-          (change)="previewThemePack()">
-          <option
-            *ngFor="let pack of availableThemePacks"
-            [value]="pack.id">
+        <select class="form-control" [(ngModel)]="selectedThemePack" (change)="previewThemePack()">
+          <option *ngFor="let pack of availableThemePacks" [value]="pack.id">
             {{ pack.name }}
           </option>
         </select>
@@ -26,11 +21,7 @@
         <br>
 
         <h5>Logo URL</h5>
-        <input
-          type="text"
-          class="form-control"
-          [(ngModel)]="logoUrl"
-          placeholder="/logo/288x128_logo_white.png">
+        <input type="text" class="form-control" [(ngModel)]="logoUrl" placeholder="/logo/288x128_logo_white.png">
         <small class="text-muted">
           Path to custom logo image (relative to static assets).
         </small>
@@ -41,15 +32,11 @@
       <div class="col-lg-6 col-md-12">
         <h5>Preview Mode</h5>
         <div class="btn-group">
-          <button
-            class="btn btn-outline-secondary"
-            (click)="previewLightTheme()">
+          <button class="btn btn-outline-secondary" (click)="previewLightTheme()">
             <i class="material-icons oppia-theme-icon">light_mode</i>
             Light
           </button>
-          <button
-            class="btn btn-outline-dark"
-            (click)="previewDarkTheme()">
+          <button class="btn btn-outline-dark" (click)="previewDarkTheme()">
             <i class="material-icons oppia-theme-icon">dark_mode</i>
             Dark
           </button>
@@ -67,15 +54,11 @@
     <hr>
 
     <div class="d-flex">
-      <button
-        class="btn btn-success"
-        (click)="saveThemeConfig()">
+      <button class="btn btn-success" (click)="saveThemeConfig()">
         <i class="material-icons oppia-theme-icon">save</i>
         Save Changes
       </button>
-      <button
-        class="btn btn-outline-secondary ml-2"
-        (click)="resetToDefaults()">
+      <button class="btn btn-outline-secondary ml-2" (click)="resetToDefaults()">
         Reset to Defaults
       </button>
     </div>
@@ -84,8 +67,8 @@
 
 <style>
   .oppia-admin-theme-tab-container {
-    max-width: 900px;
     padding: 20px;
+    max-width: 900px;
   }
 
   .oppia-admin-theme-tab-container h3 {
@@ -93,12 +76,11 @@
   }
 
   .oppia-admin-theme-tab-container h5 {
-    font-weight: 600;
     margin-bottom: 10px;
+    font-weight: 600;
   }
 
   .oppia-theme-icon {
     vertical-align: middle;
   }
 </style>
-
