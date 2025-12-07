@@ -1,3 +1,11 @@
+/DataFlow.md @oppia/dev-workflow-team
+/requirements.in.save @oppia/dev-workflow-team
+/core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.spec.ts @oppia/lace-frontend-reviewers
+/core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.html @oppia/lace-frontend-reviewers
+/core/templates/services/theme.service.ts @oppia/lace-frontend-reviewers
+/core/templates/css/variables.css @oppia/lace-frontend-reviewers
+
 # Per-directory ownership and automatic assignment for pull requests.
 
 # The paths to the directory/files must be relative to the location of this
