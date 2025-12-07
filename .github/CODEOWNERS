@@ -1,3 +1,4 @@
+/core/templates/services/theme-config-backend-api.service.ts @oppia/lace-frontend-reviewers
 /DataFlow.md @oppia/dev-workflow-team
 /core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.spec.ts @oppia/lace-frontend-reviewers

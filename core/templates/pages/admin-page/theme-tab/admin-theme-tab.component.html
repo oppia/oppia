@@ -1,69 +1,104 @@
 <div class="oppia-admin-theme-tab-container">
-    <mat-card class="oppia-page-card oppia-long-text">
-        <h3>Theme Configuration</h3>
-        <p class="text-muted">Configure the visual appearance of your Oppia instance.</p>
-        <hr>
+  <mat-card class="oppia-page-card oppia-long-text">
+    <h3>Theme Configuration</h3>
+    <p class="text-muted">
+      Configure the visual appearance of your Oppia instance.
+    </p>
+    <hr>
 
-        <div class="row">
-            <div class="col-lg-6 col-md-12">
-                <h5>Theme Pack</h5>
-                <select class="form-control" [(ngModel)]="selectedThemePack" (change)="previewThemePack()">
-                    <option *ngFor="let pack of availableThemePacks" [value]="pack.id">
-                        {{ pack.name }}
-                    </option>
-                </select>
-                <small class="text-muted">Choose a color theme for your instance. Changes preview immediately.</small>
-                <br><br>
+    <div class="row">
+      <div class="col-lg-6 col-md-12">
+        <h5>Theme Pack</h5>
+        <select
+          class="form-control"
+          [(ngModel)]="selectedThemePack"
+          (change)="previewThemePack()">
+          <option
+            *ngFor="let pack of availableThemePacks"
+            [value]="pack.id">
+            {{ pack.name }}
+          </option>
+        </select>
+        <small class="text-muted">
+          Choose a color theme for your instance. Changes preview immediately.
+        </small>
+        <br>
+        <br>
 
-                <h5>Logo URL</h5>
-                <input type="text" class="form-control" [(ngModel)]="logoUrl"
-                    placeholder="/logo/288x128_logo_white.png">
-                <small class="text-muted">Path to custom logo image (relative to static assets).</small>
-                <br><br>
-            </div>
+        <h5>Logo URL</h5>
+        <input
+          type="text"
+          class="form-control"
+          [(ngModel)]="logoUrl"
+          placeholder="/logo/288x128_logo_white.png">
+        <small class="text-muted">
+          Path to custom logo image (relative to static assets).
+        </small>
+        <br>
+        <br>
+      </div>
 
-            <div class="col-lg-6 col-md-12">
-                <h5>Preview Mode</h5>
-                <div class="btn-group">
-                    <button class="btn btn-outline-secondary" (click)="previewLightTheme()">
-                        <i class="material-icons" style="vertical-align: middle;">light_mode</i> Light
-                    </button>
-                    <button class="btn btn-outline-dark" (click)="previewDarkTheme()">
-                        <i class="material-icons" style="vertical-align: middle;">dark_mode</i> Dark
-                    </button>
-                </div>
-                <br><br>
-
-                <div class="alert alert-info">
-                    <strong>Note:</strong> Preview changes are temporary. Click "Save Changes" to persist.
-                </div>
-            </div>
+      <div class="col-lg-6 col-md-12">
+        <h5>Preview Mode</h5>
+        <div class="btn-group">
+          <button
+            class="btn btn-outline-secondary"
+            (click)="previewLightTheme()">
+            <i class="material-icons oppia-theme-icon">light_mode</i>
+            Light
+          </button>
+          <button
+            class="btn btn-outline-dark"
+            (click)="previewDarkTheme()">
+            <i class="material-icons oppia-theme-icon">dark_mode</i>
+            Dark
+          </button>
         </div>
+        <br>
+        <br>
 
-        <hr>
-        <div class="d-flex">
-            <button class="btn btn-success" (click)="saveThemeConfig()">
-                <i class="material-icons" style="vertical-align: middle;">save</i> Save Changes
-            </button>
-            <button class="btn btn-outline-secondary ml-2" (click)="resetToDefaults()">
-                Reset to Defaults
-            </button>
+        <div class="alert alert-info">
+          <strong>Note:</strong>
+          Preview changes are temporary. Click "Save Changes" to persist.
         </div>
-    </mat-card>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="d-flex">
+      <button
+        class="btn btn-success"
+        (click)="saveThemeConfig()">
+        <i class="material-icons oppia-theme-icon">save</i>
+        Save Changes
+      </button>
+      <button
+        class="btn btn-outline-secondary ml-2"
+        (click)="resetToDefaults()">
+        Reset to Defaults
+      </button>
+    </div>
+  </mat-card>
 </div>
 
 <style>
-    .oppia-admin-theme-tab-container {
-        padding: 20px;
-        max-width: 900px;
-    }
+  .oppia-admin-theme-tab-container {
+    max-width: 900px;
+    padding: 20px;
+  }
 
-    .oppia-admin-theme-tab-container h3 {
-        margin-bottom: 5px;
-    }
+  .oppia-admin-theme-tab-container h3 {
+    margin-bottom: 5px;
+  }
 
-    .oppia-admin-theme-tab-container h5 {
-        margin-bottom: 10px;
-        font-weight: 600;
-    }
+  .oppia-admin-theme-tab-container h5 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .oppia-theme-icon {
+    vertical-align: middle;
+  }
 </style>
+
