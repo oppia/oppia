@@ -25,9 +25,9 @@ export interface ThemeConfigResponse {
 }
 
 export interface ThemeConfig {
-  // Add the actual fields you need for the theme configuration.
-  themePackId: string;
-  logoUrl: string;
+  // Theme configuration fields.
+  themePackId?: string;
+  logoUrl?: string;
 }
 
 @Injectable({

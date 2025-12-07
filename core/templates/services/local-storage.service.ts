@@ -454,4 +454,50 @@ export class LocalStorageService {
     }
     return null;
   }
+
+  /**
+   * Save the theme preference to localStorage.
+   * @param theme The theme preference to save.
+   */
+  setThemePreference(theme: string): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem('oppia_theme_preference', theme);
+    }
+  }
+
+  /**
+   * Retrieve the saved theme preference from localStorage.
+   * @returns The saved theme preference if it exists, else null.
+   */
+  getThemePreference(): string | null {
+    if (this.isStorageAvailable()) {
+      return (this.storage as Storage).getItem('oppia_theme_preference');
+    }
+    return null;
+  }
+
+  /**
+   * Save the theme configuration to localStorage.
+   * @param config The theme configuration to save.
+   */
+  setThemeConfig(config: unknown): void {
+    if (this.isStorageAvailable()) {
+      (this.storage as Storage).setItem(
+        'oppia_theme_config',
+        JSON.stringify(config)
+      );
+    }
+  }
+
+  /**
+   * Retrieve the saved theme configuration from localStorage.
+   * @returns The saved theme configuration if it exists, else null.
+   */
+  getThemeConfigFromStorage(): unknown | null {
+    if (this.isStorageAvailable()) {
+      const config = (this.storage as Storage).getItem('oppia_theme_config');
+      return config ? JSON.parse(config) : null;
+    }
+    return null;
+  }
 }
