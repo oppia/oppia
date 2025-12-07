@@ -71,8 +71,8 @@ describe('Logged-in User', function () {
 
     const placeValueChapters = [
       'What are the Place Values',
-      // 'Find the Value of a Number',
-      // 'Comparing Numbers',
+      'Find the Value of a Number',
+      'Comparing Numbers',
     ];
 
     const chapterIds: (string | null)[] = [];
@@ -91,6 +91,14 @@ describe('Logged-in User', function () {
       'story',
       'Place Values'
     );
+
+    // for (let i = 0; i < 6; i++) {
+    //   await curriculumAdmin.createAndPublishExplorationWithCards(
+    //     `Explore Title ${i + 1}`,
+    //     'Algebra',
+    //     3
+    //   );
+    // }
 
     for (const [index, id] of chapterIds.entries()) {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
@@ -172,10 +180,96 @@ describe('Logged-in User', function () {
     );
     await loggedInUser.continueToNextCard();
     await loggedInUser.continueToNextCard();
+    await loggedInUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToProgressSection();
+    await loggedInUser.expectScreenshotToMatch(
+      'ProgressSectionInProgressWithOnlyChapter02',
+      __dirname
+    );
     await loggedInUser.navigateToSkillByCard('Skills', 'Place Values');
   });
+
+  it("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Classroom Lessons',
+      ['Chapter 2: Find the Value of a Number'],
+      0
+    );
+    await loggedInUser.expectSkillCardProgressToBe(
+      'Skills',
+      ['Place Values'],
+      0
+    );
+
+    await loggedInUser.navigateToLessonByCard(
+      'Classroom Lessons',
+      'Chapter 2: Find the Value of a Number'
+    );
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Classroom Lessons',
+      ['Chapter 3: Comparing Numbers'],
+      0
+    );
+    await loggedInUser.expectSkillCardProgressToBe(
+      'Skills',
+      ['Place Values'],
+      0
+    );
+
+    await loggedInUser.navigateToLessonByCard(
+      'Classroom Lessons',
+      'Chapter 3: Comparing Numbers'
+    );
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
+
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.expectScreenshotToMatch(
+      'inProgressTabCompletedSection',
+      __dirname
+    );
+    await loggedInUser.expectElementsToBePresent(
+      ['Completed'],
+      'tabSectionInProgressTab'
+    );
+    await loggedInUser.expectElementsToBePresent(
+      ['Classroom Lessons', 'Skills'],
+      'cardDisplay'
+    );
+
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Classroom Lessons',
+      ['Chapter 1: What are the Place Values'],
+      100
+    );
+    await loggedInUser.expectSkillCardProgressToBe(
+      'Skills',
+      ['Place Values'],
+      0
+    );
+  });
+
+  it('Should be able to see community lesson in Progress Tab', async function () {});
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
