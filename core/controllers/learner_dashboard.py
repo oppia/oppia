@@ -24,6 +24,7 @@ from core.domain import (
     subscription_services,
     summary_services,
     user_services,
+    badge_services,
 )
 
 from typing import Dict, Optional, TypedDict
@@ -338,6 +339,59 @@ class LearnerDashboardIdsHandler(
                 'learner_dashboard_activity_ids': (
                     learner_dashboard_activities.to_dict()
                 )
+            }
+        )
+        self.render_json(self.values)
+
+
+class LearnerDashboardBadgesSummaryHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Gets badge summary data for the learner dashboard."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_learner_dashboard
+    def get(self) -> None:
+        """Handles GET requests."""
+        assert self.user_id is not None
+        
+        # Get badge summary
+        badge_summary = user_services.get_user_badge_summary(self.user_id)
+        
+        # Get recent badges (limit 5)
+        recent_badges = []
+        try:
+            user_badges = badge_services.UserBadgeService.get_user_badges(
+                self.user_id
+            )[0]
+            # Sort by awarded date, most recent first
+            recent_badges = sorted(
+                user_badges,
+                key=lambda x: x.awarded_on,
+                reverse=True
+            )[:5]
+            recent_badges = [badge.to_dict() for badge in recent_badges]
+        except Exception:
+            pass
+        
+        # Get favorite badges (limit 3)
+        favorite_badges = []
+        try:
+            favorites = badge_services.UserBadgeService.get_user_favorites(
+                self.user_id
+            )
+            favorite_badges = [badge.to_dict() for badge in favorites[:3]]
+        except Exception:
+            pass
+        
+        self.values.update(
+            {
+                'badge_summary': badge_summary,
+                'recent_badges': recent_badges,
+                'favorite_badges': favorite_badges
             }
         )
         self.render_json(self.values)
