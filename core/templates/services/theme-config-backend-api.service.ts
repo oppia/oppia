@@ -20,24 +20,29 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 
-interface ThemeConfigResponse {
+export interface ThemeConfigResponse {
   theme_customization_config?: string;
+}
+
+export interface ThemeConfig {
+  // Add the actual fields you need for the theme configuration.
+  themePackId: string;
+  logoUrl: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeConfigBackendApiService {
-  private static readonly THEME_CONFIG_URL = '/theme_config_handler';
-
   constructor(private http: HttpClient) {}
 
-  /**
-   * Fetches the current theme configuration from the backend.
-   */
-  fetchThemeConfig(): Observable<ThemeConfigResponse> {
-    return this.http.get<ThemeConfigResponse>(
-      ThemeConfigBackendApiService.THEME_CONFIG_URL
-    );
+  getThemeConfig(): Observable<ThemeConfigResponse> {
+    // Fetches the current theme configuration from the backend.
+    return this.http.get<ThemeConfigResponse>('/themeconfighandler');
+  }
+
+  updateThemeConfig(config: ThemeConfig): Observable<ThemeConfigResponse> {
+    // Sends an updated theme configuration to the backend.
+    return this.http.post<ThemeConfigResponse>('/themeconfighandler', config);
   }
 }

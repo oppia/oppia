@@ -1,28 +1,28 @@
 // Copyright 2023 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
- * @fileoverview Component for the admin theme tab.
+ * @fileoverview Admin theme tab component.
  */
 
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {
   ThemeService,
   OppiaTheme,
   ThemeCustomizationConfig,
-} from 'services/theme.service';
+  ThemeConfigResponse,
+} from 'core/templates/services/theme.service';
 
 @Component({
   selector: 'oppia-admin-theme-tab',
@@ -31,7 +31,7 @@ import {
 export class AdminThemeTabComponent implements OnInit {
   @Output() setStatusMessage = new EventEmitter<string>();
 
-  // Available theme packs
+  // Available theme packs.
   availableThemePacks = [
     {id: '', name: 'Default (Teal)'},
     {id: 'ocean', name: 'Ocean (Blue)'},
@@ -39,32 +39,32 @@ export class AdminThemeTabComponent implements OnInit {
     {id: 'sunset', name: 'Sunset (Orange)'},
     {id: 'lavender', name: 'Lavender (Purple)'},
   ];
+
+  // Selected theme pack identifier.
   selectedThemePack = '';
 
-  // Logo configuration
+  // Logo configuration.
   logoUrl = '/logo/288x128_logo_white.png';
 
-  constructor(
-    private themeService: ThemeService,
-    private http: HttpClient
-  ) {}
+  constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
-    // Fetch current config on load
-    this.http
-      .get<{theme_customization_config: string}>('/theme_config_handler')
-      .subscribe({
-        next: response => {
-          if (response && response.theme_customization_config) {
-            try {
-              const config = JSON.parse(response.theme_customization_config);
-              this.selectedThemePack = config.themePackId || '';
-              this.logoUrl = config.logoUrl || '/logo/288x128_logo_white.png';
-            } catch {
-              // Use defaults
-            }
+    // Fetches the current theme configuration on load.
+    this.themeService
+      .getThemeConfig()
+      .subscribe((response: ThemeConfigResponse) => {
+        if (response && response.theme_customization_config) {
+          try {
+            const config = JSON.parse(
+              response.theme_customization_config
+            ) as ThemeCustomizationConfig;
+            this.selectedThemePack = config.themePackId || '';
+            this.logoUrl = config.logoUrl || '/logo/288x128_logo_white.png';
+            this.themeService.setThemeConfig(config);
+          } catch {
+            // Uses default values when parsing fails.
           }
-        },
+        }
       });
   }
 
@@ -73,43 +73,38 @@ export class AdminThemeTabComponent implements OnInit {
       themePackId: this.selectedThemePack,
       logoUrl: this.logoUrl,
     };
-    const configJson = JSON.stringify(config);
 
-    // Update via platform parameters admin API
-    this.http
-      .post('/adminhandler', {
-        action: 'save_config_properties',
-        new_config_property_values: {
-          theme_customization_config: configJson,
-        },
-      })
-      .subscribe({
-        next: () => {
-          // Apply immediately
-          this.themeService.setThemeConfig(config);
-          this.setStatusMessage.emit(
-            'Theme configuration saved successfully! Refresh to see changes.'
-          );
-        },
-        error: err => {
-          this.setStatusMessage.emit(
-            'Error saving theme config: ' +
-              (err.error?.error || 'Unknown error')
-          );
-        },
-      });
+    // Persists the theme configuration through the backend API service.
+    this.themeService.updateThemeConfig(config).subscribe({
+      next: () => {
+        this.themeService.setThemeConfig(config);
+        this.setStatusMessage.emit(
+          'Theme configuration saved successfully. Refresh to see changes.'
+        );
+      },
+      error: err => {
+        const errorMessage = err?.error?.error || 'Unknown error';
+        this.setStatusMessage.emit(
+          'Error saving theme config: ' + errorMessage
+        );
+      },
+    });
   }
 
   resetToDefaults(): void {
+    // Resets the theme configuration to default values.
     this.selectedThemePack = '';
     this.logoUrl = '/logo/288x128_logo_white.png';
-    this.themeService.setThemeConfig({});
+    this.themeService.setThemeConfig({
+      themePackId: this.selectedThemePack,
+      logoUrl: this.logoUrl,
+    });
     this.setStatusMessage.emit(
       'Theme reset to defaults. Click Save to persist.'
     );
   }
 
-  // Preview theme changes immediately
+  // Previews the currently selected theme pack and logo without saving.
   previewThemePack(): void {
     this.themeService.setThemeConfig({
       themePackId: this.selectedThemePack,
@@ -117,10 +112,12 @@ export class AdminThemeTabComponent implements OnInit {
     });
   }
 
+  // Previews the dark theme.
   previewDarkTheme(): void {
     this.themeService.setTheme(OppiaTheme.DARK);
   }
 
+  // Previews the light theme.
   previewLightTheme(): void {
     this.themeService.setTheme(OppiaTheme.LIGHT);
   }
