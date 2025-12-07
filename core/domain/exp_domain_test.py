@@ -41,7 +41,7 @@ from core.platform import models
 from core.tests import test_utils
 
 import yaml
-from typing import Any, Dict, Final, List, Tuple, Union, cast
+from typing import Any, Dict, Final, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -3011,38 +3011,36 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
     # TODO(#20377): The validation tests below should be split into separate
     # unit tests. Also, all validation errors should be covered in the tests.
-    def test_validation(self) -> None:
-        """Test validation of explorations."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
+    def create_default_exploration(
+        self,
+    ) -> Tuple[exp_domain.Exploration, translation_domain.ContentIdGenerator]:
+        """Creates and returns a default exploration for testing.
+
+        Returns:
+            Tuple[exp_domain.Exploration, translation_domain.ContentIdGenerator]. A default exploration for testing and its content ID generator.
+        """
+        exploration = self.new_exploration.create_default_exploration('eid')
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        exploration.init_state_name = ''
-        exploration.states = {}
-
-        exploration.title = 'Hello #'
-        self._assert_validation_error(exploration, 'Invalid character #')
-
+        exploration.init_state_name = 'initname'
         exploration.title = 'Title'
         exploration.category = 'Category'
 
-        # Note: If '/' ever becomes a valid state name, ensure that the rule
-        # editor frontend tenplate is fixed -- it currently uses '/' as a
-        # sentinel for an invalid state name.
-        bad_state = state_domain.State.create_default_state(
-            '/',
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
-        )
-        exploration.states = {'/': bad_state}
-        self._assert_validation_error(
-            exploration, 'Invalid character / in a state name'
-        )
+        return exploration, content_id_generator
 
+    def set_two_new_states(
+        self, content_id_generator: translation_domain.ContentIdGenerator
+    ) -> Tuple[state_domain.State, state_domain.State]:
+        """Creates, sets, and returns two new states for testing.
+
+        Args:
+            content_id_generator: ContentIdGenerator. The content id generator
+                for the exploration.
+
+        Returns:
+            Tuple[state_domain.State, state_domain.State]. A tuple of two new states.
+        """
         new_state = state_domain.State.create_default_state(
             'ABC',
             content_id_generator.generate(
@@ -3068,40 +3066,30 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             second_state, 'TextInput', content_id_generator
         )
 
-        # The 'states' property must be a non-empty dict of states.
-        exploration.states = {}
-        self._assert_validation_error(exploration, 'exploration has no states')
-        exploration.states = {'A string #': new_state}
-        self._assert_validation_error(
-            exploration, 'Invalid character # in a state name'
-        )
-        exploration.states = {'A string _': new_state}
-        self._assert_validation_error(
-            exploration, 'Invalid character _ in a state name'
-        )
+        return new_state, second_state
 
-        exploration.states = {'ABC': new_state, 'BCD': second_state}
+    def set_exploration_for_destination_and_rule_tests(
+        self,
+    ) -> Tuple[
+        exp_domain.Exploration,
+        translation_domain.ContentIdGenerator,
+        state_domain.InteractionInstance,
+        state_domain.State,
+        state_domain.AnswerGroup,
+        List[state_domain.AnswerGroupDict],
+        List[state_domain.AnswerGroup],
+        state_domain.Outcome,
+    ]:
+        """Sets exploration for destination and rule tests."""
+        exploration, content_id_generator = self.create_default_exploration()
+        new_state, second_state = self.set_two_new_states(content_id_generator)
 
-        self._assert_validation_error(exploration, 'has no initial state name')
-
-        exploration.init_state_name = 'initname'
-
-        self._assert_validation_error(
-            exploration,
-            r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
-            'the exploration\'s initial state name initname.',
-        )
-
-        # Test whether a default outcome to a non-existing state is invalid.
         exploration.states = {
             exploration.init_state_name: new_state,
             'BCD': second_state,
         }
         exploration.update_next_content_id_index(
             content_id_generator.next_content_id_index
-        )
-        self._assert_validation_error(
-            exploration, 'destination ABC is not a valid'
         )
 
         # Restore a valid exploration.
@@ -3166,69 +3154,44 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = interaction.answer_groups
         answer_group = answer_groups[0]
 
-        default_outcome.dest_if_really_stuck = 'ABD'
-        self._assert_validation_error(
+        return (
             exploration,
-            'The destination for the stuck learner ABD is not a valid state',
+            content_id_generator,
+            interaction,
+            init_state,
+            answer_group,
+            old_answer_groups,
+            new_answer_groups,
+            default_outcome,
         )
 
-        default_outcome.dest_if_really_stuck = None
-
-        answer_group.outcome.dest = 'DEF'
-        self._assert_validation_error(
-            exploration, 'destination DEF is not a valid'
-        )
-        answer_group.outcome.dest = exploration.init_state_name
-
-        answer_group.outcome.dest_if_really_stuck = 'XYZ'
-        self._assert_validation_error(
+    def update_rule_specs_to_valid(
+        self,
+    ) -> Tuple[
+        exp_domain.Exploration,
+        translation_domain.ContentIdGenerator,
+        state_domain.State,
+        List[state_domain.AnswerGroupDict],
+        List[state_domain.AnswerGroup],
+        state_domain.RuleSpec,
+    ]:
+        """Update rule specs to a valid configuration for future tests."""
+        (
             exploration,
-            'The destination for the stuck learner XYZ is not a valid state',
-        )
-
-        answer_group.outcome.dest_if_really_stuck = None
-
-        # Restore a valid exploration.
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
-        new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups)
-            for answer_groups in old_answer_groups
-        ]
-        init_state.update_interaction_answer_groups(new_answer_groups)
-        answer_groups = interaction.answer_groups
-        answer_group = answer_groups[0]
-        answer_group.outcome.dest = exploration.init_state_name
-        exploration.validate()
-
+            content_id_generator,
+            _,
+            init_state,
+            answer_group,
+            old_answer_groups,
+            _,
+        ) = self.set_values_for_rule_tests()
         # Validate RuleSpec.
         rule_spec = answer_group.rule_specs[0]
-        rule_spec.inputs = {}
-        self._assert_validation_error(
-            exploration, 'RuleSpec \'Contains\' is missing inputs'
-        )
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'Expected inputs to be a dict'
-        )
-
-        rule_spec.inputs = {'x': 'Test'}
-        rule_spec.rule_type = 'FakeRuleType'
-        self._assert_validation_error(exploration, 'Unrecognized rule type')
 
         rule_spec.inputs = {
             'x': {'contentId': 'rule_input_Equals', 'normalizedStrSet': 15}
         }
         rule_spec.rule_type = 'Contains'
-        with self.assertRaisesRegex(
-            AssertionError, 'Expected list, received 15'
-        ):
-            exploration.validate()
 
         self.set_interaction_for_state(
             exploration.states[exploration.init_state_name],
@@ -3247,187 +3210,125 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_answer_groups(new_answer_groups)
         old_answer_groups[0]['rule_specs'][0] = temp_rule
 
-        self._assert_validation_error(
+        return (
             exploration,
-            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
-            'refers to an unknown parameter within the exploration: '
-            'ExampleParam',
+            content_id_generator,
+            init_state,
+            old_answer_groups,
+            new_answer_groups,
+            rule_spec,
         )
 
+    def set_values_for_rule_tests(
+        self,
+    ) -> Tuple[
+        exp_domain.Exploration,
+        translation_domain.ContentIdGenerator,
+        state_domain.InteractionInstance,
+        state_domain.State,
+        state_domain.AnswerGroup,
+        List[state_domain.AnswerGroupDict],
+        List[state_domain.AnswerGroup],
+    ]:
+        """Sets values for rule tests."""
+        (
+            exploration,
+            content_id_generator,
+            interaction,
+            init_state,
+            answer_group,
+            old_answer_groups,
+            new_answer_groups,
+            _,
+        ) = self.set_exploration_for_destination_and_rule_tests()
+        answer_group.outcome.dest = exploration.init_state_name
+
+        answer_group.outcome.dest_if_really_stuck = None
+
+        # Restore a valid exploration.
+        self.set_interaction_for_state(
+            init_state, 'TextInput', content_id_generator
+        )
+        new_answer_groups = [
+            state_domain.AnswerGroup.from_dict(answer_groups)
+            for answer_groups in old_answer_groups
+        ]
+        init_state.update_interaction_answer_groups(new_answer_groups)
+        exploration.validate()
+        answer_groups = interaction.answer_groups
+        answer_group = answer_groups[0]
+        answer_group.outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        return (
+            exploration,
+            content_id_generator,
+            interaction,
+            init_state,
+            answer_group,
+            old_answer_groups,
+            new_answer_groups,
+        )
+
+    def set_outcome_and_destination(
+        self,
+        exploration: exp_domain.Exploration,
+        init_state: state_domain.State,
+    ) -> Tuple[
+        exp_domain.Exploration,
+        state_domain.Outcome,
+        str,
+        Optional[state_domain.Outcome],
+    ]:
+        """Sets outcome and destination for testing."""
         # Restore a valid exploration.
         exploration.param_specs['ExampleParam'] = param_domain.ParamSpec(
             'UnicodeString'
         )
         exploration.validate()
-
         # Validate Outcome.
         outcome = init_state.interaction.answer_groups[0].outcome
         destination = exploration.init_state_name
 
-        outcome.dest = None
-        self._assert_validation_error(
-            exploration, 'Every outcome should have a destination.'
-        )
-
         outcome.dest = destination
-
-        default_outcome = init_state.interaction.default_outcome
-        # Ruling out the possibility of None for mypy type checking.
-        assert default_outcome is not None
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
-
-        self._assert_validation_error(
-            exploration, 'Expected dest_if_really_stuck to be a string'
-        )
-
-        default_outcome.dest_if_really_stuck = None
-
-        # Try setting the outcome destination to something other than a string.
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.dest = 15  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'Expected outcome dest to be a string'
-        )
-
-        outcome.dest = destination
-
         outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'The "labelled_as_correct" field should be a boolean'
-        )
-
-        # Test that labelled_as_correct must be False for self-loops, and that
-        # this causes a strict validation failure but not a normal validation
-        # failure.
-        outcome.labelled_as_correct = True
-        with self.assertRaisesRegex(
-            Exception, 'is labelled correct but is a self-loop.'
-        ):
-            exploration.validate(strict=True)
-        exploration.validate()
-
-        outcome.labelled_as_correct = False
-        exploration.validate()
-
-        # Try setting the outcome destination if stuck to something other
-        # than a string.
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'Expected dest_if_really_stuck to be a string'
-        )
-
         outcome.dest_if_really_stuck = 'BCD'
-        outcome.dest = 'BCD'
-
-        # Test that no destination for the stuck learner is specified when
-        # the outcome is labelled correct.
-        outcome.labelled_as_correct = True
-
-        with self.assertRaisesRegex(
-            Exception,
-            'The outcome for the state is labelled '
-            'correct but a destination for the stuck learner '
-            'is specified.',
-        ):
-            exploration.validate(strict=True)
-        exploration.validate()
-
         outcome.labelled_as_correct = False
         exploration.validate()
-
-        outcome.dest = destination
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.param_changes = 'Changes'  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'Expected outcome param_changes to be a list'
-        )
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.param_changes = [
-            param_domain.ParamChange(0, 'generator_id', {})  # type: ignore[arg-type]
-        ]
-        self._assert_validation_error(
-            exploration, 'Expected param_change name to be a string, received 0'
-        )
 
         outcome.param_changes = []
-        exploration.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration,
-            'Expected outcome refresher_exploration_id to be a string',
-        )
-
         outcome.refresher_exploration_id = None
-        exploration.validate()
-
-        outcome.refresher_exploration_id = 'valid_string'
-        exploration.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration,
-            'Expected outcome missing_prerequisite_skill_id to be a string',
-        )
-
-        outcome.missing_prerequisite_skill_id = None
-        exploration.validate()
-
         outcome.missing_prerequisite_skill_id = 'valid_string'
-        exploration.validate()
 
-        # Test that refresher_exploration_id must be None for non-self-loops.
-        new_state_name = 'New state'
-        exploration.add_states([new_state_name])
+        default_outcome = init_state.interaction.default_outcome
+        if default_outcome:
+            default_outcome.dest_if_really_stuck = None
 
-        outcome.dest = new_state_name
-        outcome.refresher_exploration_id = 'another_string'
-        self._assert_validation_error(
+        return exploration, outcome, destination, default_outcome
+
+    def set_pencil_interaction_for_tests(
+        self,
+    ) -> Tuple[
+        exp_domain.Exploration,
+        translation_domain.ContentIdGenerator,
+        state_domain.InteractionInstance,
+        List[state_domain.AnswerGroup],
+        state_domain.State,
+        Dict[str, state_domain.InteractionCustomizationArg],
+    ]:
+        """Sets up an interaction of type PencilCodeEditor for testing."""
+        (
             exploration,
-            'has a refresher exploration ID, but is not a self-loop',
-        )
+            content_id_generator,
+            init_state,
+            old_answer_groups,
+            new_answer_groups,
+            rule_spec,
+        ) = self.update_rule_specs_to_valid()
+        interaction = init_state.interaction
 
-        outcome.refresher_exploration_id = None
-        exploration.validate()
-        exploration.delete_state(new_state_name)
-
-        # Validate InteractionInstance.
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        interaction.id = 15  # type: ignore[assignment]
-        self._assert_validation_error(
-            exploration, 'Expected interaction id to be a string'
-        )
-
-        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
-        self._assert_validation_error(exploration, 'Invalid interaction id')
         interaction.id = 'PencilCodeEditor'
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
@@ -3449,7 +3350,670 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         rule_spec.rule_type = 'Contains'
         exploration.validate()
+        interaction.customization_args = valid_text_input_cust_args
+        interaction.hints = []
+        return (
+            exploration,
+            content_id_generator,
+            interaction,
+            new_answer_groups,
+            init_state,
+            valid_text_input_cust_args,
+        )
 
+    def test_title_is_string(self) -> None:
+        """Test exploration title is string."""
+        exploration, _ = self.create_default_exploration()
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.title = 15  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected title to be a string, received 15'
+        )
+
+    def test_category_is_string(self) -> None:
+        """Test exploration category is string."""
+        exploration, _ = self.create_default_exploration()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.category = 20  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected category to be a string, received 20'
+        )
+
+    def test_objective_is_string(self) -> None:
+        """Test exploration objective is string."""
+        exploration, _ = self.create_default_exploration()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.objective = 25  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected objective to be a string, received 25'
+        )
+
+    def test_language_code_is_string(self) -> None:
+        """Test exploration language code is string."""
+        exploration, _ = self.create_default_exploration()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.language_code = 30  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected language_code to be a string, received 30'
+        )
+
+    def test_tags_is_list(self) -> None:
+        """Test exploration tags is list."""
+        exploration, _ = self.create_default_exploration()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = 'tags'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected \'tags\' to be a list, received tags'
+        )
+
+    def test_tags_list_elements_are_strings(self) -> None:
+        """Test exploration tags list elements are strings."""
+        exploration, _ = self.create_default_exploration()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.tags = [2]  # type: ignore[list-item]
+        self._assert_validation_error(
+            exploration,
+            'Expected each tag in \'tags\' to be a string, received \'2\'',
+        )
+
+    def test_tags_list_elements_not_empty(self) -> None:
+        """Test exploration tags list elements are not empty."""
+        exploration, _ = self.create_default_exploration()
+        exploration.tags = ['']
+        self._assert_validation_error(exploration, 'Tags should be non-empty.')
+
+    def test_tags_no_invalid_characters(self) -> None:
+        """Test exploration tags list elements have no invalid characters."""
+        exploration, _ = self.create_default_exploration()
+        exploration.tags = ['invalid#tag']
+        self._assert_validation_error(
+            exploration,
+            'Tags should only contain lowercase letters and spaces, received \'invalid#tag\'',
+        )
+
+    def test_tags_do_not_start_or_end_with_space(self) -> None:
+        """Test exploration tags list elements do not start or end with space."""
+        exploration, _ = self.create_default_exploration()
+        exploration.tags = [' invalidtag']
+        self._assert_validation_error(
+            exploration,
+            'Tags should not start or end with whitespace, received  \' invalidtag\'',
+        )
+        exploration.tags = ['invalidtag ']
+        self._assert_validation_error(
+            exploration,
+            'Tags should not start or end with whitespace, received  \'invalidtag \'',
+        )
+
+    def test_tags_no_consecutive_spaces(self) -> None:
+        """Test exploration tags list elements do not have consecutive spaces."""
+        exploration, _ = self.create_default_exploration()
+        exploration.tags = ['invalid  tag']
+        self._assert_validation_error(
+            exploration,
+            'Adjacent whitespace in tags should be collapsed, received \'invalid  tag\'',
+        )
+
+    def test_invalid_char_in_title(self) -> None:
+        """Test invalid characters in exploration title."""
+        exploration, _ = self.create_default_exploration()
+        exploration.title = 'Hello #'
+        self._assert_validation_error(exploration, 'Invalid character #')
+
+    def test_invalid_slash_in_state_name(self) -> None:
+        """Test invalid characters in state name."""
+        exploration, content_id_generator = self.create_default_exploration()
+        # Note: If '/' ever becomes a valid state name, ensure that the rule
+        # editor frontend tenplate is fixed -- it currently uses '/' as a
+        # sentinel for an invalid state name.
+        bad_state = state_domain.State.create_default_state(
+            '/',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
+        )
+        exploration.states = {'/': bad_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character / in a state name'
+        )
+
+    def test_empty_states_dict(self) -> None:
+        """Test empty states dict in exploration."""
+        exploration, _ = self.create_default_exploration()
+        exploration.states = {}
+        self._assert_validation_error(exploration, 'exploration has no states')
+
+    def test_invalid_char_in_state_name(self) -> None:
+        """Test invalid characters in state name."""
+        exploration, content_id_generator = self.create_default_exploration()
+
+        new_state, _ = self.set_two_new_states(content_id_generator)
+        exploration.states = {'A string #': new_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character # in a state name'
+        )
+        exploration.states = {'A string _': new_state}
+        self._assert_validation_error(
+            exploration, 'Invalid character _ in a state name'
+        )
+
+    def test_empty_init_state_name(self) -> None:
+        """Test empty initial state name in exploration."""
+        exploration, content_id_generator = self.create_default_exploration()
+        new_state, second_state = self.set_two_new_states(content_id_generator)
+        exploration.states = {'ABC': new_state, 'BCD': second_state}
+        exploration.init_state_name = ''
+        self._assert_validation_error(exploration, 'has no initial state name')
+
+    def test_exploration_language_code_is_invalid(self) -> None:
+        exploration, _ = self.create_default_exploration()
+        exploration.language_code = 'fake_code'
+        self._assert_validation_error(exploration, 'Invalid language_code')
+        exploration.language_code = 'English'
+        self._assert_validation_error(exploration, 'Invalid language_code')
+
+    def test_param_specs_is_dict(self) -> None:
+        """Test param specs is dict in exploration."""
+        exploration, content_id_generator = self.create_default_exploration()
+
+        exploration.states = {
+            exploration.init_state_name: (
+                state_domain.State.create_default_state(
+                    exploration.init_state_name,
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    ),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    ),
+                    is_initial_state=True,
+                )
+            )
+        }
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name],
+            'TextInput',
+            content_id_generator,
+        )
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index
+        )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        exploration.param_specs = 'A string'  # type: ignore[assignment]
+        self._assert_validation_error(exploration, 'param_specs to be a dict')
+
+    def test_param_spec_name_is_valid(self) -> None:
+        """Test param spec name is valid in exploration."""
+        exploration, content_id_generator = self.create_default_exploration()
+
+        exploration.states = {
+            exploration.init_state_name: (
+                state_domain.State.create_default_state(
+                    exploration.init_state_name,
+                    content_id_generator.generate(
+                        translation_domain.ContentType.CONTENT
+                    ),
+                    content_id_generator.generate(
+                        translation_domain.ContentType.DEFAULT_OUTCOME
+                    ),
+                    is_initial_state=True,
+                )
+            )
+        }
+        self.set_interaction_for_state(
+            exploration.states[exploration.init_state_name],
+            'TextInput',
+            content_id_generator,
+        )
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index
+        )
+
+        exploration.param_specs = {
+            '@': param_domain.ParamSpec.from_dict({'obj_type': 'UnicodeString'})
+        }
+        self._assert_validation_error(
+            exploration, 'Only parameter names with characters'
+        )
+
+    def test_no_state_corresponding_to_init_state_name(self) -> None:
+        """Test no state corresponding to initial state name in exploration."""
+        exploration, content_id_generator = self.create_default_exploration()
+        new_state, second_state = self.set_two_new_states(content_id_generator)
+        exploration.states = {'ABC': new_state, 'BCD': second_state}
+        exploration.init_state_name = 'initname'
+        self._assert_validation_error(
+            exploration,
+            r'There is no state in \[\'ABC\'\, \'BCD\'\] corresponding to '
+            'the exploration\'s initial state name initname.',
+        )
+
+    def test_invalid_destination_states(self) -> None:
+        """Test invalid destination states in exploration."""
+        exploration, content_id_generator = self.create_default_exploration()
+        new_state, second_state = self.set_two_new_states(content_id_generator)
+        # Test whether a default outcome to a non-existing state is invalid.
+        exploration.states = {
+            exploration.init_state_name: new_state,
+            'BCD': second_state,
+        }
+        exploration.update_next_content_id_index(
+            content_id_generator.next_content_id_index
+        )
+        self._assert_validation_error(
+            exploration, 'destination ABC is not a valid'
+        )
+
+    def test_dest_if_really_stuck_invalid_destination(self) -> None:
+        """Test invalid dest_if_really_stuck destinations in exploration."""
+        exploration, _, _, _, answer_group, _, _, default_outcome = (
+            self.set_exploration_for_destination_and_rule_tests()
+        )
+
+        default_outcome.dest_if_really_stuck = 'ABD'
+        self._assert_validation_error(
+            exploration,
+            'The destination for the stuck learner ABD is not a valid state',
+        )
+
+        default_outcome.dest_if_really_stuck = None
+
+        answer_group.outcome.dest = 'DEF'
+        self._assert_validation_error(
+            exploration, 'destination DEF is not a valid'
+        )
+        answer_group.outcome.dest = exploration.init_state_name
+        exploration.validate()
+
+        answer_group.outcome.dest_if_really_stuck = 'XYZ'
+        self._assert_validation_error(
+            exploration,
+            'The destination for the stuck learner XYZ is not a valid state',
+        )
+
+    def test_rule_spec_missing_inputs(self) -> None:
+        """Test rule spec missing inputs."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            answer_group,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {}
+        self._assert_validation_error(
+            exploration, 'RuleSpec \'Contains\' is missing inputs'
+        )
+
+    def test_rule_spec_inputs_type(self) -> None:
+        """Test rule spec inputs type."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            answer_group,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        rule_spec.inputs = 'Inputs string'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected inputs to be a dict'
+        )
+
+    def test_valid_rule_type(self) -> None:
+        """Test valid rule type."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            answer_group,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+        rule_spec.inputs = {'x': 'Test'}
+        rule_spec.rule_type = 'FakeRuleType'
+        self._assert_validation_error(exploration, 'Unrecognized rule type')
+
+    def test_rule_spec_error_contains_valid_input(self) -> None:
+        """Test rule spec error contains valid input."""
+        exploration, _, _, _, _, _ = self.update_rule_specs_to_valid()
+        self._assert_validation_error(
+            exploration,
+            'RuleSpec \'ErrorContains\' has an input with name \'x\' which '
+            'refers to an unknown parameter within the exploration: '
+            'ExampleParam',
+        )
+
+    def test_rule_spec_rule_type_is_list(self) -> None:
+        """Test rule spec rule type is list."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            answer_group,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
+
+        # Validate RuleSpec.
+        rule_spec = answer_group.rule_specs[0]
+
+        rule_spec.inputs = {
+            'x': {'contentId': 'rule_input_Equals', 'normalizedStrSet': 15}
+        }
+        rule_spec.rule_type = 'Contains'
+        with self.assertRaisesRegex(
+            AssertionError, 'Expected list, received 15'
+        ):
+            exploration.validate()
+
+    def test_outcome_has_destination(self) -> None:
+        """Test outcome has destination."""
+        exploration, _, init_state, _, _, _ = self.update_rule_specs_to_valid()
+        # Restore a valid exploration.
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        outcome.dest = None
+        self._assert_validation_error(
+            exploration, 'Every outcome should have a destination.'
+        )
+
+    def test_dest_if_really_stuck_is_string(self) -> None:
+        """Test dest_if_really_stuck is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        default_outcome = init_state.interaction.default_outcome
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        default_outcome.dest_if_really_stuck = 20  # type: ignore[assignment]
+
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string'
+        )
+
+    def test_outcome_dest_is_string(self) -> None:
+        """Test outcome dest is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest = 15  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected outcome dest to be a string'
+        )
+
+    def test_outcome_labelled_as_correct_is_boolean(self) -> None:
+        """Test outcome labelled_as_correct is boolean."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.labelled_as_correct = 'hello'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'The "labelled_as_correct" field should be a boolean'
+        )
+
+    def test_outcome_labelled_as_correct_is_not_self_loop(self) -> None:
+        """Test outcome labelled_as_correct is not self loop."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+
+        outcome.labelled_as_correct = True
+        with self.assertRaisesRegex(
+            Exception, 'is labelled correct but is a self-loop.'
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+    def test_outcome_destination_is_string(self) -> None:
+        """Test outcome destination is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        # Try setting the outcome destination if stuck to something other
+        # than a string.
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.dest_if_really_stuck = 30  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected dest_if_really_stuck to be a string'
+        )
+
+    def test_no_destination_for_stuck_learner_if_outcome_correct(self) -> None:
+        """Test no destination for stuck learner if outcome correct."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, default_outcome = (
+            self.set_outcome_and_destination(exploration, init_state)
+        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert default_outcome is not None
+
+        default_outcome.dest_if_really_stuck = None
+
+        outcome.dest_if_really_stuck = 'BCD'
+        outcome.dest = 'BCD'
+
+        # Test that no destination for the stuck learner is specified when
+        # the outcome is labelled correct.
+        outcome.labelled_as_correct = True
+        outcome.refresher_exploration_id = None
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The outcome for the state is labelled '
+            'correct but a destination for the stuck learner '
+            'is specified.',
+        ):
+            exploration.validate(strict=True)
+        exploration.validate()
+
+    def test_outcomes_are_validated(self) -> None:
+        """Test outcomes are validated."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+
+        outcome.param_changes = []
+        exploration.validate()
+
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = None
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 'valid_string'
+        exploration.validate()
+
+    def test_param_changes_is_list(self) -> None:
+        """Test param changes is list."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.param_changes = 'Changes'  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected outcome param_changes to be a list'
+        )
+
+    def test_param_change_name_is_string(self) -> None:
+        """Test param change name is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.param_changes = [
+            param_domain.ParamChange(0, 'generator_id', {})  # type: ignore[arg-type]
+        ]
+        self._assert_validation_error(
+            exploration, 'Expected param_change name to be a string, received 0'
+        )
+
+    def test_refresher_exploration_id_is_string(self) -> None:
+        """Test refresher exploration id is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.refresher_exploration_id = 12345  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome refresher_exploration_id to be a string',
+        )
+
+    def test_oucome_missing_prereq_skill_id_is_string(self) -> None:
+        """Test outcome missing prerequisite skill id is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        outcome.missing_prerequisite_skill_id = 12345  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome missing_prerequisite_skill_id to be a string',
+        )
+
+    def test_exploration_has_refresher_exploration_id_but_not_self_loop(
+        self,
+    ) -> None:
+        """Test exploration has refresher exploration id but not self loop."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        exploration, outcome, _, _ = self.set_outcome_and_destination(
+            exploration, init_state
+        )
+        # Test that refresher_exploration_id must be None for non-self-loops.
+        new_state_name = 'New state'
+        exploration.add_states([new_state_name])
+
+        outcome.dest = new_state_name
+        outcome.refresher_exploration_id = 'another_string'
+        self._assert_validation_error(
+            exploration,
+            'has a refresher exploration ID, but is not a self-loop',
+        )
+        outcome.refresher_exploration_id = None
+        exploration.validate()
+
+    def test_interaction_id_is_string(self) -> None:
+        """Test interaction id is string."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        interaction = init_state.interaction
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
+        interaction.id = 15  # type: ignore[assignment]
+        self._assert_validation_error(
+            exploration, 'Expected interaction id to be a string'
+        )
+
+    def test_interaction_id_is_valid(self) -> None:
+        """Test interaction id is valid."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
+        interaction = init_state.interaction
+        interaction.id = 'SomeInteractionTypeThatDoesNotExist'
+        self._assert_validation_error(exploration, 'Invalid interaction id')
+
+    def test_customization_args_is_dict(self) -> None:
+        """Test customization args is dict."""
+        exploration, _, interaction, _, _, _ = (
+            self.set_pencil_interaction_for_tests()
+        )
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -3458,9 +4022,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected customization args to be a dict'
         )
 
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_customization_arg_value_is_interaction_customization_arg(
+        self,
+    ) -> None:
+        """Test customization arg value is InteractionCustomizationArg."""
+        exploration, _, interaction, _, _, _ = (
+            self.set_pencil_interaction_for_tests()
+        )
+
         interaction.customization_args = {15: ''}  # type: ignore[dict-item]
         self._assert_validation_error(
             exploration,
@@ -3470,9 +4042,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             ),
         )
 
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
+    # TODO(#13059): Here we use MyPy ignore because after we fully type
+    # the codebase we plan to get rid of the tests that intentionally test
+    # wrong inputs that we can normally catch by typing.
+    def test_customization_arg_name_is_valid(self) -> None:
+        """Test customization arg name is valid."""
+        exploration, _, interaction, _, _, _ = (
+            self.set_pencil_interaction_for_tests()
+        )
+
         interaction.customization_args = {
             15: state_domain.InteractionCustomizationArg(  # type: ignore[dict-item]
                 '', {'type': 'unicode'}
@@ -3482,15 +4060,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Invalid customization arg name'
         )
 
-        interaction.customization_args = valid_text_input_cust_args
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
-        exploration.validate()
-
+    def test_answer_groups_is_list(self) -> None:
+        """Test answer groups is list."""
+        (
+            exploration,
+            _,
+            interaction,
+            _,
+            _,
+            _,
+        ) = self.set_pencil_interaction_for_tests()
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -3499,10 +4078,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer groups to be a list'
         )
 
-        new_answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_group)
-            for answer_group in old_answer_groups
-        ]
+    def test_terminal_action_does_not_have_default_outcome(self) -> None:
+        """Test terminal action does not have default outcome."""
+        (
+            exploration,
+            content_id_generator,
+            init_state,
+            _,
+            new_answer_groups,
+            _,
+        ) = self.update_rule_specs_to_valid()
+
         init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(
             init_state, 'EndExploration', content_id_generator
@@ -3511,6 +4097,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration,
             'Terminal interactions must not have a default outcome.',
         )
+
+    def test_non_terminal_action_has_default_outcome(self) -> None:
+        """Test non-terminal action has default outcome."""
+        (
+            exploration,
+            content_id_generator,
+            init_state,
+            _,
+            _,
+            _,
+        ) = self.update_rule_specs_to_valid()
 
         self.set_interaction_for_state(
             init_state, 'TextInput', content_id_generator
@@ -3521,13 +4118,42 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'Non-terminal interactions must have a default outcome.',
         )
 
+    def test_terminal_action_has_no_answer_groups(self) -> None:
+        """Test terminal action does not have answer groups."""
+        (
+            exploration,
+            content_id_generator,
+            init_state,
+            _,
+            new_answer_groups,
+            _,
+        ) = self.update_rule_specs_to_valid()
+
+        init_state.update_interaction_answer_groups(new_answer_groups)
         self.set_interaction_for_state(
             init_state, 'EndExploration', content_id_generator
         )
-        init_state.interaction.answer_groups = answer_groups
+        init_state.interaction.answer_groups = new_answer_groups
+        init_state.update_interaction_default_outcome(None)
         self._assert_validation_error(
             exploration,
             'Terminal interactions must not have any answer groups.',
+        )
+
+    def test_linear_action_has_no_answer_groups(self) -> None:
+        """Test linear action does not have answer groups."""
+        (
+            exploration,
+            content_id_generator,
+            interaction,
+            init_state,
+            _,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
+        answer_groups = interaction.answer_groups
+        exploration, _, _, default_outcome = self.set_outcome_and_destination(
+            exploration, init_state
         )
 
         init_state.interaction.answer_groups = []
@@ -3539,25 +4165,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Linear interactions must not have any answer groups.'
         )
-        exploration.update_next_content_id_index(
-            content_id_generator.next_content_id_index
-        )
-        # A terminal interaction without a default outcome or answer group is
-        # valid. This resets the exploration back to a valid state.
-        init_state.interaction.answer_groups = []
-        exploration.validate()
 
-        # Restore a valid exploration.
-        self.set_interaction_for_state(
-            init_state, 'TextInput', content_id_generator
-        )
-        init_state.update_interaction_answer_groups(answer_groups)
-        init_state.update_interaction_default_outcome(default_outcome)
-        exploration.update_next_content_id_index(
-            content_id_generator.next_content_id_index
-        )
-        exploration.validate()
-
+    def test_interaction_hints_is_list(self) -> None:
+        """Test interaction hints is list."""
+        (
+            exploration,
+            _,
+            interaction,
+            _,
+            _,
+            _,
+            _,
+        ) = self.set_values_for_rule_tests()
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -3565,9 +4184,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected hints to be a list'
         )
-        interaction.hints = []
 
-        # Validate AnswerGroup.
+    def test_tagged_skill_misconception_id_is_not_int(self) -> None:
+        """Test tagged skill misconception id is not int."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name,
@@ -3610,6 +4232,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 allow_null_interaction=False,
                 tagged_skill_misconception_id_required=False,
             )
+
+    def test_tagged_skill_misconception_id_is_none(self) -> None:
+        """Test tagged skill misconception id is none."""
+        exploration, _, _, init_state, _, _, _ = (
+            self.set_values_for_rule_tests()
+        )
         state_answer_group = state_domain.AnswerGroup(
             state_domain.Outcome(
                 exploration.init_state_name,
@@ -3653,6 +4281,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 tagged_skill_misconception_id_required=False,
             )
 
+    def test_answer_group_rules_is_list(self) -> None:
+        """Test answer group rules is list."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            init_state,
+            _,
+        ) = self.set_pencil_interaction_for_tests()
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -3661,6 +4299,16 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration, 'Expected answer group rules to be a list'
         )
 
+    def test_at_least_one_rule_per_answer_group(self) -> None:
+        """Test at least one rule per answer group."""
+        (
+            exploration,
+            _,
+            _,
+            _,
+            init_state,
+            _,
+        ) = self.set_pencil_interaction_for_tests()
         first_answer_group = init_state.interaction.answer_groups[0]
         first_answer_group.tagged_skill_misconception_id = None
         first_answer_group.rule_specs = []
@@ -3677,57 +4325,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 tagged_skill_misconception_id_required=False,
             )
 
-        exploration.states = {
-            exploration.init_state_name: (
-                state_domain.State.create_default_state(
-                    exploration.init_state_name,
-                    content_id_generator.generate(
-                        translation_domain.ContentType.CONTENT
-                    ),
-                    content_id_generator.generate(
-                        translation_domain.ContentType.DEFAULT_OUTCOME
-                    ),
-                    is_initial_state=True,
-                )
-            )
-        }
-        self.set_interaction_for_state(
-            exploration.states[exploration.init_state_name],
-            'TextInput',
-            content_id_generator,
-        )
-        exploration.update_next_content_id_index(
-            content_id_generator.next_content_id_index
-        )
-        exploration.validate()
-
-        exploration.language_code = 'fake_code'
-        self._assert_validation_error(exploration, 'Invalid language_code')
-        exploration.language_code = 'English'
-        self._assert_validation_error(exploration, 'Invalid language_code')
-        exploration.language_code = 'en'
-        exploration.validate()
-
-        # TODO(#13059): Here we use MyPy ignore because after we fully type
-        # the codebase we plan to get rid of the tests that intentionally test
-        # wrong inputs that we can normally catch by typing.
-        exploration.param_specs = 'A string'  # type: ignore[assignment]
-        self._assert_validation_error(exploration, 'param_specs to be a dict')
-
-        exploration.param_specs = {
-            '@': param_domain.ParamSpec.from_dict({'obj_type': 'UnicodeString'})
-        }
-        self._assert_validation_error(
-            exploration, 'Only parameter names with characters'
-        )
-
-        exploration.param_specs = {
-            'notAParamSpec': param_domain.ParamSpec.from_dict(
-                {'obj_type': 'UnicodeString'}
-            )
-        }
-        exploration.validate()
-
     def test_tag_validation(self) -> None:
         """Test validation of exploration tags."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
@@ -3741,7 +4338,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         )
         init_state.update_interaction_default_outcome(None)
         exploration.validate()
-
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -3749,12 +4345,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected \'tags\' to be a list'
         )
-
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
         exploration.tags = [123]  # type: ignore[list-item]
         self._assert_validation_error(exploration, 'to be a string')
+
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -4128,6 +4724,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.validate()
 
     def test_validate_exploration_outcome_dest_type(self) -> None:
+        """Test validation of exploration outcome dest type."""
         exploration = self.save_new_valid_exploration(
             'exp_id',
             'user@example.com',
@@ -4140,6 +4737,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Ruling out the possibility of None for mypy type checking.
         assert exploration.init_state.interaction.default_outcome is not None
+
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
@@ -4149,9 +4747,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         ):
             exploration.validate()
 
-    # TODO(#13059): Here we use MyPy ignore because after we fully type
-    # the codebase we plan to get rid of the tests that intentionally test
-    # wrong inputs that we can normally catch by typing.
     def test_validate_exploration_states_schema_version(self) -> None:
         exploration = self.save_new_valid_exploration(
             'exp_id',
@@ -4162,7 +4757,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             end_state_name='End',
         )
         exploration.validate()
-
+        # TODO(#13059): Here we use MyPy ignore because after we fully type
+        # the codebase we plan to get rid of the tests that intentionally test
+        # wrong inputs that we can normally catch by typing.
         exploration.states_schema_version = None  # type: ignore[assignment]
         with self.assertRaisesRegex(
             Exception, 'This exploration has no states schema version.'
@@ -4263,7 +4860,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             end_state_name='End',
         )
         exploration.validate()
-
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
