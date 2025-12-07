@@ -1,0 +1,106 @@
+<!-- Copyright 2024 The Oppia Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+<div class="badge-detail-container">
+  <button class="back-btn" (click)="goBack()">← Back to Badges</button>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Loading badge details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && hasError" class="error-state">
+    <p>Error loading badge details. Please try again.</p>
+    <button (click)="goBack()" class="back-btn">Return to Badges</button>
+  </div>
+
+  <div *ngIf="!isLoading && !hasError && badge" class="badge-detail">
+    <!-- Badge Icon and Title -->
+    <div class="badge-header">
+      <div class="badge-icon-wrapper">
+        <div class="badge-icon" [innerHTML]="badge.icon_svg"></div>
+        <span class="rarity-badge" [class]="badge.rarity">
+          {{ badge.rarity | uppercase }}
+        </span>
+      </div>
+
+      <div class="badge-info">
+        <h1 class="badge-name">{{ badge.name }}</h1>
+        <p class="badge-description">{{ badge.description }}</p>
+
+        <div class="badge-metadata">
+          <span class="metadata-item">
+            <strong>Tier:</strong> {{ badge.tier | uppercase }}
+          </span>
+          <span class="metadata-item">
+            <strong>Category:</strong> {{ badge.category | titlecase }}
+          </span>
+          <span class="metadata-item">
+            <strong>Reward:</strong> {{ badge.xp_reward }} XP
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="action-btn favorite-btn" [class.active]="isFavorite" (click)="toggleFavorite()">
+        {{ isFavorite ? '★ Remove from Favorites' : '☆ Add to Favorites' }}
+      </button>
+      <button class="action-btn share-btn" (click)="shareBadge()">
+        Share Badge
+      </button>
+      <button class="action-btn copy-btn" (click)="copyToClipboard()">
+        Copy Share Text
+      </button>
+    </div>
+
+    <!-- Share Message -->
+    <div class="share-section">
+      <h3>Share This Badge</h3>
+      <div class="share-message">
+        <p>{{ shareMessage }}</p>
+      </div>
+    </div>
+
+    <!-- Badge Details -->
+    <div class="details-section">
+      <h3>Badge Details</h3>
+      <div class="details-grid">
+        <div class="detail-card">
+          <h4>How to Earn</h4>
+          <p *ngIf="badge.criteria">
+            Complete the required activities to unlock this badge.
+          </p>
+        </div>
+        <div class="detail-card">
+          <h4>Rewards</h4>
+          <p>
+            <strong>XP:</strong> {{ badge.xp_reward }}<br>
+            <strong>Points:</strong> {{ badge.points }}
+          </p>
+        </div>
+        <div class="detail-card">
+          <h4>Rarity</h4>
+          <p [class]="'rarity-' + badge.rarity">
+            {{ badge.rarity | uppercase }}
+          </p>
+        </div>
+        <div class="detail-card">
+          <h4>Badge Type</h4>
+          <p>{{ badge.badge_type | titlecase }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

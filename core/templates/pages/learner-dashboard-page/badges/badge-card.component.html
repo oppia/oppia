@@ -1,0 +1,85 @@
+<div class="badge-card" [ngClass]="badgeClass" [style]="badgeStyle" (click)="onBadgeClick()"
+  (mouseenter)="isHovered = true" (mouseleave)="isHovered = false" [attr.role]="interactive ? 'button' : 'img'"
+  [attr.tabindex]="interactive ? 0 : -1" [attr.aria-label]="badge.name + (isEarned ? ' earned' : ' locked')" #badgeCard>
+
+  <!-- Badge Icon -->
+  <div class="badge-icon-container">
+    <svg class="badge-icon" [innerHTML]="iconSvg" [attr.aria-hidden]="'true'">
+    </svg>
+
+    <!-- Lock Indicator for Locked Badges -->
+    <div class="lock-indicator" *ngIf="!isEarned">
+      <span class="lock-icon">🔒</span>
+    </div>
+
+    <!-- Earned Check Mark -->
+    <div class="earned-check" *ngIf="isEarned">
+      <span class="check-mark">✓</span>
+    </div>
+  </div>
+
+  <!-- Badge Information -->
+  <div class="badge-info">
+    <h3 class="badge-name">{{ badge.name }}</h3>
+
+    <!-- Rarity and Tier Badges -->
+    <div class="badge-meta">
+      <span class="rarity-badge" [ngClass]="'rarity-' + badge.rarity.toLowerCase()">
+        {{ badge.rarity }}
+      </span>
+      <span class="tier-badge" [ngClass]="'tier-' + badge.tier.toLowerCase()">
+        {{ badge.tier }}
+      </span>
+    </div>
+
+    <!-- XP Reward -->
+    <div class="xp-reward">
+      <span class="xp-icon">⭐</span>
+      <span class="xp-amount">+{{ badge.xp_reward }} XP</span>
+    </div>
+  </div>
+
+  <!-- Progress Bar (if showing and criteria exists) -->
+  <div class="progress-section" *ngIf="showProgress && badge.criteria && isEarned">
+    <div class="progress-bar-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width]="progressPercentage + '%'"></div>
+      </div>
+      <span class="progress-text">{{ progressText }}</span>
+    </div>
+  </div>
+
+  <!-- Interactive Actions (shown on hover) -->
+  <div class="badge-actions" *ngIf="interactive && isHovered">
+    <!-- Favorite Button -->
+    <button class="action-button favorite-button" [class.active]="isFavorite" (click)="toggleFavorite($event)"
+      [disabled]="!isEarned" [attr.aria-label]="isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+      [attr.title]="isFavorite ? 'Remove from favorites' : 'Add to favorites'">
+      <span class="favorite-icon">{{ isFavorite ? '❤️' : '🤍' }}</span>
+    </button>
+
+    <!-- Share Button -->
+    <button class="action-button share-button" (click)="shareBadge($event)" [disabled]="!isEarned || isSharing"
+      [attr.aria-label]="'Share ' + badge.name + ' badge'" [attr.title]="'Share ' + badge.name">
+      <span class="share-icon">{{ isSharing ? '⏳' : '📤' }}</span>
+    </button>
+
+    <!-- Times Earned (if applicable) -->
+    <div class="times-earned" *ngIf="isEarned && userBadge && userBadge.times_earned > 1">
+      <span class="earned-count">×{{ userBadge.times_earned }}</span>
+    </div>
+  </div>
+
+  <!-- Badge Description Tooltip -->
+  <div class="badge-tooltip" *ngIf="isHovered && interactive">
+    <p class="description">{{ badge.description }}</p>
+    <p class="criteria-hint" *ngIf="badge.criteria && !isEarned">
+      Requirement: {{ badge.criteria.threshold }} {{ badge.criteria.condition_type }}
+    </p>
+  </div>
+
+  <!-- Notification Message -->
+  <div class="notification" *ngIf="showNotification" [@fadeInOut]>
+    {{ notificationMessage }}
+  </div>
+</div>

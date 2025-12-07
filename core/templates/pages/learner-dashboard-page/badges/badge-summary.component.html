@@ -1,0 +1,93 @@
+<div class="badge-summary-container" [class.compact]="compact">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading your badges...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="hasError && !isLoading" class="error-state">
+    <p>Unable to load badge data. Please refresh the page.</p>
+  </div>
+
+  <!-- Summary content -->
+  <div *ngIf="!isLoading && !hasError && badgeSummary" class="summary-content">
+    <!-- Header -->
+    <div class="summary-header">
+      <h3 class="summary-title">Your Badges</h3>
+      <button *ngIf="compact" (click)="navigateToBadges()" class="view-all-btn">
+        View All →
+      </button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ badgeSummary.total_badges }}</div>
+          <div class="stat-label">Badges Earned</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ badgeSummary.total_xp }}</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">💎</div>
+        <div class="stat-content">
+          <div class="stat-value">{{ badgeSummary.favorite_count }}</div>
+          <div class="stat-label">Favorites</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-label">Achievement Progress</span>
+        <span class="progress-value">{{ getProgressPercentage() | number:'1.0-0' }}%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width]="progressStyle">
+        </div>
+      </div>
+      <div class="progress-milestone">
+        Next milestone: {{ nextMilestoneCount }} badges
+      </div>
+    </div>
+
+    <!-- Recent badges -->
+    <div *ngIf="recentBadges.length > 0" class="recent-section">
+      <h4 class="section-title">Recent Badges</h4>
+      <div class="badges-grid">
+        <oppia-badge-card *ngFor="let badge of recentBadges" [badge]="badge" [size]="compact ? 'small' : 'medium'"
+          [interactive]="!compact">
+        </oppia-badge-card>
+      </div>
+    </div>
+
+    <!-- Favorite badges -->
+    <div *ngIf="favoriteBadges.length > 0" class="favorites-section">
+      <h4 class="section-title">Favorite Badges</h4>
+      <div class="badges-grid">
+        <oppia-badge-card *ngFor="let badge of favoriteBadges" [badge]="badge" [size]="compact ? 'small' : 'medium'"
+          [interactive]="!compact">
+        </oppia-badge-card>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="recentBadges.length === 0 && favoriteBadges.length === 0" class="empty-state">
+      <p>No badges earned yet. Complete lessons to earn your first badge!</p>
+      <button (click)="navigateToBadges()" class="learn-more-btn">
+        Learn about badges
+      </button>
+    </div>
+  </div>
+</div>

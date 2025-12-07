@@ -1,0 +1,18 @@
+Create Badge Detail component template
+
+<div class="badge-detail">
+  <h2>{{ badge.name }}</h2>
+  <img [src]="badge.icon_url" alt="{{ badge.name }}">
+  <p>{{ badge.description }}</p>
+
+  <div class="progress">
+    <h3>Progress</h3>
+    <progress [value]="progress" max="100"></progress>
+    <p>{{ progress }}% completed</p>
+  </div>
+
+  <div class="motivational-message">
+    <h3>How to Earn This Badge</h3>
+    <p>{{ motivationalMessage }}</p>
+  </div>
+</div>

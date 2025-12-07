@@ -1,0 +1,19 @@
+.badge-detail {
+  padding: 20px;
+  text-align: center;
+}
+
+.badge-detail img {
+  max-width: 200px;
+  height: auto;
+  margin: 10px 0;
+}
+
+.progress {
+  margin: 20px 0;
+}
+
+.motivational-message {
+  margin-top: 20px;
+  font-style: italic;
+}

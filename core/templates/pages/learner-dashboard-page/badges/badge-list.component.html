@@ -1,0 +1,183 @@
+<div class="badge-list-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="page-title">Badge Gallery</h1>
+    <p class="page-subtitle">
+      Earn {{ getTotalEarned() }} of {{ totalCount }} badges
+    </p>
+
+    <!-- Overall Progress -->
+    <div class="progress-overview">
+      <div class="progress-circle">
+        <svg class="progress-svg" viewBox="0 0 100 100">
+          <circle class="progress-background" cx="50" cy="50" r="45" />
+          <circle class="progress-fill" cx="50" cy="50" r="45"
+            [style.strokeDashoffset]="282.7 - (282.7 * getOverallProgress() / 100)" />
+        </svg>
+        <div class="progress-text">
+          <span class="progress-percentage">{{ getOverallProgress() }}%</span>
+          <span class="progress-label">Complete</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Controls Section -->
+  <div class="controls-section">
+    <!-- Search Bar -->
+    <div class="search-bar">
+      <input #searchInput type="text" class="search-input" placeholder="Search badges..."
+        (input)="onSearchChange($event.target.value)" aria-label="Search badges">
+      <button class="clear-search-btn" *ngIf="searchQuery" (click)="clearSearch()" aria-label="Clear search">
+        ✕
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label for="category-filter">Category:</label>
+        <select id="category-filter" [(ngModel)]="selectedCategory" (change)="onFilterChange()" class="filter-select">
+          <option value="">All Categories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="rarity-filter">Rarity:</label>
+        <select id="rarity-filter" [(ngModel)]="selectedRarity" (change)="onFilterChange()" class="filter-select">
+          <option value="">All Rarities</option>
+          <option *ngFor="let rarity of rarities" [value]="rarity">{{ rarity }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="type-filter">Type:</label>
+        <select id="type-filter" [(ngModel)]="selectedType" (change)="onFilterChange()" class="filter-select">
+          <option value="">All Types</option>
+          <option *ngFor="let type of types" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="tier-filter">Tier:</label>
+        <select id="tier-filter" [(ngModel)]="selectedTier" (change)="onFilterChange()" class="filter-select">
+          <option value="">All Tiers</option>
+          <option *ngFor="let tier of tiers" [value]="tier">{{ tier }}</option>
+        </select>
+      </div>
+
+      <button class="reset-filters-btn" (click)="resetFilters()" aria-label="Reset all filters">
+        Reset Filters
+      </button>
+    </div>
+
+    <!-- View Controls -->
+    <div class="view-controls">
+      <div class="view-mode-buttons">
+        <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="setViewMode('grid')"
+          aria-label="Grid view">
+          ⊞
+        </button>
+        <button class="view-btn" [class.active]="viewMode === 'list'" (click)="setViewMode('list')"
+          aria-label="List view">
+          ☰
+        </button>
+      </div>
+
+      <div class="size-buttons">
+        <button class="size-btn" [class.active]="badgeSize === 'small'" (click)="setBadgeSize('small')"
+          aria-label="Small badges" title="Small">
+          S
+        </button>
+        <button class="size-btn" [class.active]="badgeSize === 'medium'" (click)="setBadgeSize('medium')"
+          aria-label="Medium badges" title="Medium">
+          M
+        </button>
+        <button class="size-btn" [class.active]="badgeSize === 'large'" (click)="setBadgeSize('large')"
+          aria-label="Large badges" title="Large">
+          L
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Progress Section -->
+  <div class="category-progress-section" *ngIf="getCategoryProgress().length > 0">
+    <h2 class="section-title">Progress by Category</h2>
+    <div class="category-progress-list">
+      <div class="category-progress-item" *ngFor="let progress of getCategoryProgress()">
+        <span class="category-name">{{ progress.category }}</span>
+        <div class="progress-bar-container">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="(progress.earned / progress.total * 100) + '%'">
+            </div>
+          </div>
+        </div>
+        <span class="progress-text">{{ progress.earned }}/{{ progress.total }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading && badges.length === 0">
+    <div class="spinner"></div>
+    <p>Loading badges...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="hasError">
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="retry-btn" (click)="retryLoadBadges()">
+      Try Again
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && badges.length === 0 && !hasError">
+    <p class="empty-message">No badges found matching your filters.</p>
+    <button class="reset-filters-btn" (click)="resetFilters()">
+      Reset Filters
+    </button>
+  </div>
+
+  <!-- Badges Grid/List -->
+  <div class="badges-container" *ngIf="badges.length > 0" [ngClass]="'view-' + viewMode">
+    <oppia-badge-card *ngFor="let badge of badges" [badge]="badge" [userBadge]="getUserBadge(badge.badge_id)"
+      [showProgress]="true" [size]="badgeSize" [interactive]="true" [progressPercentage]="getProgressPercentage(badge)"
+      (badgeClicked)="onBadgeClicked($event)" (badgeShared)="onBadgeShared($event)"
+      (badgeFavorited)="onBadgeFavorited($event)">
+    </oppia-badge-card>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-section" *ngIf="totalPages > 1 && badges.length > 0">
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)"
+      aria-label="Previous page">
+      ← Previous
+    </button>
+
+    <div class="page-numbers">
+      <button class="page-number" *ngFor="let pageNum of getPageNumbers()" [class.active]="pageNum === currentPage"
+        (click)="goToPage(pageNum)" [attr.aria-label]="'Go to page ' + pageNum"
+        [attr.aria-current]="pageNum === currentPage ? 'page' : false">
+        {{ pageNum }}
+      </button>
+    </div>
+
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)"
+      aria-label="Next page">
+      Next →
+    </button>
+
+    <span class="pagination-info">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+  </div>
+
+  <!-- Loading More Indicator -->
+  <div class="loading-more" *ngIf="isLoadingMore">
+    <div class="spinner"></div>
+    <p>Loading more badges...</p>
+  </div>
+</div>

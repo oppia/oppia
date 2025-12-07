@@ -1,0 +1,187 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.badge-summary-container {
+  .loading-spinner {
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .error-state {
+    background: #ffebee;
+    color: #c62828;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #c62828;
+  }
+
+  .summary-content {
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      .summary-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0;
+      }
+
+      .view-all-btn {
+        padding: 0.5rem 1rem;
+        background: #2196F3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+
+        &:hover {
+          background: #1976D2;
+        }
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+
+      .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+          font-size: 0.9rem;
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .progress-section {
+      margin-bottom: 2rem;
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        color: #666;
+      }
+
+      .progress-bar {
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+          transition: width 0.3s ease;
+        }
+      }
+    }
+
+    .badges-section {
+      margin-bottom: 2rem;
+
+      .section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+      }
+
+      .badges-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 1rem;
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: #999;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+  }
+
+  &.compact {
+    .summary-header {
+      justify-content: space-between;
+      margin-bottom: 1rem;
+
+      .summary-title {
+        font-size: 1.2rem;
+      }
+
+      .view-all-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    .stats-grid {
+      display: none;
+    }
+
+    .progress-section {
+      display: none;
+    }
+
+    .badges-section .badges-list {
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .badge-summary-container {
+    .summary-content {
+      .summary-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .view-all-btn {
+          width: 100%;
+        }
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .badges-section .badges-list {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+    }
+  }
+}

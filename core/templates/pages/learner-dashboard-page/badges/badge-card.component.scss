@@ -1,0 +1,528 @@
+/* Copyright 2024 The Oppia Authors. All Rights Reserved. */
+
+$common-color: #757575;
+$rare-color: #2196F3;
+$epic-color: #9C27B0;
+$legendary-color: #FF9800;
+$mythic-color: #E91E63;
+
+$bronze-color: #CD7F32;
+$silver-color: #C0C0C0;
+$gold-color: #FFD700;
+$platinum-color: #E5E4E2;
+$diamond-color: #B9F2FF;
+
+@mixin badge-size($width, $padding, $icon-size, $font-size) {
+  width: $width;
+  padding: $padding;
+  
+  .badge-icon {
+    width: $icon-size;
+    height: $icon-size;
+  }
+  
+  .badge-name {
+    font-size: $font-size;
+  }
+}
+
+@mixin rarity-style($color, $glow: false) {
+  border-color: $color;
+  
+  .badge-name {
+    color: $color;
+  }
+  
+  @if $glow {
+    box-shadow: 0 0 15px rgba($color, 0.3);
+    
+    &:hover {
+      box-shadow: 0 0 25px rgba($color, 0.5);
+    }
+  }
+}
+
+.badge-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid;
+  border-radius: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(245, 245, 245, 0.95));
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  
+  /* Default size is medium */
+  @include badge-size(120px, 16px, 64px, 14px);
+
+  &.badge-card-small {
+    @include badge-size(80px, 12px, 40px, 12px);
+  }
+
+  &.badge-card-medium {
+    @include badge-size(120px, 16px, 64px, 14px);
+  }
+
+  &.badge-card-large {
+    @include badge-size(160px, 20px, 80px, 16px);
+  }
+
+  /* Rarity Styles */
+  &.rarity-common {
+    @include rarity-style($common-color, false);
+  }
+
+  &.rarity-rare {
+    @include rarity-style($rare-color, true);
+  }
+
+  &.rarity-epic {
+    @include rarity-style($epic-color, true);
+  }
+
+  &.rarity-legendary {
+    @include rarity-style($legendary-color, true);
+  }
+
+  &.rarity-mythic {
+    @include rarity-style($mythic-color, true);
+  }
+
+  /* Tier Styles */
+  &.tier-bronze {
+    border-color: $bronze-color;
+  }
+
+  &.tier-silver {
+    border-color: $silver-color;
+  }
+
+  &.tier-gold {
+    border-color: $gold-color;
+  }
+
+  &.tier-platinum {
+    border-color: $platinum-color;
+  }
+
+  &.tier-diamond {
+    border-color: $diamond-color;
+  }
+
+  /* Earned vs Locked States */
+  &.badge-earned {
+    filter: brightness(1);
+  }
+
+  &.badge-locked {
+    opacity: 0.6;
+    filter: grayscale(30%);
+  }
+
+  /* Favorite State */
+  &.badge-favorite {
+    background: linear-gradient(135deg, rgba(255, 240, 245, 0.95), rgba(255, 230, 240, 0.95));
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+
+    &.badge-locked {
+      opacity: 0.8;
+    }
+  }
+
+  /* Icon Container */
+  .badge-icon-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .badge-icon {
+      width: 64px;
+      height: 64px;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .lock-indicator,
+    .earned-check {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      font-size: 24px;
+      background: white;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .earned-check {
+      background: #4CAF50;
+      color: white;
+    }
+  }
+
+  /* Badge Info */
+  .badge-info {
+    text-align: center;
+    width: 100%;
+
+    .badge-name {
+      margin: 8px 0 4px;
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 1.2;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 100%;
+      color: #333;
+    }
+
+    .badge-meta {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 4px 0;
+
+      .rarity-badge,
+      .tier-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .rarity-badge {
+        background: rgba(0, 0, 0, 0.05);
+        color: #333;
+      }
+
+      .tier-badge {
+        background: rgba(0, 0, 0, 0.08);
+        color: #333;
+      }
+
+      .rarity-common { color: #757575; }
+      .rarity-rare { color: #2196F3; }
+      .rarity-epic { color: #9C27B0; }
+      .rarity-legendary { color: #FF9800; }
+      .rarity-mythic { color: #E91E63; }
+    }
+
+    .xp-reward {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #FFB300;
+
+      .xp-icon {
+        font-size: 14px;
+      }
+    }
+  }
+
+  /* Progress Bar */
+  .progress-section {
+    width: 100%;
+    margin-top: 8px;
+
+    .progress-bar-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .progress-bar {
+        flex: 1;
+        height: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #4CAF50, #8BC34A);
+          border-radius: 3px;
+          transition: width 0.3s ease;
+        }
+      }
+
+      .progress-text {
+        font-size: 11px;
+        font-weight: 600;
+        min-width: 30px;
+        text-align: right;
+        color: #4CAF50;
+      }
+    }
+  }
+
+  /* Action Buttons */
+  .badge-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    background: white;
+    padding: 6px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    animation: slideIn 0.2s ease forwards;
+
+    .action-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.05);
+        transform: scale(1.1);
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &.favorite-button.active {
+        color: #E91E63;
+      }
+    }
+
+    .times-earned {
+      display: flex;
+      align-items: center;
+      padding: 4px 8px;
+      background: rgba(255, 179, 0, 0.1);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #FFB300;
+
+      .earned-count {
+        margin-left: 2px;
+      }
+    }
+  }
+
+  /* Tooltip */
+  .badge-tooltip {
+    position: absolute;
+    bottom: -180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(51, 51, 51, 0.95);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    width: 200px;
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0;
+    animation: slideUp 0.2s ease forwards;
+    z-index: 10;
+    pointer-events: none;
+
+    .description {
+      margin: 0 0 8px;
+      font-weight: 500;
+    }
+
+    .criteria-hint {
+      margin: 0;
+      opacity: 0.8;
+      font-size: 11px;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid rgba(51, 51, 51, 0.95);
+    }
+  }
+
+  /* Notification */
+  .notification {
+    position: absolute;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(76, 175, 80, 0.95);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 20;
+    animation: popIn 0.3s ease-out;
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+  50% {
+    filter: drop-shadow(0 0 16px currentColor);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .badge-card {
+    @include badge-size(100px, 12px, 50px, 12px);
+
+    &.badge-card-small {
+      @include badge-size(70px, 10px, 35px, 11px);
+    }
+
+    &.badge-card-large {
+      @include badge-size(130px, 14px, 65px, 13px);
+    }
+
+    .badge-actions {
+      top: 4px;
+      right: 4px;
+      padding: 4px;
+      gap: 4px;
+
+      .action-button {
+        font-size: 16px;
+        padding: 3px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-card {
+    @include badge-size(80px, 10px, 40px, 11px);
+
+    &.badge-card-small {
+      @include badge-size(60px, 8px, 30px, 10px);
+    }
+
+    &.badge-card-large {
+      @include badge-size(100px, 12px, 50px, 12px);
+    }
+
+    .badge-tooltip {
+      display: none;
+    }
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .badge-card {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+
+    .badge-actions {
+      animation: none;
+      opacity: 1;
+    }
+
+    .badge-tooltip {
+      animation: none;
+      opacity: 1;
+      bottom: auto;
+    }
+  }
+}
+
+@media (prefers-contrast: more) {
+  .badge-card {
+    border-width: 4px;
+    
+    .badge-actions {
+      background: #ffffff;
+      border: 2px solid currentColor;
+    }
+  }
+}

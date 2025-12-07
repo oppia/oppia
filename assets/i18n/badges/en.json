@@ -1,0 +1,128 @@
+{
+  "badge": {
+    "title": "Badges",
+    "description": "Earn badges by completing learning activities",
+    "yourBadges": "Your Badges",
+    "viewAll": "View All Badges",
+    "recent": "Recent Badges",
+    "favorites": "Favorite Badges",
+    "noFavorites": "No favorite badges yet",
+    "noBadges": "No badges earned yet",
+    "shareText": "I earned the {badgeName} badge on Oppia!",
+    "congratulations": "Congratulations!",
+    "badgeEarned": "You earned the {badgeName} badge!",
+    "earnedOn": "Earned on {date}",
+    "reward": "Reward: {xp} XP",
+    "points": "{points} Points",
+    "progress": "Progress: {current}/{required}",
+    "category": "Category: {category}",
+    "rarity": "Rarity",
+    "tier": "Tier",
+    "leaderboard": "Leaderboard",
+    "topBadges": "Top Badges",
+    "totalAwarded": "{count} awarded",
+    "totalShared": "{count} shared",
+    "totalFavorites": "{count} favorites",
+    "engagementScore": "Engagement Score: {score}/100",
+    "statistics": "Badge Statistics",
+    "totalBadgesEarned": "Total Badges Earned",
+    "totalXP": "Total XP",
+    "totalPoints": "Total Points",
+    "badges": {
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary",
+        "mythic": "Mythic"
+      },
+      "tier": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold",
+        "platinum": "Platinum",
+        "diamond": "Diamond"
+      },
+      "category": {
+        "learning": "Learning",
+        "engagement": "Engagement",
+        "exploration": "Exploration",
+        "social": "Social",
+        "achievement": "Achievement"
+      },
+      "type": {
+        "achievement": "Achievement",
+        "milestone": "Milestone",
+        "exploration": "Exploration",
+        "social": "Social",
+        "special": "Special"
+      },
+      "definitions": {
+        "firstLesson": {
+          "name": "First Steps",
+          "description": "Complete your first lesson"
+        },
+        "lessonMaster": {
+          "name": "Lesson Master",
+          "description": "Complete 10 lessons"
+        },
+        "quizWarrior": {
+          "name": "Quiz Warrior",
+          "description": "Pass 5 quizzes with 90%+ score"
+        },
+        "dailyDevotee": {
+          "name": "Daily Devotee",
+          "description": "Log in for 7 consecutive days"
+        },
+        "perfectionist": {
+          "name": "Perfectionist",
+          "description": "Complete 20 lessons without mistakes"
+        },
+        "explorer": {
+          "name": "Explorer",
+          "description": "Visit 10 different courses"
+        },
+        "speedDemon": {
+          "name": "Speed Demon",
+          "description": "Complete a lesson in under 5 minutes"
+        },
+        "communityHelper": {
+          "name": "Community Helper",
+          "description": "Help 5 other learners"
+        },
+        "masterLearner": {
+          "name": "Master Learner",
+          "description": "Complete 50 lessons"
+        },
+        "feedbackChampion": {
+          "name": "Feedback Champion",
+          "description": "Provide feedback on 10 lessons"
+        }
+      }
+    },
+    "actions": {
+      "share": "Share Badge",
+      "addToFavorites": "Add to Favorites",
+      "removeFromFavorites": "Remove from Favorites",
+      "viewDetails": "View Details",
+      "claim": "Claim Badge",
+      "claimed": "Claimed"
+    },
+    "messages": {
+      "badgeAdded": "Badge added to favorites!",
+      "badgeRemoved": "Badge removed from favorites",
+      "badgeShared": "Badge shared successfully!",
+      "loadingBadges": "Loading badges...",
+      "noMoreBadges": "No more badges to load",
+      "error": "Error loading badges. Please try again.",
+      "successfullyEarned": "You've successfully earned this badge!"
+    },
+    "hints": {
+      "completeLesson": "Complete a lesson to earn badges",
+      "improveScore": "Improve your quiz scores to earn rare badges",
+      "loginDaily": "Log in every day to earn engagement badges",
+      "helpOthers": "Help other learners to earn social badges"
+    }
+  }
+}

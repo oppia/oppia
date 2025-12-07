@@ -1,0 +1,266 @@
+// Copyright 2024 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+.leaderboard-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .leaderboard-header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h2 {
+      font-size: 2rem;
+      color: #333;
+      margin: 0 0 0.5rem 0;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #999;
+      margin: 0;
+    }
+  }
+
+  .sort-options {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+
+    button {
+      padding: 0.75rem 1.5rem;
+      border: 2px solid #ddd;
+      background: white;
+      color: #666;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+
+      &:hover {
+        border-color: #2196F3;
+        color: #2196F3;
+      }
+
+      &.active {
+        background: #2196F3;
+        border-color: #2196F3;
+        color: white;
+      }
+    }
+  }
+
+  .loading-state,
+  .error-state,
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #666;
+  }
+
+  .error-state {
+    color: #d32f2f;
+  }
+
+  .leaderboard-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .leaderboard-header-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 120px 120px 150px;
+      gap: 1.5rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      font-weight: 600;
+      align-items: center;
+
+      .col-rank {
+        text-align: center;
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 60px 1fr 80px;
+        gap: 1rem;
+
+        .col-rarity,
+        .col-engagement {
+          display: none;
+        }
+      }
+    }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 80px 1fr 120px 120px 150px;
+      gap: 1.5rem;
+      padding: 1.5rem;
+      border-bottom: 1px solid #eee;
+      align-items: center;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: #f9f9f9;
+      }
+
+      &.top-badge {
+        background: linear-gradient(135deg,
+            rgba(102, 126, 234, 0.05) 0%,
+            rgba(118, 75, 162, 0.05) 100%);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .col-rank {
+        text-align: center;
+
+        .rank-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: #333;
+
+          .medal {
+            font-size: 1.5rem;
+          }
+        }
+      }
+
+      .col-badge {
+        .badge-name {
+          font-weight: 600;
+          color: #333;
+          margin: 0;
+        }
+      }
+
+      .col-rarity {
+        text-align: center;
+
+        .rarity-tag {
+          display: inline-block;
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.85rem;
+          white-space: nowrap;
+
+          &.rarity-common {
+            background: #757575;
+            color: white;
+          }
+
+          &.rarity-uncommon {
+            background: #4CAF50;
+            color: white;
+          }
+
+          &.rarity-rare {
+            background: #2196F3;
+            color: white;
+          }
+
+          &.rarity-epic {
+            background: #9C27B0;
+            color: white;
+          }
+
+          &.rarity-legendary {
+            background: #FF9800;
+            color: white;
+          }
+
+          &.rarity-mythic {
+            background: #E91E63;
+            color: white;
+          }
+        }
+      }
+
+      .col-awards,
+      .col-engagement {
+        text-align: center;
+        color: #666;
+      }
+
+      .col-engagement {
+        .engagement-bar {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          height: 24px;
+
+          .engagement-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 6px;
+            border-radius: 3px;
+            flex: 1;
+          }
+
+          .engagement-text {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #333;
+            min-width: 40px;
+            text-align: right;
+          }
+        }
+      }
+
+      @media (max-width: 768px) {
+        grid-template-columns: 60px 1fr 80px;
+        gap: 1rem;
+
+        .col-rarity,
+        .col-engagement {
+          display: none;
+        }
+
+        .col-awards {
+          text-align: right;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .leaderboard-container {
+    padding: 1rem;
+
+    .leaderboard-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .sort-options {
+      gap: 0.5rem;
+
+      button {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

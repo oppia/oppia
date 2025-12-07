@@ -1,0 +1,87 @@
+<!-- Copyright 2024 The Oppia Authors. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS-IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+<div class="leaderboard-container">
+  <div class="leaderboard-header">
+    <h2>Badge Leaderboard</h2>
+    <p class="subtitle">Top badges by popularity and engagement</p>
+  </div>
+
+  <!-- Sort Options -->
+  <div class="sort-options">
+    <button [class.active]="sortBy === 'awards'" (click)="changeSortBy('awards')">
+      Most Awarded
+    </button>
+    <button [class.active]="sortBy === 'engagement'" (click)="changeSortBy('engagement')">
+      Highest Engagement
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Loading leaderboard...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && hasError" class="error-state">
+    <p>Error loading leaderboard. Please try again later.</p>
+  </div>
+
+  <!-- Leaderboard Table -->
+  <div *ngIf="!isLoading && !hasError && leaderboardEntries.length > 0" class="leaderboard-table">
+    <div class="leaderboard-header-row">
+      <div class="col-rank">Rank</div>
+      <div class="col-badge">Badge</div>
+      <div class="col-rarity">Rarity</div>
+      <div class="col-awards">Total Awarded</div>
+      <div class="col-engagement">Engagement Score</div>
+    </div>
+
+    <div *ngFor="let entry of leaderboardEntries; let i = index" class="leaderboard-row" [class.top-badge]="i < 3">
+
+      <div class="col-rank">
+        <span class="rank-badge">
+          {{ entry.rank }}
+          <span class="medal" *ngIf="i < 3">{{ getMedalEmoji(i + 1) }}</span>
+        </span>
+      </div>
+
+      <div class="col-badge">
+        <div class="badge-name">{{ entry.name }}</div>
+      </div>
+
+      <div class="col-rarity">
+        <span class="rarity-tag" [ngClass]="getRarityClass(entry.rarity)">
+          {{ entry.rarity | uppercase }}
+        </span>
+      </div>
+
+      <div class="col-awards">
+        {{ entry.total_awards }}
+      </div>
+
+      <div class="col-engagement">
+        <div class="engagement-bar">
+          <div class="engagement-fill" [style.width.%]="entry.engagement_score"></div>
+          <span class="engagement-text">{{ entry.engagement_score | number: '1.0-0' }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !hasError && leaderboardEntries.length === 0" class="empty-state">
+    <p>No badges to display.</p>
+  </div>
+</div>
