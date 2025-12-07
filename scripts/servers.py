@@ -292,16 +292,14 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-E',
         # Disable security for the local ElasticSearch server.
         'xpack.security.enabled=false',
-        # Elasticsearch 8 uses stricter default disk watermarks than ES 7.
-        # We override them to 95% to match our old ES 7 behavior and prevent
-        # unexpected shard relocation or indices becoming read-only after upgrade.
-        # https://www.elastic.co/guide/en/elasticsearch/reference/8.17/modules-cluster.html#disk-based-shard-allocation
+        # ES 8.x: single-node disk watermark setting changed
+        # `cluster.routing.allocation.disk.watermark.enable_for_single_data_node` is deprecated (ES 7.14)
+        # Only `true` is allowed in ES 8.x
+        # To keep old behavior (disable disk-based shard allocation), use:
         '-E',
-        'cluster.routing.allocation.disk.watermark.low=85%',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.high=95%',
-        '-E',
-        'cluster.routing.allocation.disk.watermark.flood_stage=95%',
+        'cluster.routing.allocation.disk.threshold_enabled=false',
+        # Prevents shard relocation or read-only indices due to disk usage
+        # https://www.elastic.co/guide/en/elasticsearch/reference/8.19/migrating-8.0.html?utm_source=chatgpt.com
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
