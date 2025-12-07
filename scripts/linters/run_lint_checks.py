@@ -42,7 +42,7 @@ CUSTOMIZATION OPTIONS
 5. To lint a specific list of file extensions. Separate file
     extensions by spaces
         python -m scripts.linters.run_lint_checks
-            --only-check-file-extensions py js
+            --only_check_file_extensions py js
 
 6. To run a shard of the lint tests
         python -m scripts.linters.run_lint_checks --shard shard_name
@@ -113,7 +113,7 @@ _EXCLUSIVE_GROUP.add_argument(
     action='store_true',
 )
 _PARSER.add_argument(
-    '--only-check-file-extensions',
+    '--only_check_file_extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list. '
