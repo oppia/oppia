@@ -18,8 +18,8 @@
 
 import {TestBed} from '@angular/core/testing';
 import {ThemeService, OppiaTheme} from './theme.service';
-import {LocalStorageService} from 'services/local-storage.service';
-import {WindowRef} from 'services/contextual/window-ref.service';
+import {LocalStorageService} from './local-storage.service';
+import {WindowRef} from './contextual/window-ref.service';
 
 class MockWindowRef {
   nativeWindow = {
@@ -62,14 +62,16 @@ describe('ThemeService', () => {
   });
 
   it('should initialize with system default when no local storage exists', () => {
-    spyOn(localStorageService, 'get').and.returnValue(null);
-    themeService.init();
+    spyOn(localStorageService, 'getThemePreference').and.returnValue(null);
+    (themeService as any).init();
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.SYSTEM);
   });
 
   it('should initialize with stored preference', () => {
-    spyOn(localStorageService, 'get').and.returnValue(OppiaTheme.DARK);
-    themeService.init();
+    spyOn(localStorageService, 'getThemePreference').and.returnValue(
+      OppiaTheme.DARK
+    );
+    (themeService as any).init();
     expect(themeService.getPreferredTheme()).toBe(OppiaTheme.DARK);
     expect(
       mockWindowRef.nativeWindow.document.body.classList.add
@@ -77,13 +79,10 @@ describe('ThemeService', () => {
   });
 
   it('should update theme and persistence when setTheme is called', () => {
-    const setSpy = spyOn(localStorageService, 'set');
+    const setSpy = spyOn(localStorageService, 'setThemePreference');
     themeService.setTheme(OppiaTheme.DARK);
 
-    expect(setSpy).toHaveBeenCalledWith(
-      'oppia_theme_preference',
-      OppiaTheme.DARK
-    );
+    expect(setSpy).toHaveBeenCalledWith(OppiaTheme.DARK);
     expect(
       mockWindowRef.nativeWindow.document.body.classList.add
     ).toHaveBeenCalledWith('dark-mode');
@@ -140,7 +139,7 @@ describe('ThemeService', () => {
         add: addSpy,
         remove: removeSpy,
         forEach: (fn: (cls: string) => void) => classList.forEach(fn),
-      } as unknown as DOMTokenList;
+      } as any;
 
       themeService.setThemeConfig({themePackId: 'ocean'});
       expect(classList.has('theme-pack-ocean')).toBe(true);
