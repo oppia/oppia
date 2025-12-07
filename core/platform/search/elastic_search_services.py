@@ -169,8 +169,6 @@ def _create_index(index_name: str) -> None:
     Raises:
         elasticsearch.RequestError. The index already exists.
     """
-    es_client = ES.get_client()
-    ensure_disk_space_sufficient(es_client)
     assert isinstance(index_name, str)
     ES.get_client().indices.create(index=index_name)
 
@@ -196,8 +194,8 @@ def add_documents_to_index(
     Raises:
         SearchException. A document cannot be added to the index.
     """
-    es_client = ES.get_client()
-    ensure_disk_space_sufficient(es_client)
+
+    ensure_disk_space_sufficient(ES.get_client())
     assert isinstance(index_name, str)
 
     for document in documents:
@@ -459,7 +457,7 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
     used_percent = (total - free) / total * 100
 
     if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
-        logging.info(
+        logging.warning(
             'Elasticsearch disk usage has reached the low watermark: %.2f%% used. '
             'Consider freeing up space.',
             used_percent,
