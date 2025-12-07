@@ -152,7 +152,7 @@ why they need to be overriden.  */
 }
 
 .mat-button-success {
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 
 .mat-shadow-bottom-z-1, .mat-button.mat-raised:not([disabled]),
@@ -217,7 +217,7 @@ why they need to be overriden.  */
 }
 
 .mat-button.oppia-learner-confirm-button:hover {
-  background-color: #115fd4;
+  background-color: var(--oppia-primary-hover-color);
 }
 
 .mat-button.oppia-learner-reload-image-button {
@@ -243,7 +243,7 @@ why they need to be overriden.  */
 .mat-button.oppia-learner-got-it-button:hover,
 .mat-button.oppia-learner-hint-solution-button:focus,
 .mat-button.oppia-learner-hint-solution-button:hover {
-  background-color: #115fd4;
+  background-color: var(--oppia-primary-hover-color);
   text-decoration: none;
 }
 
@@ -579,7 +579,7 @@ p:last-child {
 
 .oppia-navbar-nav .open > a {
   background-color: #fff;
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 .oppia-dashboard-container a:hover {
   text-decoration: underline;
@@ -587,7 +587,7 @@ p:last-child {
 
 .oppia-navbar-tabs > li:hover > a {
   background-color: #fff;
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 .oppia-activity-summary-tile span {
   vertical-align: middle;
@@ -651,7 +651,7 @@ p:last-child {
   background-color: #18447e;
 }
 .label-success, .badge-success {
-  background-color: #009688;
+  background-color: var(--oppia-primary-color);
 }
 
 /*
@@ -968,7 +968,7 @@ textarea {
 }
 
 .navbar-light .navbar-container {
-  background: #00645c;
+  background: var(--oppia-primary-color);
   height: 56px;
   width: 100%;
 }
@@ -1031,7 +1031,7 @@ textarea {
     display: block;
   }
   .nav .dropdown:hover > .dropdown-menu > li > a {
-    color: #009688;
+    color: var(--oppia-primary-color);
   }
   .nav .dropdown:hover > .dropdown-menu > li > a:hover {
     background-color: #eee;
@@ -1246,7 +1246,7 @@ span.sort-explorations-select .sort-order {
 /* Rules for the tiles in the creator dashboard. */
 
 .oppia-dashboard-intro-button {
-  background-color: #00645c;
+  background-color: var(--oppia-primary-color);
   border-radius: 4px;
   color: #fff;
   font-family: "Roboto", Arial, sans-serif;
@@ -1609,7 +1609,7 @@ pre.oppia-pre-wrapped-text {
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
   background-color: #fff;
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 .btn:focus, .btn:active:focus {
   outline: 1px solid #000;
@@ -1972,7 +1972,7 @@ pre.oppia-pre-wrapped-text {
   }
 }
 .oppia-interaction-tile:hover {
-  outline: 2px solid #009688;
+  outline: 2px solid var(--oppia-primary-color);
 }
 .oppia-interaction-tile-name {
   background-color: #e0f2f1;
@@ -2166,7 +2166,7 @@ oppia-parameter {
 }
 
 .oppia-dashboard-status-green {
-  color: #009688;
+  color: var(--oppia-primary-color);
   font-weight: bold;
   text-transform: capitalize;
 }
@@ -2497,7 +2497,7 @@ div#ng-curtain {
 
 .oppia-navbar-dropdown-toggle:focus {
   background-color: #fff;
-  color: #00645c;
+  color: var(--oppia-primary-color);
 }
 .oppia-navbar-profile-picture {
   height: 32px;
@@ -2673,7 +2673,7 @@ div#ng-curtain {
 
 /* Styles for the feedback popover component in the learner view. */
 .oppia-feedback-popover-submit-btn-enabled {
-  color: #009688;
+  color: var(--oppia-primary-color);
   font-size: 13px;
 }
 
@@ -2867,7 +2867,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   text-align: center;
 }
 .oppia-navbar-nav.oppia-navbar-profile > li:hover {
-  background-color: #00645c
+  background-color: var(--oppia-primary-color)
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
@@ -2954,7 +2954,7 @@ oppia-noninteractive-link {
 .oppia-dashboard-container .oppia-highlighted-link:hover,
 .oppia-dashboard-container .oppia-highlighted-link:active,
 .oppia-dashboard-container .oppia-highlighted-link:visited {
-  color: #009688;
+  color: var(--oppia-primary-color);
 }
 
 .oppia-activity-summary-tile-mobile,

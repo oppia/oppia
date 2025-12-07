@@ -28,6 +28,7 @@ class MockWindowRef {
         classList: {
           add: jasmine.createSpy('add'),
           remove: jasmine.createSpy('remove'),
+          forEach: jasmine.createSpy('forEach'),
         } as unknown as DOMTokenList,
       },
     },
@@ -38,6 +39,8 @@ class MockWindowRef {
   };
 }
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+
 describe('ThemeService', () => {
   let themeService: ThemeService;
   let localStorageService: LocalStorageService;
@@ -46,6 +49,7 @@ describe('ThemeService', () => {
   beforeEach(() => {
     mockWindowRef = new MockWindowRef();
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       providers: [
         ThemeService,
         LocalStorageService,
