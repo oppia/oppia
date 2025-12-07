@@ -1,5 +1,4 @@
 /DataFlow.md @oppia/dev-workflow-team
-/requirements.in.save @oppia/dev-workflow-team
 /core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/components/common-layout-directives/theme-switcher/theme-switcher.component.html @oppia/lace-frontend-reviewers
