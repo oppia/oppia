@@ -422,5 +422,5 @@ describe('Logged-in User', function () {
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
-  }, DEFAULT_SPEC_TIMEOUT_MSECS);
+  });
 });
