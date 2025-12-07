@@ -45,6 +45,7 @@ tmpcompiledjs*
 uploads/*
 env/
 venv/
+oppia-env/
 *.db
 .DS_Store
 .idea
