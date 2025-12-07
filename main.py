@@ -25,6 +25,7 @@ from core.controllers import (
     acl_decorators,
     admin,
     android,
+    badge_handlers,
     base,
     beam_jobs,
     blog_admin,
@@ -661,6 +662,10 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler,
+    ),
+    get_redirect_route(
+        '/learner_dashboard/badges/summary',
+        learner_dashboard.LearnerDashboardBadgesSummaryHandler,
     ),
     get_redirect_route(
         r'%s/<thread_id>' % feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
@@ -1570,6 +1575,48 @@ URLS.extend(
         get_redirect_route(
             '/assets/copyrighted-images/<folder>/<filename>',
             resources.CopyrightImagesHandler,
+        ),
+    )
+)
+
+# Badge System URLs (Gamification)
+URLS.extend(
+    (
+        get_redirect_route(
+            r'/badgehandler/list',
+            badge_handlers.BadgeListHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/<badge_id>',
+            badge_handlers.BadgeDetailHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/userbadges',
+            badge_handlers.UserBadgesHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/progress',
+            badge_handlers.UserBadgeProgressHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/favorite/<badge_id>',
+            badge_handlers.ToggleFavoriteBadgeHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/share/<badge_id>',
+            badge_handlers.ShareBadgeHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/leaderboard',
+            badge_handlers.BadgeLeaderboardHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler/award',
+            badge_handlers.AdminBadgeAwardHandler,
+        ),
+        get_redirect_route(
+            r'/badgehandler',
+            badge_handlers.AdminBadgeHandler,
         ),
     )
 )
