@@ -1,7 +1,7 @@
 :root {
     /* =========================================
-     Base Logic & Defaults
-     ========================================= */
+   Base Logic & Defaults
+   ========================================= */
 
     /* Brand Colors */
     --oppia-primary-color: #00645c;
@@ -15,7 +15,7 @@
 
     /* Background Colors */
     --oppia-body-bg: #e8e7e3;
-    --oppia-card-bg: #ffffff;
+    --oppia-card-bg: #fff;
     --oppia-light-bg: #fff;
     --oppia-navbar-bg: var(--oppia-primary-color);
     --oppia-sidebar-bg: var(--oppia-primary-color);
@@ -65,7 +65,7 @@ body.dark-mode {
     --oppia-link-hover-color: #d2e3fc;
 
     /* Footer */
-    --oppia-footer-bg: #000000;
+    --oppia-footer-bg: #000;
     --oppia-footer-text: #e0e0e0;
 
     /* Forms */

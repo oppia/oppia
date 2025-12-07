@@ -90,7 +90,7 @@ describe('ThemeService', () => {
   });
 
   it('should respect system preference when set to SYSTEM', () => {
-    // Mock system is dark
+    // Mock system is dark.
     (mockWindowRef.nativeWindow.matchMedia as jasmine.Spy).and.returnValue({
       matches: true,
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -103,7 +103,7 @@ describe('ThemeService', () => {
   });
 
   it('should respect system preference when set to SYSTEM (light)', () => {
-    // Mock system is light
+    // Mock system is light.
     (mockWindowRef.nativeWindow.matchMedia as jasmine.Spy).and.returnValue({
       matches: false,
       addEventListener: jasmine.createSpy('addEventListener'),
@@ -126,7 +126,7 @@ describe('ThemeService', () => {
     });
 
     it('should apply theme pack class to body', () => {
-      // Need to mock forEach for classList
+      // Need to mock forEach for classList.
       const classList = new Set<string>();
       mockWindowRef.nativeWindow.document.body.classList = {
         add: (cls: string) => classList.add(cls),
