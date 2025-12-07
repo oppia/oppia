@@ -297,7 +297,7 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         # unexpected shard relocation or indices becoming read-only after upgrade.
         # https://www.elastic.co/guide/en/elasticsearch/reference/8.17/modules-cluster.html#disk-based-shard-allocation
         '-E',
-        'cluster.routing.allocation.disk.watermark.low=95%',
+        'cluster.routing.allocation.disk.watermark.low=85%',
         '-E',
         'cluster.routing.allocation.disk.watermark.high=95%',
         '-E',
