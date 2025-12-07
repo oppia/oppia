@@ -3379,3 +3379,49 @@ def check_user_is_coordinator(user_id: str, language_id: str) -> bool:
         return False
 
     return user_id in model.coordinator_ids
+
+
+def get_user_badge_summary(user_id: str) -> Dict[str, Any]:
+    """Get badge summary statistics for a user.
+
+    Args:
+        user_id: str. User ID.
+
+    Returns:
+        dict. Badge summary containing:
+            - total_badges: int
+            - total_xp: int
+            - total_points: int
+            - favorite_count: int
+            - by_rarity: dict
+            - by_tier: dict
+    """
+    from core import feconf
+    from core.domain import badge_services
+    
+    if not feconf.BADGE_SYSTEM_ENABLED:
+        return {
+            'total_badges': 0,
+            'total_xp': 0,
+            'total_points': 0,
+            'favorite_count': 0,
+            'by_rarity': {},
+            'by_tier': {}
+        }
+    
+    try:
+        return badge_services.BadgeAnalyticsService.get_user_statistics(
+            user_id
+        )
+    except Exception as e:
+        logging.error(
+            f'Error getting badge summary for user {user_id}: {str(e)}'
+        )
+        return {
+            'total_badges': 0,
+            'total_xp': 0,
+            'total_points': 0,
+            'favorite_count': 0,
+            'by_rarity': {},
+            'by_tier': {}
+        }
