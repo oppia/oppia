@@ -2862,6 +2862,157 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
             )
 
 
+class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for GenerateStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_generate_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'generate_study_guide_models',
+            study_guide_services.generate_study_guide_models,
+        ):
+            self.post_json(
+                feconf.GENERATE_STUDY_GUIDE_MODELS_URL,
+                {},
+                csrf_token=csrf_token,
+                expected_status_int=200,
+            )
+
+
+class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for DeleteStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_delete_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'delete_study_guide_models',
+            study_guide_services.delete_study_guide_models,
+        ):
+            self.delete_json(
+                feconf.DELETE_STUDY_GUIDE_MODELS_URL,
+                {},
+                expected_status_int=200,
+            )
+
+
+class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
+    """Tests for VerifyStudyGuideModelsHandler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_verify_study_guide_models(self) -> None:
+        topic_id_1 = topic_fetchers.get_new_topic_id()
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(
+            1,
+            self.admin_id,
+            topic_id_1,
+        )
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+
+        # Order of function calls in expected_args should not
+        # matter for this test.
+        with self.swap(
+            study_guide_services,
+            'verify_study_guide_models',
+            study_guide_services.verify_study_guide_models,
+        ):
+            self.get_json(
+                feconf.VERIFY_STUDY_GUIDE_MODELS_URL,
+                {},
+                expected_status_int=200,
+            )
+
+
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
 

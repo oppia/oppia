@@ -2127,7 +2127,7 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
-        # Mock set_constans_to_default method to throw an exception.
+        # Mock set_constants_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.
         self.contextManager = self.swap(
@@ -2219,11 +2219,16 @@ class AppEngineTestBase(TestBase):
         )
 
     def mock_set_constants_to_default(self) -> None:
-        """Change constants file in the test could lead to other
-        tests fail. Mock set_constants_to_default method in your test
-        will suppress this exception.
+        """Mock implementation of set_constants_to_default for tests.
+
+        Directly changing the shared constants file in your test can cause
+        problems. Mocking common.set_constants_to_default() in your test will
+        suppress this exception.
         """
-        raise Exception('Please mock this method in the test.')
+        raise Exception(
+            'Tests should mock common.set_constants_to_default() to avoid '
+            'modifying the constants file during tests.'
+        )
 
     @contextlib.contextmanager
     def mock_datetime_utcnow(

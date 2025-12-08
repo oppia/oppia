@@ -36,25 +36,17 @@ import subprocess
 import sys
 import tarfile
 
-from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
-    install_python_dev_dependencies,
+from scripts import (
+    install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
 )
-
-from typing import Final
-
-install_python_dev_dependencies.main(['--assert_compiled'])
-
-from scripts import (  # pylint: disable=wrong-import-position, wrong-import-order
+from scripts import (
     install_dependencies_json_packages,
     install_python_prod_dependencies,
 )
 
-from . import (  # pylint: disable=wrong-import-position, wrong-import-order
-    clean,
-    common,
-    pre_commit_hook,
-    pre_push_hook,
-)
+from typing import Final
+
+from . import clean, common
 
 # Place to download zip files for temporary storage.
 TMP_UNZIP_PATH: Final = os.path.join('.', 'tmp_unzip.zip')
@@ -438,6 +430,14 @@ def install_elasticsearch_dev_server() -> None:
 def main() -> None:
     """Set up GAE and install third-party libraries for Oppia."""
     print('Running install_third_party_libs script...')
+
+    # This ensures dev dependencies are present and compiled before we
+    # proceed to other setup tasks that require them.
+    install_python_dev_dependencies.main(['--assert_compiled'])
+    # Import the hook scripts here (after dev deps are installed) so that
+    # they are only loaded when running the installer.
+    from . import pre_commit_hook  # pylint: disable=wrong-import-position
+    from . import pre_push_hook  # pylint: disable=wrong-import-position
 
     if common.is_windows_os():
         raise Exception(
