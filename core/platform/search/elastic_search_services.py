@@ -433,40 +433,40 @@ def blog_post_summaries_search(
     return result_ids, resulting_offset
 
 
-def ensure_disk_space_sufficient(es_client: Any) -> None:
-    """Check Elasticsearch disk usage and raise an error if it exceeds the high
-    watermark.
+# def ensure_disk_space_sufficient(es_client: Any) -> None:
+#     """Check Elasticsearch disk usage and raise an error if it exceeds the high
+#     watermark.
 
-    This function fetches cluster statistics from the given Elasticsearch client
-    and calculates the percentage of disk space used. If the used space exceeds
-    the high watermark defined in `feconf.ES_DISK_WATERMARK_HIGH`, it raises a
-    RuntimeError to prevent further writes to the cluster.
+#     This function fetches cluster statistics from the given Elasticsearch client
+#     and calculates the percentage of disk space used. If the used space exceeds
+#     the high watermark defined in `feconf.ES_DISK_WATERMARK_HIGH`, it raises a
+#     RuntimeError to prevent further writes to the cluster.
 
-    Args:
-        es_client: Elasticsearch. Instance used to query cluster statistics.
+#     Args:
+#         es_client: Elasticsearch. Instance used to query cluster statistics.
 
-    Raises:
-        InternalErrorException. If filesystem statistics cannot be read from the
-            cluster, or if disk usage exceeds the configured high watermark.
-    """
-    stats = es_client.cluster.stats()
-    fs = stats.get('nodes', {}).get('fs', {})
-    total = fs.get('total_in_bytes')
-    free = fs.get('available_in_bytes')
+#     Raises:
+#         InternalErrorException. If filesystem statistics cannot be read from the
+#             cluster, or if disk usage exceeds the configured high watermark.
+#     """
+#     stats = es_client.cluster.stats()
+#     fs = stats.get('nodes', {}).get('fs', {})
+#     total = fs.get('total_in_bytes')
+#     free = fs.get('available_in_bytes')
 
-    used_percent = (total - free) / total * 100
+#     used_percent = (total - free) / total * 100
 
-    if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
-        logging.info(
-            'Elasticsearch disk usage has reached the low watermark: %.2f%% used. '
-            'Consider freeing up space.',
-            used_percent,
-        )
+#     if used_percent >= feconf.ES_DISK_WATERMARK_LOW:
+#         logging.info(
+#             'Elasticsearch disk usage has reached the low watermark: %.2f%% used. '
+#             'Consider freeing up space.',
+#             used_percent,
+#         )
 
-    if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
-        raise base.UserFacingExceptions.InternalErrorException(
-            f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
-            f'which exceeds the high watermark of '
-            f'{feconf.ES_DISK_WATERMARK_HIGH}%. '
-            'Please free some disk space before adding or updating documents.'
-        )
+#     if used_percent >= feconf.ES_DISK_WATERMARK_HIGH:
+#         raise base.UserFacingExceptions.InternalErrorException(
+#             f'Elasticsearch disk usage is too high: {used_percent:.2f}% used, '
+#             f'which exceeds the high watermark of '
+#             f'{feconf.ES_DISK_WATERMARK_HIGH}%. '
+#             'Please free some disk space before adding or updating documents.'
+#         )
