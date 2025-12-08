@@ -47,7 +47,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/common-layout-directives/navigation-bars/top-navigation-bar.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/apply-validation.directive.ts',
     'core/templates/components/forms/custom-forms-directives/edit-thumbnail-modal.component.spec.ts',
-    'core/templates/components/forms/custom-forms-directives/image-receiver.component.spec.ts', 
+    'core/templates/components/forms/custom-forms-directives/image-receiver.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/image-uploader-modal.component.spec.ts',
     'core/templates/components/forms/custom-forms-directives/object-editor.directive.ts',
     'core/templates/components/forms/forms-templates/mark-translations-as-needing-update-modal.component.spec.ts',
