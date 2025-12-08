@@ -29,6 +29,7 @@ module.exports = merge(common, {
     filename: '[name].[contenthash].bundle.js',
     path: path.resolve(__dirname, 'backend_prod_files/webpack_bundles'),
     publicPath: '/build/webpack_bundles/',
+    chunkFilename:'[id].[contenthash].js'
   },
   plugins: [
     // This plugin performs a direct text replacement, so the value given to it
@@ -44,6 +45,17 @@ module.exports = merge(common, {
   ],
   optimization: {
     ...common.optimization,
+    splitChunks: {
+      ...common.optimization.splitChunks, // 继承通用配置的 splitChunks
+      cacheGroups: {
+        ...common.optimization.splitChunks.cacheGroups, // 继承 CSS 分块规则
+        // 生产环境专属优化（可选）：进一步压缩 CSS chunk
+        styles: {
+          ...common.optimization.splitChunks.cacheGroups.styles,
+          minSize: 0, // 强制拆分所有 CSS，哪怕体积很小
+        }
+      }
+    },
     minimizer: [
       new TerserPlugin({
         cache: true,
