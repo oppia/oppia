@@ -787,10 +787,19 @@ export class BaseUser {
     showMessage(
       `Started closing broswer for ${this.username ?? 'unknown user'}.`
     );
-    // Stop the screen recorder.
+    // Stop the screen recorder with a timeout to prevent hanging.
     if (this.screenRecorder) {
       try {
-        await this.screenRecorder.stop();
+        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 30000;
+        await Promise.race([
+          this.screenRecorder.stop(),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error('Screen recorder stop timed out')),
+              SCREEN_RECORDER_STOP_TIMEOUT_MS
+            )
+          ),
+        ]);
         showMessage(
           `Screen recording stopped for ${this.username ?? 'unknown user'}.`
         );

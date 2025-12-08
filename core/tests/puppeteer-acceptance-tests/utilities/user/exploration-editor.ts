@@ -6544,6 +6544,9 @@ export class ExplorationEditor extends BaseUser {
    * Block Quote, Image, Math Formula, and Concept Card.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
+    // Dismiss the welcome modal if it appears (handles race condition where
+    // modal appears after previous dismissWelcomeModal call).
+    await this.dismissWelcomeModal();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
