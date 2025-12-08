@@ -452,23 +452,23 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
     if feconf.CLOUD_DATASTORE_EMULATOR_PORT:
         return
     try:
-        stats = es_client.nodes.stats(metric="fs")
+        stats = es_client.nodes.stats(metric='fs')
 
-        nodes = stats.get("nodes", {})
+        nodes = stats.get('nodes', {})
         if not nodes:
             logging.info(
-                "Elasticsearch did not return any node filesystem stats."
+                'Elasticsearch did not return any node filesystem stats.'
             )
             return
 
         node_data = next(iter(nodes.values()))
-        fs_info = node_data.get("fs", {}).get("total", {})
+        fs_info = node_data.get('fs', {}).get('total', {})
 
-        total = fs_info.get("total_in_bytes")
-        free = fs_info.get("available_in_bytes")
+        total = fs_info.get('total_in_bytes')
+        free = fs_info.get('available_in_bytes')
 
         if not total or not free:
-            logging.info("Elasticsearch filesystem information incomplete.")
+            logging.info('Elasticsearch filesystem information incomplete.')
             return
 
         used_percent = (total - free) / total * 100
@@ -489,5 +489,5 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
             )
 
     except Exception as e:
-        logging.info(f"Failed to fetch Elasticsearch disk stats: {e}")
+        logging.info('Failed to fetch Elasticsearch disk stats: %s', e)
         return
