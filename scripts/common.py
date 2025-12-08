@@ -490,6 +490,22 @@ def is_port_in_use(port: int) -> bool:
         return bool(not s.connect_ex(('localhost', port)))
 
 
+def get_ports_in_use(ports: list[int]) -> list[int]:
+    """Checks which ports from a list are currently in use.
+
+    Args:
+        ports: list[int]. List of port numbers.
+
+    Returns:
+        list[int]. List of port numbers that are currently in use.
+    """
+    in_use = []
+    for port in ports:
+        if is_port_in_use(port):
+            in_use.append(port)
+    return in_use
+
+
 def recursive_chown(path: str, uid: int, gid: int) -> None:
     """Changes the owner and group id of all files in a path to the numeric
     uid and gid.
