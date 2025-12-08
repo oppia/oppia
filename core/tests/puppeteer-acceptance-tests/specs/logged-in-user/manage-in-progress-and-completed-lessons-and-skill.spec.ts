@@ -282,11 +282,11 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
       await loggedInUser.expectScreenshotToMatch(
-        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+        'learnerDashboardProgressTabCommunityLessonsExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'Lessons in progress',
+        'In Progress',
         ['Explore Title 1'],
         0
       );
@@ -337,11 +337,11 @@ describe('Logged-in User', function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToProgressSection();
     await loggedInUser.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+      'learnerDashboardProgressTabCommunityLessons6Lessons',
       __dirname
     );
     await loggedInUser.expectLessonCardProgressToBe(
-      'Lessons in progress',
+      'In Progress',
       [
         'Explore Title 6',
         'Explore Title 5',
@@ -361,9 +361,9 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
 
-      // Before Toggling: Explore Title 1 not shown
+      // Before Toggling: Explore Title 1 not shown.
       await loggedInUser.expectLessonCardProgressToBe(
-        'Lessons in progress',
+        'In progress',
         [
           'Explore Title 6',
           'Explore Title 5',
@@ -374,14 +374,14 @@ describe('Logged-in User', function () {
         0
       );
 
-      // After Toggling: Explore Title 1 also shown along with rest 5 cards
+      // After Toggling: Explore Title 1 also shown along with rest 5 cards.
       await loggedInUser.toggleDisplayMoreCommunityLessons();
       await loggedInUser.expectScreenshotToMatch(
         'expandedInProgressCommunityLessonsShowingExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'Lessons in progress',
+        'In progress',
         [
           'Explore Title 6',
           'Explore Title 5',
@@ -393,14 +393,14 @@ describe('Logged-in User', function () {
         0
       );
 
-      // Toggling Again : Explore Title 1 not shown
+      // Toggling Again : Explore Title 1 not shown.
       await loggedInUser.toggleDisplayMoreCommunityLessons();
       await loggedInUser.expectScreenshotToMatch(
         'expandedInProgressCommunityLessonsNotShowingExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'Lessons in progress',
+        'In progress',
         [
           'Explore Title 6',
           'Explore Title 5',
