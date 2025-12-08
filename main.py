@@ -377,6 +377,18 @@ URLS = [
         admin.RegenerateTopicSummariesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.GENERATE_STUDY_GUIDE_MODELS_URL,
+        admin.GenerateStudyGuideModelsHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.DELETE_STUDY_GUIDE_MODELS_URL,
+        admin.DeleteStudyGuideModelsHandler
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VERIFY_STUDY_GUIDE_MODELS_URL,
+        admin.VerifyStudyGuideModelsHandler
+    ),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler,
     ),
@@ -1354,6 +1366,12 @@ URLS = [
     get_redirect_route(
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler,
+    ),
+    get_redirect_route(
+        r'/android_platform_parameters', android.AndroidPlatformParametersHandler
+    ),
+    get_redirect_route(
+        r'/android_feature_flags', android.AndroidFeatureFlagsHandler
     ),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
