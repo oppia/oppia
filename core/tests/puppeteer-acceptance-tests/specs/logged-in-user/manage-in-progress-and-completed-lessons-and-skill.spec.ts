@@ -86,12 +86,6 @@ describe('Logged-in User', function () {
       chapterIds.push(id);
     }
 
-    await curriculumAdmin.addStoryToTopic(
-      "Jamie's Adventures in the Arcade",
-      'story',
-      'Place Values'
-    );
-
     for (let i = 0; i < 6; i++) {
       await curriculumAdmin.createAndPublishExplorationWithCards(
         `Explore Title ${i + 1}`,
@@ -99,6 +93,12 @@ describe('Logged-in User', function () {
         3
       );
     }
+
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
 
     for (const [index, id] of chapterIds.entries()) {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
@@ -294,52 +294,109 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should be able to see 5 community lessons in Progress Tab and use "Display More" Button to see the 6th Community Lesson',
-    async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
+  it('should be able to see 5 community lessons in Progress Tab and use "Display More" Button to see the 6th Community Lesson', async function () {
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
 
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 2');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 2');
-      await loggedInUser.continueToNextCard();
+    await loggedInUser.searchForLessonInSearchBar('Explore Title 2');
+    await loggedInUser.playLessonFromSearchResults('Explore Title 2');
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInUser.searchForLessonInSearchBar('Explore Title 3');
+    await loggedInUser.playLessonFromSearchResults('Explore Title 3');
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInUser.searchForLessonInSearchBar('Explore Title 4');
+    await loggedInUser.playLessonFromSearchResults('Explore Title 4');
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInUser.searchForLessonInSearchBar('Explore Title 5');
+    await loggedInUser.playLessonFromSearchResults('Explore Title 5');
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+
+    await loggedInUser.navigateToCommunityLibraryOnNavbar();
+    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInUser.searchForLessonInSearchBar('Explore Title 6');
+    await loggedInUser.playLessonFromSearchResults('Explore Title 6');
+    await loggedInUser.continueToNextCard();
+    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInUser.navigateToProgressSection();
+    await loggedInUser.expectScreenshotToMatch(
+      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+      __dirname
+    );
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Lessons in progress',
+      [
+        'Explore Title 6',
+        'Explore Title 5',
+        'Explore Title 4',
+        'Explore Title 3',
+        'Explore Title 2',
+      ],
+      0
+    );
+
+    await loggedInUser.expectElementToBeVisible(
+      'communityLessonToggleButton',
+      true
+    );
+
+    it('should be able to toggle the "Display More" button and be able to see community Lesson "Explore Title 1" along with rest 5 cards', async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
 
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 3');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 3');
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
+      // Before Toggling: Explore Title 1 not shown
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        [
+          'Explore Title 6',
+          'Explore Title 5',
+          'Explore Title 4',
+          'Explore Title 3',
+          'Explore Title 2',
+        ],
+        0
+      );
 
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 4');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 4');
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
-
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 5');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 5');
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
-
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 6');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 6');
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
+      // After Toggling: Explore Title 1 also shown along with rest 5 cards
+      await loggedInUser.toggleDisplayMoreCommunityLessons();
       await loggedInUser.expectScreenshotToMatch(
-        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+        'expandedInProgressCommunityLessonsShowingExploreTitle1',
+        __dirname
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        [
+          'Explore Title 6',
+          'Explore Title 5',
+          'Explore Title 4',
+          'Explore Title 3',
+          'Explore Title 2',
+          'Explore Title 1',
+        ],
+        0
+      );
+
+      // Toggling Again : Explore Title 1 not shown
+      await loggedInUser.toggleDisplayMoreCommunityLessons();
+      await loggedInUser.expectScreenshotToMatch(
+        'expandedInProgressCommunityLessonsNotShowingExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
@@ -353,9 +410,50 @@ describe('Logged-in User', function () {
         ],
         0
       );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    });
+
+    it('should be able to see completed Community Lessons in the Completed section of Progress Tab', async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.expectElementsToBePresent(
+        ['In Progress', 'Completed'],
+        'tabSectionInProgressTab'
+      );
+
+      await loggedInUser.navigateToLessonByCard(
+        'Community Lessons',
+        'Explore Title 6',
+        'In Progress'
+      );
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
+
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+
+      await loggedInUser.expectScreenshotToMatch(
+        'communityLessonExploreTittle6InCompletedSectionOfProgressTab',
+        __dirname
+      );
+      await loggedInUser.expectElementsToBePresent(
+        ['In Progress', 'Completed'],
+        'tabSectionInProgressTab'
+      );
+      await loggedInUser.expectElementsToBePresent(
+        ['Community Lessons', 'Skills', 'Community Lessons'],
+        'cardDisplay'
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Community Lessons',
+        ['Explore Title 1'],
+        100,
+        'Completed'
+      );
+    });
+  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

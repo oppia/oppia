@@ -72,6 +72,7 @@ const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
 const confirmRemovalFromPlayLaterButton =
   '.e2e-test-confirm-delete-interaction';
 const playLaterSectionSelector = '.e2e-test-play-later-section';
+const communityLessonToggleButton = '.e2e-test-toggle-community-lesson-button';
 const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
@@ -3487,6 +3488,19 @@ export class LoggedInUser extends BaseUser {
 
       expect(numericProgress).toBe(progress);
     }
+  }
+
+  /**
+   * Toggle the "Display More" button on Community Lessons
+   */
+  async toggleDisplayMoreCommunityLessons(): Promise<void> {
+    await this.page.waitForSelector(communityLessonToggleButton);
+    const buttonElement = await this.page.$(communityLessonToggleButton);
+    if (!buttonElement) {
+      throw new Error('Home section not found.');
+    }
+    await this.waitForElementToBeClickable(buttonElement);
+    await buttonElement.click();
   }
 
   /**
