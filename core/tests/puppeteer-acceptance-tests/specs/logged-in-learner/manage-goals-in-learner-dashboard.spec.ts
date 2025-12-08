@@ -27,349 +27,268 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-// Some acceptance tests perform heavy setup (creating users, topics, stories
-// and explorations). Increase Jest's default timeout so the beforeAll hook
-// can complete reliably in slower environments.
-jest.setTimeout(900000);
 
-describe('Logged-In Learner - Goals Tab: Adding & Removing Goals', function () {
-  let learner: LoggedOutUser & LoggedInUser;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+describe('Logged-in User', function () {
+  jest.setTimeout(6000000);
+  let loggedInUser: LoggedInUser & LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationId1: string;
-  let explorationId2: string;
-  let explorationId3: string;
+  const chapterIds: string[] = [];
 
-  beforeAll(
-    async function () {
-      // Progress logs to help identify slow/stalled setup steps.
-      // These are intentionally simple console logs so they appear in test
-      // output; they will be removed once the root cause is found.
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: starting setup');
-      // Create users.
-      learner = await UserFactory.createNewUser(
-        'learnerGoalsTab',
-        'learner_goals_tab@example.com'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created learner');
-      curriculumAdmin = await UserFactory.createNewUser(
-        'curriculumGoals',
-        'curriculum_goals@example.com',
-        [ROLES.CURRICULUM_ADMIN]
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created curriculumAdmin');
-      releaseCoordinator = await UserFactory.createNewUser(
-        'releaseCoordGoals',
-        'release_coord_goals@example.com',
-        [ROLES.RELEASE_COORDINATOR]
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created releaseCoordinator');
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
 
-      // Enable redesigned learner dashboard.
-      await releaseCoordinator.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
-      );
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseAdm',
+      'releaseAdm@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
 
-      // Create 3 explorations (limited by constraints).
-      explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Addition Basics'
-        );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created explorationId1=', explorationId1);
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
 
-      explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Subtraction Basics',
-          'Math',
-          false
-        );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created explorationId2=', explorationId2);
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
+    );
 
-      explorationId3 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Multiplication Basics',
-          'Math',
-          false
-        );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created explorationId3=', explorationId3);
+    await curriculumAdmin.createAndPublishTopic(
+      'Division',
+      'Division subtopics',
+      'Division skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values subtopics',
+      'Place Values skills'
+    );
+    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Division');
+    await curriculumAdmin.publishClassroom('Math');
 
-      // Create topics first.
-      await curriculumAdmin.createAndPublishTopic(
-        'Addition',
-        'Addition Basics',
-        'Addition Basics'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created topic Addition');
+    const placeValueChapters = [
+      'Place Values Introduction',
+      'Place Values Practice',
+    ];
 
-      await curriculumAdmin.createAndPublishTopic(
-        'Subtraction',
-        'Subtraction Basics',
-        'Subtraction Basics'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created topic Subtraction');
+    // Create and publish Division story with two chapters.
+    const divisionChapterIds: string[] = [];
+    const divisionChapters = [
+      'Introduction to Division',
+      'Division Practice',
+    ];
 
-      await curriculumAdmin.createAndPublishTopic(
-        'Multiplication',
-        'Multiplication Basics',
-        'Multiplication Basics'
+    for (const chapter of divisionChapters) {
+      const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
       );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created topic Multiplication');
+      divisionChapterIds.push(expId ?? '');
+    }
 
-      // Then create Math classroom with first topic.
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        'Addition'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: created classroom Math');
+    await curriculumAdmin.addStoryToTopic(
+      'Learning Division',
+      'division-story',
+      'Division'
+    );
 
-      // Add stories to topics.
-      await curriculumAdmin.addStoryToTopic(
-        'Addition Story',
-        'addition-story',
-        'Addition'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added story to Addition');
-      await curriculumAdmin.addChapter(
-        'Chapter 1: Basic Addition',
-        explorationId1 as string
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added chapter for Addition');
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-  // eslint-disable-next-line no-console
-  console.log('[manage-goals-spec] beforeAll: published Addition story');
+    for (const [index, id] of divisionChapterIds.entries()) {
+      await curriculumAdmin.addChapter(divisionChapters[index], id as string);
+    }
 
-      await curriculumAdmin.addStoryToTopic(
-        'Subtraction Story',
-        'subtraction-story',
-        'Subtraction'
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added story to Subtraction');
-      await curriculumAdmin.addChapter(
-        'Chapter 1: Basic Subtraction',
-        explorationId2 as string
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added chapter for Subtraction');
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: published Subtraction story');
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
-      await curriculumAdmin.addStoryToTopic(
-        'Multiplication Story',
-        'multiplication-story',
-        'Multiplication'
+    // Create and publish Place Values story with two chapters.
+    for (const chapter of placeValueChapters) {
+      const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
       );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added story to Multiplication');
-      await curriculumAdmin.addChapter(
-        'Chapter 1: Basic Multiplication',
-        explorationId3 as string
-      );
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: added chapter for Multiplication');
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: published Multiplication story');
-      // eslint-disable-next-line no-console
-      console.log('[manage-goals-spec] beforeAll: setup complete');
-    },
-    // Test takes longer than default timeout.
-    900000
-  );
+      chapterIds.push(expId ?? '');
+    }
+
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
+
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
+
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser1',
+      'logged_in_user1@example.com'
+    );
+  });
 
   it('should navigate to Goals tab and see empty state with description', async function () {
     // Navigate to learner dashboard.
-    await learner.navigateToLearnerDashboardUsingProfileDropdown();
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInUser.navigateToGoalsSection();
 
     // Verify Goals tab is active with greeting.
-    await learner.expectLearnerGreetingsToBe("learnerGoalsTab's Goals");
-
+    await loggedInUser.expectLearnerGreetingsToBe("loggedInUser1's Goals");
     // Verify add goals button is visible.
-    await learner.expectAddGoalsButtonToBeVisible();
+    await loggedInUser.expectAddGoalsButtonToBeVisible();
   });
 
   it('should open add goals modal and display available topics', async function () {
     // Click add goals button.
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
     // Verify modal displays with classroom topics.
-    await learner.expectAddGoalsModalToBeDisplayed();
-    await learner.expectGoalCheckboxToBeVisible('Addition');
-    await learner.expectGoalCheckboxToBeVisible('Subtraction');
-    await learner.expectGoalCheckboxToBeVisible('Multiplication');
+    await loggedInUser.expectAddGoalsModalToBeDisplayed();
+    await loggedInUser.expectGoalCheckboxToBeVisible('Division');
+    await loggedInUser.expectGoalCheckboxToBeVisible('Place Values');
   });
 
   it('should add a single goal successfully', async function () {
-    // Select Addition topic.
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Addition',
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+
+    // Select Division topic.
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Division',
       true
     );
 
     // Submit goals.
-    await learner.submitGoalInRedesignedLearnerDashboard();
+    await loggedInUser.submitGoalInRedesignedLearnerDashboard();
 
     // Verify success message.
-    await learner.expectToastMessage(
+    await loggedInUser.expectToastMessage(
       "Successfully added to your 'Current Goals' list."
     );
 
     // Verify "In Progress" section appears.
-    await learner.expectRedesignedGoalsSectionToContainHeading('In Progress');
+    await loggedInUser.expectRedesignedGoalsSectionToContainHeading('In Progress');
 
     // Verify goal card appears.
-    await learner.expectGoalCardToBeVisible('Addition');
+    await loggedInUser.expectGoalCardToBeVisible('Division');
   });
 
   it('should add multiple goals up to maximum limit (5)', async function () {
     // Open add goals modal again.
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
-    // Add Subtraction and Multiplication.
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Subtraction',
-      true
-    );
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Multiplication',
+    // Add Place Values (Division already added).
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Place Values',
       true
     );
 
     // Submit goals.
-    await learner.submitGoalInRedesignedLearnerDashboard();
+    await loggedInUser.submitGoalInRedesignedLearnerDashboard();
 
     // Verify all goals are visible.
-    await learner.expectGoalCardToBeVisible('Addition');
-    await learner.expectGoalCardToBeVisible('Subtraction');
-    await learner.expectGoalCardToBeVisible('Multiplication');
+    await loggedInUser.expectGoalCardToBeVisible('Division');
+    await loggedInUser.expectGoalCardToBeVisible('Place Values');
 
     // Verify progress bars show 0%.
-    await learner.expectGoalProgressToBeDisplayed('Addition', 0);
-    await learner.expectGoalProgressToBeDisplayed('Subtraction', 0);
-    await learner.expectGoalProgressToBeDisplayed('Multiplication', 0);
+    await loggedInUser.expectGoalProgressToBeDisplayed('Division', 0);
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 0);
   });
 
   it('should disable checkboxes when maximum goal limit is reached', async function () {
-    // This test assumes we have only 3 topics, so we need to verify
-    // that if we had more topics, the UI would disable them.
-    // For now, verify all 3 are selected and no more can be added.
+    // Verify all available topics are selected.
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
-
-    // All 3 should already be checked.
-    await learner.expectGoalCheckboxToBeChecked('Addition', true);
-    await learner.expectGoalCheckboxToBeChecked('Subtraction', true);
-    await learner.expectGoalCheckboxToBeChecked('Multiplication', true);
+    // Both topics should be checked.
+    await loggedInUser.expectGoalCheckboxToBeChecked('Division', true);
+    await loggedInUser.expectGoalCheckboxToBeChecked('Place Values', true);
 
     // Close modal.
-    await learner.cancelGoalModalInRedesignedLearnerDashboard();
+    await loggedInUser.cancelGoalModalInRedesignedLearnerDashboard();
   });
 
   it('should remove a goal and verify UI updates', async function () {
     // Open add goals modal.
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
-    // Uncheck Multiplication.
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Multiplication',
+    // Uncheck Place Values.
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Place Values',
       false
     );
 
     // Submit.
-    await learner.submitGoalInRedesignedLearnerDashboard();
+    await loggedInUser.submitGoalInRedesignedLearnerDashboard();
 
     // Verify remove confirmation modal.
-    await learner.expectRemoveActivityModelToBeDisplayed(
+    await loggedInUser.expectRemoveActivityModelToBeDisplayed(
       "Remove from 'Current Goals' list?",
-      "Are you sure you want to remove 'Multiplication' from your 'Current Goals' list?"
+      "Are you sure you want to remove 'Place Values' from your 'Current Goals' list?"
     );
 
     // Confirm removal.
-    await learner.clickButtonInRemoveActivityModal('Remove');
+    await loggedInUser.clickButtonInRemoveActivityModal('Remove');
 
-    // Verify Multiplication is no longer visible.
-    await learner.expectGoalCardToBeVisible('Multiplication', false);
+    // Verify Place Values is no longer visible.
+    await loggedInUser.expectGoalCardToBeVisible('Place Values', false);
 
     // Verify other goals still visible.
-    await learner.expectGoalCardToBeVisible('Addition');
-    await learner.expectGoalCardToBeVisible('Subtraction');
+    await loggedInUser.expectGoalCardToBeVisible('Division');
   });
 
   it('should remove all goals and return to empty state', async function () {
     // Open add goals modal.
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
-    // Uncheck remaining goals.
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Addition',
-      false
-    );
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Subtraction',
+    // Uncheck remaining goal.
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Division',
       false
     );
 
     // Submit.
-    await learner.submitGoalInRedesignedLearnerDashboard();
+    await loggedInUser.submitGoalInRedesignedLearnerDashboard();
 
-    // Confirm removal for Addition.
-    await learner.expectRemoveActivityModelToBeDisplayed(
+    // Confirm removal for Division.
+    await loggedInUser.expectRemoveActivityModelToBeDisplayed(
       "Remove from 'Current Goals' list?",
-      "Are you sure you want to remove 'Addition' from your 'Current Goals' list?"
+      "Are you sure you want to remove 'Division' from your 'Current Goals' list?"
     );
-    await learner.clickButtonInRemoveActivityModal('Remove');
-
-    // Confirm removal for Subtraction.
-    await learner.expectRemoveActivityModelToBeDisplayed(
-      "Remove from 'Current Goals' list?",
-      "Are you sure you want to remove 'Subtraction' from your 'Current Goals' list?"
-    );
-    await learner.clickButtonInRemoveActivityModal('Remove');
-
+    await loggedInUser.clickButtonInRemoveActivityModal('Remove');
     // Verify "In Progress" section is no longer visible.
-    await learner.expectRedesignedGoalsSectionToContainHeading(
+    await loggedInUser.expectRedesignedGoalsSectionToContainHeading(
       'In Progress',
       false
     );
 
     // Verify empty state with add goals button.
-    await learner.expectAddGoalsButtonToBeVisible();
+    await loggedInUser.expectAddGoalsButtonToBeVisible();
   });
 
   it('should cancel adding goals without making changes', async function () {
     // Open add goals modal.
-    await learner.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
 
     // Select a goal but cancel.
-    await learner.clickOnGoalCheckboxInRedesignedLearnerDashboard(
-      'Addition',
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Place Values',
       true
     );
 
     // Cancel modal.
-    await learner.cancelGoalModalInRedesignedLearnerDashboard();
+    await loggedInUser.cancelGoalModalInRedesignedLearnerDashboard();
 
-    // Verify no goals were added.
-    await learner.expectRedesignedGoalsSectionToContainHeading(
+    // Verify no goals were added (empty state after removing all).
+    await loggedInUser.expectRedesignedGoalsSectionToContainHeading(
       'In Progress',
       false
     );

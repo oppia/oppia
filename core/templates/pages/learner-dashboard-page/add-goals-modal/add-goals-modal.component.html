@@ -6,7 +6,8 @@
     <!--TODO(#18384): Topic name translate keys-->
     <ng-container *ngFor="let topic of getPublishedTopics() | keyvalue">
       <mat-checkbox color="primary"
-                    class="oppia-learner-dash-goals-checkbox"
+                    class="oppia-learner-dash-goals-checkbox e2e-test-goal-checkbox"
+                    [attr.data-topic-name]="topic.value"
                     (change)="onChange(topic.key)"
                     [checked]="checkedTopics.has(topic.key) || completedTopics.has(topic.key)"
                     [disabled]="isCheckboxDisabled(topic.key)">

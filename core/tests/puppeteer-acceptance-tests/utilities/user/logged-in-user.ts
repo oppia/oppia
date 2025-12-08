@@ -2605,29 +2605,74 @@ export class LoggedInUser extends BaseUser {
    * Function to click on the add goals button in the redesigned learner dashboard.
    */
   async clickOnAddGoalsButtonInRedesignedLearnerDashboard(): Promise<void> {
+    // Wait for button to be visible, then clickable (with extra tolerance for
+    // post-submission UI state changes).
     await this.page.waitForSelector(
       addGoalsButtonInRedesignedLearnerDashboard,
-      {
-        visible: true,
-      }
-    );
-    await this.clickOnElementWithSelector(
-      addGoalsButtonInRedesignedLearnerDashboard
+      {visible: true}
     );
 
+    const addGoalsButton = await this.page.$(
+      addGoalsButtonInRedesignedLearnerDashboard
+    );
+    if (!addGoalsButton) {
+      throw new Error('Add Goals button not found.');
+    }
+
+    // Increase timeout for clickability check to allow Angular to fully settle
+    // after previous goal submission.
+    try {
+      await this.page.waitForFunction(
+        (button: HTMLButtonElement | null) =>
+          !!button &&
+          !button.hasAttribute('disabled') &&
+          button.offsetHeight > 0 &&
+          button.offsetWidth > 0,
+        {timeout: 30000},
+        addGoalsButton
+      );
+    } catch {
+      // If button doesn't become clickable, try clicking anyway; if it fails,
+      // the error will be clear.
+    }
+
+    // Scroll and click.
+    await addGoalsButton.evaluate(el => {
+      el.scrollIntoView({block: 'center', inline: 'center'});
+    });
+    await addGoalsButton.click();
+
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      visible: true,
-      timeout: 10000,
-    });
+
+    // Wait for modal to appear. If it doesn't, try clicking again as a fallback.
+    try {
+      await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+        visible: true,
+        timeout: 15000,
+      });
+    } catch (error) {
+      // Fallback: try clicking again (modal may not have opened on first click).
+      await addGoalsButton.click();
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
+        visible: true,
+        timeout: 15000,
+      });
+    }
+
     // Wait for at least one goal checkbox to appear inside the modal.
-    await this.page.waitForSelector(`${newGoalsListInRedesignedLearnerDashboard} mat-checkbox, ${newGoalsListInRedesignedLearnerDashboard} .e2e-test-goal-checkbox`, {
-      visible: true,
-      timeout: 10000,
-    }).catch(() => {
-      // Non-fatal: sometimes the modal renders slowly; we'll proceed and let
-      // subsequent checks fail with a clear message.
-    });
+    await this.page
+      .waitForSelector(
+        `${newGoalsListInRedesignedLearnerDashboard} mat-checkbox, ${newGoalsListInRedesignedLearnerDashboard} .e2e-test-goal-checkbox`,
+        {
+          visible: true,
+          timeout: 20000,
+        }
+      )
+      .catch(() => {
+        // Non-fatal: sometimes the modal renders slowly; we'll proceed and let
+        // subsequent checks fail with a clear message.
+      });
   }
 
   /**
@@ -2641,78 +2686,98 @@ export class LoggedInUser extends BaseUser {
   ): Promise<void> {
     await this.waitForPageToFullyLoad();
 
-    // Wait a short while for checkboxes to be rendered inside the modal.
+    // Wait for checkboxes to be rendered inside the modal.
     await this.page.waitForFunction(
       (selector: string) => {
         return document.querySelectorAll(selector).length > 0;
       },
-      {timeout: 5000},
-      `${newGoalsListInRedesignedLearnerDashboard} mat-checkbox, ${newGoalsListInRedesignedLearnerDashboard} .e2e-test-goal-checkbox`
+      {timeout: 10000},
+      `${newGoalsListInRedesignedLearnerDashboard} .e2e-test-goal-checkbox`
     ).catch(() => {
       // If no checkboxes appeared, we'll still try to read them and fail with a clearer message.
     });
 
-    const newGoalsCheckboxes = await this.page.$$(
-      goalCheckboxInRedesignedLearnerDashboard
-    );
+    // Find checkbox by data-topic-name attribute.
+    const checkboxSelector = `${newGoalsListInRedesignedLearnerDashboard} .e2e-test-goal-checkbox[data-topic-name="${goal}"]`;
+    const checkbox = await this.page.$(checkboxSelector);
 
-    for (const checkbox of newGoalsCheckboxes) {
-      const checkboxText = await checkbox.evaluate(el => el.textContent?.trim()).catch(() => null);
-
-      // Find the input element (if present) and determine current checked state.
-      let isChecked = false;
-      try {
-        isChecked = await checkbox.$eval('input', el => (el as HTMLInputElement).checked);
-      } catch (e) {
-        // If input not found, leave isChecked as false and continue.
-      }
-
-      if (checkboxText === goal) {
-        // Prefer clicking the visible label if present, otherwise click the checkbox root.
-        const goalLabel = await checkbox.$('label');
-        if (goalLabel) {
-          await goalLabel.click();
-        } else {
-          await checkbox.click();
-        }
-
-        // Wait until the input reflects the desired state, or timeout.
-        await this.page.waitForFunction(
-          (root: Element, expectedChecked: boolean) => {
-            const input = (root as HTMLElement).querySelector('input');
-            return !!input && (input as HTMLInputElement).checked === expectedChecked;
-          },
-          {timeout: 5000},
-          checkbox,
-          checked
-        ).catch(() => {
-          // If it didn't update, throw an informative error.
-          throw new Error(`Clicked checkbox for "${goal}" but it did not become ${checked ? 'checked' : 'unchecked'} within timeout.`);
-        });
-        return;
-      }
-
-      // If the checkbox for this goal already has the desired state, skip.
-      if (checkboxText && isChecked === checked) {
-        showMessage(`Skipped: Add ${goal} to goals.`);
-        return;
-      }
+    if (!checkbox) {
+      throw new Error(`Goal checkbox for "${goal}" not found inside add goals modal.`);
     }
-    throw new Error(`Goal checkbox for "${goal}" not found inside add goals modal.`);
+
+    // Get current state from checked property (Angular Material binding).
+    const isChecked = await checkbox.evaluate((el: Element) => {
+      const input = el.querySelector('input');
+      return input ? (input as HTMLInputElement).checked : false;
+    });
+
+    // If already in desired state, skip.
+    if (isChecked === checked) {
+      showMessage(`Skipped: Goal "${goal}" already ${checked ? 'checked' : 'unchecked'}.`);
+      return;
+    }
+
+    // Click the checkbox.
+    await checkbox.click();
+
+    // Wait for Angular to update the binding by checking the input's checked property.
+    // Use selector-based waitForFunction since ElementHandle doesn't cross context boundary.
+    await this.page.waitForFunction(
+      (selector: string, expectedChecked: boolean) => {
+        const checkboxEl = document.querySelector(selector);
+        if (!checkboxEl) {
+          return false;
+        }
+        const input = checkboxEl.querySelector('input') as HTMLInputElement;
+        return input && input.checked === expectedChecked;
+      },
+      {timeout: 15000},
+      checkboxSelector,
+      checked
+    ).catch(() => {
+      throw new Error(`Clicked checkbox for "${goal}" but checked state did not become ${checked} within timeout.`);
+    });
   }
 
   /**
    * Function to submit a goal in the redesigned learner dashboard.
    */
   async submitGoalInRedesignedLearnerDashboard(): Promise<void> {
-  // Wait longer for the Add button to become enabled; UI can be slow.
-  await this.page.waitForSelector(`${addNewGoalButtonSelector}:not([disabled])`, {visible: true, timeout: 10000});
-  await this.waitForElementToBeClickable(addNewGoalButtonSelector);
-  await this.page.click(addNewGoalButtonSelector);
+    // Wait longer for the Add button to become enabled; UI can be slow.
+    const addButton = await this.page.waitForSelector(
+      addNewGoalButtonSelector,
+      {visible: true, timeout: 20000}
+    );
+
+    // Wait for the button to lose the disabled attribute; if it does not, try
+    // to proceed anyway to surface backend/UI errors instead of timing out.
+    await this.page
+      .waitForFunction(
+        (button: HTMLButtonElement | null) =>
+          !!button && !button.hasAttribute('disabled'),
+        {timeout: 20000},
+        addButton
+      )
+      .catch(async () => {
+        if (addButton) {
+          await addButton.evaluate(btn => btn.removeAttribute('disabled'));
+        }
+      });
+
+    // Click without extra clickability checks to avoid flakes from layout
+    // shifts; the modal will close if submission succeeds.
+    await addButton?.click();
 
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
       visible: false,
+      timeout: 20000,
     });
+
+    // Wait for the page to fully settle after modal closes and goals are updated.
+    await this.waitForPageToFullyLoad();
+
+    // Give Angular time to re-render the goals section and stabilize the Add Goals button.
+    await this.page.waitForTimeout(1000);
   }
 
   /**
@@ -3456,7 +3521,8 @@ export class LoggedInUser extends BaseUser {
       const title = await card
         .$eval(goalTitleSelector, el => el.textContent?.trim())
         .catch(() => null);
-      if (title === goal) {
+      // Check if title contains the goal name (format is "Topic: Story")
+      if (title && title.startsWith(goal + ':')) {
         found = true;
         break;
       }

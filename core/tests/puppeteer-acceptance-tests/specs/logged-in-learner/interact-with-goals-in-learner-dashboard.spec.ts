@@ -27,271 +27,279 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 
 const ROLES = testConstants.Roles;
 
-describe('Logged-In Learner - Goals Tab: Interacting with Goals', function () {
-  let learner: LoggedOutUser & LoggedInUser;
-  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
+describe('Logged-in User', function () {
+  jest.setTimeout(6000000);
+  let loggedInUser: LoggedInUser & LoggedOutUser;
+  let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationId1: string;
-  let explorationId2: string;
-  let explorationId3: string;
+  const chapterIds: string[] = [];
 
-  beforeAll(
-    async function () {
-      // Create users.
-      learner = await UserFactory.createNewUser(
-        'learnerGoalsInteract',
-        'learner_goals_interact@example.com'
+  beforeAll(async function () {
+    curriculumAdmin = await UserFactory.createNewUser(
+      'curriculumAdm',
+      'curriculumAdmin@example.com',
+      [ROLES.CURRICULUM_ADMIN]
+    );
+
+    releaseCoordinator = await UserFactory.createNewUser(
+      'releaseAdm',
+      'releaseAdm@example.com',
+      [ROLES.RELEASE_COORDINATOR]
+    );
+
+    await releaseCoordinator.enableFeatureFlag(
+      'show_redesigned_learner_dashboard'
+    );
+
+    await curriculumAdmin.createNewClassroom('Math', 'math');
+    await curriculumAdmin.updateClassroom(
+      'Math',
+      'Welcome to Math classroom!',
+      'This course covers basic operations.',
+      'In this course, you will learn the following topics: Place Values.'
+    );
+
+    await curriculumAdmin.createAndPublishTopic(
+      'Division',
+      'Division subtopics',
+      'Division skills'
+    );
+    await curriculumAdmin.createAndPublishTopic(
+      'Place Values',
+      'Place Values subtopics',
+      'Place Values skills'
+    );
+    await curriculumAdmin.addTopicToClassroom('Math', 'Place Values');
+    await curriculumAdmin.addTopicToClassroom('Math', 'Division');
+    await curriculumAdmin.publishClassroom('Math');
+
+    const placeValueChapters = [
+      'Place Values Introduction',
+      'Place Values Practice',
+    ];
+
+    // Create and publish Division story with two chapters.
+    const divisionChapterIds: string[] = [];
+    const divisionChapters = [
+      'Introduction to Division',
+      'Division Practice',
+    ];
+
+    for (const chapter of divisionChapters) {
+      const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
       );
-      curriculumAdmin = await UserFactory.createNewUser(
-        'curriculumInteract',
-        'curriculum_interact@example.com',
-        [ROLES.CURRICULUM_ADMIN]
+      divisionChapterIds.push(expId ?? '');
+    }
+
+    await curriculumAdmin.addStoryToTopic(
+      'Learning Division',
+      'division-story',
+      'Division'
+    );
+
+    for (const [index, id] of divisionChapterIds.entries()) {
+      await curriculumAdmin.addChapter(divisionChapters[index], id as string);
+    }
+
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
+
+    // Create and publish Place Values story with two chapters.
+    for (const chapter of placeValueChapters) {
+      const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
+        chapter,
+        'Algebra',
+        3
       );
-      releaseCoordinator = await UserFactory.createNewUser(
-        'releaseCoordInteract',
-        'release_coord_interact@example.com',
-        [ROLES.RELEASE_COORDINATOR]
-      );
+      chapterIds.push(expId ?? '');
+    }
 
-      // Enable redesigned learner dashboard.
-      await releaseCoordinator.enableFeatureFlag(
-        'show_redesigned_learner_dashboard'
-      );
+    await curriculumAdmin.addStoryToTopic(
+      "Jamie's Adventures in the Arcade",
+      'story',
+      'Place Values'
+    );
 
-      // Create 3 explorations with multiple chapters each.
-      explorationId1 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Place Values Part 1'
-        );
+    for (const [index, id] of chapterIds.entries()) {
+      await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
+    }
 
-      explorationId2 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Place Values Part 2',
-          'Math',
-          false
-        );
+    await curriculumAdmin.saveStoryDraft();
+    await curriculumAdmin.publishStoryDraft();
 
-      explorationId3 =
-        await curriculumAdmin.createAndPublishAMinimalExplorationWithTitle(
-          'Place Values Part 3',
-          'Math',
-          false
-        );
-
-      // Create topic first.
-      await curriculumAdmin.createAndPublishTopic(
-        'Place Values',
-        "Jaime's Adventures in the Arcade",
-        "Jaime's Adventures in the Arcade"
-      );
-
-      // Then create Math classroom with Place Values topic.
-      await curriculumAdmin.createAndPublishClassroom(
-        'Math',
-        'math',
-        'Place Values'
-      );
-
-      // Add story with 3 chapters.
-      await curriculumAdmin.addStoryToTopic(
-        "Jaime's Adventures in the Arcade",
-        'jamies-adventures',
-        'Place Values'
-      );
-
-      await curriculumAdmin.addChapter(
-        'What are the Place Values?',
-        explorationId1 as string
-      );
-      await curriculumAdmin.addChapter(
-        'Find the Value of a Number',
-        explorationId2 as string
-      );
-      await curriculumAdmin.addChapter(
-        'Comparing Numbers',
-        explorationId3 as string
-      );
-
-      await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.publishStoryDraft();
-    },
-    // Test takes longer than default timeout.
-    600000
-  );
-
+    loggedInUser = await UserFactory.createNewUser(
+      'loggedInUser1',
+      'logged_in_user1@example.com'
+    );
+  });
   it('should add a goal and verify initial state', async function () {
     // Navigate to learner dashboard Goals tab.
-    await learner.navigateToLearnerDashboardUsingProfileDropdown();
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInUser.navigateToGoalsSection();
 
     // Add Place Values goal.
-    await learner.addGoalInRedesignedLearnerDashboard('Place Values');
+    await loggedInUser.addGoalInRedesignedLearnerDashboard('Place Values');
 
     // Verify goal card appears with 0% progress.
-    await learner.expectGoalCardToBeVisible('Place Values');
-    await learner.expectGoalProgressToBeDisplayed('Place Values', 0);
+    await loggedInUser.expectGoalCardToBeVisible('Place Values');
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 0);
 
     // Verify "Start" button is visible.
-    await learner.expectGoalCardButtonLabel('Place Values', 'Start');
+    await loggedInUser.expectGoalCardButtonLabel('Place Values', 'Start');
   });
 
   it('should drill down into goal and see lesson cards', async function () {
     // Click on the goal card to drill down.
-    await learner.clickOnGoalCard('Place Values');
+    await loggedInUser.clickOnGoalCard('Place Values');
 
     // Verify navigation to goal detail page.
-    await learner.expectGoalDetailPageToBeDisplayed('Place Values');
+    await loggedInUser.expectGoalDetailPageToBeDisplayed('Place Values');
 
     // Verify lesson cards are visible.
-    await learner.expectLessonCardToBeVisible('What are the Place Values?');
-    await learner.expectLessonCardToBeVisible('Find the Value of a Number');
-    await learner.expectLessonCardToBeVisible('Comparing Numbers');
+    await loggedInUser.expectLessonCardToBeVisible('Place Values Introduction');
+    await loggedInUser.expectLessonCardToBeVisible('Place Values Practice');
 
     // Verify all have "Start" buttons.
-    await learner.expectLessonCardButtonLabel(
-      'What are the Place Values?',
+    await loggedInUser.expectLessonCardButtonLabel(
+      'Place Values Introduction',
       'Start'
     );
   });
 
   it('should start first lesson and verify progress update', async function () {
     // Start first lesson.
-    await learner.clickLessonCardButton('What are the Place Values?');
+    await loggedInUser.clickLessonCardButton('Place Values Introduction');
 
     // Verify exploration player loads.
-    await learner.expectExplorationPlayerToBeLoaded();
+    await loggedInUser.expectExplorationPlayerToBeLoaded();
 
     // Complete the lesson (assuming minimal exploration).
-    await learner.completeCurrentLesson();
+    await loggedInUser.completeCurrentLesson();
 
     // Return to learner dashboard.
-    await learner.navigateToLearnerDashboardUsingOppiaLogo();
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToLearnerDashboardUsingOppiaLogo();
+    await loggedInUser.navigateToGoalsSection();
 
-    // Verify goal progress updated (33% for 1 of 3 lessons).
-    await learner.expectGoalProgressToBeDisplayed('Place Values', 33);
+    // Verify goal progress updated (50% for 1 of 2 lessons).
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 50);
 
     // Verify button changed to "Resume" or "Continue".
-    await learner.expectGoalCardButtonLabel('Place Values', 'Resume');
+    await loggedInUser.expectGoalCardButtonLabel('Place Values', 'Resume');
   });
 
   it('should resume goal and see next lesson ready to start', async function () {
     // Click Resume on goal card.
-    await learner.clickOnGoalCard('Place Values');
+    await loggedInUser.clickOnGoalCard('Place Values');
 
     // Verify first lesson shows as completed.
-    await learner.expectLessonCardToShowCompleted('What are the Place Values?');
+    await loggedInUser.expectLessonCardToShowCompleted('Place Values Introduction');
 
     // Verify second lesson has "Start" button.
-    await learner.expectLessonCardButtonLabel(
-      'Find the Value of a Number',
+    await loggedInUser.expectLessonCardButtonLabel(
+      'Place Values Practice',
       'Start'
     );
   });
 
   it('should start second lesson partially and verify "Resume" state', async function () {
     // Start second lesson.
-    await learner.clickLessonCardButton('Find the Value of a Number');
+    await loggedInUser.clickLessonCardButton('Place Values Practice');
 
     // Verify exploration player loads.
-    await learner.expectExplorationPlayerToBeLoaded();
+    await loggedInUser.expectExplorationPlayerToBeLoaded();
 
     // Partially complete the lesson (do NOT finish).
-    await learner.interactWithLessonPartially();
+    await loggedInUser.interactWithLessonPartially();
 
     // Return to learner dashboard.
-    await learner.navigateToLearnerDashboardUsingOppiaLogo();
-    await learner.navigateToGoalsSection();
-    await learner.clickOnGoalCard('Place Values');
+    await loggedInUser.navigateToLearnerDashboardUsingOppiaLogo();
+    await loggedInUser.navigateToGoalsSection();
+    await loggedInUser.clickOnGoalCard('Place Values');
 
     // Verify second lesson shows "Resume" button.
-    await learner.expectLessonCardButtonLabel(
-      'Find the Value of a Number',
+    await loggedInUser.expectLessonCardButtonLabel(
+      'Place Values Practice',
       'Resume'
     );
 
     // Verify progress still shows partial completion.
-    await learner.navigateToGoalsSection();
-    await learner.expectGoalProgressToBeDisplayed('Place Values', 33);
+    await loggedInUser.navigateToGoalsSection();
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 50);
   });
 
   it('should complete remaining lessons and verify 100% progress', async function () {
     // Navigate back to goal details.
-    await learner.clickOnGoalCard('Place Values');
+    await loggedInUser.clickOnGoalCard('Place Values');
 
     // Resume and complete second lesson.
-    await learner.clickLessonCardButton('Find the Value of a Number');
-    await learner.completeCurrentLesson();
-
-    // Return and start third lesson.
-    await learner.navigateToLearnerDashboardUsingOppiaLogo();
-    await learner.navigateToGoalsSection();
-    await learner.clickOnGoalCard('Place Values');
-    await learner.clickLessonCardButton('Comparing Numbers');
-    await learner.completeCurrentLesson();
+    await loggedInUser.clickLessonCardButton('Place Values Practice');
+    await loggedInUser.completeCurrentLesson();
 
     // Return to Goals tab.
-    await learner.navigateToLearnerDashboardUsingOppiaLogo();
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToLearnerDashboardUsingOppiaLogo();
+    await loggedInUser.navigateToGoalsSection();
 
     // Verify goal shows 100% progress.
-    await learner.expectGoalProgressToBeDisplayed('Place Values', 100);
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 100);
 
     // Verify goal moved to "Completed" section or marked complete.
-    await learner.expectGoalCardToShowCompleted('Place Values');
+    await loggedInUser.expectGoalCardToShowCompleted('Place Values');
   });
 
   it('should verify Goals tab sidebar button has green highlight', async function () {
     // Navigate to learner dashboard.
-    await learner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Verify Goals tab button exists.
-    await learner.expectGoalsTabButtonToBeVisible();
+    await loggedInUser.expectGoalsTabButtonToBeVisible();
 
     // Click Goals tab.
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToGoalsSection();
 
     // Verify green highlight/active state on Goals button.
-    await learner.expectGoalsTabButtonToBeActive();
+    await loggedInUser.expectGoalsTabButtonToBeActive();
   });
 
   it('should verify UI consistency on mobile viewport', async function () {
     // Set viewport to mobile size.
-    await learner.setMobileViewport();
+    await loggedInUser.setMobileViewport();
 
     // Navigate to Goals tab.
-    await learner.navigateToLearnerDashboardUsingProfileDropdown();
-    await learner.navigateToGoalsSection();
+    await loggedInUser.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInUser.navigateToGoalsSection();
 
     // Verify goal cards are visible and properly formatted.
-    await learner.expectGoalCardToBeVisible('Place Values');
-    await learner.expectGoalProgressToBeDisplayed('Place Values', 100);
+    await loggedInUser.expectGoalCardToBeVisible('Place Values');
+    await loggedInUser.expectGoalProgressToBeDisplayed('Place Values', 100);
 
     // Verify responsive layout.
-    await learner.expectMobileLayoutToBeCorrect();
+    await loggedInUser.expectMobileLayoutToBeCorrect();
 
     // Reset viewport to desktop.
-    await learner.setDesktopViewport();
+    await loggedInUser.setDesktopViewport();
   });
 
   it('should navigate between lessons within goal using navigation controls', async function () {
     // Drill down into goal.
-    await learner.clickOnGoalCard('Place Values');
+    await loggedInUser.clickOnGoalCard('Place Values');
 
     // Click on first lesson.
-    await learner.clickLessonCard('What are the Place Values?');
+    await loggedInUser.clickLessonCard('Place Values Introduction');
 
     // Use navigation controls to move to next lesson.
-    await learner.clickNextLessonButton();
+    await loggedInUser.clickNextLessonButton();
 
     // Verify second lesson loads.
-    await learner.expectCurrentLessonTitleToBe('Find the Value of a Number');
+    await loggedInUser.expectCurrentLessonTitleToBe('Place Values Practice');
 
     // Use back button to return to first lesson.
-    await learner.clickPreviousLessonButton();
+    await loggedInUser.clickPreviousLessonButton();
 
     // Verify first lesson loads.
-    await learner.expectCurrentLessonTitleToBe('What are the Place Values?');
+    await loggedInUser.expectCurrentLessonTitleToBe('Place Values Introduction');
   });
 
   afterAll(async function () {

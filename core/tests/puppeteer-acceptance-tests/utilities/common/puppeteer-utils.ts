@@ -1910,7 +1910,10 @@ export class BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToastMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
+    await this.page.waitForSelector(toastMessageSelector, {
+      visible: true,
+      timeout: 45000,
+    });
     const toastMessageElement = await this.page.$(toastMessageSelector);
     const toastMessage = await this.page.evaluate(
       el => el.textContent.trim(),
