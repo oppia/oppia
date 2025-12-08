@@ -307,7 +307,7 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         'cluster.routing.allocation.disk.watermark.high=95%',
         # Flood-stage: indices become read-only to prevent data loss if usage exceeds this threshold.
         '-E',
-        'cluster.routing.allocation.disk.watermark.flood_stage=95%',
+        'cluster.routing.allocation.disk.watermark.flood_stage=97%',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
