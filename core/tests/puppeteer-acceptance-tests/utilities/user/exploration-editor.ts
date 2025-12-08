@@ -2809,6 +2809,9 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
+    // Dismiss the welcome modal if it appears (handles race condition where
+    // modal appears after previous dismissWelcomeModal call).
+    await this.dismissWelcomeModal();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -6531,6 +6534,9 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
+    // Dismiss the welcome modal if it appears (handles race condition where
+    // modal appears after previous dismissWelcomeModal call).
+    await this.dismissWelcomeModal();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6632,6 +6638,9 @@ export class ExplorationEditor extends BaseUser {
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
+    // Dismiss the welcome modal if it appears (handles race condition where
+    // modal appears after previous dismissWelcomeModal call).
+    await this.dismissWelcomeModal();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
