@@ -185,11 +185,20 @@ export class SearchBarComponent implements OnInit, OnDestroy {
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
   }
-
   deselectAll(itemsType: string): void {
     this.selectionDetails[itemsType].selections = {};
     this.updateSelectionDetails(itemsType);
     this.refreshSearchBarLabels();
+  }
+
+  /**
+   * Triggers a search query when the dropdown menu is closed.
+   * @param {boolean} isOpen - The new open state of the dropdown.
+   */
+  triggerSearchOnDropdownClose(isOpen: boolean): void {
+    if (!isOpen) {
+      this.onSearchQueryChangeExec();
+    }
   }
 
   onSearchQueryChangeExec(): void {
