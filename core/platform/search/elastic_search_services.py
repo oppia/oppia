@@ -449,6 +449,8 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
         InternalErrorException. If filesystem statistics cannot be read from the
             cluster, or if disk usage exceeds the configured high watermark.
     """
+    if feconf.CLOUD_DATASTORE_EMULATOR_PORT:
+        return
     try:
         stats = es_client.nodes.stats(metric="fs")
 
