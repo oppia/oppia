@@ -362,9 +362,6 @@ var AutocompleteDropdownEditor = function (elem) {
     setValue: async function (text) {
       await action.click('Container Element', elem.$(containerLocator));
       await action.waitForAutosave();
-      // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
-      // field when it is 'activated', i.e. when the dropdown is clicked.
 
       await action.setValue(
         'Dropdown Element Search',
