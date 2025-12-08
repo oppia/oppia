@@ -195,7 +195,7 @@ def add_documents_to_index(
         SearchException. A document cannot be added to the index.
     """
 
-    ensure_disk_space_sufficient(ES.get_client())
+    # ensure_disk_space_sufficient(ES.get_client())
     assert isinstance(index_name, str)
 
     for document in documents:
