@@ -62,6 +62,12 @@ module.exports = {
         'rich_text_components_definitions.ts',
     },
   },
+  output: {
+    path: path.resolve(__dirname, 'build/webpack_bundles'), // 打包输出目录
+    filename: '[name].[contenthash].js', // 主文件命名规则
+    chunkFilename: '[id].[contenthash].js', // 分块文件命名规则（关键：匹配 CSS chunk 命名）
+    publicPath: '/build/webpack_bundles/' // 资源加载的基础路径，解决路径错误导致的加载失败
+  },
   entry: {
     oppia_root: commonPrefix + '/pages/oppia-root/index.ts',
     lightweight_oppia_root:
