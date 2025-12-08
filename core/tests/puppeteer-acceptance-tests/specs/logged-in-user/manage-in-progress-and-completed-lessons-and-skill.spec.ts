@@ -92,13 +92,13 @@ describe('Logged-in User', function () {
       'Place Values'
     );
 
-    // for (let i = 0; i < 6; i++) {
-    //   await curriculumAdmin.createAndPublishExplorationWithCards(
-    //     `Explore Title ${i + 1}`,
-    //     'Algebra',
-    //     3
-    //   );
-    // }
+    for (let i = 0; i < 6; i++) {
+      await curriculumAdmin.createAndPublishExplorationWithCards(
+        `Explore Title ${i + 1}`,
+        'Algebra',
+        3
+      );
+    }
 
     for (const [index, id] of chapterIds.entries()) {
       await curriculumAdmin.addChapter(placeValueChapters[index], id as string);
@@ -269,7 +269,93 @@ describe('Logged-in User', function () {
     );
   });
 
-  it('Should be able to see community lesson in Progress Tab', async function () {});
+  it(
+    'should be able to see community lesson in Progress Tab',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 1');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 1');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.expectScreenshotToMatch(
+        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+        __dirname
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        ['Explore Title 1'],
+        0
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should be able to see 5 community lessons in Progress Tab and use "Display More" Button to see the 6th Community Lesson',
+    async function () {
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 2');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 2');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 3');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 3');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 4');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 4');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 5');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 5');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+
+      await loggedInUser.navigateToCommunityLibraryOnNavbar();
+      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInUser.searchForLessonInSearchBar('Explore Title 6');
+      await loggedInUser.playLessonFromSearchResults('Explore Title 6');
+      await loggedInUser.continueToNextCard();
+      await loggedInUser.navigateToLearnerDashboard();
+      await loggedInUser.navigateToProgressSection();
+      await loggedInUser.expectScreenshotToMatch(
+        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
+        __dirname
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Lessons in progress',
+        [
+          'Explore Title 6',
+          'Explore Title 5',
+          'Explore Title 4',
+          'Explore Title 3',
+          'Explore Title 2',
+        ],
+        0
+      );
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
