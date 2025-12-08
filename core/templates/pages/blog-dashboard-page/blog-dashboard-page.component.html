@@ -1,6 +1,6 @@
 <div *ngIf="activeTab === 'main'">
   <mat-card *ngIf="blogDashboardData" class="oppia-page-card blog-dashboard-card">
-    <mat-card-header class="blog-dashboard-header mr-0">
+    <mat-card-header class="blog-dashboard-header me-0">
       <picture>
         <source type="image/webp" [srcset]="authorProfilePicWebpUrl">
         <source type="image/png" [srcset]="authorProfilePicPngUrl">
@@ -21,7 +21,7 @@
                 class="new-post-button e2e-test-create-blog-post-button e2e-test-new-post-button"
                 (click)="createNewBlogPost()">
           <mat-icon class="new-post-icon position-absolute">+</mat-icon>
-          <span class="d-flex pl-3">
+          <span class="d-flex ps-3">
             {{ 'I18N_BLOG_DASHBOARD_PAGE_NEW_POST_BUTTON' | translate | uppercase }}
           </span>
         </button>

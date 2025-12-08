@@ -179,8 +179,10 @@ const editClassroomTeaserTextInputField =
 const editClassroomUrlFragmentInputField = '.e2e-update-classroom-url-fragment';
 const editClassroomTopicListIntroInputField =
   '.e2e-test-update-classroom-topic-list-intro';
-const classroomThumbnailContainer = '.e2e-test-classroom-thumbnail-container';
-const classroomBannerContainer = '.e2e-test-classroom-banner-container';
+const classroomThumbnailContainer =
+  '.e2e-test-classroom-thumbnail-container .e2e-test-photo-button';
+const classroomBannerContainer =
+  '.e2e-test-classroom-banner-container .e2e-test-photo-button';
 const imageUploaderModal = '.e2e-test-image-uploader-modal';
 const openTopicDropdownButton = '.e2e-test-add-topic-to-classroom-button';
 const topicDropDownFormField = '.e2e-test-classroom-category-dropdown';
