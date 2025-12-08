@@ -690,11 +690,11 @@ export class MusicNotesInputComponent
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
   }
 
-  isCloneOffStaff(helperClone: JQuery<HTMLElement>): boolean {
-    return !(
-      helperClone.position().top > this.staffTop &&
-      helperClone.position().top < this.staffBottom
-    );
+  isCloneOffStaff(helperClone: HTMLElement): boolean {
+    const rect = helperClone.getBoundingClientRect();
+    const top = rect.top;
+
+    return !(top > this.staffTop && top < this.staffBottom);
   }
 
   isLedgerLineNote(lineValue: string): boolean {
