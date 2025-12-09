@@ -2740,21 +2740,29 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
+  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        // If we know the modal should appear, we can wait longer.
+        timeout: failIfMissing ? 20000 : 5000,
       });
       await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
+      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`Welcome Modal not found, but test can be continued.
-        Error: ${error.message}`);
+      if (!failIfMissing) {
+        showMessage(
+          'Welcome Modal not found, but test can be continued.\n' +
+            `Error: ${error.message}`
+        );
+      } else {
+        throw new Error(
+          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        );
+      }
     }
   }
 
