@@ -47,7 +47,7 @@ jobs:
       - name: Black formatter code
         uses: psf/black@stable
         with:
-          options: "--check --verbose"
+          options: "--check --verbose ."
           version: "25.9.0"
       - name: Explain how to fix the issue
         if: ${{ failure() }}
