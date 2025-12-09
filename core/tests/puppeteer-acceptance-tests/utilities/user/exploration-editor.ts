@@ -2757,8 +2757,20 @@ export class ExplorationEditor extends BaseUser {
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
       showMessage(`Welcome Modal not found, but test can be continued.
-        Error: ${error.message}`);
+        Error: ${(error as Error).message}`);
     }
+  }
+
+  /**
+   * Function to dismiss welcome modal if it is present. This is useful when
+   * the modal may or may not appear due to race conditions or when it has
+   * already been dismissed earlier in the test flow.
+   */
+  async dismissWelcomeModalIfPresent(): Promise<void> {
+    // The existing dismissWelcomeModal() in this class already handles the
+    // case where the modal is not present (via try/catch), so we just
+    // delegate to it.
+    await this.dismissWelcomeModal();
   }
 
   /**
@@ -2811,7 +2823,7 @@ export class ExplorationEditor extends BaseUser {
   async updateCardContent(content: string): Promise<void> {
     // Dismiss the welcome modal if it appears (handles race condition where
     // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -6536,7 +6548,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     // Dismiss the welcome modal if it appears (handles race condition where
     // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModalIfPresent();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6552,7 +6564,7 @@ export class ExplorationEditor extends BaseUser {
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
     // Dismiss the welcome modal if it appears (handles race condition where
     // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -6640,7 +6652,7 @@ export class ExplorationEditor extends BaseUser {
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
     // Dismiss the welcome modal if it appears (handles race condition where
     // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModal();
+    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
