@@ -293,7 +293,7 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should be able to see 5 community lessons in Progress Tab and use "Display More" Button to see the 6th Community Lesson', async function () {
+  it('should be able to see community lessons in Progress Tab and use "Display More" Button to see the collapseed Community Lesson', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToCommunityLibraryOnNavbar();
     await loggedInUser.expectToBeOnCommunityLibraryPage();
@@ -339,83 +339,39 @@ describe('Logged-in User', function () {
       'learnerDashboardProgressTabCommunityLessons6Lessons',
       __dirname
     );
-    // await loggedInUser.expectLessonCardProgressToBe(
-    //   'Community Lessons',
-    //   [
-    //     'Explore Title 6',
-    //     'Explore Title 5',
-    //     'Explore Title 4',
-    //     'Explore Title 3',
-    //     'Explore Title 2',
-    //   ],
-    //   0,
-    //   'In Progress',
-    // );
-
-    await loggedInUser.expectElementToBeVisible(
-      'communityLessonToggleButton',
-      true
+    await loggedInUser.expectCommunityLessonsCollapsed();
+    await loggedInUser.expectLessonCardProgressToBe(
+      'Community Lessons',
+      [
+        'Explore Title 6',
+        'Explore Title 5',
+        'Explore Title 4',
+        'Explore Title 3',
+        'Explore Title 2',
+        'Explore Title 1',
+      ],
+      0,
+      'In Progress'
     );
+    await loggedInUser.expectDisplayMoreCommunityLessonsToBeVisible();
   });
 
   it(
-    'should be able to toggle the "Display More" button and be able to see community lesson "Explore Title 1" along with rest 5 cards',
+    'should toggle Display More button for community lessons',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
 
-      // Before Toggling: Explore Title 1 not shown (only 5 visible cards).
-      await loggedInUser.expectLessonCardProgressToBe(
-        'Community Lessons',
-        [
-          'Explore Title 6',
-          'Explore Title 5',
-          'Explore Title 4',
-          'Explore Title 3',
-          'Explore Title 2',
-        ],
-        0,
-        'In Progress'
-      );
+      // Initial state.
+      await loggedInUser.expectCommunityLessonsCollapsed();
 
-      // After Toggling: Explore Title 1 also shown along with the other 5 cards.
+      // Expand.
       await loggedInUser.toggleDisplayMoreCommunityLessons();
-      await loggedInUser.expectScreenshotToMatch(
-        'expandedInProgressCommunityLessonsShowingExploreTitle1',
-        __dirname
-      );
-      await loggedInUser.expectLessonCardProgressToBe(
-        'Community Lessons',
-        [
-          'Explore Title 6',
-          'Explore Title 5',
-          'Explore Title 4',
-          'Explore Title 3',
-          'Explore Title 2',
-          'Explore Title 1',
-        ],
-        0,
-        'In Progress'
-      );
+      await loggedInUser.expectCommunityLessonsExpanded();
 
-      // Toggling Again: Explore Title 1 not shown again (back to 5 cards).
+      // Collapse again.
       await loggedInUser.toggleDisplayMoreCommunityLessons();
-      await loggedInUser.expectScreenshotToMatch(
-        'expandedInProgressCommunityLessonsNotShowingExploreTitle1',
-        __dirname
-      );
-      await loggedInUser.expectLessonCardProgressToBe(
-        'Community Lessons',
-        [
-          'Explore Title 6',
-          'Explore Title 5',
-          'Explore Title 4',
-          'Explore Title 3',
-          'Explore Title 2',
-        ],
-        0,
-        'In Progress'
-      );
+      await loggedInUser.expectCommunityLessonsCollapsed();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -453,7 +409,12 @@ describe('Logged-in User', function () {
         'tabSection'
       );
       await loggedInUser.expectElementsToBePresent(
-        ['Community Lessons', 'Skills', 'Community Lessons'],
+        [
+          'Community Lessons',
+          'Classroom Lessons',
+          'Community Lessons',
+          'Skills',
+        ],
         'cardDisplay'
       );
       await loggedInUser.expectLessonCardProgressToBe(

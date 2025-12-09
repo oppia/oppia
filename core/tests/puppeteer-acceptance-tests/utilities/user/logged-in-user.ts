@@ -73,6 +73,14 @@ const confirmRemovalFromPlayLaterButton =
   '.e2e-test-confirm-delete-interaction';
 const playLaterSectionSelector = '.e2e-test-play-later-section';
 const communityLessonToggleButton = '.e2e-test-toggle-community-lesson-button';
+const communityLessonChevronUp =
+  '.e2e-test-toggle-community-lesson-button .fa-chevron-up';
+const communityLessonChevronDown =
+  '.e2e-test-toggle-community-lesson-button .fa-chevron-down';
+const communityLessonsExpanded =
+  '.e2e-test-card-display-content.card-display-content-shown';
+const communityLessonsCollapsed =
+  '.e2e-test-card-display-content.card-display-content-hidden';
 const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
@@ -3513,12 +3521,33 @@ export class LoggedInUser extends BaseUser {
       expect(numericProgress).toBe(progress);
     }
   }
+  /**
+   * Verifies that "Display More" button on Community Lessons is Visible
+   */
+  async expectDisplayMoreCommunityLessonsToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(communityLessonToggleButton);
+  }
+
+  /**
+   * Verifies that the Display more button is not toggeled and currently is not Expanded.
+   */
+  async expectCommunityLessonsExpanded(): Promise<void> {
+    await this.expectElementToBeVisible(communityLessonsExpanded, true);
+    await this.expectElementToBeVisible(communityLessonChevronUp, true);
+  }
+  /**
+   * Verifies that the Display more button is toggeled and currently is Expanded.
+   */
+  async expectCommunityLessonsCollapsed(): Promise<void> {
+    await this.expectElementToBeVisible(communityLessonsCollapsed, true);
+    await this.expectElementToBeVisible(communityLessonChevronDown, true);
+  }
 
   /**
    * Toggle the "Display More" button on Community Lessons
    */
   async toggleDisplayMoreCommunityLessons(): Promise<void> {
-    await this.page.waitForSelector(communityLessonToggleButton);
+    await this.expectDisplayMoreCommunityLessonsToBeVisible();
     const buttonElement = await this.page.$(communityLessonToggleButton);
     if (!buttonElement) {
       throw new Error('Display More button not found.');
