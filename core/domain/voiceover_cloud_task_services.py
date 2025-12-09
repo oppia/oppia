@@ -87,7 +87,10 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
     )
 
     # List of domain instances for the voiceover regeneration requests.
-    voiceover_regeneration_task_domain_objects = []
+    voiceover_regeneration_task_domain_objects: list[
+        cloud_task_domain.VoiceoverRegenerationTaskMapping
+    ] = []
+    voiceover_regeneration_tasks_to_delete = []
 
     for task_mapping_model in voiceover_regeneration_task_requests:
         voiceover_regeneration_task = (
@@ -98,16 +101,12 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
             )
         )
 
-        if voiceover_regeneration_task.are_all_voiceovers_generated():
-            delete_voiceover_regeneration_task_run_mapping(
-                voiceover_regeneration_task.exploration_id,
-                voiceover_regeneration_task.task_run_id,
-            )
-            continue
-
         voiceover_regeneration_task_domain_objects.append(
             voiceover_regeneration_task
         )
+
+        if voiceover_regeneration_task.are_all_voiceovers_generated():
+            voiceover_regeneration_tasks_to_delete.append(task_mapping_model)
 
     # If multiple voiceover-regeneration requests exist in the Cloud Task queue
     # for the same exploration ID, they should be merged into a single
@@ -116,6 +115,12 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
         resolve_multiple_cloud_task_runs_for_exploration(
             voiceover_regeneration_task_domain_objects
         )
+    )
+
+    # Deleting the voiceover regeneration task run mapping if all
+    # voiceovers have been generated successfully.
+    cloud_task_models.VoiceoverRegenerationTaskMappingModel.delete_multi(
+        voiceover_regeneration_tasks_to_delete
     )
 
     return {

@@ -42,10 +42,7 @@ import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityVoiceovers} from 'domain/voiceover/entity-voiceovers.model';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
-import {
-  LanguageAccentToDescription,
-  VoiceoverBackendApiService,
-} from 'domain/voiceover/voiceover-backend-api.service';
+import {LanguageAccentToDescription} from 'domain/voiceover/voiceover-backend-api.service';
 import {ExplorationChangeEditVoiceovers} from 'domain/exploration/exploration-draft.model';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
@@ -125,7 +122,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     private translationStatusService: TranslationStatusService,
     private graphDataService: GraphDataService,
     private stateEditorService: StateEditorService,
-    private voiceoverBackendApiService: VoiceoverBackendApiService,
     private entityTranslationsService: EntityTranslationsService,
     private voiceoverLanguageManagementService: VoiceoverLanguageManagementService,
     private platformFeatureService: PlatformFeatureService,
@@ -204,11 +200,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
     this.pollingSub =
       this.voiceoverRegenerationTaskMappingService.status$.subscribe(() => {
-        this.automaticVoiceoverGenerationStatus =
-          this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
-            this.languageAccentCode,
-            this.activeContentId
-          );
         this.updateAutomaticVoiceoverWithRegenerationStatus();
       });
 
@@ -317,14 +308,25 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
   }
 
   updateAutomaticVoiceoverWithRegenerationStatus(): void {
-    // Note: No action is needed if voiceover generation succeeded.
-    if (this.automaticVoiceoverGenerationStatus === 'FAILED') {
+    const voiceoverGenerationStatus =
+      this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+        this.languageAccentCode,
+        this.activeContentId
+      );
+
+    if (voiceoverGenerationStatus === 'SUCCEEDED') {
+      this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
+        this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
+      });
+    } else if (voiceoverGenerationStatus === 'FAILED') {
       this.automaticVoiceover = undefined;
+      this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
     } else if (
-      this.automaticVoiceoverGenerationStatus === 'GENERATING' &&
+      voiceoverGenerationStatus === 'GENERATING' &&
       this.automaticVoiceover
     ) {
       this.automaticVoiceover.needsUpdate = true;
+      this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
     }
   }
 
@@ -345,11 +347,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         languageAccentCode
       );
 
-      this.automaticVoiceoverGenerationStatus =
-        this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
-          this.languageAccentCode,
-          this.activeContentId
-        );
+      this.updateAutomaticVoiceoverWithRegenerationStatus();
     }
 
     this.updateContentAvailabilityStatusForVoiceovers();
@@ -390,11 +388,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           );
           this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
 
-          this.automaticVoiceoverGenerationStatus =
-            this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
-              this.languageAccentCode,
-              this.activeContentId
-            );
+          this.updateAutomaticVoiceoverWithRegenerationStatus();
         }
       });
     }
@@ -452,11 +446,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.setActiveContentAutomaticVoiceover();
     this.updateStatusGraph();
 
-    this.automaticVoiceoverGenerationStatus =
-      this.voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
-        this.languageAccentCode,
-        this.activeContentId
-      );
+    this.updateAutomaticVoiceoverWithRegenerationStatus();
   }
 
   setActiveContentManualVoiceover(): void {

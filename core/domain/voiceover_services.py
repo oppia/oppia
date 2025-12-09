@@ -302,19 +302,27 @@ def compute_voiceover_related_change(
             )
 
             for entity_voiceovers in all_entity_voiceovers:
-                if entity_voiceovers.language_accent_code in (
-                    language_accent_codes
+                # If the language code is English, it indicates that the
+                # English content was modified, so all associated manual
+                # voiceovers must be marked as needing update.
+                if (
+                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    and entity_voiceovers.language_accent_code
+                    not in language_accent_codes
                 ):
-                    entity_voiceovers.mark_manual_voiceovers_as_needing_update(
-                        change.content_id
-                    )
+                    continue
+
+                entity_voiceovers.mark_manual_voiceovers_as_needing_update(
+                    change.content_id
+                )
+
         elif change.cmd == exp_domain.CMD_REMOVE_VOICEOVERS:
             language_code = change.language_code
             language_accent_codes = language_code_to_language_accent_mapping[
                 language_code
             ].keys()
-            all_entity_voiceovers = (
-                entity_voiceover_id_to_entity_voiceovers.values()
+            all_entity_voiceovers: List[voiceover_domain.EntityVoiceovers] = (
+                list(entity_voiceover_id_to_entity_voiceovers.values())
             )
 
             for entity_voiceovers in all_entity_voiceovers:
@@ -323,6 +331,9 @@ def compute_voiceover_related_change(
                 ):
                     entity_voiceovers.remove_voiceover(
                         change.content_id, feconf.VoiceoverType.MANUAL
+                    )
+                    entity_voiceovers.remove_voiceover(
+                        change.content_id, feconf.VoiceoverType.AUTO
                     )
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():

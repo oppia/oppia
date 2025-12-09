@@ -33,7 +33,7 @@
           {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
 
-        <div>
+        <div class="voiceover-action-buttons">
           <button (click)="toggleAudioNeedsUpdate()"
                   class="e2e-test-audio-status-update-button"
                   [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
@@ -86,7 +86,7 @@
           <span class="voiceover-timer">
             {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
           </span>
-          <div>
+          <div class="voiceover-action-buttons">
             <button (click)="generateVoiceover()"
                     [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers"
                     class="regenerate-voiceover-button">
@@ -127,7 +127,8 @@
             </span>
           </div>
         </div>
-        <div class="add-voiceover-button-container" *ngIf="!automaticVoiceover">
+        <div class="add-voiceover-button-container"
+             *ngIf="!automaticVoiceover && automaticVoiceoverGenerationStatus !== 'GENERATING'">
           <button (click)="generateVoiceover()"
                   class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
                   [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
@@ -167,6 +168,10 @@
 </mat-card>
 
 <style>
+  .voiceover-action-buttons {
+    display: flex;
+    margin-left: 10px;
+  }
   .voiceover-type-heading {
     font-weight: bold;
     margin: 2%;
@@ -211,7 +216,6 @@
   }
   .voiceover-timer {
     text-align: center;
-    width: 25%;
   }
   .audio-button {
     background-color: #009688;

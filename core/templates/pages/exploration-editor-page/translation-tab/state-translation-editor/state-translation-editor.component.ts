@@ -115,8 +115,9 @@ export class StateTranslationEditorComponent implements OnInit, OnDestroy {
         })
         .result.then(
           () => {
-            this.entityVoiceoversService.markManualVoiceoverAsNeedingUpdate(
-              contentId
+            this.changeListService.markVoiceoversAsNeedingUpdate(
+              contentId,
+              languageCode
             );
           },
           () => {
