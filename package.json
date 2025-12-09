@@ -38,7 +38,7 @@
     "@types/jasmine": "^3.3.12",
     "@types/jasminewd2": "^2.0.8",
     "@types/jest": "^27.5.1",
-    "@types/jest-image-snapshot": "^6.2.0",
+    "@types/jest-image-snapshot": "^5.1.0",
     "@types/jquery": "^3.3.29",
     "@types/jqueryui": "^1.12.1",
     "@types/js-yaml": "^4.0.5",
@@ -88,8 +88,8 @@
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^7.0.0",
-    "jest": "^28.0.0",
-    "jest-image-snapshot": "~6.2.0",
+    "jest": "^27.5.1",
+    "jest-image-snapshot": "~5.1.0",
     "jquery": "^3.4.0",
     "karma": "^6.0.0",
     "karma-chrome-launcher": "^3.1.0",
@@ -216,6 +216,6 @@
   "resolutions": {
     "@types/babel__traverse": "7.20.6",
     "pretty-format": "27.0.0",
-    "expect": "28.1.3"
+    "expect": "27.0.0"
   }
 }

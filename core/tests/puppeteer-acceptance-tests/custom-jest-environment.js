@@ -22,11 +22,11 @@
 const fs = require('fs');
 const path = require('path');
 const {showMessage} = require('./utilities/common/show-message');
-const {TestEnvironment} = require('jest-environment-node');
+const NodeEnvironment = require('jest-environment-node');
 
 const CONFIG_FILE = path.resolve(__dirname, 'jest-runtime-config.json');
 
-class CustomJestEnvironment extends TestEnvironment {
+class CustomJestEnvironment extends NodeEnvironment {
   async handleTestEvent(event) {
     if (event.name === 'test_done' && event.test.errors.length > 0) {
       showMessage('Test failed: Capturing screenshots...');

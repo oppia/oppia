@@ -1057,7 +1057,6 @@ export class BaseUser {
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
         storeReceivedOnFailure: true, // Store the new screenshots seperately from the composed diff screenshots on failure.
-        customReceivedPostfix: '',
         customReceivedDir: __dirname.startsWith('/home/runner')
           ? path.join(
               testConstants.TEST_SNAPSHOTS_DIR,
