@@ -917,9 +917,9 @@ export class CkEditor4RteComponent
   }
 
   ngOnDestroy(): void {
-    if (this.ck){
+    if (this.ck) {
       this.ck.destroy();
-    };
+    }
     this.subscriptions.unsubscribe();
   }
 }
