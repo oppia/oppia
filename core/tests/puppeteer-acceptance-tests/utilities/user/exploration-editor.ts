@@ -2650,11 +2650,7 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
-      await this.waitForPageToFullyLoad();
-      await this.page.waitForSelector(explorationIdElement, {
-        visible: true,
-        timeout: 60000,
-      });
+      await this.page.waitForSelector(explorationIdElement);
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
         element => (element as HTMLElement).innerText
