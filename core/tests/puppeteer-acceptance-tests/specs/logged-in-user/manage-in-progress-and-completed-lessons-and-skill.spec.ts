@@ -419,6 +419,18 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.expectLessonCardProgressToBe(
         'Community Lessons',
+        [
+          'Explore Title 5',
+          'Explore Title 4',
+          'Explore Title 3',
+          'Explore Title 2',
+          'Explore Title 1',
+        ],
+        0,
+        'In Progress'
+      );
+      await loggedInUser.expectLessonCardProgressToBe(
+        'Community Lessons',
         ['Explore Title 6'],
         100,
         'Completed'

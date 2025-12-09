@@ -423,7 +423,7 @@
           </oppia-card-display>
         </div>
       </div>
-      <div tabindex="0" class="oppia-learner-dash-section e2e-test-completed-community-lessons-section w-100" *ngIf="totalCompletedLessonsList.length !== 0 || learntTopicsList.length !== 0">
+      <div tabindex="0" class="oppia-learner-dash-section e2e-test-learner-dash-section w-100" *ngIf="totalCompletedLessonsList.length !== 0 || learntTopicsList.length !== 0">
         <p class="oppia-learner-dash-section-heading e2e-test-learner-dash-section-heading"> {{ 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION' | translate }} </p>
          <!--TODO(#18384): Display all lessons in topic or just the most recent/last?-->
         <oppia-card-display *ngIf="learntTopicsList.length !== 0" [headingI18n]="'I18N_LEARNER_DASHBOARD_PROGRESS_SECTION_CLASSROOM'" [numCards]="learntTopicMastery.length" [controlType]="'toggle'">
