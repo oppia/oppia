@@ -35,7 +35,7 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-from typing import List
+from typing import Dict, List, Tuple
 
 
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
@@ -1412,10 +1412,14 @@ class TopicEditorTests(
             next_subtopic_id=1,
         )
 
-        def fake_rubrics_fn(skill_ids) -> None:
+        def fake_rubrics_fn(
+            skill_ids: List[str],
+        ) -> Tuple[Dict[str, List[str]], List[str]]:
             return ({sid: [] for sid in skill_ids}, [])
 
-        def fake_desc_fn(skill_ids) -> None:
+        def fake_desc_fn(
+            skill_ids: List[str],
+        ) -> Tuple[Dict[str, str], List[str]]:
             return ({sid: 'A useful description' for sid in skill_ids}, [])
 
         with self.swap(
