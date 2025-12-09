@@ -39,7 +39,7 @@ export class VoiceoverRegenerationTaskMappingService {
   );
   public status$ = this.statusSubject.asObservable();
 
-  private pollingSub: Subscription | null = null;
+  public pollingSub: Subscription | null = null;
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -48,7 +48,7 @@ export class VoiceoverRegenerationTaskMappingService {
     this.startPolling();
   }
 
-  private async getLatestVoiceoverRegenerationStatus(): Promise<void> {
+  async getLatestVoiceoverRegenerationStatus(): Promise<void> {
     const status =
       await this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
         this.explorationID
@@ -80,7 +80,7 @@ export class VoiceoverRegenerationTaskMappingService {
     this.statusSubject.next(this.languageAccentToContentStatusMap);
   }
 
-  private startPolling(): void {
+  startPolling(): void {
     if (this.pollingSub) {
       this.pollingSub.unsubscribe();
     }

@@ -17,12 +17,21 @@
  * working as expected.
  */
 
-import {TestBed, waitForAsync} from '@angular/core/testing';
+import {
+  fakeAsync,
+  TestBed,
+  tick,
+  waitForAsync,
+  flush,
+  discardPeriodicTasks,
+} from '@angular/core/testing';
 import {VoiceoverRegenerationTaskMappingService} from './voiceover-regeneration-task-mapping-service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 
 describe('Voiceover regeneration task mapping service', () => {
   let voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService;
+  let voiceoverBackendApiService: VoiceoverBackendApiService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -34,13 +43,24 @@ describe('Voiceover regeneration task mapping service', () => {
     voiceoverRegenerationTaskMappingService = TestBed.inject(
       VoiceoverRegenerationTaskMappingService
     );
+    voiceoverBackendApiService = TestBed.inject(VoiceoverBackendApiService);
   });
 
-  it('should be able to initialize the service', () => {
+  it('should be able to initialize the service', fakeAsync(() => {
     voiceoverRegenerationTaskMappingService.explorationID = '';
+
+    spyOn(
+      voiceoverBackendApiService,
+      'fetchLatestVoiceoverRegenerationStatusAsync'
+    ).and.returnValue(Promise.resolve({}));
+
     voiceoverRegenerationTaskMappingService.init('exp1');
+    flush();
+    discardPeriodicTasks();
+    tick();
+
     expect(voiceoverRegenerationTaskMappingService.explorationID).toBe('exp1');
-  });
+  }));
 
   it('should be able to get content regeneration status', async () => {
     voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap = {
