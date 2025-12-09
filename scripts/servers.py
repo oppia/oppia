@@ -162,7 +162,7 @@ def managed_dev_appserver(
     host: str = '0.0.0.0',
     port: int = 8080,
     admin_host: str = '0.0.0.0',
-    admin_port: int = 8000,
+    admin_port: int = feconf.GAE_ADMIN_SERVER_PORT,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False,
