@@ -23,7 +23,6 @@ from __future__ import annotations
 import logging
 
 from core import feconf
-from core.constants import constants
 from core.controllers import base
 from core.domain import (
     platform_parameter_list,
@@ -450,8 +449,6 @@ def ensure_disk_space_sufficient(es_client: Any) -> None:
         InternalErrorException. If filesystem statistics cannot be read from the
             cluster, or if disk usage exceeds the configured high watermark.
     """
-    if constants.EMULATOR_MODE:
-        return
     try:
         stats = es_client.nodes.stats(metric='fs')
 
