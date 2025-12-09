@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-
 """Controllers for validating access."""
 
 from __future__ import annotations
@@ -70,9 +69,7 @@ class ClassroomAccessValidationHandler(
         classroom_url_fragment = self.normalized_request[
             'classroom_url_fragment'
         ]
-        classroom = classroom_config_services.get_classroom_by_url_fragment(
-            classroom_url_fragment
-        )
+        classroom = classroom_config_services.get_classroom_by_url_fragment(classroom_url_fragment)
 
         if not classroom:
             raise self.NotFoundException
