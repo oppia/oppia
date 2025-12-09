@@ -57,6 +57,9 @@ import {UserInfo} from '../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
+import { Subject } from 'rxjs';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
 
 class MockWindowRef {
   nativeWindow = {
@@ -134,7 +137,7 @@ describe('Tutor card component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [HttpClientTestingModule,NoopAnimationsModule],
       declarations: [TutorCardComponent, MockTranslatePipe],
       providers: [
         AudioBarStatusService,
@@ -300,6 +303,109 @@ describe('Tutor card component', () => {
       'User is logged out setting default chapters count'
     );
   }));
+
+  it('should correctly initialize state and progress bar after async chapter count update', fakeAsync(() => {
+    const expectedCount = 5;
+    const expectedShouldShowProgressBar = true;
+    componentInstance.displayedCard = mockDisplayedCard
+
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount').and.returnValue(
+      Promise.resolve()
+    );
+    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
+      expectedCount
+    );
+    spyOn(
+      componentInstance,
+      'setNextMilestoneAndCheckIfProgressBarIsShown'
+    ).and.returnValue(expectedShouldShowProgressBar);
+    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+    spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
+      new Subject<void>() 
+    );
+
+    fixture.detectChanges(); 
+
+    expect(
+      chapterProgressService.updateCompletedChaptersCount
+    ).toHaveBeenCalledWith(true);
+
+    tick(); 
+
+    expect(componentInstance.completedChaptersCount).toBe(expectedCount);
+    expect(
+      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown
+    ).toHaveBeenCalled();
+    expect(componentInstance.shouldShowProgressBar).toBe(
+      expectedShouldShowProgressBar
+    );
+  }));
+
+  it('should render the Milestone Completion Message when shouldShowProgressBar is FALSE', () => {
+    componentInstance.displayedCard = mockDisplayedCard
+    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
+    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+    spyOn(componentInstance, 'getMilestoneMessageIsToBeDisplayed').and.returnValue(true);
+    spyOn(componentInstance, 'generateMilestoneMessage').and.returnValue('Great Job!');
+
+    componentInstance.shouldShowProgressBar = false;
+    spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
+    new Subject<void>() 
+    );
+
+    fixture.detectChanges();
+
+    let milestoneMessage = fixture.nativeElement.querySelector('.milestone-message-star-container');
+    expect(milestoneMessage).not.toBeNull();
+
+    let progressBar = fixture.nativeElement.querySelector('.milestone-progress-bar-container');
+    expect(progressBar).toBeNull();
+  });
+
+  it('should render the Progress Bar when shouldShowProgressBar is TRUE', () => {
+    componentInstance.displayedCard = mockDisplayedCard
+
+    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
+    spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
+
+    componentInstance.shouldShowProgressBar = true;
+    componentInstance.completedChaptersCount = 3;
+    componentInstance.nextMilestoneChapterCount = 5;
+
+    spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
+      new Subject<void>() 
+    );
+
+    fixture.detectChanges();
+
+    let progressBar = fixture.nativeElement.querySelector('.milestone-message-progress-bar-container');
+
+    expect(progressBar).not.toBeNull();
+
+    let innerBar = fixture.nativeElement.querySelector('.milestone-progress-bar-inner');
+
+    expect(innerBar.style.width).toBe('60%'); // Check the data binding
+
+    let milestoneMessage = fixture.nativeElement.querySelector('.milestone-message-star-container');
+    let completionDiv = fixture.nativeElement.querySelector('.milestone-message-star-container');
+
+    expect(completionDiv).not.toBeNull();
+    expect(milestoneMessage).not.toBeNull();
+
+    let completionMessageText = fixture.nativeElement.querySelector('.milestone-message-text');
+    let progressMessageWrapper = fixture.nativeElement.querySelector('.milestone-progress-message');
+
+    expect(completionMessageText).not.toBeNull();
+    expect(progressMessageWrapper).not.toBeNull();
+  });
+
+  it('should set shouldShowProgressBar to false during cleanup (ngOnDestroy)', () => {
+    componentInstance.shouldShowProgressBar = true;
+
+    componentInstance.ngOnDestroy();
+
+    expect(componentInstance.shouldShowProgressBar).toBe(false);
+  });
 
   it('should set default profile pictures when username is null', fakeAsync(() => {
     spyOn(componentInstance, 'updateDisplayedCard');
