@@ -642,6 +642,24 @@ class CommonTests(test_utils.GenericTestBase):
             self.assertTrue(common.is_port_in_use(port))
         self.assertFalse(common.is_port_in_use(port))
 
+    def test_get_ports_in_use(self) -> None:
+        with self.open_tcp_server_port() as port_in_use:
+            # Test with one port in use and one not in use.
+            ports = [port_in_use, port_in_use + 1]
+            in_use = common.get_ports_in_use(ports)
+            self.assertEqual(in_use, [port_in_use])
+
+            # Test with no ports in use.
+            ports_not_in_use = [port_in_use + 1, port_in_use + 2]
+            in_use_empty = common.get_ports_in_use(ports_not_in_use)
+            self.assertEqual(in_use_empty, [])
+
+            # Test with all ports in use.
+            with self.open_tcp_server_port() as port_in_use2:
+                ports_all_in_use = [port_in_use, port_in_use2]
+                in_use_all = common.get_ports_in_use(ports_all_in_use)
+                self.assertEqual(set(in_use_all), set(ports_all_in_use))
+
     def test_wait_for_port_to_not_be_in_use_port_never_closes(self) -> None:
         def mock_sleep(unused_seconds: int) -> None:
             return
