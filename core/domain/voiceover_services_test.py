@@ -22,7 +22,7 @@ import datetime
 import json
 import os
 
-from core import feconf, schema_utils, utils
+from core import feconf, schema_utils
 from core.constants import constants
 from core.domain import exp_domain, exp_services
 from core.domain import platform_parameter_list as param_list
@@ -774,7 +774,7 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
         file_path = os.path.join(
             feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
         )
-        with utils.open_file(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
                 f.read()
             )
@@ -794,7 +794,7 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             feconf.VOICEOVERS_DATA_DIR,
             'autogeneratable_language_accent_list.json',
         )
-        with utils.open_file(file_path, 'r') as f:
+        with open(file_path, 'r', encoding='utf-8') as f:
             autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
                 json.loads(f.read())
             )

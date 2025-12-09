@@ -36,34 +36,12 @@ import tempfile
 import time
 from urllib import request as urlrequest
 
-from core import utils
 from core.tests import test_utils
-from scripts import servers
 
 import yaml
 from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common
-
-
-class MockCompiler:
-    def wait(self) -> None:  # pylint: disable=missing-docstring
-        pass
-
-
-class MockCompilerContextManager:
-    def __init__(self) -> None:
-        pass
-
-    def __enter__(self) -> MockCompiler:
-        return MockCompiler()
-
-    def __exit__(self, *unused_args: str) -> None:
-        pass
-
-
-def mock_context_manager() -> MockCompilerContextManager:
-    return MockCompilerContextManager()
 
 
 class CommonTests(test_utils.GenericTestBase):
@@ -82,81 +60,6 @@ class CommonTests(test_utils.GenericTestBase):
         pathlib.Path.unlink(pathlib.Path('mock_app.yaml'), missing_ok=True)
         pathlib.Path.unlink(pathlib.Path('mock_app_dev.yaml'), missing_ok=True)
         super().tearDown()
-
-    def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir:
-            common.run_ng_compilation()
-
-        self.assertNotIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr,
-        )
-
-    def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
-
-        self.assertIn(
-            'Failed to complete ng build compilation, exiting...',
-            self.print_arr,
-        )
-
-    def test_subprocess_error_results_in_failed_ng_build(self) -> None:
-        class MockFailedCompiler:
-            def wait(self) -> None:  # pylint: disable=missing-docstring
-                raise subprocess.CalledProcessError(
-                    returncode=1, cmd='', output='Subprocess execution failed.'
-                )
-
-        class MockFailedCompilerContextManager:
-            def __init__(self) -> None:
-                pass
-
-            def __enter__(self) -> MockFailedCompiler:
-                return MockFailedCompiler()
-
-            def __exit__(self, *unused_args: str) -> None:
-                pass
-
-        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
-            return MockFailedCompilerContextManager()
-
-        swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_failed_context_manager,
-            expected_args=[],
-        )
-        swap_isdir = self.swap_with_checks(
-            os.path,
-            'isdir',
-            lambda _: False,
-            expected_args=[
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-            ],
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
-        )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
-            common.run_ng_compilation()
 
     @contextlib.contextmanager
     def open_tcp_server_port(self) -> Generator[int, None, None]:
@@ -744,7 +647,7 @@ class CommonTests(test_utils.GenericTestBase):
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'temp_file')
         temp_file_path = os.path.join(temp_dirpath, 'temp_file')
-        with utils.open_file(temp_file_path, 'w') as f:
+        with open(temp_file_path, 'w', encoding='utf-8') as f:
             f.write('content')
 
         common.recursive_chown(root_temp_dir, os.getuid(), -1)
@@ -821,7 +724,7 @@ class CommonTests(test_utils.GenericTestBase):
             # In order to silence the MyPy complaints `setattr` is used to set
             # the attribute.
             setattr(temp_file, 'name', 'temp_file')
-            with utils.open_file('temp_file', 'w') as f:
+            with open('temp_file', 'w', encoding='utf-8') as f:
                 f.write('content')
 
             self.assertTrue(os.path.exists('temp_file'))
@@ -917,7 +820,7 @@ class CommonTests(test_utils.GenericTestBase):
             expected_number_of_replacements=1,
         )
 
-        with utils.open_file(origin_filepath, 'r') as f:
+        with open(origin_filepath, 'r', encoding='utf-8') as f:
             self.assertEqual(expected_lines, f.readlines())
         # Revert the file.
         shutil.move(backup_filepath, origin_filepath)
@@ -937,7 +840,7 @@ class CommonTests(test_utils.GenericTestBase):
         )
         shutil.copyfile(origin_filepath, backup_filepath)
 
-        with utils.open_file(origin_filepath, 'r') as f:
+        with open(origin_filepath, 'r', encoding='utf-8') as f:
             origin_content = f.readlines()
 
         with self.assertRaisesRegex(
@@ -950,7 +853,7 @@ class CommonTests(test_utils.GenericTestBase):
                 expected_number_of_replacements=1,
             )
         self.assertFalse(os.path.isfile(new_filepath))
-        with utils.open_file(origin_filepath, 'r') as f:
+        with open(origin_filepath, 'r', encoding='utf-8') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
         # Revert the file.
@@ -969,7 +872,7 @@ class CommonTests(test_utils.GenericTestBase):
         )
         shutil.copyfile(origin_filepath, backup_filepath)
 
-        with utils.open_file(origin_filepath, 'r') as f:
+        with open(origin_filepath, 'r', encoding='utf-8') as f:
             origin_content = f.readlines()
 
         def mock_compile(unused_arg: str) -> NoReturn:
@@ -983,7 +886,7 @@ class CommonTests(test_utils.GenericTestBase):
                 origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
             )
         self.assertFalse(os.path.isfile(new_filepath))
-        with utils.open_file(origin_filepath, 'r') as f:
+        with open(origin_filepath, 'r', encoding='utf-8') as f:
             new_content = f.readlines()
         self.assertEqual(origin_content, new_content)
         # Revert the file.
@@ -993,7 +896,7 @@ class CommonTests(test_utils.GenericTestBase):
         try:
             os.makedirs('readme_test_dir')
             common.create_readme('readme_test_dir', 'Testing readme.')
-            with utils.open_file('readme_test_dir/README.md', 'r') as f:
+            with open('readme_test_dir/README.md', 'r', encoding='utf-8') as f:
                 self.assertEqual(f.read(), 'Testing readme.')
         finally:
             if os.path.exists('readme_test_dir'):
@@ -1184,7 +1087,7 @@ class CommonTests(test_utils.GenericTestBase):
         # In order to silence the MyPy complaints `setattr` is used
         # to set the attribute.
         setattr(constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
+        with open(mock_constants_path, 'w', encoding='utf-8') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": true,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
@@ -1197,12 +1100,14 @@ class CommonTests(test_utils.GenericTestBase):
         # In order to silence the MyPy complaints `setattr` is used
         # to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
+        with open(mock_feconf_path, 'w', encoding='utf-8') as tmp:
             tmp.write('ENABLE_MAINTENANCE_MODE = False')
 
         with constants_path_swap, feconf_path_swap, check_output_swap:
             common.modify_constants(prod_env=True, maintenance_mode=False)
-            with utils.open_file(mock_constants_path, 'r') as constants_file:
+            with open(
+                mock_constants_path, 'r', encoding='utf-8'
+            ) as constants_file:
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
@@ -1212,13 +1117,15 @@ class CommonTests(test_utils.GenericTestBase):
                     '  "SHORT_COMMIT_HASH": "test"\n'
                     '};',
                 )
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False'
                 )
 
             common.modify_constants(prod_env=False, maintenance_mode=True)
-            with utils.open_file(mock_constants_path, 'r') as constants_file:
+            with open(
+                mock_constants_path, 'r', encoding='utf-8'
+            ) as constants_file:
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
@@ -1228,7 +1135,7 @@ class CommonTests(test_utils.GenericTestBase):
                     '  "SHORT_COMMIT_HASH": "test"\n'
                     '};',
                 )
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = True'
                 )
@@ -1252,7 +1159,7 @@ class CommonTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(constants_temp_file, 'name', mock_constants_path)
-        with utils.open_file(mock_constants_path, 'w') as tmp:
+        with open(mock_constants_path, 'w', encoding='utf-8') as tmp:
             tmp.write('export = {\n')
             tmp.write('  "DEV_MODE": false,\n')
             tmp.write('  "EMULATOR_MODE": false,\n')
@@ -1264,12 +1171,14 @@ class CommonTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(feconf_temp_file, 'name', mock_feconf_path)
-        with utils.open_file(mock_feconf_path, 'w') as tmp:
+        with open(mock_feconf_path, 'w', encoding='utf-8') as tmp:
             tmp.write('ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
         with constants_path_swap, feconf_path_swap:
             common.set_constants_to_default()
-            with utils.open_file(mock_constants_path, 'r') as constants_file:
+            with open(
+                mock_constants_path, 'r', encoding='utf-8'
+            ) as constants_file:
                 self.assertEqual(
                     constants_file.read(),
                     'export = {\n'
@@ -1279,7 +1188,7 @@ class CommonTests(test_utils.GenericTestBase):
                     '  "SHORT_COMMIT_HASH": ""\n'
                     '};',
                 )
-            with utils.open_file(mock_feconf_path, 'r') as feconf_file:
+            with open(mock_feconf_path, 'r', encoding='utf-8') as feconf_file:
                 self.assertEqual(
                     feconf_file.read(), 'ENABLE_MAINTENANCE_MODE = False'
                 )
@@ -1363,7 +1272,7 @@ class CommonTests(test_utils.GenericTestBase):
             hashes = {'path/file.js': '123456'}
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file(hashes)
-            with utils.open_file(hashes_path, 'r') as hashes_file:
+            with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                 self.assertEqual(
                     json.loads(hashes_file.read()),
                     {'path/file.js': '123456'},
@@ -1373,7 +1282,7 @@ class CommonTests(test_utils.GenericTestBase):
             hashes = {'file.js': '123456', 'file.min.js': '654321'}
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file(hashes)
-            with utils.open_file(hashes_path, 'r') as hashes_file:
+            with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                 self.assertEqual(
                     json.loads(hashes_file.read()),
                     {'file.min.js': '654321', 'file.js': '123456'},
@@ -1382,7 +1291,7 @@ class CommonTests(test_utils.GenericTestBase):
             # Test writing an empty dict (used by dev/test scripts).
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 common.write_hashes_json_file({})
-            with utils.open_file(hashes_path, 'r') as hashes_file:
+            with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                 self.assertEqual(json.loads(hashes_file.read()), {})
 
 
@@ -1481,7 +1390,7 @@ class UrlRetrieveTests(CommonTests):
 
             with urlopen_swap, self.swap_curl_failure:
                 common.url_retrieve('https://example.com', output_path)
-            with open(output_path, 'rb') as buffer:
+            with open(output_path, 'rb', encoding=None) as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
     def test_url_retrieve_with_successful_https_works_on_retry(self) -> None:
@@ -1504,13 +1413,15 @@ class UrlRetrieveTests(CommonTests):
 
             with urlopen_swap, self.swap_curl_failure:
                 common.url_retrieve('https://example.com', output_path)
-            with open(output_path, 'rb') as buffer:
+            with open(output_path, 'rb', encoding=None) as buffer:
                 self.assertEqual(buffer.read(), b'content')
 
     def test_url_retrieve_runs_out_of_attempts(self) -> None:
         attempts = []
 
-        def mock_open(_path: str, _options: str) -> NoReturn:
+        def mock_open(
+            _path: str, _options: str, encoding: str = 'utf-8'
+        ) -> NoReturn:
             raise AssertionError('open() should not be called')
 
         def mock_urlopen(
@@ -1530,7 +1441,9 @@ class UrlRetrieveTests(CommonTests):
                 common.url_retrieve('https://example.com', 'test_path')
 
     def test_url_retrieve_https_check_fails(self) -> None:
-        def mock_open(_path: str, _options: str) -> NoReturn:
+        def mock_open(
+            _path: str, _options: str, encoding: str = 'utf-8'
+        ) -> NoReturn:
             raise AssertionError('open() should not be called')
 
         def mock_urlopen(
@@ -1567,5 +1480,5 @@ class UrlRetrieveTests(CommonTests):
                 common.url_retrieve(
                     'https://example.com', output_path, enforce_https=False
                 )
-            with open(output_path, 'rb') as buffer:
+            with open(output_path, 'rb', encoding=None) as buffer:
                 self.assertEqual(buffer.read(), b'content')
