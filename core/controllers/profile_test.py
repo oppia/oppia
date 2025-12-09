@@ -1346,7 +1346,7 @@ class SignupTests(test_utils.GenericTestBase):
 
         calls = []
 
-        def mock_set_username(unused_uid, unused_username) -> None:
+        def mock_set_username(unused_uid: str, unused_username: str) -> None:
             calls.append('called')
 
         csrf_token = self.get_new_csrf_token()
@@ -2082,7 +2082,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
 
         calls = []
 
-        def mock_set_viewed(unused_uid):
+        def mock_set_viewed(unused_uid: str) -> None:
             calls.append('called')
 
         csrf_token = self.get_new_csrf_token()
