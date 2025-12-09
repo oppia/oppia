@@ -298,7 +298,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
                 '/profilehandler/data/%s' % self.EDITOR_USERNAME
             )
 
-        # These lists should be empty
+        # These lists should be empty.
         self.assertEqual(response['created_exp_summary_dicts'], [])
         self.assertEqual(response['edited_exp_summary_dicts'], [])
 
@@ -1340,43 +1340,43 @@ class SignupTests(test_utils.GenericTestBase):
 
         user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        # Ensure the user actually has a username stored
+        # Ensure the user actually has a username stored.
         if user_services.get_username(user_id) is None:
             user_services.set_username(user_id, self.EDITOR_USERNAME)
 
         calls = []
 
         def mock_set_username(unused_uid, unused_username):
-            calls.append("called")
+            calls.append('called')
 
         csrf_token = self.get_new_csrf_token()
 
         with self.swap(
             user_services, 'has_fully_registered_account', lambda _: False
-        ), self.swap(user_services, "set_username", mock_set_username):
+        ), self.swap(user_services, 'set_username', mock_set_username):
 
             response = self.post_json(
                 feconf.SIGNUP_DATA_URL,
                 {
-                    "username": self.EDITOR_USERNAME,
-                    "agreed_to_terms": True,
-                    "default_dashboard": constants.DASHBOARD_TYPE_LEARNER,
-                    "can_receive_email_updates": (
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                     ),
                 },
                 csrf_token=csrf_token,
             )
 
-        # Username stays the same
+        # Username stays the same.
         self.assertEqual(
             user_services.get_username(user_id),
             self.EDITOR_USERNAME,
         )
-        # Branch skipped
+        # Branch skipped.
         self.assertEqual(calls, [])
 
-        self.assertFalse(response["bulk_email_signup_message_should_be_shown"])
+        self.assertFalse(response['bulk_email_signup_message_should_be_shown'])
 
     def test_post_user_has_registered_but_not_fully_registered_account(
         self,
@@ -1390,7 +1390,7 @@ class SignupTests(test_utils.GenericTestBase):
         if user_services.get_username(user_id) is None:
             user_services.set_username(user_id, self.EDITOR_USERNAME)
 
-        # Give the user an initial dashboard
+        # Give the user an initial dashboard.
         original_dashboard = constants.DASHBOARD_TYPE_CREATOR
         user_settings = user_services.get_user_settings(user_id)
         user_settings.default_dashboard = original_dashboard
@@ -1406,10 +1406,10 @@ class SignupTests(test_utils.GenericTestBase):
             response = self.post_json(
                 feconf.SIGNUP_DATA_URL,
                 {
-                    "username": self.EDITOR_USERNAME,
-                    "agreed_to_terms": True,
-                    "default_dashboard": constants.DASHBOARD_TYPE_LEARNER,
-                    "can_receive_email_updates": (
+                    'username': self.EDITOR_USERNAME,
+                    'agreed_to_terms': True,
+                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                     ),
                 },
@@ -1419,7 +1419,7 @@ class SignupTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(user_id)
         self.assertEqual(user_settings.default_dashboard, original_dashboard)
 
-        self.assertFalse(response["bulk_email_signup_message_should_be_shown"])
+        self.assertFalse(response['bulk_email_signup_message_should_be_shown'])
 
 
 class DeleteAccountPageTests(test_utils.GenericTestBase):
@@ -1888,7 +1888,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         img2 = MockImage('not_a_data_url', 'img2.bin')
 
         class MockTakeoutObject:
-            user_data = {"hello": "world"}
+            user_data = {'hello': 'world'}
             user_images = [img1, img2]
 
         with self.swap(
@@ -1902,7 +1902,7 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
         zf = zipfile.ZipFile(io.BytesIO(response.body))
 
-        # Only JSON should appear
+        # Only JSON should appear.
         self.assertEqual(zf.namelist(), ['oppia_takeout_data.json'])
 
 
@@ -2080,25 +2080,25 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         calls = []
 
         def mock_set_viewed(unused_uid):
-            calls.append("called")
+            calls.append('called')
 
         csrf_token = self.get_new_csrf_token()
 
         with self.swap(
             user_services,
-            "set_user_has_viewed_lesson_info_modal_once",
+            'set_user_has_viewed_lesson_info_modal_once',
             mock_set_viewed,
         ):
             response = self.put_json(
-                "/userinfohandler/data",
-                {"user_has_viewed_lesson_info_modal_once": False},
+                '/userinfohandler/data',
+                {'user_has_viewed_lesson_info_modal_once': False},
                 csrf_token=csrf_token,
             )
 
-        # Should succeed
-        self.assertEqual(response, {"success": True})
+        # Should succeed.
+        self.assertEqual(response, {'success': True})
 
-        # Should not call the setter
+        # Should not call the setter.
         self.assertEqual(calls, [])
 
         # Confirm flag remains False.
