@@ -3688,7 +3688,7 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    await cardButton.click();
+    await this.clickOnElement(cardButton);
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
