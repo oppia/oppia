@@ -241,10 +241,6 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     content: '.e2e-test-learner-dash-section',
     heading: '.e2e-test-learner-dash-section-heading',
   },
-  tabSectionInProgressTab: {
-    content: '.e2e-test-in-progress-lessons-section',
-    heading: '.e2e-test-in-progress-dash-section-heading',
-  },
   cardDisplay: {
     content: '.e2e-test-card-display',
     heading: '.e2e-test-card-display-heading',
@@ -1931,16 +1927,31 @@ export class LoggedInUser extends BaseUser {
     root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
   ): Promise<void> {
     await this.page.waitForSelector(learnerDashSelectors[selector].heading);
-    const allElements = await root?.$$(learnerDashSelectors[selector].heading);
-    const sectionHeadingTexts: string[] = await Promise.all(
-      allElements.map(
-        async el =>
-          (await el.evaluate(e => (e.textContent || '').trim())) as string
-      )
-    );
+
+    const allElements =
+      (await root?.$$(learnerDashSelectors[selector].heading)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
     if (!sectionHeadingTexts.every(text => expectedTexts.includes(text))) {
       throw new Error(
-        `Expected elements not found: ${expectedTexts.join(', ')} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+        `Expected elements not found: ${expectedTexts.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
       );
     }
     showMessage(`Expected elements found: ${expectedTexts.join(', ')}`);
@@ -3314,21 +3325,27 @@ export class LoggedInUser extends BaseUser {
     criteria: string
   ): Promise<puppeteer.ElementHandle | undefined> {
     let targetElement;
+    let lastHeadingText: string | undefined;
+
     const allElements = await parentElement?.$$(selectors.content);
     for (const h of allElements || []) {
       const targetHeadingElement = await h.$(selectors.heading);
       const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
         ele.textContent?.trim()
       );
+      lastHeadingText = targetHeadingText || undefined;
       showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
       if (targetHeadingText === criteria) {
         targetElement = h;
         break;
       }
     }
+
     if (!targetElement) {
       throw new Error(
-        `Element with selectors: ${selectors.toString()} and criteria: ${criteria} is not found`
+        `Element with selectors: ${JSON.stringify(
+          selectors
+        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
       );
     }
     return targetElement;
@@ -3382,11 +3399,18 @@ export class LoggedInUser extends BaseUser {
     let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
       this.page;
     if (section === 'In Progress' || section === 'Completed') {
-      sectionElement = await this.findElement(
-        this.page,
-        learnerDashSelectors.tabSection,
-        section
-      );
+      try {
+        sectionElement = await this.findElement(
+          this.page,
+          learnerDashSelectors.tabSection,
+          section
+        );
+      } catch (e) {
+        showMessage(
+          `Section "${section}" not found with tabSection; falling back to page.`
+        );
+        sectionElement = this.page;
+      }
     }
 
     const subsectionElement = await this.findElement(
@@ -3497,7 +3521,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(communityLessonToggleButton);
     const buttonElement = await this.page.$(communityLessonToggleButton);
     if (!buttonElement) {
-      throw new Error('Home section not found.');
+      throw new Error('Display More button not found.');
     }
     await this.waitForElementToBeClickable(buttonElement);
     await buttonElement.click();

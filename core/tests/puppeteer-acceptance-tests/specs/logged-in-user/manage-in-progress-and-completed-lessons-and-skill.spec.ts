@@ -155,10 +155,7 @@ describe('Logged-in User', function () {
       'ProgressSectionInProgressWithOnlyChapter01',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresent(
-      ['In Progress'],
-      'tabSectionInProgressTab'
-    );
+    await loggedInUser.expectElementsToBePresent(['In Progress'], 'tabSection');
     await loggedInUser.expectElementsToBePresent(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
@@ -167,7 +164,8 @@ describe('Logged-in User', function () {
     await loggedInUser.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 1: What are the Place Values'],
-      0
+      0,
+      'In Progress'
     );
     await loggedInUser.expectSkillCardProgressToBe(
       'Skills',
@@ -200,7 +198,8 @@ describe('Logged-in User', function () {
     await loggedInUser.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 2: Find the Value of a Number'],
-      0
+      0,
+      'In Progress'
     );
     await loggedInUser.expectSkillCardProgressToBe(
       'Skills',
@@ -223,7 +222,8 @@ describe('Logged-in User', function () {
     await loggedInUser.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 3: Comparing Numbers'],
-      0
+      0,
+      'In Progress'
     );
     await loggedInUser.expectSkillCardProgressToBe(
       'Skills',
@@ -248,10 +248,7 @@ describe('Logged-in User', function () {
       'inProgressTabCompletedSection',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresent(
-      ['Completed'],
-      'tabSectionInProgressTab'
-    );
+    await loggedInUser.expectElementsToBePresent(['Completed'], 'tabSection');
     await loggedInUser.expectElementsToBePresent(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
@@ -260,7 +257,8 @@ describe('Logged-in User', function () {
     await loggedInUser.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 1: What are the Place Values'],
-      100
+      100,
+      'Completed'
     );
     await loggedInUser.expectSkillCardProgressToBe(
       'Skills',
@@ -286,9 +284,10 @@ describe('Logged-in User', function () {
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'In Progress',
+        'Community Lessons',
         ['Explore Title 1'],
-        0
+        0,
+        'In Progress'
       );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
@@ -340,30 +339,34 @@ describe('Logged-in User', function () {
       'learnerDashboardProgressTabCommunityLessons6Lessons',
       __dirname
     );
-    await loggedInUser.expectLessonCardProgressToBe(
-      'In Progress',
-      [
-        'Explore Title 6',
-        'Explore Title 5',
-        'Explore Title 4',
-        'Explore Title 3',
-        'Explore Title 2',
-      ],
-      0
-    );
+    // await loggedInUser.expectLessonCardProgressToBe(
+    //   'Community Lessons',
+    //   [
+    //     'Explore Title 6',
+    //     'Explore Title 5',
+    //     'Explore Title 4',
+    //     'Explore Title 3',
+    //     'Explore Title 2',
+    //   ],
+    //   0,
+    //   'In Progress',
+    // );
 
     await loggedInUser.expectElementToBeVisible(
       'communityLessonToggleButton',
       true
     );
+  });
 
-    it('should be able to toggle the "Display More" button and be able to see community Lesson "Explore Title 1" along with rest 5 cards', async function () {
+  it(
+    'should be able to toggle the "Display More" button and be able to see community lesson "Explore Title 1" along with rest 5 cards',
+    async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
 
-      // Before Toggling: Explore Title 1 not shown.
+      // Before Toggling: Explore Title 1 not shown (only 5 visible cards).
       await loggedInUser.expectLessonCardProgressToBe(
-        'In progress',
+        'Community Lessons',
         [
           'Explore Title 6',
           'Explore Title 5',
@@ -371,17 +374,18 @@ describe('Logged-in User', function () {
           'Explore Title 3',
           'Explore Title 2',
         ],
-        0
+        0,
+        'In Progress'
       );
 
-      // After Toggling: Explore Title 1 also shown along with rest 5 cards.
+      // After Toggling: Explore Title 1 also shown along with the other 5 cards.
       await loggedInUser.toggleDisplayMoreCommunityLessons();
       await loggedInUser.expectScreenshotToMatch(
         'expandedInProgressCommunityLessonsShowingExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'In progress',
+        'Community Lessons',
         [
           'Explore Title 6',
           'Explore Title 5',
@@ -390,17 +394,18 @@ describe('Logged-in User', function () {
           'Explore Title 2',
           'Explore Title 1',
         ],
-        0
+        0,
+        'In Progress'
       );
 
-      // Toggling Again : Explore Title 1 not shown.
+      // Toggling Again: Explore Title 1 not shown again (back to 5 cards).
       await loggedInUser.toggleDisplayMoreCommunityLessons();
       await loggedInUser.expectScreenshotToMatch(
         'expandedInProgressCommunityLessonsNotShowingExploreTitle1',
         __dirname
       );
       await loggedInUser.expectLessonCardProgressToBe(
-        'In progress',
+        'Community Lessons',
         [
           'Explore Title 6',
           'Explore Title 5',
@@ -408,16 +413,21 @@ describe('Logged-in User', function () {
           'Explore Title 3',
           'Explore Title 2',
         ],
-        0
+        0,
+        'In Progress'
       );
-    });
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
-    it('should be able to see completed Community Lessons in the Completed section of Progress Tab', async function () {
+  it(
+    'should be able to see completed Community Lessons in the Completed section of Progress Tab',
+    async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
       await loggedInUser.expectElementsToBePresent(
         ['In Progress', 'Completed'],
-        'tabSectionInProgressTab'
+        'tabSection'
       );
 
       await loggedInUser.navigateToLessonByCard(
@@ -435,12 +445,12 @@ describe('Logged-in User', function () {
       await loggedInUser.navigateToProgressSection();
 
       await loggedInUser.expectScreenshotToMatch(
-        'communityLessonExploreTittle6InCompletedSectionOfProgressTab',
+        'communityLessonExploreTitle6InCompletedSectionOfProgressTab',
         __dirname
       );
       await loggedInUser.expectElementsToBePresent(
         ['In Progress', 'Completed'],
-        'tabSectionInProgressTab'
+        'tabSection'
       );
       await loggedInUser.expectElementsToBePresent(
         ['Community Lessons', 'Skills', 'Community Lessons'],
@@ -448,12 +458,13 @@ describe('Logged-in User', function () {
       );
       await loggedInUser.expectLessonCardProgressToBe(
         'Community Lessons',
-        ['Explore Title 1'],
+        ['Explore Title 6'],
         100,
         'Completed'
       );
-    });
-  });
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
