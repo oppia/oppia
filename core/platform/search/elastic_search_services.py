@@ -20,10 +20,7 @@ API.
 
 from __future__ import annotations
 
-import logging
-
 from core import feconf
-from core.controllers import base
 from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
