@@ -208,10 +208,24 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(exists_arr, [False, True])
 
     def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
-        # This test checks the early-return case : when the target directory already exists,
-        # the function should skip all work and avoid calling any helper functions.
-        # In other execution paths, download, unzip, or file operations can raise errors
-        # like OSError or BadZipFile, but those cases are not exercised here.
+        """Verify that download_and_unzip_files returns early when the target exists.
+
+        This test exercises the early-return path: when the target directory already
+        exists, the function should perform no work and must not call helper
+        functions that would download, extract, remove, or rename files. Other
+        execution paths (e.g. network errors, corrupted zip files, or filesystem
+        errors) can raise exceptions, but those scenarios are intentionally not
+        covered here.
+
+        Args:
+            None.
+
+        Raises:
+            AssertionError: Raised if any of the helper functions (download,
+                extract, remove, rename) are called, or if the function does not
+                short-circuit when the target directory exists.
+        """
+
         def mock_exists(path: str) -> bool:
             if path == os.path.join('target dir', 'target root'):
                 return True
@@ -240,10 +254,24 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
     def test_download_and_unzip_files_with_exception_and_tmp_unzip_missing(
         self,
     ) -> None:
-        # This test checks the retry path: the first ZipFile open raises an exception,
-        # and the temp unzip directory does not exist. The function should retry once,
-        # call url_open, and avoid calling remove(). Other paths can raise download
-        # errors, BadZipFile, or OSError, but those are not exercised here.
+        """Verify retry behavior when the first unzip attempt fails and TMP_UNZIP_PATH is absent.
+
+        This test covers the retry path: the first call to open the zip raises an
+        exception, and the temporary unzip directory does not exist before the
+        retry. The function should retry once, call the URL-open helper to fetch a
+        local copy, and must not call remove() because there is no temporary file
+        to delete. Other paths (such as repeated failures, BadZipFile, or OS-level
+        errors) are outside the scope of this test.
+
+        Args:
+            None.
+
+        Raises:
+            AssertionError: Raised if the retry logic is not executed as expected
+                (for example, if url_open is not called, remove() is called when it
+                should not be, or the zipfile initialization count is not equal to
+                the expected number of attempts).
+        """
         exists_arr = []
         self.check_function_calls['url_open_is_called'] = False
         self.expected_check_function_calls['url_open_is_called'] = True
