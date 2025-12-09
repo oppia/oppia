@@ -785,7 +785,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             self.print_arr, ['Python dependencies consistency check succeeded.']
         )
 
-    def test_branch_is_not_changed_when_changed_branch_is_same_as_the_current_branch(
+    def test_branch_is_not_changed_when_new_branch_is_same_as_the_old_branch(
         self,
     ) -> None:
         # Here we use object because we need to mock subprocess.check_output which is a built-in function.
