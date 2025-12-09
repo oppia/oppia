@@ -32,8 +32,8 @@ from core.domain import (
     platform_parameter_list,
     rights_manager,
     subscription_services,
-    user_services,
     takeout_service,
+    user_services,
 )
 from core.platform import models
 from core.tests import test_utils

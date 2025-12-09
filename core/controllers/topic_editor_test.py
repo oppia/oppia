@@ -22,10 +22,7 @@ import os
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
-    email_manager,
     platform_parameter_list,
-    platform_parameter_services,
-    skill_domain,
     skill_services,
     story_domain,
     story_fetchers,
@@ -1393,7 +1390,7 @@ class TopicEditorTests(
     def test_get_topic_data_no_deleted_skills(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
 
-        # Create a valid skill
+        # Create a valid skill.
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             skill_id, self.admin_id, description='A useful description'
