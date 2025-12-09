@@ -33,6 +33,7 @@ from core.domain import (
     rights_manager,
     subscription_services,
     user_services,
+    takeout_service,
 )
 from core.platform import models
 from core.tests import test_utils
@@ -286,6 +287,20 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
+
+    def test_profile_data_with_no_contributions(self) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        with self.swap_to_always_return(
+            user_services, 'get_user_contributions', None
+        ):
+            response = self.get_json(
+                '/profilehandler/data/%s' % self.EDITOR_USERNAME
+            )
+
+        # These lists should be empty
+        self.assertEqual(response['created_exp_summary_dicts'], [])
+        self.assertEqual(response['edited_exp_summary_dicts'], [])
 
 
 class UserContributionsTests(test_utils.GenericTestBase):
@@ -1319,6 +1334,93 @@ class SignupTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_post_does_not_set_username_twice(self) -> None:
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Ensure the user actually has a username stored
+        if user_services.get_username(user_id) is None:
+            user_services.set_username(user_id, self.EDITOR_USERNAME)
+
+        calls = []
+
+        def mock_set_username(unused_uid, unused_username):
+            calls.append("called")
+
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap(
+            user_services, 'has_fully_registered_account', lambda _: False
+        ), self.swap(user_services, "set_username", mock_set_username):
+
+            response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    "username": self.EDITOR_USERNAME,
+                    "agreed_to_terms": True,
+                    "default_dashboard": constants.DASHBOARD_TYPE_LEARNER,
+                    "can_receive_email_updates": (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    ),
+                },
+                csrf_token=csrf_token,
+            )
+
+        # Username stays the same
+        self.assertEqual(
+            user_services.get_username(user_id),
+            self.EDITOR_USERNAME,
+        )
+        # Branch skipped
+        self.assertEqual(calls, [])
+
+        self.assertFalse(response["bulk_email_signup_message_should_be_shown"])
+
+    def test_post_user_has_registered_but_not_fully_registered_account(
+        self,
+    ) -> None:
+        # Create user.
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+        user_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        if user_services.get_username(user_id) is None:
+            user_services.set_username(user_id, self.EDITOR_USERNAME)
+
+        # Give the user an initial dashboard
+        original_dashboard = constants.DASHBOARD_TYPE_CREATOR
+        user_settings = user_services.get_user_settings(user_id)
+        user_settings.default_dashboard = original_dashboard
+        user_services.save_user_settings(user_settings)
+
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap(
+            user_services, 'has_ever_registered', lambda _: True
+        ), self.swap(
+            user_services, 'has_fully_registered_account', lambda _: False
+        ):
+            response = self.post_json(
+                feconf.SIGNUP_DATA_URL,
+                {
+                    "username": self.EDITOR_USERNAME,
+                    "agreed_to_terms": True,
+                    "default_dashboard": constants.DASHBOARD_TYPE_LEARNER,
+                    "can_receive_email_updates": (
+                        feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
+                    ),
+                },
+                csrf_token=csrf_token,
+            )
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(user_settings.default_dashboard, original_dashboard)
+
+        self.assertFalse(response["bulk_email_signup_message_should_be_shown"])
+
 
 class DeleteAccountPageTests(test_utils.GenericTestBase):
 
@@ -1776,6 +1878,33 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         self.logout()
         self.get_json('/export-account-handler', expected_status_int=401)
 
+    def test_ignores_images_with_unknown_format(self) -> None:
+        class MockImage:
+            def __init__(self, b64, path):
+                self.b64_image_data = b64
+                self.image_export_path = path
+
+        img1 = MockImage('data:image/jpeg;base64,AAAA', 'img1.jpg')
+        img2 = MockImage('not_a_data_url', 'img2.bin')
+
+        class MockTakeoutObject:
+            user_data = {"hello": "world"}
+            user_images = [img1, img2]
+
+        with self.swap(
+            takeout_service,
+            'export_data_for_user',
+            lambda unused_user_id: MockTakeoutObject(),
+        ):
+            response = self.get_custom_response(
+                '/export-account-handler', 'text/plain'
+            )
+
+        zf = zipfile.ZipFile(io.BytesIO(response.body))
+
+        # Only JSON should appear
+        self.assertEqual(zf.namelist(), ['oppia_takeout_data.json'])
+
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
@@ -1942,6 +2071,39 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             {'user_has_viewed_lesson_info_modal_once': True},
             csrf_token=csrf_token,
         )
+
+    def test_put_does_not_mark_viewed_when_false(self) -> None:
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+        user_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        calls = []
+
+        def mock_set_viewed(unused_uid):
+            calls.append("called")
+
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap(
+            user_services,
+            "set_user_has_viewed_lesson_info_modal_once",
+            mock_set_viewed,
+        ):
+            response = self.put_json(
+                "/userinfohandler/data",
+                {"user_has_viewed_lesson_info_modal_once": False},
+                csrf_token=csrf_token,
+            )
+
+        # Should succeed
+        self.assertEqual(response, {"success": True})
+
+        # Should not call the setter
+        self.assertEqual(calls, [])
+
+        # Confirm flag remains False.
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertEqual(user_settings.has_viewed_lesson_info_modal_once, False)
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):

@@ -191,7 +191,8 @@ class BulkEmailWebhookEndpoint(
                 user_email_preferences.can_receive_subscription_email,
                 bulk_email_db_already_updated=True,
             )
-        elif self.normalized_request['type'] == 'unsubscribe':
+        else:
+            assert self.normalized_request['type'] == 'unsubscribe'
             user_services.update_email_preferences(
                 user_id,
                 False,

@@ -22,7 +22,10 @@ import os
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
+    email_manager,
     platform_parameter_list,
+    platform_parameter_services,
+    skill_domain,
     skill_services,
     story_domain,
     story_fetchers,
@@ -1387,6 +1390,145 @@ class TopicEditorTests(
 
         self.logout()
 
+    def test_get_topic_data_no_deleted_skills(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        # Create a valid skill
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            skill_id, self.admin_id, description='A useful description'
+        )
+
+        # Create topic referencing this skill.
+        topic_id = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id,
+            self.admin_id,
+            name='Topic Name',
+            abbreviated_name='topic-abbrev',
+            url_fragment='topic-url',
+            description='Test topic',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+
+        def fake_rubrics_fn(skill_ids):
+            return ({sid: [] for sid in skill_ids}, [])
+
+        def fake_desc_fn(skill_ids):
+            return ({sid: 'A useful description' for sid in skill_ids}, [])
+
+        with self.swap(
+            skill_services, 'get_rubrics_of_skills', fake_rubrics_fn
+        ), self.swap(
+            skill_services, 'get_descriptions_of_skills', fake_desc_fn
+        ):
+
+            response = self.get_json(
+                f'{feconf.TOPIC_EDITOR_DATA_URL_PREFIX}/{topic_id}'
+            )
+
+        self.assertIn('topic_dict', response)
+        self.assertIn('grouped_skill_summary_dicts', response)
+        self.assertIn('skill_id_to_description_dict', response)
+        self.assertIn(
+            'A useful description',
+            response['skill_id_to_description_dict'].values(),
+        )
+
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+        ]
+    )
+    def test_get_topic_data_with_deleted_skills_no_email_sent(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+
+        # Ensure no emails sent so far.
+        messages = self._get_sent_email_messages('testadmin@example.com')
+        self.assertEqual(len(messages), 0)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id)
+        )
+
+        self.assertEqual(self.topic_id, response['topic_dict']['id'])
+        self.assertIn(self.skill_id, response['skill_question_count_dict'])
+        self.assertIn(self.skill_id_2, response['skill_question_count_dict'])
+
+        messages = self._get_sent_email_messages('testadmin@example.com')
+        self.assertEqual(len(messages), 0)
+
+        self.logout()
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+        ]
+    )
+    def test_editable_topic_handler_put_with_deleted_skills_no_email_sent(
+        self,
+    ) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+
+        messages = self._get_sent_email_messages('testadmin@example.com')
+        self.assertEqual(len(messages), 0)
+
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Testing deleted skill behavior.',
+            'topic_and_subtopic_page_change_dicts': [
+                {
+                    'cmd': 'update_topic_property',
+                    'property_name': 'name',
+                    'old_value': '',
+                    'new_value': 'Updated Name',
+                }
+            ],
+        }
+
+        csrf_token = self.get_new_csrf_token()
+
+        json_response = self.put_json(
+            f'{feconf.TOPIC_EDITOR_DATA_URL_PREFIX}/{self.topic_id}',
+            change_cmd,
+            csrf_token=csrf_token,
+        )
+
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.assertEqual('Updated Name', json_response['topic_dict']['name'])
+
+        messages = self._get_sent_email_messages('testadmin@example.com')
+        self.assertEqual(len(messages), 0)
+
+        self.logout()
+
 
 class TopicPublishSendMailHandlerTests(
     BaseTopicEditorControllerTests, test_utils.EmailTestBase
@@ -1423,6 +1565,37 @@ class TopicPublishSendMailHandlerTests(
         )
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
+
+    @test_utils.set_platform_parameters(
+        [
+            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
+            (
+                platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
+                'testadmin@example.com',
+            ),
+            (
+                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
+                'system@example.com',
+            ),
+            (platform_parameter_list.ParamName.SYSTEM_EMAIL_NAME, '.'),
+        ]
+    )
+    def test_send_mail_not_sent_when_server_can_not_send_emails(self) -> None:
+        """Tests that no email is sent when SERVER_CAN_SEND_EMAILS=False."""
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+
+        csrf_token = self.get_new_csrf_token()
+
+        self.put_json(
+            '%s/%s' % (feconf.TOPIC_SEND_MAIL_URL_PREFIX, self.topic_id),
+            {'topic_name': 'Topic Name'},
+            csrf_token=csrf_token,
+        )
+
+        messages = self._get_sent_email_messages('testadmin@example.com')
+        self.assertEqual(len(messages), 0)
+
+        self.logout()
 
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
