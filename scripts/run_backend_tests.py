@@ -61,6 +61,7 @@ import time
 
 from core import utils
 
+import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import (
@@ -155,9 +156,15 @@ _PARSER.add_argument(
     action='store_true',
 )
 _PARSER.add_argument(
-    '--skip-install',
+    '--skip_install',
     help='optional; if specified, skips the installation of '
     'third party libraries',
+    action='store_true',
+)
+_PARSER.add_argument(
+    '--use_pytest',
+    help='optional; if specified, uses pytest as the test runner instead of '
+    'the default gae_suite runner',
     action='store_true',
 )
 
@@ -443,6 +450,113 @@ def check_test_results(
     return total_count, total_errors, total_failures, time_report
 
 
+def convert_args_to_pytest(parsed_args: argparse.Namespace) -> List[str]:
+    """Convert run_backend_tests.py arguments to pytest arguments.
+
+    Args:
+        parsed_args: argparse.Namespace. Parsed command-line arguments.
+
+    Returns:
+        list(str). List of pytest command-line arguments.
+
+    Raises:
+        Exception. The shard configuration in backend_test_shards.json doesn't
+            match the actual test files on the filesystem when using the
+            --test_shard flag. This can happen when (a) a test file listed in
+            the JSON shards file doesn't exist, (b) a test file exists but
+            isn't listed in any shard, or (c) a test file is listed in
+            multiple shards.
+    """
+    pytest_args = []
+
+    # Add verbosity flag.
+    pytest_args.append('-v' if parsed_args.verbose else '-q')
+
+    # Add coverage flags if requested.
+    if parsed_args.generate_coverage_report:
+        pytest_args.extend(['--cov=.', '--cov-report=term-missing'])
+        if not parsed_args.ignore_coverage:
+            pytest_args.append('--cov-fail-under=100')
+
+    # Handle test selection.
+    if parsed_args.test_targets:
+        # Convert dot notation to pytest path notation.
+        for test_target in parsed_args.test_targets.split(','):
+            # Check if this is a specific test (has _test. in it).
+            # Since _test always appears as a suffix on module names, we can
+            # simply split on '.' and find the part ending with '_test'.
+            if '_test.' in test_target:
+                # Find the module ending with _test.
+                parts = test_target.split('.')
+                test_idx = next(
+                    i for i, part in enumerate(parts) if part.endswith('_test')
+                )
+
+                # Original format: module.path_test.ClassName(.method_name).
+                # Convert to: module/path_test.py::ClassName(::method_name).
+                test_path = '%s.py::%s' % (
+                    '/'.join(parts[: test_idx + 1]),
+                    '::'.join(parts[test_idx + 1 :]),
+                )
+
+                pytest_args.append(test_path)
+            elif test_target.endswith('_test'):
+                # Just a test module.
+                test_path = test_target.replace('.', '/') + '.py'
+                pytest_args.append(test_path)
+            else:
+                # Not a test file, add _test suffix.
+                test_path = test_target.replace('.', '/') + '_test.py'
+                pytest_args.append(test_path)
+    elif parsed_args.test_path:
+        pytest_args.append(parsed_args.test_path)
+    elif parsed_args.test_shard:
+        # Get all test targets from shard and convert to paths.
+        validation_error = check_shards_match_tests(include_load_tests=True)
+        if validation_error:
+            raise Exception(validation_error)
+        all_test_targets = get_all_test_targets_from_shard(
+            parsed_args.test_shard
+        )
+        for test_target in all_test_targets:
+            test_path = test_target.replace('.', '/') + '.py'
+            pytest_args.append(test_path)
+    elif parsed_args.run_on_changed_files_in_branch:
+        changed_files = git_changes_utils.get_changed_python_test_files()
+        for test_target in changed_files:
+            test_path = test_target.replace('.', '/') + '.py'
+            pytest_args.append(test_path)
+    else:
+        # Run all tests.
+        if parsed_args.exclude_load_tests:
+            pytest_args.append('--ignore=core/tests/load_tests')
+        # Default: run all tests in current directory.
+        pytest_args.append('.')
+
+    return pytest_args
+
+
+def run_tests_with_pytest(parsed_args: argparse.Namespace) -> int:
+    """Run tests using pytest instead of gae_suite.
+
+    Args:
+        parsed_args: argparse.Namespace. Parsed command-line arguments.
+
+    Returns:
+        int. Exit code from pytest (0 for success, non-zero for failure).
+    """
+    pytest_args = convert_args_to_pytest(parsed_args)
+
+    print('Running tests with pytest...')
+    print('Pytest arguments: %s' % ' '.join(pytest_args))
+    print('')
+
+    # Run pytest with the converted arguments.
+    exit_code = pytest.main(pytest_args)
+
+    return exit_code
+
+
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -466,6 +580,25 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if not parsed_args.skip_install:
         install_third_party_libs.main()
+
+    # If --use_pytest flag is set, delegate to pytest and return early.
+    if parsed_args.use_pytest:
+        with contextlib.ExitStack() as stack:
+            stack.enter_context(
+                servers.managed_cloud_datastore_emulator(clear_datastore=True)
+            )
+            stack.enter_context(servers.managed_redis_server())
+
+            # Run tests with pytest.
+            exit_code = run_tests_with_pytest(parsed_args)
+
+        if exit_code != 0:
+            raise Exception('Tests failed with exit code %d' % exit_code)
+
+        print('')
+        print('Done!')
+        return
+
     with contextlib.ExitStack() as stack:
         stack.enter_context(
             servers.managed_cloud_datastore_emulator(clear_datastore=True)
