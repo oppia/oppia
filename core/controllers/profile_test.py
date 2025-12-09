@@ -38,7 +38,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Any, cast, Final
+from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1880,12 +1880,15 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
     def test_ignores_images_with_unknown_format(self) -> None:
         class MockImage:
-            def __init__(self, b64, path) -> None:
+            b64_image_data: str
+            image_export_path: str
+
+            def __init__(self, b64: str, path: str) -> None:
                 self.b64_image_data = b64
                 self.image_export_path = path
 
-        img1 = cast(Any, MockImage('data:image/jpeg;base64,AAAA', 'img1.jpg'))
-        img2 = cast(Any, MockImage('not_a_data_url', 'img2.bin'))
+        img1 = MockImage('data:image/jpeg;base64,AAAA', 'img1.jpg')
+        img2 = MockImage('not_a_data_url', 'img2.bin')
 
         class MockTakeoutObject:
             user_data = {'hello': 'world'}
