@@ -1412,10 +1412,10 @@ class TopicEditorTests(
             next_subtopic_id=1,
         )
 
-        def fake_rubrics_fn(skill_ids):
+        def fake_rubrics_fn(skill_ids) -> None:
             return ({sid: [] for sid in skill_ids}, [])
 
-        def fake_desc_fn(skill_ids):
+        def fake_desc_fn(skill_ids) -> None:
             return ({sid: 'A useful description' for sid in skill_ids}, [])
 
         with self.swap(

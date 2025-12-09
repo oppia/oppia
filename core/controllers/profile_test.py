@@ -38,7 +38,7 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Final
+from typing import Any, cast, Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1346,7 +1346,7 @@ class SignupTests(test_utils.GenericTestBase):
 
         calls = []
 
-        def mock_set_username(unused_uid, unused_username):
+        def mock_set_username(unused_uid, unused_username) -> None:
             calls.append('called')
 
         csrf_token = self.get_new_csrf_token()
@@ -1880,12 +1880,12 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
 
     def test_ignores_images_with_unknown_format(self) -> None:
         class MockImage:
-            def __init__(self, b64, path):
+            def __init__(self, b64, path) -> None:
                 self.b64_image_data = b64
                 self.image_export_path = path
 
-        img1 = MockImage('data:image/jpeg;base64,AAAA', 'img1.jpg')
-        img2 = MockImage('not_a_data_url', 'img2.bin')
+        img1 = cast(Any, MockImage('data:image/jpeg;base64,AAAA', 'img1.jpg'))
+        img2 = cast(Any, MockImage('not_a_data_url', 'img2.bin'))
 
         class MockTakeoutObject:
             user_data = {'hello': 'world'}
