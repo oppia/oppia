@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to fetch EntityVoiceovers for the given entity in a
- * given langauge code.
+ * given language code.
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
