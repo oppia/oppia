@@ -499,10 +499,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.assertEqual(
                 getattr(context, attribute), getattr(default_context, attribute)
             )
-        for method in ('get_ca_certs', 'get_ciphers'):
-            self.assertEqual(
-                getattr(context, method)(), getattr(default_context, method)()
-            )
+        # Note: We intentionally don't compare get_ca_certs() because url_open
+        # uses certifi's certificate bundle which differs from system certs.
+        # We only compare get_ciphers() to verify cipher configuration matches.
+        self.assertEqual(context.get_ciphers(), default_context.get_ciphers())
 
     def test_url_retrieve_with_successful_https_works(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
