@@ -1278,6 +1278,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click the Donate button in the Get Involved Menu
    * on navbar and check if it opens the Donate page.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateButtonInGetInvolvedMenuOnNavbar(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
@@ -1288,19 +1292,23 @@ export class LoggedOutUser extends BaseUser {
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
-      await this.clickButtonToNavigateToNewPage(
+      await this.clickAndWaitForNavigation(
         mobileSidevbarGetInvolvedMenuDonateButton,
-        donateUrl
+        true,
+        {waitUntil: 'load'}
       );
+      await this.expectPageURLToContain(donateUrl);
     } else {
       await this.page.waitForSelector(navbarGetInvolvedTab, {
         visible: true,
       });
       await this.clickOnElementWithSelector(navbarGetInvolvedTab);
-      await this.clickButtonToNavigateToNewPage(
+      await this.clickAndWaitForNavigation(
         navbarGetInvolvedTabDonateButton,
-        donateUrl
+        true,
+        {waitUntil: 'load'}
       );
+      await this.expectPageURLToContain(donateUrl);
     }
   }
 
@@ -1336,6 +1344,10 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Function to click the Donate button on navbar
    * and check if it opens the Donate page.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateButtonOnNavbar(): Promise<void> {
     const navbarDonateButton = this.isViewportAtMobileWidth()
@@ -1350,7 +1362,10 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(navbarDonateButton, {
       visible: true,
     });
-    await this.clickButtonToNavigateToNewPage(navbarDonateButton, donateUrl);
+    await this.clickAndWaitForNavigation(navbarDonateButton, true, {
+      waitUntil: 'load',
+    });
+    await this.expectPageURLToContain(donateUrl);
   }
 
   /**
@@ -2512,9 +2527,16 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Clicks the "DONATE TODAY" button on the Contact Us page and checks that
    * it navigates to the correct URL.
+   *
+   * Note: The donate page contains an external DonorBox iframe that keeps
+   * network connections open, so we cannot use the standard networkidle2
+   * wait condition. Instead, we wait only for the 'load' event.
    */
   async clickDonateTodayButtonInContactUsPage(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage('DONATE TODAY', donateUrl, false);
+    await this.clickAndWaitForNavigation('DONATE TODAY', false, {
+      waitUntil: 'load',
+    });
+    await this.expectPageURLToContain(donateUrl);
   }
 
   /**
