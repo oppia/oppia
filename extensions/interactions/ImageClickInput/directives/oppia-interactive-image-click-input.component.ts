@@ -20,30 +20,30 @@
  * followed by the name of the arg.
  */
 
-import { Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { ImageClickAnswer } from 'interactions/answer-defs';
+import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ImageClickAnswer} from 'interactions/answer-defs';
 import {
   ImageClickInputCustomizationArgs,
   ImageWithRegions,
   LabeledRegion,
 } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
 import {
   ImageDimensions,
   ImagePreloaderService,
 } from 'pages/exploration-player-page/services/image-preloader.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { Subscription } from 'rxjs';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { PageContextService } from 'services/page-context.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ServicesConstants } from 'services/services.constants';
-import { SvgSanitizerService } from 'services/svg-sanitizer.service';
-import { ImageClickInputRulesService } from './image-click-input-rules.service';
-import { DeviceInfoService } from 'services/contextual/device-info.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {Subscription} from 'rxjs';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ServicesConstants} from 'services/services.constants';
+import {SvgSanitizerService} from 'services/svg-sanitizer.service';
+import {ImageClickInputRulesService} from './image-click-input-rules.service';
+import {DeviceInfoService} from 'services/contextual/device-info.service';
 
 interface RectangleRegion extends ImagePoint {
   height: number;
@@ -61,7 +61,6 @@ interface ImagePoint {
   styleUrls: [],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
-
   @Input() imageAndRegionsWithValue!: string;
   @Input() highlightRegionsOnHoverWithValue!: string;
   @Input() lastAnswer!: ImageClickAnswer;
@@ -79,8 +78,8 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   isLoadingIndicatorShown!: boolean;
   isTryAgainShown!: boolean;
   dimensions!: ImageDimensions;
-  imageContainerStyle!: { height: string; width?: string };
-  loadingIndicatorStyle!: { height: string; width?: string };
+  imageContainerStyle!: {height: string; width?: string};
+  loadingIndicatorStyle!: {height: string; width?: string};
   allRegions!: LabeledRegion[];
 
   dotCursorCoordinateX: number = 0;
@@ -99,7 +98,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private imageLocalStorageService: ImageLocalStorageService,
     private svgSanitizerService: SvgSanitizerService
-  ) { }
+  ) {}
 
   private _getAttrs() {
     return {
@@ -107,7 +106,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue,
     };
   }
-
 
   private _isMouseInsideRegion(regionArea: number[][]): boolean {
     return (
@@ -119,7 +117,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const { imageAndRegions, highlightRegionsOnHover } =
+    const {imageAndRegions, highlightRegionsOnHover} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'ImageClickInput',
         this._getAttrs()
@@ -168,7 +166,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       // we directly assign the url to the imageUrl.
       if (
         this.pageContextService.getImageSaveDestination() ===
-        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
+          AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
         this.imageLocalStorageService.isInStorage(this.filepath)
       ) {
         const base64Url = this.imageLocalStorageService.getRawImageData(
@@ -176,7 +174,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         );
         const mimeType = base64Url.split(';')[0];
         if (mimeType === AppConstants.SVG_MIME_TYPE) {
-
           this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
             base64Url
           ) as string;
@@ -216,7 +213,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   loadImage(): void {
     this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
-
       (objectUrl: string | null) => {
         this.isTryAgainShown = false;
         this.isLoadingIndicatorShown = false;
@@ -230,7 +226,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   }
 
   updateCurrentlyHoveredRegions(): void {
-
     for (let i = 0; i < this.imageAndRegions.labeledRegions.length; i++) {
       const labeledRegion = this.imageAndRegions.labeledRegions[i];
       const regionArea = labeledRegion.region.area;
@@ -279,7 +274,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     return 'inline';
   }
 
-  getDotLocation(): { left: number | null; top: number | null } {
+  getDotLocation(): {left: number | null; top: number | null} {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
     );

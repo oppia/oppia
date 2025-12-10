@@ -16,17 +16,17 @@
  * @fileoverview Directive for applying validation.
  */
 
-import { Directive, Input } from '@angular/core';
+import {Directive, Input} from '@angular/core';
 import {
   NG_VALIDATORS,
   Validator,
   AbstractControl,
   ValidationErrors,
 } from '@angular/forms';
-import { UnderscoresToCamelCasePipe } from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
-import { Validator as OppiaValidator } from 'interactions/TextInput/directives/text-input-validation.service';
+import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
+import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { SchemaValidators } from '../validators/schema-validators';
+import {SchemaValidators} from '../validators/schema-validators';
 
 @Directive({
   selector: '[applyValidation]',
@@ -56,7 +56,6 @@ export class ApplyValidationDirective implements Validator {
       let filterArgs: Record<string, unknown> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
-
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
             cloneDeep((validatorSpec as any)[key]);
         }
@@ -67,10 +66,9 @@ export class ApplyValidationDirective implements Validator {
         );
         if (error !== null) {
           errorsPresent = true;
-          allValidationErrors = { ...allValidationErrors, ...error };
+          allValidationErrors = {...allValidationErrors, ...error};
         }
       } else {
-
       }
     }
 
@@ -79,4 +77,4 @@ export class ApplyValidationDirective implements Validator {
     }
     return allValidationErrors;
   }
-} 
+}

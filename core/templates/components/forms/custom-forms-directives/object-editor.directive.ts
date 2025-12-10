@@ -49,49 +49,49 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
-import { AlgebraicExpressionEditorComponent } from 'objects/templates/algebraic-expression-editor.component';
-import { BooleanEditorComponent } from 'objects/templates/boolean-editor.component';
-import { CodeStringEditorComponent } from 'objects/templates/code-string-editor.component';
-import { CoordTwoDimEditorComponent } from 'objects/templates/coord-two-dim-editor.component';
-import { AllowedVariablesEditorComponent } from 'objects/templates/allowed-variables-editor.component';
-import { DragAndDropPositiveIntEditorComponent } from 'objects/templates/drag-and-drop-positive-int-editor.component';
-import { FilepathEditorComponent } from 'objects/templates/filepath-editor.component';
-import { FractionEditorComponent } from 'objects/templates/fraction-editor.component';
-import { GraphEditorComponent } from 'objects/templates/graph-editor.component';
-import { HtmlEditorComponent } from 'objects/templates/html-editor.component';
-import { ImageWithRegionsEditorComponent } from 'objects/templates/image-with-regions-editor.component';
-import { ListOfSetsOfTranslatableHtmlContentIdsEditorComponent } from 'objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component';
-import { ListOfTabsEditorComponent } from 'objects/templates/list-of-tabs-editor.component';
-import { ListOfUnicodeStringEditorComponent } from 'objects/templates/list-of-unicode-string-editor.component';
-import { MathEquationEditorComponent } from 'objects/templates/math-equation-editor.component';
-import { MathExpressionContentEditorComponent } from 'objects/templates/math-expression-content-editor.component';
-import { MusicPhraseEditorComponent } from 'objects/templates/music-phrase-editor.component';
-import { NonnegativeIntEditorComponent } from 'objects/templates/nonnegative-int-editor.component';
-import { NormalizedStringEditorComponent } from 'objects/templates/normalized-string-editor.component';
-import { NumberWithUnitsEditorComponent } from 'objects/templates/number-with-units-editor.component';
-import { NumericExpressionEditorComponent } from 'objects/templates/numeric-expression-editor.component';
-import { ParameterNameEditorComponent } from 'objects/templates/parameter-name-editor.component';
-import { PositionOfTermsEditorComponent } from 'objects/templates/position-of-terms-editor.component';
-import { PositiveIntEditorComponent } from 'objects/templates/positive-int-editor.component';
-import { RatioExpressionEditorComponent } from 'objects/templates/ratio-expression-editor.component';
-import { RealEditorComponent } from 'objects/templates/real-editor.component';
-import { SanitizedUrlEditorComponent } from 'objects/templates/sanitized-url-editor.component';
-import { SetOfAlgebraicIdentifierEditorComponent } from 'objects/templates/set-of-algebraic-identifier-editor.component';
-import { SetOfTranslatableHtmlContentIdsEditorComponent } from 'objects/templates/set-of-translatable-html-content-ids-editor.component';
-import { SetOfUnicodeStringEditorComponent } from 'objects/templates/set-of-unicode-string-editor.component';
-import { SkillSelectorEditorComponent } from 'objects/templates/skill-selector-editor.component';
-import { SubtitledHtmlEditorComponent } from 'objects/templates/subtitled-html-editor.component';
-import { SubtitledUnicodeEditorComponent } from 'objects/templates/subtitled-unicode-editor.component';
-import { SvgEditorComponent } from 'objects/templates/svg-editor.component';
-import { TranslatableHtmlContentIdEditorComponent } from 'objects/templates/translatable-html-content-id.component';
-import { TranslatableSetOfNormalizedStringEditorComponent } from 'objects/templates/translatable-set-of-normalized-string-editor.component';
-import { TranslatableSetOfUnicodeStringEditorComponent } from 'objects/templates/translatable-set-of-unicode-string-editor.component';
-import { UnicodeStringEditorComponent } from 'objects/templates/unicode-string-editor.component';
-import { IntEditorComponent } from 'objects/templates/int-editor.component';
-import { LoggerService } from 'services/contextual/logger.service';
-import { ComponentRef } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { SchemaDefaultValue } from 'services/schema-default-value.service';
+import {AlgebraicExpressionEditorComponent} from 'objects/templates/algebraic-expression-editor.component';
+import {BooleanEditorComponent} from 'objects/templates/boolean-editor.component';
+import {CodeStringEditorComponent} from 'objects/templates/code-string-editor.component';
+import {CoordTwoDimEditorComponent} from 'objects/templates/coord-two-dim-editor.component';
+import {AllowedVariablesEditorComponent} from 'objects/templates/allowed-variables-editor.component';
+import {DragAndDropPositiveIntEditorComponent} from 'objects/templates/drag-and-drop-positive-int-editor.component';
+import {FilepathEditorComponent} from 'objects/templates/filepath-editor.component';
+import {FractionEditorComponent} from 'objects/templates/fraction-editor.component';
+import {GraphEditorComponent} from 'objects/templates/graph-editor.component';
+import {HtmlEditorComponent} from 'objects/templates/html-editor.component';
+import {ImageWithRegionsEditorComponent} from 'objects/templates/image-with-regions-editor.component';
+import {ListOfSetsOfTranslatableHtmlContentIdsEditorComponent} from 'objects/templates/list-of-sets-of-translatable-html-content-ids-editor.component';
+import {ListOfTabsEditorComponent} from 'objects/templates/list-of-tabs-editor.component';
+import {ListOfUnicodeStringEditorComponent} from 'objects/templates/list-of-unicode-string-editor.component';
+import {MathEquationEditorComponent} from 'objects/templates/math-equation-editor.component';
+import {MathExpressionContentEditorComponent} from 'objects/templates/math-expression-content-editor.component';
+import {MusicPhraseEditorComponent} from 'objects/templates/music-phrase-editor.component';
+import {NonnegativeIntEditorComponent} from 'objects/templates/nonnegative-int-editor.component';
+import {NormalizedStringEditorComponent} from 'objects/templates/normalized-string-editor.component';
+import {NumberWithUnitsEditorComponent} from 'objects/templates/number-with-units-editor.component';
+import {NumericExpressionEditorComponent} from 'objects/templates/numeric-expression-editor.component';
+import {ParameterNameEditorComponent} from 'objects/templates/parameter-name-editor.component';
+import {PositionOfTermsEditorComponent} from 'objects/templates/position-of-terms-editor.component';
+import {PositiveIntEditorComponent} from 'objects/templates/positive-int-editor.component';
+import {RatioExpressionEditorComponent} from 'objects/templates/ratio-expression-editor.component';
+import {RealEditorComponent} from 'objects/templates/real-editor.component';
+import {SanitizedUrlEditorComponent} from 'objects/templates/sanitized-url-editor.component';
+import {SetOfAlgebraicIdentifierEditorComponent} from 'objects/templates/set-of-algebraic-identifier-editor.component';
+import {SetOfTranslatableHtmlContentIdsEditorComponent} from 'objects/templates/set-of-translatable-html-content-ids-editor.component';
+import {SetOfUnicodeStringEditorComponent} from 'objects/templates/set-of-unicode-string-editor.component';
+import {SkillSelectorEditorComponent} from 'objects/templates/skill-selector-editor.component';
+import {SubtitledHtmlEditorComponent} from 'objects/templates/subtitled-html-editor.component';
+import {SubtitledUnicodeEditorComponent} from 'objects/templates/subtitled-unicode-editor.component';
+import {SvgEditorComponent} from 'objects/templates/svg-editor.component';
+import {TranslatableHtmlContentIdEditorComponent} from 'objects/templates/translatable-html-content-id.component';
+import {TranslatableSetOfNormalizedStringEditorComponent} from 'objects/templates/translatable-set-of-normalized-string-editor.component';
+import {TranslatableSetOfUnicodeStringEditorComponent} from 'objects/templates/translatable-set-of-unicode-string-editor.component';
+import {UnicodeStringEditorComponent} from 'objects/templates/unicode-string-editor.component';
+import {IntEditorComponent} from 'objects/templates/int-editor.component';
+import {LoggerService} from 'services/contextual/logger.service';
+import {ComponentRef} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {SchemaDefaultValue} from 'services/schema-default-value.service';
 
 const EDITORS = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
@@ -170,11 +170,12 @@ interface ObjectEditor {
 })
 export class ObjectEditorComponent
   implements
-  AfterViewInit,
-  OnChanges,
-  OnDestroy,
-  ControlValueAccessor,
-  Validator {
+    AfterViewInit,
+    OnChanges,
+    OnDestroy,
+    ControlValueAccessor,
+    Validator
+{
   private _value: SchemaDefaultValue;
 
   @Input() alwaysEditable!: string;
@@ -210,9 +211,9 @@ export class ObjectEditorComponent
   @Output() valueChange = new EventEmitter();
   componentRef!: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
-  onChange: (_: SchemaDefaultValue) => void = () => { };
+  onChange: (_: SchemaDefaultValue) => void = () => {};
   onTouch!: () => void;
-  onValidatorChange: () => void = () => { };
+  onValidatorChange: () => void = () => {};
 
   // A hashmap is used instead of an array for faster lookup.
   componentErrors: Record<string, false> = {};
@@ -244,7 +245,7 @@ export class ObjectEditorComponent
     private loggerService: LoggerService,
     private componentFactoryResolver: ComponentFactoryResolver,
     private viewContainerRef: ViewContainerRef
-  ) { }
+  ) {}
 
   ngAfterViewInit(): void {
     const editorName = this.objType
@@ -280,17 +281,14 @@ export class ObjectEditorComponent
       componentRef.instance.modalId = this.modalId;
       componentRef.instance.objType = this.objType;
 
-
       if (this.schema && !componentRef.instance.schema) {
         componentRef.instance.schema = this.schema;
       }
       componentRef.instance.value = this.value;
 
-
       if (componentRef.instance.valueChanged) {
         this.componentSubscriptions.add(
           componentRef.instance.valueChanged.subscribe(newValue => {
-
             if (Array.isArray(newValue)) {
               this.value = [...newValue];
               return;
@@ -303,7 +301,6 @@ export class ObjectEditorComponent
         this.componentSubscriptions.add(
           componentRef.instance.validityChange.subscribe(errorsMap => {
             for (const errorKey of Object.keys(errorsMap)) {
-
               const errorState = errorsMap[errorKey];
               if (errorState !== true) {
                 if (this.componentErrors[errorKey] === undefined) {
@@ -336,9 +333,7 @@ export class ObjectEditorComponent
       : null;
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-
-  }
+  ngOnChanges(changes: SimpleChanges): void {}
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();

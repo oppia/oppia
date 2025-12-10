@@ -16,17 +16,16 @@
  * @fileoverview Tests for image-receiver component.
  */
 
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { MatIconModule } from '@angular/material/icon';
-import { APP_BASE_HREF } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
+import {MatIconModule} from '@angular/material/icon';
+import {RouterModule} from '@angular/router';
 
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { IdGenerationService } from 'services/id-generation.service';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { ImageReceiverComponent } from './image-receiver.component';
-import { BlogDashboardPageService } from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {IdGenerationService} from 'services/id-generation.service';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {ImageReceiverComponent} from './image-receiver.component';
+import {BlogDashboardPageService} from 'pages/blog-dashboard-page/services/blog-dashboard-page.service';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 describe('ImageReceiverComponent', () => {
   let component: ImageReceiverComponent;
@@ -40,12 +39,12 @@ describe('ImageReceiverComponent', () => {
   let dragoverEvent = document.createEvent('Event');
   dragoverEvent.initEvent('mockdragover', true, true);
   dragoverEvent.returnValue = false;
-  dragoverEvent.preventDefault = () => { };
+  dragoverEvent.preventDefault = () => {};
 
   let dropEvent = document.createEvent('Event');
   dropEvent.initEvent('mockdrop', true, true);
   dropEvent.returnValue = false;
-  dropEvent.preventDefault = () => { };
+  dropEvent.preventDefault = () => {};
 
   beforeEach(waitForAsync(() => {
     windowRef = new WindowRef();
@@ -58,8 +57,8 @@ describe('ImageReceiverComponent', () => {
       declarations: [ImageReceiverComponent, MockTranslatePipe],
       providers: [
         BlogDashboardPageService,
-        { provide: WindowRef, useValue: windowRef },
-        { provide: APP_BASE_REF, useValue: '/' },
+        {provide: WindowRef, useValue: windowRef},
+        {provide: APP_BASE_REF, useValue: '/'},
       ],
     }).compileComponents();
   }));
@@ -109,7 +108,7 @@ describe('ImageReceiverComponent', () => {
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
 
     let dataTransfer = new DataTransfer();
-    const validFile = new File(['image'], 'image.jpg', { type: 'image/jpg' });
+    const validFile = new File(['image'], 'image.jpg', {type: 'image/jpg'});
     dataTransfer.items.add(validFile);
 
     spyOn(component.fileChanged, 'emit');
@@ -131,7 +130,7 @@ describe('ImageReceiverComponent', () => {
     let dataTransfer = null;
 
     component.dropAreaRef.nativeElement.dispatchEvent(
-      new DragEvent('drop', { dataTransfer: dataTransfer })
+      new DragEvent('drop', {dataTransfer: dataTransfer})
     );
 
     expect(component.fileChanged.emit).not.toHaveBeenCalled();
@@ -144,7 +143,7 @@ describe('ImageReceiverComponent', () => {
       component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png'];
 
       let dataTransfer = new DataTransfer();
-      const file = new File(['image'], 'image.svg', { type: 'image/svg+xml' });
+      const file = new File(['image'], 'image.svg', {type: 'image/svg+xml'});
       dataTransfer.items.add(file);
 
       spyOn(component.fileChanged, 'emit');
@@ -162,7 +161,7 @@ describe('ImageReceiverComponent', () => {
 
   it(
     'should not upload image on drop if the image filename extension' +
-    ' does not match the image format',
+      ' does not match the image format',
     () => {
       component.ngAfterViewInit();
       component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];
@@ -197,7 +196,7 @@ describe('ImageReceiverComponent', () => {
   });
 
   it('should emit fileChanged event if validation passes', () => {
-    const validFile = new File(['image'], 'image.jpg', { type: 'image/jpg' });
+    const validFile = new File(['image'], 'image.jpg', {type: 'image/jpg'});
     component.imageInputRef.nativeElement = {
       files: [validFile],
       value: 'image.jpg',
@@ -213,7 +212,7 @@ describe('ImageReceiverComponent', () => {
 
   it(
     'should not upload image on drop if the allowed image formats list' +
-    ' contains non allowed file formats',
+      ' contains non allowed file formats',
     () => {
       component.ngAfterViewInit();
       component.allowedImageFormats = [
@@ -226,7 +225,7 @@ describe('ImageReceiverComponent', () => {
       ];
 
       let dataTransfer = new DataTransfer();
-      const file = new File(['image'], 'image.jpeg', { type: 'image/jpeg' });
+      const file = new File(['image'], 'image.jpeg', {type: 'image/jpeg'});
       dataTransfer.items.add(file);
 
       spyOn(component.fileChanged, 'emit');
@@ -274,7 +273,7 @@ describe('ImageReceiverComponent', () => {
     component.maxImageSizeInKB = 100;
 
     let dataTransfer = new DataTransfer();
-    let fileWithLargeSize = new File([''], 'image.jpg', { type: 'image/jpg' });
+    let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
     let sizeOfLargeFileInBytes = 100 * 1024 + 100;
 
     Object.defineProperty(fileWithLargeSize, 'size', {
@@ -303,7 +302,7 @@ describe('ImageReceiverComponent', () => {
     component.maxImageSizeInKB = 1024;
 
     let dataTransfer = new DataTransfer();
-    let fileWithLargeSize = new File([''], 'image.jpg', { type: 'image/jpg' });
+    let fileWithLargeSize = new File([''], 'image.jpg', {type: 'image/jpg'});
     let sizeOfLargeFileInBytes = 1024 * 1024 * 100;
 
     Object.defineProperty(fileWithLargeSize, 'size', {
@@ -328,7 +327,7 @@ describe('ImageReceiverComponent', () => {
 
   it(
     'should change background color when user drags and leaves an' +
-    ' image into the window',
+      ' image into the window',
     () => {
       let dragoverEvent = new DragEvent('dragover');
       let dragLeaveEvent = new DragEvent('dragleave');
@@ -352,7 +351,7 @@ describe('ImageReceiverComponent', () => {
 
   it(
     'should prevent default browser behavior if user drops an image outside' +
-    ' of image-uploader',
+      ' of image-uploader',
     () => {
       let mockWindow = {
         addEventListener: function (eventname: string, callback: () => {}) {
@@ -378,7 +377,7 @@ describe('ImageReceiverComponent', () => {
 
   it('should upload a valid image', () => {
     component.imageInputRef.nativeElement = {
-      files: [new File(['image'], 'image.jpg', { type: 'image/jpg' })],
+      files: [new File(['image'], 'image.jpg', {type: 'image/jpg'})],
     };
     component.imageInputRef.nativeElement.value = 'image.jpg';
     component.allowedImageFormats = ['jpeg', 'jpg', 'gif', 'png', 'svg'];

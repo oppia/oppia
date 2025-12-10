@@ -16,51 +16,51 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-import { Injectable } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
-import { AppConstants } from 'app.constants';
-import { AnswerClassificationResult } from 'domain/classifier/answer-classification-result.model';
+import {Injectable} from '@angular/core';
+import {TranslateService} from '@ngx-translate/core';
+import {AppConstants} from 'app.constants';
+import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
 import {
   Exploration,
   ExplorationBackendDict,
 } from 'domain/exploration/exploration.model';
-import { ParamChange } from 'domain/exploration/param-change.model';
-import { ReadOnlyExplorationBackendApiService } from 'domain/exploration/read-only-exploration-backend-api.service';
-import { Outcome } from 'domain/exploration/outcome.model';
-import { StateObjectsBackendDict } from 'domain/exploration/states.model';
-import { State } from 'domain/state/state.model';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
-import { TextInputCustomizationArgs } from 'interactions/customization-args-defs';
-import { AlertsService } from 'services/alerts.service';
-import { LoggerService } from 'services/contextual/logger.service';
-import { PageContextService } from 'services/page-context.service';
-import { UrlService } from 'services/contextual/url.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { EntityTranslationsService } from 'services/entity-translations.services';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {ParamChange} from 'domain/exploration/param-change.model';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {StateObjectsBackendDict} from 'domain/exploration/states.model';
+import {State} from 'domain/state/state.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {TextInputCustomizationArgs} from 'interactions/customization-args-defs';
+import {AlertsService} from 'services/alerts.service';
+import {LoggerService} from 'services/contextual/logger.service';
+import {PageContextService} from 'services/page-context.service';
+import {UrlService} from 'services/contextual/url.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {EntityTranslationsService} from 'services/entity-translations.services';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from './answer-classification.service';
-import { AudioPreloaderService } from './audio-preloader.service';
-import { ContentTranslationLanguageService } from './content-translation-language.service';
-import { ContentTranslationManagerService } from './content-translation-manager.service';
-import { ImagePreloaderService } from './image-preloader.service';
+import {AudioPreloaderService} from './audio-preloader.service';
+import {ContentTranslationLanguageService} from './content-translation-language.service';
+import {ContentTranslationManagerService} from './content-translation-manager.service';
+import {ImagePreloaderService} from './image-preloader.service';
 import {
   ExplorationParams,
   LearnerParamsService,
 } from './learner-params.service';
-import { PlayerTranscriptService } from './player-transcript.service';
-import { StatsReportingService } from './stats-reporting.service';
-import { ExplorationPlayerConstants } from '../current-lesson-player/exploration-player-page.constants';
+import {PlayerTranscriptService} from './player-transcript.service';
+import {StatsReportingService} from './stats-reporting.service';
+import {ExplorationPlayerConstants} from '../current-lesson-player/exploration-player-page.constants';
 import isEqual from 'lodash/isEqual';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { LearnerAnswerInfoService } from './learner-answer-info.service';
-import { PlatformFeatureService } from 'services/platform-feature.service';
-import { ComputeGraphService } from 'services/compute-graph.service';
-import { StateGraphLayoutService } from 'components/graph-services/graph-layout.service';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {LearnerAnswerInfoService} from './learner-answer-info.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ComputeGraphService} from 'services/compute-graph.service';
+import {StateGraphLayoutService} from 'components/graph-services/graph-layout.service';
 import forEach from 'lodash/forEach';
 
 @Injectable({
@@ -210,7 +210,7 @@ export class ExplorationEngineService {
     if (shouldCheckForMisspelling) {
       const answerIsOnlyMisspelled =
         this.answerClassificationService.isAnswerOnlyMisspelled(
-          oldStateCard.getInteraction()!, // FIX: Assert interaction is not null
+          oldStateCard.getInteraction()!,
           answer
         );
       if (answerIsOnlyMisspelled) {
@@ -224,10 +224,10 @@ export class ExplorationEngineService {
     return this.expressionInterpolationService.processHtml(
       outcome.feedback.html,
       envs
-    )!; // FIX: Assert return is not null
+    )!;
   }
 
-  extractDepthGraph(): { [stateName: string]: number } {
+  extractDepthGraph(): {[stateName: string]: number} {
     const graphData = this.computeGraphService.compute(
       this.getInitialStateName(),
       this.getExploration().states
@@ -239,7 +239,7 @@ export class ExplorationEngineService {
       graphData.finalStateIds
     );
 
-    let depthGraph: { [stateName: string]: number } = {};
+    let depthGraph: {[stateName: string]: number} = {};
     forEach(computedNodes, node => {
       depthGraph[node.id] = node.depth;
     });
@@ -298,19 +298,19 @@ export class ExplorationEngineService {
     paramChanges: ParamChange[],
     envs: Record<string, string>[]
   ): ExplorationParams {
-    let newParams: ExplorationParams = { ...oldParams };
+    let newParams: ExplorationParams = {...oldParams};
     if (
       paramChanges.every(pc => {
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            // FIX: Asserting default value is non-null for assignment
-            newParams[pc.name as keyof ExplorationParams] = pc.customizationArgs.value!;
+            newParams[pc.name as keyof ExplorationParams] =
+              pc.customizationArgs.value!;
           } else {
             let paramValue = this.expressionInterpolationService.processUnicode(
               pc.customizationArgs.value || '',
               [newParams].concat(envs)
             );
-            // FIX: Asserting return value for string assignment (Line 428)
+
             if (paramValue === null) {
               return false;
             }
@@ -318,7 +318,7 @@ export class ExplorationEngineService {
           }
         } else {
           // RandomSelector.
-          // FIX: Asserting return value is non-null
+
           newParams[pc.name as keyof ExplorationParams] = this.randomFromArray(
             pc.customizationArgs.list_of_values || []
           )!;
@@ -344,7 +344,7 @@ export class ExplorationEngineService {
     return this.expressionInterpolationService.processHtml(
       newState.content.html,
       envs
-    )!; // FIX: Asserting return is not null
+    )!;
   }
 
   /**
@@ -401,7 +401,7 @@ export class ExplorationEngineService {
         true,
         nextFocusLabel,
         null
-      )!; // FIX: Asserting return is not null
+      )!;
     }
 
     let questionHtml: string = this.makeQuestion(initialState, [newParams]);
@@ -422,7 +422,7 @@ export class ExplorationEngineService {
       questionHtml,
       interactionHtml,
       interaction,
-      initialState.content.contentId! // FIX: Asserting contentId is not null
+      initialState.content.contentId!
     );
     successCallback(initialCard, nextFocusLabel);
   }
@@ -491,7 +491,7 @@ export class ExplorationEngineService {
       true,
       labelForFocusTarget,
       null
-    )!; // FIX: Asserting return is not null
+    )!;
   }
 
   /**
@@ -694,7 +694,7 @@ export class ExplorationEngineService {
     answer: string,
     interactionRulesService: InteractionRulesService,
     successCallback: (
-      nextCard: StateCard | null, // FIX: nextCard can be null
+      nextCard: StateCard | null,
       refreshInteraction: boolean,
       feedbackHtml: string,
       refresherExplorationId: string | null,
@@ -718,7 +718,7 @@ export class ExplorationEngineService {
     let classificationResult: AnswerClassificationResult =
       this.answerClassificationService.getMatchingClassificationResult(
         oldStateName,
-        oldStateCard.getInteraction()!, // FIX: Assert interaction is not null
+        oldStateCard.getInteraction()!,
         answer,
         interactionRulesService
       );
@@ -728,7 +728,7 @@ export class ExplorationEngineService {
     // Use {...} to clone the object
     // since classificationResult.outcome points
     // at oldState.interaction.default_outcome.
-    let outcome = { ...classificationResult.outcome };
+    let outcome = {...classificationResult.outcome};
     let newStateName: string = outcome.dest;
 
     if (!this.pageContextService.isInExplorationEditorPage()) {
@@ -833,7 +833,7 @@ export class ExplorationEngineService {
     this.stateEditorService.onUpdateActiveStateIfInEditor.emit(newStateName);
 
     let _nextFocusLabel = this.focusManagerService.generateFocusLabel();
-    let nextInteractionHtml: string | null = null; // FIX: Declared as string | null
+    let nextInteractionHtml: string | null = null;
     let interaction = this.exploration.getInteraction(this.nextStateName);
     if (!interaction) {
       this.alertsService.addWarning(
@@ -853,7 +853,7 @@ export class ExplorationEngineService {
     }
 
     questionHtml = questionHtml + this.getRandomSuffix();
-    nextInteractionHtml = nextInteractionHtml! + this.getRandomSuffix(); // FIX: Asserted non-null before use
+    nextInteractionHtml = nextInteractionHtml! + this.getRandomSuffix();
     let contentId = this.exploration.getState(this.nextStateName).content
       .contentId;
     if (contentId === null) {
@@ -881,9 +881,9 @@ export class ExplorationEngineService {
       refreshInteraction,
       feedbackHtml,
       refresherExplorationId,
-      missingPrerequisiteSkillId!, // FIX: Asserting non-null for string argument
+      missingPrerequisiteSkillId!,
       onSameCard,
-      null!, // FIX: Asserting non-null for string argument
+      null!,
       oldStateName === this.exploration.initStateName,
       isFirstHit,
       false,
@@ -953,7 +953,7 @@ export class ExplorationEngineService {
 
     questionHtmlIfStuck = questionHtmlIfStuck + this.getRandomSuffix();
     nextInteractionIfStuckHtml =
-      nextInteractionIfStuckHtml! + this.getRandomSuffix(); // FIX: Asserted non-null
+      nextInteractionIfStuckHtml! + this.getRandomSuffix();
 
     let contentId = this.exploration.getState(this.nextStateIfStuckName).content
       .contentId;
@@ -963,7 +963,7 @@ export class ExplorationEngineService {
       questionHtmlIfStuck,
       nextInteractionIfStuckHtml,
       interaction,
-      contentId! // FIX: Asserting non-null
+      contentId!
     );
   }
 
@@ -996,7 +996,7 @@ export class ExplorationEngineService {
     let contentHtml =
       this.exploration.getState(stateName).content.html +
       this.getRandomSuffix();
-    interactionHtml = interactionHtml! + this.getRandomSuffix(); // FIX: Asserted non-null
+    interactionHtml = interactionHtml! + this.getRandomSuffix();
 
     let contentId = this.exploration.getState(stateName).content.contentId;
     if (contentId === null) {
@@ -1028,7 +1028,7 @@ export class ExplorationEngineService {
     allStates: StateObjectsBackendDict,
     destStateName: string
   ): string[] {
-    let stateGraphLinks: { source: string; target: string }[] = [];
+    let stateGraphLinks: {source: string; target: string}[] = [];
 
     // Create a list of all possible links between states.
     for (let stateName of Object.keys(allStates)) {
@@ -1054,7 +1054,7 @@ export class ExplorationEngineService {
     let shortestPathToStateInReverse: string[] = [];
     let pathsQueue: string[] = [];
     let visitedNodes: Record<string, boolean> = {};
-    let nodeToParentMap: Record<string, string | null> = {}; // FIX: Added | null
+    let nodeToParentMap: Record<string, string | null> = {};
     visitedNodes[this.exploration.initStateName] = true;
     pathsQueue.push(this.exploration.initStateName);
     // 1st state does not have a parent
@@ -1085,10 +1085,10 @@ export class ExplorationEngineService {
     }
 
     // Reconstruct the shortest path from node to parent map.
-    let currStateName: string | null = destStateName; // FIX: Added | null
+    let currStateName: string | null = destStateName;
     while (currStateName !== null) {
       shortestPathToStateInReverse.push(currStateName);
-      // FIX: nodeToParentMap[currStateName] can be null
+
       currStateName = nodeToParentMap[currStateName]!;
     }
     // Actual shortest path in order is reverse of the path retrieved

@@ -16,21 +16,21 @@
  * @fileoverview Component for RteHelperModal.
  */
 
-import { Component, Input, ViewChild } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { AppConstants } from 'app.constants';
+import {Component, Input, ViewChild} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
+import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-import { PageContextService } from 'services/page-context.service';
-import { ExternalRteSaveService } from 'services/external-rte-save.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { ServicesConstants } from 'services/services.constants';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { HtmlLengthService } from 'services/html-length.service';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {ExternalRteSaveService} from 'services/external-rte-save.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {ServicesConstants} from 'services/services.constants';
+import {FormBuilder, FormGroup} from '@angular/forms';
+import {Subscription} from 'rxjs';
+import {HtmlLengthService} from 'services/html-length.service';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -45,10 +45,10 @@ type ComponentSpecsType = typeof ServicesConstants.RTE_COMPONENT_SPECS;
 type ConvertStringLiteralsToString<T> = T extends string
   ? string // If T is a string, return the string type.
   : T extends object
-  ? // // If T is an object, map each key K of T to a new object with the same
-  // key but a value of ConvertStringLiteralsToString<T[K]>.
-  { [K in keyof T]: ConvertStringLiteralsToString<T[K]> }
-  : T; // If T is not a string or an object, return T unchanged.
+    ? // // If T is an object, map each key K of T to a new object with the same
+      // key but a value of ConvertStringLiteralsToString<T[K]>.
+      {[K in keyof T]: ConvertStringLiteralsToString<T[K]>}
+    : T; // If T is not a string or an object, return T unchanged.
 
 // CustomizationArgsSpecsType extracts the customization_arg_specs array from
 // each component in ComponentSpecsType.
@@ -67,7 +67,7 @@ export type CustomizationArgsForRteType = {
   [K in CustomizationArgsSpecsType[number]['name']]: ConvertStringLiteralsToString<
     // Extract is used to find the correct customization_arg_specs object that
     // has the 'name' property equal to K.
-    Extract<CustomizationArgsSpecsType[number], { name: K }>['default_value']
+    Extract<CustomizationArgsSpecsType[number], {name: K}>['default_value']
   >;
 };
 
@@ -82,17 +82,17 @@ type CustomizationArgsNameAndValueArray = {
     value: // Check if the 'name' property is equal to 'math_content' using a
     // conditional type.
     ComponentSpecsType[K]['customization_arg_specs'][number]['name'] extends 'math_content'
-    ? ConvertStringLiteralsToString<
-      ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
-    > & {
-      svgFile: string | null;
-      mathExpressionSvgIsBeingProcessed: boolean;
-    }
-    : // If the 'name' property is not equal to 'math_content', create a type with
-    // the 'default_value' converted to a string.
-    ConvertStringLiteralsToString<
-      ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
-    >;
+      ? ConvertStringLiteralsToString<
+          ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
+        > & {
+          svgFile: string | null;
+          mathExpressionSvgIsBeingProcessed: boolean;
+        }
+      : // If the 'name' property is not equal to 'math_content', create a type with
+        // the 'default_value' converted to a string.
+        ConvertStringLiteralsToString<
+          ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
+        >;
   }[];
   // Finally, use [keyof ComponentSpecsType] to create a union.
 }[keyof ComponentSpecsType];
@@ -108,17 +108,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  // FIX: Added '!' for TS2564 initializer errors
   @Input() componentId!: RteComponentId;
   @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
   @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
   @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage!: string; // FIX: Added '!'
+  errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm!: FormGroup; // FIX: Added '!'
-  customizationArgsFormSubscription!: Subscription; // FIX: Added '!'
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -132,8 +131,8 @@ export class RteHelperModalComponent {
   COMPONENT_ID_TABS_CONTENT = 'tabs_content';
   COMPONENT_ID_VIDEO = 'video';
   // Character limit for various RTE components.
-  // FIX: Added 'as any' cast for indexing in getCharacterLimit
-  CHARACTER_LIMITS: { [key: string]: number } = {
+
+  CHARACTER_LIMITS: {[key: string]: number} = {
     collapsible_heading: 200,
     collapsible_content: 500,
     link: 200,
@@ -153,7 +152,7 @@ export class RteHelperModalComponent {
     private imageLocalStorageService: ImageLocalStorageService,
     private imageUploadHelperService: ImageUploadHelperService,
     private htmlLengthService: HtmlLengthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     for (let i = 0; i < this.customizationArgSpecs.length; i++) {
@@ -174,7 +173,7 @@ export class RteHelperModalComponent {
             : this.customizationArgSpecs[i].default_value,
         } as Extract<
           CustomizationArgsNameAndValueArray[number],
-          { name: typeof caName }
+          {name: typeof caName}
         >;
         // If the component being created or edited is math rich text component,
         // we need to pass this extra attribute svgFile to the math RTE editor.
@@ -186,7 +185,7 @@ export class RteHelperModalComponent {
         (
           this.tmpCustomizationArgs as Extract<
             CustomizationArgsNameAndValueArray[number],
-            { name: typeof caName }
+            {name: typeof caName}
           >[]
         ).push(mathValueDict);
       } else {
@@ -201,21 +200,20 @@ export class RteHelperModalComponent {
             : this.customizationArgSpecs[i].default_value,
         } as Extract<
           CustomizationArgsNameAndValueArray[number],
-          { name: typeof caName }
+          {name: typeof caName}
         >;
         (
           this.tmpCustomizationArgs as Extract<
             CustomizationArgsNameAndValueArray[number],
-            { name: typeof caName }
+            {name: typeof caName}
           >[]
         ).push(tmpCustomizationArg);
       }
     }
 
     const formGroupControls = {};
-    // FIX: Added ': any' type to '_' parameter for TS7006
+
     this.customizationArgSpecs.forEach((_: any, index: number) => {
-      // FIX: Added 'as any' for indexing formGroupControls for TS7053
       (formGroupControls as any)[index] = this.fb.control(
         this.tmpCustomizationArgs[index].value
       );
@@ -250,10 +248,9 @@ export class RteHelperModalComponent {
   onCustomizationArgsFormChange(value: number | string | boolean): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      // FIX: Added 'as any' for indexing value
       let rawLatex: string = (value as any)[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        (value as any)[0].mathExpressionSvgIsBeingProcessed;
+      let mathExpressionSvgIsBeingProcessed: boolean = (value as any)[0]
+        .mathExpressionSvgIsBeingProcessed;
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -261,7 +258,6 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      // FIX: Added 'as any' for indexing value
       let start: number = (value as any)[1];
       let end: number = (value as any)[2];
       if ((value as any)[0] === '') {
@@ -273,35 +269,33 @@ export class RteHelperModalComponent {
       if (start !== 0 && start >= end) {
         this.updateRteErrorMessage(
           'Please ensure that the start time of the video is earlier than ' +
-          'the end time.'
+            'the end time.'
         );
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
       // Value[0] corresponds to all tab contents and titles.
-      // FIX: Added 'as any' for indexing value
+
       for (let tabIndex = 0; tabIndex < (value as any)[0].length; tabIndex++) {
-        // FIX: Added 'as any' for indexing value
         if ((value as any)[0][tabIndex].title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
-            (tabIndex + 1) +
-            ' is filled.'
+              (tabIndex + 1) +
+              ' is filled.'
           );
           break;
-          // FIX: Added 'as any' for indexing value
         } else if ((value as any)[0][tabIndex].content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
-            (tabIndex + 1) +
-            ' is filled.'
+              (tabIndex + 1) +
+              ' is filled.'
           );
           break;
         } else {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              (value as any)[0][tabIndex].content, // FIX: Added 'as any'
+              (value as any)[0][tabIndex].content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -314,7 +308,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              (value as any)[0][tabIndex].title, // FIX: Added 'as any'
+              (value as any)[0][tabIndex].title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -328,7 +322,6 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      // FIX: Added 'as any' for indexing value
       let url: string = (value as any)[0];
       let text: string = (value as any)[1];
 
@@ -348,7 +341,7 @@ export class RteHelperModalComponent {
       }
 
       if (!text.trim()) {
-        (value as any)[1] = url; // FIX: Added 'as any' for indexing value
+        (value as any)[1] = url;
         text = url;
       } else {
         // First check if the `text` looks like a URL.
@@ -368,20 +361,17 @@ export class RteHelperModalComponent {
               text = text.substring(prefix.length);
             }
           }
-          // After the cleanup, if the strings are not equal, then we do not
-          // allow the lesson creator to save it.
+
           if (url !== text) {
             this.updateRteErrorMessage(
               'It seems like clicking on this link will lead the user to a ' +
-              'different URL than the text specifies. Please change the text.'
+                'different URL than the text specifies. Please change the text.'
             );
             return;
           }
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_COLLAPSIBLE) {
-      // Check heading and content lengths for collapsible components.
-      // FIX: Added 'as any' for indexing value
       if (
         (value as any)[0] &&
         this.isContentLengthExceeded(
@@ -395,7 +385,6 @@ export class RteHelperModalComponent {
         return;
       }
 
-      // FIX: Added 'as any' for indexing value
       if (
         (value as any)[1] &&
         this.isContentLengthExceeded(
@@ -409,10 +398,12 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
-      // FIX: Added 'as any' for indexing value
       if (
         (value as any)[0] &&
-        this.isContentLengthExceeded((value as any)[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          (value as any)[0],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -424,10 +415,12 @@ export class RteHelperModalComponent {
         );
       }
 
-      // FIX: Added 'as any' for indexing value
       if (
         (value as any)[1] &&
-        this.isContentLengthExceeded((value as any)[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        this.isContentLengthExceeded(
+          (value as any)[1],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
@@ -466,8 +459,10 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    // FIX: Added 'as any' for indexing CHARACTER_LIMITS
-    return (this.CHARACTER_LIMITS as any)[componentId] || this.CHARACTER_LIMITS.default;
+    return (
+      (this.CHARACTER_LIMITS as any)[componentId] ||
+      this.CHARACTER_LIMITS.default
+    );
   }
 
   isErrorMessageNonempty(): boolean {
@@ -486,7 +481,6 @@ export class RteHelperModalComponent {
   }
 
   save(): void {
-    // FIX: Added 'as any' for indexing tmpCustomizationArgs
     for (let index in this.customizationArgsForm.value) {
       (this.tmpCustomizationArgs as any)[index].value =
         this.customizationArgsForm.value[index];
@@ -510,7 +504,7 @@ export class RteHelperModalComponent {
       // the type more specific.
       const tmpCustomizationArgs = this.tmpCustomizationArgs as Extract<
         CustomizationArgsNameAndValueArray[number],
-        { name: 'math_content' }
+        {name: 'math_content'}
       >[];
       const svgFile = tmpCustomizationArgs[0].value.svgFile;
       const svgFileName = tmpCustomizationArgs[0].value.svg_filename;
@@ -518,12 +512,12 @@ export class RteHelperModalComponent {
       if (rawLatex === '' || svgFileName === '') {
         this.alertsService.addWarning(
           'The rawLatex or svgFileName for a Math expression should not ' +
-          'be empty.'
+            'be empty.'
         );
         this.ngbActiveModal.dismiss('cancel');
         return;
       }
-      // FIX: Added non-null assertion (!) for svgFile
+
       const resampledFile =
         this.imageUploadHelperService.convertImageDataToImageFile(svgFile!);
 
@@ -541,9 +535,9 @@ export class RteHelperModalComponent {
       if (resampledFile.size > maxAllowedFileSize) {
         this.alertsService.addInfoMessage(
           `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
-          ' KB. Please split the expression into smaller ones.' +
-          "   Example: x^2 + y^2 + z^2 can be split as 'x^2 + y^2' " +
-          "and '+ z^2'",
+            ' KB. Please split the expression into smaller ones.' +
+            "   Example: x^2 + y^2 + z^2 can be split as 'x^2 + y^2' " +
+            "and '+ z^2'",
           5000
         );
         this.ngbActiveModal.dismiss('cancel');
@@ -553,13 +547,13 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
-        this.imageLocalStorageService.saveImage(svgFileName, svgFile!); // FIX: Added !
+        this.imageLocalStorageService.saveImage(svgFileName, svgFile!);
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
           svg_filename: svgFileName,
         };
         const caName = tmpCustomizationArgs[0].name;
-        (customizationArgsDict as any)[caName] = mathContentDict; // FIX: Added 'as any'
+        (customizationArgsDict as any)[caName] = mathContentDict;
         this.ngbActiveModal.close(customizationArgsDict);
         return;
       }
@@ -577,12 +571,12 @@ export class RteHelperModalComponent {
               svg_filename: response.filename,
             };
             const caName = tmpCustomizationArgs[0].name;
-            (customizationArgsDict as any)[caName] = mathContentDict; // FIX: Added 'as any'
+            (customizationArgsDict as any)[caName] = mathContentDict;
             this.ngbActiveModal.close(customizationArgsDict);
           },
           errorResponse => {
             this.alertsService.addWarning(
-              (errorResponse.error || 'Error communicating with server.')! // FIX: Added '!' for null check
+              (errorResponse.error || 'Error communicating with server.')!
             );
             this.ngbActiveModal.dismiss('cancel');
           }
@@ -592,7 +586,6 @@ export class RteHelperModalComponent {
         const caName = this.tmpCustomizationArgs[i].name;
         if (this.componentId === this.COMPONENT_ID_VIDEO) {
           if (caName === 'video_id') {
-            // FIX: Added 'as string' to handle value being passed
             this.tmpCustomizationArgs[i].value =
               this.extractVideoIdFromVideoUrl(
                 this.tmpCustomizationArgs[i].value.toString()

@@ -21,26 +21,26 @@
  * pretest mode.
  */
 
-import { EventEmitter, Injectable } from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 
-import { AppConstants } from 'app.constants';
-import { State } from 'domain/state/state.model';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExpressionInterpolationService } from 'expressions/expression-interpolation.service';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {AppConstants} from 'app.constants';
+import {State} from 'domain/state/state.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExpressionInterpolationService} from 'expressions/expression-interpolation.service';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   AnswerClassificationService,
   InteractionRulesService,
 } from 'pages/exploration-player-page/services/answer-classification.service';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
-import { AlertsService } from 'services/alerts.service';
-import { PageContextService } from 'services/page-context.service';
-import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
-import { FocusManagerService } from 'services/stateful/focus-manager.service';
+import {InteractionSpecsConstants} from 'pages/interaction-specs.constants';
+import {AlertsService} from 'services/alerts.service';
+import {PageContextService} from 'services/page-context.service';
+import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
+import {FocusManagerService} from 'services/stateful/focus-manager.service';
 import cloneDeep from 'lodash/cloneDeep';
-import { Question, QuestionBackendDict } from 'domain/question/question.model';
-import { QuestionBackendApiService } from 'domain/question/question-backend-api.service';
-import { PlayerTranscriptService } from './player-transcript.service';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
+import {QuestionBackendApiService} from 'domain/question/question-backend-api.service';
+import {PlayerTranscriptService} from './player-transcript.service';
 
 interface QuestionPlayerConfigDict {
   skillList: string[];
@@ -92,7 +92,7 @@ export class QuestionPlayerEngineService {
     private expressionInterpolationService: ExpressionInterpolationService,
     private focusManagerService: FocusManagerService,
     private playerTranscriptService: PlayerTranscriptService
-  ) { }
+  ) {}
 
   /**
    * Initializes the question player with configuration settings and fetches
@@ -136,7 +136,7 @@ export class QuestionPlayerEngineService {
     pretestQuestionObjects: Question[],
     callback: (initialCard: StateCard, nextFocusLabel: string) => void
   ): void {
-    this.init(pretestQuestionObjects, callback, () => { });
+    this.init(pretestQuestionObjects, callback, () => {});
   }
 
   /**
@@ -361,7 +361,8 @@ export class QuestionPlayerEngineService {
       newState = oldState;
     }
 
-    const questionHtml = this.makeQuestion(newState!, [
+    // FIX: Changed 'const' to 'let' because it is reassigned later.
+    let questionHtml = this.makeQuestion(newState!, [
       oldParams,
       {
         answer: 'answer',

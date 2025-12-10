@@ -29,20 +29,19 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
-import { InteractionAnswer, MusicNotesAnswer } from 'interactions/answer-defs';
+import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
   MusicNotesInputCustomizationArgs,
   ReadableMusicNote,
 } from 'interactions/customization-args-defs';
-import { InteractionAttributesExtractorService } from 'interactions/interaction-attributes-extractor.service';
-import { InteractionsExtensionsConstants } from 'interactions/interactions-extension.constants';
-import { CurrentInteractionService } from 'pages/exploration-player-page/services/current-interaction.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { Subscription } from 'rxjs';
-import { AlertsService } from 'services/alerts.service';
-import { MusicNotesInputRulesService } from './music-notes-input-rules.service';
-import { MusicPhrasePlayerService } from './music-phrase-player.service';
-
+import {InteractionAttributesExtractorService} from 'interactions/interaction-attributes-extractor.service';
+import {InteractionsExtensionsConstants} from 'interactions/interactions-extension.constants';
+import {CurrentInteractionService} from 'pages/exploration-player-page/services/current-interaction.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {Subscription} from 'rxjs';
+import {AlertsService} from 'services/alerts.service';
+import {MusicNotesInputRulesService} from './music-notes-input-rules.service';
+import {MusicPhrasePlayerService} from './music-phrase-player.service';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -67,14 +66,18 @@ interface Sequence {
   templateUrl: './music-notes-input-interaction.component.html',
 })
 export class MusicNotesInputComponent
-  implements OnInit, OnDestroy, AfterViewInit {
+  implements OnInit, OnDestroy, AfterViewInit
+{
   // These properties are initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1  @Input() lastAnswer!: string;
+  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   @Input() sequenceToGuessWithValue!: string;
   @Input() initialSequenceWithValue!: string;
+
+  @Input() lastAnswer: Sequence | null = null;
+
   sequenceToGuess!: Sequence;
-  initialSequence!: string | Sequence;
+  initialSequence!: string | Sequence | null;
   staffTop!: number;
   staffBottom!: number;
   readableSequence!: string;
@@ -111,7 +114,7 @@ export class MusicNotesInputComponent
     private alertsService: AlertsService,
     private elementRef: ElementRef,
     private renderer: Renderer2
-  ) { }
+  ) {}
 
   private _getAttributes() {
     return {
@@ -121,7 +124,7 @@ export class MusicNotesInputComponent
   }
 
   ngOnInit(): void {
-    const { sequenceToGuess, initialSequence } =
+    const {sequenceToGuess, initialSequence} =
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'MusicNotesInput',
         this._getAttributes()
@@ -251,7 +254,7 @@ export class MusicNotesInputComponent
   // start of the exploration and can be removed by the learner.
   initializeNoteSequence(initialNotesToAdd: Sequence): void {
     for (let i = 0; i < initialNotesToAdd.value.length; i++) {
-      let { baseNoteMidiNumber, offset } = this._convertReadableNoteToNote(
+      let {baseNoteMidiNumber, offset} = this._convertReadableNoteToNote(
         initialNotesToAdd.value[i]
       );
       let initialNote: MusicNote = {
@@ -295,7 +298,7 @@ export class MusicNotesInputComponent
   // as keys and the vertical positions of the staff lines as values.
   getStaffLinePositions(): Object {
     const staffLinePositionsArray: number[] = [];
-    const staffLinePositions: { [key: string]: number } = {};
+    const staffLinePositions: {[key: string]: number} = {};
     const elements: NodeListOf<HTMLElement> =
       this.elementRef.nativeElement.querySelectorAll(
         '.oppia-music-input-staff div.oppia-music-staff-position'
@@ -305,7 +308,8 @@ export class MusicNotesInputComponent
       staffLinePositionsArray.push(el.offsetTop);
     });
     for (let i = 0; i < staffLinePositionsArray.length; i++) {
-      (staffLinePositions as any)[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
+      (staffLinePositions as any)[this.verticalGridKeys[i]] =
+        staffLinePositionsArray[i];
     }
     return staffLinePositions as Object;
   }
@@ -398,7 +402,7 @@ export class MusicNotesInputComponent
     for (let i = 0; i < this.noteSequence.length; i++) {
       var innerDiv = $(
         '<div class="oppia-music-input-natural-note' +
-        ' oppia-music-input-on-staff"></div>'
+          ' oppia-music-input-on-staff"></div>'
       )
         .data('noteType', this.NOTE_TYPE_NATURAL)
         .data('noteId', this.noteSequence[i].note.noteId)
@@ -613,7 +617,7 @@ export class MusicNotesInputComponent
   // When compareNoteStarts(a, b) returns 0, a is equal to b.
   // When compareNoteStarts(a, b) returns greater than 0, a is greater
   //   than b.
-  compareNoteStarts(a: { note: MusicNote }, b: { note: MusicNote }): number {
+  compareNoteStarts(a: {note: MusicNote}, b: {note: MusicNote}): number {
     if (a.note.noteStart && b.note.noteStart) {
       return (
         (a.note.noteStart.num * b.note.noteStart.den -
@@ -672,7 +676,6 @@ export class MusicNotesInputComponent
   }
 
   getNoteStartAsFloat(note: MusicNote): number {
-
     return note.noteStart ? note.noteStart.num / note.noteStart.den : 0;
   }
 
@@ -773,7 +776,6 @@ export class MusicNotesInputComponent
   _getCorrespondingNoteName(midiNumber: string | number): string {
     let correspondingNoteName: string | null = null;
     for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
-
       if ((this.NOTE_NAMES_TO_MIDI_VALUES as any)[noteName] === midiNumber) {
         correspondingNoteName = noteName;
         break;
@@ -799,7 +801,7 @@ export class MusicNotesInputComponent
     if (note.offset !== -1 && note.offset !== 0 && note.offset !== 1) {
       console.error('Invalid note offset: ' + note.offset);
 
-      return { readableNoteName: '' };
+      return {readableNoteName: '', noteDuration: {num: 1, den: 1}};
     }
 
     let correspondingNoteName = this._getCorrespondingNoteName(
@@ -811,6 +813,10 @@ export class MusicNotesInputComponent
     return {
       readableNoteName:
         correspondingNoteName[0] + accidental + correspondingNoteName[1],
+      noteDuration: {
+        num: 1,
+        den: 1,
+      },
     } as ReadableMusicNote;
   }
 
@@ -829,7 +835,9 @@ export class MusicNotesInputComponent
     if (readableNoteName.length === 2) {
       // This is a natural note.
       return {
-        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[readableNoteName],
+        baseNoteMidiNumber: (this.NOTE_NAMES_TO_MIDI_VALUES as any)[
+          readableNoteName
+        ],
         offset: 0,
       };
     } else if (readableNoteName.length === 3) {
@@ -843,7 +851,7 @@ export class MusicNotesInputComponent
       if (offset === null) {
         console.error('Invalid readable note: ' + readableNoteName);
 
-        return { baseNoteMidiNumber: 0, offset: 0 };
+        return {baseNoteMidiNumber: 0, offset: 0};
       }
 
       return {
@@ -856,7 +864,7 @@ export class MusicNotesInputComponent
       // This is not a valid readableNote.
       console.error('Invalid readable note: ' + readableNote);
 
-      return { baseNoteMidiNumber: 0, offset: 0 };
+      return {baseNoteMidiNumber: 0, offset: 0};
     }
   }
 
@@ -959,11 +967,15 @@ export class MusicNotesInputComponent
   // Return the MIDI value for each note in the sequence.
   // TODO(#15177): Add more features to Music-Notes-Input Interaction.
   // Add chord functionality.
-  convertSequenceToGuessToMidiSequence(sequence: { baseNoteMidiNumber: number, offset: number }[]): number[][] {
+  convertSequenceToGuessToMidiSequence(
+    sequence: {baseNoteMidiNumber: number; offset: number}[]
+  ): number[][] {
     let midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
       if (sequence[i].hasOwnProperty('baseNoteMidiNumber')) {
-        midiSequence.push([this._convertNoteToMidiPitch(sequence[i] as MusicNote)]);
+        midiSequence.push([
+          this._convertNoteToMidiPitch(sequence[i] as MusicNote),
+        ]);
       } else {
         console.error('Invalid note: ' + sequence[i]);
       }

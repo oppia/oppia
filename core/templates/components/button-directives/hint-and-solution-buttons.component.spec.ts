@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for HintAndSolutionButtonsComponent
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ChangeDetectorRef, EventEmitter } from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ChangeDetectorRef, EventEmitter} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -25,25 +25,23 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import { NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { MockTranslateService } from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
-import { Interaction } from 'domain/exploration/interaction.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StateCard } from 'domain/state_card/state-card.model';
-import { ExplorationModeService } from 'pages/exploration-player-page/services/exploration-mode.service';
-import { HintAndSolutionModalService } from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
-import { HintsAndSolutionManagerService } from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import { PlayerPositionService } from 'pages/exploration-player-page/services/player-position.service';
-import { PlayerTranscriptService } from 'pages/exploration-player-page/services/player-transcript.service';
-import { StatsReportingService } from 'pages/exploration-player-page/services/stats-reporting.service';
-import { HintAndSolutionButtonsComponent } from './hint-and-solution-buttons.component';
-import { MockTranslatePipe } from 'tests/unit-test-utils';
-import { I18nLanguageCodeService } from 'services/i18n-language-code.service';
-
+import {NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {MockTranslateService} from 'components/forms/schema-based-editors/integration-tests/schema-based-editors.integration.spec';
+import {Interaction} from 'domain/exploration/interaction.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StateCard} from 'domain/state_card/state-card.model';
+import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
+import {HintAndSolutionModalService} from 'pages/exploration-player-page/services/hint-and-solution-modal.service';
+import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
+import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
+import {PlayerTranscriptService} from 'pages/exploration-player-page/services/player-transcript.service';
+import {StatsReportingService} from 'pages/exploration-player-page/services/stats-reporting.service';
+import {HintAndSolutionButtonsComponent} from './hint-and-solution-buttons.component';
+import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 
 class MockHintAndSolutionModalService extends HintAndSolutionModalService {
-
   displaySolutionModal(
     solution: any,
     isHint: any,
@@ -52,17 +50,12 @@ class MockHintAndSolutionModalService extends HintAndSolutionModalService {
     displaySolutionExplanation: any,
     ...args: any[]
   ): NgbModalRef {
-    return { result: Promise.resolve('success') } as NgbModalRef;
+    return {result: Promise.resolve('success')} as NgbModalRef;
   }
 }
 
-
 class MockStatsReportingService extends StatsReportingService {
-
-  recordSolutionHit(
-    stateName: string,
-    ...args: any[]
-  ): void { }
+  recordSolutionHit(stateName: string, ...args: any[]): void {}
 }
 
 describe('HintAndSolutionButtonsComponent', () => {
@@ -151,7 +144,7 @@ describe('HintAndSolutionButtonsComponent', () => {
         {
           provide: StatsReportingService,
           useClass: MockStatsReportingService,
-        }
+        },
       ],
     }).compileComponents();
   }));
@@ -165,9 +158,13 @@ describe('HintAndSolutionButtonsComponent', () => {
     );
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     playerTranscriptService = TestBed.inject(PlayerTranscriptService);
-    hintAndSolutionModalService = TestBed.inject(HintAndSolutionModalService) as MockHintAndSolutionModalService;
+    hintAndSolutionModalService = TestBed.inject(
+      HintAndSolutionModalService
+    ) as MockHintAndSolutionModalService;
     explorationModeService = TestBed.inject(ExplorationModeService);
-    statsReportingService = TestBed.inject(StatsReportingService) as MockStatsReportingService;
+    statsReportingService = TestBed.inject(
+      StatsReportingService
+    ) as MockStatsReportingService;
 
     spyOn(playerPositionService, 'onNewCardOpened').and.returnValue(
       new EventEmitter<StateCard>()
@@ -291,7 +288,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should reset local hints array if active card is' +
-    ' changed to the last one',
+      ' changed to the last one',
     fakeAsync(() => {
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(true);
       spyOn(component, 'resetLocalHintsArray');
@@ -307,7 +304,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should not reset local hints array if new active card is' +
-    ' not the last one',
+      ' not the last one',
     fakeAsync(() => {
       spyOn(playerTranscriptService, 'isLastCard').and.returnValue(false);
       spyOn(component, 'resetLocalHintsArray');
@@ -355,7 +352,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     "should show hint button if hint is viewable and displayed card's" +
-    ' interaction supports hints',
+      ' interaction supports hints',
     () => {
       spyOn(hintsAndSolutionManagerService, 'isHintViewable').and.returnValues(
         false,
@@ -364,7 +361,6 @@ describe('HintAndSolutionButtonsComponent', () => {
       );
 
       expect(component.isHintButtonVisible(0)).toBe(false);
-
 
       component.displayedCard = StateCard.createNewCard(
         'State 1',
@@ -431,7 +427,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should close display hint modal and reset active hint index when modal' +
-    ' is closed',
+      ' is closed',
     fakeAsync(() => {
       spyOn(hintAndSolutionModalService, 'displayHintModal').and.returnValue({
         result: Promise.reject('failure'),
@@ -469,7 +465,6 @@ describe('HintAndSolutionButtonsComponent', () => {
 
       expect(component.solutionModalIsActive).toBe(false);
 
-
       component.onClickSolutionButton();
       tick();
 
@@ -498,8 +493,8 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should open interstitial modal if solution has not' +
-    ' been consumed before and then display solution modal' +
-    ' after user confirms',
+      ' been consumed before and then display solution modal' +
+      ' after user confirms',
     fakeAsync(() => {
       spyOn(
         hintsAndSolutionManagerService,
@@ -511,7 +506,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       ).and.returnValue({
         result: Promise.resolve('success'),
       } as NgbModalRef);
-      spyOn(component, 'displaySolutionModal').and.callFake(() => { });
+      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
       component.onClickSolutionButton();
       tick();
@@ -522,7 +517,7 @@ describe('HintAndSolutionButtonsComponent', () => {
 
   it(
     'should close interstitial modal if solution has not' +
-    ' been consumed before and user click cancel',
+      ' been consumed before and user click cancel',
     fakeAsync(() => {
       spyOn(
         hintsAndSolutionManagerService,
@@ -534,7 +529,7 @@ describe('HintAndSolutionButtonsComponent', () => {
       ).and.returnValue({
         result: Promise.reject('failure'),
       } as NgbModalRef);
-      spyOn(component, 'displaySolutionModal').and.callFake(() => { });
+      spyOn(component, 'displaySolutionModal').and.callFake(() => {});
 
       component.solutionModalIsActive = true;
       component.onClickSolutionButton();

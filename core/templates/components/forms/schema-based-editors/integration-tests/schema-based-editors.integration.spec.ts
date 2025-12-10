@@ -16,7 +16,7 @@
  * @fileoverview Integration tests for schema based editors.
  */
 
-import { DebugElement } from '@angular/core';
+import {DebugElement} from '@angular/core';
 import {
   ComponentFixture,
   fakeAsync,
@@ -25,41 +25,31 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import { FormsModule, NgModel, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { By } from '@angular/platform-browser';
-import { NgbTooltipModule, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { DynamicContentModule } from 'components/interaction-display/dynamic-content.module';
-import { OppiaCkEditor4Module } from 'components/ck-editor-helpers/ckeditor4.module';
-import { CodeMirrorModule } from 'components/code-mirror/codemirror.module';
-import { ApplyValidationDirective } from 'components/forms/custom-forms-directives/apply-validation.directive';
-import { CustomFormsComponentsModule } from 'components/forms/custom-forms-directives/custom-form-components.module';
-import { ObjectEditorComponent } from 'components/forms/custom-forms-directives/object-editor.directive';
-import { AudioSliderComponent } from 'components/forms/slider/audio-slider.component';
-import { DirectivesModule } from 'directives/directives.module';
-import { SharedPipesModule } from 'filters/shared-pipes.module';
-import { MaterialModule } from 'modules/material.module';
-import { DictSchema, UnicodeSchema } from 'services/schema-default-value.service';
-import { MockTranslateModule } from 'tests/unit-test-utils';
-import { SchemaBasedBoolEditorComponent } from '../schema-based-bool-editor.component';
-import { SchemaBasedChoicesEditorComponent } from '../schema-based-choices-editor.component';
-import { SchemaBasedCustomEditorComponent } from '../schema-based-custom-editor.component';
-import { SchemaBasedDictEditorComponent } from '../schema-based-dict-editor.component';
-import { SchemaBasedEditorComponent } from '../schema-based-editor.component';
-import { SchemaBasedFloatEditorComponent } from '../schema-based-float-editor.component';
-import { SchemaBasedHtmlEditorComponent } from '../schema-based-html-editor.component';
-import { SchemaBasedIntEditorComponent } from '../schema-based-int-editor.component';
-import { SchemaBasedListEditorComponent } from '../schema-based-list-editor.component';
-import { SchemaBasedUnicodeEditor } from '../schema-based-unicode-editor.component';
-import { RteHelperModalComponent } from 'services/editor-customization.service';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { ImageUploadHelperService } from 'services/image-upload-helper.service';
-import { ImageLocalStorageService } from 'services/image-local-storage.service';
-import { CkEditorInitializerService } from 'components/forms/text-input/ck-editor-initializer.service';
-import { AlertsService } from 'services/alerts.service';
-import { AssetsBackendApiService } from 'services/assets-backend-api.service';
-
+import {NgModel} from '@angular/forms';
+import {By} from '@angular/platform-browser';
+import {NgbModalModule, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {TranslateService} from '@ngx-translate/core';
+import {ApplyValidationDirective} from 'components/forms/custom-forms-directives/apply-validation.directive';
+import {ObjectEditorComponent} from 'components/forms/custom-forms-directives/object-editor.directive';
+import {AudioSliderComponent} from 'components/forms/slider/audio-slider.component';
+import {DictSchema, UnicodeSchema} from 'services/schema-default-value.service';
+import {SchemaBasedBoolEditorComponent} from '../schema-based-bool-editor.component';
+import {SchemaBasedChoicesEditorComponent} from '../schema-based-choices-editor.component';
+import {SchemaBasedCustomEditorComponent} from '../schema-based-custom-editor.component';
+import {SchemaBasedDictEditorComponent} from '../schema-based-dict-editor.component';
+import {SchemaBasedEditorComponent} from '../schema-based-editor.component';
+import {SchemaBasedFloatEditorComponent} from '../schema-based-float-editor.component';
+import {SchemaBasedHtmlEditorComponent} from '../schema-based-html-editor.component';
+import {SchemaBasedIntEditorComponent} from '../schema-based-int-editor.component';
+import {SchemaBasedListEditorComponent} from '../schema-based-list-editor.component';
+import {SchemaBasedUnicodeEditor} from '../schema-based-unicode-editor.component';
+import {RteHelperModalComponent} from 'services/editor-customization.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
+import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {CkEditorInitializerService} from 'components/forms/text-input/ck-editor-initializer.service';
+import {AlertsService} from 'services/alerts.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 export function findComponent<T>(
   fixture: ComponentFixture<T>,
@@ -167,7 +157,6 @@ describe('Schema based editor', () => {
   });
 
   it('should follow the schema', fakeAsync(() => {
-
     const schema: DictSchema = {
       type: 'dict',
       properties: [
@@ -187,7 +176,7 @@ describe('Schema based editor', () => {
             ],
           } as UnicodeSchema,
         },
-        { name: 'real', schema: { type: 'float' } },
+        {name: 'real', schema: {type: 'float'}},
       ],
     };
     const schemaBasedEditorFixture = TestBed.createComponent(
@@ -247,12 +236,9 @@ describe('Schema based editor', () => {
     expect(schemaBasedUnicodeEditorInput.value).toBe('');
     expect(schemaBasedFloatEditorInput.value).toBe('');
 
-
     changeValuesInUI('SomeName', 4);
 
-
     expectTopLevelComponentValueToBe('SomeName', 4);
-
 
     expect(unicodeInputFormController.invalid).toBeFalsy();
     changeValuesInUI('SomeVeryLongName');
@@ -512,10 +498,10 @@ describe('Schema based editor', () => {
   }));
 
   it('should not set image data url when local storage is full', fakeAsync(() => {
-
-    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
-      true
-    );
+    spyOn(
+      imageLocalStorageService,
+      'isLocalStorageExceedsTotalStorage'
+    ).and.returnValue(true);
     spyOn(alertsService, 'addWarning');
 
     component.schema = {
@@ -586,9 +572,10 @@ describe('Schema based editor', () => {
       'blog_post_editor'
     );
 
-    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
-      false
-    );
+    spyOn(
+      imageLocalStorageService,
+      'isLocalStorageExceedsTotalStorage'
+    ).and.returnValue(false);
     spyOn(alertsService, 'addWarning');
 
     component.schema = {
@@ -612,9 +599,10 @@ describe('Schema based editor', () => {
       'blog_post_editor'
     );
 
-    spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
-      true
-    );
+    spyOn(
+      imageLocalStorageService,
+      'isLocalStorageExceedsTotalStorage'
+    ).and.returnValue(true);
     spyOn(alertsService, 'addWarning');
 
     component.schema = {
@@ -638,15 +626,16 @@ describe('Schema based editor', () => {
 
   it(
     'should not show warning for valid image file size when not in blog post' +
-    ' editor',
+      ' editor',
     () => {
       spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
         'exploration_editor'
       );
 
-      spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
-        false
-      );
+      spyOn(
+        imageLocalStorageService,
+        'isLocalStorageExceedsTotalStorage'
+      ).and.returnValue(false);
       spyOn(alertsService, 'addWarning');
 
       component.schema = {
@@ -668,15 +657,16 @@ describe('Schema based editor', () => {
 
   it(
     'should show warning for invalid image file size when not in blog post' +
-    ' editor',
+      ' editor',
     fakeAsync(() => {
       spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
         'exploration_editor'
       );
 
-      spyOn(imageLocalStorageService, 'isLocalStorageExceedsTotalStorage').and.returnValue(
-        true
-      );
+      spyOn(
+        imageLocalStorageService,
+        'isLocalStorageExceedsTotalStorage'
+      ).and.returnValue(true);
       spyOn(alertsService, 'addWarning');
 
       component.schema = {
