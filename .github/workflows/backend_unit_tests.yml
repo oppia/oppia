@@ -70,10 +70,6 @@ jobs:
   run_tests_using_pytest:
     name: Run tests using pytest (experimental)
     runs-on: ubuntu-22.04
-    # By default this job is gated to not run for pull requests. Change the
-    # `if` condition below when you want it to run for PRs (or add a label
-    # trigger). This keeps the job off for most PRs while under development.
-    if: github.event_name != 'pull_request'
     strategy:
       matrix:
         shard: [1, 2, 3, 4, 5]
