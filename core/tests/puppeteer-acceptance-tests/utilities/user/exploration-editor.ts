@@ -610,6 +610,8 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Selects multiple options from the item selection input.
+   * This function will uncheck any currently checked options that are not in
+   * the provided list, and check any options that should be selected.
    * @param options The options to select.
    */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
@@ -626,31 +628,40 @@ export class ExplorationEditor extends BaseUser {
       if (!optionText) {
         continue;
       }
-      if (options.includes(optionText)) {
-        // Click on the mat-checkbox element inside the label.
-        const checkboxElement = await optionElement.$(checkboxSelector);
-        if (!checkboxElement) {
-          throw new Error(`Checkbox not found for option: ${optionText}`);
-        }
 
-        // Check if the checkbox is already checked.
-        const isAlreadyChecked = await checkboxElement.evaluate(el =>
-          el.classList.contains('mat-checkbox-checked')
+      // Click on the mat-checkbox element inside the label.
+      const checkboxElement = await optionElement.$(checkboxSelector);
+      if (!checkboxElement) {
+        throw new Error(`Checkbox not found for option: ${optionText}`);
+      }
+
+      // Check if the checkbox is currently checked.
+      const isCurrentlyChecked = await checkboxElement.evaluate(el =>
+        el.classList.contains('mat-checkbox-checked')
+      );
+
+      const shouldBeChecked = options.includes(optionText);
+
+      if (shouldBeChecked && !isCurrentlyChecked) {
+        // Need to check this checkbox.
+        await checkboxElement.click();
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return element.classList.contains('mat-checkbox-checked');
+          },
+          {},
+          checkboxElement
         );
-
-        // Only click if the checkbox is not already checked.
-        if (!isAlreadyChecked) {
-          await checkboxElement.click();
-
-          // Wait for the mat-checkbox to have the checked class.
-          await this.page.waitForFunction(
-            (element: Element) => {
-              return element.classList.contains('mat-checkbox-checked');
-            },
-            {},
-            checkboxElement
-          );
-        }
+      } else if (!shouldBeChecked && isCurrentlyChecked) {
+        // Need to uncheck this checkbox.
+        await checkboxElement.click();
+        await this.page.waitForFunction(
+          (element: Element) => {
+            return !element.classList.contains('mat-checkbox-checked');
+          },
+          {},
+          checkboxElement
+        );
       }
     }
   }
