@@ -22,7 +22,7 @@ import datetime
 import json
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import (
     email_manager,
@@ -550,7 +550,7 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
             f.read()
         )
@@ -618,7 +618,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read())
         )
