@@ -670,8 +670,11 @@ class SuggestionToSkillActionHandler(
             )
 
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
-            suggestion_services.update_question_review_stats(suggestion)
+        # Suggestion type must be TYPE_ADD_QUESTION.
+        # Other suggestion types have different target types and schemas
+        # and will fail validation.
+        assert suggestion.suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION
+        suggestion_services.update_question_review_stats(suggestion)
 
         self.render_json(self.values)
 
@@ -893,7 +896,10 @@ class ReviewableSuggestionsHandler(
                     reviewable_suggestions
                 )
             )
-        elif suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION:
+        else:
+            # Suggestion type must be SUGGESTION_TYPE_ADD_QUESTION.
+            # Only contributor-dashboard suggestion types reach this handler.
+            assert suggestion_type == feconf.SUGGESTION_TYPE_ADD_QUESTION
             if limit is None:
                 raise ValueError(
                     'Limit must be provided for question suggestions.'
@@ -1270,10 +1276,12 @@ def _get_target_id_to_skill_opportunity_dict(
 
     for opp_id, skill in opportunity_id_to_skill.items():
         opportunity_dict = opportunity_id_to_opportunity_dict[opp_id]
-        if skill is not None and opportunity_dict is not None:
-            opportunity_dict['skill_rubrics'] = [
-                rubric.to_dict() for rubric in skill.rubrics
-            ]
+        # A failsafe is required by Mypy due to the structure of
+        # the code, skill and opportunity_dict can't be None.
+        assert opportunity_dict is not None
+        opportunity_dict['skill_rubrics'] = [
+            rubric.to_dict() for rubric in skill.rubrics
+        ]
 
     return opportunity_id_to_opportunity_dict
 
