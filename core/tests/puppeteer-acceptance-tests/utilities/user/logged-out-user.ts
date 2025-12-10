@@ -635,6 +635,15 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Closes the mobile sidebar and waits for the animation to complete.
+   * This ensures the sidebar is fully hidden before continuing.
+   */
+  private async closeMobileSidebar(): Promise<void> {
+    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(mobileSidebarOpenSelector, {hidden: true});
+  }
+
+  /**
    * Function to navigate to the home page.
    * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
@@ -1207,7 +1216,7 @@ export class LoggedOutUser extends BaseUser {
 
       // Close Navbar once links are verified.
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.closeMobileSidebar();
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
         visible: true,

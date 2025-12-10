@@ -1865,7 +1865,7 @@ export class BaseUser {
       const newTabPage = await newTarget.page();
       expect(newTabPage).toBeDefined();
       // Use startsWith instead of exact match because external sites may add
-      // query parameters (e.g., Cloudflare challenge tokens).
+      // query parameters (e.g., UTM params, Cloudflare challenge tokens, etc.).
       expect(newTabPage?.url().startsWith(targetPageUrl)).toBe(true);
       await newTabPage?.close();
     } else {
@@ -1881,9 +1881,9 @@ export class BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToastMessage(expectedMessage: string): Promise<void> {
-    // Note that the toast message disappears after a few seconds, so we need
-    // to process the toastMessageElement as soon as we receive it. Otherwise,
-    // the text within it may no longer be showing at the time of evaluation.
+    // The toast message disappears after a few seconds, so we need to process
+    // the toastMessageElement as soon as we receive it. Otherwise, the text
+    // within it may no longer be showing at the time of evaluation.
     const toastMessageElement = await this.page.waitForSelector(
       toastMessageSelector,
       {visible: true}

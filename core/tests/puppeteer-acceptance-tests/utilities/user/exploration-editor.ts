@@ -636,13 +636,13 @@ export class ExplorationEditor extends BaseUser {
       }
 
       // Check if the checkbox is currently checked.
-      const isCurrentlyChecked = await checkboxElement.evaluate(el =>
+      const checkboxIsCurrentlyChecked = await checkboxElement.evaluate(el =>
         el.classList.contains('mat-checkbox-checked')
       );
 
       const shouldBeChecked = options.includes(optionText);
 
-      if (shouldBeChecked && !isCurrentlyChecked) {
+      if (shouldBeChecked && !checkboxIsCurrentlyChecked) {
         // Need to check this checkbox. Use clickOnElement to ensure the element
         // is stable and clickable before clicking.
         await this.clickOnElement(checkboxElement);
@@ -653,7 +653,7 @@ export class ExplorationEditor extends BaseUser {
           {},
           checkboxElement
         );
-      } else if (!shouldBeChecked && isCurrentlyChecked) {
+      } else if (!shouldBeChecked && checkboxIsCurrentlyChecked) {
         // Need to uncheck this checkbox. Use clickOnElement to ensure the
         // element is stable and clickable before clicking.
         await this.clickOnElement(checkboxElement);
@@ -3682,10 +3682,10 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
       // resize button.
-      const isStateGraphModalOpen = await this.page.$(
+      const stateGraphModalIsOpen = await this.page.$(
         explorationStateGraphModalSelector
       );
-      if (!isStateGraphModalOpen) {
+      if (!stateGraphModalIsOpen) {
         // Wait for any blocking modal to close first before clicking the
         // resize button.
         const blockingModal = await this.page.$('div.modal-content');
