@@ -19,7 +19,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import (
     question_services,
@@ -713,7 +713,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'page_title_fragment': 'testing',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -762,7 +762,7 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'page_title_fragment': 'testing',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb',
             encoding=None,
@@ -787,7 +787,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def setUp(self) -> None:
         super().setUp()
         self.url = feconf.NEW_SKILL_URL
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             self.original_image_content = f.read()
@@ -943,7 +943,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             },
         ]
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
