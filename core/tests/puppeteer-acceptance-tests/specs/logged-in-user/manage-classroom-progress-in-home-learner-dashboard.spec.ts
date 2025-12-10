@@ -127,15 +127,17 @@ describe('Logged-in User', function () {
     'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectSidebarTabToBeActive('Home');
+      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+        'Home'
+      );
 
       await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
 
-      await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresentInRLD(
         ['Learn Something New'],
         'tabSection'
       );
-      await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresentInRLD(
         ["Topics available in Oppia's Classroom"],
         'cardDisplay'
       );
@@ -196,7 +198,7 @@ describe('Logged-in User', function () {
     await loggedInUser.continueToNextCard();
     await loggedInUser.navigateToLearnerDashboard();
     // Did not finish the chapter,So still in  In-progress section.
-    await loggedInUser.expectElementsToBePresent(
+    await loggedInUser.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
       'tabSection'
     );
@@ -354,6 +356,11 @@ describe('Logged-in User', function () {
       ['Chapter 6: Extra chapter'],
       0
     );
+
+    await loggedInUser.expectElementsNotToBePresentInRLD(
+      ['Recommended for you'],
+      'cardDisplay'
+    );
   });
 
   it(
@@ -397,11 +404,11 @@ describe('Logged-in User', function () {
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresent(
+    await loggedInUser.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
       'tabSection'
     );
-    await loggedInUser.expectElementsToBePresent(
+    await loggedInUser.expectElementsToBePresentInRLD(
       [
         'Lessons in progress',
         "Topics available in Oppia's Classroom",

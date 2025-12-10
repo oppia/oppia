@@ -118,9 +118,13 @@ describe('Logged-in User', function () {
     'should display empty progress message when no lessons are in progress',
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectSidebarTabToBeActive('Home');
+      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+        'Home'
+      );
       await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectSidebarTabToBeActive('Progress');
+      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+        'Progress'
+      );
       await loggedInUser.expectProgressSectionToBeEmptyInNewLD();
       await loggedInUser.expectScreenshotToMatch(
         'emptyProgressSection',
@@ -136,7 +140,7 @@ describe('Logged-in User', function () {
     await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
       true
     );
-    await loggedInUser.navigateThroughClassroomButtonONRLD();
+    await loggedInUser.navigateThroughClassroomButtonOnRLD();
     await loggedInUser.expectToBeOnPage('/learn/math');
   });
 
@@ -155,8 +159,11 @@ describe('Logged-in User', function () {
       'ProgressSectionInProgressWithOnlyChapter01',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresent(['In Progress'], 'tabSection');
-    await loggedInUser.expectElementsToBePresent(
+    await loggedInUser.expectElementsToBePresentInRLD(
+      ['In Progress'],
+      'tabSection'
+    );
+    await loggedInUser.expectElementsToBePresentInRLD(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
     );
@@ -248,8 +255,11 @@ describe('Logged-in User', function () {
       'inProgressTabCompletedSection',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresent(['Completed'], 'tabSection');
-    await loggedInUser.expectElementsToBePresent(
+    await loggedInUser.expectElementsToBePresentInRLD(
+      ['Completed'],
+      'tabSection'
+    );
+    await loggedInUser.expectElementsToBePresentInRLD(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
     );
@@ -293,7 +303,7 @@ describe('Logged-in User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should be able to see community lessons in Progress Tab and use "Display More" Button to see the collapseed Community Lesson', async function () {
+  it('should be able to see community lessons in Progress Tab and "Display More" Button', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToCommunityLibraryOnNavbar();
     await loggedInUser.expectToBeOnCommunityLibraryPage();
@@ -381,7 +391,7 @@ describe('Logged-in User', function () {
     async function () {
       await loggedInUser.navigateToLearnerDashboard();
       await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresentInRLD(
         ['In Progress', 'Completed'],
         'tabSection'
       );
@@ -404,11 +414,11 @@ describe('Logged-in User', function () {
         'communityLessonExploreTitle6InCompletedSectionOfProgressTab',
         __dirname
       );
-      await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresentInRLD(
         ['In Progress', 'Completed'],
         'tabSection'
       );
-      await loggedInUser.expectElementsToBePresent(
+      await loggedInUser.expectElementsToBePresentInRLD(
         [
           'Community Lessons',
           'Classroom Lessons',

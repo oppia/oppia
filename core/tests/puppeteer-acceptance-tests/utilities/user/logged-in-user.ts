@@ -244,6 +244,8 @@ const learnSomethingNewSectionSelector =
   '.e2e-test-learn-something-new-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
+const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
+const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -269,6 +271,11 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     button: '.e2e-test-skill-button',
     progress: '.e2e-test-progress-skill',
   },
+};
+const tabSelectorMap: Record<string, string> = {
+  Home: '.e2e-test-home-section',
+  Goals: '.e2e-test-goals-section',
+  Progress: '.e2e-test-progress-section',
 };
 
 // Learner Dashboard > Progress section selectors.
@@ -1924,12 +1931,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Verifies elements' existence.
+   * Verifies elements' existence on Redesigned Learner Dashboard(learnerDashSelectors).
    * @param {string[]} expectedTexts - Text content expected in elements.
    * @param {string} selector - Selector type.
    * @param {ParentNode} root - Page or element type we're verifying.
    */
-  async expectElementsToBePresent(
+  async expectElementsToBePresentInRLD(
     expectedTexts: string[],
     selector: string,
     root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
@@ -1963,6 +1970,54 @@ export class LoggedInUser extends BaseUser {
       );
     }
     showMessage(`Expected elements found: ${expectedTexts.join(', ')}`);
+  }
+
+  /**
+   * Verifies that elements with the given texts DO NOT exist (or are not visible)
+   * for the given selector group of Learner Dashboard (learnerDashSelectors).
+   *
+   * @param expectedTexts - Texts that must NOT appear in the matched elements.
+   * @param selector - Selector type..
+   * @param root - Page or element type we're verifying.
+   */
+  async expectElementsNotToBePresentInRLD(
+    expectedTexts: string[],
+    selectorKey: string,
+    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
+  ): Promise<void> {
+    const selectors = learnerDashSelectors[selectorKey];
+    const headingSelector = selectors.heading;
+    const allElements = (await root?.$$(headingSelector)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
+    const foundUnexpected = expectedTexts.filter(text =>
+      sectionHeadingTexts.includes(text)
+    );
+
+    if (foundUnexpected.length > 0) {
+      throw new Error(
+        `Unexpected elements found: ${foundUnexpected.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
+    }
+
+    showMessage(`Confirmed elements not present: ${expectedTexts.join(', ')}`);
   }
 
   /**
@@ -3245,13 +3300,12 @@ export class LoggedInUser extends BaseUser {
    * Verifies that the desktop sidebar is visible and the given tab is active.
    * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
    */
-  async expectSidebarTabToBeActive(
+  async expectSidebarTabToBeActiveAndContainButtonsInOrder(
     activeTab: 'Home' | 'Goals' | 'Progress'
   ): Promise<void> {
-    const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
-
     await this.page.waitForSelector(sidebarSelector, {visible: true});
 
+    await this.isElementVisible(sidebarSelectorPic, true);
     const buttonTexts = await this.page.$$eval(
       `${sidebarSelector} .e2e-test-sidebar-button`,
       els => els.map(el => el.textContent?.trim() || '')
@@ -3261,12 +3315,6 @@ export class LoggedInUser extends BaseUser {
     expect(buttonTexts[0]).toBe('Home');
     expect(buttonTexts[1]).toBe('Goals');
     expect(buttonTexts[2]).toBe('Progress');
-
-    const tabSelectorMap: Record<string, string> = {
-      Home: '.e2e-test-home-section',
-      Goals: '.e2e-test-goals-section',
-      Progress: '.e2e-test-progress-section',
-    };
 
     const activeSelector = `${sidebarSelector} ${tabSelectorMap[activeTab]}`;
 
@@ -3278,19 +3326,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to verify the number of elements matching a selector.
-   * @param {string} selector - The selector to match elements.
-   * @param {number} count - The expected number of elements.
-   */
-  async expectNumberOfElementsToBe(
-    selector: string,
-    count: number
-  ): Promise<void> {
-    const elements = await this.page.$$(selector);
-    expect(elements.length).toBe(count);
-  }
-
-  /**
    * Navigate to any classroom using button in topics available in classroom section.
    * Currently there is only math.
    * @param {string} classroom - Classroom.
@@ -3298,8 +3333,9 @@ export class LoggedInUser extends BaseUser {
   async navigateToClassroomFromLearnerDashboard(
     classroom: string
   ): Promise<void> {
-    await this.page.waitForSelector(
-      classroomButtonOnRedesignedLearnerDashboard
+    await this.isElementVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
+      true
     );
     let targetHref = '';
     const allClassroomButtonElements = await this.page.$$(
@@ -3322,44 +3358,6 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Finds child element in parent by matching text values.
-   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
-   * @param {Record<string, string>} selectors - Relevant selectors.
-   * @param {string} criteria - Title value to match.
-   */
-  async findElement(
-    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
-    selectors: Record<string, string>,
-    criteria: string
-  ): Promise<puppeteer.ElementHandle | undefined> {
-    let targetElement;
-    let lastHeadingText: string | undefined;
-
-    const allElements = await parentElement?.$$(selectors.content);
-    for (const h of allElements || []) {
-      const targetHeadingElement = await h.$(selectors.heading);
-      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
-        ele.textContent?.trim()
-      );
-      lastHeadingText = targetHeadingText || undefined;
-      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
-      if (targetHeadingText === criteria) {
-        targetElement = h;
-        break;
-      }
-    }
-
-    if (!targetElement) {
-      throw new Error(
-        `Element with selectors: ${JSON.stringify(
-          selectors
-        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
-      );
-    }
-    return targetElement;
-  }
-
-  /**
    * Navigate directly to topic in math classroom using topic card.
    * @param {string} topic - Classroom topic.
    */
@@ -3374,13 +3372,14 @@ export class LoggedInUser extends BaseUser {
       learnerDashSelectors.cardDisplay.heading
     );
 
-    const topicsAvailableInClassroomElement = await this.findElement(
-      this.page,
-      learnerDashSelectors.cardDisplay,
-      "Topics available in Oppia's Classroom"
-    );
+    const topicsAvailableInClassroomElement =
+      await this.findChildElementInParent(
+        this.page,
+        learnerDashSelectors.cardDisplay,
+        "Topics available in Oppia's Classroom"
+      );
 
-    const topicCardElement = await this.findElement(
+    const topicCardElement = await this.findChildElementInParent(
       topicsAvailableInClassroomElement,
       learnerDashSelectors.topicCard,
       topic
@@ -3400,7 +3399,7 @@ export class LoggedInUser extends BaseUser {
    * @param {string} criteria - Subsection title value to match.
    * @param {string} section - Overarching section.
    */
-  async findSubsectionElement(
+  async findSubsectionElementBasedOnTitle(
     criteria: string,
     section: string = 'N/A'
   ): Promise<puppeteer.ElementHandle | undefined> {
@@ -3408,7 +3407,7 @@ export class LoggedInUser extends BaseUser {
       this.page;
     if (section === 'In Progress' || section === 'Completed') {
       try {
-        sectionElement = await this.findElement(
+        sectionElement = await this.findChildElementInParent(
           this.page,
           learnerDashSelectors.tabSection,
           section
@@ -3421,7 +3420,7 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
-    const subsectionElement = await this.findElement(
+    const subsectionElement = await this.findChildElementInParent(
       sectionElement,
       learnerDashSelectors.cardDisplay,
       criteria
@@ -3443,19 +3442,19 @@ export class LoggedInUser extends BaseUser {
     progress: number,
     section: string = 'N/A'
   ): Promise<void> {
-    const subsectionElement = await this.findSubsectionElement(
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
       criteria,
       section
     );
 
-    await this.expectElementsToBePresent(
+    await this.expectElementsToBePresentInRLD(
       expectedTitles,
       'lessonCard',
       subsectionElement
     );
 
     for (const title of expectedTitles) {
-      const lessonCardElement = await this.findElement(
+      const lessonCardElement = await this.findChildElementInParent(
         subsectionElement,
         learnerDashSelectors.lessonCard,
         title
@@ -3489,19 +3488,19 @@ export class LoggedInUser extends BaseUser {
     progress: number,
     section: string = 'N/A'
   ): Promise<void> {
-    const subsectionElement = await this.findSubsectionElement(
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
       criteria,
       section
     );
 
-    await this.expectElementsToBePresent(
+    await this.expectElementsToBePresentInRLD(
       expectedTitles,
       'skillCard',
       subsectionElement
     );
 
     for (const title of expectedTitles) {
-      const skillCardElement = await this.findElement(
+      const skillCardElement = await this.findChildElementInParent(
         subsectionElement,
         learnerDashSelectors.skillCard,
         title
@@ -3525,7 +3524,7 @@ export class LoggedInUser extends BaseUser {
    * Verifies that "Display More" button on Community Lessons is Visible
    */
   async expectDisplayMoreCommunityLessonsToBeVisible(): Promise<void> {
-    await this.page.waitForSelector(communityLessonToggleButton);
+    await this.expectElementToBeVisible(communityLessonToggleButton, true);
   }
 
   /**
@@ -3582,12 +3581,12 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     section: string = 'N/A'
   ): Promise<void> {
-    const subsectionElement = await this.findSubsectionElement(
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
       criteria,
       section
     );
 
-    const lessonCardElement = await this.findElement(
+    const lessonCardElement = await this.findChildElementInParent(
       subsectionElement,
       learnerDashSelectors.lessonCard,
       lessonTitle
@@ -3619,12 +3618,12 @@ export class LoggedInUser extends BaseUser {
     skillTitle: string,
     section: string = 'N/A'
   ): Promise<void> {
-    const subsectionElement = await this.findSubsectionElement(
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
       criteria,
       section
     );
 
-    const skillCardElement = await this.findElement(
+    const skillCardElement = await this.findChildElementInParent(
       subsectionElement,
       learnerDashSelectors.skillCard,
       skillTitle
@@ -3661,7 +3660,7 @@ export class LoggedInUser extends BaseUser {
   /**
    * Function to click on the Or Explore All Lessons in Classroom section in the redesigned learner dashboard
    */
-  async navigateThroughClassroomButtonONRLD(): Promise<void> {
+  async navigateThroughClassroomButtonOnRLD(): Promise<void> {
     const goToClassroomButton = await this.page.$(
       classroomButtonOnRedesignedLearnerDashboard
     );
