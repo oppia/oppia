@@ -44,6 +44,10 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
                 exploration_id, task_run_id
             )
         )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_task is not None
+
         self.assertEqual(
             retrieved_task.exploration_id,
             voiceover_regeneration_task_mapping.exploration_id,
@@ -121,6 +125,8 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
                 exploration_id, task_run_id
             )
         )
+        # Ruling out the possibility of None for mypy type checking.
+        assert retrieved_task is not None
 
         self.assertEqual(
             retrieved_task.language_accent_to_content_status_map,

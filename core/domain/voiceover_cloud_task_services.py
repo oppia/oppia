@@ -68,7 +68,7 @@ def get_voiceover_regeneration_task(
 
 def get_existing_voiceover_regeneration_requests_in_task_queue(
     exploration_id: str,
-) -> Dict[str, str | Dict[str, str]]:
+) -> Dict[str, Dict[str, Dict[str, str]]]:
     """Returns the existing voiceover regeneration cloud task run requests for
     the given exploration ID.
 
@@ -185,7 +185,9 @@ def update_voiceover_regeneration_task_run_mapping_for_content(
 
 
 def resolve_multiple_cloud_task_runs_for_exploration(
-    voiceover_regeneration_task_domain_objects,
+    voiceover_regeneration_task_domain_objects: List[
+        cloud_task_domain.VoiceoverRegenerationTaskMapping
+    ],
 ) -> Dict[str, Dict[str, str]]:
     """Resolves multiple voiceover regeneration cloud task run requests for
     the same exploration by merging their content status.
@@ -313,7 +315,7 @@ def create_voiceover_regeneration_task_with_status_generating(
     task_run_id: str,
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     language_code_to_autogeneratable_accent_codes: Dict[str, List[str]],
-):
+) -> cloud_task_domain.VoiceoverRegenerationTaskMapping:
     """Creates a VoiceoverRegenerationTaskMapping object with all contents set
     to 'GENERATING' status.
 

@@ -24,6 +24,8 @@ import uuid
 from core.domain import cloud_task_domain
 from core.tests import test_utils
 
+from typing import Dict
+
 
 class CloudTaskDomainTests(test_utils.GenericTestBase):
     """Unit tests for CloudTaskRun domain object."""
@@ -266,7 +268,7 @@ class VoiceoverRegenerationTaskMappingTests(test_utils.GenericTestBase):
     def test_should_add_language_accent_to_content_status_map(self) -> None:
         exploration_id = 'exp_id'
         task_run_id = 'task_run_id'
-        language_accent_to_content_status_map = {}
+        language_accent_to_content_status_map: Dict[str, Dict[str, str]] = {}
 
         voiceover_regeneration_task_mapping = (
             cloud_task_domain.VoiceoverRegenerationTaskMapping(

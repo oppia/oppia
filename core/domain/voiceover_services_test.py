@@ -593,11 +593,8 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                 'exploration', 'exp_id_1', 2, 'en-US'
             )
         )
-
-        self.assertIsNone(
-            retrieved_entity_voiceovers.voiceovers_mapping['content_0'][
-                'manual'
-            ]
+        self.assertNotIn(
+            'content_0', retrieved_entity_voiceovers.voiceovers_mapping
         )
 
     def test_should_get_entity_voiceovers_for_reverted_version(self) -> None:

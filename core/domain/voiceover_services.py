@@ -321,8 +321,8 @@ def compute_voiceover_related_change(
             language_accent_codes = language_code_to_language_accent_mapping[
                 language_code
             ].keys()
-            all_entity_voiceovers: List[voiceover_domain.EntityVoiceovers] = (
-                list(entity_voiceover_id_to_entity_voiceovers.values())
+            all_entity_voiceovers = (
+                entity_voiceover_id_to_entity_voiceovers.values()
             )
 
             for entity_voiceovers in all_entity_voiceovers:
@@ -978,6 +978,8 @@ def _regenerate_voiceovers_for_given_contents(
     requested_task_is_async: bool = task_run_id is not None
 
     if requested_task_is_async:
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
         voiceover_regeneration_task = (
             voiceover_cloud_task_services.get_voiceover_regeneration_task(
                 exploration_id, task_run_id
@@ -985,6 +987,8 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
     if requested_task_is_async and voiceover_regeneration_task is None:
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
         voiceover_regeneration_task = voiceover_cloud_task_services.create_voiceover_regeneration_task_with_status_generating(
             exploration_id,
             task_run_id,
@@ -995,6 +999,8 @@ def _regenerate_voiceovers_for_given_contents(
         voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
             voiceover_regeneration_task
         )
+    # Ruling out the possibility of None for mypy type checking.
+    assert voiceover_regeneration_task is not None
 
     for language_code in language_codes:
         language_accent_codes = (

@@ -316,7 +316,7 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
