@@ -143,6 +143,7 @@ const donatePage = '.donate-content-container';
 const aboutPage = '.e2e-test-about-page';
 
 const mobileNavbarOpenSidebarButton = 'a.e2e-mobile-test-navbar-button';
+const mobileSidebarOpenSelector = '.e2e-test-sidebar-menu-open';
 const mobileSidebarBasicMathematicsButton =
   'a.e2e-mobile-test-mathematics-link';
 const mobileSidebarAboutButton = 'a.e2e-mobile-test-sidebar-about-button';
@@ -621,6 +622,19 @@ type KeyInput =
 
 export class LoggedOutUser extends BaseUser {
   /**
+   * Opens the mobile sidebar and waits for the animation to complete.
+   * This ensures the sidebar is fully visible before interacting with elements
+   * inside it.
+   */
+  private async openMobileSidebar(): Promise<void> {
+    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+    await this.page.waitForSelector(mobileSidebarOpenSelector, {visible: true});
+    // Wait for the sidebar slide animation to complete by checking element
+    // position stability.
+    await this.waitForElementToStabilize(mobileSidebarOpenSelector);
+  }
+
+  /**
    * Function to navigate to the home page.
    * @param {boolean} verifyURL - Whether to verify the URL after navigation. Defaults to true.
    */
@@ -1040,7 +1054,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarBasicMathematicsButton,
         mathClassroomUrl
@@ -1066,7 +1080,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
@@ -1093,7 +1107,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarTeachButton,
@@ -1154,7 +1168,7 @@ export class LoggedOutUser extends BaseUser {
     await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
       visible: true,
     });
-    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+    await this.openMobileSidebar();
     await this.page.waitForSelector(communityLibraryLinkInNavMenuSelector, {
       visible: true,
     });
@@ -1170,7 +1184,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
       await this.clickOnElementWithSelector(
         mobileSidebarExpandImpactReportSubMenuButton
@@ -1226,7 +1240,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1255,7 +1269,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1288,7 +1302,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1321,7 +1335,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
       await this.clickOnElementWithSelector(
         mobileSidebarExpandGetInvolvedMenuButton
       );
@@ -1357,7 +1371,7 @@ export class LoggedOutUser extends BaseUser {
       await this.page.waitForSelector(mobileNavbarButtonSelector, {
         visible: true,
       });
-      await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+      await this.openMobileSidebar();
     }
     await this.page.waitForSelector(navbarDonateButton, {
       visible: true,
