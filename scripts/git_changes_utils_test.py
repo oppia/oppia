@@ -22,7 +22,6 @@ import subprocess
 import sys
 import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import common, git_changes_utils
 
@@ -940,9 +939,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
     def test_get_refs_with_stdin(self) -> None:
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
-            with utils.open_file(temp_stdin_file.name, 'w') as f:
+            with open(temp_stdin_file.name, 'w', encoding='utf-8') as f:
                 f.write('local_ref local_sha1 remote_ref remote_sha1')
-            with utils.open_file(temp_stdin_file.name, 'r') as f:
+            with open(temp_stdin_file.name, 'r', encoding='utf-8') as f:
                 with self.swap(sys, 'stdin', f):
                     self.assertEqual(
                         git_changes_utils.get_refs(),
@@ -958,12 +957,12 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
 
     def test_get_refs_with_empty_remote_sha(self) -> None:
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
-            with utils.open_file(temp_stdin_file.name, 'w') as f:
+            with open(temp_stdin_file.name, 'w', encoding='utf-8') as f:
                 f.write(
                     'local_ref local_sha1 remote_ref %s'
                     % git_changes_utils.EMPTY_SHA1
                 )
-            with utils.open_file(temp_stdin_file.name, 'r') as f:
+            with open(temp_stdin_file.name, 'r', encoding='utf-8') as f:
                 with self.swap(sys, 'stdin', f):
                     self.assertEqual(
                         git_changes_utils.get_refs(),
