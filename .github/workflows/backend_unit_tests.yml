@@ -67,6 +67,41 @@ jobs:
           include-hidden-files: true
           path: .coverage
           retention-days: 1
+  run_tests_using_pytest:
+    name: Run tests using pytest (experimental)
+    runs-on: ubuntu-22.04
+    # By default this job is gated to not run for pull requests. Change the
+    # `if` condition below when you want it to run for PRs (or add a label
+    # trigger). This keeps the job off for most PRs while under development.
+    if: github.event_name != 'pull_request'
+    strategy:
+      matrix:
+        shard: [1]
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run backend test shard (pytest)
+        id: run_backend_test_shard_pytest
+        if: startsWith(github.head_ref, 'update-changelog-for-release') == false
+        run: |
+          set -euo pipefail
+          echo "Running shard ${{ matrix.shard }} with pytest enabled"
+          python -m scripts.run_backend_tests --generate_coverage_report --generate_time_report --ignore_coverage --exclude_load_tests --test_shard ${{ matrix.shard }} --use-pytest
+      - name: Show time report
+        if: always()
+        shell: bash
+        run: |
+          echo "--- backend_test_time_report.json (pytest shard) ---"
+          if [ -f backend_test_time_report.json ]; then cat backend_test_time_report.json; else echo "(no time report generated)"; fi
+      - name: Upload pytest time report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend_test_time_shard_pytest_1
+          path: backend_test_time_report.json
+          retention-days: 1
   check_combined_coverage:
     name: Check coverage
     needs: run_tests
@@ -130,7 +165,7 @@ jobs:
       pull-requests: write
   check_backend_test_times:
     name: Check test times
-    needs: run_tests
+    needs: [run_tests, run_tests_using_pytest]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository so that local actions can be used
@@ -162,11 +197,31 @@ jobs:
         with:
           name: backend_test_time_shard_5
           path: backend_test_time_reports_artifacts/backend_test_time_5
+      - name: Download pytest time report (optional)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: backend_test_time_shard_pytest_1
+          path: backend_test_time_reports_artifacts/backend_test_time_pytest_1
       - name: Move time reports from artifact folders to backend_test_time_reports folder
         shell: bash
         run: |
           mkdir -p backend_test_time_reports
-          for i in {1..5}; do cp backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.json backend_test_time_reports/backend_test_time_report_$i.json; done
+          for i in {1..5}; do
+            src=backend_test_time_reports_artifacts/backend_test_time_$i/backend_test_time_report.json
+            if [ -f "$src" ]; then
+              cp "$src" backend_test_time_reports/backend_test_time_report_$i.json
+            else
+              echo "Warning: $src not found"
+            fi
+          done
+          # Copy pytest report if present (non-fatal)
+          PYTEST_SRC=backend_test_time_reports_artifacts/backend_test_time_pytest_1/backend_test_time_report.json
+          if [ -f "$PYTEST_SRC" ]; then
+            cp "$PYTEST_SRC" backend_test_time_reports/backend_test_time_report_pytest_1.json
+          else
+            echo "No pytest time report artifact found (this is expected for many runs)"
+          fi
       - name: Check test times
         run: python -m scripts.check_backend_test_times
         shell: bash
