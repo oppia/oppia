@@ -336,6 +336,41 @@ class CustomizationArgsUtilUnitTests(test_utils.GenericTestBase):
             all_interaction_ids, interaction_ids_with_ca_frontend_interfaces
         )
 
+    def test_invalid_customization_args_raise_validation_error_with_context(
+        self,
+    ) -> None:
+        """Test that invalid customization args raise a ValidationError with
+        contextual information about the interaction and customization arg.
+        """
+        ca_item_selection_specs = (
+            interaction_registry.Registry.get_interaction_by_id(
+                'ItemSelectionInput'
+            ).customization_arg_specs
+        )
+
+        invalid_customization_args: Dict[
+            str, Dict[str, Union[str, int, List[str]]]
+        ] = {
+            'minAllowableSelectionCount': {'value': 'not-an-int'},
+            'maxAllowableSelectionCount': {'value': 1},
+            'choices': {'value': ['']},
+        }
+
+        with self.assertRaisesRegex(
+            utils.ValidationError,
+            (
+                'Interaction ItemSelectionInput has invalid customization arg '
+                'minAllowableSelectionCount'
+            ),
+        ):
+            customization_args_util.validate_customization_args_and_values(
+                'interaction',
+                'ItemSelectionInput',
+                invalid_customization_args,
+                ca_item_selection_specs,
+                fail_on_validation_errors=True,
+            )
+
     def test_frontend_customization_args_constructor_coverage(self) -> None:
         """Test to ensure that interaction.model.ts covers constructing
         customization arguments for each interaction. Uses regex to confirm

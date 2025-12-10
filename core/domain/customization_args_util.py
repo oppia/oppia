@@ -121,4 +121,7 @@ def validate_customization_args_and_values(
             # not involved (If they are, can we get sample values for the
             # state context parameters?).
             if fail_on_validation_errors:
-                raise utils.ValidationError(e)
+                raise utils.ValidationError(
+                    'Interaction %s has invalid customization arg %s: %s'
+                    % (item_type, ca_spec.name, e)
+                ) from e
