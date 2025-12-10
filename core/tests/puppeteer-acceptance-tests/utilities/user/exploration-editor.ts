@@ -643,8 +643,9 @@ export class ExplorationEditor extends BaseUser {
       const shouldBeChecked = options.includes(optionText);
 
       if (shouldBeChecked && !isCurrentlyChecked) {
-        // Need to check this checkbox.
-        await checkboxElement.click();
+        // Need to check this checkbox. Use clickOnElement to ensure the element
+        // is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
         await this.page.waitForFunction(
           (element: Element) => {
             return element.classList.contains('mat-checkbox-checked');
@@ -653,8 +654,9 @@ export class ExplorationEditor extends BaseUser {
           checkboxElement
         );
       } else if (!shouldBeChecked && isCurrentlyChecked) {
-        // Need to uncheck this checkbox.
-        await checkboxElement.click();
+        // Need to uncheck this checkbox. Use clickOnElement to ensure the
+        // element is stable and clickable before clicking.
+        await this.clickOnElement(checkboxElement);
         await this.page.waitForFunction(
           (element: Element) => {
             return !element.classList.contains('mat-checkbox-checked');
