@@ -3307,7 +3307,7 @@ export class LoggedInUser extends BaseUser {
 
     await this.isElementVisible(sidebarSelectorPic, true);
     const buttonTexts = await this.page.$$eval(
-      `${sidebarSelector} .e2e-test-sidebar-button`,
+      `${sidebarSelector} .oppia-learner-dash-sidebar_btn`,
       els => els.map(el => el.textContent?.trim() || '')
     );
 
