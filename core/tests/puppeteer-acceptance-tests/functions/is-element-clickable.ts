@@ -138,17 +138,29 @@ export default function isElementClickable(
       for (const el of overlappingElements) {
         const isSameElement = el === element;
         const isContained = element.contains(el);
+        const containsTarget = el.contains(element);
         // eslint-disable-next-line no-console
         console.log(
           `[debug]: Overlapping element ${el.tagName} ` +
             `(class="${el.className}")\n` +
             `  - Is same element: ${isSameElement}\n` +
-            `  - Is contained by target: ${isContained}`
+            `  - Is contained by target: ${isContained}\n` +
+            `  - Contains target: ${containsTarget}`
         );
       }
     }
+    // An element is considered not overlapped if any of the overlapping
+    // elements at the center point:
+    // 1. Is the element itself.
+    // 2. Is a child of the element (target contains the overlapping element).
+    // 3. Is a parent/ancestor of the element (overlapping element contains
+    //    target). This handles cases where clicking on a child element (e.g.,
+    //    a span inside a button) reports the parent container as the
+    //    overlapping element.
     if (
-      overlappingElements.some(el => el === element || element.contains(el))
+      overlappingElements.some(
+        el => el === element || element.contains(el) || el.contains(element)
+      )
     ) {
       return true;
     }

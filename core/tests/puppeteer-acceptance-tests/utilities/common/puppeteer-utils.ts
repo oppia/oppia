@@ -1864,7 +1864,9 @@ export class BaseUser {
       );
       const newTabPage = await newTarget.page();
       expect(newTabPage).toBeDefined();
-      expect(newTabPage?.url()).toBe(targetPageUrl);
+      // Use startsWith instead of exact match because external sites may add
+      // query parameters (e.g., Cloudflare challenge tokens).
+      expect(newTabPage?.url().startsWith(targetPageUrl)).toBe(true);
       await newTabPage?.close();
     } else {
       showMessage('Anchor target is the same as the current page.');
