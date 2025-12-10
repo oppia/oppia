@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service to fetch and store EntityTranslation for the given
- * entity in a given langauge.
+ * entity in a given language.
  */
 
 import {Injectable} from '@angular/core';
