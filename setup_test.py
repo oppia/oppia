@@ -19,18 +19,37 @@ from __future__ import annotations
 import builtins
 import os
 import sys
+import importlib
+import types
 
 from core import feconf
 from core.tests import test_utils
 from scripts import common
-
-import setuptools
 
 
 class SetupTests(test_utils.GenericTestBase):
     """Unit tests for setup.py."""
 
     def test_setuptools_is_invoked_with_correct_parameters(self) -> None:
+        # Import or create a fake setuptools module here (not at module
+        # import time) so importing setuptools does not run during test
+        # collection. Some environments raise assertions when importing the
+        # real `setuptools` at import time because of `_distutils_hack`.
+        injected_setuptools = False
+        try:
+            setuptools = importlib.import_module('setuptools')
+        except Exception:
+            fake_setuptools = types.ModuleType('setuptools')
+            fake_setuptools.find_packages = lambda: ['dummy_package']
+
+            def _fake_setup(**unused_kwargs):
+                return None
+
+            fake_setuptools.setup = _fake_setup
+            sys.modules['setuptools'] = fake_setuptools
+            setuptools = fake_setuptools
+            injected_setuptools = True
+
         packages = '\n'.join(
             [
                 'module1==2.1.2 \\',
@@ -54,13 +73,6 @@ class SetupTests(test_utils.GenericTestBase):
             expected_args=(('requirements.txt',),),
         )
 
-        # The expected packages should not include comments or hashes.
-        required_packages = [
-            'module1==2.1.2',
-            'module2==3.2.3',
-            'module3==4.3.4',
-        ]
-
         swap_setup = self.swap_with_checks(
             setuptools,
             'setup',
@@ -71,7 +83,11 @@ class SetupTests(test_utils.GenericTestBase):
                     'name': 'oppia-beam-job',
                     'version': feconf.OPPIA_VERSION,
                     'description': 'Oppia Apache Beam package',
-                    'install_requires': required_packages,
+                    'install_requires': [
+                        'module1==2.1.2',
+                        'module2==3.2.3',
+                        'module3==4.3.4',
+                    ],
                     'packages': setuptools.find_packages(),
                     'include_package_data': True,
                 }
@@ -93,6 +109,8 @@ class SetupTests(test_utils.GenericTestBase):
             import setup
 
             setup.main()
-
+        # Clean up the fake setuptools module if we injected one.
+        if injected_setuptools:
+            del sys.modules['setuptools']
         dummy_file_object.close()
         os.remove('dummy_requirements.txt')
