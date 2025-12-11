@@ -864,6 +864,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual('en', coordinator_rights_model[0].language_id)
         self.assertEqual('hi', coordinator_rights_model[1].language_id)
 
+    def test_mock_set_constants_to_default_raises_exception(self) -> None:
+        """Test that mock_set_constants_to_default raises an exception."""
+        with self.assertRaisesRegex(
+            Exception,
+            r'Tests should mock common\.set_constants_to_default\(\) to avoid '
+            r'modifying the constants file during tests\.',
+        ):
+            self.mock_set_constants_to_default()
+
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
