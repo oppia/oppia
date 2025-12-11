@@ -833,7 +833,7 @@ class UserExplorationEmailsHandler(
                 self.user_id, exploration_id, mute_feedback_notifications=mute
             )
         else:
-            # Meesage type must be MESSAGE_TYPE_SUGGESTION.
+            # Message type must be MESSAGE_TYPE_SUGGESTION.
             # Invalid message type exception and schema guarantee this behavior.
             assert message_type == feconf.MESSAGE_TYPE_SUGGESTION
             user_services.set_email_preferences_for_exploration(
