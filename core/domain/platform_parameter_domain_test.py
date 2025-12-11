@@ -17,6 +17,7 @@
 """Tests for the domain objects relating to platform parameters."""
 
 from __future__ import annotations
+from unittest import mock
 
 import collections
 import enum
@@ -1734,7 +1735,7 @@ class PlatformParameterTests(test_utils.GenericTestBase):
             param.validate()
 
     def test_create_with_old_rule_schema_version_failure(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             feconf, 'CURRENT_PLATFORM_PARAMETER_RULE_SCHEMA_VERSION', 2
         ):
             with self.assertRaisesRegex(

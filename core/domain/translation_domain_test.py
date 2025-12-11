@@ -17,6 +17,7 @@
 """Tests for domain objects related to translations."""
 
 from __future__ import annotations
+from unittest import mock
 
 import re
 
@@ -372,7 +373,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
             'en',
             translation_dict,
         )
-        min_value_swap = self.swap(
+        min_value_patch = mock.patch.object(
             feconf,
             'MIN_ALLOWED_MISSING_OR_UPDATE_NEEDED_WRITTEN_TRANSLATIONS',
             1,
@@ -380,7 +381,7 @@ class BaseTranslatableObjectUnitTest(test_utils.GenericTestBase):
         translatable_object = DummyTranslatableObjectWithFourParams(
             'Content', 'My name is jhon.', 'My name is Nikhil.', 'Content'
         )
-        with min_value_swap:
+        with min_value_patch:
             self.assertFalse(
                 translatable_object.are_translations_displayable(
                     entity_translations
@@ -1034,23 +1035,23 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             AssertionError, 'Expected unicode HTML string, received 30'
         ):
-            with self.swap(written_translation, 'translation', 30):
+            with mock.patch.object(written_translation, 'translation', 30):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
         ):
-            with self.swap(written_translation, 'needs_update', 20):
+            with mock.patch.object(written_translation, 'needs_update', 20):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
         ):
-            with self.swap(written_translation, 'data_format', 'int'):
+            with mock.patch.object(written_translation, 'data_format', 'int'):
                 written_translation.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid data_format'
         ):
-            with self.swap(written_translation, 'data_format', 2):
+            with mock.patch.object(written_translation, 'data_format', 2):
                 written_translation.validate()

@@ -15,6 +15,7 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
+from unittest import mock
 
 import contextlib
 import importlib
@@ -52,11 +53,13 @@ class CloudLoggingTests(test_utils.GenericTestBase):
             def setup_logging(self) -> None:
                 function_calls['setup_logging'] = True
 
-        emulator_mode_swap = self.swap(constants, 'EMULATOR_MODE', False)
-        logging_client_swap = self.swap_with_checks(
+        emulator_mode_patch = mock.patch.object(
+            constants, 'EMULATOR_MODE', False
+        )
+        logging_client_patch = self.swap_with_checks(
             google.cloud.logging, 'Client', MockClient
         )
-        with emulator_mode_swap, logging_client_swap:
+        with emulator_mode_patch, logging_client_patch:
             # This reloads the main module so that all the checks in
             # the module are reexecuted.
             importlib.reload(main)  # pylint: disable-all
@@ -99,7 +102,7 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
-        get_ndb_context_swap = self.swap_with_checks(
+        get_ndb_context_patch = self.swap_with_checks(
             datastore_services, 'get_ndb_context', get_ndb_context_mock
         )
 
@@ -112,7 +115,7 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
         test_response = webtest.TestResponse()
 
         # Verify that NdbWsgiMiddleware keeps the test_response the same.
-        with get_ndb_context_swap:
+        with get_ndb_context_patch:
             self.assertEqual(
                 middleware({'key': 'value'}, test_response), test_response
             )

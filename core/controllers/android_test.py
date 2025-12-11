@@ -15,6 +15,7 @@
 """Tests for the android handler."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -54,11 +55,11 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
     def test_initialize_in_production_raises_exception(self) -> None:
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.'
         )
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_patch:
             self.post_json(
                 '/initialize_android_test_data',
                 {},
@@ -112,15 +113,15 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.secrets_swap = self.swap_to_always_return(
+        self.secrets_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret'
         )
 
     def test_get_with_wrong_api_key_returns_error(self) -> None:
-        secrets_swap = self.swap_to_always_return(
+        secrets_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', 'not_key'
         )
-        with secrets_swap:
+        with secrets_patch:
             self.get_json(
                 '/android_data?activity_type=story&'
                 'activities_data=[{"id": "id", "version": 1}]',
@@ -130,7 +131,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_non_question_activity_with_offset_raises_error(self) -> None:
         """Test that non-question activity with offset returns error."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=exploration&'
                 'activities_data=[{"id": "exp_id"}]&offset=0',
@@ -143,7 +144,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_non_existent_activity_returns_null_payload(self) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=story&'
@@ -156,7 +157,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_exploration_returns_correct_json(self) -> None:
         exploration = self.save_new_default_exploration('exp_id', 'owner_id')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exploration&'
@@ -195,7 +196,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         )
         new_exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exploration&'
@@ -249,7 +250,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         )
         new_exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             # Try fetching two versions at once, in either order.
             self.assertEqual(
                 self.get_json(
@@ -306,7 +307,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_with_invalid_versions_returns_correct_json(self) -> None:
         exploration = self.save_new_default_exploration('exp_id', 'owner_id')
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             # Note that version 3 does not exist.
             self.assertEqual(
                 self.get_json(
@@ -350,7 +351,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_with_duplicates_is_rejected(self) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exploration&'
@@ -364,7 +365,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_story_returns_correct_json(self) -> None:
         story = self.save_new_story('story_id', 'user_id', 'Title')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=story&'
@@ -377,7 +378,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_skill_returns_correct_json(self) -> None:
         skill = self.save_new_skill('skill_id', 'user_id', 'Description')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=skill&'
@@ -390,7 +391,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_subtopic_returns_correct_json(self) -> None:
         subtopic = self.save_new_subtopic(1, 'user_id', 'topic_id')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=subtopic&'
@@ -411,7 +412,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type='
@@ -431,7 +432,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_subtopic_with_study_guide_returns_correct_json(self) -> None:
         study_guide = self.save_new_study_guide(1, 'user_id', 'topic_id')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type='
@@ -455,7 +456,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         classroom = self.save_new_valid_classroom(
             classroom_id=classroom_id, name='math'
         )
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=classroom&'
@@ -470,7 +471,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         classroom_id = classroom_config_services.get_new_classroom_id()
 
         self.save_new_valid_classroom(classroom_id=classroom_id, name='math')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=classroom&'
@@ -482,7 +483,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_exploration_translation_without_lang_code_fails(self) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
@@ -495,7 +496,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_exploration_translation_without_version_fails(self) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
@@ -527,7 +528,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         )
         translation_model.update_timestamps()
         translation_model.put()
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=exp_translations&'
                 'activities_data=[{'
@@ -565,7 +566,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_exploration_translation_with_zero_items_returns_correct_json(
         self,
     ) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
@@ -680,7 +681,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 },
             },
         }
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=exp_voiceovers&'
                 'activities_data=[{'
@@ -699,7 +700,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
     def test_get_exploration_voiceovers_with_zero_items_returns_correct_json(
         self,
     ) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_voiceovers&'
@@ -711,7 +712,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_get_exploration_voiceover_without_version_fails(self) -> None:
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_voiceovers&'
@@ -726,7 +727,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_topic_returns_correct_json(self) -> None:
         topic = self.save_new_topic('topic_id', 'user_id')
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=learntopic&'
@@ -770,7 +771,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
             'owner_id', question_id2, skill_id, 0.1
         )
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=questions'
                 '&activities_data=[{"language_code": "en"}]'
@@ -793,7 +794,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_questions_with_version_fails(self) -> None:
         """Test that supplying a version in activities_data raises an error."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=questions'
                 '&activities_data=[{"language_code": "en", "version": 1}]'
@@ -808,7 +809,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_questions_without_offset_fails(self) -> None:
         """Test that omitting the offset parameter results in an error."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             response = self.get_json(
                 '/android_data?activity_type=questions'
                 '&activities_data=[{"language_code": "en"}]',
@@ -842,7 +843,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
                 'owner_id', question_id, skill_id, 0.1
             )
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             # Use an offset of 1 to skip the first created question.
             response = self.get_json(
                 '/android_data?activity_type=questions'
@@ -860,7 +861,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_nonexistent_topic_returns_null_payload(self) -> None:
         """Test requesting nonexistent topic returns null payload."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=learntopic&'
@@ -874,7 +875,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_nonexistent_classroom_returns_null_payload(self) -> None:
         """Test requesting nonexistent classroom returns null payload."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=classroom&'
@@ -887,7 +888,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_nonexistent_subtopic_returns_null_payload(self) -> None:
         """Test requesting nonexistent subtopic returns null payload."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=subtopic&'
@@ -900,7 +901,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_nonexistent_skill_returns_null_payload(self) -> None:
         """Test requesting nonexistent skill returns null payload."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=skill&'
@@ -914,7 +915,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_nonexistent_translation_returns_empty_payload(self) -> None:
         """Test requesting nonexistent translation returns empty payload."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
@@ -939,7 +940,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         exploration = self.save_new_default_exploration('exp_id', 'owner_id')
         story = self.save_new_story('story_id', 'user_id', 'Title')
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exploration&'
@@ -984,7 +985,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
         subtopic1 = self.save_new_subtopic(1, 'user_id', 'topic_id')
         subtopic2 = self.save_new_subtopic(2, 'user_id', 'topic_id')
 
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=subtopic&'
@@ -1010,7 +1011,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_exploration_translations_missing_language_code(self) -> None:
         """Test missing language code for translations returns an error."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'
@@ -1023,7 +1024,7 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def test_get_exploration_translations_missing_version(self) -> None:
         """Test missing version for translations returns an error."""
-        with self.secrets_swap:
+        with self.secrets_patch:
             self.assertEqual(
                 self.get_json(
                     '/android_data?activity_type=exp_translations&'

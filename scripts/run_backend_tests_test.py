@@ -17,6 +17,7 @@
 """Unit tests for scripts/run_backend_tests.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import json
@@ -93,7 +94,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         def mock_install_third_party_libs() -> None:
             pass
@@ -101,7 +102,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         # We need to create a swap for install_third_party_libs because
         # run_backend_tests.py script installs third party libraries whenever
         # it is imported.
-        self.swap_install_third_party_libs = self.swap(
+        self.swap_install_third_party_libs = mock.patch.object(
             install_third_party_libs, 'main', mock_install_third_party_libs
         )
 
@@ -138,18 +139,20 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_log(msg: str) -> None:
             self.terminal_logs.append(msg)
 
-        self.swap_logs = self.swap(concurrent_task_utils, 'log', mock_log)
+        self.swap_logs = mock.patch.object(
+            concurrent_task_utils, 'log', mock_log
+        )
 
         def mock_context_manager(**_: str) -> MockCompilerContextManager:
             return MockCompilerContextManager()
 
-        self.swap_redis_server = self.swap(
+        self.swap_redis_server = mock.patch.object(
             servers, 'managed_redis_server', mock_context_manager
         )
-        self.swap_cloud_datastore_emulator = self.swap(
+        self.swap_cloud_datastore_emulator = mock.patch.object(
             servers, 'managed_cloud_datastore_emulator', mock_context_manager
         )
-        self.swap_execute_task = self.swap(
+        self.swap_execute_task = mock.patch.object(
             concurrent_task_utils, 'execute_tasks', lambda *unused_args: None
         )
 
@@ -215,7 +218,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append(shards_spec['1'][0])
-        swap_shard_modules = self.swap(
+        swap_shard_modules = mock.patch.object(
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec
         )
 
@@ -233,7 +236,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             shards_spec = json.load(shards_file)
 
         shards_spec['1'].append('scripts.new_script_test')
-        swap_shard_modules = self.swap(
+        swap_shard_modules = mock.patch.object(
             json, 'loads', lambda *unused_args, **unused_kwargs: shards_spec
         )
 
@@ -252,7 +255,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         test_modules = run_backend_tests.get_all_test_targets_from_path()
         test_modules.append('scripts.new_script_test')
 
-        swap_test_modules = self.swap(
+        swap_test_modules = mock.patch.object(
             run_backend_tests,
             'get_all_test_targets_from_path',
             lambda *unused_args, **unused_kwargs: test_modules,
@@ -326,7 +329,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False
         )
 
-        with self.print_swap:
+        with self.print_patch:
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
 
         self.assertIn(
@@ -354,7 +357,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False
         )
 
-        with self.print_swap:
+        with self.print_patch:
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
 
         self.assertIn(
@@ -381,7 +384,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False
         )
 
-        with self.print_swap, self.assertRaisesRegex(
+        with self.print_patch, self.assertRaisesRegex(
             Exception, 'Some internal error.'
         ):
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
@@ -416,7 +419,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, False
         )
 
-        with self.print_swap:
+        with self.print_patch:
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
 
         self.assertIn('CANCELED  %s' % test_target, self.print_arr)
@@ -462,7 +465,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             task2_target, True
         )
 
-        with self.print_swap, self.swap(
+        with self.print_patch, mock.patch.object(
             run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
         ):
             _, _, _, time_report = run_backend_tests.check_test_results(
@@ -488,7 +491,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             'scripts.new_script_one_test.py': [1.234, 9],
             'scripts.new_script_two_test.py': [2.542, 9],
         }
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (
@@ -498,23 +501,23 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 expected_time_report,
             ),
         )
-        swap_check_coverage = self.swap(
+        swap_check_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00),
         )
         time_report_temp_file = tempfile.NamedTemporaryFile('w+')
         time_report_path = time_report_temp_file.name
-        swap_time_report_path = self.swap(
+        swap_time_report_path = mock.patch.object(
             run_backend_tests, 'TIME_REPORT_PATH', time_report_path
         )
 
         with self.swap_execute_task, swap_check_coverage:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with swap_time_report_path, self.swap_redis_server:
-                    with self.swap(
+                    with mock.patch.object(
                         run_backend_tests, 'AVERAGE_TEST_CASE_TIME', 1
-                    ), self.print_swap:
+                    ), self.print_patch:
                         run_backend_tests.main(args=['--generate_time_report'])
         loaded_time_report = json.loads(time_report_temp_file.read())
         self.assertEqual(loaded_time_report, expected_time_report)
@@ -543,7 +546,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target, True
         )
 
-        with self.print_swap:
+        with self.print_patch:
             run_backend_tests.check_test_results(tasks, task_to_taskspec)
 
         self.assertIn(
@@ -558,7 +561,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     return False
             return True
 
-        swap_path_exists = self.swap(os.path, 'exists', mock_path_exists)
+        swap_path_exists = mock.patch.object(
+            os.path, 'exists', mock_path_exists
+        )
 
         with swap_path_exists, self.assertRaisesRegex(
             Exception,
@@ -589,19 +594,19 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 )
 
     def test_invalid_test_targets_message_is_displayed_correctly(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00),
         )
         with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
             with self.swap_cloud_datastore_emulator, swap_check_results:
-                with self.print_swap:
+                with self.print_patch:
                     run_backend_tests.main(
                         args=['--test_targets', 'scripts.run_backend_tests.py']
                     )
@@ -615,12 +620,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
     def test_error_in_matching_shards_with_tests_throws_error(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00),
@@ -639,17 +644,17 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
         with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
             with self.swap_cloud_datastore_emulator, swap_check_results:
-                with self.print_swap, swapcheck_shards_match_tests:
+                with self.print_patch, swapcheck_shards_match_tests:
                     with self.assertRaisesRegex(Exception, error_msg):
                         run_backend_tests.main(args=['--test_shard', '1'])
 
     def test_no_tests_run_raises_error(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (0, 0, 0, {}),
         )
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('', 100.00),
@@ -668,18 +673,18 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     )
 
     def test_incomplete_overall_backend_coverage_throws_error(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 98.00),
         )
 
-        with swapcheck_coverage, self.swap_redis_server, self.print_swap:
+        with swapcheck_coverage, self.swap_redis_server, self.print_patch:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 with self.swap_execute_task:
                     with self.assertRaisesRegex(
@@ -696,10 +701,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_execute_tasks(*_: str) -> None:
             raise Exception('XYZ error occured.')
 
-        self.swap_execute_task = self.swap(
+        self.swap_execute_task = mock.patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute_tasks
         )
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
@@ -712,14 +717,14 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 run_backend_tests.main(args=[])
 
     def test_errors_in_test_suite_throw_error(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 2, 0, {}),
         )
 
         with self.swap_execute_task, self.swap_redis_server, swap_check_results:
-            with self.swap_cloud_datastore_emulator, self.print_swap:
+            with self.swap_cloud_datastore_emulator, self.print_patch:
                 with self.assertRaisesRegex(Exception, '2 errors, 0 failures'):
                     run_backend_tests.main(args=['--test_shard', '1'])
 
@@ -738,15 +743,15 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             for task in tasks:
                 executed_tasks.append(task)
 
-        swap_execute_task = self.swap(
+        swap_execute_task = mock.patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute
         )
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
-        swap_check_coverage = self.swap(
+        swap_check_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00),
@@ -758,7 +763,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             test_target,
             '--generate_coverage_report',
         ]
-        with self.print_swap:
+        with self.print_patch:
             with swap_check_coverage, self.swap_redis_server, swap_execute_task:
                 with self.swap_cloud_datastore_emulator, swap_check_results:
                     run_backend_tests.main(args=args)
@@ -781,17 +786,17 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             for task in tasks:
                 executed_tasks.append(task)
 
-        swap_execute_task = self.swap(
+        swap_execute_task = mock.patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute
         )
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
 
         args = ['--skip_install', '--test_targets', test_targets]
-        with self.print_swap, self.swap_redis_server, swap_execute_task:
+        with self.print_patch, self.swap_redis_server, swap_execute_task:
             with self.swap_cloud_datastore_emulator, swap_check_results:
                 run_backend_tests.main(args=args)
 
@@ -818,23 +823,25 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             for task in tasks:
                 executed_tasks.append(task)
 
-        swap_execute_task = self.swap(
+        swap_execute_task = mock.patch.object(
             concurrent_task_utils, 'execute_tasks', mock_execute
         )
-        get_changed_python_test_files_swap = self.swap(
+        get_changed_python_test_files_patch = mock.patch.object(
             git_changes_utils,
             'get_changed_python_test_files',
             mock_get_changed_python_test_files,
         )
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
 
-        with swap_execute_task, self.print_swap:
+        with swap_execute_task, self.print_patch:
             with self.swap_cloud_datastore_emulator, swap_check_results:
-                with self.swap_redis_server, get_changed_python_test_files_swap:
+                with self.swap_redis_server, (
+                    get_changed_python_test_files_patch
+                ):
                     run_backend_tests.main(
                         args=['--run_on_changed_files_in_branch']
                     )
@@ -850,13 +857,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_get_remote_name() -> str:
             return ''
 
-        get_remote_name_swap = self.swap(
+        get_remote_name_patch = mock.patch.object(
             git_changes_utils,
             'get_local_git_repository_remote_name',
             mock_get_remote_name,
         )
 
-        with get_remote_name_swap, self.swap_redis_server:
+        with get_remote_name_patch, self.swap_redis_server:
             with self.swap_cloud_datastore_emulator, self.assertRaisesRegex(
                 SystemExit, 'Error: No remote repository found.'
             ):
@@ -865,19 +872,19 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 )
 
     def test_all_test_pass_successfully_with_full_coverage(self) -> None:
-        swap_check_results = self.swap(
+        swap_check_results = mock.patch.object(
             run_backend_tests,
             'check_test_results',
             lambda *unused_args, **unused_kwargs: (100, 0, 0, {}),
         )
-        swap_check_coverage = self.swap(
+        swap_check_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00),
         )
 
         with self.swap_execute_task, swap_check_results:
-            with swap_check_coverage, self.swap_redis_server, self.print_swap:
+            with swap_check_coverage, self.swap_redis_server, self.print_patch:
                 with self.swap_cloud_datastore_emulator:
                     run_backend_tests.main(args=['--generate_coverage_report'])
 
@@ -899,7 +906,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run() method'
                 )
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = mock.patch.object(
+            subprocess, 'run', mock_subprocess_run
+        )
         error_msg = (
             'Failed to combine coverage because subprocess failed.'
             '\n%s' % failed_process_output
@@ -923,7 +932,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run() method'
                 )
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = mock.patch.object(
+            subprocess, 'run', mock_subprocess_run
+        )
         error_msg = (
             'Failed to calculate coverage because subprocess failed. '
             '%s' % failed_process_output
@@ -953,7 +964,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run() method'
                 )
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = mock.patch.object(
+            subprocess, 'run', mock_subprocess_run
+        )
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(
                 True, include=include_files
@@ -986,7 +999,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run() method'
                 )
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = mock.patch.object(
+            subprocess, 'run', mock_subprocess_run
+        )
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(
                 False, data_file=data_file
@@ -1010,7 +1025,9 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     'Invalid command passed to subprocess.run() method'
                 )
 
-        swap_subprocess_run = self.swap(subprocess, 'run', mock_subprocess_run)
+        swap_subprocess_run = mock.patch.object(
+            subprocess, 'run', mock_subprocess_run
+        )
         with swap_subprocess_run:
             returned_output, coverage = run_backend_tests.check_coverage(True)
 
@@ -1022,11 +1039,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_run_shell_cmd(*_: str, **__: str) -> None:
             raise Exception('XYZ error.')
 
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = mock.patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd
         )
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
+        swap_hostname = mock.patch.object(
+            socket, 'gethostname', lambda: 'IamEzio'
+        )
+        swap_getpid = mock.patch.object(os, 'getpid', lambda: 12345)
 
         task = run_backend_tests.TestingTaskSpec(
             'scripts.run_backend_tests_test', False
@@ -1043,10 +1062,10 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.call_count = 1
             raise Exception('ev_epollex_linux.cc')
 
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = mock.patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd
         )
-        swapcheck_coverage = self.swap(
+        swapcheck_coverage = mock.patch.object(
             run_backend_tests,
             'check_coverage',
             lambda *unused_args, **unused_kwargs: ('Coverage report', 100.00),
@@ -1068,11 +1087,13 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             self.call_count = 1
             raise Exception('ev_epollex_linux.cc')
 
-        swap_run_shell_cmd = self.swap(
+        swap_run_shell_cmd = mock.patch.object(
             run_backend_tests, 'run_shell_cmd', mock_run_shell_cmd
         )
-        swap_hostname = self.swap(socket, 'gethostname', lambda: 'IamEzio')
-        swap_getpid = self.swap(os, 'getpid', lambda: 12345)
+        swap_hostname = mock.patch.object(
+            socket, 'gethostname', lambda: 'IamEzio'
+        )
+        swap_getpid = mock.patch.object(os, 'getpid', lambda: 12345)
 
         task = run_backend_tests.TestingTaskSpec('scripts.random_test', False)
         with swap_run_shell_cmd, swap_hostname, swap_getpid:
@@ -1085,12 +1106,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with unittest.mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
-            swap_check_results = self.swap(
+            swap_check_results = mock.patch.object(
                 run_backend_tests,
                 'check_test_results',
                 lambda *_: (100, 0, 0, {}),
             )
-            swap_coverage = self.swap(
+            swap_coverage = mock.patch.object(
                 run_backend_tests, 'check_coverage', lambda *_: ('', 100.0)
             )
             with self.swap_redis_server:
@@ -1103,12 +1124,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with unittest.mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
-            swap_check_results = self.swap(
+            swap_check_results = mock.patch.object(
                 run_backend_tests,
                 'check_test_results',
                 lambda *_: (100, 0, 0, {}),
             )
-            swap_coverage = self.swap(
+            swap_coverage = mock.patch.object(
                 run_backend_tests, 'check_coverage', lambda *_: ('', 100.0)
             )
             with self.swap_redis_server:
@@ -1225,12 +1246,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         ) -> List[str]:
             return mock_shard_tests
 
-        swap_check_shards = self.swap(
+        swap_check_shards = mock.patch.object(
             run_backend_tests,
             'check_shards_match_tests',
             mock_check_shards_match_tests,
         )
-        swap_get_shard_tests = self.swap(
+        swap_get_shard_tests = mock.patch.object(
             run_backend_tests,
             'get_all_test_targets_from_shard',
             mock_get_all_test_targets_from_shard,
@@ -1278,7 +1299,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         ) -> str:
             return 'Shard validation error'
 
-        swap_check_shards = self.swap(
+        swap_check_shards = mock.patch.object(
             run_backend_tests,
             'check_shards_match_tests',
             mock_check_shards_match_tests,
@@ -1296,7 +1317,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mock_get_changed_files() -> Set[str]:
             return {'core.utils_test', 'core.feconf_test'}
 
-        swap_changed_files = self.swap(
+        swap_changed_files = mock.patch.object(
             git_changes_utils,
             'get_changed_python_test_files',
             mock_get_changed_files,
@@ -1321,7 +1342,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         with unittest.mock.patch('pytest.main', return_value=0) as mock_pytest:
-            with self.print_swap:
+            with self.print_patch:
                 exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
 
         self.assertEqual(exit_code, 0)
@@ -1336,7 +1357,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         )
 
         with unittest.mock.patch('pytest.main', return_value=1) as mock_pytest:
-            with self.print_swap:
+            with self.print_patch:
                 exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
 
         self.assertEqual(exit_code, 1)
@@ -1346,7 +1367,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with unittest.mock.patch('pytest.main', return_value=0):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator:
-                    with self.print_swap:
+                    with self.print_patch:
                         # Should not raise an exception.
                         run_backend_tests.main(
                             args=[
@@ -1361,7 +1382,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         with unittest.mock.patch('pytest.main', return_value=1):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator:
-                    with self.print_swap:
+                    with self.print_patch:
                         with self.assertRaisesRegex(
                             Exception, 'Tests failed with exit code 1'
                         ):
@@ -1386,17 +1407,17 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             emulator_context_entered['redis'] = True
             return MockCompilerContextManager()
 
-        swap_redis = self.swap(
+        swap_redis = mock.patch.object(
             servers, 'managed_redis_server', mock_redis_server
         )
-        swap_datastore = self.swap(
+        swap_datastore = mock.patch.object(
             servers,
             'managed_cloud_datastore_emulator',
             mock_cloud_datastore_emulator,
         )
 
         with unittest.mock.patch('pytest.main', return_value=0):
-            with swap_redis, swap_datastore, self.print_swap:
+            with swap_redis, swap_datastore, self.print_patch:
                 run_backend_tests.main(
                     args=[
                         '--use_pytest',

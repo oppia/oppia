@@ -15,6 +15,7 @@
 """Tests for platform feature evaluation handler."""
 
 from __future__ import annotations
+from unittest import mock
 
 import enum
 
@@ -58,10 +59,12 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
                 FeatureStages.PROD,
             ),
         }
-        self.swap_name_to_description_feature_stage_registry_dict = self.swap(
-            registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            self.swapped_value,
+        self.swap_name_to_description_feature_stage_registry_dict = (
+            mock.patch.object(
+                registry,
+                'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+                self.swapped_value,
+            )
         )
 
         self.dev_feature_flag = feature_flag_domain.FeatureFlag(
@@ -99,15 +102,17 @@ class FeatureFlagsEvaluationHandlerTest(test_utils.GenericTestBase):
         feature_services.ALL_FEATURES_NAMES_SET = self.original_feature_name_set
 
     def test_feature_flag_evaluation_is_correct(self) -> None:
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_services,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             self.swapped_value,
         )
-        swap_name_to_description_feature_stage_registry_dict = self.swap(
-            registry,
-            'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
-            self.swapped_value,
+        swap_name_to_description_feature_stage_registry_dict = (
+            mock.patch.object(
+                registry,
+                'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
+                self.swapped_value,
+            )
         )
 
         with swap_name_to_description_feature_stage_dict:

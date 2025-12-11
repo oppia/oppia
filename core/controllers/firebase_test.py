@@ -15,6 +15,7 @@
 """Tests for the firebase controllers."""
 
 from __future__ import annotations
+from unittest import mock
 
 import collections
 
@@ -50,7 +51,7 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
     def test_get_request_forwarded_to_firebase_proxy(self) -> None:
         url = '/__/auth'
         params = {'param_1': 'value_1', 'param_2': 'value_2'}
-        with self.swap(
+        with mock.patch.object(
             firebase,
             'FIREBASE_DOMAINS',
             {'localhost': self.MOCK_FIREBASE_DOMAIN},
@@ -80,7 +81,7 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'Content-Length': '20',
         }
         payload = {'payload': 'value'}
-        with self.swap(
+        with mock.patch.object(
             firebase,
             'FIREBASE_DOMAINS',
             {'localhost': self.MOCK_FIREBASE_DOMAIN},

@@ -17,6 +17,7 @@
 """Tests for email_subscription_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import (
@@ -65,7 +66,7 @@ class InformSubscribersTest(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title'
         )
 
-        self.can_send_subscription_email_ctx = self.swap(
+        self.can_send_subscription_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
 

@@ -17,6 +17,7 @@
 """Tests for the learner group services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feature_flag_list
 from core.constants import constants
@@ -361,7 +362,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
             'Topic with id %s could not be fetched: Topic not found'
             % self.TOPIC_ID_0,
         ):
-            with self.swap(
+            with mock.patch.object(
                 topic_fetchers, 'get_topic_by_id', mock_get_topic_by_id
             ):
                 learner_group_services.get_matching_learner_group_syllabus_to_add(

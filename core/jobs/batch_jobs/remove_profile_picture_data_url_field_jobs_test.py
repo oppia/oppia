@@ -17,6 +17,7 @@
 """Remove profile_picture_data_url field from UserSettingsModel."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import user_services
@@ -98,7 +99,7 @@ class RemoveProfilePictureFieldJobTests(job_test_utils.JobTestBase):
         )
 
     def test_removal_of_profile_field(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             user_models,
             'UserSettingsModel',
             MockUserSettingsModelWithProfilePicture,

@@ -17,6 +17,7 @@
 """Tests for Exploration models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import copy
 import datetime
@@ -266,7 +267,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with mock.patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 exp_models.ExplorationRightsModel.has_reference_to_user_id(
                     self.USER_ID_1
@@ -470,7 +471,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 }
             ],
         )
-        self.allow_revert_swap = self.swap(
+        self.allow_revert_patch = mock.patch.object(
             exp_models.ExplorationRightsModel, 'ALLOW_REVERT', True
         )
 
@@ -487,14 +488,14 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 'deprecated_values': {},
             }
         )
-        self.allowed_commands_swap = self.swap(
+        self.allowed_commands_patch = mock.patch.object(
             feconf,
             'EXPLORATION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
             exploration_rights_allowed_commands,
         )
 
     def test_revert_to_valid_version_is_successful(self) -> None:
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -527,7 +528,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -554,7 +555,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.update_timestamps()
         snapshot_model.put()
 
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -567,7 +568,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
         )
 
     def test_revert_to_check_deprecated_fields_are_absent(self) -> None:
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             exp_models.ExplorationRightsModel.revert(
                 self.exploration_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -1154,7 +1155,7 @@ class TransientCheckpointUrlModelUnitTest(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 transient_checkpoint_progress_model_cls,
                 'get_by_id',
                 types.MethodType(

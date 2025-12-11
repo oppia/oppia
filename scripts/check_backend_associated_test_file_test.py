@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_backend_associated_test_file.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import logging
@@ -42,9 +43,9 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         def mock_error(msg: str) -> None:
             self.error_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.swap_logging = self.swap(logging, 'error', mock_error)
-        self.swap_exit = self.swap(sys, 'exit', lambda _: None)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
+        self.swap_logging = mock.patch.object(logging, 'error', mock_error)
+        self.swap_exit = mock.patch.object(sys, 'exit', lambda _: None)
 
     def test_checks_fail_when_a_backend_file_lacks_associated_test_file(
         self,
@@ -52,7 +53,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         frontend_file = os.path.join(tempdir.name, 'frontend_file.ts')
-        topmost_level_path_swap = self.swap(
+        topmost_level_path_patch = mock.patch.object(
             check_backend_associated_test_file,
             'TOPMOST_LEVEL_PATH',
             tempdir.name,
@@ -62,8 +63,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         with open(frontend_file, 'w', encoding='utf8') as f:
             f.write('Example code')
 
-        with self.print_swap, self.swap_logging, self.swap_exit:
-            with topmost_level_path_swap:
+        with self.print_patch, self.swap_logging, self.swap_exit:
+            with topmost_level_path_patch:
                 check_backend_associated_test_file.main()
 
         tempdir.cleanup()
@@ -88,7 +89,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
     ) -> None:
         tempdir = tempfile.TemporaryDirectory(prefix=os.getcwd() + '/core/')
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
-        topmost_level_path_swap = self.swap(
+        topmost_level_path_patch = mock.patch.object(
             check_backend_associated_test_file,
             'TOPMOST_LEVEL_PATH',
             tempdir.name,
@@ -100,8 +101,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
                 os.path.relpath(backend_file, tempdir.name)
             )
         )
-        with self.print_swap, self.swap_logging, self.swap_exit:
-            with topmost_level_path_swap:
+        with self.print_patch, self.swap_logging, self.swap_exit:
+            with topmost_level_path_patch:
                 check_backend_associated_test_file.main()
 
         tempdir.cleanup()
@@ -123,7 +124,7 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
         )
         backend_file = os.path.join(tempdir.name, 'backend_file.py')
         backend_test_file = os.path.join(tempdir.name, 'backend_file_test.py')
-        topmost_level_path_swap = self.swap(
+        topmost_level_path_patch = mock.patch.object(
             check_backend_associated_test_file,
             'TOPMOST_LEVEL_PATH',
             tempdir.name,
@@ -133,8 +134,8 @@ class CheckBackendAssociatedTestFileTests(test_utils.GenericTestBase):
             f.write('Example code')
         with open(backend_test_file, 'w', encoding='utf8') as f:
             f.write('Example code')
-        with self.print_swap, self.swap_logging, self.swap_exit:
-            with topmost_level_path_swap:
+        with self.print_patch, self.swap_logging, self.swap_exit:
+            with topmost_level_path_patch:
                 check_backend_associated_test_file.main()
 
         tempdir.cleanup()

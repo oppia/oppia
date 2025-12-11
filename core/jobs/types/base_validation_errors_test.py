@@ -17,6 +17,7 @@
 """Unit tests for base model validator errors."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import pickle
@@ -95,11 +96,11 @@ class BaseValidationErrorTests(AuditErrorsTestBase):
         def mock_get_model_id(unused_model: base_models.BaseModel) -> None:
             return None
 
-        get_model_id_swap = self.swap(
+        get_model_id_patch = mock.patch.object(
             job_utils, 'get_model_id', mock_get_model_id
         )
 
-        with get_model_id_swap, self.assertRaisesRegex(
+        with get_model_id_patch, self.assertRaisesRegex(
             AssertionError, 'Model ID should not be none'
         ):
             FooError(self.model)

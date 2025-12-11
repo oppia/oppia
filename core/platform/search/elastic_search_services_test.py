@@ -17,6 +17,7 @@
 """Tests for the python elastic search wrapper."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.domain import search_services
 from core.platform.search import elastic_search_services
@@ -43,7 +44,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             return {'_shards': {'failed': 0}}
 
         es_client = elastic_search_services.ES.get_client()
-        with self.swap(es_client, 'index', mock_index):
+        with mock.patch.object(es_client, 'index', mock_index):
             elastic_search_services.add_documents_to_index(
                 [{'id': correct_id}], correct_index_name
             )
@@ -67,7 +68,9 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             Exception, 'Failed to add document to index.'
         )
         es_client = elastic_search_services.ES.get_client()
-        with assert_raises_ctx, self.swap(es_client, 'index', mock_index):
+        with assert_raises_ctx, mock.patch.object(
+            es_client, 'index', mock_index
+        ):
             elastic_search_services.add_documents_to_index(
                 documents, correct_index_name
             )
@@ -112,7 +115,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             self.assertEqual(body, {'query': {'match_all': {}}})
 
         es_client = elastic_search_services.ES.get_client()
-        swap_delete_by_query = self.swap(
+        swap_delete_by_query = mock.patch.object(
             es_client, 'delete_by_query', mock_delete_by_query
         )
 
@@ -187,7 +190,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             return {'hits': {'hits': []}}
 
         es_client = elastic_search_services.ES.get_client()
-        swap_search = self.swap(es_client, 'search', mock_search)
+        swap_search = mock.patch.object(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = elastic_search_services.search(
                 '', correct_index_name, ['my_category'], ['en', 'es']
@@ -240,7 +243,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             return {'hits': {'hits': []}}
 
         es_client = elastic_search_services.ES.get_client()
-        swap_search = self.swap(es_client, 'search', mock_search)
+        swap_search = mock.patch.object(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = elastic_search_services.search(
                 'query', correct_index_name, ['my_category'], ['en', 'es']
@@ -353,7 +356,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             return {'hits': {'hits': []}}
 
         es_client = elastic_search_services.ES.get_client()
-        swap_search = self.swap(es_client, 'search', mock_search)
+        swap_search = mock.patch.object(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(
@@ -412,7 +415,7 @@ class ElasticSearchUnitTests(test_utils.GenericTestBase):
             return {'hits': {'hits': []}}
 
         es_client = elastic_search_services.ES.get_client()
-        swap_search = self.swap(es_client, 'search', mock_search)
+        swap_search = mock.patch.object(es_client, 'search', mock_search)
         with swap_search:
             result, new_offset = (
                 elastic_search_services.blog_post_summaries_search(

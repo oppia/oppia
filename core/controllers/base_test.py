@@ -17,6 +17,7 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
+from unittest import mock
 
 import contextlib
 import importlib
@@ -67,7 +68,9 @@ class HelperFunctionTests(test_utils.GenericTestBase):
         oppia_root_path = os.path.join(
             'core', 'templates', 'pages', 'oppia-root'
         )
-        with self.swap(feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path):
+        with mock.patch.object(
+            feconf, 'FRONTEND_TEMPLATES_DIR', oppia_root_path
+        ):
             self.assertIn(
                 '"Loading | Oppia"',
                 base.load_template(
@@ -284,7 +287,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with mock.patch.object(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn(
@@ -292,7 +295,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_root_redirect_rules_for_deleted_user_dev_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with mock.patch.object(constants, 'DEV_MODE', True):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn(
@@ -319,7 +322,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with mock.patch.object(logging, 'warning', mock_logging_function):
             self.get_json('/mock', expected_status_int=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -346,7 +349,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         def mock_logging_function(msg: str) -> None:
             observed_log_messages.append(msg)
 
-        with self.swap(logging, 'warning', mock_logging_function):
+        with mock.patch.object(logging, 'warning', mock_logging_function):
             self.testapp.options('/mock', status=500)
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
@@ -354,13 +357,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
 
     def test_dev_mode_cannot_be_true_on_production(self) -> None:
-        server_software_swap = self.swap(
+        server_software_patch = mock.patch.object(
             os, 'environ', {'SERVER_SOFTWARE': 'Production'}
         )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'DEV_MODE can\'t be true on production.'
         )
-        with assert_raises_regexp_context_manager, server_software_swap:
+        with assert_raises_regexp_context_manager, server_software_patch:
             # This reloads the feconf module so that all the checks in
             # the module are reexecuted.
             importlib.reload(feconf)  # pylint: disable-all
@@ -372,18 +375,18 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'error', _mock_logging_function):
+        with mock.patch.object(logging, 'error', _mock_logging_function):
             self.post_json('/frontend_errors', {'error': 'errors'})
 
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
     def test_redirect_when_user_is_disabled(self) -> None:
-        get_auth_claims_from_request_swap = self.swap_to_always_raise(
+        get_auth_claims_from_request_patch = self.swap_to_always_raise(
             auth_services,
             'get_auth_claims_from_request',
             auth_domain.UserDisabledError,
         )
-        with get_auth_claims_from_request_swap:
+        with get_auth_claims_from_request_patch:
             response = self.get_html_response('/', expected_status_int=302)
             self.assertIn(
                 'pending-account-deletion', response.headers['location']
@@ -679,7 +682,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         )
         with contextlib.ExitStack() as context_stack:
             context_stack.enter_context(
-                self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', True)
+                mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', True)
             )
             self.context_stack = context_stack.pop_all()
 
@@ -759,7 +762,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_maintenance_mode_is_disabled(self) -> None:
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
     def test_signup_succeeds_when_user_is_super_admin(self) -> None:
@@ -780,7 +783,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         )
         self.context_stack.enter_context(self.super_admin_context())
 
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
@@ -799,7 +802,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(auth_services, 'destroy_auth_session')
         )
 
-        with self.swap(feconf, 'ENABLE_MAINTENANCE_MODE', False):
+        with mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
@@ -837,7 +840,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
         def mock_get_current_time(unused_cls: str) -> float:
             return current_time
 
-        with self.swap(
+        with mock.patch.object(
             base.CsrfTokenManager,
             '_get_current_time',
             types.MethodType(mock_get_current_time, base.CsrfTokenManager),
@@ -1229,7 +1232,7 @@ class GetHandlerTypeIfExceptionRaisedTests(test_utils.GenericTestBase):
         fake_urls = []
         fake_urls.append(main.get_redirect_route(r'/fake', self.FakeHandler))
         fake_urls.append(main.URLS[-1])
-        with self.swap(main, 'URLS', fake_urls):
+        with mock.patch.object(main, 'URLS', fake_urls):
             self.testapp = webtest.TestApp(
                 webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG)
             )
@@ -1322,7 +1325,7 @@ class GetItemsEscapedCharactersTests(test_utils.GenericTestBase):
                 debug=feconf.DEBUG,
             )
         )
-        with self.swap(self, 'testapp', mock_testapp):
+        with mock.patch.object(self, 'testapp', mock_testapp):
             params = {'param1': 'value1', 'param2': 'value2'}
             result = self.get_json('/mock?param1=value1&param2=value2')
             self.assertDictContainsSubset(params, result)
@@ -1962,7 +1965,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
 
     def test_cannot_access_exploration_with_incorrect_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp1):
+        with mock.patch.object(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                 expected_status_int=400,
@@ -1978,7 +1981,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
 
     def test_can_access_exploration_with_correct_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp2):
+        with mock.patch.object(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                 expected_status_int=200,
@@ -1992,7 +1995,7 @@ class SchemaValidationUrlArgsTests(test_utils.GenericTestBase):
             'MockHandlerWithMissingUrlPathSchema handler class.'
         )
 
-        with self.swap(self, 'testapp', self.mock_testapp3):
+        with mock.patch.object(self, 'testapp', self.mock_testapp3):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.exp_id,
                 expected_status_int=500,
@@ -2178,7 +2181,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
 
     def test_cannot_access_exploration_with_incorrect_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp1):
+        with mock.patch.object(self, 'testapp', self.mock_testapp1):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                 expected_status_int=400,
@@ -2199,7 +2202,7 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
             'MockHandlerWithMissingRequestSchema handler class.'
         )
 
-        with self.swap(self, 'testapp', self.mock_testapp2):
+        with mock.patch.object(self, 'testapp', self.mock_testapp2):
             response = self.get_json(
                 '/mock_play_exploration?exploration_id=%s' % self.exp_id,
                 expected_status_int=500,
@@ -2210,11 +2213,11 @@ class SchemaValidationRequestArgsTests(test_utils.GenericTestBase):
     def test_can_access_exploration_with_default_value_in_schema(self) -> None:
         self.login(self.OWNER_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp3):
+        with mock.patch.object(self, 'testapp', self.mock_testapp3):
             self.get_json('/mock_play_exploration?apply_draft=true')
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp4):
+        with mock.patch.object(self, 'testapp', self.mock_testapp4):
             self.put_json('/mock_play_exploration', {}, csrf_token=csrf_token)
         self.logout()
 
@@ -2256,8 +2259,8 @@ class HandlerClassWithSchemaInStillNeedsSchemaListRaiseErrorTest(
         )
 
     def test_post_request_raise_internal_server_error(self) -> None:
-        test_app_ctx = self.swap(self, 'testapp', self.testapp)
-        handler_class_still_needs_schema_list_ctx = self.swap(
+        test_app_ctx = mock.patch.object(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = mock.patch.object(
             handler_schema_constants,
             'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
             ['MockHandler'],
@@ -2298,11 +2301,11 @@ class HeaderRequestsTests(test_utils.GenericTestBase):
         )
 
     def test_head_request_with_invalid_url_args_raises(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.testapp.head('/mock/not_int', status=400)
 
     def test_valid_head_request_returns_only_headers(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             response = self.testapp.head('/mock/234', status=200)
             self.assertEqual(response.body, b'')
             self.assertIsNotNone(response.headers)
@@ -2335,7 +2338,7 @@ class RequestMethodNotInHandlerClassDoNotRaiseMissingSchemaErrorTest(
         )
 
     def test_get_request_do_not_raise_notimplemented_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.get_json('/mock', expected_status_int=404)
 
 
@@ -2398,7 +2401,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
         self.csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
     def test_both_args_in_post_request(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request',
                 self.payload,
@@ -2406,7 +2409,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             )
 
     def test_post_request_with_invalid_source_raise_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request',
                 self.payload,
@@ -2416,7 +2419,7 @@ class HandlerClassWithBothRequestAndPayloadTest(test_utils.GenericTestBase):
             )
 
     def test_post_request_with_valid_source_do_not_raise_error(self) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock?arg_a=arg_in_request',
                 self.payload,
@@ -2519,7 +2522,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             response_dict = self.post_json(
                 '/mock_upload/exploration/0',
                 {'filename': 'test.png'},
@@ -2574,7 +2577,7 @@ class UrlPathNormalizationTest(test_utils.GenericTestBase):
         list_string = '["id1", "id2", "id3"]'
         int_string = '1'
 
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.get_json(
                 '/mock_normalization/%s/%s' % (int_string, list_string),
                 expected_status_int=200,
@@ -2646,7 +2649,7 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     def test_request_with_schema_using_payload_or_request_attr_raise_error(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.testapp):
+        with mock.patch.object(self, 'testapp', self.testapp):
             self.post_json(
                 '/mock_with_schema',
                 self.payload,
@@ -2657,8 +2660,8 @@ class RaiseErrorOnGetTest(test_utils.GenericTestBase):
     def test_request_without_schema_using_payload_or_request_attr_raise_no_err(
         self,
     ) -> None:
-        test_app_ctx = self.swap(self, 'testapp', self.testapp)
-        handler_class_still_needs_schema_list_ctx = self.swap(
+        test_app_ctx = mock.patch.object(self, 'testapp', self.testapp)
+        handler_class_still_needs_schema_list_ctx = mock.patch.object(
             handler_schema_constants,
             'HANDLER_CLASS_NAMES_WITH_NO_SCHEMA',
             ['MockHandlerWithoutSchema'],
@@ -2709,7 +2712,7 @@ class ExceptionsLoggingTests(test_utils.GenericTestBase):
 
     def test_handle_not_logged_in_exception_logs_warning(self) -> None:
         """Ensures NotLoggedInException logs a warning with the correct format."""
-        with self.swap(logging, 'warning', self.mock_logging_warning):
+        with mock.patch.object(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotLoggedInException('Unauthenticated user'), False
             )
@@ -2732,7 +2735,7 @@ Handler class name: BaseHandler
 
     def test_not_found_exception_logs_warning(self) -> None:
         """Ensures NotFoundException logs a warning with the correct format."""
-        with self.swap(logging, 'warning', self.mock_logging_warning):
+        with mock.patch.object(logging, 'warning', self.mock_logging_warning):
             self.handler.handle_exception(
                 self.handler.NotFoundException('Invalid URL requested'), False
             )
@@ -2755,7 +2758,9 @@ Handler class name: BaseHandler
 
     def test_unauthorized_user_exception_logs_warning(self) -> None:
         """Ensures UnauthorizedUserException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        with mock.patch.object(
+            logging, 'exception', self.mock_logging_exception
+        ):
             self.handler.handle_exception(
                 self.handler.UnauthorizedUserException('Unauthorized User'),
                 False,
@@ -2779,7 +2784,9 @@ Handler class name: BaseHandler
 
     def test_invalid_input_exception_logs_warning(self) -> None:
         """Ensures InvalidInputException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        with mock.patch.object(
+            logging, 'exception', self.mock_logging_exception
+        ):
             self.handler.handle_exception(
                 self.handler.InvalidInputException('Invalid Input'), False
             )
@@ -2802,7 +2809,9 @@ Handler class name: BaseHandler
 
     def test_internal_error_exception_logs_warning(self) -> None:
         """Ensures InternalErrorException logs an exception with the correct format."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        with mock.patch.object(
+            logging, 'exception', self.mock_logging_exception
+        ):
             self.handler.handle_exception(
                 self.handler.InternalErrorException('Internal Error'), False
             )
@@ -2835,7 +2844,9 @@ Handler class name: BaseHandler
 
     def test_generic_exception_logging_logs_exception(self) -> None:
         """Tests that a generic exception logs using LogType.EXCEPTION."""
-        with self.swap(logging, 'exception', self.mock_logging_exception):
+        with mock.patch.object(
+            logging, 'exception', self.mock_logging_exception
+        ):
             generic_exception = Exception('Generic error')
             self.handler.handle_exception(generic_exception, False)
             expected_log_message = f"""
@@ -2870,7 +2881,7 @@ Handler class name: BaseHandler
         def mock_logging_exception(msg: str) -> None:
             self.logged_exceptions.append(msg)
 
-        with self.swap(logging, 'exception', mock_logging_exception):
+        with mock.patch.object(logging, 'exception', mock_logging_exception):
             self.testapp.get('/mock', status=500)
 
         self.assertTrue(

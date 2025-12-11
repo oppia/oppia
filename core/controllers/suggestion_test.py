@@ -17,6 +17,7 @@
 """Tests for suggestion controllers."""
 
 from __future__ import annotations
+from unittest import mock
 
 import base64
 import os
@@ -694,16 +695,16 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         # has a high enough score to review suggestions in this category. This
         # will be used to test whether the author can review a suggestion in
         # the same category because of the author's high score in a later test.
-        enable_recording_of_scores_swap = self.swap(
+        enable_recording_of_scores_patch = mock.patch.object(
             feconf, 'ENABLE_RECORDING_OF_SCORES', True
         )
-        increment_score_of_author_swap = self.swap(
+        increment_score_of_author_patch = mock.patch.object(
             suggestion_models,
             'INCREMENT_SCORE_OF_AUTHOR_BY',
             feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW,
         )
 
-        with enable_recording_of_scores_swap, increment_score_of_author_swap:
+        with enable_recording_of_scores_patch, increment_score_of_author_patch:
             csrf_token = self.get_new_csrf_token()
             self.put_json(
                 '%s/exploration/%s/%s'
@@ -988,7 +989,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         )['suggestions'][0]
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with mock.patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x,
@@ -1283,7 +1284,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        with self.swap(
+        with mock.patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x,
@@ -1919,7 +1920,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             change_dict,
             'description',
         )
-        with self.swap(
+        with mock.patch.object(
             opportunity_services,
             'update_translation_opportunity_with_accepted_suggestion',
             lambda x, _: x,

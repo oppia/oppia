@@ -638,7 +638,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         ) -> List[Dict[str, Union[str, float]]]:
             raise Exception('Mocked exception during voiceover regeneration')
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_regeneration_services,
             'synthesize_voiceover_for_html_string',
             mock_synthesize_voiceover_for_html_string,

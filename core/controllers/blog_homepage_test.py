@@ -15,6 +15,7 @@
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 
@@ -539,13 +540,15 @@ class BlogPostSearchHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response_dict['blog_post_summaries_list']), 4)
         self.assertEqual(response_dict['search_offset'], None)
 
-        default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 2)
-        max_cards_limit_swap = self.swap(
+        default_query_limit_patch = mock.patch.object(
+            feconf, 'DEFAULT_QUERY_LIMIT', 2
+        )
+        max_cards_limit_patch = mock.patch.object(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
         )
         # Load the search results with an empty query.
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with default_query_limit_swap, max_cards_limit_swap:
+            with default_query_limit_patch, max_cards_limit_patch:
                 response_dict = self.get_json(feconf.BLOG_SEARCH_DATA_URL)
 
                 self.assertEqual(len(logs), 1)

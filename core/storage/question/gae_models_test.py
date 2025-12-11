@@ -15,6 +15,7 @@
 """Tests for core.storage.question.gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import random
 import types
@@ -213,7 +214,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             'many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 question_models.QuestionModel,
                 'get_by_id',
                 types.MethodType(
@@ -730,13 +731,15 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             alist.sort(key=k)
             return alist[:num]
 
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        sample_patch = mock.patch.object(random, 'sample', mock_random_sample)
 
         def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
 
-        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
-        with sample_swap, random_int_swap:
+        random_int_patch = mock.patch.object(
+            utils, 'get_random_int', mock_random_int
+        )
+        with sample_patch, random_int_patch:
             question_skill_links_1 = question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill(  # pylint: disable=line-too-long
                 3, ['skill_id1'], 0.6
             )
@@ -963,13 +966,15 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             alist.sort(key=k)
             return alist[:num]
 
-        sample_swap = self.swap(random, 'sample', mock_random_sample)
+        sample_patch = mock.patch.object(random, 'sample', mock_random_sample)
 
         def mock_random_int(upper_bound: int) -> int:
             return 1 if upper_bound > 1 else 0
 
-        random_int_swap = self.swap(utils, 'get_random_int', mock_random_int)
-        with sample_swap, random_int_swap:
+        random_int_patch = mock.patch.object(
+            utils, 'get_random_int', mock_random_int
+        )
+        with sample_patch, random_int_patch:
             question_skill_links_1 = question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill(
                 3, ['skill_id1']
             )

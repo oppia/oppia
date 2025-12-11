@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import collections
@@ -1633,39 +1634,6 @@ class TestBase(unittest.TestCase):
     # of object on which attribute needs to be replaced, and argument
     # 'newvalue' can accept any type of value to replace it with the
     # old value.
-    @contextlib.contextmanager
-    def swap(self, obj: Any, attr: str, newvalue: Any) -> Iterator[None]:
-        """Swap an object's attribute value within the context of a 'with'
-        statement. The object can be anything that supports getattr and setattr,
-        such as class instances, modules, etc.
-
-        Example usage:
-
-            import math
-            with self.swap(math, 'sqrt', lambda x: 42):
-                print math.sqrt(16.0) # prints 42
-            print math.sqrt(16.0) # prints 4 as expected.
-
-        To mock class methods, pass the function to the classmethod decorator
-        first, for example:
-
-            import types
-            with self.swap(
-                SomePythonClass, 'some_classmethod',
-                classmethod(new_classmethod)):
-
-        NOTE: self.swap and other context managers that are created using
-        contextlib.contextmanager use generators that yield exactly once. This
-        means that you can only use them once after construction, otherwise,
-        the generator will immediately raise StopIteration, and contextlib will
-        raise a RuntimeError.
-        """
-        original = getattr(obj, attr)
-        setattr(obj, attr, newvalue)
-        try:
-            yield
-        finally:
-            setattr(obj, attr, original)
 
     # Here we use type Any because argument 'obj' can accept any kind
     # of object on which attribute needs to be replaced, and argument
@@ -1683,7 +1651,7 @@ class TestBase(unittest.TestCase):
             """Returns the input value."""
             return value
 
-        with self.swap(obj, attr, function_that_always_returns):
+        with mock.patch.object(obj, attr, function_that_always_returns):
             yield
 
     # Here we use type Any because the argument 'obj' can accept any
@@ -1701,7 +1669,7 @@ class TestBase(unittest.TestCase):
             """Raises the input exception."""
             raise error
 
-        with self.swap(obj, attr, function_that_always_raises):
+        with mock.patch.object(obj, attr, function_that_always_raises):
             yield
 
     # Here we use type Any because argument 'obj' can accept any kind
@@ -1741,7 +1709,7 @@ class TestBase(unittest.TestCase):
             return returns
 
         call_counter = CallCounter(impl)
-        with self.swap(obj, attr, call_counter):
+        with mock.patch.object(obj, attr, call_counter):
             yield call_counter
 
     # Here we use type Any because the argument 'obj' can accept any
@@ -1770,11 +1738,11 @@ class TestBase(unittest.TestCase):
                 def mock_popen(command, shell):
                     return
 
-                popen_swap = self.swap_with_checks(
+                popen_patch = self.swap_with_checks(
                     subprocess, 'Popen', mock_popen,
                     expected_args=[(['python'],), (['python2'],)],
                     expected_kwargs=[{'shell': True}, {'shell': False}])
-                with popen_swap:
+                with popen_patch:
                     function_that_invokes_popen()
 
         Args:
@@ -2130,7 +2098,7 @@ class AppEngineTestBase(TestBase):
         # Mock set_constants_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.
-        self.contextManager = self.swap(
+        self.contextManager = mock.patch.object(
             common,
             'set_constants_to_default',
             self.mock_set_constants_to_default,
@@ -2160,12 +2128,12 @@ class AppEngineTestBase(TestBase):
                 None, a temporary result object is created (by calling the
                 defaultTestResult() method) and used instead.
         """
-        platform_taskqueue_services_swap = self.swap(
+        platform_taskqueue_services_patch = mock.patch.object(
             platform_taskqueue_services,
             'create_http_task',
             self._platform_taskqueue_services_stub.create_http_task,
         )
-        with platform_taskqueue_services_swap:
+        with platform_taskqueue_services_patch:
             super().run(result=result)
 
     def count_jobs_in_taskqueue(self, queue_name: Optional[str]) -> int:
@@ -2680,57 +2648,57 @@ version: 1
             stack.callback(AuthServicesStub.install_stub(self))
             es_client = elastic_search_services.ES.get_client()
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     es_client.indices, 'create', es_stub.mock_create_index
                 )
             )
             stack.enter_context(
-                self.swap(es_client, 'index', es_stub.mock_index)
+                mock.patch.object(es_client, 'index', es_stub.mock_index)
             )
             stack.enter_context(
-                self.swap(es_client, 'exists', es_stub.mock_exists)
+                mock.patch.object(es_client, 'exists', es_stub.mock_exists)
             )
             stack.enter_context(
-                self.swap(es_client, 'delete', es_stub.mock_delete)
+                mock.patch.object(es_client, 'delete', es_stub.mock_delete)
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     es_client, 'delete_by_query', es_stub.mock_delete_by_query
                 )
             )
             stack.enter_context(
-                self.swap(es_client, 'search', es_stub.mock_search)
+                mock.patch.object(es_client, 'search', es_stub.mock_search)
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     memory_cache_services,
                     'flush_caches',
                     memory_cache_services_stub.flush_caches,
                 )
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     memory_cache_services,
                     'get_multi',
                     memory_cache_services_stub.get_multi,
                 )
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     memory_cache_services,
                     'set_multi',
                     memory_cache_services_stub.set_multi,
                 )
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     memory_cache_services,
                     'get_memory_cache_stats',
                     memory_cache_services_stub.get_memory_cache_stats,
                 )
             )
             stack.enter_context(
-                self.swap(
+                mock.patch.object(
                     memory_cache_services,
                     'delete_multi',
                     memory_cache_services_stub.delete_multi,
@@ -3063,7 +3031,7 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(base, 'load_template', mock_load_template):
+        with mock.patch.object(base, 'load_template', mock_load_template):
             response = self.testapp.get(
                 url,
                 params=params,
@@ -3179,7 +3147,7 @@ version: 1
         # source directory instead of webpack_bundles since webpack_bundles is
         # only produced after webpack compilation which is not performed during
         # backend tests.
-        with self.swap(base, 'load_template', mock_load_template):
+        with mock.patch.object(base, 'load_template', mock_load_template):
 
             if http_method == 'GET':
                 response = self.testapp.get(
@@ -4659,7 +4627,7 @@ class LinterTestBase(GenericTestBase):
             """
             self.linter_stdout.append(' '.join(str(arg) for arg in args))
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
     def assert_same_list_elements(
         self, phrases: List[str], stdout: List[str]
@@ -4772,7 +4740,7 @@ class GenericEmailTestBase(GenericTestBase):
         mailgun api key, mailgun domain name and mocked version of
         send_email_to_recipients().
         """
-        with self.swap(
+        with mock.patch.object(
             email_services,
             'send_email_to_recipients',
             self._send_email_to_recipients,

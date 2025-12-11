@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/js_ts_linter.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import multiprocessing
 import os
@@ -105,8 +106,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ) -> Ret:
             return Ret()
 
-        popen_error_swap = self.swap(subprocess, 'Popen', mock_popen_error_call)
-        with popen_error_swap:
+        popen_error_patch = mock.patch.object(
+            subprocess, 'Popen', mock_popen_error_call
+        )
+        with popen_error_patch:
             with self.assertRaisesRegex(Exception, 'Some error'):
                 js_ts_linter.compile_all_ts_files()
 
@@ -121,11 +124,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_communicate(unused_self: str) -> Tuple[bytes, bytes]:
             return (b'Output', b'Invalid')
 
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        communicate_swap = self.swap(
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
+        communicate_patch = mock.patch.object(
             subprocess.Popen, 'communicate', mock_communicate
         )
-        with popen_swap, communicate_swap:
+        with popen_patch, communicate_patch:
             with self.assertRaisesRegex(Exception, 'Invalid'):
                 js_ts_linter.ThirdPartyJsTsLintChecksManager(
                     [VALID_TS_FILEPATH]
@@ -135,9 +138,9 @@ class JsTsLintTests(test_utils.LinterTestBase):
         def mock_exists(unused_path: str) -> bool:
             return False
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.assertRaisesRegex(
+        with exists_patch, self.assertRaisesRegex(
             Exception,
             'ERROR    Please run start.py first to install node-eslint and '
             'its dependencies.',
@@ -200,11 +203,11 @@ class JsTsLintTests(test_utils.LinterTestBase):
             )
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_patch = mock.patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
         )
 
-        with compile_all_ts_files_swap:
+        with compile_all_ts_files_patch:
             lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [], [VALID_UNLISTED_SERVICE_PATH], FILE_CACHE
             ).perform_all_lint_checks()
@@ -249,10 +252,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
             )
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
 
-        compile_all_ts_files_swap = self.swap(
+        compile_all_ts_files_patch = mock.patch.object(
             js_ts_linter, 'compile_all_ts_files', mock_compile_all_ts_files
         )
-        with compile_all_ts_files_swap:
+        with compile_all_ts_files_patch:
             lint_task_report = js_ts_linter.JsTsLintChecksManager(
                 [],
                 [VALID_IGNORED_SERVICE_PATH],
@@ -306,10 +309,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 stderr=b'',
             )
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
 
-        with exists_swap, popen_swap:
+        with exists_patch, popen_patch:
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_TS_FILEPATH]
             ).perform_all_lint_checks()
@@ -358,10 +361,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 stderr=b'',
             )
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
 
-        with exists_swap, popen_swap:
+        with exists_patch, popen_patch:
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_TS_FILEPATH]
             ).perform_all_lint_checks()
@@ -394,10 +397,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 stderr=b'',
             )
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
 
-        with exists_swap, popen_swap:
+        with exists_patch, popen_patch:
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_TS_FILEPATH]
             ).perform_all_lint_checks()
@@ -417,10 +420,10 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ) -> MockProcess:
             return MockProcess(returncode=0, stdout=b'', stderr=b'')
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
 
-        with exists_swap, popen_swap:
+        with exists_patch, popen_patch:
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_TS_FILEPATH]
             ).perform_all_lint_checks()

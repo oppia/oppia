@@ -15,6 +15,7 @@
 """Tests for the admin page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import enum
@@ -119,7 +120,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        self.prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -151,7 +152,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload an exploration in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'reload_exploration', 'exploration_id': '3'},
@@ -169,7 +170,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'exploration_id\' must be provided when the action '
             'is reload_exploration.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'reload_exploration', 'exploration_id': None},
@@ -189,7 +190,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'collection_id\' must be provided when the action '
             'is reload_collection.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'reload_collection', 'collection_id': None},
@@ -210,7 +211,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'blog_post_title\' must be provided when the action '
             'is generate_dummy_blog_post.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'generate_dummy_blog_post', 'blog_post_title': None},
@@ -229,7 +230,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'num_dummy_exps_to_generate\' must be provided when the '
             'action is generate_dummy_explorations.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -253,7 +254,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'num_dummy_exps_to_publish\' must be provided when the '
             'action is generate_dummy_explorations.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -277,7 +278,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'skill_id\' must be provided when the '
             'action is _generate_dummy_question_suggestions.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -301,7 +302,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'num_dummy_question_suggestions_generate\' must be provided'
             ' when the action is _generate_dummy_question_suggestions.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -325,7 +326,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'topic_id\' must be provided when the '
             'action is generate_dummy_stories.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -349,7 +350,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'num_dummy_stories_to_generate\' must be provided'
             ' when the action is generate_dummy_stories.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -373,7 +374,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'data\' must be provided when the action is '
             'upload_topic_similarities.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'upload_topic_similarities', 'data': None},
@@ -393,7 +394,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'story_id\' must be provided when the '
             'action is generate_dummy_chapters.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -417,7 +418,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'num_dummy_chapters_to_generate\' must be provided'
             ' when the action is generate_dummy_chapters.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -441,7 +442,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'topic_id\' must be provided when the action is '
             'regenerate_topic_related_opportunities.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -464,7 +465,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'exp_id\' must be provided when the action is '
             'rollback_exploration_to_safe_state.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -487,7 +488,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'platform_param_name\' must be provided when the action is '
             'update_platform_parameter_rules.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -510,7 +511,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'new_rules\' must be provided when the action is '
             'update_platform_parameter_rules.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -543,7 +544,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'The \'commit_message\' must be provided when the action is '
             'update_platform_parameter_rules.',
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -564,7 +565,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'generate_dummy_new_structures_data'},
@@ -593,7 +594,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy skills in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'generate_dummy_new_skill_data'},
@@ -608,7 +609,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy classroom in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'generate_dummy_classroom'},
@@ -651,7 +652,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot reload a collection in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {'action': 'reload_collection', 'collection_id': '2'},
@@ -675,7 +676,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.assertFalse(collection_rights.community_owned)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with mock.patch.object(logging, 'info', _mock_logging_function):
             self.post_json(
                 '/adminhandler',
                 {'action': 'reload_collection', 'collection_id': '0'},
@@ -1120,7 +1121,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         param = self._create_dummy_param()
 
-        with self.swap(
+        with mock.patch.object(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
@@ -1190,7 +1191,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with mock.patch.object(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
@@ -1243,7 +1244,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with mock.patch.object(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
@@ -1295,7 +1296,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             }
         ]
 
-        with self.swap(
+        with mock.patch.object(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             [ParamName.TEST_PARAMETER_1],
@@ -1776,12 +1777,12 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.'
         )
 
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -1852,7 +1853,7 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'Cannot generate dummy question suggestion in production.',
@@ -1864,7 +1865,7 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -1958,7 +1959,7 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regex = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy stories in production.'
         )
@@ -1970,7 +1971,7 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
             self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL), topic
         )
 
-        with assert_raises_regex, prod_mode_swap:
+        with assert_raises_regex, prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -2081,7 +2082,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regex = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy chapters in production.'
         )
@@ -2106,7 +2107,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
             'story_id',
         )
 
-        with assert_raises_regex, prod_mode_swap:
+        with assert_raises_regex, prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -2305,7 +2306,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        self.prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
 
     def test_admins_can_generate_dummy_translation_opportunities(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2418,7 +2419,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.'
         )
-        with assert_raises_regexp_context_manager, self.prod_mode_swap:
+        with assert_raises_regexp_context_manager, self.prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {
@@ -2900,7 +2901,7 @@ class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
         # Order of function calls in expected_args should not
         # matter for this test.
-        with self.swap(
+        with mock.patch.object(
             study_guide_services,
             'generate_study_guide_models',
             study_guide_services.generate_study_guide_models,
@@ -2951,7 +2952,7 @@ class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
         # Order of function calls in expected_args should not
         # matter for this test.
-        with self.swap(
+        with mock.patch.object(
             study_guide_services,
             'delete_study_guide_models',
             study_guide_services.delete_study_guide_models,
@@ -3001,7 +3002,7 @@ class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
 
         # Order of function calls in expected_args should not
         # matter for this test.
-        with self.swap(
+        with mock.patch.object(
             study_guide_services,
             'verify_study_guide_models',
             study_guide_services.verify_study_guide_models,
@@ -4124,7 +4125,7 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
         # swap flakes can occur, since as the time flows the saved milliseconds
         # can differ from the milliseconds saved into the
         # UsernameChangeAuditModel's ID.
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -4473,12 +4474,12 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new blog post in production mode.'
         )
 
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_patch:
             self.post_json(
                 '/adminhandler',
                 {

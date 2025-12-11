@@ -17,6 +17,7 @@
 """Tests for collection models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import copy
 import datetime
@@ -253,7 +254,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with mock.patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
                 collection_models.CollectionRightsModel.has_reference_to_user_id(
                     self.USER_ID_1
@@ -454,7 +455,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 }
             ],
         )
-        self.allow_revert_swap = self.swap(
+        self.allow_revert_patch = mock.patch.object(
             collection_models.CollectionRightsModel, 'ALLOW_REVERT', True
         )
 
@@ -471,14 +472,14 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
                 'deprecated_values': {},
             }
         )
-        self.allowed_commands_swap = self.swap(
+        self.allowed_commands_patch = mock.patch.object(
             feconf,
             'COLLECTION_RIGHTS_CHANGE_ALLOWED_COMMANDS',
             collection_rights_allowed_commands,
         )
 
     def test_revert_to_valid_version_is_successful(self) -> None:
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -507,7 +508,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
             )
@@ -539,7 +540,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
         snapshot_model.content = broken_dict
         snapshot_model.update_timestamps()
         snapshot_model.put()
-        with self.allow_revert_swap, self.allowed_commands_swap:
+        with self.allow_revert_patch, self.allowed_commands_patch:
             collection_models.CollectionRightsModel.revert(
                 self.collection_model, self.USER_ID_COMMITTER, 'Revert', 1
             )

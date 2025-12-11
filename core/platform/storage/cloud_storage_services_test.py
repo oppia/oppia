@@ -17,6 +17,7 @@
 """Tests for cloud_storage_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.platform.storage import cloud_storage_services
 from core.tests import test_utils
@@ -156,20 +157,22 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.bucket_2 = MockBucket()
         self.client.buckets['bucket_1'] = self.bucket_1
         self.client.buckets['bucket_2'] = self.bucket_2
-        self.get_client_swap = self.swap(storage, 'Client', lambda: self.client)
-        self.get_bucket_swap = self.swap(
+        self.get_client_patch = mock.patch.object(
+            storage, 'Client', lambda: self.client
+        )
+        self.get_bucket_patch = mock.patch.object(
             cloud_storage_services, '_get_bucket', self.client.get_bucket
         )
 
     def test_isfile_when_file_exists_returns_true(self) -> None:
         self.bucket_1.blobs['path/to/file.txt'] = MockBlob('path/to/file.txt')
-        with self.get_client_swap:
+        with self.get_client_patch:
             self.assertTrue(
                 cloud_storage_services.isfile('bucket_1', 'path/to/file.txt')
             )
 
     def test_isfile_when_file_does_not_exist_returns_false(self) -> None:
-        with self.get_bucket_swap:
+        with self.get_bucket_patch:
             self.assertFalse(
                 cloud_storage_services.isfile('bucket_1', 'path/to/file.txt')
             )
@@ -180,7 +183,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.bucket_2.blobs['path/file.txt'] = MockBlob('path/file.txt')
         self.bucket_2.blobs['path/file.txt'].upload_from_string(b'xyz')
 
-        with self.get_bucket_swap:
+        with self.get_bucket_patch:
             self.assertEqual(
                 cloud_storage_services.get('bucket_1', 'path/to/file.txt'),
                 b'abc',
@@ -190,7 +193,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
             )
 
     def test_commit_saves_file_into_bucket(self) -> None:
-        with self.get_bucket_swap:
+        with self.get_bucket_patch:
             cloud_storage_services.commit(
                 'bucket_1', 'path/to/file.txt', b'abc', 'audio/mpeg'
             )
@@ -218,7 +221,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.assertFalse(self.bucket_1.blobs['path/to/file.txt'].deleted)
         self.assertFalse(self.bucket_2.blobs['path/file.txt'].deleted)
 
-        with self.get_bucket_swap:
+        with self.get_bucket_patch:
             cloud_storage_services.delete('bucket_1', 'path/to/file.txt')
             cloud_storage_services.delete('bucket_2', 'path/file.txt')
 
@@ -235,7 +238,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
             b'xyz', content_type='image/png'
         )
 
-        with self.get_bucket_swap:
+        with self.get_bucket_patch:
             cloud_storage_services.copy(
                 'bucket_1', 'path/to/file.txt', 'other/path/to/file.txt'
             )
@@ -262,7 +265,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
     ) -> None:
         non_existent_source_path = 'path/to/file.txt'
 
-        with self.get_bucket_swap, self.assertRaisesRegex(
+        with self.get_bucket_patch, self.assertRaisesRegex(
             ValueError,
             'Source asset does not exist at %s.' % non_existent_source_path,
         ):
@@ -278,7 +281,7 @@ class CloudStorageServicesTests(test_utils.TestBase):
         self.bucket_1.blobs['path/to/file2.txt'] = MockBlob('path/to/file2.txt')
         self.bucket_1.blobs['path/to/file2.txt'].upload_from_string(b'ghi')
 
-        with self.get_client_swap, self.get_bucket_swap:
+        with self.get_client_patch, self.get_bucket_patch:
             path_blobs = cloud_storage_services.listdir('bucket_1', 'path')
             path_slash_blobs = cloud_storage_services.listdir(
                 'bucket_1', 'path/'

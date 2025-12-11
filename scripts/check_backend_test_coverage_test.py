@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_backend_test_coverage.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -38,7 +39,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
         self.env = os.environ.copy()
         self.cmd = [
             sys.executable,
@@ -176,7 +177,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=((1,),)
         )
 
-        with self.print_swap, swap_sys_exit, swap_subprocess_run:
+        with self.print_patch, swap_sys_exit, swap_subprocess_run:
             check_backend_test_coverage.main()
 
         self.assertIn(
@@ -208,7 +209,7 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
             ],
         )
 
-        with self.print_swap, swap_subprocess_run:
+        with self.print_patch, swap_subprocess_run:
             check_backend_test_coverage.main()
 
         self.assertIn(

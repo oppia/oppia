@@ -17,6 +17,7 @@
 """Unit tests for scripts/install_third_party_libs.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import collections
@@ -138,26 +139,26 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.check_call_swap = self.swap(
+        self.check_call_patch = mock.patch.object(
             subprocess, 'check_call', mock_check_call
         )
 
         def mock_popen(*_args: str, **_kwargs: str) -> Ret:
             return Ret()
 
-        self.Popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-        self.check_call_error_swap = self.swap(
+        self.Popen_patch = mock.patch.object(subprocess, 'Popen', mock_popen)
+        self.check_call_error_patch = mock.patch.object(
             subprocess, 'check_call', mock_check_call_error
         )
-        self.Popen_error_swap = self.swap(
+        self.Popen_error_patch = mock.patch.object(
             subprocess, 'Popen', mock_popen_error_call
         )
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         def mock_ensure_directory_exists(unused_path: str) -> None:
             pass
 
-        self.dir_exists_swap = self.swap(
+        self.dir_exists_patch = mock.patch.object(
             common, 'ensure_directory_exists', mock_ensure_directory_exists
         )
 
@@ -212,42 +213,42 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                 return False
             return True
 
-        swap_install_gcloud_sdk = self.swap(
+        swap_install_gcloud_sdk = mock.patch.object(
             install_third_party_libs,
             'install_gcloud_sdk',
             mock_install_gcloud_sdk,
         )
-        swap_install_redis_cli = self.swap(
+        swap_install_redis_cli = mock.patch.object(
             install_third_party_libs,
             'install_redis_cli',
             mock_install_redis_cli,
         )
-        swap_install_elasticsearch_dev_server = self.swap(
+        swap_install_elasticsearch_dev_server = mock.patch.object(
             install_third_party_libs,
             'install_elasticsearch_dev_server',
             mock_install_elasticsearch_dev_server,
         )
-        swap_install_python_prod_main = self.swap(
+        swap_install_python_prod_main = mock.patch.object(
             install_python_prod_dependencies, 'main', mock_external_script_call
         )
-        swap_install_json_deps_main = self.swap(
+        swap_install_json_deps_main = mock.patch.object(
             install_dependencies_json_packages,
             'main',
             mock_external_script_call,
         )
-        swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
-        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
-        swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
-        pre_commit_hook_main_swap = self.swap(
+        swap_isdir = mock.patch.object(os.path, 'isdir', mock_isdir)
+        swap_mkdir = mock.patch.object(os, 'mkdir', mock_mkdir)
+        swap_copytree = mock.patch.object(shutil, 'copytree', mock_copytree)
+        pre_commit_hook_main_patch = mock.patch.object(
             pre_commit_hook, 'main', mock_main_for_pre_commit_hook
         )
-        pre_push_hook_main_swap = self.swap(
+        pre_push_hook_main_patch = mock.patch.object(
             pre_push_hook, 'main', mock_main_for_pre_push_hook
         )
 
-        with self.check_call_swap, self.Popen_swap, swap_install_redis_cli:
+        with self.check_call_patch, self.Popen_patch, swap_install_redis_cli:
             with swap_install_gcloud_sdk, swap_install_python_prod_main:
-                with pre_commit_hook_main_swap, pre_push_hook_main_swap:
+                with pre_commit_hook_main_patch, pre_push_hook_main_patch:
                     with swap_isdir, swap_mkdir, swap_copytree:
                         with swap_install_elasticsearch_dev_server:
                             with swap_install_json_deps_main:
@@ -273,10 +274,10 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_exists(unused_path: str) -> bool:
             return True
 
-        walk_swap = self.swap(os, 'walk', mock_walk)
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        with walk_swap, remove_swap, exists_swap:
+        walk_patch = mock.patch.object(os, 'walk', mock_walk)
+        remove_patch = mock.patch.object(os, 'remove', mock_remove)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        with walk_patch, remove_patch, exists_patch:
             install_third_party_libs.clean_pyc_files()
         self.assertEqual(check_file_removals, expected_check_file_removals)
 
@@ -314,13 +315,13 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        untar_files_swap = self.swap(
+        swap_call = mock.patch.object(subprocess, 'call', mock_call)
+        untar_files_patch = mock.patch.object(
             install_third_party_libs,
             'download_and_untar_files',
             mock_download_and_untar_files,
         )
-        with swap_call, untar_files_swap:
+        with swap_call, untar_files_patch:
             install_third_party_libs.install_redis_cli()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -360,8 +361,8 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        untar_files_swap = self.swap(
+        swap_call = mock.patch.object(subprocess, 'call', mock_call)
+        untar_files_patch = mock.patch.object(
             install_third_party_libs,
             'download_and_untar_files',
             mock_download_and_untar_files,
@@ -373,9 +374,11 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
             'download_and_unzip_files_is_called': False,
         }
 
-        mac_os_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_os_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
-        with swap_call, untar_files_swap, mac_os_swap, linux_os_swap:
+        mac_os_patch = mock.patch.object(common, 'is_mac_os', mock_is_mac_os)
+        linux_os_patch = mock.patch.object(
+            common, 'is_linux_os', mock_is_linux_os
+        )
+        with swap_call, untar_files_patch, mac_os_patch, linux_os_patch:
             install_third_party_libs.install_elasticsearch_dev_server()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -400,13 +403,13 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(subprocess, 'call', mock_call)
-        mac_swap = self.swap(common, 'is_mac_os', mock_is_mac_os)
-        linux_swap = self.swap(common, 'is_linux_os', mock_is_linux_os)
+        swap_call = mock.patch.object(subprocess, 'call', mock_call)
+        mac_patch = mock.patch.object(common, 'is_mac_os', mock_is_mac_os)
+        linux_patch = mock.patch.object(common, 'is_linux_os', mock_is_linux_os)
         os_not_supported_exception = self.assertRaisesRegex(
             Exception, 'Unrecognized or unsupported operating system.'
         )
-        with mac_swap, linux_swap, swap_call, os_not_supported_exception:
+        with mac_patch, linux_patch, swap_call, os_not_supported_exception:
             install_third_party_libs.install_elasticsearch_dev_server()
 
     def test_elasticsearch_already_installed(self) -> None:
@@ -423,7 +426,7 @@ class InstallRedisAndElasticSearchTests(test_utils.GenericTestBase):
 
             return Ret()
 
-        swap_call = self.swap(subprocess, 'call', mock_call)
+        swap_call = mock.patch.object(subprocess, 'call', mock_call)
         expected_check_function_calls = {
             'subprocess_call_is_called': True,
             'download_and_untar_files_is_called': False,
@@ -468,43 +471,45 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_get(unused_var: str) -> None:
             return None
 
-        self.test_py_swap = self.swap(
+        self.test_py_patch = mock.patch.object(
             install_third_party_libs,
             'test_python_version',
             mock_test_python_version,
         )
-        self.download_swap = self.swap(
+        self.download_patch = mock.patch.object(
             install_third_party_libs,
             'download_and_install_package',
             mock_download_and_install_package,
         )
-        self.exists_true_swap = self.swap_to_always_return(
+        self.exists_true_patch = self.swap_to_always_return(
             os.path, 'exists', True
         )
-        self.exists_false_swap = self.swap_to_always_return(
+        self.exists_false_patch = self.swap_to_always_return(
             os.path, 'exists', False
         )
-        self.is_x64_architecture_true_swap = self.swap_to_always_return(
+        self.is_x64_architecture_true_patch = self.swap_to_always_return(
             common, 'is_x64_architecture', True
         )
-        self.is_x64_architecture_false_swap = self.swap_to_always_return(
+        self.is_x64_architecture_false_patch = self.swap_to_always_return(
             common, 'is_x64_architecture', False
         )
-        self.uname_swap = self.swap(os, 'uname', mock_uname)
-        self.rename_swap = self.swap(os, 'rename', mock_rename)
-        self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
-        self.get_swap = self.swap(os.environ, 'get', mock_get)
-        self.cd_swap = self.swap(common, 'CD', MockCD)
+        self.uname_patch = mock.patch.object(os, 'uname', mock_uname)
+        self.rename_patch = mock.patch.object(os, 'rename', mock_rename)
+        self.isfile_patch = mock.patch.object(os.path, 'isfile', mock_isfile)
+        self.delete_patch = mock.patch.object(
+            clean, 'delete_file', mock_delete_file
+        )
+        self.get_patch = mock.patch.object(os.environ, 'get', mock_get)
+        self.cd_patch = mock.patch.object(common, 'CD', MockCD)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro']
         )
-        self.version_info_py310_swap = self.swap(
+        self.version_info_py310_patch = mock.patch.object(
             sys, 'version_info', version_info(major=3, minor=10, micro=16)
         )
 
     def test_python_version_testing_with_correct_version(self) -> None:
-        with self.version_info_py310_swap:
+        with self.version_info_py310_patch:
             install_third_party_libs.test_python_version()
 
     def test_python_version_testing_with_incorrect_version_and_linux_os(
@@ -518,17 +523,17 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_uname() -> List[str]:
             return ['Linux']
 
-        print_swap = self.swap(
+        print_patch = mock.patch.object(
             common, 'print_each_string_after_two_new_lines', mock_print
         )
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        uname_patch = mock.patch.object(os, 'uname', mock_uname)
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor', 'micro']
         )
-        version_swap = self.swap(
+        version_patch = mock.patch.object(
             sys, 'version_info', version_info(major=3, minor=4, micro=12)
         )
-        with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
+        with print_patch, uname_patch, version_patch, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'
         ):
             install_third_party_libs.test_python_version()
@@ -574,14 +579,18 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_remove(unused_path: str) -> None:
             check_function_calls['remove_is_called'] = True
 
-        url_retrieve_swap = self.swap(common, 'url_retrieve', mock_url_retrieve)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extract_swap = self.swap(tarfile.TarFile, 'extractall', mock_extractall)
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+        url_retrieve_patch = mock.patch.object(
+            common, 'url_retrieve', mock_url_retrieve
+        )
+        open_patch = mock.patch.object(tarfile, 'open', mock_open)
+        extract_patch = mock.patch.object(
+            tarfile.TarFile, 'extractall', mock_extractall
+        )
+        close_patch = mock.patch.object(tarfile.TarFile, 'close', mock_close)
+        remove_patch = mock.patch.object(os, 'remove', mock_remove)
 
-        with url_retrieve_swap, open_swap, extract_swap, close_swap:
-            with remove_swap:
+        with url_retrieve_patch, open_patch, extract_patch, close_patch:
+            with remove_patch:
                 install_third_party_libs.download_and_install_package(
                     'url', 'filename'
                 )
@@ -607,9 +616,9 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        getcwd_swap = self.swap(os, 'getcwd', mock_getcwd)
-        print_swap = self.swap(builtins, 'print', mock_print)
-        with self.test_py_swap, getcwd_swap, print_swap:
+        getcwd_patch = mock.patch.object(os, 'getcwd', mock_getcwd)
+        print_patch = mock.patch.object(builtins, 'print', mock_print)
+        with self.test_py_patch, getcwd_patch, print_patch:
             with self.assertRaisesRegex(
                 Exception, 'Please run this script from the oppia/ directory.'
             ):
@@ -620,9 +629,9 @@ class SetupTests(test_utils.GenericTestBase):
         )
 
     def test_install_on_windows_os_gives_failure(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Windows')
 
-        with os_name_swap:
+        with os_name_patch:
             with self.assertRaisesRegex(
                 Exception,
                 'Installation of Oppia is not supported on Windows OS.',
@@ -630,12 +639,12 @@ class SetupTests(test_utils.GenericTestBase):
                 install_third_party_libs.main()
 
     def test_package_install_with_darwin_x64(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Darwin')
 
-        with self.test_py_swap, os_name_swap:
-            with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_true_swap:
+        with self.test_py_patch, os_name_patch:
+            with self.download_patch, self.rename_patch, self.exists_false_patch:
+                with self.delete_patch, self.isfile_patch:
+                    with self.is_x64_architecture_true_patch:
                         install_third_party_libs.install_node()
 
         for item, status in self.check_function_calls.items():
@@ -649,19 +658,21 @@ class SetupTests(test_utils.GenericTestBase):
         )
 
     def test_package_install_with_darwin_x86(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Darwin')
         all_cmd_tokens: List[str] = []
 
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
 
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_patch = mock.patch.object(
+            subprocess, 'check_call', mock_check_call
+        )
 
-        with self.test_py_swap, os_name_swap:
-            with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_false_swap, self.cd_swap:
-                        with check_call_swap:
+        with self.test_py_patch, os_name_patch:
+            with self.download_patch, self.rename_patch, self.exists_false_patch:
+                with self.delete_patch, self.isfile_patch:
+                    with self.is_x64_architecture_false_patch, self.cd_patch:
+                        with check_call_patch:
                             install_third_party_libs.install_node()
         for item, status in self.check_function_calls.items():
             self.assertTrue(status, msg='Failed check for %s' % item)
@@ -675,12 +686,12 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_linux_x64(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Linux')
 
-        with self.test_py_swap, os_name_swap:
-            with self.download_swap, self.rename_swap, self.exists_false_swap:
-                with self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_true_swap:
+        with self.test_py_patch, os_name_patch:
+            with self.download_patch, self.rename_patch, self.exists_false_patch:
+                with self.delete_patch, self.isfile_patch:
+                    with self.is_x64_architecture_true_patch:
                         install_third_party_libs.install_node()
 
         for item, status in self.check_function_calls.items():
@@ -694,20 +705,22 @@ class SetupTests(test_utils.GenericTestBase):
         )
 
     def test_package_install_with_linux_x86(self) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Linux')
 
         all_cmd_tokens: List[str] = []
 
         def mock_check_call(cmd_tokens: List[str]) -> None:
             all_cmd_tokens.extend(cmd_tokens)
 
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        check_call_patch = mock.patch.object(
+            subprocess, 'check_call', mock_check_call
+        )
 
-        with self.test_py_swap, os_name_swap, check_call_swap:
-            with self.download_swap, self.rename_swap, self.cd_swap:
-                with self.delete_swap, self.isfile_swap:
-                    with self.is_x64_architecture_false_swap:
-                        with self.exists_false_swap:
+        with self.test_py_patch, os_name_patch, check_call_patch:
+            with self.download_patch, self.rename_patch, self.cd_patch:
+                with self.delete_patch, self.isfile_patch:
+                    with self.is_x64_architecture_false_patch:
+                        with self.exists_false_patch:
                             install_third_party_libs.install_node()
 
         for item, status in self.check_function_calls.items():
@@ -724,13 +737,13 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_incompatible_system_raises_error(
         self,
     ) -> None:
-        os_name_swap = self.swap(common, 'OS_NAME', 'Solaris')
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Solaris')
 
-        with self.test_py_swap, os_name_swap:
-            with self.rename_swap, self.exists_false_swap:
+        with self.test_py_patch, os_name_patch:
+            with self.rename_patch, self.exists_false_patch:
                 with self.assertRaisesRegex(
                     Exception, 'System\'s Operating System is not compatible.'
-                ), self.is_x64_architecture_true_swap:
+                ), self.is_x64_architecture_true_patch:
                     install_third_party_libs.main()
 
     def test_if_node_is_already_installed_then_skip_installation(self) -> None:
@@ -740,11 +753,11 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_print(arg: str) -> None:
             print_list.append(arg)
 
-        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        print_swap = self.swap(builtins, 'print', mock_print)
+        os_name_patch = mock.patch.object(common, 'OS_NAME', 'Linux')
+        print_patch = mock.patch.object(builtins, 'print', mock_print)
 
-        with self.test_py_swap, print_swap:
-            with self.rename_swap, self.exists_true_swap, os_name_swap:
+        with self.test_py_patch, print_patch:
+            with self.rename_patch, self.exists_true_patch, os_name_patch:
                 install_third_party_libs.install_node()
 
         print(print_list)
@@ -790,10 +803,10 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             if self.raise_error:
                 raise Exception
 
-        self.remove_swap = self.swap(os, 'remove', mock_remove)
-        self.makedirs_swap = self.swap(os, 'makedirs', mock_makedirs)
-        self.print_swap = self.swap(builtins, 'print', mock_print)
-        self.url_retrieve_swap = self.swap(
+        self.remove_patch = mock.patch.object(os, 'remove', mock_remove)
+        self.makedirs_patch = mock.patch.object(os, 'makedirs', mock_makedirs)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
+        self.url_retrieve_patch = mock.patch.object(
             common, 'url_retrieve', mock_url_retrieve
         )
 
@@ -838,18 +851,18 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
                 return False
             return True
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extractall_swap = self.swap(
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        open_patch = mock.patch.object(tarfile, 'open', mock_open)
+        extractall_patch = mock.patch.object(
             tarfile.TarFile, 'extractall', mock_extractall
         )
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
-        copytree_swap = self.swap(shutil, 'copytree', mock_copytree)
-        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        close_patch = mock.patch.object(tarfile.TarFile, 'close', mock_close)
+        copytree_patch = mock.patch.object(shutil, 'copytree', mock_copytree)
+        isdir_patch = mock.patch.object(os.path, 'isdir', mock_isdir)
 
-        with self.remove_swap, self.makedirs_swap, self.print_swap:
-            with self.url_retrieve_swap, exists_swap, isdir_swap:
-                with open_swap, extractall_swap, close_swap, copytree_swap:
+        with self.remove_patch, self.makedirs_patch, self.print_patch:
+            with self.url_retrieve_patch, exists_patch, isdir_patch:
+                with open_patch, extractall_patch, close_patch, copytree_patch:
                     install_third_party_libs.install_gcloud_sdk()
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls
@@ -868,10 +881,10 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
                 return False
             return True
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
 
-        with self.remove_swap, self.makedirs_swap:
-            with self.print_swap, self.url_retrieve_swap, exists_swap:
+        with self.remove_patch, self.makedirs_patch:
+            with self.print_patch, self.url_retrieve_patch, exists_patch:
                 with self.assertRaisesRegex(
                     Exception, 'Error downloading Google Cloud SDK.'
                 ):
@@ -935,11 +948,11 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
         def mock_remove(unused_self: str) -> None:
             pass
 
-        open_swap = self.swap(tarfile, 'open', mock_open)
-        extractall_swap = self.swap(
+        open_patch = mock.patch.object(tarfile, 'open', mock_open)
+        extractall_patch = mock.patch.object(
             tarfile.TarFile, 'extractall', mock_extractall
         )
-        close_swap = self.swap(tarfile.TarFile, 'close', mock_close)
+        close_patch = mock.patch.object(tarfile.TarFile, 'close', mock_close)
 
         initialized_directories = []
 
@@ -966,18 +979,20 @@ class GoogleCloudSdkInstallationTests(test_utils.GenericTestBase):
             ),
         ]
 
-        swap_exists = self.swap(os.path, 'exists', mock_exists)
-        swap_isdir = self.swap(os.path, 'isdir', mock_isdir)
-        swap_mkdir = self.swap(os, 'mkdir', mock_mkdir)
-        swap_copytree = self.swap(shutil, 'copytree', mock_copytree)
-        swap_remove = self.swap(os, 'remove', mock_remove)
-        popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
-        run_swap = self.swap(subprocess, 'run', mock_subprocess_run)
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        swap_exists = mock.patch.object(os.path, 'exists', mock_exists)
+        swap_isdir = mock.patch.object(os.path, 'isdir', mock_isdir)
+        swap_mkdir = mock.patch.object(os, 'mkdir', mock_mkdir)
+        swap_copytree = mock.patch.object(shutil, 'copytree', mock_copytree)
+        swap_remove = mock.patch.object(os, 'remove', mock_remove)
+        popen_patch = mock.patch.object(subprocess, 'Popen', mock_check_call)
+        run_patch = mock.patch.object(subprocess, 'run', mock_subprocess_run)
+        check_call_patch = mock.patch.object(
+            subprocess, 'check_call', mock_check_call
+        )
 
-        with check_call_swap, popen_swap, close_swap, run_swap, swap_remove:
+        with check_call_patch, popen_patch, close_patch, run_patch, swap_remove:
             with swap_isdir, swap_mkdir, swap_copytree, swap_exists:
-                with self.url_retrieve_swap, open_swap, extractall_swap:
+                with self.url_retrieve_patch, open_patch, extractall_patch:
                     install_third_party_libs.install_gcloud_sdk()
 
         self.assertEqual(copied_src_dst_tuples, correct_copied_src_dst_tuples)

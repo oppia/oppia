@@ -17,6 +17,7 @@
 """Unit tests for core.domain.user_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -671,7 +672,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages: List[str] = []
-        logging_mocker = self.swap(logging, 'error', error_messages.append)
+        logging_mocker = mock.patch.object(
+            logging, 'error', error_messages.append
+        )
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, status_code=404)
@@ -688,7 +691,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         gravatar_url = user_services.get_gravatar_url(user_email)
 
         error_messages: List[str] = []
-        logging_mocker = self.swap(logging, 'exception', error_messages.append)
+        logging_mocker = mock.patch.object(
+            logging, 'exception', error_messages.append
+        )
 
         with logging_mocker, requests_mock.Mocker() as requests_mocker:
             requests_mocker.get(gravatar_url, exc=Exception)
@@ -755,12 +760,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertDictEqual(merge_fields, {'NAME': 'Name'})
             return can_receive_email_updates
 
-        fn_swap = self.swap(
+        fn_patch = mock.patch.object(
             bulk_email_services,
             'add_or_update_user_status',
             _mock_add_or_update_user_status,
         )
-        with fn_swap:
+        with fn_patch:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
                     'email@example.com', 'Android', name='Name'
@@ -780,12 +785,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertNotIn('NAME', merge_fields)
             return can_receive_email_updates
 
-        fn_swap = self.swap(
+        fn_patch = mock.patch.object(
             bulk_email_services,
             'add_or_update_user_status',
             _mock_add_or_update_user_status,
         )
-        with fn_swap:
+        with fn_patch:
             self.assertTrue(
                 user_services.add_user_to_mailing_list(
                     'email@example.com', 'Android'
@@ -829,8 +834,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'info', _mock_logging_function)
-        with logging_swap:
+        logging_patch = mock.patch.object(
+            logging, 'info', _mock_logging_function
+        )
+        with logging_patch:
             user_services.update_email_preferences(
                 user_id,
                 feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
@@ -858,12 +865,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """Mocks bulk_email_services.add_or_update_user_status()."""
             return not can_receive_email_updates
 
-        bulk_email_swap = self.swap(
+        bulk_email_patch = mock.patch.object(
             bulk_email_services,
             'add_or_update_user_status',
             _mock_add_or_update_user_status,
         )
-        with bulk_email_swap:
+        with bulk_email_patch:
             bulk_email_signup_message_should_be_shown = (
                 user_services.update_email_preferences(
                     user_id,
@@ -937,7 +944,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             """
             raise Exception('Server error')
 
-        with self.swap(
+        with mock.patch.object(
             bulk_email_services,
             'add_or_update_user_status',
             _mock_add_or_update_user_status,
@@ -3511,7 +3518,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None
         )
 
-        with self.swap(
+        with mock.patch.object(
             user_services,
             'get_current_date_as_string',
             self.mock_get_current_date_as_string,
@@ -3571,7 +3578,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             user_services.get_last_week_dashboard_stats(self.owner_id), None
         )
 
-        with self.swap(
+        with mock.patch.object(
             user_services,
             'get_current_date_as_string',
             self.mock_get_current_date_as_string,
@@ -3629,7 +3636,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
 
     def test_get_user_impact_score(self) -> None:
         expected_impact_score = 3
-        with self.swap(
+        with mock.patch.object(
             user_models.UserStatsModel, 'impact_score', expected_impact_score
         ):
             impact_score_for_user_with_no_activity = (
@@ -3682,7 +3689,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
     def test_update_dashboard_stats_log_with_invalid_schema_version(
         self,
     ) -> None:
-        with self.swap(user_models.UserStatsModel, 'schema_version', 5):
+        with mock.patch.object(user_models.UserStatsModel, 'schema_version', 5):
             with self.assertRaisesRegex(
                 Exception,
                 'Sorry, we can only process v1-v%d dashboard stats schemas at'

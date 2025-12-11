@@ -17,6 +17,7 @@
 """Tests for the platform parameter registry."""
 
 from __future__ import annotations
+from unittest import mock
 
 import enum
 
@@ -352,7 +353,7 @@ class PlatformParameterRegistryTests(test_utils.GenericTestBase):
                 [name],
             )
 
-        with self.swap(
+        with mock.patch.object(
             registry.Registry,
             'update_platform_parameter',
             _mock_update_platform_parameter,

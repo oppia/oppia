@@ -15,6 +15,7 @@
 """Unit tests for the cloud_datastore_services.py"""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -182,7 +183,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
         )
         with self.swap_to_always_raise(
             ndb, 'get_multi', Exception('Mock key error')
-        ), self.swap(logging, 'exception', _mock_logging_function):
+        ), mock.patch.object(logging, 'exception', _mock_logging_function):
             with self.assertRaisesRegex(Exception, error_msg):
                 cloud_datastore_services.get_multi(dummy_keys)
         self.assertEqual(

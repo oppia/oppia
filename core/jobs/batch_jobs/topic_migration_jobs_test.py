@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.topic_migration_jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -125,12 +126,12 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         ) -> None:
             versioned_story_references['schema_version'] = current_version + 1
 
-        self.story_reference_schema_version_swap = self.swap(
+        self.story_reference_schema_version_patch = mock.patch.object(
             feconf,
             'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
             mock_story_reference_schema_version,
         )
-        self.update_story_reference_swap = self.swap(
+        self.update_story_reference_patch = mock.patch.object(
             topic_domain.Topic,
             'update_story_references_from_model',
             classmethod(mock_update_story_references_from_model),
@@ -140,7 +141,7 @@ class MigrateTopicJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_unmigrated_topic_with_unmigrated_prop_is_migrated(self) -> None:
-        with self.story_reference_schema_version_swap, self.update_story_reference_swap:  # pylint: disable=line-too-long
+        with self.story_reference_schema_version_patch, self.update_story_reference_patch:  # pylint: disable=line-too-long
             unmigrated_topic_model = self.create_model(
                 topic_models.TopicModel,
                 id=self.TOPIC_1_ID,
@@ -407,12 +408,12 @@ class AuditTopicMigrateJobTests(job_test_utils.JobTestBase):
         ) -> None:
             versioned_story_references['schema_version'] = current_version + 1
 
-        self.story_reference_schema_version_swap = self.swap(
+        self.story_reference_schema_version_patch = mock.patch.object(
             feconf,
             'CURRENT_STORY_REFERENCE_SCHEMA_VERSION',
             mock_story_reference_schema_version,
         )
-        self.update_story_reference_swap = self.swap(
+        self.update_story_reference_patch = mock.patch.object(
             topic_domain.Topic,
             'update_story_references_from_model',
             classmethod(mock_update_story_references_from_model),

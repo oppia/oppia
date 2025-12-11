@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/docstrings_checker."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.tests import test_utils
 
@@ -257,13 +258,13 @@ class DocstringsCheckerTest(test_utils.GenericTestBase):
             raise Exception('An exception.') #@
         """
         )
-        node_ignores_exception_swap = self.swap(
+        node_ignores_exception_patch = mock.patch.object(
             utils,
             'node_ignores_exception',
             lambda _, __: (_ for _ in ()).throw(astroid.InferenceError()),
         )
 
-        with node_ignores_exception_swap:
+        with node_ignores_exception_patch:
             exceptions = docstrings_checker.possible_exc_types(raise_node)
         self.assertEqual(exceptions, set([]))
 

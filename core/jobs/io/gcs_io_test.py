@@ -17,6 +17,7 @@
 """Unit tests for jobs.io.gcs_io."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import utils
 from core.domain import user_services
@@ -118,7 +119,7 @@ class DeleteFileTest(job_test_utils.PipelinedTestBase):
         file_path = 'dummy_folder/dummy_subfolder/dummy_file'
         file_paths = [file_path]
 
-        with self.swap(
+        with mock.patch.object(
             gcs_io.DeleteFile, '_delete_file', lambda self, file_path: file_path
         ):  # pylint: disable=unused-argument
             filepath_p_collec = (
@@ -163,7 +164,7 @@ class GetFilesTest(job_test_utils.PipelinedTestBase):
     def test_check_correct_filepath_is_passing(self) -> None:
         file_paths = ['dummy_folder/dummy_subfolder']
 
-        with self.swap(
+        with mock.patch.object(
             gcs_io.GetFiles,
             '_get_file_with_prefix',
             lambda self, file_path: file_path,

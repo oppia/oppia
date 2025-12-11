@@ -17,6 +17,7 @@
 """Tests for core.storage.user.gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import types
@@ -364,7 +365,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
 
     def test_get_new_id_with_deleted_user_model(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             user_models.DeletedUserModel,
             'get_by_id',
             types.MethodType(lambda _, __: True, user_models.DeletedUserModel),
@@ -374,12 +375,12 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             user_models.UserSettingsModel.get_new_id('exploration')
 
     def test_get_new_id_for_too_many_collisions_raises_error(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             user_models.UserSettingsModel,
             'get_by_id',
             types.MethodType(lambda _, __: True, user_models.UserSettingsModel),
@@ -389,7 +390,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             user_models.UserSettingsModel.get_new_id('exploration')
 
 
@@ -3689,7 +3690,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
 
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             user_models.PseudonymizedUserModel,
             'get_by_id',
             types.MethodType(
@@ -3701,7 +3702,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
 
     def test_get_export_policy(self) -> None:
@@ -3723,7 +3724,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             ids.add(new_id)
 
     def test_get_new_id_simulate_collisions(self) -> None:
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             user_models.PseudonymizedUserModel,
             'get_by_id',
             types.MethodType(
@@ -3735,7 +3736,7 @@ class PseudonymizedUserModelTests(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             user_models.PseudonymizedUserModel.get_new_id('exploration')
 
 

@@ -17,6 +17,7 @@
 """Tests for the domain objects relating to feature flags."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -194,8 +195,10 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False):
+        with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.object(
+                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+            ):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in dev stage cannot be updated in test '
@@ -209,8 +212,10 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.object(
+                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+            ):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in dev stage cannot be updated in prod '
@@ -224,8 +229,10 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with self.swap(constants, 'DEV_MODE', False):
-            with self.swap(feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True):
+        with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.object(
+                feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
+            ):
                 with self.assertRaisesRegex(
                     utils.ValidationError,
                     'Feature flag in test stage cannot be updated in prod '

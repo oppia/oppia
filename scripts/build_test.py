@@ -17,6 +17,7 @@
 """Unit tests for scripts/build.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import ast
 import collections
@@ -333,7 +334,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Swapping out constants to check if the reverse is true.
         # ALL JS files that ends with ...Service.js should not be built.
-        with self.swap(
+        with mock.patch.object(
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)
         ):
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
@@ -342,7 +343,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
         """
-        with self.swap(
+        with mock.patch.object(
             build,
             'FILEPATHS_NOT_TO_RENAME',
             ('*.py', 'path/to/fonts/*', 'path/to/third_party.min.css.map'),
@@ -386,7 +387,7 @@ class BuildTests(test_utils.GenericTestBase):
         """Test is_file_hash_provided_to_frontend returns the correct boolean
         value for filepath that should be provided to frontend.
         """
-        with self.swap(
+        with mock.patch.object(
             build,
             'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/file.js', 'path/to/file.html', 'file.js'),
@@ -398,7 +399,7 @@ class BuildTests(test_utils.GenericTestBase):
                 build.is_file_hash_provided_to_frontend('path/to/file.html')
             )
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
-        with self.swap(
+        with mock.patch.object(
             build,
             'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('path/to/*', '*.js', '*_end.html'),
@@ -462,7 +463,7 @@ class BuildTests(test_utils.GenericTestBase):
         excluding file with extensions in FILE_EXTENSIONS_TO_IGNORE.
         """
         # Prevent getting hashes of HTML files.
-        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
+        with mock.patch.object(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
             file_hashes: Dict[str, str] = {}
             self.assertEqual(len(file_hashes), 0)
             file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
@@ -477,7 +478,7 @@ class BuildTests(test_utils.GenericTestBase):
     def test_filter_hashes(self) -> None:
         """Test filter_hashes filters the provided hash correctly."""
         # Set constant to provide everything to frontend.
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
+        with mock.patch.object(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
             hashes = {'path/to/file.js': '123456', 'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
             self.assertEqual(
@@ -487,7 +488,7 @@ class BuildTests(test_utils.GenericTestBase):
                 filtered_hashes['/path/file.min.js'], hashes['path/file.min.js']
             )
 
-        with self.swap(
+        with mock.patch.object(
             build,
             'FILEPATHS_PROVIDED_TO_FRONTEND',
             ('test_path/*', 'path/to/file.js'),
@@ -513,8 +514,8 @@ class BuildTests(test_utils.GenericTestBase):
         hashes_path = os.path.join(MOCK_ASSETS_OUT_DIR, 'hashes.json')
 
         # Set constant to provide everything to frontend.
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
+        with mock.patch.object(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
+            with mock.patch.object(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
                 with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
@@ -788,7 +789,7 @@ class BuildTests(test_utils.GenericTestBase):
             assets_hashes, EMPTY_DIR
         )
         # Since all HTML and Python files are already built, they are ignored.
-        with self.swap(
+        with mock.patch.object(
             build,
             'FILE_EXTENSIONS_TO_IGNORE',
             (
@@ -822,13 +823,13 @@ class BuildTests(test_utils.GenericTestBase):
     def test_generate_app_yaml_with_deploy_mode(self) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
+        app_dev_yaml_filepath_patch = mock.patch.object(
             build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath
         )
-        app_yaml_filepath_swap = self.swap(
+        app_yaml_filepath_patch = mock.patch.object(
             build, 'APP_YAML_FILEPATH', mock_yaml_filepath
         )
-        env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
+        env_vars_to_remove_from_deployed_app_yaml_patch = mock.patch.object(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
             ['FIREBASE_AUTH_EMULATOR_HOST'],
@@ -850,8 +851,8 @@ class BuildTests(test_utils.GenericTestBase):
         with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
-        with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
-            with env_vars_to_remove_from_deployed_app_yaml_swap:
+        with app_dev_yaml_filepath_patch, app_yaml_filepath_patch:
+            with env_vars_to_remove_from_deployed_app_yaml_patch:
                 build.generate_app_yaml(deploy_mode=True)
 
         with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
@@ -871,13 +872,13 @@ class BuildTests(test_utils.GenericTestBase):
     ) -> None:
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
         mock_yaml_filepath = 'mock_app.yaml'
-        app_dev_yaml_filepath_swap = self.swap(
+        app_dev_yaml_filepath_patch = mock.patch.object(
             build, 'APP_DEV_YAML_FILEPATH', mock_dev_yaml_filepath
         )
-        app_yaml_filepath_swap = self.swap(
+        app_yaml_filepath_patch = mock.patch.object(
             build, 'APP_YAML_FILEPATH', mock_yaml_filepath
         )
-        env_vars_to_remove_from_deployed_app_yaml_swap = self.swap(
+        env_vars_to_remove_from_deployed_app_yaml_patch = mock.patch.object(
             build,
             'ENV_VARS_TO_REMOVE_FROM_DEPLOYED_APP_YAML',
             ['DATASTORE_HOST'],
@@ -899,8 +900,8 @@ class BuildTests(test_utils.GenericTestBase):
         with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
-        with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
-            with env_vars_to_remove_from_deployed_app_yaml_swap:
+        with app_dev_yaml_filepath_patch, app_yaml_filepath_patch:
+            with env_vars_to_remove_from_deployed_app_yaml_patch:
                 with self.assertRaisesRegex(
                     Exception,
                     'Environment variable \'DATASTORE_HOST\' to be '
@@ -955,7 +956,9 @@ class BuildTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.swap(build, 'safe_delete_file', _mock_safe_delete_file):
+        with mock.patch.object(
+            build, 'safe_delete_file', _mock_safe_delete_file
+        ):
             build.minify_third_party_libs('core/tests/data/third_party')
 
         self.assertTrue(
@@ -986,26 +989,26 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_safe_delete_directory_tree(unused_path: str) -> None:
             check_function_calls['safe_delete_directory_tree_gets_called'] += 1
 
-        with self.swap(
+        with mock.patch.object(
             build, 'safe_delete_directory_tree', mock_safe_delete_directory_tree
         ):
             build.clean()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_build_with_prod_env(self) -> None:
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', lambda _: None
         )
-        build_using_webpack_swap = self.swap_with_checks(
+        build_using_webpack_patch = self.swap_with_checks(
             build,
             'build_using_webpack',
             lambda _: None,
             expected_args=[(build.WEBPACK_PROD_CONFIG,)],
         )
-        build_using_ng_swap = self.swap_with_checks(
+        build_using_ng_patch = self.swap_with_checks(
             build, 'build_using_ng', lambda: None, expected_args=[()]
         )
-        modify_constants_swap = self.swap_with_checks(
+        modify_constants_patch = self.swap_with_checks(
             common,
             'modify_constants',
             lambda **_: None,
@@ -1017,32 +1020,32 @@ class BuildTests(test_utils.GenericTestBase):
                 }
             ],
         )
-        generate_python_package_swap = self.swap_with_checks(
+        generate_python_package_patch = self.swap_with_checks(
             build, 'generate_python_package', lambda: None, expected_args=[()]
         )
-        clean_swap = self.swap_with_checks(
+        clean_patch = self.swap_with_checks(
             build, 'clean', lambda: None, expected_args=[()]
         )
 
-        with ensure_files_exist_swap, build_using_webpack_swap, clean_swap:
-            with modify_constants_swap, build_using_ng_swap:
-                with generate_python_package_swap:
+        with ensure_files_exist_patch, build_using_webpack_patch, clean_patch:
+            with modify_constants_patch, build_using_ng_patch:
+                with generate_python_package_patch:
                     build.main(args=['--prod_env'])
 
     def test_build_with_prod_source_maps(self) -> None:
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', lambda _: None
         )
-        build_using_webpack_swap = self.swap_with_checks(
+        build_using_webpack_patch = self.swap_with_checks(
             build,
             'build_using_webpack',
             lambda _: None,
             expected_args=[(build.WEBPACK_PROD_SOURCE_MAPS_CONFIG,)],
         )
-        build_using_ng_swap = self.swap_with_checks(
+        build_using_ng_patch = self.swap_with_checks(
             build, 'build_using_ng', lambda: None, expected_args=[()]
         )
-        modify_constants_swap = self.swap_with_checks(
+        modify_constants_patch = self.swap_with_checks(
             common,
             'modify_constants',
             lambda **_: None,
@@ -1054,26 +1057,26 @@ class BuildTests(test_utils.GenericTestBase):
                 }
             ],
         )
-        compare_file_count_swap = self.swap(
+        compare_file_count_patch = mock.patch.object(
             build, '_compare_file_count', lambda *_: None
         )
-        clean_swap = self.swap_with_checks(
+        clean_patch = self.swap_with_checks(
             build, 'clean', lambda: None, expected_args=[()]
         )
-        install_python_dev_dependencies_swap = self.swap_with_checks(
+        install_python_dev_dependencies_patch = self.swap_with_checks(
             install_python_dev_dependencies,
             'main',
             lambda _: None,
             expected_args=[(['--uninstall'],)],
         )
-        install_third_party_libs_swap = self.swap_with_checks(
+        install_third_party_libs_patch = self.swap_with_checks(
             install_third_party_libs, 'main', lambda: None, expected_args=[()]
         )
 
-        with ensure_files_exist_swap, build_using_webpack_swap:
-            with modify_constants_swap, compare_file_count_swap:
-                with clean_swap, install_python_dev_dependencies_swap:
-                    with build_using_ng_swap, install_third_party_libs_swap:
+        with ensure_files_exist_patch, build_using_webpack_patch:
+            with modify_constants_patch, compare_file_count_patch:
+                with clean_patch, install_python_dev_dependencies_patch:
+                    with build_using_ng_patch, install_third_party_libs_patch:
                         build.main(args=['--prod_env', '--source_maps'])
 
     def test_build_with_watcher(self) -> None:
@@ -1101,15 +1104,15 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist
         )
-        modify_constants_swap = self.swap(
+        modify_constants_patch = mock.patch.object(
             common, 'modify_constants', mock_modify_constants
         )
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_patch = mock.patch.object(build, 'clean', mock_clean)
 
-        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
+        with ensure_files_exist_patch, modify_constants_patch, clean_patch:
             build.main(args=[])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1137,16 +1140,16 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist
         )
-        clean_swap = self.swap(build, 'clean', mock_clean)
+        clean_patch = mock.patch.object(build, 'clean', mock_clean)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod env.',
         )
-        with ensure_files_exist_swap, assert_raises_regexp_context_manager:
-            with clean_swap:
+        with ensure_files_exist_patch, assert_raises_regexp_context_manager:
+            with clean_patch:
                 build.main(args=['--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1175,14 +1178,14 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_clean() -> None:
             check_function_calls['clean_gets_called'] = True
 
-        ensure_files_exist_swap = self.swap(
+        ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', mock_ensure_files_exist
         )
-        modify_constants_swap = self.swap(
+        modify_constants_patch = mock.patch.object(
             common, 'modify_constants', mock_modify_constants
         )
-        clean_swap = self.swap(build, 'clean', mock_clean)
-        with ensure_files_exist_swap, modify_constants_swap, clean_swap:
+        clean_patch = mock.patch.object(build, 'clean', mock_clean)
+        with ensure_files_exist_patch, modify_constants_patch, clean_patch:
             build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -1200,14 +1203,14 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        webpack_compiler_swap = self.swap(
+        webpack_compiler_patch = mock.patch.object(
             servers, 'managed_webpack_compiler', mock_managed_webpack_compiler
         )
-        get_file_count_swap = self.swap(
+        get_file_count_patch = mock.patch.object(
             build, 'get_file_count', mock_get_file_count
         )
 
-        with webpack_compiler_swap, get_file_count_swap:
+        with webpack_compiler_patch, get_file_count_patch:
             build.build_using_webpack(build.WEBPACK_PROD_CONFIG)
 
     def test_build_using_webpack_command_with_incorrect_filecount_fails(
@@ -1225,14 +1228,14 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        webpack_compiler_swap = self.swap(
+        webpack_compiler_patch = mock.patch.object(
             servers, 'managed_webpack_compiler', mock_managed_webpack_compiler
         )
-        get_file_count_swap = self.swap(
+        get_file_count_patch = mock.patch.object(
             build, 'get_file_count', mock_get_file_count
         )
 
-        with webpack_compiler_swap, get_file_count_swap:
+        with webpack_compiler_patch, get_file_count_patch:
             with self.assertRaisesRegex(
                 AssertionError, 'webpack_bundles should be non-empty.'
             ):
@@ -1249,20 +1252,20 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        ng_build_swap = self.swap_with_checks(
+        ng_build_patch = self.swap_with_checks(
             servers,
             'managed_ng_build',
             mock_managed_ng_build,
             expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}],
         )
-        get_file_count_swap = self.swap_with_checks(
+        get_file_count_patch = self.swap_with_checks(
             build,
             'get_file_count',
             mock_get_file_count,
             expected_args=[('dist/oppia-angular-prod',)],
         )
 
-        with ng_build_swap, get_file_count_swap:
+        with ng_build_patch, get_file_count_patch:
             build.build_using_ng()
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
@@ -1278,20 +1281,20 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        ng_build_swap = self.swap_with_checks(
+        ng_build_patch = self.swap_with_checks(
             servers,
             'managed_ng_build',
             mock_managed_ng_build,
             expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}],
         )
-        get_file_count_swap = self.swap_with_checks(
+        get_file_count_patch = self.swap_with_checks(
             build,
             'get_file_count',
             mock_get_file_count,
             expected_args=[('dist/oppia-angular-prod',)],
         )
 
-        with ng_build_swap, get_file_count_swap:
+        with ng_build_patch, get_file_count_patch:
             with self.assertRaisesRegex(
                 AssertionError, 'angular generated bundle should be non-empty'
             ):

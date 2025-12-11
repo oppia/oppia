@@ -923,46 +923,46 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self) -> None:
-        get_app_swap = self.swap_with_call_counter(
+        get_app_patch = self.swap_with_call_counter(
             firebase_admin, 'get_app', raises=ValueError('initialize_app')
         )
-        init_app_swap = self.swap_with_call_counter(
+        init_app_patch = self.swap_with_call_counter(
             firebase_admin, 'initialize_app', returns=self.APP
         )
 
-        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+        with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
         self.assertEqual(init_app_counter.times_called, 1)
 
     def test_returns_existing_connection(self) -> None:
-        get_app_swap = self.swap_with_call_counter(
+        get_app_patch = self.swap_with_call_counter(
             firebase_admin, 'get_app', returns=self.APP
         )
-        init_app_swap = self.swap_with_call_counter(
+        init_app_patch = self.swap_with_call_counter(
             firebase_admin,
             'initialize_app',
             raises=Exception('unexpected call'),
         )
 
-        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+        with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             firebase_auth_services.establish_firebase_connection()
 
         self.assertEqual(get_app_counter.times_called, 1)
         self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_get_app_error(self) -> None:
-        get_app_swap = self.swap_with_call_counter(
+        get_app_patch = self.swap_with_call_counter(
             firebase_admin, 'get_app', raises=ValueError('uh-oh!')
         )
-        init_app_swap = self.swap_with_call_counter(
+        init_app_patch = self.swap_with_call_counter(
             firebase_admin,
             'initialize_app',
             raises=Exception('unexpected call'),
         )
 
-        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+        with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
@@ -970,14 +970,14 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         self.assertEqual(init_app_counter.times_called, 0)
 
     def test_raises_authentic_initialize_app_error(self) -> None:
-        get_app_swap = self.swap_with_call_counter(
+        get_app_patch = self.swap_with_call_counter(
             firebase_admin, 'get_app', raises=ValueError('initialize_app')
         )
-        init_app_swap = self.swap_with_call_counter(
+        init_app_patch = self.swap_with_call_counter(
             firebase_admin, 'initialize_app', raises=ValueError('uh-oh!')
         )
 
-        with get_app_swap as get_app_counter, init_app_swap as init_app_counter:
+        with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
@@ -1548,7 +1548,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
         )
-        update_user_swap = self.swap_to_always_raise(
+        update_user_patch = self.swap_to_always_raise(
             firebase_auth,
             'update_user',
             error=firebase_exceptions.UnknownError('could not update'),
@@ -1560,7 +1560,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         )
         self.firebase_sdk_stub.assert_is_not_disabled('aid')
 
-        with update_user_swap, log_capturing_context as logs:
+        with update_user_patch, log_capturing_context as logs:
             firebase_auth_services.mark_user_for_deletion('uid')
 
         self.assert_matches_regexps(logs, ['could not update'])
@@ -1599,13 +1599,13 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         )
 
     def test_delete_user_when_firebase_raises_an_error(self) -> None:
-        delete_swap = self.swap_to_always_raise(
+        delete_patch = self.swap_to_always_raise(
             firebase_auth,
             'delete_user',
             error=firebase_exceptions.InternalError('could not connect'),
         )
 
-        with delete_swap, self.capture_logging() as logs:
+        with delete_patch, self.capture_logging() as logs:
             firebase_auth_services.delete_external_auth_associations(
                 self.USER_ID
             )

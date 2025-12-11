@@ -15,6 +15,7 @@
 """Tests for gae_suite."""
 
 from __future__ import annotations
+from unittest import mock
 
 import unittest
 
@@ -49,13 +50,13 @@ class GaeSuiteTests(test_utils.GenericTestBase):
     def test_cannot_add_directory_with_invalid_path(self) -> None:
         """Creates invalid path."""
 
-        dir_to_add_swap = self.swap(
+        dir_to_add_patch = mock.patch.object(
             common, 'DIRS_TO_ADD_TO_SYS_PATH', ['invalid_path']
         )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Directory invalid_path does not exist.'
         )
-        with assert_raises_regexp_context_manager, dir_to_add_swap:
+        with assert_raises_regexp_context_manager, dir_to_add_patch:
             gae_suite.main(args=[])
 
     def test_failing_tests(self) -> None:
@@ -66,14 +67,14 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('core.tests.data.failing_tests')]
 
-        create_test_suites_swap = self.swap(
+        create_test_suites_patch = mock.patch.object(
             gae_suite, 'create_test_suites', _mock_create_test_suites
         )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Test suite failed: 1 tests run, 0 errors, 1 failures.'
         )
 
-        with create_test_suites_swap, assert_raises_regexp_context_manager:
+        with create_test_suites_patch, assert_raises_regexp_context_manager:
             gae_suite.main(args=[])
 
     def test_no_tests_run_with_invalid_filename(self) -> None:
@@ -83,12 +84,12 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             loader = unittest.TestLoader()
             return [loader.loadTestsFromName('invalid_test')]
 
-        create_test_suites_swap = self.swap(
+        create_test_suites_patch = mock.patch.object(
             gae_suite, 'create_test_suites', _mock_create_test_suites
         )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Test suite failed: 1 tests run, 1 errors, 0 failures.'
         )
 
-        with create_test_suites_swap, assert_raises_regexp_context_manager:
+        with create_test_suites_patch, assert_raises_regexp_context_manager:
             gae_suite.main(args=[])

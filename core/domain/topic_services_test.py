@@ -17,6 +17,7 @@
 """Tests for topic services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 import os
@@ -4079,7 +4080,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -4161,7 +4162,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -4407,12 +4408,14 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit('user_id_admin', 'topic model created', commit_cmd_dicts)
 
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_schema_version_swap = self.swap(
+        swap_topic_object = mock.patch.object(
+            topic_domain, 'Topic', MockTopicObject
+        )
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 4
         )
 
-        with swap_topic_object, current_schema_version_swap:
+        with swap_topic_object, current_schema_version_patch:
             topic = topic_fetchers.get_topic_from_model(model)
 
         self.assertEqual(topic.subtopic_schema_version, 4)
@@ -4453,12 +4456,14 @@ class StoryReferenceMigrationTests(test_utils.GenericTestBase):
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit('user_id_admin', 'topic model created', commit_cmd_dicts)
 
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_schema_version_swap = self.swap(
+        swap_topic_object = mock.patch.object(
+            topic_domain, 'Topic', MockTopicObject
+        )
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2
         )
 
-        with swap_topic_object, current_schema_version_swap:
+        with swap_topic_object, current_schema_version_patch:
             topic = topic_fetchers.get_topic_from_model(model)
 
         self.assertEqual(topic.story_reference_schema_version, 2)

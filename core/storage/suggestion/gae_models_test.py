@@ -17,6 +17,7 @@
 """Tests for the suggestion gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -1613,7 +1614,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
+        with mock.patch.object(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestions = suggestion_models.GeneralSuggestionModel.get_translation_suggestions_in_review_with_exp_id(
                 'exp1', self.translation_language_code
             )
@@ -1800,7 +1801,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        with self.swap(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
+        with mock.patch.object(feconf, 'DEFAULT_SUGGESTION_QUERY_LIMIT', 1):
             suggestion_model_results = suggestion_models.GeneralSuggestionModel.get_translation_suggestion_ids_with_exp_ids(
                 ['exp4', 'exp5']
             )
@@ -1810,7 +1811,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_model_results), 2)
 
     def test_get_all_stale_suggestion_ids(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0
         ):
             self.assertEqual(
@@ -1820,7 +1821,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 1,
             )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000,
@@ -1835,7 +1836,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def test_get__suggestions_waiting_too_long_raises_if_suggestion_types_empty(
         self,
     ) -> None:
-        with self.swap(feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []):
+        with mock.patch.object(
+            feconf, 'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES', []
+        ):
             with self.assertRaisesRegex(
                 Exception,
                 'Expected the suggestion types offered on the Contributor '
@@ -1854,7 +1857,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         mock_get_current_time_in_millisecs = lambda: mock_value
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -1902,12 +1905,12 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             feconf.SUGGESTION_TYPE_ADD_QUESTION
         ]
 
-        with self.swap(
+        with mock.patch.object(
             feconf,
             'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types,
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -1936,7 +1939,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         )
 
         # Make sure the threshold is nonzero.
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             1,
@@ -1972,7 +1975,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(
             mocked_datetime_less_than_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -2009,7 +2012,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(
             mocked_datetime_eq_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -2037,7 +2040,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             0,
@@ -2089,7 +2092,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.mock_datetime_utcnow(
             mocked_datetime_past_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -2151,7 +2154,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             'hi',
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             0,
@@ -2517,7 +2520,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.translation_language_code,
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'MAX_TRANSLATION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS',
             1,
@@ -2563,7 +2566,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.question_language_code,
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'MAX_QUESTION_SUGGESTIONS_TO_FETCH_FOR_REVIEWER_EMAILS',
             1,

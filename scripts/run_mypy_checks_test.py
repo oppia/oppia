@@ -17,6 +17,7 @@
 """Tests for MyPy type check runner script."""
 
 from __future__ import annotations
+from unittest import mock
 
 import subprocess
 
@@ -74,14 +75,14 @@ class MypyScriptChecks(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_failure
 
-        self.popen_swap_success = self.swap(
+        self.popen_patch_success = mock.patch.object(
             subprocess, 'Popen', mock_popen_success
         )
-        self.popen_swap_failure = self.swap(
+        self.popen_patch_failure = mock.patch.object(
             subprocess, 'Popen', mock_popen_failure
         )
 
-        self.directories_swap = self.swap(
+        self.directories_patch = mock.patch.object(
             run_mypy_checks, 'EXCLUDED_DIRECTORIES', ['dir1/', 'dir2/']
         )
 
@@ -94,7 +95,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             './mypy.ini',
             '.',
         ]
-        with self.directories_swap:
+        with self.directories_patch:
             cmd = run_mypy_checks.get_mypy_cmd(None)
             self.assertEqual(cmd, expected_cmd)
 
@@ -106,12 +107,12 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             'file1.py',
             'file2.py',
         ]
-        with self.directories_swap:
+        with self.directories_patch:
             cmd = run_mypy_checks.get_mypy_cmd(['file1.py', 'file2.py'])
             self.assertEqual(cmd, expected_cmd)
 
     def test_running_script_without_mypy_errors(self) -> None:
-        with self.popen_swap_success:
+        with self.popen_patch_success:
             process = subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
             )
@@ -119,7 +120,7 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             self.assertEqual(output[0], b'test\n')
 
     def test_running_script_with_mypy_errors(self) -> None:
-        with self.popen_swap_failure:
+        with self.popen_patch_failure:
             process = subprocess.Popen(
                 [PYTHON_CMD, '-m', MYPY_SCRIPT_MODULE], stdout=subprocess.PIPE
             )
@@ -127,12 +128,12 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             self.assertEqual(output[0], b'')
 
     def test_main_with_files_without_mypy_errors(self) -> None:
-        with self.popen_swap_success:
+        with self.popen_patch_success:
             process = run_mypy_checks.main(args=['--files', 'file1.py'])
             self.assertEqual(process, 0)
 
     def test_main_without_mypy_errors(self) -> None:
-        with self.popen_swap_success:
+        with self.popen_patch_success:
             process = run_mypy_checks.main(args=[])
             self.assertEqual(process, 0)
 
@@ -141,6 +142,6 @@ class MypyScriptChecks(test_utils.GenericTestBase):
             run_mypy_checks.main(args=['--files', 'file1.py'])
 
     def test_main_failure_due_to_mypy_errors(self) -> None:
-        with self.popen_swap_failure:
+        with self.popen_patch_failure:
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_mypy_checks.main(args=[])

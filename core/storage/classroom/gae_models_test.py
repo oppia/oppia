@@ -17,6 +17,7 @@
 """Tests for classroom models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import types
 
@@ -198,7 +199,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             Exception, 'A classroom with the given classroom ID already exists.'
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 classroom_model_cls,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, classroom_model_cls),
@@ -228,7 +229,7 @@ class ClassroomModelUnitTest(test_utils.GenericTestBase):
             'New classroom id generator is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 classroom_model_cls,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, classroom_model_cls),

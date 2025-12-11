@@ -15,6 +15,7 @@
 """Tests for the collection editor page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import base64
 

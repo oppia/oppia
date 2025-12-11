@@ -17,6 +17,7 @@
 """Tests for Oppia statistics models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import types
 
@@ -823,7 +824,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             stats_models.PlaythroughModel,
             'get_by_id',
             types.MethodType(lambda _, __: True, stats_models.PlaythroughModel),
@@ -835,7 +836,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
             'many collisions.',
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             stats_models.PlaythroughModel.create(
                 'exp_id1', 1, 'EarlyQuit', {}, []
             )
@@ -1170,7 +1171,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
 
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
+        with mock.patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1
         ):
             stats_models.StateAnswersModel.insert_submitted_answers(
@@ -1287,7 +1288,7 @@ class StateAnswersModelUnitTests(test_utils.GenericTestBase):
     def test_get_all_state_answer_models_of_all_shards(self) -> None:
         # Use a smaller max answer list size so fewer answers are needed to
         # exceed a shard. This will increase the 'shard_count'.
-        with self.swap(
+        with mock.patch.object(
             stats_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1
         ):
             submitted_answer_list1: List[stats_domain.SubmittedAnswerDict] = [

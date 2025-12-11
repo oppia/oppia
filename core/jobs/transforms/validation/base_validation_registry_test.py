@@ -17,6 +17,7 @@
 """Unit tests for jobs.transforms.base_validation_registry."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation_registry
@@ -35,13 +36,13 @@ class GetAuditsByKindTests(test_utils.TestBase):
         return cls.unique_obj
 
     def test_returns_value_from_decorator(self) -> None:
-        get_audit_do_fn_types_by_kind_swap = self.swap(
+        get_audit_do_fn_types_by_kind_patch = mock.patch.object(
             validation_decorators.AuditsExisting,
             'get_audit_do_fn_types_by_kind',
             self.get_audit_do_fn_types_by_kind_mock,
         )
 
-        with get_audit_do_fn_types_by_kind_swap:
+        with get_audit_do_fn_types_by_kind_patch:
             self.assertIs(
                 base_validation_registry.get_audit_do_fn_types_by_kind(),
                 self.unique_obj,
@@ -61,13 +62,15 @@ class GetIdReferencingPropertiesByKindOfPossessorTests(test_utils.TestBase):
         return cls.unique_obj
 
     def test_returns_value_from_decorator(self) -> None:
-        get_id_referencing_properties_by_kind_of_possessor_swap = self.swap(
-            validation_decorators.RelationshipsOf,
-            'get_id_referencing_properties_by_kind_of_possessor',
-            self.get_id_referencing_properties_by_kind_of_possessor_mock,
+        get_id_referencing_properties_by_kind_of_possessor_patch = (
+            mock.patch.object(
+                validation_decorators.RelationshipsOf,
+                'get_id_referencing_properties_by_kind_of_possessor',
+                self.get_id_referencing_properties_by_kind_of_possessor_mock,
+            )
         )
 
-        with get_id_referencing_properties_by_kind_of_possessor_swap:
+        with get_id_referencing_properties_by_kind_of_possessor_patch:
             self.assertIs(
                 base_validation_registry.get_id_referencing_properties_by_kind_of_possessor(),
                 self.unique_obj,
@@ -87,13 +90,13 @@ class GetAllModelKindsReferencedByPropertiesTests(test_utils.TestBase):
         return cls.unique_obj
 
     def test_returns_value_from_decorator(self) -> None:
-        get_all_model_kinds_referenced_by_properties_swap = self.swap(
+        get_all_model_kinds_referenced_by_properties_patch = mock.patch.object(
             validation_decorators.RelationshipsOf,
             'get_all_model_kinds_referenced_by_properties',
             self.get_all_model_kinds_referenced_by_properties_mock,
         )
 
-        with get_all_model_kinds_referenced_by_properties_swap:
+        with get_all_model_kinds_referenced_by_properties_patch:
             self.assertIs(
                 base_validation_registry.get_all_model_kinds_referenced_by_properties(),
                 self.unique_obj,

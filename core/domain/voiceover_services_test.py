@@ -17,6 +17,7 @@
 """Tests for voiecover service methods."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import json
@@ -1013,7 +1014,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1081,7 +1082,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1178,7 +1179,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(entity_voiceovers_models), 0)
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1337,7 +1338,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             ]
             return errors_while_voiceover_regeneration
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_regeneration_services,
             'regenerate_voiceovers_of_exploration',
             mock_regenerate_voiceovers_of_exploration,
@@ -1496,7 +1497,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         self.assertEqual(entity_translation.language_code, language_code)
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1581,7 +1582,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1648,7 +1649,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(entity_voiceovers_list), 0)
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
@@ -1698,7 +1699,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(entity_voiceovers.voiceovers_mapping, {})
 
-        with self.swap(
+        with mock.patch.object(
             voiceover_services,
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,

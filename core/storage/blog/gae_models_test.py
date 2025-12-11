@@ -17,6 +17,7 @@
 """Tests for Blog Post models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import types
@@ -115,7 +116,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         ):
 
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_post_model_cls,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, blog_post_model_cls),
@@ -128,7 +129,7 @@ class BlogPostModelTest(test_utils.GenericTestBase):
             'New blog post id generator is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_post_model_cls,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, blog_post_model_cls),
@@ -535,7 +536,7 @@ class BlogPostRightsModelTest(test_utils.GenericTestBase):
             'Blog Post ID conflict on creating new blog post rights model.',
         ):
             #  Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_post_rights_model_cls,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, blog_post_rights_model_cls),
@@ -623,7 +624,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
 
             # Swap dependent method get_by_author to simulate collision every
             # time.
-            with self.swap(
+            with mock.patch.object(
                 blog_author_details_model_cls,
                 'get_by_author',
                 types.MethodType(
@@ -640,7 +641,7 @@ class BlogAuthorDetailsModelTest(test_utils.GenericTestBase):
             'New instance id generator is producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_author_details_model_cls,
                 'get_by_id',
                 types.MethodType(

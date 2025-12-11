@@ -15,6 +15,7 @@
 """Tests for methods relating to sending emails."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -230,10 +231,10 @@ class ExplorationMembershipEmailTests(test_utils.EmailTestBase):
             '%s - invitation to collaborate'
         ) % self.EXPLORATION_TITLE
 
-        self.can_send_editor_role_email_ctx = self.swap(
+        self.can_send_editor_role_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
-        self.can_not_send_editor_role_email_ctx = self.swap(
+        self.can_not_send_editor_role_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
@@ -808,7 +809,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
     )
     def test_email_not_sent_if_content_parameter_is_not_modified(self) -> None:
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        log_new_error_ctx = mock.patch.object(
+            logging, 'error', log_new_error_counter
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
@@ -887,7 +890,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
         )
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        log_new_error_ctx = mock.patch.object(
+            logging, 'error', log_new_error_counter
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
@@ -944,7 +949,9 @@ class SignupEmailTests(test_utils.EmailTestBase):
     )
     def test_email_with_bad_content_is_not_sent(self) -> None:
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        log_new_error_ctx = mock.patch.object(
+            logging, 'error', log_new_error_counter
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
@@ -1342,7 +1349,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
             """Returns the generated hash for tests."""
             return 'Email Hash'
 
-        self.generate_hash_ctx = self.swap(
+        self.generate_hash_ctx = mock.patch.object(
             email_models.SentEmailModel,
             '_generate_hash',
             types.MethodType(
@@ -1368,12 +1375,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         ]
     )
     def test_send_email_does_not_resend_if_same_hash_exists(self) -> None:
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 1000
         )
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        log_new_error_ctx = mock.patch.object(
+            logging, 'error', log_new_error_counter
+        )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with duplicate_email_ctx, log_new_error_ctx:
@@ -1443,12 +1452,14 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
         ]
     )
     def test_send_email_does_not_resend_within_duplicate_interval(self) -> None:
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2
         )
 
         log_new_error_counter = test_utils.CallCounter(logging.error)
-        log_new_error_ctx = self.swap(logging, 'error', log_new_error_counter)
+        log_new_error_ctx = mock.patch.object(
+            logging, 'error', log_new_error_counter
+        )
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with duplicate_email_ctx, log_new_error_ctx:
                 all_models: Sequence[email_models.SentEmailModel] = (
@@ -1519,7 +1530,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     )
     def test_sending_email_with_different_recipient_but_same_hash(self) -> None:
         """Hash for both messages is same but recipients are different."""
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2
         )
 
@@ -1595,7 +1606,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     )
     def test_sending_email_with_different_subject_but_same_hash(self) -> None:
         """Hash for both messages is same but subjects are different."""
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2
         )
 
@@ -1671,7 +1682,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     )
     def test_sending_email_with_different_body_but_same_hash(self) -> None:
         """Hash for both messages is same but body is different."""
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2
         )
 
@@ -1748,7 +1759,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
     def test_duplicate_emails_are_sent_after_some_time_has_elapsed(
         self,
     ) -> None:
-        duplicate_email_ctx = self.swap(
+        duplicate_email_ctx = mock.patch.object(
             feconf, 'DUPLICATE_EMAIL_INTERVAL_MINS', 2
         )
 
@@ -1840,10 +1851,10 @@ class FeedbackMessageBatchEmailTests(test_utils.EmailTestBase):
             'You\'ve received 3 new messages on your explorations'
         )
 
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
@@ -2011,10 +2022,10 @@ class SuggestionEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title'
         )
         self.recipient_list = [self.editor_id]
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
@@ -2147,10 +2158,10 @@ class SubscriptionEmailTests(test_utils.EmailTestBase):
         subscription_services.subscribe_to_creator(
             self.new_user_id, self.editor_id
         )
-        self.can_send_subscription_email_ctx = self.swap(
+        self.can_send_subscription_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
-        self.can_not_send_subscription_email_ctx = self.swap(
+        self.can_not_send_subscription_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
@@ -2275,10 +2286,10 @@ class FeedbackMessageInstantEmailTests(test_utils.EmailTestBase):
             'A', self.editor_id, title='Title'
         )
         self.recipient_list = [self.editor_id]
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
-        self.can_not_send_feedback_email_ctx = self.swap(
+        self.can_not_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
 
@@ -3207,7 +3218,9 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
-        with self.swap(feconf, 'DEFAULT_STATE_CONTENT_STR', question_html):
+        with mock.patch.object(
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html
+        ):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -3320,11 +3333,11 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
         )
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = mock.patch.object(
             logging, 'error', self.log_new_error_counter
         )
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = mock.patch.object(
             logging, 'info', self._mock_logging_info
         )
 
@@ -5347,7 +5360,9 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         """Creates a question suggestion with the given question html and
         submission datetime.
         """
-        with self.swap(feconf, 'DEFAULT_STATE_CONTENT_STR', question_html):
+        with mock.patch.object(
+            feconf, 'DEFAULT_STATE_CONTENT_STR', question_html
+        ):
             content_id_generator = translation_domain.ContentIdGenerator()
             add_question_change_dict: Dict[
                 str, Union[str, float, question_domain.QuestionDict]
@@ -5464,11 +5479,11 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = mock.patch.object(
             logging, 'error', self.log_new_error_counter
         )
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = mock.patch.object(
             logging, 'info', self._mock_logging_info
         )
 
@@ -5490,7 +5505,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_server_can_send_emails_is_false(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.log_new_error_ctx:
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     0,
@@ -5523,7 +5538,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     ) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.log_new_error_ctx:
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     0,
@@ -5565,7 +5580,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_admin_email_does_not_exist(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.log_new_error_ctx:
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     0,
@@ -5600,7 +5615,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
     def test_email_not_sent_if_no_admins_to_notify(self) -> None:
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with self.log_new_error_ctx:
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     0,
@@ -5631,7 +5646,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         self,
     ) -> None:
         with self.log_new_info_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -5719,7 +5734,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -5828,7 +5843,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -5925,7 +5940,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -6037,7 +6052,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -6159,7 +6174,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -6317,7 +6332,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
         )
 
         with self.log_new_error_ctx:
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -6391,11 +6406,11 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
         )
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = mock.patch.object(
             logging, 'error', self.log_new_error_counter
         )
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = mock.patch.object(
             logging, 'info', self._mock_logging_info
         )
 
@@ -6779,11 +6794,11 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
         self.save_new_skill(self.skill_id, self.author_id)
 
         self.log_new_error_counter = test_utils.CallCounter(logging.error)
-        self.log_new_error_ctx = self.swap(
+        self.log_new_error_ctx = mock.patch.object(
             logging, 'error', self.log_new_error_counter
         )
         self.logged_info: List[str] = []
-        self.log_new_info_ctx = self.swap(
+        self.log_new_info_ctx = mock.patch.object(
             logging, 'info', self._mock_logging_info
         )
 

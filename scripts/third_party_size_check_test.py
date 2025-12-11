@@ -15,6 +15,7 @@
 """Unit tests for scripts/third_party_size_check.py"""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -35,7 +36,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
         if os.path.isdir(os.path.join(os.getcwd(), 'dummy_dir')):
             shutil.rmtree('dummy_dir')
         skip_files_list = '\n'.join(
@@ -86,7 +87,7 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
     def test_get_skip_files_list_throws_error(self) -> None:
         err = IOError('XYZ error.')
-        print_swap = self.swap_with_checks(
+        print_patch = self.swap_with_checks(
             builtins, 'print', lambda _: None, expected_args=((err,),)
         )
 
@@ -103,24 +104,24 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
             sys, 'exit', lambda _: None, expected_args=((1,),)
         )
 
-        with swap_open, swap_sys_exit, print_swap:
+        with swap_open, swap_sys_exit, print_patch:
             third_party_size_check.get_skip_files_list()
 
     def test_check_size_in_dir(self) -> None:
         def mock_get_skip_files_list() -> list[str]:
             return []
 
-        swap_get_skip_files_list = self.swap(
+        swap_get_skip_files_list = mock.patch.object(
             third_party_size_check,
             'get_skip_files_list',
             mock_get_skip_files_list,
         )
-        swap_third_party_dir = self.swap(
+        swap_third_party_dir = mock.patch.object(
             third_party_size_check,
             'THIRD_PARTY_PATH',
             os.path.join(os.getcwd(), 'dummy_dir'),
         )
-        with swap_third_party_dir, swap_get_skip_files_list, self.print_swap:
+        with swap_third_party_dir, swap_get_skip_files_list, self.print_patch:
             third_party_size_check.check_third_party_size()
         self.assertIn(
             '    Number of files in third-party folder: 4', self.print_arr
@@ -133,29 +134,29 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), 'dummy_dir', 'random*.py'),
             ]
 
-        swap_get_skip_files_list = self.swap(
+        swap_get_skip_files_list = mock.patch.object(
             third_party_size_check,
             'get_skip_files_list',
             mock_get_skip_files_list,
         )
-        swap_third_party_dir = self.swap(
+        swap_third_party_dir = mock.patch.object(
             third_party_size_check,
             'THIRD_PARTY_PATH',
             os.path.join(os.getcwd(), 'dummy_dir'),
         )
-        with swap_third_party_dir, swap_get_skip_files_list, self.print_swap:
+        with swap_third_party_dir, swap_get_skip_files_list, self.print_patch:
             third_party_size_check.check_third_party_size()
         self.assertIn(
             '    Number of files in third-party folder: 2', self.print_arr
         )
 
     def test_check_third_party_size_pass(self) -> None:
-        swap_check_size_in_dir = self.swap(
+        swap_check_size_in_dir = mock.patch.object(
             third_party_size_check,
             '_check_size_in_dir',
             lambda *unused_args: 100,
         )
-        with self.print_swap, swap_check_size_in_dir:
+        with self.print_patch, swap_check_size_in_dir:
             third_party_size_check.check_third_party_size()
 
         self.assertIn(
@@ -164,15 +165,15 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         )
 
     def test_check_third_party_size_fail(self) -> None:
-        swap_check_size_in_dir = self.swap(
+        swap_check_size_in_dir = mock.patch.object(
             third_party_size_check,
             '_check_size_in_dir',
             lambda *unused_args: (
                 third_party_size_check.THIRD_PARTY_SIZE_LIMIT + 1
             ),
         )
-        swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
-        with self.print_swap, swap_check_size_in_dir, swap_sys_exit:
+        swap_sys_exit = mock.patch.object(sys, 'exit', lambda _: None)
+        with self.print_patch, swap_check_size_in_dir, swap_sys_exit:
             third_party_size_check.check_third_party_size()
 
         self.assertIn(

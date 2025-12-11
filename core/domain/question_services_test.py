@@ -17,6 +17,7 @@
 """Tests for core.domain.question_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 import re
@@ -841,7 +842,9 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
         assert_raises_context_manager = self.assertRaisesRegex(
             Exception, '\'str\' object has no attribute \'cmd\''
         )
@@ -849,7 +852,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally test
         # wrong inputs that we can normally catch by typing.
-        with logging_swap, assert_raises_context_manager:
+        with logging_patch, assert_raises_context_manager:
             question_services.update_question(
                 self.editor_id,
                 self.question_id,

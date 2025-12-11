@@ -15,6 +15,7 @@
 """Tests for the library page and associated handlers."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 import logging
@@ -342,10 +343,14 @@ class LibraryPageTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-        default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
+        logging_patch = mock.patch.object(
+            logging, 'exception', _mock_logging_function
+        )
+        default_query_limit_patch = mock.patch.object(
+            feconf, 'DEFAULT_QUERY_LIMIT', 1
+        )
         # Load the search results with an empty query.
-        with default_query_limit_swap, logging_swap:
+        with default_query_limit_patch, logging_patch:
             self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
 
             self.assertEqual(len(observed_log_messages), 1)

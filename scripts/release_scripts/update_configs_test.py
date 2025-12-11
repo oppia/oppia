@@ -17,6 +17,7 @@
 """Unit tests for scripts/release_scripts/update_configs.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 import tempfile
@@ -310,23 +311,25 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 'update_analytics_constants_based_on_config'
             ] = True
 
-        apply_changes_swap = self.swap(
+        apply_changes_patch = mock.patch.object(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes
         )
-        verify_config_files_swap = self.swap(
+        verify_config_files_patch = mock.patch.object(
             update_configs, 'verify_config_files', mock_verify_config_files
         )
-        update_app_yaml_swap = self.swap(
+        update_app_yaml_patch = mock.patch.object(
             update_configs, 'update_app_yaml', mock_update_app_yaml
         )
-        update_analytics_constants_based_on_config_swap = self.swap(
+        update_analytics_constants_based_on_config_patch = mock.patch.object(
             update_configs,
             'update_analytics_constants_based_on_config',
             mock_update_analytics_constants_based_on_config,
         )
 
-        with apply_changes_swap, verify_config_files_swap, update_app_yaml_swap:
-            with update_analytics_constants_based_on_config_swap:
+        with (
+            apply_changes_patch
+        ), verify_config_files_patch, update_app_yaml_patch:
+            with update_analytics_constants_based_on_config_patch:
                 update_configs.main(
                     args=[
                         '--release_dir_path',

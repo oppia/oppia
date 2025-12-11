@@ -15,6 +15,7 @@
 """Tests for wipeout service."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -351,7 +352,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             """Mocks logging.info()."""
             observed_log_messages.append(msg % args)
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with mock.patch.object(logging, 'info', _mock_logging_function):
             wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
 
@@ -805,7 +806,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     ) -> None:
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
-        send_email_swap = self.swap_with_checks(
+        send_email_patch = self.swap_with_checks(
             email_manager,
             'send_account_deleted_email',
             lambda x, y: None,
@@ -817,7 +818,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             ],
         )
 
-        with send_email_swap:
+        with send_email_patch:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -872,14 +873,14 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             'The Wipeout process failed for the user with ID \'%s\' '
             'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
         )
-        send_email_swap = self.swap_with_checks(
+        send_email_patch = self.swap_with_checks(
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
             expected_args=[('WIPEOUT: Account deletion failed', email_content)],
         )
 
-        with send_email_swap:
+        with send_email_patch:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -910,7 +911,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             learnt_topic_ids=[],
         ).put()
 
-        send_email_swap = self.swap_with_checks(
+        send_email_patch = self.swap_with_checks(
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
@@ -918,7 +919,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             called=False,
         )
 
-        with send_email_swap:
+        with send_email_patch:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -5789,11 +5790,11 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
-        delete_external_auth_associations_swap = self.swap_to_always_return(
+        delete_external_auth_associations_patch = self.swap_to_always_return(
             auth_services, 'delete_external_auth_associations'
         )
 
-        with delete_external_auth_associations_swap:
+        with delete_external_auth_associations_patch:
             wipeout_service.delete_user(
                 wipeout_service.get_pending_deletion_request(self.user_1_id)
             )
@@ -6333,13 +6334,13 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_subject: str, email_body: str
         ) -> None:
             """Mocks email_manager.send_mail_to_admin() as it's not possible to
-            send mail with self.testapp_swap, i.e with the URLs defined in
+            send mail with self.testapp_patch, i.e with the URLs defined in
             main_cron.
             """
             self.email_subjects.append(email_subject)
             self.email_bodies.append(email_body)
 
-        self.send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_patch = mock.patch.object(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
@@ -6353,7 +6354,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         ]
     )
     def test_repeated_deletion_is_successful_when_emails_enabled(self) -> None:
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertIn('SUCCESS', self.email_bodies[0])
             self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -6362,14 +6363,14 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
     def test_repeated_deletion_is_successful_when_emails_disabled(self) -> None:
-        send_mail_to_admin_swap = self.swap_with_checks(
+        send_mail_to_admin_patch = self.swap_with_checks(
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
             # Func shouldn't be called when emails are disabled.
             called=False,
         )
-        with send_mail_to_admin_swap:
+        with send_mail_to_admin_patch:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
             wipeout_service.delete_users_pending_to_be_deleted()
@@ -6386,7 +6387,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         ] = user_models.PendingDeletionRequestModel.query().fetch()
         for pending_deletion_request_model in pending_deletion_request_models:
             pending_deletion_request_model.delete()
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             # When there are no pending deletion models, expect no emails.
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
@@ -6401,7 +6402,7 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         ]
     )
     def test_regular_deletion_is_successful(self) -> None:
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             wipeout_service.delete_users_pending_to_be_deleted()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -6469,13 +6470,13 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_subject: str, email_body: str
         ) -> None:
             """Mocks email_manager.send_mail_to_admin() as it's not possible to
-            send mail with self.testapp_swap, i.e with the URLs defined in
+            send mail with self.testapp_patch, i.e with the URLs defined in
             main_cron.
             """
             self.email_subjects.append(email_subject)
             self.email_bodies.append(email_body)
 
-        self.send_mail_to_admin_swap = self.swap(
+        self.send_mail_to_admin_patch = mock.patch.object(
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
@@ -6483,7 +6484,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
     )
     def test_verification_when_user_is_not_deleted_emails_enabled(self) -> None:
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('NOT DELETED', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -6491,14 +6492,14 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     def test_verification_when_user_is_not_deleted_emails_disabled(
         self,
     ) -> None:
-        send_mail_to_admin_swap = self.swap_with_checks(
+        send_mail_to_admin_patch = self.swap_with_checks(
             email_manager,
             'send_mail_to_admin',
             lambda x, y: None,
             # Func shouldn't be called when emails are disabled.
             called=False,
         )
-        with send_mail_to_admin_swap:
+        with send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
@@ -6530,7 +6531,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             [pending_deletion_request]
         )
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('SUCCESS', self.email_bodies[0])
         self.assertIn(self.user_1_id, self.email_bodies[0])
@@ -6566,7 +6567,7 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             learnt_topic_ids=[],
         ).put()
 
-        with self.send_mail_to_admin_swap:
+        with self.send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])

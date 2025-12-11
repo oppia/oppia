@@ -17,6 +17,7 @@
 """Tests the methods defined in topic fetchers."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import (
@@ -312,11 +313,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         )
         commit_cmd_dicts = [commit_cmd.to_dict()]
         model.commit(self.user_id_a, 'topic model created', commit_cmd_dicts)
-        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
-        current_story_refrence_schema_version_swap = self.swap(
+        swap_topic_object = mock.patch.object(
+            topic_domain, 'Topic', MockTopicObject
+        )
+        current_story_refrence_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2
         )
-        with swap_topic_object, current_story_refrence_schema_version_swap:
+        with swap_topic_object, current_story_refrence_schema_version_patch:
             topic: topic_domain.Topic = topic_fetchers.get_topic_from_model(
                 model
             )

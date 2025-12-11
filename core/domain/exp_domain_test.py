@@ -19940,7 +19940,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
     def test_metadata_properties_are_synced(self) -> None:
         self._require_metadata_properties_to_be_synced()
 
-        swapped_metadata_properties = self.swap(
+        swapped_metadata_properties = mock.patch.object(
             constants,
             'METADATA_PROPERTIES',
             [
@@ -19971,7 +19971,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         ):
             self._require_metadata_properties_to_be_synced()
 
-        swapped_metadata_properties = self.swap(
+        swapped_metadata_properties = mock.patch.object(
             constants,
             'METADATA_PROPERTIES',
             [

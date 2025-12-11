@@ -17,6 +17,7 @@
 """Unit tests for scripts/concurrent_task_utils.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import threading
@@ -53,7 +54,7 @@ class ConcurrentTaskUtilsTests(test_utils.GenericTestBase):
             """
             self.task_stdout.append(' '.join(str(arg) for arg in args))
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
 
 class TaskResultTests(ConcurrentTaskUtilsTests):
@@ -102,7 +103,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
         self.semaphore.acquire()
         task.start_time = time.time()
-        with self.print_swap:
+        with self.print_patch:
             task.start()
             task.join()
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -119,7 +120,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
         self.semaphore.acquire()
         task.start_time = time.time()
-        with self.print_swap:
+        with self.print_patch:
             task.start()
             task.join()
         self.assertIn(
@@ -151,7 +152,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
         self.semaphore.acquire()
         task.start_time = time.time()
-        with self.print_swap:
+        with self.print_patch:
             task.start()
             task.join()
         self.assertRegex(
@@ -183,7 +184,7 @@ class TaskThreadTests(ConcurrentTaskUtilsTests):
         )
         self.semaphore.acquire()
         task.start_time = time.time()
-        with self.print_swap:
+        with self.print_patch:
             task.start()
             task.join()
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
@@ -201,7 +202,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
             name='test',
             errors_to_retry_on=[],
         )
-        with self.print_swap:
+        with self.print_patch:
             concurrent_task_utils.execute_tasks([task], self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 1)
@@ -216,7 +217,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
                 errors_to_retry_on=[],
             )
             task_list.append(task)
-        with self.print_swap:
+        with self.print_patch:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         expected_output = [s for s in self.task_stdout if 'FINISHED' in s]
         self.assertTrue(len(expected_output) == 6)
@@ -228,7 +229,7 @@ class ExecuteTasksTests(ConcurrentTaskUtilsTests):
                 test_function, True, self.semaphore, errors_to_retry_on=[]
             )
             task_list.append(task)
-        with self.print_swap:
+        with self.print_patch:
             concurrent_task_utils.execute_tasks(task_list, self.semaphore)
         self.assertIn(
             'test_function() missing 1 required '

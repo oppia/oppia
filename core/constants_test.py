@@ -15,6 +15,7 @@
 """Tests for Constants object and cosntants.json file."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 import pkgutil
@@ -193,5 +194,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_can_be_set(self) -> None:
         """Test __setattr__ to see if constants can be set as needed."""
-        with self.swap(constants.constants, 'TESTING_CONSTANT', 'test_2'):
+        with mock.patch.object(
+            constants.constants, 'TESTING_CONSTANT', 'test_2'
+        ):
             self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')

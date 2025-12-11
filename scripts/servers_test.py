@@ -15,6 +15,7 @@
 """Unit tests for scripts/servers.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import collections
@@ -133,7 +134,7 @@ class ManagedProcessTests(test_utils.TestBase):
                 child_procs=child_procs,
             )
 
-        with self.swap(psutil, 'Popen', mock_popen):
+        with mock.patch.object(psutil, 'Popen', mock_popen):
             yield popen_calls
 
     @contextlib.contextmanager
@@ -168,9 +169,15 @@ class ManagedProcessTests(test_utils.TestBase):
         )
 
         with contextlib.ExitStack() as exit_stack:
-            exit_stack.enter_context(self.swap(os.path, 'exists', new_exists))
-            exit_stack.enter_context(self.swap(shutil, 'rmtree', new_rmtree))
-            exit_stack.enter_context(self.swap(os, 'makedirs', new_makedirs))
+            exit_stack.enter_context(
+                mock.patch.object(os.path, 'exists', new_exists)
+            )
+            exit_stack.enter_context(
+                mock.patch.object(shutil, 'rmtree', new_rmtree)
+            )
+            exit_stack.enter_context(
+                mock.patch.object(os, 'makedirs', new_makedirs)
+            )
             yield new_rmtree, new_makedirs
 
     def assert_proc_was_managed_as_expected(
@@ -208,7 +215,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_does_not_raise_when_psutil_not_in_path(self) -> None:
         self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(sys, 'path', []))
+        self.exit_stack.enter_context(mock.patch.object(sys, 'path', []))
 
         # Entering the context should not raise.
         self.exit_stack.enter_context(
@@ -588,10 +595,10 @@ class ManagedProcessTests(test_utils.TestBase):
             )
         )
         self.exit_stack.enter_context(
-            self.swap(shutil, 'rmtree', mock_os_remove_files)
+            mock.patch.object(shutil, 'rmtree', mock_os_remove_files)
         )
         self.exit_stack.enter_context(
-            self.swap(os.path, 'exists', mock_os_path_exists)
+            mock.patch.object(os.path, 'exists', mock_os_path_exists)
         )
         self.exit_stack.enter_context(
             self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
@@ -703,7 +710,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_web_browser_on_linux_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
+        self.exit_stack.enter_context(
+            mock.patch.object(common, 'OS_NAME', 'Linux')
+        )
         self.exit_stack.enter_context(
             self.swap_to_always_return(os, 'listdir', value=[])
         )
@@ -721,7 +730,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_web_browser_on_mac_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Darwin'))
+        self.exit_stack.enter_context(
+            mock.patch.object(common, 'OS_NAME', 'Darwin')
+        )
         self.exit_stack.enter_context(
             self.swap_to_always_return(os, 'listdir', value=[])
         )
@@ -738,7 +749,9 @@ class ManagedProcessTests(test_utils.TestBase):
 
     def test_managed_web_browser_on_windows_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Windows'))
+        self.exit_stack.enter_context(
+            mock.patch.object(common, 'OS_NAME', 'Windows')
+        )
 
         with self.assertRaisesRegex(
             Exception,
@@ -754,7 +767,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_web_browser_for_exception(self) -> None:
         web_browser_error = 'Mock Exception while launching web browser.'
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
+        self.exit_stack.enter_context(
+            mock.patch.object(common, 'OS_NAME', 'Linux')
+        )
         mock_create_managed_web_browser = self.swap_to_always_raise(
             servers, 'create_managed_web_browser', Exception(web_browser_error)
         )
@@ -1112,7 +1127,9 @@ class ManagedProcessTests(test_utils.TestBase):
         self,
     ) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
-        self.exit_stack.enter_context(self.swap(common, 'OS_NAME', 'Linux'))
+        self.exit_stack.enter_context(
+            mock.patch.object(common, 'OS_NAME', 'Linux')
+        )
         self.exit_stack.enter_context(
             self.swap_to_always_raise(subprocess, 'check_output', error=OSError)
         )
@@ -1191,8 +1208,8 @@ class ManagedProcessTests(test_utils.TestBase):
             self.assertIsNotNone(context)
             return io.BytesIO(b'content')
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-        with urlopen_swap:
+        urlopen_patch = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
+        with urlopen_patch:
             with servers.managed_webdriverio_server(mobile=True):
                 self.assertEqual(os.getenv('MOBILE'), 'true')
 
@@ -1212,11 +1229,11 @@ class ManagedProcessTests(test_utils.TestBase):
             self.assertIsNotNone(context)
             return io.BytesIO(b'content')
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        urlopen_patch = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
 
-        with urlopen_swap:
+        with urlopen_patch:
             self.exit_stack.enter_context(
                 servers.managed_webdriverio_server(
                     suite_name='abc',
@@ -1329,7 +1346,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
     def test_chrome_before_115_queries_api(self) -> None:
         def mock_check_output(_: List[str]) -> bytes:
@@ -1343,14 +1360,14 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             'LATEST_RELEASE_72.0.3626'
         )
 
-        check_output_swap = self.swap(
+        check_output_patch = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        url_open_swap = self.swap_with_checks(
+        url_open_patch = self.swap_with_checks(
             common, 'url_open', mock_url_open, expected_args=[(expected_url,)]
         )
 
-        with check_output_swap, url_open_swap:
+        with check_output_patch, url_open_patch:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '72.0.3626.69',
@@ -1363,12 +1380,12 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         def mock_url_open(_: str) -> None:
             raise AssertionError('url_open should not be called.')
 
-        check_output_swap = self.swap(
+        check_output_patch = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        url_open_swap = self.swap(common, 'url_open', mock_url_open)
+        url_open_patch = mock.patch.object(common, 'url_open', mock_url_open)
 
-        with check_output_swap, url_open_swap:
+        with check_output_patch, url_open_patch:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '115.0.3626.123',
@@ -1381,7 +1398,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         swap_ng_build = self.swap_with_checks(
             servers, 'managed_ng_build', mock_context_manager, expected_args=[]
         )
-        with self.print_swap, swap_ng_build, swap_isdir:
+        with self.print_patch, swap_ng_build, swap_isdir:
             servers.run_ng_compilation()
 
         self.assertNotIn(
@@ -1399,7 +1416,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         swap_sys_exit = self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,)]
         )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()
 
         self.assertIn(
@@ -1446,5 +1463,5 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         swap_sys_exit = self.swap_with_checks(
             sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
         )
-        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()

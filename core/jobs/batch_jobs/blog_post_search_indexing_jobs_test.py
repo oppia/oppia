@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import math
@@ -70,7 +71,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         blog_summary.update_timestamps()
         blog_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
@@ -93,7 +94,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )
@@ -116,7 +117,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             blog_summary.update_timestamps()
             blog_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
@@ -140,13 +141,13 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        max_batch_size_swap = self.swap(
+        max_batch_size_patch = mock.patch.object(
             blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob,
             'MAX_BATCH_SIZE',
             1,
         )
 
-        with add_docs_to_index_swap, max_batch_size_swap:
+        with add_docs_to_index_patch, max_batch_size_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 5')]
             )
@@ -173,7 +174,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             add_docs_to_index_mock,
@@ -196,7 +197,7 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult.as_stderr(
@@ -221,14 +222,14 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         blog_summary.update_timestamps()
         blog_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
             called=False,
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is_empty()
 
     def test_skips_draft_blog_post_model(self) -> None:
@@ -247,14 +248,14 @@ class IndexBlogPostSummariesInSearchJobTests(job_test_utils.JobTestBase):
         blog_summary.update_timestamps()
         blog_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
             expected_args=[([], search_services.SEARCH_INDEX_BLOG_POSTS)],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )

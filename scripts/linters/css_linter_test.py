@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/css_linter.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 import subprocess
@@ -62,12 +63,12 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_join(*unused_args: str) -> str:
             return 'node_modules/stylelint/bin/stylelinter.js'
 
-        join_swap = self.swap(os.path, 'join', mock_join)
+        join_patch = mock.patch.object(os.path, 'join', mock_join)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             [INVALID_CSS_FILEPATH]
         )
-        with self.print_swap, join_swap, self.assertRaisesRegex(
+        with self.print_patch, join_patch, self.assertRaisesRegex(
             Exception,
             'ERROR    Please run start.py first to install node-eslint or '
             'node-stylelint and its dependencies.',
@@ -83,12 +84,12 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         ) -> scripts_test_utils.PopenStub:
             return scripts_test_utils.PopenStub(stdout=b'True', stderr=b'True')
 
-        popen_swap = self.swap_with_checks(subprocess, 'Popen', mock_popen)
+        popen_patch = self.swap_with_checks(subprocess, 'Popen', mock_popen)
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             [VALID_CSS_FILEPATH]
         )
-        with self.print_swap, popen_swap, self.assertRaisesRegex(
+        with self.print_patch, popen_patch, self.assertRaisesRegex(
             Exception, 'True'
         ):
             third_party_linter.perform_all_lint_checks()

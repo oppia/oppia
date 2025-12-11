@@ -17,6 +17,7 @@
 """Tests for state domain objects and methods defined on them."""
 
 from __future__ import annotations
+from unittest import mock
 
 import contextlib
 import copy
@@ -226,13 +227,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction.answer_type = 'ListOfSetsOfHtmlStrings'
             return interaction
 
-        rules_registry_swap = self.swap(
+        rules_registry_patch = mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
         )
 
-        interaction_registry_swap = self.swap(
+        interaction_registry_patch = mock.patch.object(
             interaction_registry.Registry,
             'get_interaction_by_id',
             classmethod(mock_get_interaction_by_id),
@@ -244,7 +245,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_list.append(html_str)
             return html_str
 
-        with rules_registry_swap, interaction_registry_swap:
+        with rules_registry_patch, interaction_registry_patch:
             state_domain.State.convert_html_fields_in_state(
                 state.to_dict(), _append_to_list
             )
@@ -535,13 +536,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             interaction.can_have_solution = True
             return interaction
 
-        rules_registry_swap = self.swap(
+        rules_registry_patch = mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
         )
 
-        interaction_registry_swap = self.swap(
+        interaction_registry_patch = mock.patch.object(
             interaction_registry.Registry,
             'get_interaction_by_id',
             classmethod(mock_get_interaction_by_id),
@@ -553,7 +554,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             html_list.append(html_str)
             return html_str
 
-        with rules_registry_swap, interaction_registry_swap:
+        with rules_registry_patch, interaction_registry_patch:
             state_domain.State.convert_html_fields_in_state(
                 state.to_dict(), _append_to_list
             )
@@ -641,7 +642,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -775,7 +776,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -882,7 +883,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -2268,7 +2269,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -2386,7 +2387,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -2484,7 +2485,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         ) -> Dict[str, rules_registry.RuleSpecsExtensionDict]:
             return mock_html_field_types_to_rule_specs_dict
 
-        with self.swap(
+        with mock.patch.object(
             rules_registry.Registry,
             'get_html_field_types_to_rule_specs',
             classmethod(mock_get_html_field_types_to_rule_specs),
@@ -2646,7 +2647,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid content HTML'
         ):
-            with self.swap(subtitled_html, 'html', 20):
+            with mock.patch.object(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
     def test_subtitled_html_validation_with_invalid_content(self) -> None:
@@ -2659,7 +2660,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected content id to be a string, received 20',
         ):
-            with self.swap(subtitled_html, 'content_id', 20):
+            with mock.patch.object(subtitled_html, 'content_id', 20):
                 subtitled_html.validate()
 
     def test_subtitled_unicode_validation_with_invalid_html_type(self) -> None:
@@ -2672,7 +2673,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid content unicode'
         ):
-            with self.swap(subtitled_unicode, 'unicode_str', 20):
+            with mock.patch.object(subtitled_unicode, 'unicode_str', 20):
                 subtitled_unicode.validate()
 
     def test_subtitled_unicode_validation_with_invalid_content(self) -> None:
@@ -2685,7 +2686,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected content id to be a string, received 20',
         ):
-            with self.swap(subtitled_unicode, 'content_id', 20):
+            with mock.patch.object(subtitled_unicode, 'content_id', 20):
                 subtitled_unicode.validate()
 
     def test_voiceover_validation(self) -> None:
@@ -2696,54 +2697,56 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected audio filename to be a string'
         ):
-            with self.swap(audio_voiceover, 'filename', 20):
+            with mock.patch.object(audio_voiceover, 'filename', 20):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
         ):
-            with self.swap(audio_voiceover, 'filename', '.invalidext'):
+            with mock.patch.object(audio_voiceover, 'filename', '.invalidext'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
         ):
-            with self.swap(audio_voiceover, 'filename', 'justanextension'):
+            with mock.patch.object(
+                audio_voiceover, 'filename', 'justanextension'
+            ):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Invalid audio filename'
         ):
-            with self.swap(audio_voiceover, 'filename', 'a.invalidext'):
+            with mock.patch.object(audio_voiceover, 'filename', 'a.invalidext'):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected file size to be an int'
         ):
-            with self.swap(audio_voiceover, 'file_size_bytes', 'abc'):
+            with mock.patch.object(audio_voiceover, 'file_size_bytes', 'abc'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(utils.ValidationError, 'Invalid file size'):
-            with self.swap(audio_voiceover, 'file_size_bytes', -3):
+            with mock.patch.object(audio_voiceover, 'file_size_bytes', -3):
                 audio_voiceover.validate()
 
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected needs_update to be a bool'
         ):
-            with self.swap(audio_voiceover, 'needs_update', 'hello'):
+            with mock.patch.object(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
         ):
-            with self.swap(audio_voiceover, 'duration_secs', 'test'):
+            with mock.patch.object(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError, 'Expected duration_secs to be a float'
         ):
-            with self.swap(audio_voiceover, 'duration_secs', '10'):
+            with mock.patch.object(audio_voiceover, 'duration_secs', '10'):
                 audio_voiceover.validate()
         with self.assertRaisesRegex(
             utils.ValidationError,
             'Expected duration_secs to be positive number, '
             'or zero if not yet specified',
         ):
-            with self.swap(audio_voiceover, 'duration_secs', -3.45):
+            with mock.patch.object(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
     def test_hints_validation(self) -> None:
@@ -2910,7 +2913,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected solicit_answer_details to be a boolean, received',
         ):
-            with self.swap(init_state, 'solicit_answer_details', 'abc'):
+            with mock.patch.object(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
         self.set_interaction_for_state(
@@ -2923,7 +2926,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'The Continue interaction does not '
             'support soliciting answer details from learners.',
         ):
-            with self.swap(init_state, 'solicit_answer_details', True):
+            with mock.patch.object(init_state, 'solicit_answer_details', True):
                 exploration.validate()
         self.set_interaction_for_state(
             init_state, 'TextInput', content_id_generator
@@ -2949,7 +2952,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected linked_skill_id to be a str, received 12.',
         ):
-            with self.swap(init_state, 'linked_skill_id', 12):
+            with mock.patch.object(init_state, 'linked_skill_id', 12):
                 exploration.validate()
         self.assertEqual(init_state.linked_skill_id, None)
 
@@ -2963,7 +2966,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'Expected '
             'inapplicable_skill_misconception_ids to be a list, received 12.',
         ):
-            with self.swap(
+            with mock.patch.object(
                 init_state, 'inapplicable_skill_misconception_ids', 12
             ):
                 exploration.validate()
@@ -2978,7 +2981,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected card_is_checkpoint to be a boolean, received',
         ):
-            with self.swap(init_state, 'card_is_checkpoint', 'abc'):
+            with mock.patch.object(init_state, 'card_is_checkpoint', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.card_is_checkpoint, True)
 
@@ -3301,7 +3304,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'warning', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'warning', _mock_logging_function
+        )
 
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
         state_answer_group = state_domain.AnswerGroup(
@@ -3332,7 +3337,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             [state_answer_group]
         )
 
-        with logging_swap, self.assertRaisesRegex(KeyError, '\'x\''):
+        with logging_patch, self.assertRaisesRegex(KeyError, '\'x\''):
             (
                 exploration.init_state.interaction.answer_groups[0]
                 .rule_specs[0]

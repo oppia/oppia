@@ -15,6 +15,7 @@
 """Tests for feedback-related services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import (
@@ -885,7 +886,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         event_handler_call_counter_exploration = test_utils.CallCounter(
             event_services.FeedbackThreadCreatedEventHandler.record
         )
-        with self.swap(
+        with mock.patch.object(
             event_services.FeedbackThreadCreatedEventHandler,
             'record',
             event_handler_call_counter_exploration,
@@ -905,7 +906,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         event_handler_call_counter_non_exploration = test_utils.CallCounter(
             event_services.FeedbackThreadCreatedEventHandler.record
         )
-        with self.swap(
+        with mock.patch.object(
             event_services.FeedbackThreadCreatedEventHandler,
             'record',
             event_handler_call_counter_non_exploration,
@@ -1139,7 +1140,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title'
         )
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
 
@@ -1242,7 +1243,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             model = feedback_models.UnsentFeedbackEmailModel.get(self.editor_id)
             self.assertEqual(model.retries, 0)
 
-            with self.swap(
+            with mock.patch.object(
                 feconf, 'DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS', -1
             ):
                 feedback_services.update_feedback_email_retries_transactional(
@@ -1474,7 +1475,7 @@ class FeedbackMessageEmailTests(test_utils.EmailTestBase):
             self.assertEqual(len(messages), 1)
 
     def test_that_emails_are_not_sent_if_service_is_disabled(self) -> None:
-        cannot_send_feedback_message_email_ctx = self.swap(
+        cannot_send_feedback_message_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', False
         )
         with cannot_send_feedback_message_email_ctx:
@@ -1717,7 +1718,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title'
         )
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
 
@@ -1943,7 +1944,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title'
         )
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
 

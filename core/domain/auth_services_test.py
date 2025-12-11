@@ -17,6 +17,7 @@
 """Tests for core.domain.auth_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.constants import constants
 from core.domain import (
@@ -313,7 +314,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         def mock_destroy_auth_session(_: webapp2.Response) -> None:
             auth_section.remove('established')
 
-        with self.swap(
+        with mock.patch.object(
             platform_auth_services,
             'establish_auth_session',
             mock_establish_auth_session,
@@ -322,7 +323,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
                 webapp2.Request.blank('/'), webapp2.Response()
             )
             self.assertEqual(['established'], auth_section)
-        with self.swap(
+        with mock.patch.object(
             platform_auth_services,
             'destroy_auth_session',
             mock_destroy_auth_session,
@@ -339,14 +340,14 @@ class AuthServicesTests(test_utils.GenericTestBase):
         def mock_revoke_super_admin_privileges(uid: str) -> None:
             super_admin_privilage.remove(uid)
 
-        with self.swap(
+        with mock.patch.object(
             platform_auth_services,
             'grant_super_admin_privileges',
             mock_grant_super_admin_privileges,
         ):
             auth_services.grant_super_admin_privileges('uid1')
             self.assertEqual(['uid1'], super_admin_privilage)
-        with self.swap(
+        with mock.patch.object(
             platform_auth_services,
             'revoke_super_admin_privileges',
             mock_revoke_super_admin_privileges,

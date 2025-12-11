@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/js_ts_linter.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import multiprocessing
 import os
@@ -116,6 +117,7 @@ VALID_PY_IGNORE_PRAGMA_FILEPATH: Final = os.path.join(
 VALID_PY_FILE_PATH = os.path.join(LINTER_TESTS_DIR, 'valid.py')
 
 INVALID_NO_NEWLINE_FILE_CONTENT = """from __future__ import annotations
+from unittest import mock
 
 class FakeClass:
     \"\"\"Fake docstring for valid syntax purposes.\"\"\"
@@ -328,7 +330,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         def _mock_readlines_error(unused_self: str) -> None:
             raise Exception('filecache error')
 
-        with self.swap(FILE_CACHE, 'readlines', _mock_readlines_error):
+        with mock.patch.object(FILE_CACHE, 'readlines', _mock_readlines_error):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_ANNOTATIONS_FILEPATH], FILE_CACHE
             )
@@ -390,7 +392,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"EMULATOR_MODE": true',
             )
 
-        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+        with mock.patch.object(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE
             )
@@ -415,7 +417,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
                 '"EMULATOR_MODE": false',
             )
 
-        with self.swap(FILE_CACHE, 'readlines', mock_readlines):
+        with mock.patch.object(FILE_CACHE, 'readlines', mock_readlines):
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [CONSTANTS_FILEPATH], FILE_CACHE
             )
@@ -494,12 +496,12 @@ class GeneralLintTests(test_utils.LinterTestBase):
         linter = general_purpose_linter.GeneralPurposeLinter(
             [INVALID_BYPASS_FLAG], FILE_CACHE
         )
-        excluded_files_swap = self.swap(
+        excluded_files_patch = mock.patch.object(
             warranted_angular_security_bypasses,
             'EXCLUDED_BYPASS_SECURITY_TRUST_FILES',
             [INVALID_BYPASS_FLAG],
         )
-        with excluded_files_swap:
+        with excluded_files_patch:
             lint_task_report = linter.check_disallowed_flags()
         self.assertEqual(lint_task_report.trimmed_messages, [])
         self.assertEqual(lint_task_report.name, 'Disallow flags')
@@ -528,13 +530,13 @@ class GeneralLintTests(test_utils.LinterTestBase):
         ) -> bool:
             return True
 
-        filepath_excluded_swap = self.swap(
+        filepath_excluded_patch = mock.patch.object(
             general_purpose_linter,
             'is_filepath_excluded_for_bad_patterns_check',
             mock_is_filepath_excluded_for_bad_patterns_check,
         )
 
-        with filepath_excluded_swap:
+        with filepath_excluded_patch:
             linter = general_purpose_linter.GeneralPurposeLinter(
                 [INVALID_MERGE_CONFLICT_FILEPATH], FILE_CACHE
             )

@@ -17,6 +17,7 @@
 """Tests for the beam jobs controllers."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -59,11 +60,11 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
 
     def test_get_returns_registered_jobs(self) -> None:
         job = beam_job_domain.BeamJob(FooJob)
-        get_beam_jobs_swap = self.swap_to_always_return(
+        get_beam_jobs_patch = self.swap_to_always_return(
             beam_job_services, 'get_beam_jobs', value=[job]
         )
 
-        with get_beam_jobs_swap:
+        with get_beam_jobs_patch:
             response = self.get_json('/beam_job')
 
         self.assertEqual(

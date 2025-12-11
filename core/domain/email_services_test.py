@@ -15,6 +15,7 @@
 """Tests for services relating to emails."""
 
 from __future__ import annotations
+from unittest import mock
 
 import textwrap
 
@@ -41,7 +42,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             Exception, 'This app cannot send emails to users.'
         )
 
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
+        with send_email_exception, mock.patch.object(
+            constants, 'DEV_MODE', False
+        ):
             email_services.send_mail(
                 self.system_email_address,
                 self.admin_email_address,
@@ -114,7 +117,9 @@ class EmailServicesTest(test_utils.EmailTestBase):
             Exception, 'This app cannot send emails to users.'
         )
 
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
+        with send_email_exception, mock.patch.object(
+            constants, 'DEV_MODE', False
+        ):
             email_services.send_bulk_mail(
                 self.system_email_address,
                 [self.admin_email_address],
@@ -272,7 +277,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             'Bulk email failed to send. Please try again later or'
             ' contact us to report a bug at https://www.oppia.org/contact.',
         )
-        swap_send_email_to_recipients = self.swap(
+        swap_send_email_to_recipients = mock.patch.object(
             platform_email_services,
             'send_email_to_recipients',
             lambda *_, **__: False,
@@ -293,7 +298,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
             )
             % self.admin_email_address,
         )
-        swap_send_email_to_recipients = self.swap(
+        swap_send_email_to_recipients = mock.patch.object(
             platform_email_services,
             'send_email_to_recipients',
             lambda *_: False,

@@ -15,6 +15,7 @@
 """Unit tests for the cloud_transaction_services.py"""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.platform.transactions import cloud_transaction_services
 from core.tests import test_utils
@@ -47,7 +48,7 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
         def mock_get_client() -> MockClient:
             return mock_client
 
-        swap_get_client = self.swap(
+        swap_get_client = mock.patch.object(
             cloud_transaction_services, 'get_client', mock_get_client
         )
 

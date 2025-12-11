@@ -15,6 +15,7 @@
 """Tests for the story viewer page"""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 
@@ -876,11 +877,11 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(
+        story_fetchers_patch = mock.patch.object(
             story_fetchers, 'get_story_by_id', _mock_none_function
         )
 
-        with story_fetchers_swap:
+        with story_fetchers_patch:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
                     '%s/staging/topic/%s/%s'

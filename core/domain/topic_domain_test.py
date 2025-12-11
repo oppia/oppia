@@ -17,6 +17,7 @@
 """Tests for topic domain objects."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -1363,13 +1364,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         vers_story_ref_dict = topic_domain.VersionedStoryReferencesDict(
             {'schema_version': 1, 'story_references': [story_ref_dict]}
         )
-        swap_topic_object = self.swap(
+        swap_topic_object = mock.patch.object(
             topic_domain, 'Topic', self.MockTopicObject
         )
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_STORY_REFERENCE_SCHEMA_VERSION', 2
         )
-        with swap_topic_object, current_schema_version_swap:
+        with swap_topic_object, current_schema_version_patch:
             topic_domain.Topic.update_story_references_from_model(
                 vers_story_ref_dict, schema_version
             )

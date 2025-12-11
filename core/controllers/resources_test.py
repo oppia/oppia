@@ -15,6 +15,7 @@
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 
@@ -582,7 +583,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False):
             self.get_json(
                 '/assetsdevhandler/exploration/0/assets/image/myfile.png',
                 expected_status_int=404,

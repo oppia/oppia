@@ -17,6 +17,7 @@
 """Unit tests for linter_utils.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -101,14 +102,14 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
             """Mock for print."""
             self.log = ' '.join(str(arg) for arg in args)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
     def test_print_failure_message_prints_in_red_color(self) -> None:
         message = 'Failure Message'
         red_color_message_prefix = '\033[91m'
         escape_sequence = '\033[0m'
 
-        with self.print_swap:
+        with self.print_patch:
             linter_utils.print_failure_message(message)
 
         self.assertEqual(
@@ -121,7 +122,7 @@ class ColorMessagePrintTest(test_utils.GenericTestBase):
         green_color_message_prefix = '\033[92m'
         escape_sequence = '\033[0m'
 
-        with self.print_swap:
+        with self.print_patch:
             linter_utils.print_success_message(message)
 
         self.assertEqual(

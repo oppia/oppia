@@ -15,6 +15,7 @@
 """Unit tests for scripts/create_expression_parser.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 import subprocess
@@ -42,8 +43,10 @@ class CreateExpressionParserTests(test_utils.GenericTestBase):
         ) -> None:
             libraries_installed.append([library_name, library_version, path])
 
-        swap_check_call = self.swap(subprocess, 'check_call', mock_check_call)
-        swap_install_npm_library = self.swap(
+        swap_check_call = mock.patch.object(
+            subprocess, 'check_call', mock_check_call
+        )
+        swap_install_npm_library = mock.patch.object(
             common, 'install_npm_library', mock_install_npm_library
         )
 

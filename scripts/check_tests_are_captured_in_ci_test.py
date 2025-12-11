@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_tests_are_captured_in_ci.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 import os
@@ -111,27 +112,29 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         ) as f:
             f.write(json.dumps({'suites': ACCEPTANCE_TEST_SUITES}))
 
-        self.acceptance_ci_test_suite_config_file_path_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'ACCEPTANCE_CI_TEST_SUITE_CONFIG_FILE_PATH',
-            acceptance_ci_test_suite_config_file,
+        self.acceptance_ci_test_suite_config_file_path_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'ACCEPTANCE_CI_TEST_SUITE_CONFIG_FILE_PATH',
+                acceptance_ci_test_suite_config_file,
+            )
         )
-        self.e2e_ci_test_suite_config_file_path_swap = self.swap(
+        self.e2e_ci_test_suite_config_file_path_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'E2E_CI_TEST_SUITE_CONFIG_FILE_PATH',
             e2e_ci_test_suite_config_file,
         )
-        self.e2e_webdriverio_config_file_swap = self.swap(
+        self.e2e_webdriverio_config_file_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'E2E_WEBDRIVERIO_CONFIG_FILE_PATH',
             self.dummy_e2e_webdriverio_config_file,
         )
-        self.acceptance_test_specs_directory_swap = self.swap(
+        self.acceptance_test_specs_directory_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'ACCEPTANCE_TEST_SPECS_DIRECTORY',
             self.dummy_acceptance_specs_directory,
         )
-        self.acceptance_test_specs_old_directory_swap = self.swap(
+        self.acceptance_test_specs_old_directory_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'ACCEPTANCE_TEST_SPECS_DIRECTORY_OLD',
             self.dummy_acceptance_old_directory,
@@ -166,21 +169,21 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         )
 
     def test_get_acceptance_test_suites_from_ci_config_file(self) -> None:
-        with self.acceptance_ci_test_suite_config_file_path_swap:
+        with self.acceptance_ci_test_suite_config_file_path_patch:
             acceptance_test_suites = (
                 check_tests_are_captured_in_ci.get_acceptance_test_suites_from_ci_config_file()
             )
             self.assertEqual(acceptance_test_suites, ACCEPTANCE_TEST_SUITES)
 
     def test_get_e2e_test_suites_from_ci_config_file(self) -> None:
-        with self.e2e_ci_test_suite_config_file_path_swap:
+        with self.e2e_ci_test_suite_config_file_path_patch:
             e2e_test_suites = (
                 check_tests_are_captured_in_ci.get_e2e_test_suites_from_ci_config_file()
             )
             self.assertEqual(e2e_test_suites, E2E_TEST_SUITES)
 
     def test_read_webdriverio_config_file(self) -> None:
-        with self.e2e_webdriverio_config_file_swap:
+        with self.e2e_webdriverio_config_file_patch:
             webdriverio_config_file_content = (
                 check_tests_are_captured_in_ci.read_webdriverio_config_file()
             )
@@ -203,9 +206,9 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
                 return ['suiteC.js', 'suiteD.js']
             return []
 
-        os_listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        os_listdir_patch = mock.patch.object(os, 'listdir', mock_listdir)
 
-        with os_listdir_swap:
+        with os_listdir_patch:
             e2e_test_modules = (
                 check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_directory()
             )
@@ -215,14 +218,14 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             )
 
     def test_get_e2e_test_modules_from_webdriverio_config_file(self) -> None:
-        with self.e2e_webdriverio_config_file_swap:
+        with self.e2e_webdriverio_config_file_patch:
             e2e_test_modules = (
                 check_tests_are_captured_in_ci.get_e2e_test_modules_from_webdriverio_config_file()
             )
             self.assertEqual(e2e_test_modules, ['suiteA.js', 'suiteB.js'])
 
     def test_get_e2e_test_suites_from_webdriverio_config_file(self) -> None:
-        with self.e2e_webdriverio_config_file_swap:
+        with self.e2e_webdriverio_config_file_patch:
             e2e_test_suites = (
                 check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
             )
@@ -238,13 +241,13 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
     def test_get_e2e_test_suites_from_webdriverio_config_file_with_exclusion(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        e2e_test_suites_that_are_not_run_in_ci_swap = self.swap(
+        e2e_test_suites_that_are_not_run_in_ci_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'E2E_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI',
             ['suiteB'],
         )
-        with self.e2e_webdriverio_config_file_swap:
-            with e2e_test_suites_that_are_not_run_in_ci_swap:
+        with self.e2e_webdriverio_config_file_patch:
+            with e2e_test_suites_that_are_not_run_in_ci_patch:
                 e2e_test_suites = (
                     check_tests_are_captured_in_ci.get_e2e_test_suites_from_webdriverio_config_file()
                 )
@@ -257,12 +260,12 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         def mock_get_cwd() -> str:
             return self.temp_directory.name
 
-        os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
+        os_getcwd_patch = mock.patch.object(os, 'getcwd', mock_get_cwd)
 
         with (
-            self.acceptance_test_specs_directory_swap,
-            self.acceptance_test_specs_old_directory_swap,
-            os_getcwd_swap,
+            self.acceptance_test_specs_directory_patch,
+            self.acceptance_test_specs_old_directory_patch,
+            os_getcwd_patch,
         ):
             acceptance_test_suites = (
                 check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
@@ -275,19 +278,19 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         def mock_get_cwd() -> str:
             return self.temp_directory.name
 
-        acceptance_test_suites_that_are_not_run_in_ci_swap = self.swap(
+        acceptance_test_suites_that_are_not_run_in_ci_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'ACCEPTANCE_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI',
             ['test2/acceptance_suite2'],
         )
-        os_getcwd_swap = self.swap(os, 'getcwd', mock_get_cwd)
+        os_getcwd_patch = mock.patch.object(os, 'getcwd', mock_get_cwd)
 
         with (
-            self.acceptance_test_specs_directory_swap,
-            self.acceptance_test_specs_old_directory_swap,
-            os_getcwd_swap,
+            self.acceptance_test_specs_directory_patch,
+            self.acceptance_test_specs_old_directory_patch,
+            os_getcwd_patch,
         ):
-            with acceptance_test_suites_that_are_not_run_in_ci_swap:
+            with acceptance_test_suites_that_are_not_run_in_ci_patch:
                 acceptance_test_suites = (
                     check_tests_are_captured_in_ci.get_acceptance_test_suites_from_acceptance_directory()
                 )
@@ -307,19 +310,23 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         ):  # pylint: disable=line-too-long
             return ACCEPTANCE_TEST_SUITES
 
-        get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_acceptance_test_suites_from_ci_config_file',
-            mock_get_acceptance_test_suites_from_ci_config_file,
+        get_acceptance_test_suites_from_ci_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_acceptance_test_suites_from_ci_config_file',
+                mock_get_acceptance_test_suites_from_ci_config_file,
+            )
         )
-        get_acceptance_test_suites_from_acceptance_directory_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_acceptance_test_suites_from_acceptance_directory',
-            mock_get_acceptance_test_suites_from_acceptance_directory,
+        get_acceptance_test_suites_from_acceptance_directory_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_acceptance_test_suites_from_acceptance_directory',
+                mock_get_acceptance_test_suites_from_acceptance_directory,
+            )
         )
 
-        with get_acceptance_test_suites_from_ci_config_file_swap:
-            with get_acceptance_test_suites_from_acceptance_directory_swap:
+        with get_acceptance_test_suites_from_ci_config_file_patch:
+            with get_acceptance_test_suites_from_acceptance_directory_patch:
                 with self.assertRaisesRegex(
                     Exception,
                     re.escape(
@@ -342,19 +349,23 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         ):  # pylint: disable=line-too-long
             return ['suiteA.js', 'suiteB.js']
 
-        get_e2e_test_modules_from_webdriverio_directory_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_modules_from_webdriverio_directory',
-            mock_get_e2e_test_modules_from_webdriverio_directory,
+        get_e2e_test_modules_from_webdriverio_directory_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_modules_from_webdriverio_directory',
+                mock_get_e2e_test_modules_from_webdriverio_directory,
+            )
         )
-        get_e2e_test_modules_from_webdriverio_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_modules_from_webdriverio_config_file',
-            mock_get_e2e_test_modules_from_webdriverio_config_file,
+        get_e2e_test_modules_from_webdriverio_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_modules_from_webdriverio_config_file',
+                mock_get_e2e_test_modules_from_webdriverio_config_file,
+            )
         )
 
-        with get_e2e_test_modules_from_webdriverio_directory_swap:
-            with get_e2e_test_modules_from_webdriverio_config_file_swap:
+        with get_e2e_test_modules_from_webdriverio_directory_patch:
+            with get_e2e_test_modules_from_webdriverio_config_file_patch:
                 with self.assertRaisesRegex(
                     Exception,
                     'One or more test module from webdriverio or '
@@ -374,19 +385,21 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         ):  # pylint: disable=line-too-long
             return E2E_TEST_SUITES
 
-        get_e2e_test_suites_from_ci_config_file_swap = self.swap(
+        get_e2e_test_suites_from_ci_config_file_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'get_e2e_test_suites_from_ci_config_file',
             mock_get_e2e_test_suites_from_ci_config_file,
         )
-        get_e2e_test_suites_from_webdriverio_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_suites_from_webdriverio_config_file',
-            mock_get_e2e_test_suites_from_webdriverio_config_file,
+        get_e2e_test_suites_from_webdriverio_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_suites_from_webdriverio_config_file',
+                mock_get_e2e_test_suites_from_webdriverio_config_file,
+            )
         )
 
-        with get_e2e_test_suites_from_ci_config_file_swap:
-            with get_e2e_test_suites_from_webdriverio_config_file_swap:
+        with get_e2e_test_suites_from_ci_config_file_patch:
+            with get_e2e_test_suites_from_webdriverio_config_file_patch:
                 with self.assertRaisesRegex(
                     Exception,
                     re.escape(
@@ -428,41 +441,53 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
         ):  # pylint: disable=line-too-long
             return E2E_TEST_SUITES
 
-        get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_acceptance_test_suites_from_ci_config_file',
-            mock_get_acceptance_test_suites_from_ci_config_file,
+        get_acceptance_test_suites_from_ci_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_acceptance_test_suites_from_ci_config_file',
+                mock_get_acceptance_test_suites_from_ci_config_file,
+            )
         )
-        get_acceptance_test_suites_from_acceptance_directory_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_acceptance_test_suites_from_acceptance_directory',
-            mock_get_acceptance_test_suites_from_acceptance_directory,
+        get_acceptance_test_suites_from_acceptance_directory_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_acceptance_test_suites_from_acceptance_directory',
+                mock_get_acceptance_test_suites_from_acceptance_directory,
+            )
         )
-        get_e2e_test_modules_from_webdriverio_directory_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_modules_from_webdriverio_directory',
-            mock_get_e2e_test_modules_from_webdriverio_directory,
+        get_e2e_test_modules_from_webdriverio_directory_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_modules_from_webdriverio_directory',
+                mock_get_e2e_test_modules_from_webdriverio_directory,
+            )
         )
-        get_e2e_test_modules_from_webdriverio_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_modules_from_webdriverio_config_file',
-            mock_get_e2e_test_modules_from_webdriverio_config_file,
+        get_e2e_test_modules_from_webdriverio_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_modules_from_webdriverio_config_file',
+                mock_get_e2e_test_modules_from_webdriverio_config_file,
+            )
         )
-        get_e2e_test_suites_from_ci_config_file_swap = self.swap(
+        get_e2e_test_suites_from_ci_config_file_patch = mock.patch.object(
             check_tests_are_captured_in_ci,
             'get_e2e_test_suites_from_ci_config_file',
             mock_get_e2e_test_suites_from_ci_config_file,
         )
-        get_e2e_test_suites_from_webdriverio_config_file_swap = self.swap(
-            check_tests_are_captured_in_ci,
-            'get_e2e_test_suites_from_webdriverio_config_file',
-            mock_get_e2e_test_suites_from_webdriverio_config_file,
+        get_e2e_test_suites_from_webdriverio_config_file_patch = (
+            mock.patch.object(
+                check_tests_are_captured_in_ci,
+                'get_e2e_test_suites_from_webdriverio_config_file',
+                mock_get_e2e_test_suites_from_webdriverio_config_file,
+            )
         )
 
-        with get_acceptance_test_suites_from_ci_config_file_swap:
-            with get_acceptance_test_suites_from_acceptance_directory_swap:
-                with get_e2e_test_modules_from_webdriverio_directory_swap:
-                    with get_e2e_test_modules_from_webdriverio_config_file_swap:
-                        with get_e2e_test_suites_from_ci_config_file_swap:
-                            with get_e2e_test_suites_from_webdriverio_config_file_swap:  # pylint: disable=line-too-long
+        with get_acceptance_test_suites_from_ci_config_file_patch:
+            with get_acceptance_test_suites_from_acceptance_directory_patch:
+                with get_e2e_test_modules_from_webdriverio_directory_patch:
+                    with (
+                        get_e2e_test_modules_from_webdriverio_config_file_patch
+                    ):
+                        with get_e2e_test_suites_from_ci_config_file_patch:
+                            with get_e2e_test_suites_from_webdriverio_config_file_patch:  # pylint: disable=line-too-long
                                 check_tests_are_captured_in_ci.main()

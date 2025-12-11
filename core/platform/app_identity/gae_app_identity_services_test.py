@@ -17,6 +17,7 @@
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 
@@ -30,7 +31,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return 'some_id'
 
-        with self.swap(os.environ, 'get', mock_get):
+        with mock.patch.object(os.environ, 'get', mock_get):
             self.assertEqual(
                 gae_app_identity_services.get_application_id(), 'some_id'
             )
@@ -40,7 +41,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return default
 
-        with self.swap(os.environ, 'get', mock_get):
+        with mock.patch.object(os.environ, 'get', mock_get):
             self.assertEqual(
                 gae_app_identity_services.get_application_id(), 'dev-project-id'
             )
@@ -50,7 +51,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return ''
 
-        with self.swap(os.environ, 'get', mock_get):
+        with mock.patch.object(os.environ, 'get', mock_get):
             with self.assertRaisesRegex(
                 ValueError, 'Value "" for application id is invalid.'
             ):
@@ -61,7 +62,7 @@ class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
             assert key == 'GOOGLE_CLOUD_PROJECT'
             return 'some_id'
 
-        with self.swap(os.environ, 'get', mock_get):
+        with mock.patch.object(os.environ, 'get', mock_get):
             self.assertEqual(
                 gae_app_identity_services.get_gcs_resource_bucket_name(),
                 'some_id-resources',

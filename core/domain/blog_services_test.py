@@ -17,6 +17,7 @@
 """Tests for blog post services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -711,7 +712,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_patch = mock.patch.object(
             search_services, 'add_documents_to_index', add_docs_counter
         )
 
@@ -729,7 +730,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         for i in range(4):
             blog_services.publish_blog_post(all_blog_post_ids[i])
 
-        with add_docs_swap:
+        with add_docs_patch:
             blog_services.index_blog_post_summaries_given_ids(all_blog_post_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
@@ -761,11 +762,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             actual_docs.extend(docs)
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_patch = mock.patch.object(
             search_services, 'add_documents_to_index', add_docs_counter
         )
 
-        with add_docs_swap:
+        with add_docs_patch:
 
             blog_services.update_blog_post(
                 blog_post.id,
@@ -845,13 +846,13 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         def _mock_get_author_details_by_author(unused_user_id: str) -> None:
             return None
 
-        get_author_details_swap = self.swap(
+        get_author_details_patch = mock.patch.object(
             blog_models.BlogAuthorDetailsModel,
             'get_by_author',
             _mock_get_author_details_by_author,
         )
 
-        with get_author_details_swap:
+        with get_author_details_patch:
             with self.assertRaisesRegex(
                 Exception,
                 ('Unable to fetch author details for the given user.'),
@@ -1149,7 +1150,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Ensure the maximum number of blog posts that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(
+        with mock.patch.object(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 2
         ):
             # Need to load 3 pages to find all of the blog posts. Since the
@@ -1210,11 +1211,15 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        search_results_page_size_swap = self.swap(
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
+        search_results_page_size_patch = mock.patch.object(
             feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 5
         )
-        max_iterations_swap = self.swap(blog_services, 'MAX_ITERATIONS', 1)
+        max_iterations_patch = mock.patch.object(
+            blog_services, 'MAX_ITERATIONS', 1
+        )
 
         def _mock_delete_documents_from_index(
             unused_doc_ids: List[str], unused_index: int
@@ -1225,7 +1230,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             """
             pass
 
-        with self.swap(
+        with mock.patch.object(
             search_services,
             'delete_documents_from_index',
             _mock_delete_documents_from_index,
@@ -1233,7 +1238,9 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             blog_services.delete_blog_post(self.all_blog_post_ids[0])
             blog_services.delete_blog_post(self.all_blog_post_ids[1])
 
-        with logging_swap, search_results_page_size_swap, max_iterations_swap:
+        with (
+            logging_patch
+        ), search_results_page_size_patch, max_iterations_patch:
             (blog_post_ids, _) = blog_services.get_blog_post_ids_matching_query(
                 '',
                 [],

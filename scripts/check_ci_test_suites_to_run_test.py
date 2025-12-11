@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_ci_test_suites_to_run.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 import os
@@ -314,27 +315,27 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         ) as f:
             f.write('exploration-player-page.module.ts')
 
-        self.root_files_mapping_file_path_swap = self.swap(
+        self.root_files_mapping_file_path_patch = mock.patch.object(
             check_ci_test_suites_to_run,
             'ROOT_FILES_MAPPING_FILE_PATH',
             root_files_mapping_file,
         )
-        self.root_files_config_file_path_swap = self.swap(
+        self.root_files_config_file_path_patch = mock.patch.object(
             check_ci_test_suites_to_run,
             'ROOT_FILES_CONFIG_FILE_PATH',
             root_files_config_file,
         )
-        self.lighthouse_pages_config_file_path_swap = self.swap(
+        self.lighthouse_pages_config_file_path_patch = mock.patch.object(
             check_ci_test_suites_to_run,
             'LIGHTHOUSE_PAGES_CONFIG_FILE_PATH',
             lighthouse_pages_config_file,
         )
-        self.ci_test_suite_configs_directory_swap = self.swap(
+        self.ci_test_suite_configs_directory_patch = mock.patch.object(
             check_ci_test_suites_to_run,
             'CI_TEST_SUITE_CONFIGS_DIRECTORY',
             ci_test_suite_configs_directory,
         )
-        self.test_modules_mapping_directory_swap = self.swap(
+        self.test_modules_mapping_directory_patch = mock.patch.object(
             check_ci_test_suites_to_run,
             'TEST_MODULES_MAPPING_DIRECTORY',
             test_modules_mapping_directory,
@@ -348,7 +349,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
             """Mocks the main function of generate_root_files_mapping script."""
             pass
 
-        self.generate_root_files_mapping_swap = self.swap(
+        self.generate_root_files_mapping_patch = mock.patch.object(
             generate_root_files_mapping,
             'main',
             mock_generate_root_files_mapping,
@@ -503,7 +504,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
 
         with swap_popen:
             git_diff_name_status_files = (
@@ -536,7 +537,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         ) -> MockSubprocessPopen:
             return MockSubprocessPopen()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
 
         with swap_popen:
             with self.assertRaisesRegex(
@@ -567,7 +568,7 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         )
 
     def test_get_lighthouse_pages_from_config(self) -> None:
-        with self.lighthouse_pages_config_file_path_swap:
+        with self.lighthouse_pages_config_file_path_patch:
             self.assertEqual(
                 check_ci_test_suites_to_run.get_lighthouse_pages_from_config(),
                 LIGHTHOUSE_PAGES,
@@ -650,9 +651,9 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         )
 
     def test_check_ci_test_suites_to_run_with_output_all_suites(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
                     check_ci_test_suites_to_run.main(
                         [
                             '--github_base_ref',
@@ -668,10 +669,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
                     )
 
     def test_check_ci_test_suites_to_run_with_python_file(self) -> None:
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['core/constants.py', 'core/utils.py'],
@@ -692,10 +693,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_file_not_in_root_file_mapping(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['package.json'],
@@ -716,10 +717,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_no_tests_corresponding_to_changed_files(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: [
@@ -758,10 +759,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_run_all_tests_root_file(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['src/main.ts'],
@@ -782,10 +783,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_partial_root_file_changes(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: [
@@ -855,10 +856,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_test_module(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: [
@@ -900,10 +901,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
     def test_check_ci_test_suites_to_run_with_changed_lighthouse_modules(
         self,
     ) -> None:  # pylint: disable=line-too-long
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['.lighthouserc-performance.js'],
@@ -970,10 +971,10 @@ class CheckCITestSuitesToRunTests(test_utils.GenericTestBase):
         with open(acceptance_config_file_path, 'w+', encoding='utf-8') as f:
             f.write(json.dumps(acceptance_config))
 
-        with self.root_files_mapping_file_path_swap, self.lighthouse_pages_config_file_path_swap:  # pylint: disable=line-too-long
-            with self.ci_test_suite_configs_directory_swap, self.test_modules_mapping_directory_swap:  # pylint: disable=line-too-long
-                with self.root_files_config_file_path_swap, self.generate_root_files_mapping_swap:  # pylint: disable=line-too-long
-                    with self.swap(
+        with self.root_files_mapping_file_path_patch, self.lighthouse_pages_config_file_path_patch:  # pylint: disable=line-too-long
+            with self.ci_test_suite_configs_directory_patch, self.test_modules_mapping_directory_patch:  # pylint: disable=line-too-long
+                with self.root_files_config_file_path_patch, self.generate_root_files_mapping_patch:  # pylint: disable=line-too-long
+                    with mock.patch.object(
                         check_ci_test_suites_to_run,
                         'get_git_diff_name_status_files',
                         lambda *args: ['README.md'],

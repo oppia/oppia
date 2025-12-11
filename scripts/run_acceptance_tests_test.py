@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_acceptance_tests.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import contextlib
 import os
@@ -97,10 +98,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
 
-        self.swap_mock_set_constants_to_default = self.swap(
+        self.swap_mock_set_constants_to_default = mock.patch.object(
             common, 'set_constants_to_default', mock_constants
         )
-        self.compile_test_ts_files_swap = self.swap(
+        self.compile_test_ts_files_patch = mock.patch.object(
             run_acceptance_tests, 'compile_test_ts_files', lambda: None
         )
 
@@ -116,8 +117,10 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         ) -> PopenErrorReturn:
             return PopenErrorReturn()
 
-        popen_error_swap = self.swap(subprocess, 'Popen', mock_popen_error_call)
-        with popen_error_swap:
+        popen_error_patch = mock.patch.object(
+            subprocess, 'Popen', mock_popen_error_call
+        )
+        with popen_error_patch:
             with self.assertRaisesRegex(Exception, 'Some error'):
                 run_acceptance_tests.compile_test_ts_files()
 
@@ -153,14 +156,16 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             'build',
             'puppeteer-acceptance-tests',
         )
-        os_path_exists_swap = self.swap(os.path, 'exists', mock_os_path_exists)
-        shutil_rmtree_swap = self.swap_with_checks(
+        os_path_exists_patch = mock.patch.object(
+            os.path, 'exists', mock_os_path_exists
+        )
+        shutil_rmtree_patch = self.swap_with_checks(
             shutil,
             'rmtree',
             mock_shutil_rmtree,
             expected_args=[(build_dir_path,)],
         )
-        shutil_copytree_swap = self.swap_with_checks(
+        shutil_copytree_patch = self.swap_with_checks(
             shutil,
             'copytree',
             mock_shutil_copytree,
@@ -175,18 +180,18 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             './node_modules/typescript/bin/tsc -p %s'
             % './tsconfig.puppeteer-acceptance-tests.json'
         )
-        process_swap = self.swap_with_checks(
+        process_patch = self.swap_with_checks(
             subprocess,
             'Popen',
             mock_popen_call,
             expected_args=[(expected_cmd,)],
         )
-        communicate_swap = self.swap(
+        communicate_patch = mock.patch.object(
             subprocess.Popen, 'communicate', mock_communicate
         )
 
-        with os_path_exists_swap, shutil_rmtree_swap, process_swap:
-            with shutil_copytree_swap, communicate_swap:
+        with os_path_exists_patch, shutil_rmtree_patch, process_patch:
+            with shutil_copytree_patch, communicate_patch:
                 run_acceptance_tests.compile_test_ts_files()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
@@ -201,7 +206,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.compile_test_ts_files_swap, self.assertRaisesRegex(
+        with self.compile_test_ts_files_patch, self.assertRaisesRegex(
             SystemExit,
             """
             Oppia server is already running. Try shutting all the servers down
@@ -281,7 +286,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap:
+            with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_work_with_non_ascii_chars(self) -> None:
@@ -360,7 +365,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap:
+            with self.compile_test_ts_files_patch:
                 lines, _ = run_acceptance_tests.run_tests(args)
 
         self.assertEqual(
@@ -450,7 +455,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.compile_test_ts_files_swap:
+        with self.compile_test_ts_files_patch:
             run_acceptance_tests.main(
                 args=['--suite', 'testSuite', '--skip_build']
             )
@@ -526,7 +531,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap:
+            with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
     def test_start_tests_for_long_lived_process(self) -> None:
@@ -597,5 +602,5 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         with self.swap_mock_set_constants_to_default:
-            with self.compile_test_ts_files_swap:
+            with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])

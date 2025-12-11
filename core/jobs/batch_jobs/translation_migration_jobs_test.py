@@ -17,6 +17,7 @@
 """Unit tests for translation migration jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import exp_domain, rights_manager, state_domain
@@ -250,11 +251,11 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
+        raise_patch = self.swap_to_always_raise(
             state_domain.State,
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
-        with raise_swap:
+        with raise_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
@@ -278,10 +279,10 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
+        raise_patch = self.swap_to_always_raise(
             translation_models.EntityTranslationsModel, 'create_new'
         )
-        with raise_swap:
+        with raise_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
@@ -376,11 +377,11 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
+        raise_patch = self.swap_to_always_raise(
             state_domain.State,
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
-        with raise_swap:
+        with raise_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(
@@ -404,10 +405,10 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_swap = self.swap_to_always_raise(
+        raise_patch = self.swap_to_always_raise(
             translation_models.EntityTranslationsModel, 'create_new'
         )
-        with raise_swap:
+        with raise_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult(

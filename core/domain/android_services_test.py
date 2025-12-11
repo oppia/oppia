@@ -17,6 +17,7 @@
 """Unit tests for core.domain.android_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 import os

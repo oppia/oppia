@@ -17,6 +17,7 @@
 """Tests for methods in the interaction registry."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 import os
@@ -82,7 +83,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             set(interaction_registry.Registry.get_all_interaction_ids()),
         )
 
-        with self.swap(interaction_registry.Registry, '_interactions', {}):
+        with mock.patch.object(
+            interaction_registry.Registry, '_interactions', {}
+        ):
             self.assertEqual(
                 {
                     type(i).__name__

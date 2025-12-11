@@ -17,6 +17,7 @@
 """Tests for user query services."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import email_services, user_query_services
@@ -191,7 +192,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        send_bulk_email_swap = self.swap_with_checks(
+        send_bulk_email_patch = self.swap_with_checks(
             email_services,
             'send_bulk_mail',
             lambda *_: None,
@@ -211,7 +212,7 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             ],
         )
 
-        with send_bulk_email_swap:
+        with send_bulk_email_patch:
             user_query_services.send_email_to_qualified_users(
                 self.USER_QUERY_1_ID,
                 'subject',

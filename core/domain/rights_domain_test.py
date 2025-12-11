@@ -17,6 +17,7 @@
 """Tests for rights domain objects."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 
@@ -191,13 +192,15 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
 
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'The ownership of this exploration cannot be released.'
         )
 
-        with logging_swap, assert_raises_regexp_context_manager:
+        with logging_patch, assert_raises_regexp_context_manager:
             rights_manager.release_ownership_of_exploration(
                 self.viewer, self.exp_id
             )

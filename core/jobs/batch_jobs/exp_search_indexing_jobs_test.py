@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_search_indexing_jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.constants import constants
 from core.domain import search_services
@@ -63,7 +64,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
@@ -85,7 +86,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )
@@ -106,7 +107,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             exp_summary.update_timestamps()
             exp_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
@@ -129,13 +130,13 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        max_batch_size_swap = self.swap(
+        max_batch_size_patch = mock.patch.object(
             exp_search_indexing_jobs.IndexExplorationsInSearchJob,
             'MAX_BATCH_SIZE',
             1,
         )
 
-        with add_docs_to_index_swap, max_batch_size_swap:
+        with add_docs_to_index_patch, max_batch_size_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 5')]
             )
@@ -161,7 +162,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             add_docs_to_index_mock,
@@ -183,7 +184,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             ],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [
                     job_run_result.JobRunResult.as_stderr(
@@ -207,14 +208,14 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
             called=False,
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is_empty()
 
     def test_skips_private_model(self) -> None:
@@ -232,14 +233,14 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_swap = self.swap_with_checks(
+        add_docs_to_index_patch = self.swap_with_checks(
             platform_search_services,
             'add_documents_to_index',
             lambda _, __: None,
             expected_args=[([], search_services.SEARCH_INDEX_EXPLORATIONS)],
         )
 
-        with add_docs_to_index_swap:
+        with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )

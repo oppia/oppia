@@ -17,6 +17,7 @@
 """Unit tests for core.domain.collection_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -329,11 +330,11 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             'collection_id', self.owner_id
         )
 
-        apply_change_list_swap = self.swap(
+        apply_change_list_patch = mock.patch.object(
             collection_services, 'apply_change_list', lambda _, __: collection
         )
 
-        with apply_change_list_swap, self.assertRaisesRegex(
+        with apply_change_list_patch, self.assertRaisesRegex(
             Exception,
             'Unexpected error: received an invalid change list when trying to '
             'save collection',
@@ -492,7 +493,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
 
         self.assertEqual(completed_exp_ids, [['exp_id', 'exp_id_1']])
 
-    def test_update_collection_by_swapping_collection_nodes(self) -> None:
+    def test_update_collection_by_patchping_collection_nodes(self) -> None:
         collection = self.save_new_valid_collection(
             'collection_id', self.owner_id, exploration_id='exp_id_1'
         )
@@ -541,13 +542,15 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
 
         self.save_new_valid_collection('collection_id', self.owner_id)
 
         with self.assertRaisesRegex(
             Exception, 'Command invalid command is not allowed'
-        ), logging_swap:
+        ), logging_patch:
             collection_services.update_collection(
                 self.owner_id,
                 'collection_id',
@@ -1032,7 +1035,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of collections that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
+        with mock.patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
             # Need to load 3 pages to find all of the collections. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all collections are returned. We validate the correct
@@ -1465,11 +1468,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             )
             self.assertEqual(doc_ids, [self.COLLECTION_0_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_patch = mock.patch.object(
             gae_search_services, 'delete_documents_from_index', mock_delete_docs
         )
 
-        with delete_docs_swap:
+        with delete_docs_patch:
             collection_services.delete_collection(
                 self.owner_id, self.COLLECTION_0_ID
             )
@@ -1487,11 +1490,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
                 doc_ids, [self.COLLECTION_0_ID, self.COLLECTION_1_ID]
             )
 
-        delete_docs_swap = self.swap(
+        delete_docs_patch = mock.patch.object(
             gae_search_services, 'delete_documents_from_index', mock_delete_docs
         )
 
-        with delete_docs_swap:
+        with delete_docs_patch:
             collection_services.delete_collections(
                 self.owner_id, [self.COLLECTION_0_ID, self.COLLECTION_1_ID]
             )
@@ -2437,7 +2440,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_patch = mock.patch.object(
             gae_search_services, 'add_documents_to_index', add_docs_counter
         )
 
@@ -2456,7 +2459,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
                 self.owner, expected_collection_ids[ind]
             )
 
-        with add_docs_swap:
+        with add_docs_patch:
             collection_services.index_collections_given_ids(all_collection_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)

@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import (
@@ -176,7 +177,7 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'does not match the latest schema version %s'
             % (self.EXP_1_ID, '1', feconf.CURRENT_STATE_SCHEMA_VERSION, '61')
         )
-        with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
+        with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
             with self.assertRaisesRegex(Exception, error_regex):
                 (
                     exp_fetchers.get_multiple_versioned_exp_interaction_ids_mapping_by_version(
@@ -862,10 +863,10 @@ title: Old Title
 
         # Create exploration that uses an old states schema version and ensure
         # it is properly converted.
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
         )
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
         )
         with swap_states_schema_41, swap_exp_schema_46:
@@ -928,10 +929,10 @@ title: Old Title
 
     def test_migration_with_invalid_state_schema(self) -> None:
         self.save_new_valid_exploration('fake_eid', self.albert_id)
-        swap_earlier_state_to_60 = self.swap(
+        swap_earlier_state_to_60 = mock.patch.object(
             feconf, 'EARLIEST_SUPPORTED_STATE_SCHEMA_VERSION', 60
         )
-        swap_current_state_61 = self.swap(
+        swap_current_state_61 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61
         )
         with swap_earlier_state_to_60, swap_current_state_61:
@@ -971,10 +972,10 @@ title: Old Title
         end_state_name: str = 'End'
 
         # Create an exploration with an old states schema version.
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
         )
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
         )
         with swap_states_schema_41, swap_exp_schema_46:

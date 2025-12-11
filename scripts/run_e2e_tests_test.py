@@ -16,6 +16,7 @@
 """Unit tests for scripts/run_e2e_tests.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import contextlib
 import subprocess
@@ -61,7 +62,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_constants() -> None:
             print('mock_set_constants_to_default')
 
-        self.swap_mock_set_constants_to_default = self.swap(
+        self.swap_mock_set_constants_to_default = mock.patch.object(
             common, 'set_constants_to_default', mock_constants
         )
 
@@ -98,7 +99,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.swap_with_call_counter(time, 'sleep')
         )
         self.exit_stack.enter_context(
-            self.swap(common, 'is_port_in_use', lambda _: False)
+            mock.patch.object(common, 'is_port_in_use', lambda _: False)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(sys, 'exit', lambda _: None)
@@ -330,7 +331,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             )
         )
         self.exit_stack.enter_context(
-            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+            mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -345,7 +346,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return 'sample\noutput', 1
 
         self.exit_stack.enter_context(
-            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+            mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -365,7 +366,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return 'sample\noutput', 1
 
         self.exit_stack.enter_context(
-            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+            mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -390,7 +391,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             )
         )
         self.exit_stack.enter_context(
-            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+            mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -410,7 +411,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             )
         )
         self.exit_stack.enter_context(
-            self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
+            mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(

@@ -17,6 +17,7 @@
 """Tests for translation service functions."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import (
@@ -687,10 +688,10 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
         exp.version = 5
 
-        are_translations_displayable_swap = self.swap_to_always_return(
+        are_translations_displayable_patch = self.swap_to_always_return(
             exp, 'are_translations_displayable', True
         )
-        with are_translations_displayable_swap:
+        with are_translations_displayable_patch:
             observed_language_list = (
                 translation_services.get_displayable_translation_languages(
                     feconf.TranslatableEntityType.EXPLORATION, exp
@@ -698,10 +699,10 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         self.assertItemsEqual(observed_language_list, expected_language_list)
 
-        are_translations_displayable_swap = self.swap_to_always_return(
+        are_translations_displayable_patch = self.swap_to_always_return(
             exp, 'are_translations_displayable', False
         )
-        with are_translations_displayable_swap:
+        with are_translations_displayable_patch:
             observed_language_list = (
                 translation_services.get_displayable_translation_languages(
                     feconf.TranslatableEntityType.EXPLORATION, exp

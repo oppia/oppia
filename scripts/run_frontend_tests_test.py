@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_frontend_tests.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -48,7 +49,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         ) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         class MockFile:
             def __init__(self, flakes: int = 0) -> None:
@@ -162,27 +163,27 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             self.frontend_coverage_checks_called = True
             self.frontend_coverage_checks_args.append(args)
 
-        self.swap_success_Popen = self.swap(
+        self.swap_success_Popen = mock.patch.object(
             subprocess, 'Popen', mock_success_check_call
         )
-        self.swap_flaky_Popen = self.swap(
+        self.swap_flaky_Popen = mock.patch.object(
             subprocess, 'Popen', mock_flaky_check_call
         )
-        self.swap_very_flaky_Popen = self.swap(
+        self.swap_very_flaky_Popen = mock.patch.object(
             subprocess, 'Popen', mock_very_flaky_check_call
         )
-        self.swap_failed_Popen = self.swap(
+        self.swap_failed_Popen = mock.patch.object(
             subprocess, 'Popen', mock_failed_check_call
         )
-        self.swap_sys_exit = self.swap(sys, 'exit', mock_sys_exit)
-        self.swap_build = self.swap(build, 'main', mock_build)
-        self.swap_common = self.swap(
+        self.swap_sys_exit = mock.patch.object(sys, 'exit', mock_sys_exit)
+        self.swap_build = mock.patch.object(build, 'main', mock_build)
+        self.swap_common = mock.patch.object(
             common, 'print_each_string_after_two_new_lines', lambda _: None
         )
-        self.swap_install_third_party_libs = self.swap(
+        self.swap_install_third_party_libs = mock.patch.object(
             install_third_party_libs, 'main', lambda: None
         )
-        self.swap_check_frontend_coverage = self.swap(
+        self.swap_check_frontend_coverage = mock.patch.object(
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage
         )
 
@@ -198,11 +199,13 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 return True
             return original_os_path_exists(path)
 
-        os_path_exists_swap = self.swap(os.path, 'exists', mock_os_path_exists)
+        os_path_exists_patch = mock.patch.object(
+            os.path, 'exists', mock_os_path_exists
+        )
 
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage, os_path_exists_swap:
+                with self.swap_check_frontend_coverage, os_path_exists_patch:
                     run_frontend_tests.main(
                         args=[
                             '--check_coverage',
@@ -238,7 +241,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
 
     def test_frontend_tests_with_specs_to_run_invalid_spec(self) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     with self.assertRaisesRegex(
@@ -252,7 +255,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
     def test_frontend_tests_with_specs_to_run_no_specs_found_allow_no_spec(
         self,
     ) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     with self.assertRaisesRegex(SystemExit, '0'):
@@ -307,38 +310,40 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_parent_branch_name_for_diff() -> str:
             return 'develop'
 
-        get_remote_name_swap = self.swap(
+        get_remote_name_patch = mock.patch.object(
             git_changes_utils,
             'get_local_git_repository_remote_name',
             mock_get_remote_name,
         )
-        get_refs_swap = self.swap(git_changes_utils, 'get_refs', mock_get_refs)
-        get_changed_files_swap = self.swap_with_checks(
+        get_refs_patch = mock.patch.object(
+            git_changes_utils, 'get_refs', mock_get_refs
+        )
+        get_changed_files_patch = self.swap_with_checks(
             git_changes_utils,
             'get_changed_files',
             mock_get_changed_files,
             expected_args=[(git_refs, 'remote')],
         )
-        get_staged_acmrt_files_swap = self.swap(
+        get_staged_acmrt_files_patch = mock.patch.object(
             git_changes_utils,
             'get_staged_acmrt_files',
             mock_get_staged_acmrt_files,
         )
-        get_file_spec_swap = self.swap(
+        get_file_spec_patch = mock.patch.object(
             run_frontend_tests, 'get_file_spec', mock_get_file_spec
         )
-        get_parent_branch_name_for_diff_swap = self.swap(
+        get_parent_branch_name_for_diff_patch = mock.patch.object(
             git_changes_utils,
             'get_parent_branch_name_for_diff',
             mock_get_parent_branch_name_for_diff,
         )
 
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage, get_remote_name_swap:
-                    with get_refs_swap, get_changed_files_swap:
-                        with get_file_spec_swap, get_staged_acmrt_files_swap:
-                            with get_parent_branch_name_for_diff_swap:
+                with self.swap_check_frontend_coverage, get_remote_name_patch:
+                    with get_refs_patch, get_changed_files_patch:
+                        with get_file_spec_patch, get_staged_acmrt_files_patch:
+                            with get_parent_branch_name_for_diff_patch:
                                 run_frontend_tests.main(
                                     args=['--run_on_changed_files_in_branch']
                                 )
@@ -359,15 +364,15 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         def mock_get_remote_name() -> str:
             return ''
 
-        get_remote_name_swap = self.swap(
+        get_remote_name_patch = mock.patch.object(
             git_changes_utils,
             'get_local_git_repository_remote_name',
             mock_get_remote_name,
         )
 
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
-                with self.swap_check_frontend_coverage, get_remote_name_swap:
+                with self.swap_check_frontend_coverage, get_remote_name_patch:
                     with self.assertRaisesRegex(
                         SystemExit, 'Error: No remote repository found.'
                     ):
@@ -376,7 +381,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                         )
 
     def test_frontend_tests_passed(self) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
@@ -401,7 +406,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun(self) -> None:
-        with self.swap_flaky_Popen, self.print_swap, self.swap_build:
+        with self.swap_flaky_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
@@ -433,7 +438,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_rerun_twice(self) -> None:
-        with self.swap_flaky_Popen, self.print_swap, self.swap_build:
+        with self.swap_flaky_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--check_coverage'])
@@ -467,7 +472,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(len(self.sys_exit_message), 0)
 
     def test_frontend_tests_failed(self) -> None:
-        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+        with self.swap_failed_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--verbose'])
@@ -485,7 +490,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         self.assertIn(1, self.sys_exit_message)
 
     def test_frontend_tests_are_run_correctly_on_production(self) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage:
                     run_frontend_tests.main(args=['--run_minified_tests'])
@@ -505,7 +510,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
 
     def test_coverage_checks_are_not_run_when_frontend_tests_fail(self) -> None:
-        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+        with self.swap_failed_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(args=['--check_coverage'])
@@ -526,7 +531,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
 
     def test_combined_frontend_spec_file_download_failed(self) -> None:
-        with self.swap_failed_Popen, self.print_swap, self.swap_build:
+        with self.swap_failed_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(
@@ -546,7 +551,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         )
 
     def test_combined_frontend_spec_file_is_downloaded_correctly(self) -> None:
-        with self.swap_success_Popen, self.print_swap, self.swap_build:
+        with self.swap_success_Popen, self.print_patch, self.swap_build:
             with self.swap_install_third_party_libs, self.swap_common:
                 with self.swap_check_frontend_coverage, self.swap_sys_exit:
                     run_frontend_tests.main(

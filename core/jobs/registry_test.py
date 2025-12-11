@@ -17,6 +17,7 @@
 """Unit tests for jobs.registry."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core.jobs import base_jobs, registry
 from core.tests import test_utils
@@ -48,24 +49,24 @@ class RegistryTests(test_utils.TestBase):
         return cls.unique_obj
 
     def test_get_all_jobs_returns_value_from_job_metaclass(self) -> None:
-        get_all_jobs_swap = self.swap(
+        get_all_jobs_patch = mock.patch.object(
             base_jobs.JobMetaclass, 'get_all_jobs', self.get_all_jobs_mock
         )
 
-        with get_all_jobs_swap:
+        with get_all_jobs_patch:
             self.assertIs(registry.get_all_jobs(), self.unique_obj)
 
     def test_get_all_jobs_never_returns_an_empty_list(self) -> None:
         self.assertNotEqual(registry.get_all_jobs(), [])
 
     def test_get_all_job_names_returns_value_from_job_metaclass(self) -> None:
-        get_all_job_names_swap = self.swap(
+        get_all_job_names_patch = mock.patch.object(
             base_jobs.JobMetaclass,
             'get_all_job_names',
             self.get_all_job_names_mock,
         )
 
-        with get_all_job_names_swap:
+        with get_all_job_names_patch:
             self.assertIs(registry.get_all_job_names(), self.unique_obj)
 
     def test_get_all_job_names_never_returns_an_empty_list(self) -> None:
@@ -74,13 +75,13 @@ class RegistryTests(test_utils.TestBase):
     def test_get_job_class_by_name_returns_value_from_job_metaclass(
         self,
     ) -> None:
-        get_job_class_by_name_swap = self.swap(
+        get_job_class_by_name_patch = mock.patch.object(
             base_jobs.JobMetaclass,
             'get_job_class_by_name',
             self.get_job_class_by_name_mock,
         )
 
-        with get_job_class_by_name_swap:
+        with get_job_class_by_name_patch:
             self.assertIs(
                 registry.get_job_class_by_name('arbitrary'), self.unique_obj
             )

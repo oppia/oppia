@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -533,7 +534,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of explorations that can fit on the search
         # results page is maintained by the summaries function.
-        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
+        with mock.patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct
@@ -591,11 +592,15 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        search_results_page_size_swap = self.swap(
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
+        search_results_page_size_patch = mock.patch.object(
             feconf, 'SEARCH_RESULTS_PAGE_SIZE', 6
         )
-        max_iterations_swap = self.swap(exp_services, 'MAX_ITERATIONS', 1)
+        max_iterations_patch = mock.patch.object(
+            exp_services, 'MAX_ITERATIONS', 1
+        )
 
         def _mock_delete_documents_from_index(
             unused_doc_ids: List[str], unused_index: str
@@ -606,7 +611,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             """
             pass
 
-        with self.swap(
+        with mock.patch.object(
             search_services,
             'delete_documents_from_index',
             _mock_delete_documents_from_index,
@@ -614,7 +619,9 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
             exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
 
-        with logging_swap, search_results_page_size_swap, max_iterations_swap:
+        with (
+            logging_patch
+        ), search_results_page_size_patch, max_iterations_patch:
             (exp_ids, _) = exp_services.get_exploration_ids_matching_query(
                 '', [], []
             )
@@ -1135,11 +1142,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(doc_ids, [self.EXP_0_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_patch = mock.patch.object(
             search_services, 'delete_documents_from_index', mock_delete_docs
         )
 
-        with delete_docs_swap:
+        with delete_docs_patch:
             exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
 
     def test_explorations_are_removed_from_index_when_deleted(self) -> None:
@@ -1153,11 +1160,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(doc_ids, [self.EXP_0_ID, self.EXP_1_ID])
 
-        delete_docs_swap = self.swap(
+        delete_docs_patch = mock.patch.object(
             search_services, 'delete_documents_from_index', mock_delete_docs
         )
 
-        with delete_docs_swap:
+        with delete_docs_patch:
             exp_services.delete_explorations(
                 self.owner_id, [self.EXP_0_ID, self.EXP_1_ID]
             )
@@ -5738,10 +5745,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
 
         # Using the old version of the exploration should raise an error.
-        change_list_swap = self.swap_to_always_return(
+        change_list_patch = self.swap_to_always_return(
             exp_services, 'apply_change_list', value=v1_exploration
         )
-        with change_list_swap, self.assertRaisesRegex(
+        with change_list_patch, self.assertRaisesRegex(
             Exception, 'version 1, which is too old'
         ):
             exp_services.update_exploration(
@@ -6955,7 +6962,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_patch = mock.patch.object(
             search_services, 'add_documents_to_index', add_docs_counter
         )
 
@@ -6972,7 +6979,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         for i in range(4):
             rights_manager.publish_exploration(self.owner, expected_exp_ids[i])
 
-        with add_docs_swap:
+        with add_docs_patch:
             exp_services.index_explorations_given_ids(all_exp_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
@@ -7008,11 +7015,11 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             actual_docs.extend(docs)
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(
+        add_docs_patch = mock.patch.object(
             search_services, 'add_documents_to_index', add_docs_counter
         )
 
-        with add_docs_swap:
+        with add_docs_patch:
             self.save_new_valid_exploration(
                 exp_id,
                 self.owner_id,
@@ -7369,8 +7376,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        with logging_swap:
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
+        with logging_patch:
             exp_services.regenerate_exploration_summary_with_new_contributor(
                 'dummy_id', self.albert_id
             )
@@ -7977,11 +7986,11 @@ title: Old Title
             """Mocks exp_fetchers.get_exploration_by_id()."""
             return exploration
 
-        fetch_swap = self.swap(
+        fetch_patch = mock.patch.object(
             exp_services, 'apply_change_list', _mock_apply_change_list
         )
 
-        with fetch_swap, self.assertRaisesRegex(
+        with fetch_patch, self.assertRaisesRegex(
             Exception,
             'Unexpected error: trying to update version 1 of exploration '
             'from version 2. Please reload the page and try again.',
@@ -9304,12 +9313,12 @@ title: Old Title
             """Mocks exploration.validate()."""
             raise utils.ValidationError('Bad')
 
-        validate_swap = self.swap(
+        validate_patch = mock.patch.object(
             exp_domain.Exploration,
             'validate',
             _mock_exploration_validate_function,
         )
-        with validate_swap:
+        with validate_patch:
             info = exp_services.get_exploration_validation_error(
                 self.NEW_EXP_ID, 0
             )
@@ -10230,7 +10239,9 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             draft_change_list_exp_version=1,
             draft_change_list_id=2,
         ).put()
-        with self.swap(state_domain.SubtitledHtml, 'validate', lambda x: True):
+        with mock.patch.object(
+            state_domain.SubtitledHtml, 'validate', lambda x: True
+        ):
             updated_exploration = exp_services.get_exp_with_draft_applied(
                 'exp_id', self.USER_ID
             )
@@ -12050,7 +12061,9 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
 
         self.save_new_default_exploration('ID', 'owner_id')
         exp_snapshot_id = exp_models.ExplorationModel.get_snapshot_id('ID', 1)
@@ -12061,7 +12074,7 @@ class RegenerateMissingExpStatsUnitTests(test_utils.GenericTestBase):
         exp_snapshot.update_timestamps()
         exp_models.ExplorationSnapshotMetadataModel.put(exp_snapshot)
 
-        with logging_swap:
+        with logging_patch:
             exp_services.regenerate_missing_stats_for_exploration('ID')
         self.assertEqual(
             observed_log_messages,

@@ -15,6 +15,7 @@
 """Tests for mailchimp services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 
@@ -225,7 +226,7 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_function_input_validation(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = mock.patch.object(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
             swapped_mailchimp,
@@ -324,12 +325,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_add_or_update_mailchimp_user_status(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = mock.patch.object(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
             swapped_mailchimp,
         )
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
+        swap_api = mock.patch.object(
+            secrets_services, 'get_secret', lambda _: 'key'
+        )
 
         with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
@@ -406,12 +409,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_android_merge_fields(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = mock.patch.object(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
             swapped_mailchimp,
         )
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
+        swap_api = mock.patch.object(
+            secrets_services, 'get_secret', lambda _: 'key'
+        )
 
         with swap_mailchimp_context, swap_api:
             # Tests condition where user was initally unsubscribed in list and
@@ -441,12 +446,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_catch_or_raise_errors_when_creating_new_invalid_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = mock.patch.object(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
             swapped_mailchimp,
         )
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
+        swap_api = mock.patch.object(
+            secrets_services, 'get_secret', lambda _: 'key'
+        )
 
         with swap_mailchimp_context, swap_api:
             # Creates a mailchimp entry for a deleted user.
@@ -484,12 +491,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
     def test_permanently_delete_user(self) -> None:
         mailchimp = self.MockMailchimpClass()
         swapped_mailchimp = lambda: mailchimp
-        swap_mailchimp_context = self.swap(
+        swap_mailchimp_context = mock.patch.object(
             mailchimp_bulk_email_services,
             '_get_mailchimp_class',
             swapped_mailchimp,
         )
-        swap_api = self.swap(secrets_services, 'get_secret', lambda _: 'key')
+        swap_api = mock.patch.object(
+            secrets_services, 'get_secret', lambda _: 'key'
+        )
 
         with swap_mailchimp_context, swap_api:
             self.assertEqual(len(mailchimp.lists.members.users_data), 3)

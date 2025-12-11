@@ -15,6 +15,7 @@
 """Unit tests for scripts/generate_root_files_mapping.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import subprocess
@@ -31,12 +32,12 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_messages.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         def mock_compile_and_check_typescript(_tsconfig_filepath: str) -> None:
             return
 
-        self.compile_and_check_typescript_swap = self.swap_with_checks(
+        self.compile_and_check_typescript_patch = self.swap_with_checks(
             run_typescript_checks,
             'compile_and_check_typescript',
             mock_compile_and_check_typescript,
@@ -68,12 +69,12 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             )
             return process
 
-        subprocess_popen_swap = self.swap(
+        subprocess_popen_patch = mock.patch.object(
             subprocess, 'Popen', mock_subprocess_popen
         )
 
-        with self.print_swap, self.compile_and_check_typescript_swap:
-            with subprocess_popen_swap:
+        with self.print_patch, self.compile_and_check_typescript_patch:
+            with subprocess_popen_patch:
                 generate_root_files_mapping.main()
                 self.assertEqual(
                     self.print_messages,
@@ -104,12 +105,14 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             )
             return process
 
-        communicate_swap = self.swap(process, 'communicate', mock_communicate)
-        subprocess_popen_swap = self.swap(
+        communicate_patch = mock.patch.object(
+            process, 'communicate', mock_communicate
+        )
+        subprocess_popen_patch = mock.patch.object(
             subprocess, 'Popen', mock_subprocess_popen
         )
 
-        with self.compile_and_check_typescript_swap, communicate_swap:
-            with subprocess_popen_swap:
+        with self.compile_and_check_typescript_patch, communicate_patch:
+            with subprocess_popen_patch:
                 with self.assertRaisesRegex(Exception, 'Error'):
                     generate_root_files_mapping.main()

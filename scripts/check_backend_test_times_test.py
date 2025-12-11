@@ -15,6 +15,7 @@
 """Unit tests for scripts/check_backend_test_times.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import json
@@ -46,7 +47,7 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         with open(backend_test_time_report_one, 'w', encoding='utf-8') as f:
             f.write(
@@ -83,7 +84,7 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
                 )
             )
 
-        self.backend_test_time_reports_swap = self.swap(
+        self.backend_test_time_reports_patch = mock.patch.object(
             check_backend_test_times,
             'BACKEND_TEST_TIME_REPORTS_DIRECTORY',
             self.backend_test_time_reports_directory.name,
@@ -211,12 +212,12 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         backend_test_time_reports_directory = tempfile.TemporaryDirectory()
-        backend_test_time_reports_swap = self.swap(
+        backend_test_time_reports_patch = mock.patch.object(
             check_backend_test_times,
             'BACKEND_TEST_TIME_REPORTS_DIRECTORY',
             backend_test_time_reports_directory.name,
         )
-        with backend_test_time_reports_swap:
+        with backend_test_time_reports_patch:
             with self.assertRaisesRegex(
                 RuntimeError,
                 'No backend test time reports found in %s. Please run '
@@ -227,7 +228,7 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
         backend_test_time_reports_directory.cleanup()
 
     def test_get_sorted_backend_test_times_from_reports(self) -> None:
-        with self.backend_test_time_reports_swap:
+        with self.backend_test_time_reports_patch:
             (
                 sorted_backend_test_times,
                 sorted_backend_test_times_by_avg_test_case,
@@ -244,13 +245,15 @@ class CheckBackendTestTimesTests(test_utils.GenericTestBase):
 
     def test_check_backend_test_times_creates_correct_file(self) -> None:
         backend_test_times_temp_file = tempfile.NamedTemporaryFile('w+')
-        backend_test_times_file_swap = self.swap(
+        backend_test_times_file_patch = mock.patch.object(
             check_backend_test_times,
             'BACKEND_TEST_TIMES_FILE',
             backend_test_times_temp_file.name,
         )
-        with self.backend_test_time_reports_swap, backend_test_times_file_swap:
-            with self.print_swap:
+        with self.backend_test_time_reports_patch, (
+            backend_test_times_file_patch
+        ):
+            with self.print_patch:
                 check_backend_test_times.main()
         sorted_backend_test_times_from_file = []
         for line in backend_test_times_temp_file.readlines():

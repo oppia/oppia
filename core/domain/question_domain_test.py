@@ -15,6 +15,7 @@
 """Tests for question domain objects."""
 
 from __future__ import annotations
+from unittest import mock
 
 import copy
 import datetime

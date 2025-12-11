@@ -17,6 +17,7 @@
 """Unit tests for jobs.base_validation_jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -209,7 +210,9 @@ class BaseValidationJobTests(job_test_utils.JobTestBase):
 
         self.put_multi([model1, model2, model3])
 
-        with self.swap(base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2):
+        with mock.patch.object(
+            base_validation_jobs, 'ERROR_TRUNCATION_LIMIT', 2
+        ):
             self.assert_job_output_is(
                 [
                     {

@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_presubmit_checks.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -35,7 +36,7 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
         current_dir = os.path.abspath(os.getcwd())
         self.changed_frontend_file = os.path.join(
@@ -122,10 +123,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
+        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=['-b', specified_branch])
 
@@ -163,10 +164,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
+        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests, self.swap_frontend_tests:
                 run_presubmit_checks.main(args=[])
 
@@ -204,10 +205,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
             else:
                 raise Exception('Invalid cmd passed: %s' % cmd)
 
-        swap_check_output = self.swap(
+        swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_swap, swap_check_output, self.swap_run_lint_checks:
+        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
             with self.swap_backend_tests:
                 run_presubmit_checks.main(args=[])
 

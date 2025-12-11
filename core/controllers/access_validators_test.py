@@ -15,6 +15,7 @@
 """Tests for core.domain.access_validator."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -317,7 +318,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_false_if_no_public_classrooms_are_present(
         self,
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with mock.patch.object(constants, 'DEV_MODE', False):
             self.get_json(
                 '%s/can_access_classrooms_page'
                 % (ACCESS_VALIDATION_HANDLER_PREFIX),
@@ -327,7 +328,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_true_in_dev_mode_if_no_classroom_are_present(
         self,
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with mock.patch.object(constants, 'DEV_MODE', True):
             self.get_html_response(
                 '%s/can_access_classrooms_page'
                 % ACCESS_VALIDATION_HANDLER_PREFIX

@@ -15,6 +15,7 @@
 """Tests for core.storage.app_feedback_report.gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import enum
@@ -250,7 +251,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 app_feedback_report_models.AppFeedbackReportModel,
                 'get_by_id',
                 types.MethodType(
@@ -432,7 +433,7 @@ class AppFeedbackReportModelTests(test_utils.GenericTestBase):
             'The field %s is not a valid field to filter reports on'
             % (InvalidFilter.INVALID_FIELD.name),
         ):
-            with self.swap(
+            with mock.patch.object(
                 model_class,
                 'query',
                 self._mock_query_filters_returns_empty_list,
@@ -633,7 +634,7 @@ class AppFeedbackReportTicketModelTests(test_utils.GenericTestBase):
             'many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 model_class,
                 'get_by_id',
                 types.MethodType(lambda x, y: True, model_class),

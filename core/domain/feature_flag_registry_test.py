@@ -17,6 +17,7 @@
 """Tests for feature flag registry."""
 
 from __future__ import annotations
+from unittest import mock
 
 import enum
 
@@ -40,7 +41,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_name_to_description_feature_stage_dict = self.swap(
+        self.swap_name_to_description_feature_stage_dict = mock.patch.object(
             registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -129,8 +130,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with mock.patch.object(constants, 'DEV_MODE', False):
+                with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
                 ):
                     with self.assertRaisesRegex(
@@ -147,8 +148,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with mock.patch.object(constants, 'DEV_MODE', False):
+                with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
                     with self.assertRaisesRegex(
@@ -164,7 +165,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
                         )
 
     def test_updating_test_feature_in_prod_env_raises_exception(self) -> None:
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -175,8 +176,8 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             },
         )
         with swap_name_to_description_feature_stage_dict:
-            with self.swap(constants, 'DEV_MODE', False):
-                with self.swap(
+            with mock.patch.object(constants, 'DEV_MODE', False):
+                with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
                     with self.assertRaisesRegex(

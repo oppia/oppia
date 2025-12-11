@@ -17,6 +17,7 @@
 """Tests for Blog Post Statistics Models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import types
 
@@ -97,7 +98,7 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             ' collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_stats_models.BlogPostViewedEventLogEntryModel,
                 'get_by_id',
                 types.MethodType(
@@ -118,12 +119,14 @@ class BlogPostViewedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return rand_hash
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with mock.patch.object(
+                utils, 'convert_to_hash', mock_convert_to_hash
+            ):
                 new_id = blog_stats_models.BlogPostViewedEventLogEntryModel.get_new_event_entity_id(
                     'BLOG'
                 )
@@ -222,12 +225,14 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return rand_hash
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with mock.patch.object(
+                utils, 'convert_to_hash', mock_convert_to_hash
+            ):
                 new_id = blog_stats_models.BlogPostReadEventLogEntryModel.get_new_event_entity_id(
                     'BLOG'
                 )
@@ -244,7 +249,7 @@ class BlogPostReadEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             ' collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_stats_models.BlogPostReadEventLogEntryModel,
                 'get_by_id',
                 types.MethodType(
@@ -356,12 +361,14 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return rand_hash
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
         ):
-            with self.swap(utils, 'convert_to_hash', mock_convert_to_hash):
+            with mock.patch.object(
+                utils, 'convert_to_hash', mock_convert_to_hash
+            ):
                 new_id = blog_stats_models.BlogPostExitedEventLogEntryModel.get_new_event_entity_id(
                     'BLOG'
                 )
@@ -389,7 +396,7 @@ class BlogPostExitedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
             ' collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 blog_stats_models.BlogPostExitedEventLogEntryModel,
                 'get_by_id',
                 types.MethodType(

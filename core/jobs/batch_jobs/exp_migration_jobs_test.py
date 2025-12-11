@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_migration_jobs."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants
@@ -1488,7 +1489,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             exp_domain.Exploration,
             '_convert_states_v46_dict_to_v47_dict',
             mock_conversion,
@@ -1546,10 +1547,10 @@ class ExpSnapshotsMigrationAuditJobTests(
         )
 
     def test_audit_job_detects_exploration_that_is_not_up_to_date(self) -> None:
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
         )
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
         )
         with swap_states_schema_41, swap_exp_schema_46:
@@ -1564,10 +1565,10 @@ class ExpSnapshotsMigrationAuditJobTests(
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
 
-        swap_states_schema_42 = self.swap(
+        swap_states_schema_42 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42
         )
-        swap_exp_schema_47 = self.swap(
+        swap_exp_schema_47 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47
         )
         with swap_states_schema_42, swap_exp_schema_47:
@@ -1584,11 +1585,11 @@ class ExpSnapshotsMigrationAuditJobTests(
             )
 
     def test_audit_job_handles_missing_states_schema_version(self) -> None:
-        swap_exp_schema_37 = self.swap(
+        swap_exp_schema_37 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37
         )
         with swap_exp_schema_37:
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 exploration = exp_domain.Exploration.create_default_exploration(
                     self.VALID_EXP_ID, title='title', category='category'
                 )
@@ -1613,7 +1614,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                     }
                 )
             ]
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 exp_services.update_exploration(
                     feconf.SYSTEM_COMMITTER_ID,
                     self.VALID_EXP_ID,
@@ -1639,7 +1640,7 @@ class ExpSnapshotsMigrationAuditJobTests(
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 self.assert_job_output_is(
                     [
                         job_run_result.JobRunResult(
@@ -1892,10 +1893,10 @@ class ExpSnapshotsMigrationJobTests(
     def test_migration_job_detects_exploration_that_is_not_up_to_date(
         self,
     ) -> None:
-        swap_states_schema_41 = self.swap(
+        swap_states_schema_41 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 41
         )
-        swap_exp_schema_46 = self.swap(
+        swap_exp_schema_46 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 46
         )
         with swap_states_schema_41, swap_exp_schema_46:
@@ -1910,10 +1911,10 @@ class ExpSnapshotsMigrationJobTests(
             feconf.CURRENT_STATE_SCHEMA_VERSION,
         )
 
-        swap_states_schema_42 = self.swap(
+        swap_states_schema_42 = mock.patch.object(
             feconf, 'CURRENT_STATE_SCHEMA_VERSION', 42
         )
-        swap_exp_schema_47 = self.swap(
+        swap_exp_schema_47 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 47
         )
         with swap_states_schema_42, swap_exp_schema_47:
@@ -2018,7 +2019,7 @@ class ExpSnapshotsMigrationJobTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             exp_domain.Exploration,
             '_convert_states_v46_dict_to_v47_dict',
             mock_conversion,
@@ -2044,11 +2045,11 @@ class ExpSnapshotsMigrationJobTests(
             )
 
     def test_audit_job_handles_missing_states_schema_version(self) -> None:
-        swap_exp_schema_37 = self.swap(
+        swap_exp_schema_37 = mock.patch.object(
             exp_domain.Exploration, 'CURRENT_EXP_SCHEMA_VERSION', 37
         )
         with swap_exp_schema_37:
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 exploration = exp_domain.Exploration.create_default_exploration(
                     self.VALID_EXP_ID, title='title', category='category'
                 )
@@ -2073,7 +2074,7 @@ class ExpSnapshotsMigrationJobTests(
                     }
                 )
             ]
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 exp_services.update_exploration(
                     feconf.SYSTEM_COMMITTER_ID,
                     self.VALID_EXP_ID,
@@ -2099,7 +2100,7 @@ class ExpSnapshotsMigrationJobTests(
             snapshot_content_model.put()
 
             # There is no failure due to a missing states schema version.
-            with self.swap(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
+            with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 44):
                 self.assert_job_output_is(
                     [
                         job_run_result.JobRunResult(

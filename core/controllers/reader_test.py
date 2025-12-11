@@ -15,6 +15,7 @@
 """Tests for the page that allows learners to play through an exploration."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 
@@ -280,7 +281,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.editor_id, question_id_2, self.skill_id, 0.5
         )
         # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+        with mock.patch.object(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
                 '%s/%s?story_url_fragment=title'
                 % (feconf.EXPLORATION_PRETESTS_URL_PREFIX, exp_id)
@@ -398,7 +399,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             self.editor_id, question_id_2, self.skill_id, 0.5
         )
         # Call the handler.
-        with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
+        with mock.patch.object(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             with self.swap_to_always_return(
                 story_domain.Story,
                 'get_prerequisite_skill_ids_for_exp_id',
@@ -1832,11 +1833,11 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             """Mocks None."""
             return None
 
-        story_fetchers_swap = self.swap(
+        story_fetchers_patch = mock.patch.object(
             story_fetchers, 'get_story_by_id', _mock_none_function
         )
 
-        with story_fetchers_swap:
+        with story_fetchers_patch:
             with self.capture_logging(min_level=logging.ERROR) as captured_logs:
                 self.post_json(
                     '/explorehandler/exploration_maybe_leave_event'
@@ -3244,7 +3245,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
         ):
             self.put_json(
@@ -3263,7 +3264,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=404,
             )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             exploration_dict = self.get_json(
@@ -3348,7 +3349,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             exploration_dict = self.get_json(
@@ -3397,7 +3398,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             state_reference = stats_services.get_state_reference_for_question(

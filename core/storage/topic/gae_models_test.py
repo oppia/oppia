@@ -17,6 +17,7 @@
 """Tests for Topic model."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.constants import constants
@@ -274,7 +275,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_has_reference_to_user_id(self) -> None:
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+        with mock.patch.object(base_models, 'FETCH_BATCH_SIZE', 1):
             topic_rights = topic_models.TopicRightsModel(
                 id=self.TOPIC_1_ID, manager_ids=['manager_id']
             )

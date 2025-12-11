@@ -17,6 +17,7 @@
 """Tests for the ratings system."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 
@@ -276,7 +277,7 @@ class RatingServicesTests(test_utils.GenericTestBase):
             exp_summary.ratings = {}
             return exp_summary
 
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_summary_by_id',
             _mock_get_exploration_summary_by_id,

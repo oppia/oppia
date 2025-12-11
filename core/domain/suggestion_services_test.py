@@ -15,6 +15,7 @@
 """Tests for suggestion related services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import random
@@ -138,20 +139,20 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         """Sets up the appropriate mocks to successfully call
         accept_suggestion.
         """
-        with self.swap(
+        with mock.patch.object(
             exp_services, 'update_exploration', self.mock_update_exploration
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_fetchers,
                 'get_exploration_by_id',
                 self.mock_get_exploration_by_id,
             ):
-                with self.swap(
+                with mock.patch.object(
                     suggestion_registry.SuggestionEditStateContent,
                     'pre_accept_validate',
                     self.mock_pre_accept_validate_does_nothing,
                 ):
-                    with self.swap(
+                    with mock.patch.object(
                         suggestion_registry.SuggestionEditStateContent,
                         '_get_change_list_for_accepting_edit_state_content_suggestion',  # pylint: disable=line-too-long
                         self.mock_get_change_list_does_nothing,
@@ -167,12 +168,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         """Sets up the appropriate mocks to successfully call
         create_suggestion.
         """
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_fetchers,
                 'get_exploration_by_id',
                 self.mock_get_exploration_by_id,
@@ -353,14 +354,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'test description',
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0
         ):
             self.assertEqual(
                 len(suggestion_services.get_all_stale_suggestion_ids()), 1
             )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
             7 * 24 * 60 * 60 * 1000,
@@ -451,11 +452,11 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # score of the author of that suggestion is increased by 1. Therefore,
         # by setting that increment to minimum score required to review, we can
         # ensure that the email is sent.
-        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
-            with self.swap(
+        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with mock.patch.object(
                 feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True
             ):
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'INCREMENT_SCORE_OF_AUTHOR_BY',
                     feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW,
@@ -509,8 +510,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # score of the author of that suggestion is increased by 1. This is
         # less than the minimum score required to review so an email should not
         # be sent.
-        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
-            with self.swap(
+        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+            with mock.patch.object(
                 feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True
             ):
                 self.mock_accept_suggestion(
@@ -560,7 +561,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        with self.swap(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
             self.mock_accept_suggestion(
                 self.suggestion_id,
                 self.reviewer_id,
@@ -633,12 +634,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 ),
             },
         }
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_fetchers,
                 'get_exploration_by_id',
                 self.mock_get_exploration_by_id,
@@ -1955,12 +1956,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             'data_format': 'html',
         }
 
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_domain.Exploration,
                 'get_content_html',
                 self.MockExploration.get_content_html,
@@ -1996,7 +1997,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         ]
         self.topic_name = 'topic'
 
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
@@ -2126,12 +2127,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Create the translation suggestion associated with exploration id
         # target_id_1.
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_domain.Exploration,
                 'get_content_html',
                 self.MockExploration.get_content_html,
@@ -2162,12 +2163,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     ) -> None:
         # Create the translation suggestion associated with exploration id
         # target_id_2.
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_domain.Exploration,
                 'get_content_html',
                 self.MockExploration.get_content_html,
@@ -2183,12 +2184,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 )
         # Create the translation suggestion associated with exploration id
         # target_id_3.
-        with self.swap(
+        with mock.patch.object(
             exp_fetchers,
             'get_exploration_by_id',
             self.mock_get_exploration_by_id,
         ):
-            with self.swap(
+            with mock.patch.object(
                 exp_domain.Exploration,
                 'get_content_html',
                 self.MockExploration.get_content_html,
@@ -3179,7 +3180,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_accept_suggestion(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
@@ -5327,7 +5328,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
 
     def test_create_and_reject_suggestion(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
@@ -5360,7 +5361,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
     def test_create_and_accept_suggestion_with_message(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
@@ -5397,7 +5398,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
     def test_auto_reject_translation_suggestions_for_content_ids(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             feedback_models.GeneralFeedbackThreadModel,
             'generate_new_thread_id',
             self.mock_generate_new_thread_id,
@@ -5506,7 +5507,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestions[0].status, suggestion_models.STATUS_REJECTED
         )
 
-    def test_swap_exp_from_story_rejects_translation_suggestion(self) -> None:
+    def test_patch_exp_from_story_rejects_translation_suggestion(self) -> None:
         self.create_translation_suggestion_associated_with_exp(
             self.EXP_ID, self.author_id
         )
@@ -5720,7 +5721,7 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         """Creates a question suggestion with the html content used for the
         question in the question suggestion.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf, 'DEFAULT_STATE_CONTENT_STR', question_html_content
         ):
             content_id_generator = translation_domain.ContentIdGenerator()
@@ -5840,7 +5841,7 @@ class ReviewableSuggestionEmailInfoUnitTests(test_utils.GenericTestBase):
         # Dashboard in the future.
         suggestion_emphasized_text_getter_functions_mock: Dict[str, str] = {}
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_services,
             'SUGGESTION_EMPHASIZED_TEXT_GETTER_FUNCTIONS',
             suggestion_emphasized_text_getter_functions_mock,
@@ -6827,7 +6828,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_services,
             'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER',
             1,
@@ -6878,7 +6879,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_services,
             'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER',
             2,
@@ -7087,7 +7088,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_services,
             'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER',
             1,
@@ -7218,7 +7219,7 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             )
         )
 
-        with self.swap(
+        with mock.patch.object(
             suggestion_services,
             'MAX_NUMBER_OF_SUGGESTIONS_TO_EMAIL_REVIEWER',
             1,
@@ -8051,12 +8052,12 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
             feconf.SUGGESTION_TYPE_ADD_QUESTION
         ]
 
-        with self.swap(
+        with mock.patch.object(
             feconf,
             'CONTRIBUTOR_DASHBOARD_SUGGESTION_TYPES',
             mocked_contributor_dashboard_suggestion_types,
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 0,
@@ -8075,7 +8076,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         self._create_translation_suggestion()
 
         # Make sure the threshold is nonzero.
-        with self.swap(
+        with mock.patch.object(
             suggestion_models,
             'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
             1,
@@ -8102,7 +8103,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.mock_datetime_utcnow(
             mocked_datetime_less_than_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -8126,7 +8127,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
 
         mock_get_current_time_in_millisecs = lambda: mock_value
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -8140,7 +8141,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
                     suggestions.append(suggestion)
 
                 # Set the review wait time threshold.
-                with self.swap(
+                with mock.patch.object(
                     suggestion_models,
                     'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                     threshold_days,
@@ -8166,7 +8167,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.mock_datetime_utcnow(
             mocked_datetime_eq_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -8204,7 +8205,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.mock_datetime_utcnow(
             mocked_datetime_past_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,
@@ -8243,7 +8244,7 @@ class GetSuggestionsWaitingTooLongForReviewInfoForAdminsUnitTests(
         with self.mock_datetime_utcnow(
             mocked_datetime_past_review_wait_time_threshold
         ):
-            with self.swap(
+            with mock.patch.object(
                 suggestion_models,
                 'SUGGESTION_REVIEW_WAIT_TIME_THRESHOLD_IN_DAYS',
                 mocked_threshold_review_wait_time_in_days,

@@ -15,6 +15,7 @@
 """Tests for the Question Editor controller."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 import os
@@ -780,11 +781,11 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             """Mocks '_get_question_by_id'. Returns None."""
             return None
 
-        question_services_swap = self.swap(
+        question_services_patch = mock.patch.object(
             question_services, 'get_question_by_id', _mock_get_question_by_id
         )
 
-        with question_services_swap:
+        with question_services_patch:
             self.login(self.EDITOR_EMAIL)
             self.get_json(
                 '%s/%s'

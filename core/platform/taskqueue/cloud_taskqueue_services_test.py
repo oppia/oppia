@@ -17,6 +17,7 @@
 """Tests for methods in the cloud_taskqueue_services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import json
@@ -85,7 +86,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             )
             return self.Response(task_name)
 
-        with self.swap(
+        with mock.patch.object(
             cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
         ):
             cloud_taskqueue_services.create_http_task(
@@ -140,7 +141,7 @@ class CloudTaskqueueServicesUnitTests(test_utils.TestBase):
             )
             return self.Response(task_name)
 
-        with self.swap(
+        with mock.patch.object(
             cloud_taskqueue_services.CLIENT, 'create_task', mock_create_task
         ):
             cloud_taskqueue_services.create_http_task(

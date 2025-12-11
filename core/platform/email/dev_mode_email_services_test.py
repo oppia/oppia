@@ -17,6 +17,7 @@
 """Tests for the email services API wrapper in DEV_MODE."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 import textwrap
@@ -84,7 +85,7 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.'
         )
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with mock.patch.object(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 [self.admin_email_address],
@@ -160,7 +161,7 @@ class EmailTests(test_utils.GenericTestBase):
             ' environment.'
         )
 
-        with self.swap(logging, 'info', _mock_logging_function):
+        with mock.patch.object(logging, 'info', _mock_logging_function):
             dev_mode_email_services.send_email_to_recipients(
                 self.system_email_address,
                 ['a@a.com', 'b@b.com', 'c@c.com', 'd@d.com'],

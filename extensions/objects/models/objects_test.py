@@ -17,6 +17,7 @@
 """Tests for typed object classes (mostly normalization)."""
 
 from __future__ import annotations
+from unittest import mock
 
 import inspect
 import json
@@ -1224,7 +1225,9 @@ class BaseTranslatableObjectTests(test_utils.GenericTestBase):
         ):
             objects.BaseTranslatableObject.get_schema()
 
-        with self.swap(objects.BaseTranslatableObject, '_value_key_name', 'a'):
+        with mock.patch.object(
+            objects.BaseTranslatableObject, '_value_key_name', 'a'
+        ):
             with self.assertRaisesRegex(
                 NotImplementedError,
                 'The _value_key_name and _value_schema for this class must '

@@ -17,6 +17,7 @@
 """Unit tests for scripts/extend_index_yaml.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import os
 import tempfile
@@ -144,10 +145,10 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         self.web_inf_index_xml_file = tempfile.NamedTemporaryFile()
         self.index_yaml_file_name = self.index_yaml_file.name
         self.web_inf_index_xml_file_name = self.web_inf_index_xml_file.name
-        self.index_yaml_swap = self.swap(
+        self.index_yaml_patch = mock.patch.object(
             extend_index_yaml, 'INDEX_YAML_PATH', self.index_yaml_file.name
         )
-        self.web_inf_index_xml_swap = self.swap(
+        self.web_inf_index_xml_patch = mock.patch.object(
             extend_index_yaml,
             'WEB_INF_INDEX_XML_PATH',
             self.web_inf_index_xml_file.name,
@@ -166,7 +167,7 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
         self, index_yaml: str, web_inf_index_xml: str, expected_index_yaml: str
     ) -> None:
         """Run tests for extend_index_yaml script."""
-        with self.index_yaml_swap, self.web_inf_index_xml_swap:
+        with self.index_yaml_patch, self.web_inf_index_xml_patch:
             with self.open_index_yaml_w as f:
                 f.write(index_yaml)
             with self.open_web_inf_index_xml as f:
@@ -477,11 +478,11 @@ class ExtendIndexYamlTests(test_utils.GenericTestBase):
     ) -> None:
         # Create a swap that points to a non-existent file.
         non_existent_file = '/tmp/non_existent_web_inf_index_xml.xml'
-        web_inf_index_xml_swap = self.swap(
+        web_inf_index_xml_patch = mock.patch.object(
             extend_index_yaml, 'WEB_INF_INDEX_XML_PATH', non_existent_file
         )
 
-        with self.index_yaml_swap, web_inf_index_xml_swap:
+        with self.index_yaml_patch, web_inf_index_xml_patch:
             self.assertFalse(
                 os.path.exists(extend_index_yaml.WEB_INF_INDEX_XML_PATH)
             )

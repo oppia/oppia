@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_lighthouse_tests.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import json
@@ -61,9 +62,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             self.print_arr.append(msg)
 
-        self.print_swap = self.swap(builtins, 'print', mock_print)
+        self.print_patch = mock.patch.object(builtins, 'print', mock_print)
 
-        self.swap_sys_exit = self.swap(sys, 'exit', lambda _: None)
+        self.swap_sys_exit = mock.patch.object(sys, 'exit', lambda _: None)
         puppeteer_path = os.path.join(
             'core', 'tests', 'puppeteer', 'lighthouse_setup.js'
         )
@@ -92,22 +93,22 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         env = os.environ.copy()
         env['PIP_NO_DEPS'] = 'True'
-        self.swap_ng_build = self.swap(
+        self.swap_ng_build = mock.patch.object(
             servers, 'managed_ng_build', mock_context_manager
         )
-        self.swap_webpack_compiler = self.swap(
+        self.swap_webpack_compiler = mock.patch.object(
             servers, 'managed_webpack_compiler', mock_context_manager
         )
-        self.swap_redis_server = self.swap(
+        self.swap_redis_server = mock.patch.object(
             servers, 'managed_redis_server', mock_context_manager
         )
-        self.swap_elasticsearch_dev_server = self.swap(
+        self.swap_elasticsearch_dev_server = mock.patch.object(
             servers, 'managed_elasticsearch_dev_server', mock_context_manager
         )
-        self.swap_firebase_auth_emulator = self.swap(
+        self.swap_firebase_auth_emulator = mock.patch.object(
             servers, 'managed_firebase_auth_emulator', mock_context_manager
         )
-        self.swap_cloud_datastore_emulator = self.swap(
+        self.swap_cloud_datastore_emulator = mock.patch.object(
             servers, 'managed_cloud_datastore_emulator', mock_context_manager
         )
         self.swap_dev_appserver = self.swap_with_checks(
@@ -133,7 +134,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     }
                 )
             )
-        self.lighthouse_pages_json_filepath_swap = self.swap(
+        self.lighthouse_pages_json_filepath_patch = mock.patch.object(
             run_lighthouse_tests,
             'LIGHTHOUSE_PAGES_JSON_FILEPATH',
             'dummy-lighthouse-pages.json',
@@ -161,7 +162,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             run_lighthouse_tests.inject_entities_into_url(url, entities)
 
     def test_get_lighthouse_pages_config(self) -> None:
-        with self.lighthouse_pages_json_filepath_swap:
+        with self.lighthouse_pages_json_filepath_patch:
             pages_config = run_lighthouse_tests.get_lighthouse_pages_config()
             self.assertEqual(
                 pages_config,
@@ -199,7 +200,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command,),),
         )
 
-        with self.print_swap, swap_popen:
+        with self.print_patch, swap_popen:
             run_lighthouse_tests.run_lighthouse_puppeteer_script()
 
         self.assertIn(
@@ -233,7 +234,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command,),),
         )
 
-        with self.print_swap, self.swap_sys_exit, swap_popen:
+        with self.print_patch, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_puppeteer_script()
 
         self.assertIn('Return code: 1', self.print_arr)
@@ -263,7 +264,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_isfile = mock.patch.object(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess,
             'Popen',
@@ -271,7 +272,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
         )
 
-        with self.print_swap, swap_popen, swap_isfile:
+        with self.print_patch, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn(
@@ -305,7 +306,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_isfile = self.swap(os.path, 'isfile', lambda _: True)
+        swap_isfile = mock.patch.object(os.path, 'isfile', lambda _: True)
         swap_popen = self.swap_with_checks(
             subprocess,
             'Popen',
@@ -313,7 +314,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.puppeteer_bash_command + self.extra_args,),),
         )
 
-        with self.print_swap, self.swap_sys_exit, swap_popen, swap_isfile:
+        with self.print_patch, self.swap_sys_exit, swap_popen, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn('Return code: 1', self.print_arr)
@@ -332,7 +333,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: True, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             run_lighthouse_tests.run_webpack_compilation()
 
         self.assertNotIn(
@@ -344,7 +345,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: False, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
 
@@ -385,7 +386,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', lambda _: False, expected_kwargs=[]
         )
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
 
@@ -420,7 +421,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
             'http://localhost:8181/, http://localhost:8181/about'
         )
-        with self.print_swap, swap_popen:
+        with self.print_patch, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE
             )
@@ -456,7 +457,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_args=((self.lighthouse_check_bash_command,),),
         )
 
-        with self.print_swap, self.swap_sys_exit, swap_popen:
+        with self.print_patch, self.swap_sys_exit, swap_popen:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE
             )
@@ -482,24 +483,26 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
         swap_run_lighthouse_tests = self.swap_with_checks(
             run_lighthouse_tests,
             'run_lighthouse_checks',
             lambda *unused_args: None,
             expected_args=[('accessibility',)],
         )
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None, expected_kwargs=[{'args': []}]
         )
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_emulator_mode = mock.patch.object(
+            constants, 'EMULATOR_MODE', False
+        )
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
-                        with self.lighthouse_pages_json_filepath_swap:
+                        with self.lighthouse_pages_json_filepath_patch:
                             run_lighthouse_tests.main(
                                 args=['--mode', 'accessibility']
                             )
@@ -540,8 +543,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build,
             'main',
@@ -549,12 +552,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{'args': ['--prod_env']}],
         )
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
-                            with self.lighthouse_pages_json_filepath_swap:
+                            with self.lighthouse_pages_json_filepath_patch:
                                 run_lighthouse_tests.main(
                                     args=['--mode', 'performance']
                                 )
@@ -596,8 +599,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build,
             'main',
@@ -605,12 +608,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             expected_kwargs=[{'args': ['--prod_env']}],
         )
 
-        with self.print_swap, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
                         with swap_popen, swap_run_lighthouse_tests:
-                            with self.lighthouse_pages_json_filepath_swap:
+                            with self.lighthouse_pages_json_filepath_patch:
                                 run_lighthouse_tests.main(
                                     args=[
                                         '--mode',
@@ -669,17 +672,19 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None, expected_kwargs=[{'args': []}]
         )
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
+        swap_emulator_mode = mock.patch.object(
+            constants, 'EMULATOR_MODE', False
+        )
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
-                        with self.lighthouse_pages_json_filepath_swap:
+                        with self.lighthouse_pages_json_filepath_patch:
                             run_lighthouse_tests.main(
                                 args=[
                                     '--mode',
@@ -750,21 +755,23 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         ) -> MockTask:  # pylint: disable=unused-argument
             return MockTask()
 
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
         swap_build = self.swap_with_checks(
             build, 'main', lambda args: None, expected_kwargs=[{'args': []}]
         )
-        swap_emulator_mode = self.swap(constants, 'EMULATOR_MODE', False)
-        swap_popen = self.swap(subprocess, 'Popen', mock_popen)
-        swap_isdir = self.swap(os.path, 'isdir', lambda _: True)
+        swap_emulator_mode = mock.patch.object(
+            constants, 'EMULATOR_MODE', False
+        )
+        swap_popen = mock.patch.object(subprocess, 'Popen', mock_popen)
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_swap:
+                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with swap_run_puppeteer_script:
-                            with self.lighthouse_pages_json_filepath_swap:
+                            with self.lighthouse_pages_json_filepath_patch:
                                 run_lighthouse_tests.main(
                                     args=[
                                         '--mode',

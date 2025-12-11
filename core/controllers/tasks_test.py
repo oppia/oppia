@@ -15,6 +15,7 @@
 """Tests for Tasks Email Handler."""
 
 from __future__ import annotations
+from unittest import mock
 
 import uuid
 
@@ -63,7 +64,7 @@ class TasksTests(test_utils.EmailTestBase):
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title'
         )
-        self.can_send_feedback_email_ctx = self.swap(
+        self.can_send_feedback_email_ctx = mock.patch.object(
             feconf, 'CAN_SEND_TRANSACTIONAL_EMAILS', True
         )
         self.THREAD_ID = 'exploration.exp1.thread_1'
@@ -414,7 +415,7 @@ class TasksTests(test_utils.EmailTestBase):
             """Replaces get_user_ids_by_role for testing purposes."""
             return [self.moderator_id]
 
-        get_moderator_id_as_list = self.swap(
+        get_moderator_id_as_list = mock.patch.object(
             user_services, 'get_user_ids_by_role', fake_get_user_ids_by_role
         )
 

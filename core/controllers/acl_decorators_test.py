@@ -17,6 +17,7 @@
 """Tests for core.domain.acl_decorators."""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 
@@ -85,13 +86,13 @@ class OpenAccessDecoratorTests(test_utils.GenericTestBase):
 
     def test_access_with_logged_in_user(self) -> None:
         self.login(self.VIEWER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_access_with_guest_user(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock')
         self.assertTrue(response['success'])
 
@@ -123,7 +124,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_error_when_mailchimp_webhook_secret_is_none(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         swap_api_key_secrets_return_none = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -133,7 +134,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
             ],
         )
 
-        with testapp_swap:
+        with testapp_patch:
             with swap_api_key_secrets_return_none:
                 response = self.get_json(
                     '/mock_secret_page/%s' % self.secret,
@@ -148,12 +149,12 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['status_code'], 404)
 
     def test_error_when_given_webhook_secret_is_invalid(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        mailchimp_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', self.secret
         )
 
-        with testapp_swap, mailchimp_swap:
+        with testapp_patch, mailchimp_patch:
             response = self.get_json(
                 '/mock_secret_page/%s' % self.invalid_secret,
                 expected_status_int=404,
@@ -167,12 +168,12 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['status_code'], 404)
 
     def test_no_error_when_given_webhook_secret_is_valid(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        mailchimp_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', self.secret
         )
 
-        with testapp_swap, mailchimp_swap:
+        with testapp_patch, mailchimp_patch:
             response = self.get_json(
                 '/mock_secret_page/%s' % self.secret, expected_status_int=200
             )
@@ -219,7 +220,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
         skill_ids = [skill_id]
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_skills/%s' % json.dumps(skill_ids)
             )
@@ -227,7 +228,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
 
     def test_invalid_input_exception_with_invalid_skill_ids(self) -> None:
         skill_ids = ['abcd1234']
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_skills/%s' % json.dumps(skill_ids),
                 expected_status_int=400,
@@ -236,7 +237,7 @@ class ViewSkillsDecoratorTests(test_utils.GenericTestBase):
 
     def test_page_not_found_exception_with_invalid_skill_ids(self) -> None:
         skill_ids = ['invalid_id12', 'invalid_id13']
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_skills/%s' % json.dumps(skill_ids),
                 expected_status_int=404,
@@ -293,7 +294,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_download_exploration_with_disabled_exploration_ids(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s'
                 % (feconf.DISABLED_EXPLORATION_IDS[0]),
@@ -307,14 +308,14 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
     def test_guest_can_download_published_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.published_exp_id
             )
         self.assertEqual(response['exploration_id'], self.published_exp_id)
 
     def test_guest_cannot_download_private_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -328,7 +329,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_download_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.private_exp_id
             )
@@ -337,7 +338,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_owner_can_download_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.private_exp_id
             )
@@ -346,7 +347,7 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_logged_in_user_cannot_download_unowned_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -363,11 +364,11 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        exp_rights_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        exp_rights_patch = self.swap_to_always_return(
             rights_manager, 'get_exploration_rights', value=None
         )
-        with testapp_swap, exp_rights_swap:
+        with testapp_patch, exp_rights_patch:
             response = self.get_json(
                 '/mock_download_exploration/%s' % self.published_exp_id,
                 expected_status_int=404,
@@ -426,7 +427,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_view_exploration_stats_with_disabled_exploration_ids(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s'
                 % (feconf.DISABLED_EXPLORATION_IDS[0]),
@@ -440,14 +441,14 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
     def test_guest_can_view_published_exploration_stats(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.published_exp_id
             )
         self.assertEqual(response['exploration_id'], self.published_exp_id)
 
     def test_guest_cannot_view_private_exploration_stats(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -461,7 +462,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_view_private_exploration_stats(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.private_exp_id
             )
@@ -470,7 +471,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_owner_can_view_private_exploration_stats(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.private_exp_id
             )
@@ -479,7 +480,7 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_logged_in_user_cannot_view_unowned_exploration_stats(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -496,11 +497,11 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        exp_rights_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        exp_rights_patch = self.swap_to_always_return(
             rights_manager, 'get_exploration_rights', value=None
         )
-        with testapp_swap, exp_rights_swap:
+        with testapp_patch, exp_rights_patch:
             response = self.get_json(
                 '/mock_view_exploration_stats/%s' % self.published_exp_id,
                 expected_status_int=404,
@@ -541,7 +542,7 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
 
     def test_logged_in_user_is_redirected_to_access_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response('/mock/', expected_status_int=302)
         self.assertEqual(
             'http://localhost/access_page', response.headers['location']
@@ -549,7 +550,7 @@ class RequireUserIdElseRedirectToHomepageTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_is_redirected_to_homepage(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response('/mock/', expected_status_int=302)
         self.assertEqual('http://localhost/', response.headers['location'])
 
@@ -599,7 +600,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_access_exploration_with_disabled_exploration_ids(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s'
                 % (feconf.DISABLED_EXPLORATION_IDS[0]),
@@ -607,14 +608,14 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
             )
 
     def test_guest_can_access_published_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.published_exp_id
             )
         self.assertEqual(response['exploration_id'], self.published_exp_id)
 
     def test_guest_cannot_access_private_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -622,7 +623,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_access_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id
             )
@@ -631,7 +632,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_owner_can_access_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id
             )
@@ -640,7 +641,7 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_logged_in_user_cannot_access_not_owned_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -694,7 +695,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 (
                     '/mock_play_exploration/%s'
@@ -706,7 +707,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
 
     def test_moderator_user_can_access_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id
             )
@@ -715,7 +716,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
 
     def test_exp_owner_can_access_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id
             )
@@ -724,7 +725,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
 
     def test_logged_in_user_cannot_access_not_owned_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s' % self.private_exp_id,
                 expected_status_int=404,
@@ -733,7 +734,7 @@ class PlayExplorationAsLoggedInUserTests(test_utils.GenericTestBase):
 
     def test_invalid_exploration_id_raises_error(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_exploration/%s' % 'invalid_exp_id',
                 expected_status_int=404,
@@ -797,14 +798,14 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_can_access_published_collection(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_collection/%s' % self.published_col_id
             )
         self.assertEqual(response['collection_id'], self.published_col_id)
 
     def test_guest_cannot_access_private_collection(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id,
                 expected_status_int=404,
@@ -812,7 +813,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_access_private_collection(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id
             )
@@ -821,7 +822,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_owner_can_access_private_collection(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id
             )
@@ -832,7 +833,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_collection/%s' % self.private_col_id,
                 expected_status_int=404,
@@ -841,7 +842,7 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_access_collection_with_invalid_collection_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_collection/invalid_collection_id',
                 expected_status_int=404,
@@ -904,21 +905,21 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_collection_with_invalid_collection_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_collection/invalid_col_id', expected_status_int=404
             )
         self.logout()
 
     def test_guest_cannot_edit_collection_via_json_handler(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_collection/%s' % self.published_col_id,
                 expected_status_int=401,
             )
 
     def test_guest_is_redirected_when_using_html_handler(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             self.MockHandler,
             'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML,
@@ -931,7 +932,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_edit_collection(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_collection/%s' % self.private_col_id,
                 expected_status_int=401,
@@ -940,7 +941,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_owner_can_edit_owned_collection(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_collection/%s' % self.private_col_id
             )
@@ -949,7 +950,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_edit_private_collection(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_collection/%s' % self.private_col_id
             )
@@ -959,7 +960,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_moderator_can_edit_public_collection(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_collection/%s' % self.published_col_id
             )
@@ -968,7 +969,7 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_any_private_collection(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_collection/%s' % self.private_col_id
             )
@@ -1029,19 +1030,19 @@ class ClassroomExistDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_any_user_can_access_a_valid_classroom(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_classroom_data/math', expected_status_int=200)
 
     def test_redirects_user_to_default_classroom_if_given_not_available(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_classroom_data/invalid', expected_status_int=404
             )
 
     def test_raises_error_if_return_type_is_not_json(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_html_response(
                 '/mock_classroom_page/invalid', expected_status_int=500
             )
@@ -1076,23 +1077,23 @@ class CreateExplorationDecoratorTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_create_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/create', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_create_exploration(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/create')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_cannot_create_exploration_via_json_handler(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/create', expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             self.MockHandler,
             'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML,
@@ -1131,11 +1132,11 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_create_collection_via_json_handler(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/create', expected_status_int=401)
 
     def test_guest_is_redirected_when_using_html_handler(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             self.MockHandler,
             'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML,
@@ -1145,13 +1146,13 @@ class CreateCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_create_collection(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/create', expected_status_int=401)
         self.logout()
 
     def test_collection_editor_can_create_collection(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/create')
         self.assertTrue(response['success'])
         self.logout()
@@ -1186,19 +1187,19 @@ class AccessCreatorDashboardTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_access_editor_dashboard(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/access', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_access_editor_dashboard(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/access')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_user_cannot_access_editor_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/access', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -1252,7 +1253,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % feconf.DISABLED_EXPLORATION_IDS[0],
@@ -1264,7 +1265,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % self.private_exp_id,
@@ -1281,7 +1282,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_comment_on_feedback_thread/invalid_thread_id',
                 expected_status_int=400,
@@ -1292,7 +1293,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % (self.private_exp_id),
@@ -1305,7 +1306,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             )
 
     def test_guest_is_redirected_when_using_html_handler(self) -> None:
-        with self.swap(
+        with mock.patch.object(
             self.MockHandler,
             'GET_HANDLER_ERROR_RETURN_TYPE',
             feconf.HANDLER_TYPE_HTML,
@@ -1327,7 +1328,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % (self.private_exp_id)
@@ -1338,7 +1339,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % (self.published_exp_id)
@@ -1349,7 +1350,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_comment_on_feedback_thread/exploration.%s.thread1'
                 % (self.private_exp_id)
@@ -1402,7 +1403,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_cannot_create_feedback_threads_with_disabled_exp_id(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s'
                 % (feconf.DISABLED_EXPLORATION_IDS[0]),
@@ -1413,7 +1414,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_feedback_thread/%s' % self.private_exp_id,
                 expected_status_int=401,
@@ -1428,14 +1429,14 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
     def test_guest_can_create_feedback_threads_for_public_exploration(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.published_exp_id
             )
 
     def test_owner_cannot_create_feedback_for_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.private_exp_id
             )
@@ -1443,7 +1444,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_moderator_can_create_feeback_for_public_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.published_exp_id
             )
@@ -1451,7 +1452,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_moderator_can_create_feeback_for_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_create_feedback_thread/%s' % self.private_exp_id
             )
@@ -1525,7 +1526,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_cannot_view_feedback_threads_with_disabled_exp_id(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.disabled_exp_thread_id,
                 expected_status_int=404,
@@ -1533,7 +1534,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_viewer_cannot_view_feedback_for_private_exploration(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id,
                 expected_status_int=401,
@@ -1548,7 +1549,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_feedback_thread/invalid_thread_id',
                 expected_status_int=400,
@@ -1561,20 +1562,20 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         skill_thread_id = feedback_services.create_thread(
             'skill', 'skillid1', None, 'unused subject', 'unused text'
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_view_feedback_thread/%s' % skill_thread_id)
 
     def test_guest_can_view_feedback_threads_for_public_exploration(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.public_exp_thread_id
             )
 
     def test_owner_cannot_view_feedback_for_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id
             )
@@ -1582,7 +1583,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_moderator_can_view_feeback_for_public_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.public_exp_thread_id
             )
@@ -1590,7 +1591,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
 
     def test_moderator_can_view_feeback_for_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_feedback_thread/%s' % self.private_exp_thread_id
             )
@@ -1637,23 +1638,23 @@ class ManageEmailDashboardTests(test_utils.GenericTestBase):
 
     def test_moderator_cannot_access_email_dashboard(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_super_admin_can_access_email_dashboard(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.mock_testapp.put('/mock/%s' % self.query_id)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_error_when_user_is_not_logged_in(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -1688,12 +1689,12 @@ class RateExplorationTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_give_rating(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s' % self.exp_id, expected_status_int=401)
 
     def test_normal_user_can_give_rating(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exp_id)
         self.assertEqual(response['exploration_id'], self.exp_id)
         self.logout()
@@ -1728,19 +1729,19 @@ class AccessModeratorPageTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_moderator_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_moderator_can_access_moderator_page(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_guest_cannot_access_moderator_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -1775,12 +1776,12 @@ class FlagExplorationTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_flag_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s' % self.exp_id, expected_status_int=401)
 
     def test_normal_user_can_flag_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exp_id)
         self.assertEqual(response['exploration_id'], self.exp_id)
         self.logout()
@@ -1812,12 +1813,12 @@ class SubscriptionToUsersTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_subscribe_to_users(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_normal_user_can_subscribe_to_users(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertTrue(response['success'])
         self.logout()
@@ -1852,19 +1853,19 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_send_moderator_emails(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_moderator_can_send_moderator_emails(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_guest_cannot_send_moderator_emails(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -1909,7 +1910,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/release-coordinator', expected_status_int=401
             )
@@ -1921,7 +1922,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/release-coordinator', expected_status_int=401
             )
@@ -1934,7 +1935,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.system_email_address)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/release-coordinator', expected_status_int=401
             )
@@ -1950,7 +1951,7 @@ class CanAccessReleaseCoordinatorPageDecoratorTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/release-coordinator')
 
         self.assertEqual(response['success'], 1)
@@ -1991,7 +1992,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_blog_admin_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-admin', expected_status_int=401)
 
         self.assertEqual(
@@ -2001,7 +2002,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_blog_admin_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-admin', expected_status_int=401)
 
         self.assertEqual(
@@ -2011,7 +2012,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
 
     def test_blog_post_editor_cannot_access_blog_admin_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-admin', expected_status_int=401)
 
         self.assertEqual(
@@ -2023,7 +2024,7 @@ class CanAccessBlogAdminPageDecoratorTests(test_utils.GenericTestBase):
     def test_blog_admin_can_access_blog_admin_page(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-admin')
 
         self.assertEqual(response['success'], 1)
@@ -2065,7 +2066,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_manage_blog_post_editors(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/blogadminrolehandler', expected_status_int=401
             )
@@ -2077,7 +2078,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_manage_blog_post_editors(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/blogadminrolehandler', expected_status_int=401
             )
@@ -2089,7 +2090,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
 
     def test_blog_post_editors_cannot_manage_blog_post_editors(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/blogadminrolehandler', expected_status_int=401
             )
@@ -2103,7 +2104,7 @@ class CanManageBlogPostEditorsDecoratorTests(test_utils.GenericTestBase):
     def test_blog_admin_can_manage_blog_editors(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blogadminrolehandler')
 
         self.assertEqual(response['success'], 1)
@@ -2147,7 +2148,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_blog_dashboard(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-dashboard', expected_status_int=401)
 
         self.assertEqual(
@@ -2157,7 +2158,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_blog_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-dashboard', expected_status_int=401)
 
         self.assertEqual(
@@ -2168,7 +2169,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
     def test_blog_editors_can_access_blog_dashboard(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-dashboard')
 
         self.assertEqual(response['success'], 1)
@@ -2177,7 +2178,7 @@ class CanAccessBlogDashboardDecoratorTests(test_utils.GenericTestBase):
     def test_blog_admins_can_access_blog_dashboard(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/blog-dashboard')
 
         self.assertEqual(response['success'], 1)
@@ -2233,7 +2234,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
         self.blog_post_id = blog_post.id
 
     def test_guest_cannot_delete_blog_post(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
                 expected_status_int=401,
@@ -2244,7 +2245,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_editor_can_delete_owned_blog_post(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id
             )
@@ -2253,7 +2254,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_admin_can_delete_any_blog_post(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id
             )
@@ -2262,7 +2263,7 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_editor_cannot_delete_not_owned_blog_post(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
                 expected_status_int=401,
@@ -2276,11 +2277,11 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
 
     def test_error_with_invalid_blog_post_id(self) -> None:
         self.login(self.user_email)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        blog_post_rights_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        blog_post_rights_patch = self.swap_to_always_return(
             blog_services, 'get_blog_post_rights', value=None
         )
-        with testapp_swap, blog_post_rights_swap:
+        with testapp_patch, blog_post_rights_patch:
             response = self.get_json(
                 '/mock_delete_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404,
@@ -2341,7 +2342,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
         self.blog_post_id = blog_post.id
 
     def test_guest_cannot_edit_blog_post(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
                 expected_status_int=401,
@@ -2352,7 +2353,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_editor_can_edit_owned_blog_post(self) -> None:
         self.login(self.BLOG_EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id
             )
@@ -2361,7 +2362,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_admin_can_edit_any_blog_post(self) -> None:
         self.login(self.BLOG_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id
             )
@@ -2370,7 +2371,7 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     def test_blog_editor_cannot_edit_not_owned_blog_post(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
                 expected_status_int=401,
@@ -2384,11 +2385,11 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
 
     def test_error_with_invalid_blog_post_id(self) -> None:
         self.login(self.user_email)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        blog_post_rights_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        blog_post_rights_patch = self.swap_to_always_return(
             blog_services, 'get_blog_post_rights', value=None
         )
-        with testapp_swap, blog_post_rights_swap:
+        with testapp_patch, blog_post_rights_patch:
             response = self.get_json(
                 '/mock_edit_blog_post/%s' % self.blog_post_id,
                 expected_status_int=404,
@@ -2440,7 +2441,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
 
         self.assertEqual(
@@ -2449,7 +2450,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
 
         self.assertEqual(
@@ -2460,7 +2461,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.system_email_address)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job', expected_status_int=401)
 
         self.assertEqual(
@@ -2471,7 +2472,7 @@ class CanRunAnyJobDecoratorTests(test_utils.GenericTestBase):
     def test_release_coordinator_can_run_any_job(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/run-anny-job')
 
         self.assertEqual(response['success'], 1)
@@ -2514,7 +2515,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_not_logged_in_user_cannot_access_translation_stats(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401
             )
@@ -2525,7 +2526,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_unauthorized_user_cannot_access_translation_stats(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/translation-stats', expected_status_int=401
             )
@@ -2538,7 +2539,7 @@ class CanAccessTranslationStatsDecoratorTests(test_utils.GenericTestBase):
 
     def test_authorized_user_can_access_translation_stats(self) -> None:
         self.login(self.TRANSLATION_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/translation-stats')
 
         self.assertEqual(response['success'], 1)
@@ -2584,7 +2585,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/manage-memcache', expected_status_int=401
             )
@@ -2595,7 +2596,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_release_coordinator_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/manage-memcache', expected_status_int=401
             )
@@ -2608,7 +2609,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
     def test_super_admin_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.system_email_address)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/manage-memcache', expected_status_int=401
             )
@@ -2621,7 +2622,7 @@ class CanManageMemcacheDecoratorTests(test_utils.GenericTestBase):
     def test_release_coordinator_can_run_any_job(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/manage-memcache')
 
         self.assertEqual(response['success'], 1)
@@ -2676,7 +2677,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_release_coordinator_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/translation',
                 expected_status_int=401,
@@ -2689,7 +2690,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_manage_contributors_role(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/translation',
                 expected_status_int=401,
@@ -2703,7 +2704,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_translation_admin_can_manage_translation_role(self) -> None:
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/translation'
             )
@@ -2714,7 +2715,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_translation_admin_cannot_manage_question_role(self) -> None:
         self.login(self.TRANSLATION_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/question',
                 expected_status_int=401,
@@ -2729,7 +2730,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_question_admin_can_manage_question_role(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/can_manage_contributors_role/question')
 
         self.assertEqual(response['success'], 1)
@@ -2738,7 +2739,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_question_admin_cannot_manage_translation_role(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/translation',
                 expected_status_int=401,
@@ -2753,7 +2754,7 @@ class CanManageContributorsRoleDecoratorTests(test_utils.GenericTestBase):
     def test_invalid_category_raise_error(self) -> None:
         self.login(self.QUESTION_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/can_manage_contributors_role/invalid', expected_status_int=400
             )
@@ -2791,17 +2792,17 @@ class DeleteAnyUserTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_delete_any_user(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_not_logged_user_cannot_delete_any_user(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
 
     def test_primary_admin_can_delete_any_user(self) -> None:
         self.login(self.system_email_address)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
@@ -2879,7 +2880,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_voiceover_exploration(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401
             )
@@ -2887,21 +2888,21 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_can_voiceover_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_moderator_can_voiceover_public_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
     def test_moderator_can_voiceover_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
 
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
@@ -2909,7 +2910,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
 
     def test_admin_can_voiceover_private_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
@@ -2919,13 +2920,13 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can voiceover assigned public exploration.
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
 
         # Checking voice artist cannot voiceover public exploration which he/she
         # is not assigned for.
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401
             )
@@ -2935,7 +2936,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_1, expected_status_int=401
             )
@@ -2945,14 +2946,14 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401
             )
         self.logout()
 
     def test_guest_cannot_voiceover_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401
             )
@@ -2962,7 +2963,7 @@ class VoiceoverExplorationTests(test_utils.GenericTestBase):
     def test_error_with_invalid_voiceover_exploration_id(self) -> None:
         self.login(self.user_email)
         invalid_id = 'invalid'
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % invalid_id, expected_status_int=404
             )
@@ -3062,7 +3063,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_can_add_voice_artist_to_public_exp(self) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
                 {},
@@ -3074,7 +3075,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.delete_json(
                 '/mock/exploration/%s' % self.published_exp_id_1, {}
             )
@@ -3086,7 +3087,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/%s/abc' % unsupported_entity_type,
                 {},
@@ -3103,7 +3104,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     ) -> None:
         unsupported_entity_type = 'topic'
         self.login(self.VOICEOVER_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.delete_json(
                 '/mock/%s/abc' % unsupported_entity_type,
                 {},
@@ -3119,7 +3120,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1,
                 {},
@@ -3136,14 +3137,14 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.delete_json('/mock/exploration/%s' % self.private_exp_id_1, {})
         self.logout()
 
     def test_owner_cannot_add_voice_artist_to_public_exp(self) -> None:
         self.login(self.OWNER_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
                 {},
@@ -3158,7 +3159,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_remove_voice_artist_in_public_exp(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.delete_json(
                 '/mock/exploration/%s' % self.private_exp_id_1,
                 {},
@@ -3173,7 +3174,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_random_user_cannot_add_voice_artist_to_public_exp(self) -> None:
         self.login(self.user_email)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.post_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
                 {},
@@ -3190,7 +3191,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.delete_json(
                 '/mock/exploration/%s' % self.published_exp_id_1,
                 {},
@@ -3207,7 +3208,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/invalid_exp_id',
                 {},
@@ -3220,7 +3221,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.delete_json(
                 '/mock/exploration/invalid_exp_id', {}, expected_status_int=404
             )
@@ -3230,7 +3231,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         csrf_token = self.get_new_csrf_token()
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/mock/exploration/%s' % self.private_exp_id_1,
                 {},
@@ -3241,7 +3242,7 @@ class VoiceArtistManagementTests(test_utils.GenericTestBase):
     def test_voiceover_admin_cannot_remove_voice_artist_without_login(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.delete_json(
                 '/mock/exploration/%s' % self.private_exp_id_1,
                 {},
@@ -3296,7 +3297,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_exploration_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_exploration/invalid_exp_id', expected_status_int=404
             )
@@ -3304,7 +3305,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_edit_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id,
                 expected_status_int=401,
@@ -3313,7 +3314,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_can_edit_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id
             )
@@ -3322,7 +3323,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_moderator_can_edit_public_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.published_exp_id
             )
@@ -3331,7 +3332,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_moderator_can_edit_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id
             )
@@ -3341,7 +3342,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_private_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id
             )
@@ -3349,7 +3350,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_cannot_edit_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_exploration/%s' % self.private_exp_id,
                 expected_status_int=401,
@@ -3389,19 +3390,19 @@ class ManageOwnAccountTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_update_preferences(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_manage_preferences(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_guest_cannot_update_preferences(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -3438,14 +3439,14 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_access_admin_page(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/', expected_status_int=401)
         self.logout()
 
     def test_normal_user_cannot_access_admin_page(self) -> None:
         self.login(self.user_email)
         user_id = user_services.get_user_id_from_username(self.username)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = '%s is not a super admin of this application' % user_id
         self.assertEqual(response['error'], error_msg)
@@ -3453,13 +3454,13 @@ class AccessAdminPageTests(test_utils.GenericTestBase):
 
     def test_super_admin_can_access_admin_page(self) -> None:
         self.login(self.user_email, is_super_admin=True)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_guest_cannot_access_admin_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -3503,7 +3504,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = (
             'You do not have credentials to access contributor dashboard '
@@ -3520,8 +3521,8 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     ) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
-        with self.swap(constants, 'DEV_MODE', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(constants, 'DEV_MODE', True):
+            with mock.patch.object(self, 'testapp', self.mock_testapp):
                 response = self.get_json('/mock/', expected_status_int=401)
         error_msg = (
             'You do not have credentials to access contributor dashboard '
@@ -3536,8 +3537,8 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_question_coordinator_can_access_new_cd_admin_page(self) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)
-        with self.swap(constants, 'DEV_MODE', True):
-            with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(constants, 'DEV_MODE', True):
+            with mock.patch.object(self, 'testapp', self.mock_testapp):
                 response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
@@ -3547,13 +3548,13 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     ) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
         self.logout()
 
     def test_guest_cannot_access_contributor_dashboard_admin_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -3562,7 +3563,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = (
             'You do not have credentials to access contributor dashboard '
@@ -3597,13 +3598,13 @@ class UploadExplorationTests(test_utils.GenericTestBase):
 
     def test_super_admin_can_upload_explorations(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_upload_exploration/')
         self.logout()
 
     def test_normal_user_cannot_upload_explorations(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_upload_exploration/', expected_status_int=401
             )
@@ -3614,7 +3615,7 @@ class UploadExplorationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_upload_explorations(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_upload_exploration/', expected_status_int=401
             )
@@ -3664,7 +3665,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_cannot_delete_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id,
                 expected_status_int=401,
@@ -3675,7 +3676,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_can_delete_owned_private_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id
             )
@@ -3684,7 +3685,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     def test_moderator_can_delete_published_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.published_exp_id
             )
@@ -3693,7 +3694,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_delete_published_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.published_exp_id,
                 expected_status_int=401,
@@ -3707,7 +3708,7 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     def test_moderator_can_delete_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_exploration/%s' % self.private_exp_id
             )
@@ -3750,7 +3751,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_suggest_changes(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.exploration_id, expected_status_int=401
             )
@@ -3758,7 +3759,7 @@ class SuggestChangesToExplorationTests(test_utils.GenericTestBase):
 
     def test_normal_user_can_suggest_changes(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exploration_id)
         self.assertEqual(response['exploration_id'], self.exploration_id)
         self.logout()
@@ -3796,13 +3797,13 @@ class SuggestChangesDecoratorsTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_suggest_changes(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock', expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_suggest_changes(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock')
         self.logout()
 
@@ -3868,14 +3869,14 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
     def test_author_can_resubmit_suggestion(self) -> None:
         self.login(self.author_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.suggestion_id)
         self.assertEqual(response['suggestion_id'], self.suggestion_id)
         self.logout()
 
     def test_non_author_cannot_resubmit_suggestion(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.suggestion_id, expected_status_int=401
             )
@@ -3884,7 +3885,7 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
     def test_error_with_invalid_suggestion_id(self) -> None:
         invalid_id = 'invalid'
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % invalid_id, expected_status_int=400
             )
@@ -4020,7 +4021,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.suggestion_id_3 = self.suggestion_3.suggestion_id
 
     def test_guest_cannot_accept_suggestion(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_1),
@@ -4032,7 +4033,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def test_owner_can_accept_suggestion(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_1)
@@ -4043,11 +4044,11 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def test_user_with_review_rights_can_accept_suggestion(self) -> None:
         self.login(self.EDITOR_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        review_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        review_patch = self.swap_to_always_return(
             suggestion_services, 'can_user_review_category', value=True
         )
-        with testapp_swap, review_swap:
+        with testapp_patch, review_patch:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_1)
@@ -4060,11 +4061,11 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        translation_review_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        translation_review_patch = self.swap_to_always_return(
             user_services, 'can_review_translation_suggestions', value=True
         )
-        with testapp_swap, translation_review_swap:
+        with testapp_patch, translation_review_patch:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_2)
@@ -4077,11 +4078,11 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        question_review_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        question_review_patch = self.swap_to_always_return(
             user_services, 'can_review_question_suggestions', value=True
         )
-        with testapp_swap, question_review_swap:
+        with testapp_patch, question_review_patch:
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_3)
@@ -4092,7 +4093,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def test_curriculum_admin_can_accept_suggestions(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id_1)
@@ -4103,7 +4104,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def test_error_when_format_of_suggestion_id_is_invalid(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, 'invalid_suggestion_id'),
@@ -4119,7 +4120,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, 'invalid.suggestion.id'),
@@ -4164,7 +4165,7 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_review_suggestion(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s'
                 % (self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION),
@@ -4175,8 +4176,8 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
 
     def test_error_when_suggestion_type_is_invalid(self) -> None:
         self.login(self.VIEWER_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        with testapp_swap:
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        with testapp_patch:
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s' % (self.TARGET_TYPE, 'invalid'),
                 expected_status_int=404,
@@ -4192,11 +4193,11 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        translation_review_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        translation_review_patch = self.swap_to_always_return(
             user_services, 'can_review_translation_suggestions', value=True
         )
-        with testapp_swap, translation_review_swap:
+        with testapp_patch, translation_review_patch:
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s'
                 % (self.TARGET_TYPE, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT)
@@ -4212,11 +4213,11 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        question_review_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        question_review_patch = self.swap_to_always_return(
             user_services, 'can_review_question_suggestions', value=True
         )
-        with testapp_swap, question_review_swap:
+        with testapp_patch, question_review_patch:
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s'
                 % (self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION)
@@ -4231,12 +4232,12 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        question_review_swap = self.swap_to_always_return(
+        question_review_patch = self.swap_to_always_return(
             user_services, 'can_review_question_suggestions', value=False
         )
-        with testapp_swap, question_review_swap:
+        with testapp_patch, question_review_patch:
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s'
                 % (self.TARGET_TYPE, feconf.SUGGESTION_TYPE_ADD_QUESTION),
@@ -4253,12 +4254,12 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        translation_review_swap = self.swap_to_always_return(
+        translation_review_patch = self.swap_to_always_return(
             user_services, 'can_review_translation_suggestions', value=False
         )
-        with testapp_swap, translation_review_swap:
+        with testapp_patch, translation_review_patch:
             response = self.get_json(
                 '/mock_review_suggestion/%s/%s'
                 % (self.TARGET_TYPE, feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
@@ -4315,7 +4316,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     def test_cannot_publish_exploration_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_exploration/invalid_exp_id',
                 expected_status_int=404,
@@ -4324,7 +4325,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_can_publish_owned_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_exploration/%s' % self.private_exp_id
             )
@@ -4333,7 +4334,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     def test_already_published_exploration_cannot_be_published(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_exploration/%s' % self.public_exp_id,
                 expected_status_int=401,
@@ -4342,7 +4343,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     def test_moderator_cannot_publish_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_exploration/%s' % self.private_exp_id,
                 expected_status_int=401,
@@ -4351,7 +4352,7 @@ class PublishExplorationTests(test_utils.GenericTestBase):
 
     def test_admin_can_publish_any_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_exploration/%s' % self.private_exp_id
             )
@@ -4396,7 +4397,7 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_modify_exploration_roles(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.private_exp_id, expected_status_int=401
             )
@@ -4409,20 +4410,20 @@ class ModifyExplorationRolesTests(test_utils.GenericTestBase):
 
     def test_owner_can_modify_exploration_roles(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
     def test_moderator_can_modify_roles_of_unowned_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s' % self.private_exp_id)
         self.logout()
 
     def test_admin_can_modify_roles_of_any_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id)
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
@@ -4505,7 +4506,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_cannot_publish_collection_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_collection/invalid_col_id',
                 expected_status_int=404,
@@ -4514,7 +4515,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_cannot_unpublish_collection_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_unpublish_collection/invalid_col_id',
                 expected_status_int=404,
@@ -4523,7 +4524,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_owner_can_publish_collection(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_collection/%s' % self.private_col_id
             )
@@ -4532,7 +4533,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_owner_cannot_unpublish_public_collection(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_unpublish_collection/%s' % self.published_col_id,
                 expected_status_int=401,
@@ -4541,7 +4542,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_moderator_can_unpublish_public_collection(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_unpublish_collection/%s' % self.published_col_id
             )
@@ -4550,7 +4551,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_admin_can_publish_any_collection(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_collection/%s' % self.private_col_id
             )
@@ -4559,7 +4560,7 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
 
     def test_admin_cannot_publish_already_published_collection(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_publish_collection/%s' % self.published_col_id,
                 expected_status_int=401,
@@ -4598,7 +4599,7 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_access_learner_dashboard(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You do not have the credentials to access this page.'
         self.assertEqual(response['error'], error_msg)
@@ -4606,13 +4607,13 @@ class AccessLearnerDashboardDecoratorTests(test_utils.GenericTestBase):
 
     def test_exploration_editor_can_access_learner_dashboard(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_user_cannot_access_learner_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -4649,7 +4650,7 @@ class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_access_feedback_updates(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You do not have the credentials to access this page.'
         self.assertEqual(response['error'], error_msg)
@@ -4657,13 +4658,13 @@ class AccessFeedbackUpdatesDecoratorTests(test_utils.GenericTestBase):
 
     def test_exploration_editor_can_access_feedback_updates(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_user_cannot_access_feedback_updates(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -4700,7 +4701,7 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_access_teacher_dashboard(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You do not have the credentials to access this page.'
         self.assertEqual(response['error'], error_msg)
@@ -4708,13 +4709,13 @@ class AccessLearnerGroupsDecoratorTests(test_utils.GenericTestBase):
 
     def test_exploration_editor_can_access_learner_groups(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_guest_user_cannot_access_teacher_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/', expected_status_int=401)
         error_msg = 'You must be logged in to access this resource.'
         self.assertEqual(response['error'], error_msg)
@@ -4765,7 +4766,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_topic_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_topic/invalid_topic_id', expected_status_int=404
             )
@@ -4773,28 +4774,28 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
         self.logout()
 
     def test_topic_manager_can_edit_topic(self) -> None:
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
         self.logout()
 
     def test_normal_user_cannot_edit_topic(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401
             )
         self.logout()
 
     def test_guest_user_cannot_edit_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_topic/%s' % self.topic_id, expected_status_int=401
             )
@@ -4843,7 +4844,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_delete_topic_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_delete_topic/invalid_topic_id', expected_status_int=404
             )
@@ -4851,14 +4852,14 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_delete_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_topic/%s' % self.topic_id)
         self.assertEqual(response['topic_id'], self.topic_id)
         self.logout()
 
     def test_normal_user_cannot_delete_topic(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_topic/%s' % self.topic_id, expected_status_int=401
             )
@@ -4870,7 +4871,7 @@ class DeleteTopicDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_delete_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_topic/%s' % self.topic_id, expected_status_int=401
             )
@@ -4919,7 +4920,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_delete_topic_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_view_topic_editor/invalid_topic_id',
                 expected_status_int=404,
@@ -4928,7 +4929,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_view_topic_editor(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_topic_editor/%s' % (self.topic_id)
             )
@@ -4937,7 +4938,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_view_topic_editor(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_topic_editor/%s' % self.topic_id,
                 expected_status_int=401,
@@ -4950,7 +4951,7 @@ class ViewAnyTopicEditorDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_view_topic_editor(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_topic_editor/%s' % self.topic_id,
                 expected_status_int=401,
@@ -5003,7 +5004,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_story_with_invalid_story_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/story_id_new', expected_status_int=404
             )
@@ -5014,7 +5015,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/%s' % story_id, expected_status_int=404
             )
@@ -5022,11 +5023,11 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_story_with_invalid_canonical_story_ids(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        canonical_story_ids_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        canonical_story_ids_patch = self.swap_to_always_return(
             topic_domain.Topic, 'get_canonical_story_ids', value=[]
         )
-        with testapp_swap, canonical_story_ids_swap:
+        with testapp_patch, canonical_story_ids_patch:
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=404
             )
@@ -5039,7 +5040,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_story(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_story/%s' % self.story_id)
         self.assertEqual(response['story_id'], self.story_id)
         self.logout()
@@ -5049,7 +5050,7 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_story/%s' % self.story_id)
         self.assertEqual(response['story_id'], self.story_id)
         self.logout()
@@ -5058,14 +5059,14 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
 
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=401
             )
         self.logout()
 
     def test_guest_user_cannot_edit_story(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_story/%s' % self.story_id, expected_status_int=401
             )
@@ -5117,7 +5118,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_delete_story_with_invalid_story_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_delete_story/story_id_new', expected_status_int=404
             )
@@ -5128,7 +5129,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         story_id = story_services.get_new_story_id()
         topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_story(story_id, self.admin_id, topic_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_delete_story/%s' % story_id, expected_status_int=404
             )
@@ -5136,7 +5137,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_delete_story(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_story/%s' % self.story_id)
         self.assertEqual(response['story_id'], self.story_id)
         self.logout()
@@ -5146,7 +5147,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.set_topic_managers([self.manager_username], self.topic_id)
 
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_story/%s' % self.story_id)
         self.assertEqual(response['story_id'], self.story_id)
         self.logout()
@@ -5155,7 +5156,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.viewer_email, self.viewer_username)
 
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_story/%s' % self.story_id, expected_status_int=401
             )
@@ -5164,7 +5165,7 @@ class DeleteStoryDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_delete_story(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_story/%s' % self.story_id, expected_status_int=401
             )
@@ -5213,21 +5214,21 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_access_dashboard(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_access_dashboard/')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_topic_manager_can_access_dashboard(self) -> None:
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_access_dashboard/')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_normal_user_cannot_access_dashboard(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_access_dashboard/', expected_status_int=401
             )
@@ -5239,7 +5240,7 @@ class AccessTopicsAndSkillsDashboardDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_dashboard(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_access_dashboard/', expected_status_int=401
             )
@@ -5292,7 +5293,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def test_cannot_add_story_to_topic_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_add_story_to_topic/invalid_topic_id',
                 expected_status_int=404,
@@ -5301,7 +5302,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def test_admin_can_add_story_to_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id
             )
@@ -5312,7 +5313,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_add_story_to_topic/incorrect_id', expected_status_int=404
             )
@@ -5320,7 +5321,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_add_story_to_topic(self) -> None:
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id
             )
@@ -5329,7 +5330,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_add_story_to_topic(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id,
                 expected_status_int=401,
@@ -5341,7 +5342,7 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_add_story_to_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id,
                 expected_status_int=401,
@@ -5440,14 +5441,14 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         self.login(self.user_email)
 
     def test_user_cannot_access_non_existent_story(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404,
             )
 
     def test_user_cannot_access_story_when_topic_is_not_published(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=404,
@@ -5455,7 +5456,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
 
     def test_user_cannot_access_story_when_story_is_not_published(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=404,
@@ -5468,7 +5469,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=200,
@@ -5481,7 +5482,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_html_response(
                 '/mock_story_page/staging/topic/story/%s'
                 % self.story_url_fragment,
@@ -5495,7 +5496,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/topic/story/000',
                 expected_status_int=302,
@@ -5512,7 +5513,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/invalid-topic/story/%s'
                 % self.story_url_fragment,
@@ -5529,7 +5530,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/math/topic/story/%s'
                 % self.story_url_fragment,
@@ -5546,7 +5547,7 @@ class StoryViewerAsLoggedInUserTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/topic/story/Story-frag',
                 expected_status_int=302,
@@ -5642,14 +5643,14 @@ class StoryViewerTests(test_utils.GenericTestBase):
         )
 
     def test_cannot_access_non_existent_story(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/non-existent-frag',
                 expected_status_int=404,
             )
 
     def test_cannot_access_story_when_topic_is_not_published(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=404,
@@ -5657,7 +5658,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
 
     def test_cannot_access_story_when_story_is_not_published(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=404,
@@ -5668,7 +5669,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_story_data/staging/topic/%s' % self.story_url_fragment,
                 expected_status_int=200,
@@ -5679,7 +5680,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_html_response(
                 '/mock_story_page/staging/topic/story/%s'
                 % self.story_url_fragment,
@@ -5693,7 +5694,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/topic/story/000',
                 expected_status_int=302,
@@ -5710,7 +5711,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/invalid-topic/story/%s'
                 % self.story_url_fragment,
@@ -5727,7 +5728,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/math/topic/story/%s'
                 % self.story_url_fragment,
@@ -5744,7 +5745,7 @@ class StoryViewerTests(test_utils.GenericTestBase):
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_story_page/staging/topic/story/Story-frag',
                 expected_status_int=302,
@@ -5913,14 +5914,14 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         )
 
     def test_cannot_access_non_existent_subtopic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/non-existent-frag',
                 expected_status_int=404,
             )
 
     def test_cannot_access_subtopic_when_topic_is_not_published(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=404,
@@ -5933,7 +5934,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag-two/sub-three-frag',
                 expected_status_int=200,
@@ -5941,7 +5942,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     def test_can_access_subtopic_when_topic_is_published(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_subtopic_data/staging/topic-frag/sub-one-frag',
                 expected_status_int=200,
@@ -5949,7 +5950,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     def test_redirect_to_classroom_if_user_is_banned(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302,
@@ -5961,7 +5962,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     def test_can_access_subtopic_when_all_url_fragments_are_valid(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             studyguide_url_fragment = 'studyguide/sub-one-frag'
             self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/%s'
@@ -5976,7 +5977,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             studyguide_url_fragment = 'studyguide/sub-three-frag'
             self.get_html_response(
                 '/mock_study_guide/staging/topic-frag-two/%s'
@@ -5988,7 +5989,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/studyguide/000',
                 expected_status_int=302,
@@ -6003,11 +6004,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     ) -> None:
         studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        subtopic_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        subtopic_patch = self.swap_to_always_return(
             subtopic_page_services, 'get_subtopic_page_by_id', None
         )
-        with testapp_swap, subtopic_swap:
+        with testapp_patch, subtopic_patch:
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/%s'
                 % studyguide_url_fragment,
@@ -6026,11 +6027,11 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     ) -> None:
         studyguide_url_fragment = 'studyguide/sub-three-frag'
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        subtopic_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        subtopic_patch = self.swap_to_always_return(
             study_guide_services, 'get_study_guide_by_id', None
         )
-        with testapp_swap, subtopic_swap:
+        with testapp_patch, subtopic_patch:
             response = self.get_html_response(
                 '/mock_study_guide/staging/topic-frag-two/%s'
                 % studyguide_url_fragment,
@@ -6046,7 +6047,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     ) -> None:
         studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/math/invalid-topic/%s'
                 % studyguide_url_fragment,
@@ -6058,7 +6059,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
 
     def test_redirect_with_correct_classroom_name_in_url(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/math/topic-frag/studyguide/sub-one-frag',
                 expected_status_int=302,
@@ -6072,7 +6073,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
     def test_redirect_with_lowercase_subtopic_url_fragment(self) -> None:
         studyguide_url_fragment = 'studyguide/Sub-One-Frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_subtopic_page/staging/topic-frag/%s'
                 % studyguide_url_fragment,
@@ -6159,21 +6160,21 @@ class TopicViewerTests(test_utils.GenericTestBase):
         )
 
     def test_cannot_access_non_existent_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/invalid-topic',
                 expected_status_int=404,
             )
 
     def test_cannot_access_unpublished_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/topic', expected_status_int=404
             )
 
     def test_can_access_published_topic(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_topic_data/staging/topic', expected_status_int=200
             )
@@ -6182,7 +6183,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/invalid-topic', expected_status_int=302
             )
@@ -6192,7 +6193,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
     def test_redirect_with_correct_classroom_name_in_url(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/math/topic', expected_status_int=302
             )
@@ -6203,7 +6204,7 @@ class TopicViewerTests(test_utils.GenericTestBase):
 
     def test_redirect_with_lowercase_topic_url_fragment(self) -> None:
         topic_services.publish_topic(self.topic_id, self.admin_id)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_html_response(
                 '/mock_topic_page/staging/TOPIC', expected_status_int=302
             )
@@ -6247,13 +6248,13 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
     def test_admin_can_create_skill(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_skill')
         self.logout()
 
     def test_banned_user_cannot_create_skill(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_skill', expected_status_int=401
             )
@@ -6264,7 +6265,7 @@ class CreateSkillTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_add_create_skill(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_skill', expected_status_int=401
             )
@@ -6323,7 +6324,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     def test_admin_can_manage_question_skill_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id
             )
@@ -6332,7 +6333,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     def test_viewer_cannot_manage_question_skill_status(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id,
                 expected_status_int=401,
@@ -6344,7 +6345,7 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_manage_question_skill_status(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id,
                 expected_status_int=401,
@@ -6385,13 +6386,13 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
     def test_admin_can_create_topic(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_create_topic')
         self.logout()
 
     def test_banned_user_cannot_create_topic(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_topic', expected_status_int=401
             )
@@ -6402,7 +6403,7 @@ class CreateTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_create_topic(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_create_topic', expected_status_int=401
             )
@@ -6449,13 +6450,13 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
     def test_admin_can_manage_rights(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_manage_rights_for_topic/%s' % self.topic_id)
         self.logout()
 
     def test_banned_user_cannot_manage_rights(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_rights_for_topic/%s' % self.topic_id,
                 expected_status_int=401,
@@ -6467,7 +6468,7 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_manage_rights(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_manage_rights_for_topic/%s' % self.topic_id,
                 expected_status_int=401,
@@ -6516,7 +6517,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     def test_admin_can_change_topic_publication_status(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_change_publication_status/%s' % self.topic_id)
         self.logout()
 
@@ -6524,7 +6525,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_change_publication_status/invalid_topic_id',
                 expected_status_int=404,
@@ -6533,7 +6534,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_change_topic_publication_status(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_change_publication_status/%s' % self.topic_id,
                 expected_status_int=401,
@@ -6546,7 +6547,7 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_change_topic_publication_status(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_change_publication_status/%s' % self.topic_id,
                 expected_status_int=401,
@@ -6589,13 +6590,13 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
 
     def test_super_admin_can_perform_tasks_in_taskqueue(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_tasks_in_taskqueue')
         self.logout()
 
     def test_normal_user_cannot_perform_tasks_in_taskqueue(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_perform_tasks_in_taskqueue', expected_status_int=401
             )
@@ -6608,7 +6609,7 @@ class PerformTasksInTaskqueueTests(test_utils.GenericTestBase):
     def test_request_with_appropriate_header_can_perform_tasks_in_taskqueue(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_perform_tasks_in_taskqueue',
                 headers={'X-AppEngine-QueueName': 'name'},
@@ -6645,13 +6646,13 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
 
     def test_super_admin_can_perform_cron_tasks(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_perform_cron_task')
         self.logout()
 
     def test_normal_user_cannot_perform_cron_tasks(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_perform_cron_task', expected_status_int=401
             )
@@ -6664,7 +6665,7 @@ class PerformCronTaskTests(test_utils.GenericTestBase):
     def test_request_with_appropriate_header_can_perform_cron_tasks(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_perform_cron_task', headers={'X-AppEngine-Cron': 'true'}
             )
@@ -6714,7 +6715,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_skill_with_invalid_skill_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_custom_response(
                 '/mock_edit_skill/', 'text/plain', expected_status_int=404
             )
@@ -6722,28 +6723,28 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_skill(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
     def test_topic_manager_can_edit_public_skill(self) -> None:
         self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
     def test_normal_user_cannot_edit_public_skill(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401
             )
         self.logout()
 
     def test_guest_cannot_edit_public_skill(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401
             )
@@ -6782,19 +6783,19 @@ class DeleteSkillDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_delete_skill(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_delete_skill')
         self.assertTrue(response['success'])
         self.logout()
 
     def test_normal_user_cannot_delete_public_skill(self) -> None:
         self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock_delete_skill', expected_status_int=401)
         self.logout()
 
     def test_guest_cannot_delete_public_skill(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_skill', expected_status_int=401
             )
@@ -6858,7 +6859,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_edit_question(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401,
@@ -6869,7 +6870,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_question_with_invalid_question_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_question/invalid_question_id',
                 expected_status_int=404,
@@ -6878,7 +6879,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_admin_can_edit_question(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id
             )
@@ -6887,7 +6888,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_edit_question(self) -> None:
         self.login(self.user_a_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id
             )
@@ -6896,7 +6897,7 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_any_user_cannot_edit_question(self) -> None:
         self.login(self.user_b_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401,
@@ -6961,7 +6962,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_view_question_editor(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % self.question_id,
                 expected_status_int=401,
@@ -6972,7 +6973,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_view_question_editor_with_invalid_question_id(self) -> None:
         invalid_id = 'invalid_question_id'
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % invalid_id,
                 expected_status_int=404,
@@ -6986,7 +6987,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
 
     def test_curriculum_admin_can_view_question_editor(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % self.question_id
             )
@@ -6995,7 +6996,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_view_question_editor(self) -> None:
         self.login(self.user_a_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % self.question_id
             )
@@ -7005,7 +7006,7 @@ class ViewQuestionEditorDecoratorTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_view_question_editor(self) -> None:
         self.login(self.user_b_email)
         user_id_b = self.get_user_id_from_email(self.user_b_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_view_question_editor/%s' % self.question_id,
                 expected_status_int=401,
@@ -7066,7 +7067,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_guest_cannot_delete_question(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id,
                 expected_status_int=401,
@@ -7076,7 +7077,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_curriculum_admin_can_delete_question(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id
             )
@@ -7085,7 +7086,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_topic_manager_can_delete_question(self) -> None:
         self.login(self.user_a_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id
             )
@@ -7095,7 +7096,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
     def test_normal_user_cannot_delete_question(self) -> None:
         self.login(self.user_b_email)
         user_id_b = self.get_user_id_from_email(self.user_b_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id,
                 expected_status_int=401,
@@ -7147,7 +7148,7 @@ class PlayQuestionDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_can_play_question_with_valid_question_id(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_question/%s' % (self.question_id)
             )
@@ -7209,7 +7210,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_cannot_play_exploration_on_disabled_exploration_ids(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (
@@ -7220,7 +7221,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             )
 
     def test_guest_can_play_exploration_on_published_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_EXPLORATION, self.published_exp_id)
@@ -7231,7 +7232,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             self.assertEqual(response['entity_id'], self.published_exp_id)
 
     def test_guest_cannot_play_exploration_on_private_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id),
@@ -7239,7 +7240,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             )
 
     def test_cannot_play_exploration_with_none_exploration_rights(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_EXPLORATION, 'fake_exp_id'),
@@ -7247,7 +7248,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             )
 
     def test_can_play_question_for_valid_question_id(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_QUESTION, self.question_id)
@@ -7257,7 +7258,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['entity_type'], 'question')
 
     def test_cannot_play_question_invalid_question_id(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_QUESTION, 'question_id'),
@@ -7265,7 +7266,7 @@ class PlayEntityDecoratorTests(test_utils.GenericTestBase):
             )
 
     def test_cannot_play_entity_for_invalid_entity(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_play_entity/%s/%s'
                 % ('fake_entity_type', 'fake_entity_id'),
@@ -7335,7 +7336,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_can_edit_exploration_with_valid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/exploration/%s' % (self.published_exp_id)
             )
@@ -7347,7 +7348,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_cannot_edit_exploration_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/exploration/invalid_exp_id',
                 expected_status_int=404,
@@ -7356,7 +7357,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_banned_user_cannot_edit_exploration(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_EXPLORATION, self.private_exp_id),
@@ -7366,7 +7367,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_can_edit_question_with_valid_question_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_QUESTION, self.question_id)
@@ -7389,7 +7390,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             subtopics=[],
             next_subtopic_id=1,
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s' % (feconf.ENTITY_TYPE_TOPIC, topic_id)
             )
@@ -7400,7 +7401,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_edit_topic_with_invalid_topic_id(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         topic_id = 'incorrect_id'
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_TOPIC, topic_id),
@@ -7412,7 +7413,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s' % (feconf.ENTITY_TYPE_SKILL, skill_id)
             )
@@ -7424,7 +7425,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id)
@@ -7438,7 +7439,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     ) -> None:
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
@@ -7451,7 +7452,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, description='Description')
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS, skill_id),
@@ -7465,7 +7466,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
 
     def test_can_submit_images_to_explorations(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (
@@ -7480,7 +7481,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_unauthenticated_users_cannot_submit_images_to_explorations(
         self,
     ) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (
@@ -7494,7 +7495,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (
@@ -7515,7 +7516,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         blog_admin_id = self.get_user_id_from_email(self.BLOG_ADMIN_EMAIL)
         blog_post = blog_services.create_new_blog_post(blog_admin_id)
         blog_post_id = blog_post.id
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s'
                 % (feconf.ENTITY_TYPE_BLOG_POST, blog_post_id)
@@ -7540,7 +7541,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             subtopics=[],
             next_subtopic_id=1,
         )
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_entity/%s/%s' % (feconf.ENTITY_TYPE_STORY, story_id)
             )
@@ -7549,7 +7550,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_edit_entity_invalid_entity(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_edit_entity/%s/%s' % ('invalid_entity_type', 'q_id'),
                 expected_status_int=404,
@@ -7628,20 +7629,20 @@ class SaveExplorationTests(test_utils.GenericTestBase):
         )
 
     def test_unautheticated_user_cannot_save_exploration(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401
             )
 
     def test_cannot_save_exploration_with_invalid_exp_id(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/invalid_exp_id', expected_status_int=404)
         self.logout()
 
     def test_banned_user_cannot_save_exploration(self) -> None:
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401
             )
@@ -7649,21 +7650,21 @@ class SaveExplorationTests(test_utils.GenericTestBase):
 
     def test_owner_can_save_exploration(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_moderator_can_save_public_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
     def test_moderator_can_save_private_exploration(self) -> None:
         self.login(self.MODERATOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
 
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
@@ -7671,7 +7672,7 @@ class SaveExplorationTests(test_utils.GenericTestBase):
 
     def test_admin_can_save_private_exploration(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
@@ -7679,13 +7680,13 @@ class SaveExplorationTests(test_utils.GenericTestBase):
     def test_voice_artist_can_only_save_assigned_exploration(self) -> None:
         self.login(self.VOICE_ARTIST_EMAIL)
         # Checking voice artist can only save assigned public exploration.
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
 
         # Checking voice artist cannot save public exploration which he/she
         # is not assigned for.
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401
             )
@@ -7887,7 +7888,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_authors_cannot_update_suggestion_that_they_created(self) -> None:
         self.login(self.author_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
                 expected_status_int=401,
@@ -7901,7 +7902,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_admin_can_update_any_given_translation_suggestion(self) -> None:
         self.login(self.curriculum_admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id
             )
@@ -7912,14 +7913,14 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_admin_can_update_any_given_question_suggestion(self) -> None:
         self.login(self.curriculum_admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
         self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
         self.logout()
 
     def test_reviewer_can_update_translation_suggestion(self) -> None:
         self.login(self.hi_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id
             )
@@ -7930,13 +7931,13 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_reviewer_can_update_question_suggestion(self) -> None:
         self.login(self.hi_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.question_suggestion_id)
         self.assertEqual(response['suggestion_id'], self.question_suggestion_id)
         self.logout()
 
     def test_guest_cannot_update_any_suggestion(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
                 expected_status_int=401,
@@ -7949,7 +7950,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.en_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.translation_suggestion_id,
                 expected_status_int=401,
@@ -7963,7 +7964,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.hi_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % 'suggestion-id', expected_status_int=400
             )
@@ -7976,7 +7977,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_non_existent_suggestions_cannot_be_updated(self) -> None:
         self.login(self.hi_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % 'exploration.exp1.'
                 'WzE2MTc4NzExNzExNDEuOTE0XQ==WzQ5NTs',
@@ -7986,7 +7987,7 @@ class DecoratorForUpdatingSuggestionTests(test_utils.GenericTestBase):
 
     def test_not_allowed_suggestions_cannot_be_updated(self) -> None:
         self.login(self.en_language_reviewer)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock/%s' % self.edit_state_suggestion_id,
                 expected_status_int=400,
@@ -8123,7 +8124,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         payload = {}
         payload['report'] = self.REPORT_JSON
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report',
                 payload,
@@ -8142,7 +8143,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         payload = {}
         payload['report'] = self.REPORT_JSON
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report',
                 payload,
@@ -8160,7 +8161,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         payload = {}
         payload['report'] = self.REPORT_JSON
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report',
                 payload,
@@ -8180,7 +8181,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         payload = {}
         payload['report'] = self.REPORT_JSON
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report',
                 payload,
@@ -8200,7 +8201,7 @@ class OppiaAndroidDecoratorTest(test_utils.GenericTestBase):
         payload = {}
         payload['report'] = self.REPORT_JSON
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             self.post_json(
                 '/appfeedbackreporthandler/incoming_android_report',
                 payload,
@@ -8242,7 +8243,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_classroom_admin_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/classroom-admin', expected_status_int=401
             )
@@ -8254,7 +8255,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_classroom_admin_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/classroom-admin', expected_status_int=401
             )
@@ -8266,7 +8267,7 @@ class CanAccessClassroomAdminPageDecoratorTests(test_utils.GenericTestBase):
     def test_classroom_admin_can_access_classroom_admin_page(self) -> None:
         self.login(self.CLASSROOM_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/classroom-admin')
 
         self.assertEqual(response['success'], 1)
@@ -8306,7 +8307,7 @@ class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
 
     def test_normal_user_cannot_access_voiceover_admin_page(self) -> None:
         self.login(self.user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/voiceover-admin', expected_status_int=401
             )
@@ -8318,7 +8319,7 @@ class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_cannot_access_voiceover_admin_page(self) -> None:
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/voiceover-admin', expected_status_int=401
             )
@@ -8330,7 +8331,7 @@ class CanAccessVoiceoverAdminPageDecoratorTests(test_utils.GenericTestBase):
     def test_voiceover_admin_can_access_voiceover_admin_page(self) -> None:
         self.login(self.VOICEOVER_ADMIN_EMAIL)
 
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with mock.patch.object(self, 'testapp', self.mock_testapp):
             response = self.get_json('/voiceover-admin')
 
         self.assertEqual(response['success'], 1)
@@ -8364,7 +8365,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_error_when_android_build_secret_is_none(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         swap_api_key_secrets_return_none = self.swap_with_checks(
             secrets_services,
             'get_secret',
@@ -8374,7 +8375,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
             ],
         )
 
-        with testapp_swap:
+        with testapp_patch:
             with swap_api_key_secrets_return_none:
                 response = self.get_json(
                     '/mock_secret_page',
@@ -8388,12 +8389,12 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_error_when_given_api_key_is_invalid(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        mailchimp_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret'
         )
 
-        with testapp_swap, mailchimp_swap:
+        with testapp_patch, mailchimp_patch:
             response = self.get_json(
                 '/mock_secret_page',
                 expected_status_int=401,
@@ -8406,12 +8407,12 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
     def test_no_error_when_given_api_key_is_valid(self) -> None:
-        testapp_swap = self.swap(self, 'testapp', self.mock_testapp)
-        mailchimp_swap = self.swap_to_always_return(
+        testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
+        mailchimp_patch = self.swap_to_always_return(
             secrets_services, 'get_secret', 'secret'
         )
 
-        with testapp_swap, mailchimp_swap:
+        with testapp_patch, mailchimp_patch:
             response = self.get_json(
                 '/mock_secret_page',
                 expected_status_int=200,

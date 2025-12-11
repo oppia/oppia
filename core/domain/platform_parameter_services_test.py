@@ -17,6 +17,7 @@
 """Unit tests for platform_parameter_services.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import enum
 
@@ -96,7 +97,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             platform_parameter_domain.DataTypes.NUMBER,
         )
 
-        self.swap_all_platform_params_list = self.swap(
+        self.swap_all_platform_params_list = mock.patch.object(
             platform_parameter_list,
             'ALL_PLATFORM_PARAMS_LIST',
             self.param_name_enums,
@@ -139,7 +140,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_create_evaluation_context_for_client_returns_correct_context(
         self,
     ) -> None:
-        with self.swap(constants, 'DEV_MODE', True):
+        with mock.patch.object(constants, 'DEV_MODE', True):
             context = parameter_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',
@@ -178,21 +179,23 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 False,
             )
 
-            with self.swap(constants, 'BRANCH_NAME', ''):
+            with mock.patch.object(constants, 'BRANCH_NAME', ''):
                 self.assertTrue(
                     parameter_services.get_platform_parameter_value(
                         self.param_c.name
                     )
                 )
 
-            with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'):
+            with mock.patch.object(
+                constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'
+            ):
                 self.assertTrue(
                     parameter_services.get_platform_parameter_value(
                         self.param_c.name
                     )
                 )
 
-            with self.swap(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            with mock.patch.object(constants, 'BRANCH_NAME', 'release-3-3-1'):
                 self.assertTrue(
                     parameter_services.get_platform_parameter_value(
                         self.param_c.name

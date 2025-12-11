@@ -17,6 +17,7 @@
 """Tests interface for storage model switching."""
 
 from __future__ import annotations
+from unittest import mock
 
 import re
 import sys
@@ -361,7 +362,7 @@ class RegistryUnitTest(test_utils.TestBase):
             azure_speech_synthesis_services,
         )
 
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False):
             self.assertEqual(
                 azure_speech_synthesis_services,
                 self.registry_instance.import_speech_synthesis_services(),
@@ -371,11 +372,11 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailgun.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf,
             'EMAIL_SERVICE_PROVIDER',
             feconf.EMAIL_SERVICE_PROVIDER_MAILGUN,
-        ), self.swap(constants, 'DEV_MODE', False):
+        ), mock.patch.object(constants, 'DEV_MODE', False):
             from core.platform.email import mailgun_email_services
 
             self.assertEqual(
@@ -387,9 +388,9 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), self.swap(constants, 'DEV_MODE', False):
+        ), mock.patch.object(constants, 'DEV_MODE', False):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid email service provider: invalid service provider',
@@ -400,11 +401,11 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         mailchimp.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf,
             'BULK_EMAIL_SERVICE_PROVIDER',
             feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP,
-        ), self.swap(constants, 'EMULATOR_MODE', False):
+        ), mock.patch.object(constants, 'EMULATOR_MODE', False):
             from core.platform.bulk_email import mailchimp_bulk_email_services
 
             self.assertEqual(
@@ -416,9 +417,9 @@ class RegistryUnitTest(test_utils.TestBase):
         """Tests import email services method for when email service provider is
         an invalid option.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), self.swap(constants, 'EMULATOR_MODE', False):
+        ), mock.patch.object(constants, 'EMULATOR_MODE', False):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid bulk email service provider: invalid service '
@@ -440,7 +441,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudTaskqueue:
             pass
 
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudTaskqueue
             # which is of class type. So because of this MyPy throws an error.
@@ -461,7 +462,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_cloud_translate_services(self) -> None:
         """Tests import cloud translate services function."""
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False):
             from core.platform.translate import cloud_translate_services
 
             self.assertEqual(
@@ -491,7 +492,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudStorage:
             pass
 
-        with self.swap(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudStorage
             # which is of class type. So because of this MyPy throws an error.

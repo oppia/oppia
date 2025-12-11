@@ -15,6 +15,7 @@
 """Unit tests for setup.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import os
@@ -84,7 +85,7 @@ class SetupTests(test_utils.GenericTestBase):
             if common.GOOGLE_CLOUD_SDK_HOME not in path
         ]
 
-        swap_path = self.swap(sys, 'path', dummy_path)
+        swap_path = mock.patch.object(sys, 'path', dummy_path)
 
         with swap_setup, swap_path, swap_open:
             # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to

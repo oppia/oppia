@@ -17,6 +17,7 @@
 """Tests for event handling."""
 
 from __future__ import annotations
+from unittest import mock
 
 import importlib
 import inspect
@@ -415,8 +416,10 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        with logging_swap:
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
+        with logging_patch:
             event_services.StatsEventsHandler.record(
                 'eid1',
                 1,

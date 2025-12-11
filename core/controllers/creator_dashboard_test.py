@@ -15,6 +15,7 @@
 """Tests for the creator dashboard and the notifications dashboard."""
 
 from __future__ import annotations
+from unittest import mock
 
 import logging
 import os
@@ -291,7 +292,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
                 )
             ]
 
-        with self.swap(
+        with mock.patch.object(
             feedback_services,
             'get_thread_analytics_multi',
             mock_get_thread_analytics_multi,
@@ -414,7 +415,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
-        get_last_week_dashboard_stats_swap = self.swap(
+        get_last_week_dashboard_stats_patch = mock.patch.object(
             user_services,
             'get_last_week_dashboard_stats',
             lambda _: {
@@ -426,7 +427,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             },
         )
 
-        with get_last_week_dashboard_stats_swap:
+        with get_last_week_dashboard_stats_patch:
             last_week_stats = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)[
                 'last_week_stats'
             ]
@@ -445,14 +446,14 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
     def test_broken_last_week_stats_produce_exception(self) -> None:
         self.login(self.OWNER_EMAIL, is_super_admin=True)
 
-        get_last_week_dashboard_stats_swap = self.swap(
+        get_last_week_dashboard_stats_patch = mock.patch.object(
             user_services,
             'get_last_week_dashboard_stats',
             lambda _: {'key_1': 1, 'key_2': 2},
         )
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with get_last_week_dashboard_stats_swap:
+            with get_last_week_dashboard_stats_patch:
                 last_week_stats = self.get_json(
                     feconf.CREATOR_DASHBOARD_DATA_URL
                 )['last_week_stats']
@@ -623,7 +624,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_upload_exploration(self) -> None:
-        with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
+        with mock.patch.object(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
             self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 

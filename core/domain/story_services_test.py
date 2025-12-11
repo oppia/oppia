@@ -15,6 +15,7 @@
 """Tests the methods defined in story services."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import logging
@@ -899,7 +900,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'error', _mock_logging_function
+        )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Expected change to be of type StoryChange'
         )
@@ -907,7 +910,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         # TODO(#13059): Here we use MyPy ignore because after we fully type
         # the codebase we plan to get rid of the tests that intentionally
         # test wrong inputs that we can normally catch by typing.
-        with logging_swap, assert_raises_regexp_context_manager:
+        with logging_patch, assert_raises_regexp_context_manager:
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, [{}], 'Updated story node.'  # type: ignore[list-item]
             )
@@ -1640,13 +1643,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             """Mocks logging.exception()."""
             raise Exception('Error in exploration')
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
-        validate_fn_swap = self.swap(
+        logging_patch = mock.patch.object(
+            logging, 'exception', _mock_logging_function
+        )
+        validate_fn_patch = mock.patch.object(
             exp_services,
             'validate_exploration_for_story',
             _mock_validate_function,
         )
-        with logging_swap, validate_fn_swap:
+        with logging_patch, validate_fn_patch:
             self.save_new_valid_exploration(
                 'exp_id_1', self.user_id_a, title='title', category='Algebra'
             )
@@ -2921,7 +2926,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         def mock_get_current_time_in_millisecs() -> int:
             return 1690555400000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             mock_get_current_time_in_millisecs,
@@ -3342,11 +3347,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT,
         )
 
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 5
         )
 
-        with current_schema_version_swap:
+        with current_schema_version_patch:
             story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 5)

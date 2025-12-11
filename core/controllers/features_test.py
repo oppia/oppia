@@ -15,6 +15,7 @@
 """Tests for fetching the features Oppia provides to its users."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf
 from core.domain import opportunity_services, rights_manager, user_services

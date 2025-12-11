@@ -17,6 +17,7 @@
 """Tests for methods in core.domain.caching_services"""
 
 from __future__ import annotations
+from unittest import mock
 
 import json
 
@@ -637,7 +638,7 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
                     ),
                 )
 
-        with self.swap(
+        with mock.patch.object(
             memory_cache_services,
             'set_multi',
             mock_memory_cache_services_set_multi,

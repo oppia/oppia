@@ -15,6 +15,7 @@
 """Tests for the release coordinator page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import enum
 
@@ -291,13 +292,13 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_flag_name\' must be provided when the action is '
             'update_feature_flag.',
         )
-        with assert_raises_regexp_context_manager, prod_mode_swap:
+        with assert_raises_regexp_context_manager, prod_mode_patch:
             self.put_json(
                 feconf.FEATURE_FLAGS_URL,
                 {'action': 'update_feature_flag', 'feature_flag_name': None},
@@ -310,7 +311,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_flag_services,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -320,12 +321,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
             },
         )
-        feature_list_ctx = self.swap(
+        feature_list_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1],
         )
-        feature_set_ctx = self.swap(
+        feature_set_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_1.value]),
@@ -354,7 +355,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
     def test_post_with_flag_changes_updates_feature_flags(self) -> None:
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_flag_registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -364,12 +365,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
             },
         )
-        feature_list_ctx = self.swap(
+        feature_list_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_1],
         )
-        feature_set_ctx = self.swap(
+        feature_set_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_1.value]),
@@ -414,13 +415,13 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_list_ctx = self.swap(
+        feature_list_ctx = mock.patch.object(
             feature_flag_services, 'ALL_FEATURE_FLAGS', []
         )
-        feature_set_ctx = self.swap(
+        feature_set_ctx = mock.patch.object(
             feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([])
         )
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_flag_registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -455,7 +456,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        swap_name_to_description_feature_stage_dict = self.swap(
+        swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_flag_registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
             {
@@ -465,12 +466,12 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
                 )
             },
         )
-        feature_list_ctx = self.swap(
+        feature_list_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURE_FLAGS',
             [FeatureNames.TEST_FEATURE_2],
         )
-        feature_set_ctx = self.swap(
+        feature_set_ctx = mock.patch.object(
             feature_flag_services,
             'ALL_FEATURES_NAMES_SET',
             set([FeatureNames.TEST_FEATURE_2.value]),

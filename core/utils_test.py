@@ -17,6 +17,7 @@
 """Unit tests for utils.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import base64
 import copy
@@ -233,7 +234,7 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def test_are_datetimes_close(self) -> None:
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
-        with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
+        with mock.patch.object(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
             self.assertTrue(
                 utils.are_datetimes_close(
                     datetime.datetime(2016, 12, 1, 0, 0, 1), initial_time
@@ -625,7 +626,7 @@ class UtilsTests(test_utils.GenericTestBase):
             )
 
     def test_get_asset_dir_prefix_with_prod_mode(self) -> None:
-        with self.swap(constants, 'DEV_MODE', False):
+        with mock.patch.object(constants, 'DEV_MODE', False):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')
 
     def test_base64_from_int(self) -> None:

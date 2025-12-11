@@ -17,6 +17,7 @@
 """Unit tests for scripts/install_dependencies_json_packages.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import io
@@ -86,23 +87,23 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> None:
             self.check_function_calls['extractall_is_called'] = True
 
-        self.unzip_swap = self.swap(
+        self.unzip_patch = mock.patch.object(
             install_dependencies_json_packages,
             'TMP_UNZIP_PATH',
             MOCK_TMP_UNZIP_PATH,
         )
-        self.dir_exists_swap = self.swap(
+        self.dir_exists_patch = mock.patch.object(
             common, 'ensure_directory_exists', mock_ensure_directory_exists
         )
-        self.exists_swap = self.swap(os.path, 'exists', mock_exists)
-        self.remove_swap = self.swap(os, 'remove', mock_remove)
-        self.rename_swap = self.swap(os, 'rename', mock_rename)
-        self.url_retrieve_swap = self.swap(
+        self.exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        self.remove_patch = mock.patch.object(os, 'remove', mock_remove)
+        self.rename_patch = mock.patch.object(os, 'rename', mock_rename)
+        self.url_retrieve_patch = mock.patch.object(
             install_dependencies_json_packages,
             'url_retrieve',
             mock_url_retrieve,
         )
-        self.extract_swap = self.swap(
+        self.extract_patch = mock.patch.object(
             zipfile.ZipFile, 'extractall', mock_extractall
         )
 
@@ -136,13 +137,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_url_retrieve(_url: str, filename: str) -> None:
             check_file_downloads[filename] = True
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_retrieve_swap = self.swap(
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        url_retrieve_patch = mock.patch.object(
             install_dependencies_json_packages,
             'url_retrieve',
             mock_url_retrieve,
         )
-        with self.dir_exists_swap, exists_swap, url_retrieve_swap:
+        with self.dir_exists_patch, exists_patch, url_retrieve_patch:
             install_dependencies_json_packages.download_files(
                 'source_url', 'target_dir', ['file1', 'file2']
             )
@@ -157,11 +158,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             exists_arr.append(False)
             return False
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
 
-        with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
-            with self.remove_swap, self.rename_swap, self.unzip_swap:
-                with self.extract_swap:
+        with exists_patch, self.dir_exists_patch, self.url_retrieve_patch:
+            with self.remove_patch, self.rename_patch, self.unzip_patch:
+                with self.extract_patch:
                     install_dependencies_json_packages.download_and_unzip_files(
                         'source url', 'target dir', 'zip root', 'target root'
                     )
@@ -192,13 +193,13 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             )
             return file_obj
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        url_open_swap = self.swap(
+        exists_patch = mock.patch.object(os.path, 'exists', mock_exists)
+        url_open_patch = mock.patch.object(
             install_dependencies_json_packages, 'url_open', mock_url_open
         )
-        with exists_swap, self.dir_exists_swap, self.url_retrieve_swap:
-            with self.remove_swap, self.rename_swap, self.extract_swap:
-                with url_open_swap:
+        with exists_patch, self.dir_exists_patch, self.url_retrieve_patch:
+            with self.remove_patch, self.rename_patch, self.extract_patch:
+                with url_open_patch:
                     install_dependencies_json_packages.download_and_unzip_files(
                         'http://src', 'target dir', 'zip root', 'target root'
                     )
@@ -245,8 +246,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
+        print_patch = mock.patch.object(builtins, 'print', mock_print)
+        with print_patch, self.assertRaisesRegex(SystemExit, '1'):
             install_dependencies_json_packages.test_dependencies_syntax(
                 'files',
                 {
@@ -266,8 +267,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
+        print_patch = mock.patch.object(builtins, 'print', mock_print)
+        with print_patch, self.assertRaisesRegex(SystemExit, '1'):
             install_dependencies_json_packages.test_dependencies_syntax(
                 'zip',
                 {
@@ -290,8 +291,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         def mock_print(msg: str) -> None:
             print_arr.append(msg)
 
-        print_swap = self.swap(builtins, 'print', mock_print)
-        with print_swap, self.assertRaisesRegex(SystemExit, '1'):
+        print_patch = mock.patch.object(builtins, 'print', mock_print)
+        with print_patch, self.assertRaisesRegex(SystemExit, '1'):
             install_dependencies_json_packages.test_dependencies_syntax(
                 'zip',
                 {
@@ -326,10 +327,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        return_json_swap = self.swap(
+        return_json_patch = mock.patch.object(
             install_dependencies_json_packages, 'return_json', mock_return_json
         )
-        with return_json_swap:
+        with return_json_patch:
             install_dependencies_json_packages.validate_dependencies('filepath')
 
     def test_validate_dependencies_with_missing_download_format(self) -> None:
@@ -346,10 +347,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 }
             }
 
-        return_json_swap = self.swap(
+        return_json_patch = mock.patch.object(
             install_dependencies_json_packages, 'return_json', mock_return_json
         )
-        with return_json_swap, self.assertRaisesRegex(
+        with return_json_patch, self.assertRaisesRegex(
             Exception,
             re.escape(
                 'downloadFormat not specified in {\'version\': \'2.7.5\', '
@@ -419,27 +420,27 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> None:
             check_function_calls['download_and_unzip_files_is_called'] = True
 
-        return_json_swap = self.swap(
+        return_json_patch = mock.patch.object(
             install_dependencies_json_packages, 'return_json', mock_return_json
         )
-        validate_swap = self.swap(
+        validate_patch = mock.patch.object(
             install_dependencies_json_packages,
             'validate_dependencies',
             mock_validate_dependencies,
         )
-        download_files_swap = self.swap(
+        download_files_patch = mock.patch.object(
             install_dependencies_json_packages,
             'download_files',
             mock_download_files,
         )
-        unzip_files_swap = self.swap(
+        unzip_files_patch = mock.patch.object(
             install_dependencies_json_packages,
             'download_and_unzip_files',
             mock_download_and_unzip_files,
         )
 
-        with validate_swap, return_json_swap, download_files_swap:
-            with unzip_files_swap:
+        with validate_patch, return_json_patch, download_files_patch:
+            with unzip_files_patch:
                 install_dependencies_json_packages.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -502,9 +503,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 self._assert_ssl_context_matches_default(context)
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_patch = mock.patch.object(
+                urlrequest, 'urlopen', mock_urlopen
+            )
 
-            with urlopen_swap:
+            with urlopen_patch:
                 install_dependencies_json_packages.url_retrieve(
                     'https://example.com', output_path
                 )
@@ -527,9 +530,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     raise ssl.SSLError()
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_patch = mock.patch.object(
+                urlrequest, 'urlopen', mock_urlopen
+            )
 
-            with urlopen_swap:
+            with urlopen_patch:
                 install_dependencies_json_packages.url_retrieve(
                     'https://example.com', output_path
                 )
@@ -551,10 +556,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self._assert_ssl_context_matches_default(context)
             raise ssl.SSLError('test_error')
 
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        open_patch = mock.patch.object(builtins, 'open', mock_open)
+        urlopen_patch = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
 
-        with open_swap, urlopen_swap:
+        with open_patch, urlopen_patch:
             with self.assertRaisesRegex(ssl.SSLError, 'test_error'):
                 install_dependencies_json_packages.url_retrieve(
                     'https://example.com', 'test_path'
@@ -569,10 +574,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         ) -> NoReturn:  # pylint: disable=unused-argument
             raise AssertionError('urlopen() should not be called')
 
-        open_swap = self.swap(builtins, 'open', mock_open)
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        open_patch = mock.patch.object(builtins, 'open', mock_open)
+        urlopen_patch = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
 
-        with open_swap, urlopen_swap:
+        with open_patch, urlopen_patch:
             with self.assertRaisesRegex(
                 Exception, 'The URL http://example.com should use HTTPS.'
             ):
@@ -594,9 +599,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 self._assert_ssl_context_matches_default(context)
                 return io.BytesIO(b'content')
 
-            urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+            urlopen_patch = mock.patch.object(
+                urlrequest, 'urlopen', mock_urlopen
+            )
 
-            with urlopen_swap:
+            with urlopen_patch:
                 install_dependencies_json_packages.url_retrieve(
                     'https://example.com', output_path, enforce_https=False
                 )

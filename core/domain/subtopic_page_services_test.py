@@ -17,6 +17,7 @@
 """Tests for subtopic page domain objects."""
 
 from __future__ import annotations
+from unittest import mock
 
 import copy
 import re
@@ -365,7 +366,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             )
 
     def test_migrate_page_contents_from_v1_to_v2_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2
         )
         html_content = (
@@ -418,7 +419,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
 
-        with current_schema_version_swap:
+        with current_schema_version_patch:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model
             )
@@ -429,7 +430,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_migrate_page_contents_from_v2_to_v3_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 3
         )
         html_content = (
@@ -483,7 +484,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(subtopic_page_model.page_contents_schema_version, 2)
 
-        with current_schema_version_swap:
+        with current_schema_version_patch:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model
             )
@@ -494,7 +495,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_migrate_page_contents_from_v3_to_v4_schema(self) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 4
         )
         expected_html_content = '<p>1 × 3 😕 😊</p>'
@@ -538,7 +539,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(subtopic_page_model.page_contents_schema_version, 3)
 
-        with current_schema_version_swap:
+        with current_schema_version_patch:
             subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model
             )
@@ -551,7 +552,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
         self,
     ) -> None:
-        current_schema_version_swap = self.swap(
+        current_schema_version_patch = mock.patch.object(
             feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2
         )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
@@ -565,7 +566,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         subtopic_page_model.page_contents_schema_version = 0
         subtopic_page_model.commit(self.user_id, '', [])
 
-        with current_schema_version_swap, assert_raises_regexp_context_manager:
+        with current_schema_version_patch, assert_raises_regexp_context_manager:
             subtopic_page_services.get_subtopic_page_from_model(
                 subtopic_page_model
             )

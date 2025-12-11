@@ -15,6 +15,7 @@
 """Tests for the skill editor page."""
 
 from __future__ import annotations
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants
@@ -123,7 +124,9 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
             actions.remove(role_services.ACTION_EDIT_SKILL_DESCRIPTION)
             return actions
 
-        with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
+        with mock.patch.object(
+            role_services, 'get_all_actions', mock_get_all_actions
+        ):
             json_response = self.get_json(self.url)
             self.assertEqual(json_response['can_edit_skill_description'], False)
         self.logout()
@@ -343,12 +346,12 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         # Check PUT returns 400 when an exception is raised updating the
         # skill.
-        update_skill_swap = self.swap(
+        update_skill_patch = mock.patch.object(
             skill_services,
             'update_skill',
             self._mock_update_skill_raise_exception,
         )
-        with update_skill_swap:
+        with update_skill_patch:
             self.put_json(
                 self.url,
                 self.put_payload,
@@ -383,12 +386,12 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_editable_skill_handler_delete_succeeds(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can delete a skill.
-        skill_has_topics_swap = self.swap(
+        skill_has_topics_patch = mock.patch.object(
             topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [],
         )
-        with skill_has_topics_swap:
+        with skill_has_topics_patch:
             self.delete_json(self.url)
         self.logout()
 
@@ -398,15 +401,15 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check DELETE returns 400 when the skill still has associated
         # questions.
-        skill_has_questions_swap = self.swap(
+        skill_has_questions_patch = mock.patch.object(
             skill_services, 'skill_has_associated_questions', lambda x: True
         )
-        skill_has_topics_swap = self.swap(
+        skill_has_topics_patch = mock.patch.object(
             topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [],
         )
-        with skill_has_questions_swap, skill_has_topics_swap:
+        with skill_has_questions_patch, skill_has_topics_patch:
             self.delete_json(self.url, expected_status_int=400)
         self.logout()
 

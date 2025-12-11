@@ -15,6 +15,7 @@
 """Tests for the voiceover admin page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import uuid
@@ -379,12 +380,12 @@ class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
         )
 
         with (
-            self.swap(
+            mock.patch.object(
                 opportunity_services,
                 'is_exploration_available_for_contribution',
                 lambda _: True,
             ),
-            self.swap(taskqueue_services, 'defer', mock_defer),
+            mock.patch.object(taskqueue_services, 'defer', mock_defer),
         ):
             self.post_json(handler_url, {}, csrf_token=csrf_token)
 

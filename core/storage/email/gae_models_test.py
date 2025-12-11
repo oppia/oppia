@@ -17,6 +17,7 @@
 """Tests for core.storage.email.gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import types
@@ -55,14 +56,14 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return 'Email Hash'
 
-        self.generate_constant_hash_ctx = self.swap(
+        self.generate_constant_hash_ctx = mock.patch.object(
             email_models.SentEmailModel,
             '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel),
         )
         # Since we cannot reuse swap, we need to duplicate the code so that
         # we can create the intitial model here.
-        with self.swap(
+        with mock.patch.object(
             email_models.SentEmailModel,
             '_generate_hash',
             types.MethodType(mock_generate_hash, email_models.SentEmailModel),
@@ -278,7 +279,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
         ) -> str:
             return 'some_poor_hash'
 
-        swap_generate_hash = self.swap(
+        swap_generate_hash = mock.patch.object(
             utils, 'convert_to_hash', mock_convert_to_hash
         )
         with swap_generate_hash:
@@ -307,7 +308,7 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
             'producing too many collisions.',
         ):
             # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
+            with mock.patch.object(
                 email_models.SentEmailModel,
                 'get_by_id',
                 types.MethodType(

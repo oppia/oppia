@@ -17,6 +17,7 @@
 """Tests for core.storage.base_model.gae_models."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import re
@@ -362,7 +363,7 @@ class BaseHumanMaintainedModelTests(test_utils.GenericTestBase):
             # and we do actually want to save the changes in this case.
             base_models.BaseModel.put(self)
 
-        with self.swap(TestBaseHumanMaintainedModel, 'put', mock_put):
+        with mock.patch.object(TestBaseHumanMaintainedModel, 'put', mock_put):
             self.model_instance.put()
 
     def test_put(self) -> None:
@@ -836,7 +837,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             for version_number in model_2_version_numbers
         ]
 
-        with self.swap(feconf, 'MAX_NUMBER_OF_OPS_IN_TRANSACTION', 2):
+        with mock.patch.object(feconf, 'MAX_NUMBER_OF_OPS_IN_TRANSACTION', 2):
             TestVersionedModel.delete_multi(
                 [model_1_id, model_2_id],
                 feconf.SYSTEM_COMMITTER_ID,
@@ -1026,7 +1027,7 @@ class BaseModelTests(test_utils.GenericTestBase):
     def test_create_raises_error_when_many_id_collisions_occur(self) -> None:
 
         # Swap dependent method get_by_id to simulate collision every time.
-        get_by_id_swap = self.swap(
+        get_by_id_patch = mock.patch.object(
             TestBaseModel,
             'get_by_id',
             types.MethodType(lambda _, __: True, TestBaseModel),
@@ -1036,7 +1037,7 @@ class BaseModelTests(test_utils.GenericTestBase):
             Exception, 'New id generator is producing too many collisions.'
         )
 
-        with assert_raises_regexp_context_manager, get_by_id_swap:
+        with assert_raises_regexp_context_manager, get_by_id_patch:
             TestBaseModel.get_new_id('exploration')
 
     def test_get_version_multi(self) -> None:

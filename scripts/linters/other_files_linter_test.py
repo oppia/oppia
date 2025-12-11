@@ -17,6 +17,7 @@
 """Unit tests for app_dev_linter.py."""
 
 from __future__ import annotations
+from unittest import mock
 
 import builtins
 import io
@@ -72,8 +73,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
 
-        self.open_swap = self.swap(builtins, 'open', mock_open)
-        self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        self.open_patch = mock.patch.object(builtins, 'open', mock_open)
+        self.listdir_patch = mock.patch.object(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self) -> None:
         def mock_readlines(
@@ -85,10 +86,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-5.3.3/',
             )
 
-        readlines_swap = self.swap(
+        readlines_patch = mock.patch.object(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        with readlines_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_skip_files_in_app_dev_yaml()
@@ -108,10 +109,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-5.3/',
             )
 
-        readlines_swap = self.swap(
+        readlines_patch = mock.patch.object(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        with readlines_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_skip_files_in_app_dev_yaml()
@@ -141,10 +142,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '}),]',
             )
 
-        readlines_swap = self.swap(
+        readlines_patch = mock.patch.object(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        with readlines_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_webpack_config_file()
@@ -167,10 +168,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '}),]',
             )
 
-        readlines_swap = self.swap(
+        readlines_patch = mock.patch.object(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        with readlines_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_webpack_config_file()
@@ -189,10 +190,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         ) -> Tuple[str, ...]:
             return ('plugins: [', '   new HtmlWebpackPlugin({', '}),]')
 
-        readlines_swap = self.swap(
+        readlines_patch = mock.patch.object(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        with readlines_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_webpack_config_file()
@@ -210,7 +211,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_swap, self.listdir_swap:
+        with self.open_patch, self.listdir_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -225,7 +226,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_swap, self.listdir_swap:
+        with self.open_patch, self.listdir_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -238,7 +239,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def test_check_third_party_libs_type_defs_multiple(self) -> None:
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_swap, self.listdir_swap, self.print_swap:
+        with self.open_patch, self.listdir_patch, self.print_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -263,7 +264,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_swap, self.listdir_swap:
+        with self.open_patch, self.listdir_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -289,7 +290,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_swap, self.listdir_swap, self.print_swap:
+        with self.open_patch, self.listdir_patch, self.print_patch:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -348,13 +349,13 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'mock_read called with unexpected path %s' % path
             )
 
-        listdir_swap = self.swap_with_checks(
+        listdir_patch = self.swap_with_checks(
             os,
             'listdir',
             mock_listdir,
             expected_args=[(other_files_linter.WORKFLOWS_DIR,)],
         )
-        read_swap = self.swap(FILE_CACHE, 'read', mock_read)
+        read_patch = mock.patch.object(FILE_CACHE, 'read', mock_read)
 
         expected = [
             '%s --> Job run has an unnamed step'
@@ -362,7 +363,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'FAILED  Github workflow steps have a name check failed',
         ]
 
-        with listdir_swap, read_swap:
+        with listdir_patch, read_patch:
             task_results = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_github_workflows_have_name()

@@ -17,6 +17,7 @@
 """Tests for the exploration editor page."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import io
@@ -1321,7 +1322,9 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
             """Mocks logging.error()."""
             observed_log_messages.append(msg % args)
 
-        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        logging_patch = mock.patch.object(
+            logging, 'exception', _mock_logging_function
+        )
 
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
@@ -1329,7 +1332,7 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(exp_id, owner_id)
 
-        with logging_swap:
+        with logging_patch:
             self.get_json(
                 '/createhandler/state_interaction_stats/%s/%s'
                 % (exp_id, 'invalid_state_name'),
@@ -1467,9 +1470,9 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             if msg != log_from_google_app_engine:
                 observed_log_messages.append(msg)
 
-        with self.swap(logging, 'info', mock_logging_function), self.swap(
-            logging, 'debug', mock_logging_function
-        ):
+        with mock.patch.object(
+            logging, 'info', mock_logging_function
+        ), mock.patch.object(logging, 'debug', mock_logging_function):
             # Checking for non-moderator/non-admin.
 
             # Unpublished exploration id.
@@ -3761,11 +3764,11 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
         # User will behave as a voice artist because check_can_edit_activity
         # is false but check_can_voiceover_activity is still true.
-        get_voiceover_swap = self.swap_to_always_return(
+        get_voiceover_patch = self.swap_to_always_return(
             rights_manager, 'check_can_edit_activity', value=False
         )
 
-        with get_voiceover_swap:
+        with get_voiceover_patch:
             response = self.put_json(
                 '/createhandler/autosave_draft/%s' % self.EXP_ID2,
                 payload,
@@ -3953,7 +3956,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
         ):
             response = self.get_json(
@@ -3965,7 +3968,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -4024,7 +4027,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -4055,7 +4058,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
         ):
             self.delete_json(
@@ -4069,7 +4072,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -4147,7 +4150,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with self.swap(
+        with mock.patch.object(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
@@ -4288,11 +4291,11 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         ) as f:
             raw_image = f.read()
 
-        get_image_exists_swap = self.swap_to_always_return(
+        get_image_exists_patch = self.swap_to_always_return(
             fs_services.GcsFileSystem, 'isfile', value=True
         )
 
-        with get_image_exists_swap:
+        with get_image_exists_patch:
             response = self.post_json(
                 publish_url,
                 {
@@ -4370,7 +4373,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         """Test that regex pattern updates with
         changes to accepted extensions.
         """
-        with self.swap(
+        with mock.patch.object(
             feconf,
             'ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS',
             {'test': ['abc', 'xyz']},

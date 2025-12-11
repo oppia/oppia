@@ -15,6 +15,7 @@
 """Tests for story domain objects and methods defined on them."""
 
 from __future__ import annotations
+from unittest import mock
 
 import datetime
 import os
@@ -1099,7 +1100,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             _mock_get_current_time_in_millisecs,
@@ -1128,7 +1129,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         def _mock_get_current_time_in_millisecs() -> int:
             return 1672483686000
 
-        with self.swap(
+        with mock.patch.object(
             utils,
             'get_current_time_in_millisecs',
             _mock_get_current_time_in_millisecs,
