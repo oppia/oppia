@@ -72,6 +72,7 @@ const volunteerUrl = testConstants.URLs.Volunteer;
 const welcomeToOppiaUrl = testConstants.URLs.WelcomeToOppia;
 const impactReport2022Url = testConstants.URLs.ImpactReport2022Url;
 const impactReport2023Url = testConstants.URLs.ImpactReport2023Url;
+const impactReport2024Url = testConstants.URLs.ImpactReport2024Url;
 const teacherStoryTaggedBlogsLink =
   testConstants.URLs.TeacherStoryTaggedBlogsLink;
 const parentsTeachersGuideUrl = testConstants.URLs.ParentsTeachersGuideUrl;
@@ -130,6 +131,7 @@ const oppiaTwitterLinkIcon = '.e2e-test-oppia-twitter-follow';
 const oppiaGithubLinkIcon = '.e2e-test-oppia-github-follow';
 const oppiaLinkedInLinkIcon = '.e2e-test-oppia-linkedin-follow';
 const oppiaAndroidAppButton = '.e2e-test-oppia-android-app';
+const signUpUsernameInputField = 'input.e2e-test-username-input';
 
 const watchAVideoButton =
   'a.e2e-test-thanks-for-donating-page-watch-a-video-button';
@@ -1175,6 +1177,11 @@ export class LoggedOutUser extends BaseUser {
       );
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
+      await this.openExternalLinkBySelectorAndText(
+        mobileSidebarImpactReportButton,
         '2023',
         impactReport2023Url
       );
@@ -1192,6 +1199,11 @@ export class LoggedOutUser extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.openExternalLinkBySelectorAndText(
+        navbarAboutTabImpactReportButton,
+        '2024',
+        impactReport2024Url
+      );
       await this.openExternalLinkBySelectorAndText(
         navbarAboutTabImpactReportButton,
         '2023',
@@ -2803,7 +2815,7 @@ export class LoggedOutUser extends BaseUser {
   async clickViewReportButtonInAboutPage(): Promise<void> {
     await this.openExternalLink(
       impactReportButtonInAboutPage,
-      impactReport2023Url
+      impactReport2024Url
     );
   }
 
@@ -6882,6 +6894,34 @@ export class LoggedOutUser extends BaseUser {
    */
   async expectNextCardButtonTextToBe(buttonText: string): Promise<void> {
     await this.expectTextContentToBe(nextCardButton, buttonText);
+  }
+
+  /**
+   * Waits for the username input field to be visible on the signup page.
+   */
+  async waitForUsernameInputToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(signUpUsernameInputField);
+  }
+
+  /**
+   * Types an invalid username in the username input field and blurs it.
+   * Blur is needed to trigger validation on the input field.
+   * @param {string} invalidUsername - The invalid username to type.
+   */
+  async typeInvalidUsernameInUsernameInput(
+    invalidUsername: string
+  ): Promise<void> {
+    await this.typeInInputField(signUpUsernameInputField, invalidUsername);
+    await this.page.evaluate(selector => {
+      document.querySelector(selector).blur();
+    }, signUpUsernameInputField);
+  }
+
+  /**
+   * Clears all text from the username input field.
+   */
+  async clearUsernameInput(): Promise<void> {
+    await this.clearAllTextFrom(signUpUsernameInputField);
   }
 }
 

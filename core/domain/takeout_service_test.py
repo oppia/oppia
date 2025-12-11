@@ -2295,13 +2295,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'blog_author_details': expected_blog_author_details,
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
             encoding=None,
         ) as f:
             raw_image_png = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
             'rb',
             encoding=None,
@@ -2401,13 +2401,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'story_progress': story_progress_data,
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
             encoding=None,
         ) as f:
             raw_image_png = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
             'rb',
             encoding=None,

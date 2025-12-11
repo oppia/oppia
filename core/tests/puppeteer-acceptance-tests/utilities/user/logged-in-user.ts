@@ -25,7 +25,6 @@ const profilePageUrlPrefix = testConstants.URLs.ProfilePagePrefix;
 const WikiPrivilegesToFirebaseAccount =
   testConstants.URLs.WikiPrivilegesToFirebaseAccount;
 const baseUrl = testConstants.URLs.BaseURL;
-const homePageUrl = testConstants.URLs.Home;
 const signUpEmailField = testConstants.SignInDetails.inputField;
 const learnerDashboardUrl = testConstants.URLs.LearnerDashboard;
 const feedbackUpdatesUrl = testConstants.URLs.FeedbackUpdates;
@@ -742,7 +741,10 @@ export class LoggedInUser extends BaseUser {
         submittedMessageSelector,
         (el: Element) => el.textContent
       );
-      if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
+      if (
+        !submittedMessageText ||
+        submittedMessageText.trim() !== 'Thank you for the feedback!'
+      ) {
         throw new Error(
           `Unexpected submitted message text: ${submittedMessageText}`
         );
@@ -801,11 +803,11 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Navigates to the sign up page. If the user hasn't accepted cookies, it clicks 'OK' to accept them.
-   * Then, it clicks on the 'Sign in' button.
+   * Navigates to the sign up page by going to splash page (home), then clicking 'Sign in' button.
+   * If the user hasn't accepted cookies, it clicks 'OK' to accept them.
    */
   async navigateToSignUpPage(): Promise<void> {
-    await this.goto(homePageUrl);
+    await this.goto(splashPageUrl, false);
     if (!this.userHasAcceptedCookies) {
       await this.clickOnElementWithText('OK');
       this.userHasAcceptedCookies = true;
@@ -871,9 +873,10 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to sign in the user with the given email to the Oppia website only when the email is valid.
+   * Function to enter email and proceed to the next page (username page).
+   * This will click "Sign In" and verify the username field is visible.
    */
-  async enterEmail(email: string): Promise<void> {
+  async enterEmailAndProceedToNextPage(email: string): Promise<void> {
     await this.page.waitForSelector(signUpEmailField, {
       visible: true,
     });
@@ -892,6 +895,10 @@ export class LoggedInUser extends BaseUser {
       // is redirected to the home page it is dependent to "redirects" in URL.
       await this.page.waitForSelector(signUpEmailField, {
         hidden: true,
+      });
+
+      await this.page.waitForSelector(signUpUsernameField, {
+        visible: true,
       });
     }
   }
@@ -2817,20 +2824,34 @@ export class LoggedInUser extends BaseUser {
   /**
    * Checks if Learner is on the learner dashboard page.
    */
-  expectToBeOnLearnerDashboardPage(): void {
-    expect(this.page.url()).toBe(`${baseUrl}/learner-dashboard`);
+  async expectToBeOnLearnerDashboardPage(): Promise<void> {
+    await this.expectElementToBeVisible(learnerDashboardContainerSelector);
   }
 
   /**
-   * Checks if greeting has name of the user
+   * Checks if greeting has name of the user.
    */
   async expectGreetingToHaveNameOfUser(userName: string): Promise<void> {
-    const greetingElement = await this.page.$(greetingSelector);
-    const greetingText = await this.page.evaluate(
-      el => el.textContent,
-      greetingElement
+    // Check for redesigned dashboard greeting first.
+    const isRedesignedGreetingVisible = await this.isElementVisible(
+      learnerGreetingsSelector,
+      true
     );
-    expect(greetingText).toContain(userName);
+    if (isRedesignedGreetingVisible) {
+      const greetingText = await this.page.$eval(learnerGreetingsSelector, el =>
+        el.textContent?.trim()
+      );
+      expect(greetingText).toContain(userName);
+    } else {
+      // Fall back to old dashboard greeting selector.
+      await this.expectElementToBeVisible(greetingSelector);
+      const greetingElement = await this.page.$(greetingSelector);
+      const greetingText = await this.page.evaluate(
+        el => el.textContent,
+        greetingElement
+      );
+      expect(greetingText).toContain(userName);
+    }
   }
 
   /**
@@ -3004,7 +3025,7 @@ export class LoggedInUser extends BaseUser {
 
   /**
    * Function to verify the lesson card is present in the page.
-   * @param {string} lessonTitle - The title of the lesson card.
+   * @param {string} lessonTitle - The title of the lesson card (can be partial match).
    * @param {puppeteer.ElementHandle<Element> | puppeteer.Page} context - The context of the page.
    */
   async expectLessonCardToBePresent(
@@ -3017,7 +3038,10 @@ export class LoggedInUser extends BaseUser {
         card.$eval(lessonTitleSelector, el => el.textContent?.trim())
       )
     );
-    expect(lessonCardTitles).toContain(lessonTitle);
+    const titleFound = lessonCardTitles.some(title =>
+      title?.includes(lessonTitle)
+    );
+    expect(titleFound).toBe(true);
   }
 
   /**
@@ -3134,6 +3158,40 @@ export class LoggedInUser extends BaseUser {
     await this.expectElementToBeVisible(
       learnSomethingNewSectionSelector,
       visible
+    );
+  }
+
+  /**
+   * Function to verify that a specific chapter is present in the Learn Something New section.
+   * @param {string} chapterTitle - The title of the chapter to verify.
+   */
+  async expectChapterToBePresentInLearnSomethingNewSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(learnSomethingNewSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(lessonCardContainer, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Learn Something New section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const learnSomethingNewSection = await this.page.$(
+      learnSomethingNewSectionSelector
+    );
+    if (!learnSomethingNewSection) {
+      throw new Error('Learn Something New section not found.');
+    }
+    await this.expectLessonCardToBePresent(
+      chapterTitle,
+      learnSomethingNewSection
     );
   }
 

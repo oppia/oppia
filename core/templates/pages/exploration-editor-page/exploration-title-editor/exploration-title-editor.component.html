@@ -1,5 +1,5 @@
 <div [ngClass]="{'has-error': (explorationTitle.dirty || explorationTitle.touched) && !(explorationTitleService.displayed.length > 0)}">
-  <span [attr.aria-label]="'Choose a title for your exploration. (Please use at most ' + MAX_CHARS_IN_EXPLORATION_TITLE + ' characters, so that this fits in the summary card.)'" tabindex="0" class="sr-only"></span>
+  <span [attr.aria-label]="'Choose a title for your exploration. (Please use at most ' + MAX_CHARS_IN_EXPLORATION_TITLE + ' characters, so that this fits in the summary card.)'" tabindex="0" class="visually-hidden"></span>
   <mat-form-field appearance="fill">
     <mat-label>{{ labelText }}</mat-label>
     <input matInput
@@ -14,7 +14,7 @@
            #explorationTitle="ngModel"
            autofocus>
     <mat-hint>
-      <span class="form-text">
+      <span class="form-text d-block">
         <em>Please use at most {{MAX_CHARS_IN_EXPLORATION_TITLE}} characters, so that this fits in the summary card.</em>
         <span *ngIf="explorationTitleService.displayed.length > 0">
           <em>Characters used: {{explorationTitleService.displayed.length}}/{{MAX_CHARS_IN_EXPLORATION_TITLE}}</em>

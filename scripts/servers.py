@@ -24,6 +24,7 @@ import re
 import shutil
 import signal
 import subprocess
+import sys
 import threading
 
 from core import feconf
@@ -162,7 +163,7 @@ def managed_dev_appserver(
     host: str = '0.0.0.0',
     port: int = 8080,
     admin_host: str = '0.0.0.0',
-    admin_port: int = 8000,
+    admin_port: int = feconf.GAE_ADMIN_SERVER_PORT,
     enable_host_checking: bool = True,
     automatic_restart: bool = False,
     skip_sdk_update_check: bool = False,
@@ -883,3 +884,21 @@ def managed_acceptance_tests_server(
 
     with managed_acceptance_tests_proc as proc:
         yield proc
+
+
+def run_ng_compilation() -> None:
+    """Runs angular compilation."""
+    max_tries = 2
+    ng_bundles_dir_name = 'dist/oppia-angular'
+    for _ in range(max_tries):
+        try:
+            with managed_ng_build() as proc:
+                proc.wait()
+        except subprocess.CalledProcessError as error:
+            print(error.output)
+            sys.exit(error.returncode)
+        if os.path.isdir(ng_bundles_dir_name):
+            break
+    if not os.path.isdir(ng_bundles_dir_name):
+        print('Failed to complete ng build compilation, exiting...')
+        sys.exit(1)

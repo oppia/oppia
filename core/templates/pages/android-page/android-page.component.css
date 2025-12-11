@@ -39,7 +39,7 @@
 .oppia-android-updates-button {
   background: #00645c;
   border-radius: 4px;
-  color: #fff;
+  color: #fff !important;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 16px;
   font-style: normal;
@@ -321,7 +321,7 @@
   border: 1px solid #00645c;
   border-radius: 50%;
   height: 15px;
-  width: 15px;
+  width: 15px !important;
 }
 
 .oppia-android-carousel-item-active {
