@@ -15,13 +15,13 @@
 """Unit tests for scripts/run_acceptance_tests.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import contextlib
 import os
 import shutil
 import subprocess
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import (
@@ -180,7 +180,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with shutil_copytree_patch, communicate_patch:
                 run_acceptance_tests.compile_test_ts_files()
 
-        # Assertions for the mocks
+        # Assertions for the mocks.
         shutil.rmtree.assert_called_once_with(build_dir_path)
         shutil.copytree.assert_called_once_with(
             os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),

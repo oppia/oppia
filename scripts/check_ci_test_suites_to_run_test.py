@@ -15,12 +15,12 @@
 """Unit tests for scripts/check_ci_test_suites_to_run.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import json
 import os
 import subprocess
 import tempfile
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import check_ci_test_suites_to_run, generate_root_files_mapping

@@ -15,7 +15,6 @@
 """Unit tests for scripts/servers.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import collections
@@ -31,6 +30,7 @@ import subprocess
 import sys
 import threading
 import time
+from unittest import mock
 from urllib import request as urlrequest
 
 from core.tests import test_utils

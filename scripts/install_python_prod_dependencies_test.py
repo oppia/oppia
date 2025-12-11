@@ -17,7 +17,6 @@
 """Unit tests for 'scripts/install_python_prod_dependencies.py'."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import importlib.metadata
@@ -29,6 +28,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils

@@ -17,6 +17,7 @@
 """Tests for the Azure text-to-speech service in the development environment."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.platform import models

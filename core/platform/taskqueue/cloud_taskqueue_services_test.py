@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import datetime
 import json
+from unittest import mock
 
 from core import feconf
 from core.platform.taskqueue import cloud_taskqueue_services

@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import ast
 import collections
 import contextlib
@@ -30,6 +28,7 @@ import re
 import sys
 import tempfile
 import threading
+from unittest import mock
 
 from core.tests import test_utils
 

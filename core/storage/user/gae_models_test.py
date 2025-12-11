@@ -17,10 +17,10 @@
 """Tests for core.storage.user.gae_models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import types
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import exp_domain, exp_services

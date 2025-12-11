@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import builtins
 import json
 import os
@@ -28,7 +26,7 @@ import subprocess
 import sys
 import tempfile
 import threading
-import unittest.mock
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import (
@@ -1104,7 +1102,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertEqual(len(results[0].messages), 1)
 
     def test_skip_install_with_third_party_installation_skipped(self) -> None:
-        with unittest.mock.patch(
+        with mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
             swap_check_results = mock.patch.object(
@@ -1122,7 +1120,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             mock_third_party_install.assert_not_called()
 
     def test_third_party_install_with_skip_flag_not_set(self) -> None:
-        with unittest.mock.patch(
+        with mock.patch(
             'scripts.install_third_party_libs.main'
         ) as mock_third_party_install:
             swap_check_results = mock.patch.object(
@@ -1342,7 +1340,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             ['--test_targets=core.utils_test', '--skip_install']
         )
 
-        with unittest.mock.patch('pytest.main', return_value=0) as mock_pytest:
+        with mock.patch('pytest.main', return_value=0) as mock_pytest:
             with self.print_patch:
                 exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
 
@@ -1357,7 +1355,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             ['--test_targets=core.utils_test', '--skip_install']
         )
 
-        with unittest.mock.patch('pytest.main', return_value=1) as mock_pytest:
+        with mock.patch('pytest.main', return_value=1) as mock_pytest:
             with self.print_patch:
                 exit_code = run_backend_tests.run_tests_with_pytest(parsed_args)
 
@@ -1365,7 +1363,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         mock_pytest.assert_called_once()
 
     def test_main_with_use_pytest_flag_success(self) -> None:
-        with unittest.mock.patch('pytest.main', return_value=0):
+        with mock.patch('pytest.main', return_value=0):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator:
                     with self.print_patch:
@@ -1380,7 +1378,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         self.assertIn('Done!', self.print_arr)
 
     def test_main_with_use_pytest_flag_failure(self) -> None:
-        with unittest.mock.patch('pytest.main', return_value=1):
+        with mock.patch('pytest.main', return_value=1):
             with self.swap_redis_server:
                 with self.swap_cloud_datastore_emulator:
                     with self.print_patch:
@@ -1417,7 +1415,7 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
             mock_cloud_datastore_emulator,
         )
 
-        with unittest.mock.patch('pytest.main', return_value=0):
+        with mock.patch('pytest.main', return_value=0):
             with swap_redis, swap_datastore, self.print_patch:
                 run_backend_tests.main(
                     args=[

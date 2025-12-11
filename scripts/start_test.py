@@ -16,10 +16,9 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import argparse
 import unittest
+from unittest import mock
 
 from scripts import start
 

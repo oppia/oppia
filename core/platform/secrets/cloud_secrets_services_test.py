@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import types
-
 from unittest import mock
 
 from core.platform.secrets import cloud_secrets_services

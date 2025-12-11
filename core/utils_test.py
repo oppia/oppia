@@ -18,14 +18,13 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import base64
 import copy
 import datetime
 import os
 import time
 import urllib
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

@@ -15,11 +15,11 @@
 """Tests for core.storage.app_feedback_report.gae_models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import enum
 import types
+from unittest import mock
 
 from core import feconf, utils
 from core.platform import models

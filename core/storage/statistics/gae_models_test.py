@@ -17,9 +17,9 @@
 """Tests for Oppia statistics models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import types
+from unittest import mock
 
 from core import feconf
 from core.domain import exp_domain, stats_domain

@@ -19,9 +19,7 @@
 from __future__ import annotations
 
 import datetime
-
 import pickle
-
 from unittest import mock
 
 from core import feconf

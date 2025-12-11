@@ -17,9 +17,9 @@
 """Tests for core.storage.feedback.gae_models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import types
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import feedback_domain, feedback_services

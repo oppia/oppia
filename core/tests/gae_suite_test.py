@@ -15,9 +15,9 @@
 """Tests for gae_suite."""
 
 from __future__ import annotations
-from unittest import mock
 
 import unittest
+from unittest import mock
 
 from core.tests import gae_suite, test_utils
 from scripts import common

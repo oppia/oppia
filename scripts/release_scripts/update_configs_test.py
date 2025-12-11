@@ -17,10 +17,10 @@
 """Unit tests for scripts/release_scripts/update_configs.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import os
 import tempfile
+from unittest import mock
 
 from core.tests import test_utils
 from scripts.release_scripts import update_configs

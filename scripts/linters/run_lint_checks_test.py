@@ -17,12 +17,12 @@
 """Unit tests for scripts/run_lint_checks.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import multiprocessing
 import os
 import subprocess
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 
@@ -216,10 +216,6 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         }
 
         shards_patch = mock.patch.object(run_lint_checks, 'SHARDS', mock_shards)
-
-        filenames_from_path_expected_args = [(os.getcwd(),)] + [
-            (prefix,) for prefix in mock_shards['1']
-        ]
 
         get_filenames_from_path_patch = mock.patch.object(
             run_lint_checks,

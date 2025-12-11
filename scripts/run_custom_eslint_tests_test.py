@@ -15,12 +15,12 @@
 """Unit tests for scripts/run_custom_eslint_tests.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import subprocess
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common, run_custom_eslint_tests

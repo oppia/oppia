@@ -17,6 +17,7 @@
 """Unit tests for scripts/linters/docstrings_checker."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.tests import test_utils

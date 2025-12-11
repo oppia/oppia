@@ -15,12 +15,12 @@
 """Unit tests for scripts/run_frontend_tests.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import subprocess
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 

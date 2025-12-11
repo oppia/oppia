@@ -17,6 +17,7 @@
 """Tests for dev_mode_cloud_translate_services."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.platform.translate import dev_mode_translate_services

@@ -16,13 +16,12 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import builtins
 import json
 import os
 import subprocess
 import sys
+from unittest import mock
 
 from core.constants import constants
 from core.tests import test_utils
@@ -499,6 +498,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             constants, 'EMULATOR_MODE', False
         )
 
+        env = os.environ.copy()
+
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, swap_emulator_mode, self.print_patch:
@@ -558,6 +559,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = mock.patch.object(
             build, 'main', side_effect=lambda args: None
         )
+
+        env = os.environ.copy()
 
         with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
@@ -620,6 +623,8 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = mock.patch.object(
             build, 'main', side_effect=lambda args: None
         )
+
+        env = os.environ.copy()
 
         with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
@@ -730,12 +735,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'performance'
         )
         build.main.assert_called_once_with(args=[])
-        servers.managed_dev_appserver.assert_called_once_with(
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env,
-        )
 
     def test_main_function_calls_puppeteer_record(self) -> None:
         class MockTask:

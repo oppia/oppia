@@ -17,11 +17,11 @@
 """Tests for typed object classes (mostly normalization)."""
 
 from __future__ import annotations
-from unittest import mock
 
 import inspect
 import json
 import re
+from unittest import mock
 
 from core import schema_utils_test
 from core.tests import test_utils

@@ -15,6 +15,7 @@
 """Unit tests for the cloud_transaction_services.py"""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.platform.transactions import cloud_transaction_services

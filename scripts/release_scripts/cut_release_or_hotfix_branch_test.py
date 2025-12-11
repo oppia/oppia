@@ -17,13 +17,13 @@
 """Unit tests for scripts/release_scripts/cut_release_or_hotfix_branch.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import argparse
 import builtins
 import json
 import subprocess
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common

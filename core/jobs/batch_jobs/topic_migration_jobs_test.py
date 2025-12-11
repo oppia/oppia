@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import datetime
-
 from unittest import mock
 
 from core import feconf

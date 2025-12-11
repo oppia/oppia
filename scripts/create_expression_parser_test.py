@@ -16,10 +16,9 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import os
 import subprocess
+from unittest import mock
 
 from core.tests import test_utils
 

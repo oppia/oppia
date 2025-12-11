@@ -15,12 +15,12 @@
 """Unit tests for scripts/third_party_size_check.py"""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import shutil
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import third_party_size_check

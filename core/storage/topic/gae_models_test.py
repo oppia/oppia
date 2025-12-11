@@ -17,6 +17,7 @@
 """Tests for Topic model."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

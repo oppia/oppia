@@ -18,12 +18,11 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import builtins
 import io
 import multiprocessing
 import os
+from unittest import mock
 
 from core.tests import test_utils
 

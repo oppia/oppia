@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import logging
 import textwrap
-
 from unittest import mock
 
 from core.domain import platform_parameter_list

@@ -23,7 +23,6 @@ import datetime
 import itertools
 import json
 import logging
-
 from unittest import mock
 
 from core import feconf, utils

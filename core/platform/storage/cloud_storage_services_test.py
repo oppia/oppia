@@ -17,6 +17,7 @@
 """Tests for cloud_storage_services."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.platform.storage import cloud_storage_services

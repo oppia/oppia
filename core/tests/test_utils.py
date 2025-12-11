@@ -17,7 +17,6 @@
 """Common utilities for test classes."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import collections
@@ -35,6 +34,7 @@ import random
 import re
 import string
 import unittest
+from unittest import mock
 
 import main
 from core import feature_flag_list, feconf, schema_utils, utils
@@ -389,9 +389,7 @@ def enable_feature_flags(
                 feature_flag: Optional[  # pylint: disable=unused-argument
                     feature_flag_domain.FeatureFlag
                 ] = None,
-                user_id: Optional[
-                    str
-                ] = None,  # pylint: disable=unused-argument
+                _user_id: Optional[str] = None,
             ) -> bool:
                 """Mocks is_feature_flag_enabled function to return True if the
                 target_feature_flag_name is present in feature_flag_names.
@@ -399,7 +397,7 @@ def enable_feature_flags(
                 Args:
                     feature_flag_name: str. The name of the target feature flag.
                     feature_flag: FeatureFlag|None. The feature flag domain model.
-                    user_id: str|None. The id of the user, if logged-out user
+                    _user_id: str|None. The id of the user, if logged-out user
                         then None.
 
                 Returns:
@@ -862,11 +860,11 @@ class AuthServicesStub:
         self._external_user_id_associations: Set[str] = set()
 
     @classmethod
-    def install_stub(cls, test: GenericTestBase) -> Callable[..., None]:
+    def install_stub(cls, _test: GenericTestBase) -> Callable[..., None]:
         """Installs a new instance of the stub onto the given test instance.
 
         Args:
-            test: GenericTestBase. The test instance to install the stub on.
+            _test: GenericTestBase. The test instance to install the stub on.
 
         Returns:
             callable. A function that will uninstall the stub when called.
@@ -1572,6 +1570,7 @@ class TestBase(unittest.TestCase):
     # Here we use type Any because argument 'obj' can accept any kind
     # of object on which attribute needs to be replaced, and argument
     # 'value' can accept any type of value to replace it with the old
+    # value.
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestCase's assertRaises().
@@ -1759,7 +1758,7 @@ class AppEngineTestBase(TestBase):
             'set_constants_to_default',
             self.mock_set_constants_to_default,
         )
-        self.contextManager.__enter__()
+        self.contextManager.__enter__()  # pylint: disable=unnecessary-dunder-call
 
     def tearDown(self) -> None:
         datastore_services.delete_multi(

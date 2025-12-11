@@ -17,11 +17,11 @@
 """Unit tests for scripts/concurrent_task_utils.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import threading
 import time
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import concurrent_task_utils

@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-from unittest import mock
-
 import builtins
 import contextlib
 import errno
@@ -36,6 +34,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from unittest import mock
 from urllib import request as urlrequest
 
 from core.tests import test_utils

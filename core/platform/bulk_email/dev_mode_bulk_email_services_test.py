@@ -17,7 +17,6 @@
 from __future__ import annotations
 
 import logging
-
 from unittest import mock
 
 from core.platform.bulk_email import dev_mode_bulk_email_services

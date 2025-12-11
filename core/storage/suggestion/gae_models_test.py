@@ -17,9 +17,9 @@
 """Tests for the suggestion gae_models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

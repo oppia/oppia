@@ -15,10 +15,10 @@
 """Unit tests for scripts/generate_root_files_mapping.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import subprocess
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common, generate_root_files_mapping, run_typescript_checks

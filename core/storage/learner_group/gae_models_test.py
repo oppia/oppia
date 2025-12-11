@@ -17,9 +17,9 @@
 """Tests for Learner group models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import types
+from unittest import mock
 
 from core.platform import models
 from core.tests import test_utils

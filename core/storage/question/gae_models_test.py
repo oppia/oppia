@@ -15,10 +15,10 @@
 """Tests for core.storage.question.gae_models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import random
 import types
+from unittest import mock
 
 from core import utils
 from core.constants import constants

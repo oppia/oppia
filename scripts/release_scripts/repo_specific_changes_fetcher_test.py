@@ -17,10 +17,10 @@
 """Unit tests for scripts/release_scripts/repo_specific_changes_fetcher.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common

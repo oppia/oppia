@@ -17,7 +17,6 @@
 """Unit tests for scripts/install_dependencies_json_packages.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import io
@@ -26,6 +25,7 @@ import re
 import ssl
 import tempfile
 import zipfile
+from unittest import mock
 from urllib import request as urlrequest
 
 from core.tests import test_utils

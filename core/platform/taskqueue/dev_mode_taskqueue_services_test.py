@@ -17,9 +17,9 @@
 """Tests for methods in the dev_mode_taskqueue_services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import feconf
 from core.platform.taskqueue import dev_mode_taskqueue_services

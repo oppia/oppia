@@ -15,11 +15,11 @@
 """Unit tests for scripts/run_presubmit_checks.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import subprocess
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import run_backend_tests, run_frontend_tests, run_presubmit_checks

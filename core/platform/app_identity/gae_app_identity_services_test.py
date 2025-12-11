@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import os
-
 from unittest import mock
 
 from core.platform.app_identity import gae_app_identity_services

@@ -17,7 +17,6 @@
 """Unit tests for scripts/run_portserver.py"""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import io
@@ -25,6 +24,7 @@ import logging
 import os
 import socket
 import sys
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import run_portserver

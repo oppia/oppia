@@ -17,11 +17,11 @@
 """Tests for Exploration models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import copy
 import datetime
 import types
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

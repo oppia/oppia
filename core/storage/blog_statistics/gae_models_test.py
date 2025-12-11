@@ -17,9 +17,9 @@
 """Tests for Blog Post Statistics Models."""
 
 from __future__ import annotations
-from unittest import mock
 
 import types
+from unittest import mock
 
 from core import utils
 from core.platform import models

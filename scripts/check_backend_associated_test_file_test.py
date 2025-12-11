@@ -15,13 +15,13 @@
 """Unit tests for scripts/check_backend_associated_test_file.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import logging
 import os
 import sys
 import tempfile
+from unittest import mock
 
 from core import feconf
 from core.tests import test_utils

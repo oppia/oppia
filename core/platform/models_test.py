@@ -21,7 +21,6 @@ from __future__ import annotations
 import re
 import sys
 from types import ModuleType  # pylint: disable=import-only-modules
-
 from unittest import mock
 
 from core import feconf

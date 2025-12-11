@@ -15,6 +15,7 @@
 """Unit tests for core.storage.beam_job.gae_models."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import utils

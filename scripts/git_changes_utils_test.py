@@ -15,13 +15,13 @@
 """Unit tests for scripts/git_changes_utils.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import subprocess
 import sys
 import tempfile
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import common, git_changes_utils

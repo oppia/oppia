@@ -15,12 +15,12 @@
 """Unit tests for scripts/check_tests_are_captured_in_ci.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import json
 import os
 import re
 import tempfile
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import check_tests_are_captured_in_ci

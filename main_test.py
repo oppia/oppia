@@ -15,10 +15,10 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
-from unittest import mock
 
 import contextlib
 import importlib
+from unittest import mock
 
 import main
 from core.constants import constants
