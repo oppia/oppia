@@ -95,8 +95,8 @@ class TranslationServiceTests(test_utils.GenericTestBase):
         )
 
     def test_get_machine_translation_checks_datastore_first(self) -> None:
-        with self.swap_to_always_raise(
-            translate_services.CLIENT, 'translate', error=AssertionError
+        with mock.patch.object(
+            translate_services.CLIENT, 'translate', side_effect=AssertionError
         ):
             self.assertEqual(
                 translation_services.get_and_cache_machine_translation(
@@ -688,7 +688,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
         )
         exp.version = 5
 
-        are_translations_displayable_patch = self.swap_to_always_return(
+        are_translations_displayable_patch = mock.patch.object(
             exp, 'are_translations_displayable', True
         )
         with are_translations_displayable_patch:
@@ -699,7 +699,7 @@ class EntityTranslationServicesTest(test_utils.GenericTestBase):
             )
         self.assertItemsEqual(observed_language_list, expected_language_list)
 
-        are_translations_displayable_patch = self.swap_to_always_return(
+        are_translations_displayable_patch = mock.patch.object(
             exp, 'are_translations_displayable', False
         )
         with are_translations_displayable_patch:

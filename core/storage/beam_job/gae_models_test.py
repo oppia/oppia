@@ -44,8 +44,8 @@ class BeamJobRunModelTest(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        collision_context = self.swap_to_always_return(
-            utils, 'convert_to_hash', value=model.id
+        collision_context = mock.patch.object(
+            utils, 'convert_to_hash', return_value=model.id
         )
 
         with collision_context:
@@ -94,8 +94,8 @@ class BeamJobRunResultModelTest(test_utils.GenericTestBase):
         model.update_timestamps()
         model.put()
 
-        collision_context = self.swap_to_always_return(
-            utils, 'convert_to_hash', value=model.id
+        collision_context = mock.patch.object(
+            utils, 'convert_to_hash', return_value=model.id
         )
 
         with collision_context:

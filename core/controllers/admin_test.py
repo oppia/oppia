@@ -1505,7 +1505,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_grant_super_admin_privileges(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
 
-        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+        grant_super_admin_privileges_stub = mock.patch.object(
             firebase_auth_services, 'grant_super_admin_privileges'
         )
 
@@ -1517,7 +1517,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
         self.assertNotIn('error', response)
 
     def test_grant_super_admin_privileges_requires_system_default_admin(
@@ -1525,7 +1525,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        grant_super_admin_privileges_stub = self.swap_with_call_counter(
+        grant_super_admin_privileges_stub = mock.patch.object(
             firebase_auth_services, 'grant_super_admin_privileges'
         )
 
@@ -1537,7 +1537,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 expected_status_int=401,
             )
 
-        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(call_counter.call_count, 0)
         self.assertEqual(
             response['error'],
             'Only the default system admin can manage super admins',
@@ -1575,7 +1575,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_revoke_super_admin_privileges(self) -> None:
         self.login(self.admin_email_address, is_super_admin=True)
 
-        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+        revoke_super_admin_privileges_stub = mock.patch.object(
             firebase_auth_services, 'revoke_super_admin_privileges'
         )
 
@@ -1586,7 +1586,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
         self.assertNotIn('error', response)
 
     def test_revoke_super_admin_privileges_requires_system_default_admin(
@@ -1594,7 +1594,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 
-        revoke_super_admin_privileges_stub = self.swap_with_call_counter(
+        revoke_super_admin_privileges_stub = mock.patch.object(
             firebase_auth_services, 'revoke_super_admin_privileges'
         )
 
@@ -1605,7 +1605,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 expected_status_int=401,
             )
 
-        self.assertEqual(call_counter.times_called, 0)
+        self.assertEqual(call_counter.call_count, 0)
         self.assertEqual(
             response['error'],
             'Only the default system admin can manage super admins',
@@ -3775,7 +3775,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             'num_answers': 0,
         }
 
-        swap_state_answers = self.swap_to_always_return(
+        swap_state_answers = mock.patch.object(
             stats_services, 'get_state_answers', None
         )
         with swap_state_answers:

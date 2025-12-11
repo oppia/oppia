@@ -88,7 +88,7 @@ class RunJobTests(test_utils.GenericTestBase):
             options=job_options.JobOptions(namespace=self.namespace),
         )
 
-        with self.swap_to_always_return(pipeline, 'run', value=mock_run_result):
+        with mock.patch.object(pipeline, 'run', return_value=mock_run_result):
             run = jobs_manager.run_job(WorkingJob, False, pipeline=pipeline)
 
         self.assertEqual(run.dataflow_job_id, '123')
@@ -105,7 +105,7 @@ class RunJobTests(test_utils.GenericTestBase):
             options=job_options.JobOptions(namespace=self.namespace),
         )
 
-        with self.swap_to_always_return(pipeline, 'run', value=mock_run_result):
+        with mock.patch.object(pipeline, 'run', return_value=mock_run_result):
             run = jobs_manager.run_job(WorkingJob, False, pipeline=pipeline)
 
         self.assertIsNone(run.dataflow_job_id)
@@ -136,8 +136,10 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
 
         self.exit_stack = contextlib.ExitStack()
         self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
+            mock.patch.object(
+                dataflow,
+                'JobsV1Beta3Client',
+                return_value=self.dataflow_client_mock,
             )
         )
 
@@ -221,8 +223,10 @@ class CancelJobTests(test_utils.GenericTestBase):
 
         self.exit_stack = contextlib.ExitStack()
         self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                dataflow, 'JobsV1Beta3Client', value=self.dataflow_client_mock
+            mock.patch.object(
+                dataflow,
+                'JobsV1Beta3Client',
+                return_value=self.dataflow_client_mock,
             )
         )
 

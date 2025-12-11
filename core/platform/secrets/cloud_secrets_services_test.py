@@ -29,7 +29,7 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
     """Tests for the Python Cloud Secret services."""
 
     def test_get_secret_returns_existing_secret(self) -> None:
-        with self.swap_to_always_return(
+        with mock.patch.object(
             cloud_secrets_services.CLIENT,
             'access_secret_version',
             types.SimpleNamespace(payload=types.SimpleNamespace(data=b'secre')),
@@ -37,7 +37,7 @@ class CloudSecretsServicesTests(test_utils.GenericTestBase):
             self.assertEqual(cloud_secrets_services.get_secret('name'), 'secre')
 
     def test_get_secret_returns_none_when_secret_does_not_exist(self) -> None:
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             cloud_secrets_services.CLIENT,
             'access_secret_version',
             Exception('Secret not found'),

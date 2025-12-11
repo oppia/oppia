@@ -50,7 +50,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
     """Tests for fetching whether playthrough recording is enabled."""
 
     def test_can_record_playthroughs_in_curated_explorations(self) -> None:
-        with self.swap_to_always_return(
+        with mock.patch.object(
             opportunity_services,
             'is_exploration_available_for_contribution',
             True,
@@ -60,7 +60,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         self.assertTrue(json_response['exploration_is_curated'])
 
     def test_can_not_record_playthroughs_with_non_curated_exps(self) -> None:
-        with self.swap_to_always_return(
+        with mock.patch.object(
             opportunity_services,
             'is_exploration_available_for_contribution',
             False,

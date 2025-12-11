@@ -624,7 +624,7 @@ class MigrateQuestionSuggestionsJobTests(
                 self.author_id, skill_id
             )
         )
-        migrate_state_schema_raise = self.swap_to_always_raise(
+        migrate_state_schema_raise = mock.patch.object(
             question_fetchers, 'migrate_state_schema'
         )
         with migrate_state_schema_raise:
@@ -708,7 +708,7 @@ class AuditMigrateQuestionSuggestionsJobTests(
                 self.author_id, skill_id
             )
         )
-        migrate_state_schema_raise = self.swap_to_always_raise(
+        migrate_state_schema_raise = mock.patch.object(
             question_fetchers, 'migrate_state_schema'
         )
         with migrate_state_schema_raise:

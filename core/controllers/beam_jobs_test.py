@@ -60,8 +60,8 @@ class BeamJobHandlerTests(BeamHandlerTestBase):
 
     def test_get_returns_registered_jobs(self) -> None:
         job = beam_job_domain.BeamJob(FooJob)
-        get_beam_jobs_patch = self.swap_to_always_return(
-            beam_job_services, 'get_beam_jobs', value=[job]
+        get_beam_jobs_patch = mock.patch.object(
+            beam_job_services, 'get_beam_jobs', return_value=[job]
         )
 
         with get_beam_jobs_patch:
@@ -92,7 +92,7 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
     def test_put_starts_new_job(self) -> None:
         model = beam_job_services.create_beam_job_run_model('FooJob')
 
-        with self.swap_to_always_return(jobs_manager, 'run_job', value=model):
+        with mock.patch.object(jobs_manager, 'run_job', return_value=model):
             response = self.put_json(
                 '/beam_job_run',
                 {'job_name': 'FooJob'},
@@ -116,8 +116,8 @@ class BeamJobRunHandlerTests(BeamHandlerTestBase):
             False,
         )
 
-        swap_cancel_beam_job = self.swap_to_always_return(
-            beam_job_services, 'cancel_beam_job', value=run
+        swap_cancel_beam_job = mock.patch.object(
+            beam_job_services, 'cancel_beam_job', return_value=run
         )
         with swap_cancel_beam_job:
             response = self.delete_json('/beam_job_run', {'job_id': model.id})

@@ -113,12 +113,12 @@ class AndroidActivityHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.secrets_patch = self.swap_to_always_return(
+        self.secrets_patch = mock.patch.object(
             secrets_services, 'get_secret', 'secret'
         )
 
     def test_get_with_wrong_api_key_returns_error(self) -> None:
-        secrets_patch = self.swap_to_always_return(
+        secrets_patch = mock.patch.object(
             secrets_services, 'get_secret', 'not_key'
         )
         with secrets_patch:

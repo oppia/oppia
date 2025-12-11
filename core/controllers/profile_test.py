@@ -59,7 +59,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         exception = 'Could not find the resource {}/profilehandler/data/{}.'
         message = exception.format('http://localhost', self.EDITOR_USERNAME)
         error = {'error': message, 'status_code': 404}
-        with self.swap_to_always_return(
+        with mock.patch.object(
             user_services, 'get_user_settings_from_username', False
         ):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
@@ -105,7 +105,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
             self.assertEqual(response, error)
 
     def test_user_does_have_fully_registered_account(self) -> None:
-        with self.swap_to_always_return(
+        with mock.patch.object(
             user_services, 'has_fully_registered_account', True
         ):
             self.login(self.EDITOR_EMAIL)
@@ -816,9 +816,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap_to_always_return(
-            user_services, 'has_ever_registered', False
-        ):
+        with mock.patch.object(user_services, 'has_ever_registered', False):
             json_response = self.post_json(
                 feconf.SIGNUP_DATA_URL,
                 {
@@ -839,9 +837,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
         csrf_token = self.get_new_csrf_token()
-        with self.swap_to_always_return(
-            user_services, 'update_email_preferences', True
-        ):
+        with mock.patch.object(user_services, 'update_email_preferences', True):
             json_response = self.post_json(
                 feconf.SIGNUP_DATA_URL,
                 {
@@ -1441,7 +1437,7 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.swap_secret = self.swap_to_always_return(
+        self.swap_secret = mock.patch.object(
             secrets_services, 'get_secret', 'secret'
         )
         user_services.update_email_preferences(

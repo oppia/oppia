@@ -939,7 +939,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             exp_100.id,
         )
         corrupt_story = None
-        swap_with_corrupt_story = self.swap_to_always_return(
+        swap_with_corrupt_story = mock.patch.object(
             story_fetchers, 'get_stories_by_ids', [corrupt_story]
         )
         self.login(self.CURRICULUM_ADMIN_EMAIL)

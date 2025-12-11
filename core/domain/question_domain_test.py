@@ -1394,7 +1394,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
         test_value['state_schema_version'] = 35
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             customization_args_util,
             'validate_customization_args_and_values',
             value=True,
@@ -1427,7 +1427,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_value['state']['recorded_voiceovers'] = {'voiceovers_mapping': {}}  # type: ignore[typeddict-item]
         test_value['state_schema_version'] = 35
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             customization_args_util,
             'validate_customization_args_and_values',
             value=True,
@@ -1513,7 +1513,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             test_value['state']['interaction']['customization_args'], {}
         )
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             customization_args_util,
             'validate_customization_args_and_values',
             value=True,

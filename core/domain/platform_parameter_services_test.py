@@ -246,7 +246,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
         parameter = platform_parameter_domain.PlatformParameter.from_dict(
             param_dict  # type: ignore[arg-type]
         )
-        swap_get_platform_parameter = self.swap_to_always_return(
+        swap_get_platform_parameter = mock.patch.object(
             registry.Registry, 'get_platform_parameter', parameter
         )
 

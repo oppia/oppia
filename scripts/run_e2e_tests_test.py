@@ -83,7 +83,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return num_var > 10
 
         mock_sleep = self.exit_stack.enter_context(
-            self.swap_with_call_counter(time, 'sleep')
+            mock.patch.object(time, 'sleep')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(common, 'is_port_in_use', mock_is_port_in_use)
@@ -92,11 +92,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         common.wait_for_port_to_be_in_use(1)
 
         self.assertEqual(num_var, 11)
-        self.assertEqual(mock_sleep.times_called, 10)
+        self.assertEqual(mock_sleep.call_count, 10)
 
     def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self) -> None:
         mock_sleep = self.exit_stack.enter_context(
-            self.swap_with_call_counter(time, 'sleep')
+            mock.patch.object(time, 'sleep')
         )
         self.exit_stack.enter_context(
             mock.patch.object(common, 'is_port_in_use', lambda _: False)
@@ -108,7 +108,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         common.wait_for_port_to_be_in_use(1)
 
         self.assertEqual(
-            mock_sleep.times_called, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+            mock_sleep.call_count, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
         )
 
     def test_install_third_party_libraries_without_skip(self) -> None:

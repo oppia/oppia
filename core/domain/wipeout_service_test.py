@@ -704,7 +704,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.user_1_id)
         user_settings.created_on = None
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             user_services, 'get_user_settings', user_settings
         ):
             with self.assertRaisesRegex(
@@ -5790,7 +5790,7 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
 
         wipeout_service.pre_delete_user(self.user_1_id)
         self.process_and_flush_pending_tasks()
-        delete_external_auth_associations_patch = self.swap_to_always_return(
+        delete_external_auth_associations_patch = mock.patch.object(
             auth_services, 'delete_external_auth_associations'
         )
 

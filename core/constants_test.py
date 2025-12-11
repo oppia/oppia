@@ -41,7 +41,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_non_existing_file_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             pkgutil,
             'get_data',
             FileNotFoundError(
@@ -58,7 +58,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_binary_file_in_package_returns_the_content(self) -> None:
         """Test get_package_file_contents with imaginary binary file."""
-        with self.swap_to_always_return(pkgutil, 'get_data', 'File data'):
+        with mock.patch.object(pkgutil, 'get_data', 'File data'):
             self.assertEqual(
                 constants.get_package_file_contents(
                     'assets', 'non_exist.xy', binary_mode=True
@@ -86,7 +86,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_file_in_package_returns_the_content(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with self.swap_to_always_return(pkgutil, 'get_data', b'File data'):
+        with mock.patch.object(pkgutil, 'get_data', b'File data'):
             self.assertEqual(
                 constants.get_package_file_contents('assets', 'non_exist.xy'),
                 'File data',
@@ -94,7 +94,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with self.swap_to_always_return(pkgutil, 'get_data', None):
+        with mock.patch.object(pkgutil, 'get_data', None):
             with self.assertRaisesRegex(
                 FileNotFoundError,
                 'No such file or directory: \'assets/non_exist.xy\'',

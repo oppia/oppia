@@ -3764,8 +3764,8 @@ class EditorAutosaveTest(BaseEditorControllerTests):
 
         # User will behave as a voice artist because check_can_edit_activity
         # is false but check_can_voiceover_activity is still true.
-        get_voiceover_patch = self.swap_to_always_return(
-            rights_manager, 'check_can_edit_activity', value=False
+        get_voiceover_patch = mock.patch.object(
+            rights_manager, 'check_can_edit_activity', return_value=False
         )
 
         with get_voiceover_patch:
@@ -4291,8 +4291,8 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         ) as f:
             raw_image = f.read()
 
-        get_image_exists_patch = self.swap_to_always_return(
-            fs_services.GcsFileSystem, 'isfile', value=True
+        get_image_exists_patch = mock.patch.object(
+            fs_services.GcsFileSystem, 'isfile', return_value=True
         )
 
         with get_image_exists_patch:

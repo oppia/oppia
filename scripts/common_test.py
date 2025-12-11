@@ -975,16 +975,14 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertTrue(raised_once)
 
     def test_write_stdout_safe_with_oserror(self) -> None:
-        write_patch = self.swap_to_always_raise(
-            os, 'write', OSError('OS error')
-        )
+        write_patch = mock.patch.object(os, 'write', OSError('OS error'))
         with write_patch, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
 
     def test_write_stdout_safe_with_unsupported_operation(self) -> None:
         mock_stdout = io.StringIO()
 
-        write_patch = self.swap_to_always_raise(
+        write_patch = mock.patch.object(
             os, 'write', io.UnsupportedOperation('unsupported operation')
         )
         stdout_write_patch = mock.patch.object(sys, 'stdout', mock_stdout)
@@ -1211,9 +1209,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_oppia_server_already_running_when_ports_closed(self) -> None:
         with contextlib.ExitStack() as stack:
             stack.enter_context(
-                self.swap_to_always_return(
-                    common, 'is_port_in_use', value=False
-                )
+                mock.patch.object(common, 'is_port_in_use', return_value=False)
             )
 
             self.assertFalse(common.is_oppia_server_already_running())

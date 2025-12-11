@@ -470,7 +470,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.story_id_1)
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             feature_flag_services, 'is_feature_flag_enabled', True
         ), self.swap_with_checks(
             topic_services,
@@ -1244,13 +1244,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.additional_story_references[0].story_is_published, False
         )
 
-        with self.swap_with_call_counter(
-            topic_services, 'generate_topic_summary'
-        ) as (generate_topic_summary):
+        with mock.patch.object(topic_services, 'generate_topic_summary') as (
+            generate_topic_summary
+        ):
             topic_services.publish_story(
                 self.TOPIC_ID, self.story_id_1, self.user_id_admin
             )
-            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
+            self.assertGreaterEqual(generate_topic_summary.call_count, 1)
         topic_services.publish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin
         )
@@ -1268,13 +1268,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 1)
         self.assertEqual(topic_summary.additional_story_count, 1)
 
-        with self.swap_with_call_counter(
-            topic_services, 'generate_topic_summary'
-        ) as (generate_topic_summary):
+        with mock.patch.object(topic_services, 'generate_topic_summary') as (
+            generate_topic_summary
+        ):
             topic_services.unpublish_story(
                 self.TOPIC_ID, self.story_id_1, self.user_id_admin
             )
-            self.assertGreaterEqual(generate_topic_summary.times_called, 1)
+            self.assertGreaterEqual(generate_topic_summary.call_count, 1)
         topic_services.unpublish_story(
             self.TOPIC_ID, self.story_id_3, self.user_id_admin
         )
@@ -4347,7 +4347,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             None  # type: ignore[assignment]
         )
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             topic_fetchers,
             'get_topic_summary_by_id',
             topic_summary_without_exp_ids,

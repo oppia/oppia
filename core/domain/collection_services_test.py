@@ -921,9 +921,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             'No collection summary model exists for the given id:'
             ' Invalid_collection_id',
         ):
-            with self.swap_to_always_return(
-                rights_manager, 'publish_collection', True
-            ):
+            with mock.patch.object(rights_manager, 'publish_collection', True):
                 collection_services.publish_collection_and_update_user_profiles(
                     system_user, 'Invalid_collection_id'
                 )
@@ -2462,7 +2460,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         with add_docs_patch:
             collection_services.index_collections_given_ids(all_collection_ids)
 
-        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(add_docs_counter.call_count, 1)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
@@ -2663,7 +2661,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id('test_id')
         collection.last_updated = None
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             collection_services, 'get_collection_by_id', collection
         ):
             with self.assertRaisesRegex(
@@ -2681,7 +2679,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection = collection_services.get_collection_by_id('test_id')
         collection.created_on = None
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             collection_services, 'get_collection_by_id', collection
         ):
             with self.assertRaisesRegex(

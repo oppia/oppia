@@ -1018,7 +1018,7 @@ class GenerateExplorationOpportunitySummariesJobTests(
             [exp_model, story_model, topic_model, topic_rights_model]
         )
 
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             opportunity_services,
             'create_exp_opportunity_summary',
             Exception('Error generating opportunity'),

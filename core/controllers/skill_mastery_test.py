@@ -743,7 +743,7 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         topic_id_1 = topic_fetchers.get_new_topic_id()
         topic_id_2 = topic_fetchers.get_new_topic_id()
 
-        with self.swap_to_always_return(
+        with mock.patch.object(
             topic_fetchers, 'get_topics_by_ids', [None, 'random_topic']
         ):
             json_response = self.get_json(

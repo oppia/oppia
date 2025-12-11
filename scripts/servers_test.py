@@ -409,8 +409,8 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_raise_when_process_errors(self) -> None:
         self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                psutil, 'wait_procs', error=Exception('uh-oh')
+            mock.patch.object(
+                psutil, 'wait_procs', side_effect=Exception('uh-oh')
             )
         )
         logs = self.exit_stack.enter_context(
@@ -436,7 +436,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_firebase_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(servers.managed_firebase_auth_emulator())
@@ -453,7 +453,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.swap_managed_cloud_datastore_emulator_io_operations(True)
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -477,7 +477,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.swap_managed_cloud_datastore_emulator_io_operations(False)
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -485,8 +485,8 @@ class ManagedProcessTests(test_utils.TestBase):
         )
         self.exit_stack.close()
 
-        self.assertEqual(rmtree_counter.times_called, 0)
-        self.assertEqual(makedirs_counter.times_called, 1)
+        self.assertEqual(rmtree_counter.call_count, 0)
+        self.assertEqual(makedirs_counter.call_count, 1)
 
     def test_managed_cloud_datastore_emulator_clears_data_dir(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -495,7 +495,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.swap_managed_cloud_datastore_emulator_io_operations(True)
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -505,8 +505,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertIn('--no-store-on-disk', popen_calls[0].program_args)
 
-        self.assertEqual(rmtree_counter.times_called, 1)
-        self.assertEqual(makedirs_counter.times_called, 1)
+        self.assertEqual(rmtree_counter.call_count, 1)
+        self.assertEqual(makedirs_counter.call_count, 1)
 
     def test_managed_cloud_datastore_emulator_acknowledges_data_dir(
         self,
@@ -517,7 +517,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.swap_managed_cloud_datastore_emulator_io_operations(True)
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -527,13 +527,13 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertNotIn('--no-store-on-disk', popen_calls[0].program_args)
 
-        self.assertEqual(rmtree_counter.times_called, 0)
-        self.assertEqual(makedirs_counter.times_called, 0)
+        self.assertEqual(rmtree_counter.call_count, 0)
+        self.assertEqual(makedirs_counter.call_count, 0)
 
     def test_managed_dev_appserver(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -548,7 +548,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_elasticsearch_dev_server(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -590,8 +590,8 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(
-                subprocess, 'call', value=scripts_test_utils.PopenStub()
+            mock.patch.object(
+                subprocess, 'call', return_value=scripts_test_utils.PopenStub()
             )
         )
         self.exit_stack.enter_context(
@@ -601,7 +601,7 @@ class ManagedProcessTests(test_utils.TestBase):
             mock.patch.object(os.path, 'exists', mock_os_path_exists)
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         self.exit_stack.enter_context(
@@ -628,7 +628,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
@@ -678,7 +678,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
@@ -706,7 +706,7 @@ class ManagedProcessTests(test_utils.TestBase):
             '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH),
         )
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        self.assertEqual(mock_os_remove.times_called, 1)
+        self.assertEqual(mock_os_remove.call_count, 1)
 
     def test_managed_web_browser_on_linux_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -714,7 +714,7 @@ class ManagedProcessTests(test_utils.TestBase):
             mock.patch.object(common, 'OS_NAME', 'Linux')
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(os, 'listdir', value=[])
+            mock.patch.object(os, 'listdir', return_value=[])
         )
 
         managed_web_browser = servers.create_managed_web_browser(123)
@@ -734,7 +734,7 @@ class ManagedProcessTests(test_utils.TestBase):
             mock.patch.object(common, 'OS_NAME', 'Darwin')
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_return(os, 'listdir', value=[])
+            mock.patch.object(os, 'listdir', return_value=[])
         )
 
         managed_web_browser = servers.create_managed_web_browser(123)
@@ -770,7 +770,7 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(
             mock.patch.object(common, 'OS_NAME', 'Linux')
         )
-        mock_create_managed_web_browser = self.swap_to_always_raise(
+        mock_create_managed_web_browser = mock.patch.object(
             servers, 'create_managed_web_browser', Exception(web_browser_error)
         )
 
@@ -842,7 +842,7 @@ class ManagedProcessTests(test_utils.TestBase):
             % (common.PORTSERVER_SOCKET_FILEPATH),
         )
         self.assertEqual(proc.signals_received, [signal.SIGINT])
-        self.assertEqual(mock_os_remove.times_called, 1)
+        self.assertEqual(mock_os_remove.call_count, 1)
 
     def test_managed_portserver_when_signals_are_rejected(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1131,7 +1131,7 @@ class ManagedProcessTests(test_utils.TestBase):
             mock.patch.object(common, 'OS_NAME', 'Linux')
         )
         self.exit_stack.enter_context(
-            self.swap_to_always_raise(subprocess, 'check_output', error=OSError)
+            mock.patch.object(subprocess, 'check_output', side_effect=OSError)
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(

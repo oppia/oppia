@@ -205,8 +205,8 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
             )
         )
 
-        collision_context = self.swap_to_always_return(
-            utils, 'convert_to_hash', value=cloud_task_model.id
+        collision_context = mock.patch.object(
+            utils, 'convert_to_hash', return_value=cloud_task_model.id
         )
 
         with collision_context:

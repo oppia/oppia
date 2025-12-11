@@ -53,7 +53,7 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_same_source_target_language_doesnt_call_emulator(
         self,
     ) -> None:
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             dev_mode_translate_services.CLIENT,
             'translate',
             error=AssertionError,
@@ -66,8 +66,10 @@ class DevModeCloudTranslateServicesUnitTests(test_utils.TestBase):
     def test_translate_text_with_valid_input_calls_emulator_translate(
         self,
     ) -> None:
-        with self.swap_to_always_return(
-            dev_mode_translate_services.CLIENT, 'translate', value='hola mundo'
+        with mock.patch.object(
+            dev_mode_translate_services.CLIENT,
+            'translate',
+            return_value='hola mundo',
         ):
             translated_text = dev_mode_translate_services.translate_text(
                 'hello world', 'en', 'es'

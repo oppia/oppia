@@ -309,7 +309,7 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
             thread_id,
         )
-        with self.swap_to_always_return(
+        with mock.patch.object(
             suggestion_services, 'get_suggestion_by_id', translation_suggestion
         ):
             with self.assertRaisesRegex(

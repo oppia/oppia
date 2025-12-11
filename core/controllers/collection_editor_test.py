@@ -486,10 +486,10 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         collection_rights = rights_domain.ActivityRights(
             'Invalid_collection_id', [feconf.SYSTEM_COMMITTER_ID], [], [], []
         )
-        swap_collection_rights = self.swap_to_always_return(
+        swap_collection_rights = mock.patch.object(
             rights_manager, 'get_collection_rights', collection_rights
         )
-        swap_can_edit_activity_status = self.swap_to_always_return(
+        swap_can_edit_activity_status = mock.patch.object(
             rights_manager, 'check_can_edit_activity', True
         )
 

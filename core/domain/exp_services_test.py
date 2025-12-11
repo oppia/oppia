@@ -5745,8 +5745,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         )
 
         # Using the old version of the exploration should raise an error.
-        change_list_patch = self.swap_to_always_return(
-            exp_services, 'apply_change_list', value=v1_exploration
+        change_list_patch = mock.patch.object(
+            exp_services, 'apply_change_list', return_value=v1_exploration
         )
         with change_list_patch, self.assertRaisesRegex(
             Exception, 'version 1, which is too old'
@@ -6982,7 +6982,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         with add_docs_patch:
             exp_services.index_explorations_given_ids(all_exp_ids)
 
-        self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(add_docs_counter.call_count, 1)
 
     def test_updated_exploration_is_added_correctly_to_index(self) -> None:
         exp_id = 'id0'
@@ -7030,7 +7030,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
             rights_manager.publish_exploration(self.owner, exp_id)
             self.assertEqual(actual_docs, [initial_exp_doc])
-            self.assertEqual(add_docs_counter.times_called, 2)
+            self.assertEqual(add_docs_counter.call_count, 2)
 
             actual_docs = []
             exp_services.update_exploration(
@@ -7050,7 +7050,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
 
             self.process_and_flush_pending_tasks()
             self.assertEqual(actual_docs, [updated_exp_doc])
-            self.assertEqual(add_docs_counter.times_called, 3)
+            self.assertEqual(add_docs_counter.call_count, 3)
 
     def test_get_number_of_ratings(self) -> None:
         self.save_new_valid_exploration(self.EXP_0_ID, self.owner_id)

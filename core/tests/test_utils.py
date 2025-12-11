@@ -941,84 +941,84 @@ class AuthServicesStub:
             stub = cls()
 
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'establish_auth_session',
                     stub.establish_auth_session,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'destroy_auth_session',
                     stub.destroy_auth_session,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'get_auth_claims_from_request',
                     stub.get_auth_claims_from_request,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'mark_user_for_deletion',
                     stub.mark_user_for_deletion,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'delete_external_auth_associations',
                     stub.delete_external_auth_associations,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'verify_external_auth_associations_are_deleted',
                     stub.verify_external_auth_associations_are_deleted,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'get_auth_id_from_user_id',
                     stub.get_auth_id_from_user_id,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'get_user_id_from_auth_id',
                     stub.get_user_id_from_auth_id,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'get_multi_user_ids_from_auth_ids',
                     stub.get_multi_user_ids_from_auth_ids,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'get_multi_auth_ids_from_user_ids',
                     stub.get_multi_auth_ids_from_user_ids,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'associate_auth_id_with_user_id',
                     stub.associate_auth_id_with_user_id,
                 )
             )
             stack.enter_context(
-                test.swap(
+                mock.patch.object(
                     platform_auth_services,
                     'associate_multi_auth_ids_with_user_ids',
                     stub.associate_multi_auth_ids_with_user_ids,
@@ -1638,83 +1638,6 @@ class TestBase(unittest.TestCase):
     # Here we use type Any because argument 'obj' can accept any kind
     # of object on which attribute needs to be replaced, and argument
     # 'value' can accept any type of value to replace it with the old
-    # value.
-    @contextlib.contextmanager
-    def swap_to_always_return(
-        self, obj: Any, attr: str, value: Optional[Any] = None
-    ) -> Iterator[None]:
-        """Swap obj.attr with a function that always returns the given value."""
-
-        # Here we use type Any because this function returns the newly
-        # replaced return value, and that value can be of any type.
-        def function_that_always_returns(*_: str, **__: str) -> Any:
-            """Returns the input value."""
-            return value
-
-        with mock.patch.object(obj, attr, function_that_always_returns):
-            yield
-
-    # Here we use type Any because the argument 'obj' can accept any
-    # kind of object on which attribute needs to be replaced.
-    @contextlib.contextmanager
-    def swap_to_always_raise(
-        self,
-        obj: Any,
-        attr: str,
-        error: Union[Exception, Type[Exception]] = Exception,
-    ) -> Iterator[None]:
-        """Swap obj.attr with a function that always raises the given error."""
-
-        def function_that_always_raises(*_: str, **__: str) -> None:
-            """Raises the input exception."""
-            raise error
-
-        with mock.patch.object(obj, attr, function_that_always_raises):
-            yield
-
-    # Here we use type Any because argument 'obj' can accept any kind
-    # of object on which attribute needs to be replaced, and argument
-    # 'returns' can accept any type of value to replace it with the old
-    # function's return value.
-    @contextlib.contextmanager
-    def swap_with_call_counter(
-        self,
-        obj: Any,
-        attr: str,
-        raises: Optional[Exception] = None,
-        returns: Any = None,
-    ) -> Iterator[CallCounter]:
-        """Swap obj.attr with a CallCounter instance.
-
-        Args:
-            obj: *. The Python object whose attribute you want to swap.
-            attr: str. The name of the function to be swapped.
-            raises: Exception|None. The exception raised by the swapped
-                function. If None, then no exception is raised.
-            returns: *. The return value of the swapped function.
-
-        Yields:
-            CallCounter. A CallCounter instance that's installed as obj.attr's
-            implementation while within the context manager returned.
-        """
-
-        # Here we use type Any because this method returns the return value
-        # of the swapped function, and that value can be of any type.
-        def impl(*_: str, **__: str) -> Any:
-            """Behaves according to the given values."""
-            if raises is not None:
-                # Pylint thinks we're trying to raise `None` even though
-                # we've explicitly checked for it above.
-                raise raises  # pylint: disable=raising-bad-type
-            return returns
-
-        call_counter = CallCounter(impl)
-        with mock.patch.object(obj, attr, call_counter):
-            yield call_counter
-
-    # Here we use type Any because the argument 'obj' can accept any
-    # kind of object on which attribute needs to be replaced.
-    @contextlib.contextmanager
     def swap_with_checks(
         self,
         obj: Any,

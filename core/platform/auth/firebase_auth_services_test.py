@@ -923,24 +923,24 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
     APP = object()
 
     def test_initializes_when_connection_does_not_exist(self) -> None:
-        get_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'get_app', raises=ValueError('initialize_app')
+        get_app_patch = mock.patch.object(
+            firebase_admin, 'get_app', side_effect=ValueError('initialize_app')
         )
-        init_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'initialize_app', returns=self.APP
+        init_app_patch = mock.patch.object(
+            firebase_admin, 'initialize_app', return_value=self.APP
         )
 
         with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             firebase_auth_services.establish_firebase_connection()
 
-        self.assertEqual(get_app_counter.times_called, 1)
-        self.assertEqual(init_app_counter.times_called, 1)
+        self.assertEqual(get_app_counter.call_count, 1)
+        self.assertEqual(init_app_counter.call_count, 1)
 
     def test_returns_existing_connection(self) -> None:
-        get_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'get_app', returns=self.APP
+        get_app_patch = mock.patch.object(
+            firebase_admin, 'get_app', return_value=self.APP
         )
-        init_app_patch = self.swap_with_call_counter(
+        init_app_patch = mock.patch.object(
             firebase_admin,
             'initialize_app',
             raises=Exception('unexpected call'),
@@ -949,14 +949,14 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
         with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             firebase_auth_services.establish_firebase_connection()
 
-        self.assertEqual(get_app_counter.times_called, 1)
-        self.assertEqual(init_app_counter.times_called, 0)
+        self.assertEqual(get_app_counter.call_count, 1)
+        self.assertEqual(init_app_counter.call_count, 0)
 
     def test_raises_authentic_get_app_error(self) -> None:
-        get_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'get_app', raises=ValueError('uh-oh!')
+        get_app_patch = mock.patch.object(
+            firebase_admin, 'get_app', side_effect=ValueError('uh-oh!')
         )
-        init_app_patch = self.swap_with_call_counter(
+        init_app_patch = mock.patch.object(
             firebase_admin,
             'initialize_app',
             raises=Exception('unexpected call'),
@@ -966,23 +966,23 @@ class EstablishFirebaseConnectionTests(test_utils.TestBase):
             with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
-        self.assertEqual(get_app_counter.times_called, 1)
-        self.assertEqual(init_app_counter.times_called, 0)
+        self.assertEqual(get_app_counter.call_count, 1)
+        self.assertEqual(init_app_counter.call_count, 0)
 
     def test_raises_authentic_initialize_app_error(self) -> None:
-        get_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'get_app', raises=ValueError('initialize_app')
+        get_app_patch = mock.patch.object(
+            firebase_admin, 'get_app', side_effect=ValueError('initialize_app')
         )
-        init_app_patch = self.swap_with_call_counter(
-            firebase_admin, 'initialize_app', raises=ValueError('uh-oh!')
+        init_app_patch = mock.patch.object(
+            firebase_admin, 'initialize_app', side_effect=ValueError('uh-oh!')
         )
 
         with get_app_patch as get_app_counter, init_app_patch as init_app_counter:
             with self.assertRaisesRegex(ValueError, 'uh-oh!'):
                 firebase_auth_services.establish_firebase_connection()
 
-        self.assertEqual(get_app_counter.times_called, 1)
-        self.assertEqual(init_app_counter.times_called, 1)
+        self.assertEqual(get_app_counter.call_count, 1)
+        self.assertEqual(init_app_counter.call_count, 1)
 
 
 class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
@@ -1246,7 +1246,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
-        always_raise_expired_session_cookie_error = self.swap_to_always_raise(
+        always_raise_expired_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
             error=firebase_auth.ExpiredSessionCookieError('uh-oh', None),
@@ -1267,7 +1267,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
-        always_raise_revoked_session_cookie_error = self.swap_to_always_raise(
+        always_raise_revoked_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
             error=firebase_auth.RevokedSessionCookieError('uh-oh'),
@@ -1289,7 +1289,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
-        always_raise_expired_session_cookie_error = self.swap_to_always_raise(
+        always_raise_expired_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
             error=firebase_auth.UserDisabledError('uh-oh'),
@@ -1308,7 +1308,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
-        always_raise_unknown_error = self.swap_to_always_raise(
+        always_raise_unknown_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
             error=firebase_exceptions.UnknownError('uh-oh'),
@@ -1548,7 +1548,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
         )
-        update_user_patch = self.swap_to_always_raise(
+        update_user_patch = mock.patch.object(
             firebase_auth,
             'update_user',
             error=firebase_exceptions.UnknownError('could not update'),
@@ -1599,7 +1599,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         )
 
     def test_delete_user_when_firebase_raises_an_error(self) -> None:
-        delete_patch = self.swap_to_always_raise(
+        delete_patch = mock.patch.object(
             firebase_auth,
             'delete_user',
             error=firebase_exceptions.InternalError('could not connect'),
@@ -1650,7 +1650,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self,
     ) -> ContextManager[None]:
         """Swaps the get_user function so that it always fails."""
-        return self.swap_to_always_return(
+        return mock.patch.object(
             firebase_auth,
             'get_users',
             firebase_auth.GetUsersResult(
@@ -1660,7 +1660,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_get_users_to_raise_error(self) -> ContextManager[None]:
         """Swaps the get_user function so that it always fails."""
-        return self.swap_to_always_raise(
+        return mock.patch.object(
             firebase_auth,
             'get_users',
             firebase_exceptions.FirebaseError(message='error', code='E111'),
@@ -1668,8 +1668,8 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
     def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
         """Swaps the delete_user function so that it always fails."""
-        return self.swap_to_always_raise(
-            firebase_auth, 'delete_user', error=self.UNKNOWN_ERROR
+        return mock.patch.object(
+            firebase_auth, 'delete_user', side_effect=self.UNKNOWN_ERROR
         )
 
     def test_delete_external_auth_associations_happy_path(self) -> None:

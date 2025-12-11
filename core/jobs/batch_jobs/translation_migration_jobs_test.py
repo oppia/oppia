@@ -251,7 +251,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_patch = self.swap_to_always_raise(
+        raise_patch = mock.patch.object(
             state_domain.State,
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
@@ -279,7 +279,7 @@ class EntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_patch = self.swap_to_always_raise(
+        raise_patch = mock.patch.object(
             translation_models.EntityTranslationsModel, 'create_new'
         )
         with raise_patch:
@@ -377,7 +377,7 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_patch = self.swap_to_always_raise(
+        raise_patch = mock.patch.object(
             state_domain.State,
             'generate_old_content_id_to_new_content_id_in_v54_states',
         )
@@ -405,7 +405,7 @@ class AuditEntityTranslationsModelGenerationOneOffJobTests(
         ] = translation_models.EntityTranslationsModel.get_all().fetch()
 
         self.assertEqual(len(entity_translation_models), 0)
-        raise_patch = self.swap_to_always_raise(
+        raise_patch = mock.patch.object(
             translation_models.EntityTranslationsModel, 'create_new'
         )
         with raise_patch:

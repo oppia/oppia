@@ -31,7 +31,7 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_api_key_secrets_return_none = self.swap_to_always_return(
+        self.swap_api_key_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
         self.swap_api_key_secrets_return_secret = self.swap_with_checks(

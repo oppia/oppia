@@ -439,11 +439,11 @@ class CallCounterTests(test_utils.GenericTestBase):
 
         wrapped_function = test_utils.CallCounter(f)
 
-        self.assertEqual(wrapped_function.times_called, 0)
+        self.assertEqual(wrapped_function.call_count, 0)
 
         for i in range(5):
             self.assertEqual(wrapped_function(i), i**2)
-            self.assertEqual(wrapped_function.times_called, i + 1)
+            self.assertEqual(wrapped_function.call_count, i + 1)
 
 
 class FailingFunctionTests(test_utils.GenericTestBase):
@@ -569,7 +569,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         self.assertIs(obj.func(), obj)
 
-        with self.swap_to_always_return(obj, 'func'):
+        with mock.patch.object(obj, 'func'):
             self.assertIsNone(obj.func())
 
     def test_patch_to_always_return_with_value(self) -> None:
@@ -579,7 +579,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         self.assertEqual(obj.func(), 0)
 
-        with self.swap_to_always_return(obj, 'func', value=123):
+        with mock.patch.object(obj, 'func', return_value=123):
             self.assertEqual(obj.func(), 123)
 
     def test_patch_to_always_raise_without_error_uses_empty_exception(
@@ -590,7 +590,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         obj.func = test_func
         self.assertIsNone(obj.func())
 
-        with self.swap_to_always_raise(obj, 'func'):
+        with mock.patch.object(obj, 'func'):
             try:
                 obj.func()
             except Exception as e:
@@ -609,7 +609,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             obj.func()
 
-        with self.swap_to_always_raise(obj, 'func', error=ValueError('abc')):
+        with mock.patch.object(obj, 'func', side_effect=ValueError('abc')):
             with self.assertRaisesRegex(ValueError, 'abc'):
                 obj.func()
 

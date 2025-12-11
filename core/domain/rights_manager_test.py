@@ -1105,7 +1105,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
         self.assertTrue(exp_rights.is_editor(self.user_id_b))
 
-        with self.swap_to_always_return(user_services, 'get_usernames', [None]):
+        with mock.patch.object(user_services, 'get_usernames', [None]):
             rights_manager.deassign_role_for_exploration(
                 self.user_a, self.EXP_ID, self.user_id_b
             )

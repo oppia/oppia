@@ -400,7 +400,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         )
         # Call the handler.
         with mock.patch.object(feconf, 'NUM_PRETEST_QUESTIONS', 1):
-            with self.swap_to_always_return(
+            with mock.patch.object(
                 story_domain.Story,
                 'get_prerequisite_skill_ids_for_exp_id',
                 None,

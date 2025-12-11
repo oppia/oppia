@@ -150,7 +150,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_given_webhook_secret_is_invalid(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        mailchimp_patch = self.swap_to_always_return(
+        mailchimp_patch = mock.patch.object(
             secrets_services, 'get_secret', self.secret
         )
 
@@ -169,7 +169,7 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_no_error_when_given_webhook_secret_is_valid(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        mailchimp_patch = self.swap_to_always_return(
+        mailchimp_patch = mock.patch.object(
             secrets_services, 'get_secret', self.secret
         )
 
@@ -365,8 +365,8 @@ class DownloadExplorationDecoratorTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.user_email)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        exp_rights_patch = self.swap_to_always_return(
-            rights_manager, 'get_exploration_rights', value=None
+        exp_rights_patch = mock.patch.object(
+            rights_manager, 'get_exploration_rights', return_value=None
         )
         with testapp_patch, exp_rights_patch:
             response = self.get_json(
@@ -498,8 +498,8 @@ class ViewExplorationStatsDecoratorTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.user_email)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        exp_rights_patch = self.swap_to_always_return(
-            rights_manager, 'get_exploration_rights', value=None
+        exp_rights_patch = mock.patch.object(
+            rights_manager, 'get_exploration_rights', return_value=None
         )
         with testapp_patch, exp_rights_patch:
             response = self.get_json(
@@ -2278,8 +2278,8 @@ class CanDeleteBlogPostTests(test_utils.GenericTestBase):
     def test_error_with_invalid_blog_post_id(self) -> None:
         self.login(self.user_email)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        blog_post_rights_patch = self.swap_to_always_return(
-            blog_services, 'get_blog_post_rights', value=None
+        blog_post_rights_patch = mock.patch.object(
+            blog_services, 'get_blog_post_rights', return_value=None
         )
         with testapp_patch, blog_post_rights_patch:
             response = self.get_json(
@@ -2386,8 +2386,8 @@ class CanEditBlogPostTests(test_utils.GenericTestBase):
     def test_error_with_invalid_blog_post_id(self) -> None:
         self.login(self.user_email)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        blog_post_rights_patch = self.swap_to_always_return(
-            blog_services, 'get_blog_post_rights', value=None
+        blog_post_rights_patch = mock.patch.object(
+            blog_services, 'get_blog_post_rights', return_value=None
         )
         with testapp_patch, blog_post_rights_patch:
             response = self.get_json(
@@ -4045,8 +4045,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     def test_user_with_review_rights_can_accept_suggestion(self) -> None:
         self.login(self.EDITOR_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        review_patch = self.swap_to_always_return(
-            suggestion_services, 'can_user_review_category', value=True
+        review_patch = mock.patch.object(
+            suggestion_services, 'can_user_review_category', return_value=True
         )
         with testapp_patch, review_patch:
             response = self.get_json(
@@ -4062,8 +4062,10 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.EDITOR_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        translation_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_translation_suggestions', value=True
+        translation_review_patch = mock.patch.object(
+            user_services,
+            'can_review_translation_suggestions',
+            return_value=True,
         )
         with testapp_patch, translation_review_patch:
             response = self.get_json(
@@ -4079,8 +4081,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.EDITOR_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        question_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_question_suggestions', value=True
+        question_review_patch = mock.patch.object(
+            user_services, 'can_review_question_suggestions', return_value=True
         )
         with testapp_patch, question_review_patch:
             response = self.get_json(
@@ -4194,8 +4196,10 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        translation_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_translation_suggestions', value=True
+        translation_review_patch = mock.patch.object(
+            user_services,
+            'can_review_translation_suggestions',
+            return_value=True,
         )
         with testapp_patch, translation_review_patch:
             response = self.get_json(
@@ -4214,8 +4218,8 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        question_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_question_suggestions', value=True
+        question_review_patch = mock.patch.object(
+            user_services, 'can_review_question_suggestions', return_value=True
         )
         with testapp_patch, question_review_patch:
             response = self.get_json(
@@ -4234,8 +4238,8 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        question_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_question_suggestions', value=False
+        question_review_patch = mock.patch.object(
+            user_services, 'can_review_question_suggestions', return_value=False
         )
         with testapp_patch, question_review_patch:
             response = self.get_json(
@@ -4256,8 +4260,10 @@ class ViewReviewableSuggestionsTests(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
         user_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        translation_review_patch = self.swap_to_always_return(
-            user_services, 'can_review_translation_suggestions', value=False
+        translation_review_patch = mock.patch.object(
+            user_services,
+            'can_review_translation_suggestions',
+            return_value=False,
         )
         with testapp_patch, translation_review_patch:
             response = self.get_json(
@@ -5024,8 +5030,8 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
     def test_cannot_edit_story_with_invalid_canonical_story_ids(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        canonical_story_ids_patch = self.swap_to_always_return(
-            topic_domain.Topic, 'get_canonical_story_ids', value=[]
+        canonical_story_ids_patch = mock.patch.object(
+            topic_domain.Topic, 'get_canonical_story_ids', return_value=[]
         )
         with testapp_patch, canonical_story_ids_patch:
             response = self.get_json(
@@ -6005,7 +6011,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         studyguide_url_fragment = 'studyguide/sub-one-frag'
         topic_services.publish_topic(self.topic_id, self.admin_id)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        subtopic_patch = self.swap_to_always_return(
+        subtopic_patch = mock.patch.object(
             subtopic_page_services, 'get_subtopic_page_by_id', None
         )
         with testapp_patch, subtopic_patch:
@@ -6028,7 +6034,7 @@ class SubtopicViewerTests(test_utils.GenericTestBase):
         studyguide_url_fragment = 'studyguide/sub-three-frag'
         topic_services.publish_topic(self.topic_id_2, self.admin_id)
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        subtopic_patch = self.swap_to_always_return(
+        subtopic_patch = mock.patch.object(
             study_guide_services, 'get_study_guide_by_id', None
         )
         with testapp_patch, subtopic_patch:
@@ -8390,7 +8396,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_given_api_key_is_invalid(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        mailchimp_patch = self.swap_to_always_return(
+        mailchimp_patch = mock.patch.object(
             secrets_services, 'get_secret', 'secret'
         )
 
@@ -8408,7 +8414,7 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
     def test_no_error_when_given_api_key_is_valid(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        mailchimp_patch = self.swap_to_always_return(
+        mailchimp_patch = mock.patch.object(
             secrets_services, 'get_secret', 'secret'
         )
 

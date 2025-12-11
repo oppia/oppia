@@ -815,7 +815,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
-                self.assertEqual(log_new_error_counter.times_called, 0)
+                self.assertEqual(log_new_error_counter.call_count, 0)
 
                 self.login(self.EDITOR_EMAIL)
                 self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -836,7 +836,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 )
 
                 # However, an error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(log_new_error_counter.call_count, 1)
                 self.assertEqual(
                     logs[0],
                     'Please ensure that the value for the admin platform '
@@ -896,7 +896,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
-                self.assertEqual(log_new_error_counter.times_called, 0)
+                self.assertEqual(log_new_error_counter.call_count, 0)
 
                 self.login(self.EDITOR_EMAIL)
                 self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -917,7 +917,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 )
 
                 # However, an error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(log_new_error_counter.call_count, 1)
                 self.assertEqual(
                     logs[0],
                     'Please ensure that the value for the admin platform '
@@ -955,7 +955,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
 
         with self.capture_logging(min_level=logging.ERROR) as logs:
             with log_new_error_ctx:
-                self.assertEqual(log_new_error_counter.times_called, 0)
+                self.assertEqual(log_new_error_counter.call_count, 0)
 
                 self.login(self.EDITOR_EMAIL)
                 self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
@@ -976,7 +976,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                 )
 
                 # However, an error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(log_new_error_counter.call_count, 1)
                 self.assertTrue(
                     logs[0].startswith(
                         'Original email HTML body does not match cleaned HTML body'
@@ -1422,7 +1422,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 )
 
                 # An error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(log_new_error_counter.call_count, 1)
                 self.assertRegex(logs[0], 'Duplicate email')
 
                 # Check that a new email was not sent.
@@ -1486,7 +1486,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 self.assertEqual(len(all_models), 1)
 
                 # No error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 0)
+                self.assertEqual(log_new_error_counter.call_count, 0)
 
                 email_manager._send_email(  # pylint: disable=protected-access
                     self.new_user_id,
@@ -1498,7 +1498,7 @@ class DuplicateEmailTests(test_utils.EmailTestBase):
                 )
 
                 # An error should be recorded in the logs.
-                self.assertEqual(log_new_error_counter.times_called, 1)
+                self.assertEqual(log_new_error_counter.call_count, 1)
                 self.assertRegex(logs[0], 'Duplicate email')
 
                 # Check that a new email was not sent.
@@ -3366,7 +3366,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
@@ -3390,7 +3390,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'The "contributor_dashboard_reviewer_emails_is_enabled" '
@@ -3425,7 +3425,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'There was no email for the given reviewer id: '
@@ -3452,7 +3452,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0], 'No Contributor Dashboard reviewers to notify.'
             )
@@ -5521,7 +5521,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
@@ -5554,7 +5554,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'The "notify_admins_suggestions_waiting_too_long" property '
@@ -5596,7 +5596,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'There was no email for the given admin id: '
@@ -5628,7 +5628,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'There were no admins to notify.')
 
     @test_utils.set_platform_parameters(
@@ -6534,7 +6534,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
@@ -6570,7 +6570,7 @@ class NotifyReviewersNewSuggestionsTests(test_utils.EmailTestBase):
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0], 'No reviewers found for language en to notify'
             )
@@ -6821,7 +6821,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'This app cannot send emails to users.')
 
     @test_utils.set_platform_parameters(
@@ -6849,7 +6849,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'The "enable_admin_notifications_for_reviewer_shortage" '
@@ -6877,7 +6877,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(logs[0], 'There were no admins to notify.')
 
     @test_utils.set_platform_parameters(
@@ -6938,7 +6938,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
 
             messages = self._get_all_sent_email_messages()
             self.assertEqual(len(messages), 0)
-            self.assertEqual(self.log_new_error_counter.times_called, 1)
+            self.assertEqual(self.log_new_error_counter.call_count, 1)
             self.assertEqual(
                 logs[0],
                 'There was no email for the given admin id: '
@@ -8860,7 +8860,7 @@ class MailchimpSecretTest(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.swap_webhook_secrets_return_none = self.swap_to_always_return(
+        self.swap_webhook_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
         self.swap_webhook_secrets_return_secret = self.swap_with_checks(

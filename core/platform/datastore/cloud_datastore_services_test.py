@@ -181,7 +181,7 @@ class CloudDatastoreServicesTests(test_utils.GenericTestBase):
             'get_multi failed after %s retries'
             % cloud_datastore_services.MAX_GET_RETRIES
         )
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             ndb, 'get_multi', Exception('Mock key error')
         ), mock.patch.object(logging, 'exception', _mock_logging_function):
             with self.assertRaisesRegex(Exception, error_msg):

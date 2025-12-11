@@ -291,7 +291,7 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(story_summary.thumbnail_bg_color, None)
         self.assertEqual(story_summary.thumbnail_filename, None)
-        with self.swap_to_always_return(story_models.StorySummaryModel, 'get'):
+        with mock.patch.object(story_models.StorySummaryModel, 'get'):
             story_summary = story_fetchers.get_story_summary_by_id('fakeID')
             self.assertEqual(story_summary, None)
 

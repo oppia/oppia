@@ -178,9 +178,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with mock.patch.object(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url, [200, 301, 302, 400, 401, 404, 405]
@@ -192,9 +190,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with mock.patch.object(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
@@ -209,9 +205,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with mock.patch.object(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
@@ -226,9 +220,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         for route in main.URLS:
             url = re.sub('<([^/^:]+)>', 'abc123', route.template)
 
-            with self.swap_to_always_return(
-                secrets_services, 'get_secret', 'secret'
-            ):
+            with mock.patch.object(secrets_services, 'get_secret', 'secret'):
                 # Some of these will 404 or 302. This is expected.
                 self.get_response_without_checking_for_errors(
                     url,
@@ -381,7 +373,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(observed_log_messages, ['Frontend error: errors'])
 
     def test_redirect_when_user_is_disabled(self) -> None:
-        get_auth_claims_from_request_patch = self.swap_to_always_raise(
+        get_auth_claims_from_request_patch = mock.patch.object(
             auth_services,
             'get_auth_claims_from_request',
             auth_domain.UserDisabledError,
@@ -493,15 +485,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(
-                self.swap_with_call_counter(
-                    auth_services, 'destroy_auth_session'
-                )
+                mock.patch.object(auth_services, 'destroy_auth_session')
             )
             logs = exit_stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR)
             )
             exit_stack.enter_context(
-                self.swap_to_always_raise(
+                mock.patch.object(
                     auth_services,
                     'get_auth_claims_from_request',
                     error=auth_domain.StaleAuthSessionError('uh-oh'),
@@ -510,7 +500,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             response = self.get_html_response('/', expected_status_int=302)
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
         self.assertEqual(
             response.location,
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
@@ -521,15 +511,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     ) -> None:
         with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(
-                self.swap_with_call_counter(
-                    auth_services, 'destroy_auth_session'
-                )
+                mock.patch.object(auth_services, 'destroy_auth_session')
             )
             logs = exit_stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR)
             )
             exit_stack.enter_context(
-                self.swap_to_always_raise(
+                mock.patch.object(
                     auth_services,
                     'get_auth_claims_from_request',
                     error=auth_domain.InvalidAuthSessionError('uh-oh'),
@@ -539,7 +527,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             response = self.get_html_response('/', expected_status_int=302)
 
         self.assert_matches_regexps(logs, ['User session is invalid!'])
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
         self.assertEqual(
             response.location,
             'http://localhost/login?return_url=http%3A%2F%2Flocalhost%2F',
@@ -548,15 +536,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_signup_attempt_on_wrong_page_fails(self) -> None:
         with contextlib.ExitStack() as exit_stack:
             call_counter = exit_stack.enter_context(
-                self.swap_with_call_counter(
-                    auth_services, 'destroy_auth_session'
-                )
+                mock.patch.object(auth_services, 'destroy_auth_session')
             )
             logs = exit_stack.enter_context(
                 self.capture_logging(min_level=logging.ERROR)
             )
             exit_stack.enter_context(
-                self.swap_to_always_return(
+                mock.patch.object(
                     auth_services,
                     'get_auth_claims_from_request',
                     auth_domain.AuthClaims(
@@ -579,11 +565,11 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 'page http://localhost/' % self.NEW_USER_EMAIL
             ],
         )
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
 
     def test_user_without_email_id_raises_exception(self) -> None:
         with contextlib.ExitStack() as exit_stack:
-            swap_auth_claim = self.swap_to_always_return(
+            swap_auth_claim = mock.patch.object(
                 auth_services,
                 'get_auth_claims_from_request',
                 auth_domain.AuthClaims(
@@ -606,8 +592,8 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 self.capture_logging(min_level=logging.ERROR)
             )
             exit_stack.enter_context(
-                self.swap_to_always_raise(
-                    webapp2.Request, 'get', error=ValueError('uh-oh')
+                mock.patch.object(
+                    webapp2.Request, 'get', side_effect=ValueError('uh-oh')
                 )
             )
             self.get_custom_response(
@@ -692,7 +678,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_html_response_is_rejected(self) -> None:
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
 
         response = self.get_html_response(
@@ -700,21 +686,21 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         )
 
         self.assertNotIn(b'<oppia-library-page-root>', response.body)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 1)
 
     def test_html_response_is_not_rejected_when_user_is_super_admin(
         self,
     ) -> None:
         self.context_stack.enter_context(self.super_admin_context())
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
 
         response = self.get_html_response('/community-library')
 
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 0)
 
     def test_html_response_is_not_rejected_when_user_is_release_coordinator(
         self,
@@ -723,14 +709,14 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
             self.login_context(self.RELEASE_COORDINATOR_EMAIL)
         )
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
 
         response = self.get_html_response('/community-library')
 
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 0)
 
     def test_csrfhandler_handler_is_not_rejected(self) -> None:
         response = self.get_json('/csrfhandler')
@@ -741,21 +727,21 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
     def test_session_begin_handler_is_not_rejected(self) -> None:
         call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'establish_auth_session')
+            mock.patch.object(auth_services, 'establish_auth_session')
         )
 
         self.get_html_response('/session_begin', expected_status_int=200)
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
 
     def test_session_end_handler_is_not_rejected(self) -> None:
         call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
 
         self.get_html_response('/session_end', expected_status_int=200)
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
 
     def test_signup_fails(self) -> None:
         with self.assertRaisesRegex(Exception, '302 Moved Temporarily'):
@@ -779,18 +765,18 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         # logging out, rather than asserting that destroy_auth_session() gets
         # called.
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
         self.context_stack.enter_context(self.super_admin_context())
 
         with mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 0)
 
         self.get_json('/url_handler?current_url=/')
 
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 0)
 
     def test_non_admin_auth_session_is_destroyed_when_in_maintenance_mode(
         self,
@@ -799,19 +785,19 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
         # logging out, rather than asserting that destroy_auth_session() gets
         # called.
         destroy_auth_session_call_counter = self.context_stack.enter_context(
-            self.swap_with_call_counter(auth_services, 'destroy_auth_session')
+            mock.patch.object(auth_services, 'destroy_auth_session')
         )
 
         with mock.patch.object(feconf, 'ENABLE_MAINTENANCE_MODE', False):
             self.get_json('/url_handler?current_url=/')
 
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 0)
 
         self.get_html_response(
             '/url_handler?current_url=/', expected_status_int=302
         )
 
-        self.assertEqual(destroy_auth_session_call_counter.times_called, 1)
+        self.assertEqual(destroy_auth_session_call_counter.call_count, 1)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
@@ -950,28 +936,24 @@ class SessionBeginHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_begin handler."""
 
     def test_get(self) -> None:
-        swap = self.swap_with_call_counter(
-            auth_services, 'establish_auth_session'
-        )
+        swap = mock.patch.object(auth_services, 'establish_auth_session')
 
         with swap as call_counter:
             self.get_html_response('/session_begin', expected_status_int=200)
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
 
 
 class SessionEndHandlerTests(test_utils.GenericTestBase):
     """Tests for /session_end handler."""
 
     def test_get(self) -> None:
-        swap = self.swap_with_call_counter(
-            auth_services, 'destroy_auth_session'
-        )
+        swap = mock.patch.object(auth_services, 'destroy_auth_session')
 
         with swap as call_counter:
             self.get_html_response('/session_end', expected_status_int=200)
 
-        self.assertEqual(call_counter.times_called, 1)
+        self.assertEqual(call_counter.call_count, 1)
 
 
 class I18nDictsTests(test_utils.GenericTestBase):

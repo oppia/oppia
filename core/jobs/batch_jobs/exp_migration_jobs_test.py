@@ -660,7 +660,7 @@ class MigrateExplorationJobTests(
 
         self.assertEqual(exp_model.states_schema_version, 41)
 
-        with self.swap_to_always_raise(
+        with mock.patch.object(
             translation_services,
             'compute_translation_related_change',
             Exception('Error generating related models'),

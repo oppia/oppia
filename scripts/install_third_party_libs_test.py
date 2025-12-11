@@ -481,16 +481,12 @@ class SetupTests(test_utils.GenericTestBase):
             'download_and_install_package',
             mock_download_and_install_package,
         )
-        self.exists_true_patch = self.swap_to_always_return(
-            os.path, 'exists', True
-        )
-        self.exists_false_patch = self.swap_to_always_return(
-            os.path, 'exists', False
-        )
-        self.is_x64_architecture_true_patch = self.swap_to_always_return(
+        self.exists_true_patch = mock.patch.object(os.path, 'exists', True)
+        self.exists_false_patch = mock.patch.object(os.path, 'exists', False)
+        self.is_x64_architecture_true_patch = mock.patch.object(
             common, 'is_x64_architecture', True
         )
-        self.is_x64_architecture_false_patch = self.swap_to_always_return(
+        self.is_x64_architecture_false_patch = mock.patch.object(
             common, 'is_x64_architecture', False
         )
         self.uname_patch = mock.patch.object(os, 'uname', mock_uname)
