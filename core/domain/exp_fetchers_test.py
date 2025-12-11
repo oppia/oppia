@@ -17,6 +17,7 @@
 """Unit tests for core.domain.exp_fetchers."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

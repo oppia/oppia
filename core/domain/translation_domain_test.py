@@ -17,9 +17,9 @@
 """Tests for domain objects related to translations."""
 
 from __future__ import annotations
-from unittest import mock
 
 import re
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import (

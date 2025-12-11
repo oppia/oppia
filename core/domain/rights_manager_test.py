@@ -15,9 +15,8 @@
 """Tests for classes and methods relating to user rights."""
 
 from __future__ import annotations
-from unittest import mock
 
-import unittest.mock
+from unittest import mock
 
 from core.constants import constants
 from core.domain import (

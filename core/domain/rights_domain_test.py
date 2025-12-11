@@ -17,9 +17,9 @@
 """Tests for rights domain objects."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
+from unittest import mock
 
 from core import utils
 from core.domain import rights_domain, rights_manager, user_services

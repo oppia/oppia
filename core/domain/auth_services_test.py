@@ -17,6 +17,7 @@
 """Tests for core.domain.auth_services."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.constants import constants

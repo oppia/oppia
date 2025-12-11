@@ -15,9 +15,9 @@
 """Tests for the firebase controllers."""
 
 from __future__ import annotations
-from unittest import mock
 
 import collections
+from unittest import mock
 
 from core.controllers import firebase
 from core.tests import test_utils

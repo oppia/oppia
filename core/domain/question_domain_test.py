@@ -15,11 +15,11 @@
 """Tests for question domain objects."""
 
 from __future__ import annotations
-from unittest import mock
 
 import copy
 import datetime
 import re
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import (

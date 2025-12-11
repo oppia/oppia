@@ -17,10 +17,11 @@
 """Tests for the email services API wrapper in DEV_MODE."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
 import textwrap
+
+from unittest import mock
 
 from core.domain import platform_parameter_list
 from core.platform.email import dev_mode_email_services

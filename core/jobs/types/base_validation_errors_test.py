@@ -17,10 +17,12 @@
 """Unit tests for base model validator errors."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+
 import pickle
+
+from unittest import mock
 
 from core import feconf
 from core.jobs import job_utils

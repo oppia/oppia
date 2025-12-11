@@ -17,10 +17,10 @@
 """Tests for the domain taskqueue services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import uuid
+from unittest import mock
 
 from core import feconf
 from core.domain import taskqueue_services

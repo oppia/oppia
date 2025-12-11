@@ -17,6 +17,7 @@
 """Tests for the python elastic search wrapper."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.domain import search_services

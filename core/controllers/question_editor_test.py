@@ -15,10 +15,10 @@
 """Tests for the Question Editor controller."""
 
 from __future__ import annotations
-from unittest import mock
 
 import json
 import os
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

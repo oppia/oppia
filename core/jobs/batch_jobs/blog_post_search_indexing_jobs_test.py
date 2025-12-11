@@ -17,10 +17,10 @@
 """Unit tests for jobs.batch_jobs.blog_post_search_indexing_jobs."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import math
+from unittest import mock
 
 from core import utils
 from core.domain import search_services

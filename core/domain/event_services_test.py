@@ -17,12 +17,12 @@
 """Tests for event handling."""
 
 from __future__ import annotations
-from unittest import mock
 
 import importlib
 import inspect
 import logging
 import re
+from unittest import mock
 
 from core import feconf
 from core.domain import (

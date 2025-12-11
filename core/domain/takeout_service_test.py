@@ -15,12 +15,12 @@
 """Unit tests for core.domain.takeout_service."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import json
 import logging
 import os
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

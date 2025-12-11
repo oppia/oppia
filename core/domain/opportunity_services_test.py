@@ -17,10 +17,10 @@
 """Unit tests for core.domain.opportunity_services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
-import unittest.mock
+
+from unittest import mock
 
 from core import feature_flag_list, feconf
 from core.constants import constants

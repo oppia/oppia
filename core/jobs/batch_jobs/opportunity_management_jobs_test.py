@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.opportunity_management_jobs."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

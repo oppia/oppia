@@ -15,9 +15,9 @@
 """Tests for the blog homepage page."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

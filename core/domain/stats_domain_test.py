@@ -17,10 +17,10 @@
 """Tests for core.domain.stats_domain."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import re
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import exp_domain, stats_domain, stats_services

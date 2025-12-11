@@ -17,10 +17,10 @@
 """Unit tests for core.domain.beam_job_services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import itertools
+from unittest import mock
 
 from core.domain import beam_job_domain, beam_job_services
 from core.jobs import base_jobs, jobs_manager

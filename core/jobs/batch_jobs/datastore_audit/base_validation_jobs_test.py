@@ -17,9 +17,9 @@
 """Unit tests for jobs.base_validation_jobs."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs.datastore_audit import base_validation_jobs

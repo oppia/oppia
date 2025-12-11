@@ -17,10 +17,10 @@
 """Tests for methods in the interaction registry."""
 
 from __future__ import annotations
-from unittest import mock
 
 import json
 import os
+from unittest import mock
 
 from core import feconf, schema_utils
 from core.domain import interaction_registry

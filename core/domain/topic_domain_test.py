@@ -17,9 +17,9 @@
 """Tests for topic domain objects."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import android_validation_constants, feconf, utils
 from core.constants import constants

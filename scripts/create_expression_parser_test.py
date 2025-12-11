@@ -15,6 +15,7 @@
 """Unit tests for scripts/create_expression_parser.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import os

@@ -17,10 +17,10 @@
 """Tests for the domain objects relating to platform parameters."""
 
 from __future__ import annotations
-from unittest import mock
 
 import collections
 import enum
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import platform_parameter_domain as parameter_domain

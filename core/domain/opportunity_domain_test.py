@@ -17,9 +17,9 @@
 """Tests for opportunity domain objects."""
 
 from __future__ import annotations
-from unittest import mock
 
 import re
+from unittest import mock
 
 from core.constants import constants
 from core.domain import opportunity_domain

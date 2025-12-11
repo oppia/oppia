@@ -17,9 +17,9 @@
 """Tests for the platform parameter registry."""
 
 from __future__ import annotations
-from unittest import mock
 
 import enum
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import caching_services

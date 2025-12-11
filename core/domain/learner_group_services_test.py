@@ -17,6 +17,7 @@
 """Tests for the learner group services."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feature_flag_list

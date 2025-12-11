@@ -17,6 +17,7 @@
 """Remove profile_picture_data_url field from UserSettingsModel."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

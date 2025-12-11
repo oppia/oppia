@@ -15,9 +15,10 @@
 """Tests for dev mode bulk email services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
+
+from unittest import mock
 
 from core.platform.bulk_email import dev_mode_bulk_email_services
 from core.tests import test_utils

@@ -15,11 +15,11 @@
 """Tests the methods defined in story services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import logging
 import os
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

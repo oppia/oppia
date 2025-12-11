@@ -17,11 +17,11 @@
 """Tests for blog post services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import logging
 import math
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import (

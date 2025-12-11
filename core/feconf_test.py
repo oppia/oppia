@@ -17,10 +17,10 @@
 """Unit tests for core/feconf.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import os
+from unittest import mock
 
 from core import feconf
 from core.tests import test_utils

@@ -17,9 +17,9 @@
 """Unit tests for platform_parameter_services.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import enum
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

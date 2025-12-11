@@ -15,9 +15,9 @@
 """Tests for platform feature evaluation handler."""
 
 from __future__ import annotations
-from unittest import mock
 
 import enum
+from unittest import mock
 
 from core import feature_flag_list
 from core.domain import feature_flag_domain

@@ -17,11 +17,11 @@
 """Unit tests for core.domain.value_generators_domain."""
 
 from __future__ import annotations
-from unittest import mock
 
 import importlib
 import inspect
 import re
+from unittest import mock
 
 from core.domain import value_generators_domain
 from core.tests import test_utils

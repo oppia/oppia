@@ -15,10 +15,10 @@
 """Tests for Constants object and cosntants.json file."""
 
 from __future__ import annotations
-from unittest import mock
 
 import os
 import pkgutil
+from unittest import mock
 
 from core import constants, feconf
 from core.tests import test_utils

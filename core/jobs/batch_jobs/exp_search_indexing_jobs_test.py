@@ -17,6 +17,7 @@
 """Unit tests for jobs.batch_jobs.exp_search_indexing_jobs."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.constants import constants

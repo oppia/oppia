@@ -17,9 +17,9 @@
 """Tests for the beam jobs controllers."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import feconf
 from core.domain import beam_job_domain, beam_job_services

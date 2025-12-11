@@ -15,6 +15,7 @@
 """Tests the methods defined in story fetchers."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

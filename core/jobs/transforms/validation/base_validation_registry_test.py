@@ -17,6 +17,7 @@
 """Unit tests for jobs.transforms.base_validation_registry."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core.jobs.decorators import validation_decorators

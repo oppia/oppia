@@ -15,9 +15,9 @@
 """Tests for Oppia resource handling (e.g. templates, images)."""
 
 from __future__ import annotations
-from unittest import mock
 
 import os
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

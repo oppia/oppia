@@ -17,9 +17,9 @@
 """Tests for the ratings system."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core.domain import exp_domain, exp_fetchers, exp_services, rating_services
 from core.platform import models

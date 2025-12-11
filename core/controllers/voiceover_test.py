@@ -15,10 +15,10 @@
 """Tests for the voiceover admin page."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import uuid
+from unittest import mock
 
 from core import feature_flag_list, feconf
 from core.domain import (

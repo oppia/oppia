@@ -17,6 +17,7 @@
 """Unit tests for scripts/install_third_party_libs.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import builtins

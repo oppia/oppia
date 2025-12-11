@@ -17,6 +17,7 @@
 """Tests the methods defined in topic fetchers."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

@@ -17,9 +17,10 @@
 """Tests for core.platform.app_identity.gae_app_identity_services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import os
+
+from unittest import mock
 
 from core.platform.app_identity import gae_app_identity_services
 from core.tests import test_utils

@@ -15,10 +15,9 @@
 """Tests for the contributor dashboard controllers."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
-import unittest.mock
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

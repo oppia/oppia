@@ -17,6 +17,7 @@
 """Unit tests for scripts/build.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import ast

@@ -17,10 +17,10 @@
 """Tests for suggestion controllers."""
 
 from __future__ import annotations
-from unittest import mock
 
 import base64
 import os
+from unittest import mock
 
 from core import feconf
 from core.constants import constants

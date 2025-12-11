@@ -15,10 +15,12 @@
 """Unit tests for the cloud_datastore_services.py"""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+
 import logging
+
+from unittest import mock
 
 from core import feconf
 from core.platform import models

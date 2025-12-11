@@ -15,10 +15,10 @@
 """Tests for the topic editor page."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import os
+from unittest import mock
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants

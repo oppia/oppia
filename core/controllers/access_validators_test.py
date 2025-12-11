@@ -15,9 +15,9 @@
 """Tests for core.domain.access_validator."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import feature_flag_list, feconf
 from core.constants import constants

@@ -15,6 +15,7 @@
 """Tests for the questions list."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf

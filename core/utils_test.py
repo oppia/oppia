@@ -17,6 +17,7 @@
 """Unit tests for utils.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import base64

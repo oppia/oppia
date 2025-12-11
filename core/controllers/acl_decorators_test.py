@@ -17,9 +17,9 @@
 """Tests for core.domain.acl_decorators."""
 
 from __future__ import annotations
-from unittest import mock
 
 import json
+from unittest import mock
 
 from core import android_validation_constants, feature_flag_list, feconf
 from core.constants import constants

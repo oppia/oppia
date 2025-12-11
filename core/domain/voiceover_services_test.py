@@ -17,11 +17,11 @@
 """Tests for voiecover service methods."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import json
 import os
+from unittest import mock
 
 from core import feconf, schema_utils
 from core.constants import constants

@@ -15,6 +15,7 @@
 """Tests for the skill editor page."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import feconf, utils

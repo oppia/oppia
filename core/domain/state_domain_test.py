@@ -17,13 +17,13 @@
 """Tests for state domain objects and methods defined on them."""
 
 from __future__ import annotations
-from unittest import mock
 
 import contextlib
 import copy
 import logging
 import os
 import re
+from unittest import mock
 
 from core import feconf, schema_utils, utils
 from core.domain import (

@@ -17,7 +17,6 @@
 """Tests for generic controller behavior."""
 
 from __future__ import annotations
-from unittest import mock
 
 import contextlib
 import importlib
@@ -28,6 +27,7 @@ import logging
 import os
 import re
 import types
+from unittest import mock
 
 import main
 from core import feconf, handler_schema_constants, utils

@@ -17,9 +17,10 @@
 """Unit tests for jobs.batch_jobs.topic_migration_jobs."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+
+from unittest import mock
 
 from core import feconf
 from core.domain import topic_domain

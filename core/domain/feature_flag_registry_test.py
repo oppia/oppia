@@ -17,9 +17,9 @@
 """Tests for feature flag registry."""
 
 from __future__ import annotations
-from unittest import mock
 
 import enum
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

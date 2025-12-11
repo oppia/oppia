@@ -17,6 +17,7 @@
 """Unit tests for jobs.io.gcs_io."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 from core import utils

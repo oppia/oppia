@@ -17,9 +17,10 @@
 """Tests for the Python Cloud Secret services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import types
+
+from unittest import mock
 
 from core.platform.secrets import cloud_secrets_services
 from core.tests import test_utils

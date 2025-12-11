@@ -15,9 +15,10 @@
 """Tests for mailchimp services."""
 
 from __future__ import annotations
-from unittest import mock
 
 import logging
+
+from unittest import mock
 
 from core.domain import platform_parameter_list
 from core.platform import models

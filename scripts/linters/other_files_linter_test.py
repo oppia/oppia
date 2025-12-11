@@ -17,6 +17,7 @@
 """Unit tests for app_dev_linter.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import builtins

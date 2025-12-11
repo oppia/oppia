@@ -15,9 +15,9 @@
 """Tests for services relating to emails."""
 
 from __future__ import annotations
-from unittest import mock
 
 import textwrap
+from unittest import mock
 
 from core.constants import constants
 from core.domain import email_services, platform_parameter_list

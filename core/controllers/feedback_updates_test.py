@@ -15,9 +15,9 @@
 """Tests for the feedback updates."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import feconf, utils
 from core.domain import (

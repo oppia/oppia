@@ -15,6 +15,7 @@
 """Unit tests for scripts/run_lighthouse_tests.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import builtins

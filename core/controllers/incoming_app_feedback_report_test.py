@@ -17,9 +17,9 @@
 """Tests for the controller managing incoming feedback reports."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
+from unittest import mock
 
 from core import android_validation_constants
 from core.domain import app_feedback_report_domain

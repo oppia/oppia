@@ -15,10 +15,10 @@
 """Tests for story domain objects and methods defined on them."""
 
 from __future__ import annotations
-from unittest import mock
 
 import datetime
 import os
+from unittest import mock
 
 from core import feconf, utils
 from core.constants import constants

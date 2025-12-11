@@ -17,6 +17,7 @@
 """Unit tests for scripts/run_backend_tests.py."""
 
 from __future__ import annotations
+
 from unittest import mock
 
 import builtins
