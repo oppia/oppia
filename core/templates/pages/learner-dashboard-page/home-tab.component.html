@@ -20,11 +20,11 @@
         </a>
       </div>
       <div class="continue-where-you-left-off-scroll">
-        <div class="continue-where-you-left-off-section e2e-test-continue-section e2e-test-non-empty-section" *ngIf="continueWhereYouLeftOffList.length !== 0" 
+        <div class="continue-where-you-left-off-section e2e-test-continue-section e2e-test-non-empty-section" *ngIf="continueWhereYouLeftOffList.length !== 0"
         [ngStyle]="windowIsNarrow && {'width': width + 'px'}">
           <div *ngFor="let topicSummaryTile of continueWhereYouLeftOffList" class="topic-summary">
             <div *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts; let i = index"
-              class="story-summary-tile">
+                 class="story-summary-tile">
               <oppia-learner-story-summary-tile [storySummary]="storySummaryTile" [displayArea]="'homeTab'"
                 [topicName]="topicSummaryTile.name" (click)="registerClassroomInProgressLessonEvent(topicSummaryTile.classroomName, topicSummaryTile.name)">
               </oppia-learner-story-summary-tile>
@@ -49,7 +49,7 @@
                 </oppia-learner-topic-summary-tile>
               </div>
               <a [href]="getClassroomLink(item.key)" target="{{ openInNewWindow ? '_blank' : '_self' }}"
-                class="oppia-classroom-link">
+                 class="oppia-classroom-link">
                 <div class="classroom-card">
                   <p class="classroom-text">
                     <span [innerHTML]="'I18N_VIEW_ALL_TOPICS' | translate: {classroomName: item.key}"></span>
@@ -66,9 +66,9 @@
       <p class="suggested-for-you-heading" [innerHTML]="'I18N_LEARNER_DASHBOARD_LEARN_SOMETHING_NEW_SECTION' | translate"></p>
       <p [innerHTML]="'I18N_LEARNER_DASHBOARD_EMPTY_LEARN_SOMETHING_NEW_SECTION' | translate" class="mt-4"></p>
       <a class="btn oppia-dashboard-intro-button oppia-transition-200 oppia-learner-dashboard-intro-button-link"
-        [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate" 
-        href="/community-library"
-        [oppiaFocusOn]="'ourLessonsBtn'"[routerLink]="communityLibraryUrl"
+         [innerHTML]="'I18N_ACTION_BROWSE_LESSONS' | translate"
+         href="/community-library"
+         [oppiaFocusOn]="'ourLessonsBtn'"[routerLink]="communityLibraryUrl"
         >
       </a>
     </div>
@@ -95,10 +95,10 @@
         </p>
         <div class="d-flex flex-wrap justify-content-between w-100">
           <oppia-card-display *ngIf="continueWhereYouLeftOffList.length !== 0 || incompleteExplorationsList?.length > 0 || incompleteCollectionsList?.length > 0 || partiallyLearntTopicsList.length !== 0"
-            [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'" 
-            [numCards]="getTotalInProgressLessons()"
-            [displayMaxWidth]="'fit-content'"
-            class="e2e-test-continue-where-you-left-off">
+                              [headingI18n]="'I18N_LEARNER_DASHBOARD_HOME_PROGRESS_SECTION'"
+                              [numCards]="getTotalInProgressLessons()"
+                              [displayMaxWidth]="'fit-content'"
+                              class="e2e-test-continue-where-you-left-off">
             <ng-container *ngFor="let topicSummaryTile of partiallyLearntTopicsList">
               <ng-container *ngFor="let storySummaryTile of topicSummaryTile.canonicalStorySummaryDicts">
                 <lesson-card [story]="storySummaryTile" [topic]="topicSummaryTile.name" [isGoal]="currentGoalIds.has(topicSummaryTile.id)" (lessonLoaded)="onLessonLoaded()" > </lesson-card>
