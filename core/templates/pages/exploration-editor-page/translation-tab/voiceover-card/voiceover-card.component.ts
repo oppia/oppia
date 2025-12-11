@@ -169,6 +169,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       )
     );
 
+    this.directiveSubscriptions.add(
+      this.voiceoverRegenerationTaskMappingService.onNewRegenerationRequest.subscribe(
+        () => {
+          this.updateAutomaticVoiceoverWithRegenerationStatus();
+        }
+      )
+    );
+
     if (
       this.entityVoiceoversService.isEntityVoiceoversLoaded() &&
       !this.translationLanguageService.getActiveLanguageAccentCode()
@@ -188,6 +196,8 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             ?.automatedVoiceoversAudioOffsetsMsecs || {}
         );
         this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
+        this.voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes =
+          this.entityVoiceoversService.getLanguageAccentCodes();
       })
     );
 

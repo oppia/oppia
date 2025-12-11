@@ -149,6 +149,10 @@ describe('Voiceover card component', () => {
       translationLanguageService,
       'onActiveLanguageAccentChanged'
     ).and.returnValue(new EventEmitter<void>());
+    spyOn(
+      voiceoverRegenerationTaskMappingService,
+      'onNewRegenerationRequest'
+    ).and.returnValue(new EventEmitter<void>());
     spyOn(entityVoiceoversService, 'onVoiceoverLoad').and.returnValue(
       new EventEmitter<void>()
     );
@@ -189,6 +193,7 @@ describe('Voiceover card component', () => {
     translationLanguageService.onActiveLanguageChanged.emit();
     translationTabActiveContentIdService.onActiveContentIdChanged.emit();
     entityVoiceoversService.onVoiceoverLoad.emit();
+    voiceoverRegenerationTaskMappingService.onNewRegenerationRequest.emit();
 
     flush();
     tick(5000);

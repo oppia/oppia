@@ -177,4 +177,31 @@ describe('Voiceover regeneration task mapping service', () => {
 
     expect(emittedValue).toEqual(status2);
   }));
+
+  it('should be able to update newly added regeneration tasks', () => {
+    voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes = [
+      'en-US',
+    ];
+    voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap =
+      {};
+
+    voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks([
+      'content_0',
+      'content_1',
+    ]);
+
+    expect(
+      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+        'en-US',
+        'content_0'
+      )
+    ).toBe('GENERATING');
+
+    expect(
+      voiceoverRegenerationTaskMappingService.getContentRegenerationStatus(
+        'en-US',
+        'content_1'
+      )
+    ).toBe('GENERATING');
+  });
 });

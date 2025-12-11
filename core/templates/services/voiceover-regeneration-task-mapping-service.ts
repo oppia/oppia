@@ -17,7 +17,7 @@
  * the given exploration.
  */
 
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {BehaviorSubject, interval, from, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {
@@ -33,6 +33,7 @@ export class VoiceoverRegenerationTaskMappingService {
 
   public languageAccentToContentStatusMap: LanguageAccentToContentStatusMap =
     {};
+  public currentLanguageAccentCodes: string[] = [];
 
   public statusSubject = new BehaviorSubject<LanguageAccentToContentStatusMap>(
     {}
@@ -40,6 +41,7 @@ export class VoiceoverRegenerationTaskMappingService {
   public status$ = this.statusSubject.asObservable();
 
   public pollingSub: Subscription | null = null;
+  private _newRegenerationRequestEventEmitter = new EventEmitter<void>();
 
   constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
 
@@ -102,5 +104,22 @@ export class VoiceoverRegenerationTaskMappingService {
         this.languageAccentToContentStatusMap = status;
         this.statusSubject.next(status);
       });
+  }
+
+  updateNewlyAddedRegenerationTasks(contentIds: string[]): void {
+    for (let languageAccentCode of this.currentLanguageAccentCodes) {
+      for (let contentId of contentIds) {
+        if (!this.languageAccentToContentStatusMap[languageAccentCode]) {
+          this.languageAccentToContentStatusMap[languageAccentCode] = {};
+        }
+        this.languageAccentToContentStatusMap[languageAccentCode][contentId] =
+          'GENERATING';
+      }
+    }
+    this._newRegenerationRequestEventEmitter.emit();
+  }
+
+  get onNewRegenerationRequest(): EventEmitter<void> {
+    return this._newRegenerationRequestEventEmitter;
   }
 }
