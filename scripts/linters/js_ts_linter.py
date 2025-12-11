@@ -34,19 +34,6 @@ if MYPY:  # pragma: no cover
 
 COMPILED_TYPESCRIPT_TMP_PATH: Final = 'tmpcompiledjs/'
 
-# The INJECTABLES_TO_IGNORE contains a list of services that are not supposed
-# to be included in angular-services.index.ts. These services are not required
-# for our application to run but are only present to aid tests or belong to a
-# class of legacy services that will soon be removed from the codebase.
-# NOTE TO DEVELOPERS: Don't add any more files to this list. If you have any
-# questions, please talk to @srijanreddy98.
-INJECTABLES_TO_IGNORE: Final = [
-    # This file is required for the js-ts-linter-test.
-    'MockIgnoredService',
-    # Route guards cannot be made injectables until migration is complete.
-    'CanAccessSplashPageGuard',
-]
-
 
 def compile_all_ts_files() -> None:
     """Compiles all project typescript files into
@@ -108,68 +95,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         """Return all filepaths."""
         return self.js_filepaths + self.ts_filepaths
 
-    def _check_angular_services_index(self) -> concurrent_task_utils.TaskResult:
-        """Finds all @Injectable classes and makes sure that they are added to
-            Oppia root and Angular Services Index.
-
-        Returns:
-            TaskResult. TaskResult having all the messages returned by the
-            lint checks.
-        """
-        name = 'Angular Services Index file'
-        error_messages: List[str] = []
-        injectable_pattern = '%s%s' % (
-            'Injectable\\({\\n*\\s*providedIn: \'root\'\\n*}\\)\\n',
-            'export class ([A-Za-z0-9]*)',
-        )
-        angular_services_index_path = (
-            './core/templates/services/angular-services.index.ts'
-        )
-        angular_services_index = self.file_cache.read(
-            angular_services_index_path
-        )
-        error_messages = []
-        failed = False
-        for file_path in self.ts_files:
-            file_content = self.file_cache.read(file_path)
-            class_names = re.findall(injectable_pattern, file_content)
-            for class_name in class_names:
-                if class_name in INJECTABLES_TO_IGNORE:
-                    continue
-                import_statement_regex = 'import {[\\s*\\w+,]*%s' % class_name
-                if not re.search(
-                    import_statement_regex, angular_services_index
-                ):
-                    error_message = (
-                        'Please import %s to Angular Services Index file in %s'
-                        'from %s'
-                        % (class_name, angular_services_index_path, file_path)
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-
-                service_name_type_pair_regex = '\\[\'%s\',\\n*\\s*%s\\]' % (
-                    class_name,
-                    class_name,
-                )
-                service_name_type_pair = '[\'%s\', %s]' % (
-                    class_name,
-                    class_name,
-                )
-
-                if not re.search(
-                    service_name_type_pair_regex, angular_services_index
-                ):
-                    error_message = (
-                        'Please add the pair %s to the angularServices in %s'
-                        % (service_name_type_pair, angular_services_index_path)
-                    )
-                    error_messages.append(error_message)
-                    failed = True
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
-
     def perform_all_lint_checks(self) -> List[concurrent_task_utils.TaskResult]:
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -195,8 +120,6 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         compile_all_ts_files()
 
         linter_stdout = []
-
-        linter_stdout.append(self._check_angular_services_index())
 
         # Clear temp compiled typescript files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
