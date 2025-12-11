@@ -30,7 +30,7 @@ environment setup and troubleshooting.
 
 - Run backend unit tests locally:
 
-  python -m scripts.run_backend_tests --test-target <path_or_testname>
+  python -m scripts.run_backend_tests --test_target <path_or_testname>
 
   (This is the same test runner used by CI.)
 
@@ -38,6 +38,9 @@ environment setup and troubleshooting.
 
   python -m scripts.linters.run_lint_checks
   npx prettier --check .
+
+  Note: You can use the `--skip_install` flag with test scripts to
+  skip dependency installation if you've already installed them recently.
 
 Project-specific conventions and patterns (discoverable in the tree):
 
@@ -57,6 +60,26 @@ Project-specific conventions and patterns (discoverable in the tree):
   (e.g. `node-16.13.0`). In general we prefer using the pinned versions in
   CI and in local development so that we can keep the environment consistent.
 
+Code quality and testing standards:
+
+- Test coverage: Maintain 100% line and branch coverage for all new or modified
+  code. Always add tests for new functionality.
+- Type safety: Never use `Any` or `unknown` types in TypeScript. Use specific,
+  well-defined types.
+- Documentation: Document anything that is not obvious. Add comments explaining
+  the "why" behind non-obvious decisions, not just the "what".
+- Pylint disables: Never use whole-file pylint disables (e.g., at the top of a
+  file). Disable specific checks only on the lines that need them, with a
+  comment explaining why the disable is necessary.
+- Lint errors: Custom lint scripts live in the codebase itself (under
+  `scripts/linters/`). Search for the error message in the codebase to find the
+  script that's checking for it and understand what it's looking for.
+- Main branch: The main Oppia branch is `develop`, not `main` or `master`.
+- Communication: Never present speculation as fact. If you're uncertain about
+  behavior, document format, or best practices, clearly state at the outset
+  that you're making an educated guess or recommendation rather than citing
+  confirmed documentation.
+
 Integration points / external dependencies:
 
 - Google App Engine concepts (datastore, platform services).
@@ -71,7 +94,7 @@ Integration points / external dependencies:
 Small examples for agents to be effective quickly:
 
 -- To run a focused backend test for a file locally:
-`python -m scripts.run_backend_tests --test-target <path_or_testname>`.
+`python -m scripts.run_backend_tests --test_target <path_or_testname>`.
 -- When editing frontend deps or build config locally: install Node 16 (nvm),
 then run `yarn install --pure-lockfile` from `assets/` and follow the steps
 for running frontend scripts described on the wiki.
