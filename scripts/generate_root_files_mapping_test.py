@@ -37,15 +37,10 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
         def mock_compile_and_check_typescript(_tsconfig_filepath: str) -> None:
             return
 
-        self.compile_and_check_typescript_patch = self.swap_with_checks(
+        self.compile_and_check_typescript_patch = mock.patch.object(
             run_typescript_checks,
             'compile_and_check_typescript',
-            mock_compile_and_check_typescript,
-            expected_args=[
-                (
-                    generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH,
-                )  # pylint: disable=line-too-long
-            ],
+            side_effect=mock_compile_and_check_typescript,
         )
 
     def tearDown(self) -> None:
@@ -84,6 +79,9 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
                         'Root files mapping generated successfully!',
                     ],
                 )
+        self.compile_and_check_typescript_patch.assert_called_once_with(
+            generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
+        )
 
     def test_generate_root_files_mapping_failure(self) -> None:
         def mock_communicate() -> tuple[bytes, bytes]:
@@ -116,3 +114,6 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             with subprocess_popen_patch:
                 with self.assertRaisesRegex(Exception, 'Error'):
                     generate_root_files_mapping.main()
+        self.compile_and_check_typescript_patch.assert_called_once_with(
+            generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
+        )

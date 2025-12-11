@@ -1222,71 +1222,55 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     def test_cron_exploration_recommendations_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
-                    ),
-                }
-            ],
+        beam_job_patch = mock.patch.object(
+            beam_job_services, 'run_beam_job', side_effect=lambda **_: None
         )
-        with swap_with_checks, self.testapp_patch:
+        with beam_job_patch, self.testapp_patch:
             self.get_html_response('/cron/explorations/recommendations')
+
+        beam_job_patch.assert_called_once_with(
+            job_class=(
+                exp_recommendation_computation_jobs.ComputeExplorationRecommendationsJob
+            )
+        )
 
     def test_cron_activity_search_rank_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        exp_search_indexing_jobs.IndexExplorationsInSearchJob
-                    ),
-                }
-            ],
+        search_index_patch = mock.patch.object(
+            beam_job_services, 'run_beam_job', side_effect=lambda **_: None
         )
-        with swap_with_checks, self.testapp_patch:
+        with search_index_patch, self.testapp_patch:
             self.get_html_response('/cron/explorations/search_rank')
+
+        search_index_patch.assert_called_once_with(
+            job_class=(exp_search_indexing_jobs.IndexExplorationsInSearchJob)
+        )
 
     def test_cron_blog_post_search_rank_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob
-                    ),
-                }
-            ],
+        blog_search_patch = mock.patch.object(
+            beam_job_services, 'run_beam_job', side_effect=lambda **_: None
         )
-        with swap_with_checks, self.testapp_patch:
+        with blog_search_patch, self.testapp_patch:
             self.get_html_response('/cron/blog_posts/search_rank')
+
+        blog_search_patch.assert_called_once_with(
+            job_class=(blog_post_search_indexing_jobs.IndexBlogPostsInSearchJob)
+        )
 
     def test_cron_dashboard_stats_handler(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        swap_with_checks = self.swap_with_checks(
-            beam_job_services,
-            'run_beam_job',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'job_class': (
-                        user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
-                    ),
-                }
-            ],
+        dashboard_stats_patch = mock.patch.object(
+            beam_job_services, 'run_beam_job', side_effect=lambda **_: None
         )
-        with swap_with_checks, self.testapp_patch:
+        with dashboard_stats_patch, self.testapp_patch:
             self.get_html_response('/cron/users/dashboard_stats')
+
+        dashboard_stats_patch.assert_called_once_with(
+            job_class=(
+                user_stats_computation_jobs.CollectWeeklyDashboardStatsJob
+            )
+        )
 
 
 class CronMailChapterPublicationsNotificationsHandlerTests(

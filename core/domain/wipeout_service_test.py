@@ -806,16 +806,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     ) -> None:
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
-        send_email_patch = self.swap_with_checks(
+        send_email_patch = mock.patch.object(
             email_manager,
             'send_account_deleted_email',
-            lambda x, y: None,
-            expected_args=[
-                (
-                    self.pending_deletion_request.user_id,
-                    self.pending_deletion_request.email,
-                )
-            ],
+            side_effect=lambda x, y: None,
         )
 
         with send_email_patch:
@@ -825,6 +819,11 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 ),
                 wipeout_domain.USER_VERIFICATION_SUCCESS,
             )
+
+        send_email_patch.assert_called_once_with(
+            self.pending_deletion_request.user_id,
+            self.pending_deletion_request.email,
+        )
 
         self.assertIsNotNone(
             user_models.DeletedUserModel.get_by_id(self.user_1_id)
@@ -873,11 +872,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             'The Wipeout process failed for the user with ID \'%s\' '
             'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
         )
-        send_email_patch = self.swap_with_checks(
-            email_manager,
-            'send_mail_to_admin',
-            lambda x, y: None,
-            expected_args=[('WIPEOUT: Account deletion failed', email_content)],
+        send_email_patch = mock.patch.object(
+            email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
         )
 
         with send_email_patch:
@@ -887,6 +883,10 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 ),
                 wipeout_domain.USER_VERIFICATION_FAILURE,
             )
+
+        send_email_patch.assert_called_once_with(
+            'WIPEOUT: Account deletion failed', email_content
+        )
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id)
@@ -911,12 +911,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             learnt_topic_ids=[],
         ).put()
 
-        send_email_patch = self.swap_with_checks(
-            email_manager,
-            'send_mail_to_admin',
-            lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+        send_email_patch = mock.patch.object(
+            email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
         )
 
         with send_email_patch:
@@ -926,6 +922,8 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 ),
                 wipeout_domain.USER_VERIFICATION_FAILURE,
             )
+
+        send_email_patch.assert_not_called()
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id)
@@ -6363,18 +6361,16 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
     def test_repeated_deletion_is_successful_when_emails_disabled(self) -> None:
-        send_mail_to_admin_patch = self.swap_with_checks(
-            email_manager,
-            'send_mail_to_admin',
-            lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+        send_mail_to_admin_patch = mock.patch.object(
+            email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
         )
         with send_mail_to_admin_patch:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
+
+        send_mail_to_admin_patch.assert_not_called()
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -6492,16 +6488,14 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     def test_verification_when_user_is_not_deleted_emails_disabled(
         self,
     ) -> None:
-        send_mail_to_admin_patch = self.swap_with_checks(
-            email_manager,
-            'send_mail_to_admin',
-            lambda x, y: None,
-            # Func shouldn't be called when emails are disabled.
-            called=False,
+        send_mail_to_admin_patch = mock.patch.object(
+            email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
         )
         with send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
+
+        send_mail_to_admin_patch.assert_not_called()
 
     @test_utils.set_platform_parameters(
         [

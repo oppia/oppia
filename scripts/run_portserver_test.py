@@ -113,15 +113,13 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
         pid = 12345
 
-        swap_open = self.swap_with_checks(
-            builtins,
-            'open',
-            mock_open,
-            expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
-        )
+        with mock.patch.object(
+            builtins, 'open', side_effect=mock_open
+        ) as mock_open_obj:
+            with mock_open_obj:
+                returned_time = run_portserver.get_process_start_time(pid)
 
-        with swap_open:
-            returned_time = run_portserver.get_process_start_time(pid)
+        mock_open_obj.assert_called_once_with('/proc/12345/stat', 'r')
         self.assertEqual(returned_time, 0)
 
     def test_get_process_start_time(self) -> None:
@@ -130,15 +128,15 @@ class RunPortserverTests(test_utils.GenericTestBase):
         )
         pid = 12345
 
-        swap_open = self.swap_with_checks(
+        with mock.patch.object(
             builtins,
             'open',
-            lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=(('/proc/{}/stat'.format(pid), 'r'),),
-        )
+            side_effect=lambda *unused_args, **unused_kwargs: dummy_file_object,
+        ) as mock_open_obj:
+            with mock_open_obj:
+                returned_time = run_portserver.get_process_start_time(pid)
 
-        with swap_open:
-            returned_time = run_portserver.get_process_start_time(pid)
+        mock_open_obj.assert_called_once_with('/proc/12345/stat', 'r')
         self.assertEqual(returned_time, 11)
         dummy_file_object.close()
 
@@ -148,15 +146,13 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
         pid = 12345
 
-        swap_open = self.swap_with_checks(
-            builtins,
-            'open',
-            mock_open,
-            expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),
-        )
+        with mock.patch.object(
+            builtins, 'open', side_effect=mock_open
+        ) as mock_open_obj:
+            with mock_open_obj:
+                returned_text = run_portserver.get_process_command_line(pid)
 
-        with swap_open:
-            returned_text = run_portserver.get_process_command_line(pid)
+        mock_open_obj.assert_called_once_with('/proc/12345/cmdline', 'r')
         self.assertEqual(returned_text, '')
 
     def test_get_process_command_line(self) -> None:
@@ -164,15 +160,15 @@ class RunPortserverTests(test_utils.GenericTestBase):
         expected_text = dummy_file_object.read()
         pid = 12345
 
-        swap_open = self.swap_with_checks(
+        with mock.patch.object(
             builtins,
             'open',
-            lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=(('/proc/{}/cmdline'.format(pid), 'r'),),
-        )
+            side_effect=lambda *unused_args, **unused_kwargs: dummy_file_object,
+        ) as mock_open_obj:
+            with mock_open_obj:
+                returned_text = run_portserver.get_process_command_line(pid)
 
-        with swap_open:
-            returned_text = run_portserver.get_process_command_line(pid)
+        mock_open_obj.assert_called_once_with('/proc/12345/cmdline', 'r')
         self.assertEqual(returned_text, expected_text)
 
         dummy_file_object.close()
@@ -233,12 +229,13 @@ class RunPortserverTests(test_utils.GenericTestBase):
 
     def test_should_allocate_port(self) -> None:
         pid = 12345
-        swap_os_kill = self.swap_with_checks(
-            os, 'kill', lambda *unused_args: None, expected_args=((pid, 0),)
-        )
-        with swap_os_kill:
-            result = run_portserver.should_allocate_port(pid)
+        with mock.patch.object(
+            os, 'kill', side_effect=lambda *unused_args: None
+        ) as mock_kill:
+            with mock_kill:
+                result = run_portserver.should_allocate_port(pid)
 
+        mock_kill.assert_called_once_with(12345, 0)
         self.assertTrue(result)
 
     def test_should_allocate_port_handles_invalid_pid(self) -> None:
@@ -265,12 +262,13 @@ class RunPortserverTests(test_utils.GenericTestBase):
         def mock_kill(*unused_args: str) -> None:
             raise OSError('Some XYZ error occurred.')
 
-        swap_os_kill = self.swap_with_checks(
-            os, 'kill', mock_kill, expected_args=((pid, 0),)
-        )
-        with swap_os_kill, self.swap_log:
-            result = run_portserver.should_allocate_port(pid)
+        with mock.patch.object(
+            os, 'kill', side_effect=mock_kill
+        ) as mock_kill_obj:
+            with mock_kill_obj, self.swap_log:
+                result = run_portserver.should_allocate_port(pid)
 
+        mock_kill_obj.assert_called_once_with(12345, 0)
         self.assertFalse(result)
         self.assertIn(
             'Not allocating a port to a non-existent process',
@@ -435,34 +433,32 @@ class RunPortserverTests(test_utils.GenericTestBase):
         def dummy_handler(data: bytes) -> bytes:
             return data
 
-        swap_hasattr = self.swap_with_checks(
-            builtins,
-            'hasattr',
-            lambda *unused_args: False,
-            expected_args=((socket, 'AF_UNIX'),),
-        )
-        swap_socket = mock.patch.object(
-            socket, 'socket', lambda *unused_args: mock_socket
-        )
-
-        with swap_socket, swap_hasattr:
-            server = run_portserver.Server(dummy_handler, '\08181')
-
-            connection_socket = MockSocket()
-            # Here we use cast because MockSocket is a test double and does not
-            # inherit from socket.socket, but we want to use it in place
-            # of a real socket for testing handle_connection.
-            cast_socket = cast(MockSocket, server.socket)
-            # Here we use cast because the 'handle_connection' method expects a
-            # 'socket.socket' object, but for this test we are providing a
-            # MockSocket test double to simulate a real connection.
-            run_portserver.Server.handle_connection(
-                cast(socket.socket, connection_socket), dummy_handler
+        with mock.patch.object(
+            builtins, 'hasattr', side_effect=lambda *unused_args: False
+        ) as mock_hasattr:
+            swap_socket = mock.patch.object(
+                socket, 'socket', lambda *unused_args: mock_socket
             )
 
-            self.assertFalse(cast_socket.server_closed)
-            server.close()
+            with swap_socket, mock_hasattr:
+                server = run_portserver.Server(dummy_handler, '\08181')
 
+                connection_socket = MockSocket()
+                # Here we use cast because MockSocket is a test double and does not
+                # inherit from socket.socket, but we want to use it in place
+                # of a real socket for testing handle_connection.
+                cast_socket = cast(MockSocket, server.socket)
+                # Here we use cast because the 'handle_connection' method expects a
+                # 'socket.socket' object, but for this test we are providing a
+                # MockSocket test double to simulate a real connection.
+                run_portserver.Server.handle_connection(
+                    cast(socket.socket, connection_socket), dummy_handler
+                )
+
+                self.assertFalse(cast_socket.server_closed)
+                server.close()
+
+        mock_hasattr.assert_called_once_with(socket, 'AF_UNIX')
         self.assertTrue(cast_socket.server_closed)
 
     def test_handle_connection_raises_value_error_when_handler_returns_none(
@@ -496,27 +492,26 @@ class RunPortserverTests(test_utils.GenericTestBase):
         def dummy_handler(data: bytes) -> bytes:
             return data
 
-        swap_hasattr = self.swap_with_checks(
-            builtins,
-            'hasattr',
-            lambda *unused_args: False,
-            expected_args=((socket, 'AF_UNIX'),),
-        )
-        swap_socket = mock.patch.object(
-            socket, 'socket', lambda *unused_args: MockSocket()
-        )
-        swap_remove = self.swap_with_checks(
-            os, 'remove', lambda _: None, expected_args=((path,),)
-        )
+        with mock.patch.object(
+            builtins, 'hasattr', side_effect=lambda *unused_args: False
+        ) as mock_hasattr:
+            swap_socket = mock.patch.object(
+                socket, 'socket', lambda *unused_args: MockSocket()
+            )
+            with mock.patch.object(
+                os, 'remove', side_effect=lambda _: None
+            ) as mock_remove:
+                with swap_socket, mock_hasattr, mock_remove:
+                    server = run_portserver.Server(dummy_handler, path)
+                    # Here we use cast because server.socket is a MockSocket
+                    # test double,which has server_closed, but mypy sees it
+                    # as socket.socket.
+                    cast_socket = cast(MockSocket, server.socket)
+                    self.assertFalse(cast_socket.server_closed)
+                    server.close()
 
-        with swap_socket, swap_hasattr, swap_remove:
-            server = run_portserver.Server(dummy_handler, path)
-            # Here we use cast because server.socket is a MockSocket
-            # test double,which has server_closed, but mypy sees it
-            # as socket.socket.
-            cast_socket = cast(MockSocket, server.socket)
-            self.assertFalse(cast_socket.server_closed)
-            server.close()
+        mock_hasattr.assert_called_once_with(socket, 'AF_UNIX')
+        mock_remove.assert_called_once_with('8181')
 
         self.assertTrue(cast_socket.server_closed)
 

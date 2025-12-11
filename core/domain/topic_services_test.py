@@ -377,15 +377,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.compute_summary_of_topic(self.topic)
 
     def test_generate_topic_summary_when_publishing_story(self) -> None:
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.publish_story(
                 self.TOPIC_ID, self.story_id_1, self.user_id_admin
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -399,15 +401,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.story_id_1, self.user_id_admin
         )
 
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.unpublish_story(
                 self.TOPIC_ID, self.story_id_1, self.user_id_admin
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -425,15 +429,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Keep the swap assertions separate to ensure exactly 1 call to
         # generate_topic_summary occurs per delete call.
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.delete_canonical_story(
                 self.user_id_admin, self.TOPIC_ID, self.story_id_1
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -443,15 +449,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             {self.story_id_3: []},
         )
 
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.delete_additional_story(
                 self.user_id_admin, self.TOPIC_ID, self.story_id_3
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -470,14 +478,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.story_id_1)
 
-        with mock.patch.object(
+        feature_flag_patch = mock.patch.object(
             feature_flag_services, 'is_feature_flag_enabled', True
-        ), self.swap_with_checks(
+        )
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with feature_flag_patch, generate_topic_summary_patch:
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin,
                 self.story_id_1,
@@ -495,6 +504,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Publish story chapter.',
                 self.TOPIC_ID,
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -541,12 +552,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID,
         )
 
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin,
                 self.story_id_1,
@@ -564,6 +575,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Unpublish story chapter.',
                 self.TOPIC_ID,
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -609,12 +622,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID,
         )
 
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin,
                 self.story_id_1,
@@ -629,6 +642,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Delete story chapter.',
                 self.TOPIC_ID,
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)
@@ -679,12 +694,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         self.publish_exploration(self.user_id_admin, exp_id_2)
 
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(self.TOPIC_ID,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             topic_services.update_story_and_topic_summary(
                 self.user_id_admin,
                 self.story_id_1,
@@ -704,6 +719,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                 'Change exploration of chapter.',
                 self.TOPIC_ID,
             )
+
+        generate_topic_summary_patch.assert_called_once_with(self.TOPIC_ID)
 
         topic_summary = topic_fetchers.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic_summary.id, self.TOPIC_ID)

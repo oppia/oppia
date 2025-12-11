@@ -318,11 +318,10 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
         get_refs_patch = mock.patch.object(
             git_changes_utils, 'get_refs', mock_get_refs
         )
-        get_changed_files_patch = self.swap_with_checks(
+        get_changed_files_patch = mock.patch.object(
             git_changes_utils,
             'get_changed_files',
-            mock_get_changed_files,
-            expected_args=[(git_refs, 'remote')],
+            side_effect=mock_get_changed_files,
         )
         get_staged_acmrt_files_patch = mock.patch.object(
             git_changes_utils,
@@ -357,6 +356,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts',
         ]
         self.assertIn(cmd, self.cmd_token_list)
+        get_changed_files_patch.assert_called_once_with(git_refs, 'remote')
 
     def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
         self,

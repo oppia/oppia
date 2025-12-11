@@ -64,27 +64,22 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_subprocess_run = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_subprocess_run,
-            expected_args=((self.cmd,),),
-            expected_kwargs=[
-                {
-                    'capture_output': True,
-                    'encoding': 'utf-8',
-                    'env': self.env,
-                    'check': False,
-                }
-            ],
-        )
-
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_subprocess_run
+        ) as mock_run, self.assertRaisesRegex(
             RuntimeError,
             'Run backend tests before running this script. '
             '\nOUTPUT: No data to report.\nERROR: None',
         ):
             check_backend_test_coverage.main()
+
+        mock_run.assert_called_once_with(
+            self.cmd,
+            capture_output=True,
+            encoding='utf-8',
+            env=self.env,
+            check=False,
+        )
 
     def test_failure_to_execute_coverage_command_throws_error(self) -> None:
         class MockProcess:
@@ -97,27 +92,22 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_subprocess_run = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_subprocess_run,
-            expected_args=((self.cmd,),),
-            expected_kwargs=[
-                {
-                    'capture_output': True,
-                    'encoding': 'utf-8',
-                    'env': self.env,
-                    'check': False,
-                }
-            ],
-        )
-
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_subprocess_run
+        ) as mock_run, self.assertRaisesRegex(
             RuntimeError,
             'Failed to calculate coverage because subprocess failed. '
             '\nOUTPUT: Some error occured.\nERROR: Some error.',
         ):
             check_backend_test_coverage.main()
+
+        mock_run.assert_called_once_with(
+            self.cmd,
+            capture_output=True,
+            encoding='utf-8',
+            env=self.env,
+            check=False,
+        )
 
     def test_error_in_parsing_coverage_report_throws_error(self) -> None:
         class MockProcess:
@@ -129,25 +119,20 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_subprocess_run = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_subprocess_run,
-            expected_args=((self.cmd,),),
-            expected_kwargs=[
-                {
-                    'capture_output': True,
-                    'encoding': 'utf-8',
-                    'env': self.env,
-                    'check': False,
-                }
-            ],
-        )
-
-        with swap_subprocess_run, self.assertRaisesRegex(
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_subprocess_run
+        ) as mock_run, self.assertRaisesRegex(
             RuntimeError, 'Error in parsing coverage report.'
         ):
             check_backend_test_coverage.main()
+
+        mock_run.assert_called_once_with(
+            self.cmd,
+            capture_output=True,
+            encoding='utf-8',
+            env=self.env,
+            check=False,
+        )
 
     def test_overall_backend_coverage_checks_failed(self) -> None:
         class MockProcess:
@@ -159,26 +144,22 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_subprocess_run = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_subprocess_run,
-            expected_args=((self.cmd,),),
-            expected_kwargs=[
-                {
-                    'capture_output': True,
-                    'encoding': 'utf-8',
-                    'env': self.env,
-                    'check': False,
-                }
-            ],
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=((1,),)
-        )
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_subprocess_run
+        ) as mock_run, mock.patch.object(
+            sys, 'exit', side_effect=lambda _: None
+        ) as mock_exit:
+            with self.print_patch, mock_exit, mock_run:
+                check_backend_test_coverage.main()
 
-        with self.print_patch, swap_sys_exit, swap_subprocess_run:
-            check_backend_test_coverage.main()
+        mock_run.assert_called_once_with(
+            self.cmd,
+            capture_output=True,
+            encoding='utf-8',
+            env=self.env,
+            check=False,
+        )
+        mock_exit.assert_called_once_with(1)
 
         self.assertIn(
             'Backend overall line coverage checks failed.', self.print_arr
@@ -194,23 +175,19 @@ class CheckOverallBackendTestCoverageTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_subprocess_run = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_subprocess_run,
-            expected_args=((self.cmd,),),
-            expected_kwargs=[
-                {
-                    'capture_output': True,
-                    'encoding': 'utf-8',
-                    'env': self.env,
-                    'check': False,
-                }
-            ],
-        )
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_subprocess_run
+        ) as mock_run:
+            with self.print_patch, mock_run:
+                check_backend_test_coverage.main()
 
-        with self.print_patch, swap_subprocess_run:
-            check_backend_test_coverage.main()
+        mock_run.assert_called_once_with(
+            self.cmd,
+            capture_output=True,
+            encoding='utf-8',
+            env=self.env,
+            check=False,
+        )
 
         self.assertIn(
             'Backend overall line coverage checks passed.', self.print_arr

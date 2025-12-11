@@ -39,13 +39,8 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.swap_api_key_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
-        self.swap_api_key_secrets_return_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: 'azure_key',
-            expected_args=[
-                ('AZURE_TTS_API_KEY',),
-            ],
+        self.swap_api_key_secrets_return_secret = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: 'azure_key'
         )
 
     @mock.patch('azure.cognitiveservices.speech.SpeechSynthesizer')
@@ -114,6 +109,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'AZURE_TTS_API_KEY'
+        )
 
     def test_raise_exception_when_azure_api_key_is_not_set(self) -> None:
         azure_exception = self.assertRaisesRegex(
@@ -193,6 +191,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'AZURE_TTS_API_KEY'
+        )
 
     def test_regenerate_speech_from_text_failed_for_invalid_credentials(
         self,
@@ -288,6 +289,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         self.assertEqual(result_binary_data, mock_audio_data)
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertEqual(result_error, error_details)
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'AZURE_TTS_API_KEY'
+        )
 
     def test_should_return_word_boundary_collection_correctly(self) -> None:
         word_boundary_collection = (

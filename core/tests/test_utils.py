@@ -24,7 +24,6 @@ import collections
 import contextlib
 import copy
 import datetime
-import functools
 import inspect
 import io
 import itertools
@@ -1573,207 +1572,6 @@ class TestBase(unittest.TestCase):
     # Here we use type Any because argument 'obj' can accept any kind
     # of object on which attribute needs to be replaced, and argument
     # 'value' can accept any type of value to replace it with the old
-    def swap_with_checks(
-        self,
-        obj: Any,
-        attr: str,
-        new_function: Callable[..., Any],
-        expected_args: Optional[Sequence[Tuple[Any, ...]]] = None,
-        expected_kwargs: Optional[Sequence[Dict[str, Any]]] = None,
-        called: bool = True,
-    ) -> Iterator[None]:
-        """Swap an object's function value within the context of a 'with'
-        statement. The object can be anything that supports getattr and setattr,
-        such as class instances, modules, etc.
-
-        Examples:
-            If you want to check subprocess.Popen is invoked twice like
-            `subprocess.Popen(['python'], shell=True)` and
-            `subprocess.Popen(['python2], shell=False), you can first define the
-            mock function, then the swap, and just run the target function in
-            context, as follows:
-
-                def mock_popen(command, shell):
-                    return
-
-                popen_patch = self.swap_with_checks(
-                    subprocess, 'Popen', mock_popen,
-                    expected_args=[(['python'],), (['python2'],)],
-                    expected_kwargs=[{'shell': True}, {'shell': False}])
-                with popen_patch:
-                    function_that_invokes_popen()
-
-        Args:
-            obj: *. The Python object whose attribute you want to swap.
-            attr: str. The name of the function to be swapped.
-            new_function: function. The new function you want to use.
-            expected_args: None|list(tuple). The expected args that you want
-                this function to be invoked with. When its value is None, args
-                will not be checked. If the value type is list, the function
-                will check whether the called args is the first element in the
-                list. If matched, this tuple will be removed from the list.
-            expected_kwargs: None|list(dict). The expected keyword args you want
-                this function to be invoked with. Similar to expected_args.
-            called: bool. Whether the function is expected to be invoked. This
-                will always be checked.
-
-        Yields:
-            context. The context with function replaced.
-        """
-        original_function = getattr(obj, attr)
-        original_long_message_value = self.longMessage
-        msg = '%s.%s() failed the expectations of swap_with_checks()' % (
-            obj.__name__,
-            attr,
-        )
-
-        expected_args_iter = iter(expected_args or ())
-        expected_kwargs_iter = iter(expected_kwargs or ())
-
-        # Here we use type Any because args and kwargs are the arguments of the
-        # swapped functions and swapped functions can have an arbitrary number
-        # of arguments with different types.
-        @functools.wraps(original_function)
-        def new_function_with_checks(*args: Any, **kwargs: Any) -> Any:
-            """Wrapper function for the new value which keeps track of how many
-            times this function is invoked.
-
-            Args:
-                *args: list(*). The args passed into `attr` function.
-                **kwargs: dict. The key word args passed into `attr` function.
-
-            Returns:
-                *. Result of `new_function`.
-            """
-            # Here we use MyPy ignore because we are defining a new attribute
-            # 'call_num' on a function and MyPy does not allow the addition of
-            # new attributes on a function ( or a function class ). So, because
-            # of this, MyPy throws a '"Callable" has no attribute "call_num"'
-            # error. Thus to avoid the error, we used ignore here.
-            new_function_with_checks.call_num += 1  # type: ignore[attr-defined]
-
-            # Includes assertion error information in addition to the message.
-            self.longMessage = True
-
-            # Here we use MyPy ignore because we are accessing the 'call_num'
-            # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' do not contain a 'call_num' attribute. So,
-            # because of this, MyPy throws a '"Callable" has no attribute
-            # "call_num"' error. Thus to avoid the error, we used ignore here.
-            if expected_args:
-                next_args = next(expected_args_iter, None)
-                self.assertEqual(
-                    args,
-                    next_args,
-                    msg='*args to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
-                )
-
-            # Here we use MyPy ignore because we are accessing the 'call_num'
-            # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' do not contain a 'call_num' attribute. So,
-            # because of this, MyPy throws a '"Callable" has no attribute
-            # "call_num"' error. Thus to avoid the error, we used ignore here.
-            if expected_kwargs:
-                next_kwargs = next(expected_kwargs_iter, None)
-                self.assertEqual(
-                    kwargs,
-                    next_kwargs,
-                    msg='**kwargs to call #%d of %s'
-                    % (new_function_with_checks.call_num, msg),  # type: ignore[attr-defined]
-                )
-
-            # Reset self.longMessage just in case `new_function()` raises.
-            self.longMessage = original_long_message_value
-
-            return new_function(*args, **kwargs)
-
-        # Here we use MyPy ignore because we are accessing the 'call_num'
-        # attribute on a function which is of type 'callable' and functions
-        # of type 'callable' do not contain a 'call_num' attribute. So,
-        # because of this, MyPy throws a '"Callable" has no attribute
-        # "call_num"' error. Thus to avoid the error, we used ignore here.
-        new_function_with_checks.call_num = 0  # type: ignore[attr-defined]
-        setattr(obj, attr, new_function_with_checks)
-
-        try:
-            yield
-            # Includes assertion error information in addition to the message.
-            self.longMessage = True
-            # Here we use MyPy ignore because we are accessing the 'call_num'
-            # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' do not contain a 'call_num' attribute. So,
-            # because of this, MyPy throws a '"Callable" has no attribute
-            # "call_num"' error. Thus to avoid the error, we used ignore here.
-            self.assertEqual(
-                new_function_with_checks.call_num > 0, called, msg=msg  # type: ignore[attr-defined]
-            )
-            pretty_unused_args: List[str] = []
-
-            # Here we use type Any because the expected_args can contains
-            # arguments of arbitrary and mixed types from different functions.
-            args: Any
-            # Here we use type Any because the expected_kwargs can contains
-            # arguments of arbitrary and mixed types from different functions.
-            kwargs: Any
-            for args, kwargs in itertools.zip_longest(
-                expected_args_iter, expected_kwargs_iter, fillvalue={}
-            ):
-                pretty_unused_args.append(
-                    ', '.join(
-                        itertools.chain(
-                            (repr(a) for a in args),
-                            ('%s=%r' % kwarg for kwarg in kwargs.items()),
-                        )
-                    )
-                )
-
-            # Here we use MyPy ignore because we are accessing the 'call_num'
-            # attribute on a function which is of type 'callable' and functions
-            # of type 'callable' do not contain a 'call_num' attribute. So,
-            # because of this, MyPy throws a '"Callable" has no attribute
-            # "call_num"' error. Thus to avoid the error, we used ignore here.
-            if pretty_unused_args:
-                num_expected_calls = (
-                    new_function_with_checks.call_num  # type: ignore[attr-defined]
-                    + len(pretty_unused_args)
-                )
-
-                missing_call_summary = '\n'.join(
-                    '\tCall %d of %d: %s(%s)'
-                    % (i, num_expected_calls, attr, call_args)
-                    # Here we use MyPy ignore because we are accessing the
-                    # 'call_num' attribute on a function which is of type
-                    # 'callable' and functions of type 'callable' do not
-                    # contain a 'call_num' attribute. So, because of this,
-                    # MyPy throws a '"Callable" has no attribute "call_num"'
-                    # error. Thus to avoid the error, we used ignore here.
-                    for i, call_args in enumerate(
-                        pretty_unused_args,
-                        start=new_function_with_checks.call_num + 1,  # type: ignore[attr-defined]
-                    )
-                )
-                # Here we use MyPy ignore because we are accessing the
-                # 'call_num' attribute on a function which is of type
-                # 'callable' and functions of type 'callable' do not
-                # contain a 'call_num' attribute. So, because of this,
-                # MyPy throws a '"Callable" has no attribute "call_num"'
-                # error. Thus to avoid the error, we used ignore here.
-                self.fail(
-                    msg='Only %d of the %d expected calls were made.\n'
-                    '\n'
-                    'Missing:\n'
-                    '%s : %s'
-                    % (
-                        new_function_with_checks.call_num,  # type: ignore[attr-defined]
-                        num_expected_calls,
-                        missing_call_summary,
-                        msg,
-                    )
-                )
-        finally:
-            self.longMessage = original_long_message_value
-            setattr(obj, attr, original_function)
 
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with TestCase's assertRaises().
@@ -2885,9 +2683,9 @@ version: 1
 
         expect_errors = expected_status_int >= 400
 
-        # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
+        # This patch ensures that the templates are fetched from the source
+        # directory instead of webpack_bundles, since webpack_bundles is only
+        # produced after webpack compilation which is not performed during
         # backend tests.
         with mock.patch.object(base, 'load_template', mock_load_template):
             response = self.testapp.get(
@@ -3001,9 +2799,9 @@ version: 1
                 msg='Expected params to be a dict, received %s' % params,
             )
 
-        # This swap is required to ensure that the templates are fetched from
-        # source directory instead of webpack_bundles since webpack_bundles is
-        # only produced after webpack compilation which is not performed during
+        # This patch ensures that the templates are fetched from the source
+        # directory instead of webpack_bundles, since webpack_bundles is only
+        # produced after webpack compilation which is not performed during
         # backend tests.
         with mock.patch.object(base, 'load_template', mock_load_template):
 

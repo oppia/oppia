@@ -159,32 +159,18 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         os_path_exists_patch = mock.patch.object(
             os.path, 'exists', mock_os_path_exists
         )
-        shutil_rmtree_patch = self.swap_with_checks(
-            shutil,
-            'rmtree',
-            mock_shutil_rmtree,
-            expected_args=[(build_dir_path,)],
+        shutil_rmtree_patch = mock.patch.object(
+            shutil, 'rmtree', side_effect=mock_shutil_rmtree
         )
-        shutil_copytree_patch = self.swap_with_checks(
-            shutil,
-            'copytree',
-            mock_shutil_copytree,
-            expected_args=[
-                (
-                    os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
-                    os.path.join(build_dir_path, 'data'),
-                )
-            ],
+        shutil_copytree_patch = mock.patch.object(
+            shutil, 'copytree', side_effect=mock_shutil_copytree
         )
         expected_cmd = (
             './node_modules/typescript/bin/tsc -p %s'
             % './tsconfig.puppeteer-acceptance-tests.json'
         )
-        process_patch = self.swap_with_checks(
-            subprocess,
-            'Popen',
-            mock_popen_call,
-            expected_args=[(expected_cmd,)],
+        process_patch = mock.patch.object(
+            subprocess, 'Popen', side_effect=mock_popen_call
         )
         communicate_patch = mock.patch.object(
             subprocess.Popen, 'communicate', mock_communicate
@@ -194,15 +180,25 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             with shutil_copytree_patch, communicate_patch:
                 run_acceptance_tests.compile_test_ts_files()
 
+        # Assertions for the mocks
+        shutil.rmtree.assert_called_once_with(build_dir_path)
+        shutil.copytree.assert_called_once_with(
+            os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
+            os.path.join(build_dir_path, 'data'),
+        )
+        subprocess.Popen.assert_called_once_with(expected_cmd)
+
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: True
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common,
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: True,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        portserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
 
@@ -215,79 +211,93 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         ):
             run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
+        is_running_mock.assert_called()
+        portserver_mock.assert_called()
+
     def test_start_tests_when_no_other_instance_running(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common,
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: False,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
+        build_js_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                build, 'build_js_files', side_effect=lambda *_, **__: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        elasticsearch_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        firebase_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        appserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        redis_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        portserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        datastore_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        acceptance_server_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        sys_exit_mock = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', side_effect=lambda _: None)
         )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+        is_running_mock.assert_called()
+        build_js_mock.assert_called_once_with(True)
+        elasticsearch_mock.assert_called()
+        firebase_mock.assert_called()
+        appserver_mock.assert_called()
+        redis_mock.assert_called()
+        portserver_mock.assert_called()
+        datastore_mock.assert_called()
+        acceptance_server_mock.assert_called_once_with(
+            suite_name='testSuite',
+            headless=False,
+            mobile=False,
+            prod_env=False,
+            stdout=subprocess.PIPE,
+        )
+        sys_exit_mock.assert_called_once_with(0)
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_acceptance_tests_server(
@@ -302,62 +312,58 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 )
             )
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common,
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: False,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
+        build_js_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                build, 'build_js_files', side_effect=lambda *_, **__: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        elasticsearch_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        firebase_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        appserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        redis_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        datastore_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        acceptance_server_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_acceptance_tests_server',
-                mock_managed_acceptance_tests_server,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_acceptance_tests_server,
             )
         )
         args = run_acceptance_tests._PARSER.parse_args(  # pylint: disable=protected-access, line-too-long
@@ -372,87 +378,95 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             [line.decode('utf-8') for line in lines], ['sample', '✓', 'output']
         )
 
+        is_running_mock.assert_called()
+        build_js_mock.assert_called_once_with(True)
+        elasticsearch_mock.assert_called()
+        firebase_mock.assert_called()
+        appserver_mock.assert_called()
+        redis_mock.assert_called()
+        datastore_mock.assert_called()
+        acceptance_server_mock.assert_called_once_with(
+            suite_name='testSuite',
+            headless=False,
+            mobile=False,
+            prod_env=False,
+            stdout=subprocess.PIPE,
+        )
+
     def test_start_tests_skip_build(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 common,
-                'modify_constants',
-                lambda *_, **__: None,
-                expected_kwargs=[{'prod_env': False}],
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: False,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'set_constants_to_default', lambda: None
+        modify_constants_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'modify_constants', side_effect=lambda *_, **__: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        set_constants_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'set_constants_to_default', side_effect=lambda: None
+            )
+        )
+        elasticsearch_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        firebase_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        appserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        redis_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        webpack_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webpack_compiler',
-                mock_managed_process,
-                called=False,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        portserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        datastore_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        acceptance_server_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        sys_exit_mock = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', side_effect=lambda _: None)
         )
 
         with self.compile_test_ts_files_patch:
@@ -460,147 +474,185 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 args=['--suite', 'testSuite', '--skip_build']
             )
 
+        is_running_mock.assert_called()
+        modify_constants_mock.assert_called_once_with(prod_env=False)
+        set_constants_mock.assert_called()
+        elasticsearch_mock.assert_called()
+        firebase_mock.assert_called()
+        appserver_mock.assert_called()
+        redis_mock.assert_called()
+        webpack_mock.assert_not_called()
+        portserver_mock.assert_called()
+        datastore_mock.assert_called()
+        acceptance_server_mock.assert_called_once_with(
+            suite_name='testSuite',
+            headless=False,
+            mobile=False,
+            prod_env=False,
+            stdout=subprocess.PIPE,
+        )
+        sys_exit_mock.assert_called_once_with(0)
+
     def test_start_tests_in_jasmine(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common,
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: False,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
+        build_js_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                build, 'build_js_files', side_effect=lambda *_, **__: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        elasticsearch_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        firebase_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        appserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        redis_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        portserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        datastore_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        acceptance_server_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_acceptance_tests_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        sys_exit_mock = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', side_effect=lambda _: None)
         )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+        is_running_mock.assert_called()
+        build_js_mock.assert_called_once_with(True)
+        elasticsearch_mock.assert_called()
+        firebase_mock.assert_called()
+        appserver_mock.assert_called()
+        redis_mock.assert_called()
+        portserver_mock.assert_called()
+        datastore_mock.assert_called()
+        acceptance_server_mock.assert_called_once_with(
+            suite_name='testSuite',
+            headless=False,
+            mobile=False,
+            prod_env=False,
+            stdout=subprocess.PIPE,
+        )
+        sys_exit_mock.assert_called_once_with(0)
 
     def test_start_tests_for_long_lived_process(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        is_running_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                common,
+                'is_oppia_server_already_running',
+                side_effect=lambda *_: False,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
+        build_js_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                build, 'build_js_files', side_effect=lambda *_, **__: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        elasticsearch_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        firebase_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        appserver_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        redis_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        datastore_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        acceptance_server_mock = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_acceptance_tests_server',
-                mock_managed_long_lived_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'testSuite',
-                        'headless': False,
-                        'mobile': False,
-                        'prod_env': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_long_lived_process,
             )
         )
-
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        sys_exit_mock = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', side_effect=lambda _: None)
         )
 
         with self.swap_mock_set_constants_to_default:
             with self.compile_test_ts_files_patch:
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
+
+        is_running_mock.assert_called()
+        build_js_mock.assert_called_once_with(True)
+        elasticsearch_mock.assert_called()
+        firebase_mock.assert_called()
+        appserver_mock.assert_called()
+        redis_mock.assert_called()
+        datastore_mock.assert_called()
+        acceptance_server_mock.assert_called_once_with(
+            suite_name='testSuite',
+            headless=False,
+            mobile=False,
+            prod_env=False,
+            stdout=subprocess.PIPE,
+        )
+        sys_exit_mock.assert_called_once_with(0)

@@ -2614,11 +2614,10 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             question_contribution_stats = None
             question_review_stats = None
 
-        swap_get_stats = self.swap_with_checks(
+        swap_get_stats = mock.patch.object(
             suggestion_services,
             'get_all_contributor_stats',
-            lambda _: MockStats(),
-            expected_args=((self.new_user_id,),),
+            side_effect=lambda _: MockStats(),
         )
 
         with swap_get_stats:
@@ -2626,6 +2625,8 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME
             )
         self.assertEqual(response, {})
+
+        swap_get_stats.assert_called_once_with(self.new_user_id)
 
     def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)

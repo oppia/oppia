@@ -43,13 +43,8 @@ class EmailTests(test_utils.GenericTestBase):
         self.swap_api_key_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
-        self.swap_api_key_secrets_return_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: 'key',
-            expected_args=[
-                ('MAILGUN_API_KEY',),
-            ],
+        self.swap_api_key_secrets_return_secret = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: 'key'
         )
 
     @test_utils.set_platform_parameters(
@@ -80,6 +75,10 @@ class EmailTests(test_utils.GenericTestBase):
                 plaintext_body,
                 html_body,
             )
+
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'MAILGUN_API_KEY'
+        )
 
         expected_data = {
             'from': sender_email,
@@ -130,6 +129,10 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body,
                 attachments=attachments,
             )
+
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'MAILGUN_API_KEY'
+        )
 
         mock_post.assert_called_once()
         _, kwargs = mock_post.call_args

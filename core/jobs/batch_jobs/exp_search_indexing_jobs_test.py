@@ -64,32 +64,33 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_patch = self.swap_with_checks(
+        add_docs_to_index_patch = mock.patch.object(
             platform_search_services,
             'add_documents_to_index',
-            lambda _, __: None,
-            expected_args=[
-                (
-                    [
-                        {
-                            'id': 'abcd',
-                            'language_code': 'lang',
-                            'title': 'title',
-                            'category': 'category',
-                            'tags': [],
-                            'objective': 'objective',
-                            'rank': 20,
-                        }
-                    ],
-                    search_services.SEARCH_INDEX_EXPLORATIONS,
-                )
-            ],
+            side_effect=lambda _, __: None,
         )
 
         with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )
+
+        add_docs_to_index_patch.assert_called_once_with(
+            *(
+                [
+                    {
+                        'id': 'abcd',
+                        'language_code': 'lang',
+                        'title': 'title',
+                        'category': 'category',
+                        'tags': [],
+                        'objective': 'objective',
+                        'rank': 20,
+                    }
+                ],
+                search_services.SEARCH_INDEX_EXPLORATIONS,
+            )
+        )
 
     def test_indexes_non_deleted_models(self) -> None:
         for i in range(5):
@@ -107,27 +108,10 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             exp_summary.update_timestamps()
             exp_summary.put()
 
-        add_docs_to_index_patch = self.swap_with_checks(
+        add_docs_to_index_patch = mock.patch.object(
             platform_search_services,
             'add_documents_to_index',
-            lambda _, __: None,
-            expected_args=[
-                (
-                    [
-                        {
-                            'id': 'abcd%s' % i,
-                            'language_code': 'lang',
-                            'title': 'title',
-                            'category': 'category',
-                            'tags': [],
-                            'objective': 'objective',
-                            'rank': 20,
-                        }
-                    ],
-                    search_services.SEARCH_INDEX_EXPLORATIONS,
-                )
-                for i in range(5)
-            ],
+            side_effect=lambda _, __: None,
         )
 
         max_batch_size_patch = mock.patch.object(
@@ -140,6 +124,29 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 5')]
             )
+
+        add_docs_to_index_patch.assert_has_calls(
+            [
+                mock.call(*arg)
+                for arg in [
+                    (
+                        [
+                            {
+                                'id': 'abcd%s' % i,
+                                'language_code': 'lang',
+                                'title': 'title',
+                                'category': 'category',
+                                'tags': [],
+                                'objective': 'objective',
+                                'rank': 20,
+                            }
+                        ],
+                        search_services.SEARCH_INDEX_EXPLORATIONS,
+                    )
+                    for i in range(5)
+                ]
+            ]
+        )
 
     def test_reports_failed_when_indexing_fails(self) -> None:
         exp_summary = self.create_model(
@@ -162,26 +169,10 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         ) -> None:
             raise platform_search_services.SearchException('search exception')
 
-        add_docs_to_index_patch = self.swap_with_checks(
+        add_docs_to_index_patch = mock.patch.object(
             platform_search_services,
             'add_documents_to_index',
-            add_docs_to_index_mock,
-            expected_args=[
-                (
-                    [
-                        {
-                            'id': 'abcd',
-                            'language_code': 'lang',
-                            'title': 'title',
-                            'category': 'category',
-                            'tags': [],
-                            'objective': 'objective',
-                            'rank': 20,
-                        }
-                    ],
-                    search_services.SEARCH_INDEX_EXPLORATIONS,
-                )
-            ],
+            side_effect=add_docs_to_index_mock,
         )
 
         with add_docs_to_index_patch:
@@ -192,6 +183,23 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                     )
                 ]
             )
+
+        add_docs_to_index_patch.assert_called_once_with(
+            *(
+                [
+                    {
+                        'id': 'abcd',
+                        'language_code': 'lang',
+                        'title': 'title',
+                        'category': 'category',
+                        'tags': [],
+                        'objective': 'objective',
+                        'rank': 20,
+                    }
+                ],
+                search_services.SEARCH_INDEX_EXPLORATIONS,
+            )
+        )
 
     def test_skips_deleted_model(self) -> None:
         exp_summary = self.create_model(
@@ -208,15 +216,16 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_patch = self.swap_with_checks(
+        add_docs_to_index_patch = mock.patch.object(
             platform_search_services,
             'add_documents_to_index',
-            lambda _, __: None,
-            called=False,
+            side_effect=lambda _, __: None,
         )
 
         with add_docs_to_index_patch:
             self.assert_job_output_is_empty()
+
+        add_docs_to_index_patch.assert_not_called()
 
     def test_skips_private_model(self) -> None:
         exp_summary = self.create_model(
@@ -233,14 +242,17 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
         exp_summary.update_timestamps()
         exp_summary.put()
 
-        add_docs_to_index_patch = self.swap_with_checks(
+        add_docs_to_index_patch = mock.patch.object(
             platform_search_services,
             'add_documents_to_index',
-            lambda _, __: None,
-            expected_args=[([], search_services.SEARCH_INDEX_EXPLORATIONS)],
+            side_effect=lambda _, __: None,
         )
 
         with add_docs_to_index_patch:
             self.assert_job_output_is(
                 [job_run_result.JobRunResult.as_stdout('SUCCESS: 1')]
             )
+
+        add_docs_to_index_patch.assert_called_once_with(
+            *([], search_services.SEARCH_INDEX_EXPLORATIONS)
+        )

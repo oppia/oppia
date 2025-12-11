@@ -2849,18 +2849,21 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
 
         # Order of function calls in expected_args should not
         # matter for this test.
-        with self.swap_with_checks(
+        generate_topic_summary_patch = mock.patch.object(
             topic_services,
             'generate_topic_summary',
-            topic_services.generate_topic_summary,
-            expected_args=[(topic_id_1,), (topic_id_2,)],
-        ):
+            side_effect=topic_services.generate_topic_summary,
+        )
+        with generate_topic_summary_patch:
             self.put_json(
                 feconf.REGENERATE_TOPIC_SUMMARIES_URL,
                 {},
                 csrf_token=csrf_token,
                 expected_status_int=200,
             )
+
+        generate_topic_summary_patch.assert_any_call(topic_id_1)
+        generate_topic_summary_patch.assert_any_call(topic_id_2)
 
 
 class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):

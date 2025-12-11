@@ -176,11 +176,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         shards_patch = mock.patch.object(run_lint_checks, 'SHARDS', mock_shards)
 
-        get_filenames_from_path_patch = self.swap_with_checks(
+        get_filenames_from_path_patch = mock.patch.object(
             run_lint_checks,
             '_get_filepaths_from_path',
-            mock_get_filepaths_from_path,
-            expected_args=[(prefix,) for prefix in mock_shards['1']],
+            side_effect=mock_get_filepaths_from_path,
         )
         install_patch = mock.patch.object(
             install_third_party_libs, 'main', mock_install_third_party_main
@@ -192,6 +191,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     RuntimeError, 'mock_file in multiple shards'
                 ):
                     run_lint_checks.main(args=['--shard', '1'])
+
+        get_filenames_from_path_patch.assert_called_once_with('a/')
 
     def test_main_with_other_shard(self) -> None:
         def mock_get_filepaths_from_path(
@@ -220,11 +221,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
             (prefix,) for prefix in mock_shards['1']
         ]
 
-        get_filenames_from_path_patch = self.swap_with_checks(
+        get_filenames_from_path_patch = mock.patch.object(
             run_lint_checks,
             '_get_filepaths_from_path',
-            mock_get_filepaths_from_path,
-            expected_args=filenames_from_path_expected_args,
+            side_effect=mock_get_filepaths_from_path,
         )
 
         with self.print_patch, self.sys_patch, shards_patch:
@@ -233,6 +233,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     run_lint_checks.main(
                         args=['--shard', run_lint_checks.OTHER_SHARD_NAME]
                     )
+        get_filenames_from_path_patch.assert_any_call(os.getcwd())
+        get_filenames_from_path_patch.assert_any_call('a/')
         self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self) -> None:

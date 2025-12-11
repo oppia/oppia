@@ -197,14 +197,8 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
         self.swap_webhook_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
-        self.swap_webhook_secrets_return_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: 'secret',
-            expected_args=[
-                ('ANDROID_BUILD_SECRET',),
-                ('ANDROID_BUILD_SECRET',),
-            ],
+        self.swap_webhook_secrets_return_secret = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: 'secret'
         )
 
     def test_cloud_secrets_return_none_logs_exception(self) -> None:
@@ -225,3 +219,10 @@ class AndroidBuildSecretTests(test_utils.GenericTestBase):
             self.assertFalse(
                 android_services.verify_android_build_secret('not-secret')
             )
+
+        self.swap_webhook_secrets_return_secret.assert_has_calls(
+            [
+                mock.call('ANDROID_BUILD_SECRET'),
+                mock.call('ANDROID_BUILD_SECRET'),
+            ]
+        )

@@ -170,18 +170,16 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_popen = self.swap_with_checks(
-            subprocess,
-            'Popen',
-            mock_popen,
-            expected_args=((self.coverage_exc_list,),),
-        )
-
         expected_result = 'LOG_INFO_TEST: This is task output.\n'
-        with swap_popen, self.swap_logs:
-            returned_result = run_backend_tests.run_shell_cmd(
-                self.coverage_exc_list
-            )
+        with mock.patch.object(
+            subprocess, 'Popen', side_effect=mock_popen
+        ) as mock_popen_obj:
+            with mock_popen_obj, self.swap_logs:
+                returned_result = run_backend_tests.run_shell_cmd(
+                    self.coverage_exc_list
+                )
+
+        mock_popen_obj.assert_called_once_with(self.coverage_exc_list)
 
         self.assertIn('INFO: This is task output.', self.terminal_logs)
         self.assertEqual(expected_result, returned_result)
@@ -200,17 +198,16 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         ) -> MockProcess:
             return MockProcess()
 
-        swap_popen = self.swap_with_checks(
-            subprocess,
-            'Popen',
-            mock_popen,
-            expected_args=((self.coverage_exc_list,),),
-        )
-        with swap_popen, self.swap_logs:
-            with self.assertRaisesRegex(
-                Exception, 'Error 1\nError XYZ occured.'
-            ):
-                run_backend_tests.run_shell_cmd(self.coverage_exc_list)
+        with mock.patch.object(
+            subprocess, 'Popen', side_effect=mock_popen
+        ) as mock_popen_obj:
+            with mock_popen_obj, self.swap_logs:
+                with self.assertRaisesRegex(
+                    Exception, 'Error 1\nError XYZ occured.'
+                ):
+                    run_backend_tests.run_shell_cmd(self.coverage_exc_list)
+
+        mock_popen_obj.assert_called_once_with(self.coverage_exc_list)
 
     def test_duplicate_test_files_in_shards_throws_error(self) -> None:
 
@@ -636,17 +633,20 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
         def mockcheck_shards_match_tests(**unused_kwargs: str) -> str:
             return error_msg
 
-        swapcheck_shards_match_tests = self.swap_with_checks(
+        with mock.patch.object(
             run_backend_tests,
             'check_shards_match_tests',
-            mockcheck_shards_match_tests,
-            expected_kwargs=[{'include_load_tests': True}],
-        )
-        with self.swap_execute_task, swapcheck_coverage, self.swap_redis_server:
-            with self.swap_cloud_datastore_emulator, swap_check_results:
-                with self.print_patch, swapcheck_shards_match_tests:
-                    with self.assertRaisesRegex(Exception, error_msg):
-                        run_backend_tests.main(args=['--test_shard', '1'])
+            side_effect=mockcheck_shards_match_tests,
+        ) as mock_check_shards:
+            with self.swap_execute_task, (
+                swapcheck_coverage
+            ), self.swap_redis_server:
+                with self.swap_cloud_datastore_emulator, swap_check_results:
+                    with self.print_patch, mock_check_shards:
+                        with self.assertRaisesRegex(Exception, error_msg):
+                            run_backend_tests.main(args=['--test_shard', '1'])
+
+        mock_check_shards.assert_called_once_with(include_load_tests=True)
 
     def test_no_tests_run_raises_error(self) -> None:
         swap_check_results = mock.patch.object(

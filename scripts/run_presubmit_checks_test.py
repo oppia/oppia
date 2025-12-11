@@ -81,23 +81,20 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         ) -> None:
             self.scripts_called['run_lint_checks'] = True
 
-        self.swap_frontend_tests = self.swap_with_checks(
+        self.swap_frontend_tests = mock.patch.object(
             run_frontend_tests,
             'main',
-            mock_frontend_tests,
-            expected_kwargs=[{'args': ['--run_minified_tests']}],
+            side_effect=mock_frontend_tests,
         )
-        self.swap_backend_tests = self.swap_with_checks(
+        self.swap_backend_tests = mock.patch.object(
             run_backend_tests,
             'main',
-            mock_backend_tests,
-            expected_kwargs=[{'args': []}],
+            side_effect=mock_backend_tests,
         )
-        self.swap_run_lint_checks = self.swap_with_checks(
+        self.swap_run_lint_checks = mock.patch.object(
             run_lint_checks,
             'main',
-            mock_run_lint_checks,
-            expected_kwargs=[{'args': []}],
+            side_effect=mock_run_lint_checks,
         )
 
     def test_run_presubmit_checks_when_branch_is_specified(self) -> None:
@@ -139,6 +136,11 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
+        self.swap_run_lint_checks.assert_called_once_with(args=[])
+        self.swap_backend_tests.assert_called_once_with(args=[])
+        self.swap_frontend_tests.assert_called_once_with(
+            args=['--run_minified_tests']
+        )
 
     def test_run_presubmit_checks_when_current_branch_exists_on_remote_origin(
         self,
@@ -180,6 +182,11 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
+        self.swap_run_lint_checks.assert_called_once_with(args=[])
+        self.swap_backend_tests.assert_called_once_with(args=[])
+        self.swap_frontend_tests.assert_called_once_with(
+            args=['--run_minified_tests']
+        )
 
     def test_frontend_tests_are_not_run_when_no_frontend_files_are_changed(
         self,
@@ -221,3 +228,5 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Backend tests passed.', self.print_arr)
         self.assertNotIn('Frontend tests passed.', self.print_arr)
+        self.swap_run_lint_checks.assert_called_once_with(args=[])
+        self.swap_backend_tests.assert_called_once_with(args=[])

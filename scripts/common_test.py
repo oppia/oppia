@@ -571,15 +571,18 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_is_port_in_use(unused_port_number: int) -> Literal[True]:
             return True
 
-        sleep_patch = self.swap_with_checks(
-            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60
-        )
-        is_port_in_use_patch = mock.patch.object(
-            common, 'is_port_in_use', mock_is_port_in_use
-        )
+        with mock.patch.object(
+            time, 'sleep', side_effect=mock_sleep
+        ) as mock_sleep_obj:
+            is_port_in_use_patch = mock.patch.object(
+                common, 'is_port_in_use', mock_is_port_in_use
+            )
 
-        with sleep_patch, is_port_in_use_patch:
-            success = common.wait_for_port_to_not_be_in_use(9999)
+            with mock_sleep_obj, is_port_in_use_patch:
+                success = common.wait_for_port_to_not_be_in_use(9999)
+
+        for _ in range(60):
+            mock_sleep_obj.assert_any_call(1)
         self.assertFalse(success)
 
     def test_wait_for_port_to_not_be_in_use_port_closes(self) -> None:
@@ -608,18 +611,21 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_exit(unused_code: str) -> None:
             pass
 
-        sleep_patch = self.swap_with_checks(
-            time, 'sleep', mock_sleep, expected_args=[(1,)] * 60 * 5
-        )
-        is_port_in_use_patch = mock.patch.object(
-            common, 'is_port_in_use', mock_is_port_in_use
-        )
-        exit_patch = self.swap_with_checks(
-            sys, 'exit', mock_exit, expected_args=[(1,)]
-        )
+        with mock.patch.object(
+            time, 'sleep', side_effect=mock_sleep
+        ) as mock_sleep_obj:
+            is_port_in_use_patch = mock.patch.object(
+                common, 'is_port_in_use', mock_is_port_in_use
+            )
+            with mock.patch.object(
+                sys, 'exit', side_effect=mock_exit
+            ) as mock_exit_obj:
+                with mock_sleep_obj, is_port_in_use_patch, mock_exit_obj:
+                    common.wait_for_port_to_be_in_use(9999)
 
-        with sleep_patch, is_port_in_use_patch, exit_patch:
-            common.wait_for_port_to_be_in_use(9999)
+        for _ in range(60 * 5):
+            mock_sleep_obj.assert_any_call(1)
+        mock_exit_obj.assert_called_once_with(1)
 
     def test_wait_for_port_to_be_in_use_port_opens(self) -> None:
         def mock_sleep(unused_seconds: int) -> NoReturn:
@@ -881,13 +887,17 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_compile(unused_arg: str) -> NoReturn:
             raise ValueError('Exception raised from compile()')
 
-        compile_patch = self.swap_with_checks(re, 'compile', mock_compile)
-        with self.assertRaisesRegex(
-            ValueError, re.escape('Exception raised from compile()')
-        ), compile_patch:
-            common.inplace_replace_file(
-                origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
-            )
+        with mock.patch.object(
+            re, 'compile', side_effect=mock_compile
+        ) as mock_compile_obj:
+            with self.assertRaisesRegex(
+                ValueError, re.escape('Exception raised from compile()')
+            ), mock_compile_obj:
+                common.inplace_replace_file(
+                    origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
+                )
+
+        mock_compile_obj.assert_called_once_with()
         self.assertFalse(os.path.isfile(new_filepath))
         with open(origin_filepath, 'r', encoding='utf-8') as f:
             new_content = f.readlines()
@@ -912,20 +922,17 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_getcwd() -> str:
             return '/old/path'
 
-        chdir_patch = self.swap_with_checks(
-            os,
-            'chdir',
-            mock_chdir,
-            expected_args=[
-                ('/new/path',),
-                ('/old/path',),
-            ],
-        )
-        getcwd_patch = mock.patch.object(os, 'getcwd', mock_getcwd)
+        with mock.patch.object(
+            os, 'chdir', side_effect=mock_chdir
+        ) as mock_chdir_obj:
+            getcwd_patch = mock.patch.object(os, 'getcwd', mock_getcwd)
 
-        with chdir_patch, getcwd_patch:
-            with common.CD('/new/path'):
-                pass
+            with mock_chdir_obj, getcwd_patch:
+                with common.CD('/new/path'):
+                    pass
+
+        mock_chdir_obj.assert_any_call('/new/path')
+        mock_chdir_obj.assert_any_call('/old/path')
 
     def test_patch_env_when_var_had_a_value(self) -> None:
         os.environ['ABC'] = 'Hard as Rocket Science'
@@ -958,20 +965,15 @@ class CommonTests(test_utils.GenericTestBase):
 
             return 4
 
-        write_patch = self.swap_with_checks(
-            os,
-            'write',
-            write_raise_oserror,
-            expected_args=(
-                (sys.stdout.fileno(), b'test'),
-                (sys.stdout.fileno(), b'test'),
-            ),
-        )
-        with write_patch:
+        with mock.patch.object(
+            os, 'write', side_effect=write_raise_oserror
+        ) as mock_write:
             # This test makes sure that when write fails (with errno.EAGAIN)
             # the call is repeated.
             common.write_stdout_safe('test')
 
+        mock_write.assert_any_call(sys.stdout.fileno(), b'test')
+        mock_write.assert_any_call(sys.stdout.fileno(), b'test')
         self.assertTrue(raised_once)
 
     def test_write_stdout_safe_with_oserror(self) -> None:
@@ -1216,15 +1218,20 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_is_oppia_server_already_running_when_a_port_is_open(self) -> None:
         with contextlib.ExitStack() as stack:
-            stack.enter_context(
-                self.swap_with_checks(
+            mock_is_port_in_use = stack.enter_context(
+                mock.patch.object(
                     common,
                     'is_port_in_use',
-                    lambda port: port == common.GAE_PORT_FOR_E2E_TESTING,
+                    side_effect=lambda port: port
+                    == common.GAE_PORT_FOR_E2E_TESTING,
                 )
             )
 
             self.assertTrue(common.is_oppia_server_already_running())
+
+        mock_is_port_in_use.assert_called_once_with(
+            common.GAE_PORT_FOR_E2E_TESTING
+        )
 
     def test_start_subprocess_for_result(self) -> None:
         process = subprocess.Popen(

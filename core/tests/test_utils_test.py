@@ -617,37 +617,39 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd() -> None:
             return
 
-        getcwd_patch = self.swap_with_checks(os, 'getcwd', mock_getcwd)
-        with getcwd_patch:
+        with mock.patch.object(os, 'getcwd', side_effect=mock_getcwd) as patch:
             SwapWithCheckTestClass.getcwd_function_without_args()
+        patch.assert_called_once_with()
 
     def test_patch_with_check_on_called_failed(self) -> None:
         def mock_getcwd() -> None:
             return
 
-        getcwd_patch = self.swap_with_checks(os, 'getcwd', mock_getcwd)
         with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
-            with getcwd_patch:
+            with mock.patch.object(
+                os, 'getcwd', side_effect=mock_getcwd
+            ) as patch:
                 SwapWithCheckTestClass.empty_function_without_args()
+            patch.assert_called_once_with()
 
     def test_patch_with_check_on_not_called(self) -> None:
         def mock_getcwd() -> None:
             return
 
-        getcwd_patch = self.swap_with_checks(
-            os, 'getcwd', mock_getcwd, called=False
-        )
-        with getcwd_patch:
+        with mock.patch.object(os, 'getcwd', side_effect=mock_getcwd) as patch:
             SwapWithCheckTestClass.empty_function_without_args()
+        patch.assert_not_called()
 
     def test_patch_with_check_on_not_called_failed(self) -> None:
         def mock_getcwd() -> None:
             return
 
-        getcwd_patch = self.swap_with_checks(os, 'getcwd', mock_getcwd)
         with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
-            with getcwd_patch:
+            with mock.patch.object(
+                os, 'getcwd', side_effect=mock_getcwd
+            ) as patch:
                 SwapWithCheckTestClass.empty_function_without_args()
+            patch.assert_called_once_with()
 
     def test_patch_with_check_on_expected_args(self) -> None:
         def mock_getenv(unused_env: str) -> None:
@@ -656,17 +658,16 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_patch = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)]
-        )
-        samefile_patch = self.swap_with_checks(
-            os.path,
-            'samefile',
-            mock_samefile,
-            expected_args=[('first', 'second')],
-        )
-        with getenv_patch, samefile_patch:
+        with mock.patch.object(
+            os, 'getenv', side_effect=mock_getenv
+        ) as getenv_patch, mock.patch.object(
+            os.path, 'samefile', side_effect=mock_samefile
+        ) as samefile_patch:
             SwapWithCheckTestClass.functions_with_args()
+        getenv_patch.assert_has_calls(
+            [mock.call(*('123',)), mock.call(*('456',))]
+        )
+        samefile_patch.assert_called_once_with(*('first', 'second'))
 
     def test_patch_with_check_on_expected_args_failed_on_run_sequence(
         self,
@@ -677,18 +678,17 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_patch = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)]
-        )
-        samefile_patch = self.swap_with_checks(
-            os.path,
-            'samefile',
-            mock_samefile,
-            expected_args=[('first', 'second')],
-        )
         with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
-            with getenv_patch, samefile_patch:
+            with mock.patch.object(
+                os, 'getenv', side_effect=mock_getenv
+            ) as getenv_patch, mock.patch.object(
+                os.path, 'samefile', side_effect=mock_samefile
+            ) as samefile_patch:
                 SwapWithCheckTestClass.functions_with_args()
+            getenv_patch.assert_has_calls(
+                [mock.call(*('456',)), mock.call(*('123',))]
+            )
+            samefile_patch.assert_called_once_with(*('first', 'second'))
 
     def test_patch_with_check_on_expected_args_failed_on_wrong_args_number(
         self,
@@ -699,18 +699,22 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        getenv_patch = self.swap_with_checks(
-            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)]
-        )
-        samefile_patch = self.swap_with_checks(
-            os.path,
-            'samefile',
-            mock_samefile,
-            expected_args=[('first', 'second'), ('third', 'forth')],
-        )
         with self.assertRaisesRegex(AssertionError, r'samefile'):
-            with getenv_patch, samefile_patch:
+            with mock.patch.object(
+                os, 'getenv', side_effect=mock_getenv
+            ) as getenv_patch, mock.patch.object(
+                os.path, 'samefile', side_effect=mock_samefile
+            ) as samefile_patch:
                 SwapWithCheckTestClass.functions_with_args()
+            getenv_patch.assert_has_calls(
+                [mock.call(*('123',)), mock.call(*('456',))]
+            )
+            samefile_patch.assert_has_calls(
+                [
+                    mock.call(*('first', 'second')),
+                    mock.call(*('third', 'forth')),
+                ]
+            )
 
     def test_patch_with_check_on_expected_kwargs(self) -> None:
         def mock_getenv(
@@ -718,16 +722,14 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ) -> None:
             return
 
-        getenv_patch = self.swap_with_checks(
-            os,
-            'getenv',
-            mock_getenv,
-            expected_args=[('123',), ('678',)],
-            expected_kwargs=[{'default': '456'}, {'default': '900'}],
-        )
-
-        with getenv_patch:
+        with mock.patch.object(os, 'getenv', side_effect=mock_getenv) as patch:
             SwapWithCheckTestClass.functions_with_kwargs()
+        patch.assert_has_calls(
+            [
+                mock.call(*('123',), **{'default': '456'}),
+                mock.call(*('678',), **{'default': '900'}),
+            ]
+        )
 
     def test_patch_with_check_on_expected_kwargs_failed_on_wrong_numbers(
         self,
@@ -737,20 +739,18 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ) -> None:
             return
 
-        getenv_patch = self.swap_with_checks(
-            os,
-            'getenv',
-            mock_getenv,
-            expected_kwargs=[
-                {'key': '123', 'default': '456'},
-                {'key': '678', 'default': '900'},
-                {'key': '678', 'default': '900'},
-            ],
-        )
-
         with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
-            with getenv_patch:
+            with mock.patch.object(
+                os, 'getenv', side_effect=mock_getenv
+            ) as patch:
                 SwapWithCheckTestClass.functions_with_kwargs()
+            patch.assert_has_calls(
+                [
+                    mock.call(**{'key': '123', 'default': '456'}),
+                    mock.call(**{'key': '678', 'default': '900'}),
+                    mock.call(**{'key': '678', 'default': '900'}),
+                ]
+            )
 
     def test_patch_with_check_on_capature_exception_raised_by_tested_function(
         self,
@@ -758,13 +758,14 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd() -> None:
             raise ValueError('Exception raised from getcwd()')
 
-        getcwd_patch = self.swap_with_checks(os, 'getcwd', mock_getcwd)
-
         with self.assertRaisesRegex(
             ValueError, re.escape('Exception raised from getcwd()')
         ):
-            with getcwd_patch:
+            with mock.patch.object(
+                os, 'getcwd', side_effect=mock_getcwd
+            ) as patch:
                 SwapWithCheckTestClass.getcwd_function_without_args()
+            patch.assert_called_once_with()
 
     def test_assert_raises_with_error_message(self) -> None:
         def mock_exception_func() -> None:
@@ -826,14 +827,12 @@ class TestUtilsTests(test_utils.GenericTestBase):
                 ('page-dir-2', [], ['duplicate_file.ts']),
             ]
 
-        walk_patch = self.swap_with_checks(
-            os, 'walk', mock_walk, expected_args=[('core/templates/pages',)]
-        )
         with self.assertRaisesRegex(
             Exception, 'Multiple files found with name: duplicate_file.ts'
         ):
-            with walk_patch:
+            with mock.patch.object(os, 'walk', side_effect=mock_walk) as patch:
                 test_utils.mock_load_template('duplicate_file.ts')
+            patch.assert_called_once_with(*('core/templates/pages',))
 
     def test_raises_error_if_no_user_name_exists_with_strict_true(self) -> None:
         with self.assertRaisesRegex(

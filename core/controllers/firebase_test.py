@@ -51,26 +51,28 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
     def test_get_request_forwarded_to_firebase_proxy(self) -> None:
         url = '/__/auth'
         params = {'param_1': 'value_1', 'param_2': 'value_2'}
-        with mock.patch.object(
+        firebase_domains_patch = mock.patch.object(
             firebase,
             'FIREBASE_DOMAINS',
             {'localhost': self.MOCK_FIREBASE_DOMAIN},
-        ), self.swap_with_checks(
+        )
+        request_patch = mock.patch.object(
             requests,
             'request',
-            lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('GET', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
-            [
-                {
-                    'params': params,
-                    'timeout': firebase.TIMEOUT_SECS,
-                    'data': None,
-                    'headers': {'Host': 'localhost:80'},
-                }
-            ],
-        ):
+            side_effect=lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
+        )
+        with firebase_domains_patch, request_patch:
             response = self.get_json(url, params)
             self.assertDictEqual(response, {'key': 'val'})
+
+        request_patch.assert_called_once_with(
+            'GET',
+            f'{self.MOCK_FIREBASE_DOMAIN}{url}',
+            params=params,
+            timeout=firebase.TIMEOUT_SECS,
+            data=None,
+            headers={'Host': 'localhost:80'},
+        )
 
     def test_post_request_forwarded_to_firebase_proxy(self) -> None:
         url = '/__/auth/random_url'
@@ -81,24 +83,17 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'Content-Length': '20',
         }
         payload = {'payload': 'value'}
-        with mock.patch.object(
+        firebase_domains_patch = mock.patch.object(
             firebase,
             'FIREBASE_DOMAINS',
             {'localhost': self.MOCK_FIREBASE_DOMAIN},
-        ), self.swap_with_checks(
+        )
+        request_patch = mock.patch.object(
             requests,
             'request',
-            lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
-            [('POST', f'{self.MOCK_FIREBASE_DOMAIN}{url}')],
-            [
-                {
-                    'data': payload,
-                    'params': {},
-                    'headers': headers,
-                    'timeout': firebase.TIMEOUT_SECS,
-                }
-            ],
-        ):
+            side_effect=lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
+        )
+        with firebase_domains_patch, request_patch:
             response = self.post_task(url, payload, headers)
 
             for header, value in self.MOCK_FIREBASE_RESPONSE.headers.items():
@@ -109,7 +104,16 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
                     self.assertNotIn(header, response.headers)
                 else:
                     self.assertEqual(response.headers[header], value)
-            self.assertEqual(
-                response.status_int, self.MOCK_FIREBASE_RESPONSE.status_code
-            )
-            self.assertEqual(response.body, self.MOCK_FIREBASE_RESPONSE.content)
+
+        request_patch.assert_called_once_with(
+            'POST',
+            f'{self.MOCK_FIREBASE_DOMAIN}{url}',
+            data=payload,
+            params={},
+            headers=headers,
+            timeout=firebase.TIMEOUT_SECS,
+        )
+        self.assertEqual(
+            response.status_int, self.MOCK_FIREBASE_RESPONSE.status_code
+        )
+        self.assertEqual(response.body, self.MOCK_FIREBASE_RESPONSE.content)

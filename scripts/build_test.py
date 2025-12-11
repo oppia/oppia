@@ -999,32 +999,20 @@ class BuildTests(test_utils.GenericTestBase):
         ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', lambda _: None
         )
-        build_using_webpack_patch = self.swap_with_checks(
-            build,
-            'build_using_webpack',
-            lambda _: None,
-            expected_args=[(build.WEBPACK_PROD_CONFIG,)],
+        build_using_webpack_patch = mock.patch.object(
+            build, 'build_using_webpack', side_effect=lambda _: None
         )
-        build_using_ng_patch = self.swap_with_checks(
-            build, 'build_using_ng', lambda: None, expected_args=[()]
+        build_using_ng_patch = mock.patch.object(
+            build, 'build_using_ng', side_effect=lambda: None
         )
-        modify_constants_patch = self.swap_with_checks(
-            common,
-            'modify_constants',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'prod_env': True,
-                    'emulator_mode': True,
-                    'maintenance_mode': False,
-                }
-            ],
+        modify_constants_patch = mock.patch.object(
+            common, 'modify_constants', side_effect=lambda **_: None
         )
-        generate_python_package_patch = self.swap_with_checks(
-            build, 'generate_python_package', lambda: None, expected_args=[()]
+        generate_python_package_patch = mock.patch.object(
+            build, 'generate_python_package', side_effect=lambda: None
         )
-        clean_patch = self.swap_with_checks(
-            build, 'clean', lambda: None, expected_args=[()]
+        clean_patch = mock.patch.object(
+            build, 'clean', side_effect=lambda: None
         )
 
         with ensure_files_exist_patch, build_using_webpack_patch, clean_patch:
@@ -1032,45 +1020,42 @@ class BuildTests(test_utils.GenericTestBase):
                 with generate_python_package_patch:
                     build.main(args=['--prod_env'])
 
+        build.build_using_webpack.assert_called_once_with(
+            build.WEBPACK_PROD_CONFIG
+        )
+        build.build_using_ng.assert_called_once_with()
+        common.modify_constants.assert_called_once_with(
+            prod_env=True,
+            emulator_mode=True,
+            maintenance_mode=False,
+        )
+        build.generate_python_package.assert_called_once_with()
+        build.clean.assert_called_once_with()
+
     def test_build_with_prod_source_maps(self) -> None:
         ensure_files_exist_patch = mock.patch.object(
             build, '_ensure_files_exist', lambda _: None
         )
-        build_using_webpack_patch = self.swap_with_checks(
-            build,
-            'build_using_webpack',
-            lambda _: None,
-            expected_args=[(build.WEBPACK_PROD_SOURCE_MAPS_CONFIG,)],
+        build_using_webpack_patch = mock.patch.object(
+            build, 'build_using_webpack', side_effect=lambda _: None
         )
-        build_using_ng_patch = self.swap_with_checks(
-            build, 'build_using_ng', lambda: None, expected_args=[()]
+        build_using_ng_patch = mock.patch.object(
+            build, 'build_using_ng', side_effect=lambda: None
         )
-        modify_constants_patch = self.swap_with_checks(
-            common,
-            'modify_constants',
-            lambda **_: None,
-            expected_kwargs=[
-                {
-                    'prod_env': True,
-                    'emulator_mode': True,
-                    'maintenance_mode': False,
-                }
-            ],
+        modify_constants_patch = mock.patch.object(
+            common, 'modify_constants', side_effect=lambda **_: None
         )
         compare_file_count_patch = mock.patch.object(
             build, '_compare_file_count', lambda *_: None
         )
-        clean_patch = self.swap_with_checks(
-            build, 'clean', lambda: None, expected_args=[()]
+        clean_patch = mock.patch.object(
+            build, 'clean', side_effect=lambda: None
         )
-        install_python_dev_dependencies_patch = self.swap_with_checks(
-            install_python_dev_dependencies,
-            'main',
-            lambda _: None,
-            expected_args=[(['--uninstall'],)],
+        install_python_dev_dependencies_patch = mock.patch.object(
+            install_python_dev_dependencies, 'main', side_effect=lambda _: None
         )
-        install_third_party_libs_patch = self.swap_with_checks(
-            install_third_party_libs, 'main', lambda: None, expected_args=[()]
+        install_third_party_libs_patch = mock.patch.object(
+            install_third_party_libs, 'main', side_effect=lambda: None
         )
 
         with ensure_files_exist_patch, build_using_webpack_patch:
@@ -1078,6 +1063,21 @@ class BuildTests(test_utils.GenericTestBase):
                 with clean_patch, install_python_dev_dependencies_patch:
                     with build_using_ng_patch, install_third_party_libs_patch:
                         build.main(args=['--prod_env', '--source_maps'])
+
+        build.build_using_webpack.assert_called_once_with(
+            build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
+        )
+        build.build_using_ng.assert_called_once_with()
+        common.modify_constants.assert_called_once_with(
+            prod_env=True,
+            emulator_mode=True,
+            maintenance_mode=False,
+        )
+        build.clean.assert_called_once_with()
+        install_python_dev_dependencies.main.assert_called_once_with(
+            ['--uninstall']
+        )
+        install_third_party_libs.main.assert_called_once_with()
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1252,21 +1252,20 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 1
 
-        ng_build_patch = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_managed_ng_build,
-            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}],
+        ng_build_patch = mock.patch.object(
+            servers, 'managed_ng_build', side_effect=mock_managed_ng_build
         )
-        get_file_count_patch = self.swap_with_checks(
-            build,
-            'get_file_count',
-            mock_get_file_count,
-            expected_args=[('dist/oppia-angular-prod',)],
+        get_file_count_patch = mock.patch.object(
+            build, 'get_file_count', side_effect=mock_get_file_count
         )
 
         with ng_build_patch, get_file_count_patch:
             build.build_using_ng()
+
+        servers.managed_ng_build.assert_called_once_with(
+            use_prod_env=True, watch_mode=False
+        )
+        build.get_file_count.assert_called_once_with('dist/oppia-angular-prod')
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self,
@@ -1281,17 +1280,11 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_file_count(unused_path: str) -> int:
             return 0
 
-        ng_build_patch = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_managed_ng_build,
-            expected_kwargs=[{'use_prod_env': True, 'watch_mode': False}],
+        ng_build_patch = mock.patch.object(
+            servers, 'managed_ng_build', side_effect=mock_managed_ng_build
         )
-        get_file_count_patch = self.swap_with_checks(
-            build,
-            'get_file_count',
-            mock_get_file_count,
-            expected_args=[('dist/oppia-angular-prod',)],
+        get_file_count_patch = mock.patch.object(
+            build, 'get_file_count', side_effect=mock_get_file_count
         )
 
         with ng_build_patch, get_file_count_patch:
@@ -1299,6 +1292,11 @@ class BuildTests(test_utils.GenericTestBase):
                 AssertionError, 'angular generated bundle should be non-empty'
             ):
                 build.build_using_ng()
+
+        servers.managed_ng_build.assert_called_once_with(
+            use_prod_env=True, watch_mode=False
+        )
+        build.get_file_count.assert_called_once_with('dist/oppia-angular-prod')
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
@@ -1324,20 +1322,24 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
         # The webpack compilation processes will be called 4 times as mock_isdir
         # will return true after 4 calls.
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
+        webpack_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_webpack_compiler',
+                side_effect=mock_managed_process,
             )
         )
         mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
         self.exit_stack.enter_context(mock_exit)
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
+        isdir_mock = self.exit_stack.enter_context(
+            mock.patch.object(os.path, 'isdir', side_effect=mock_os_path_isdir)
         )
 
         build.run_webpack_compilation()
 
         mock_exit.assert_not_called()
+        webpack_mock.assert_called()
+        isdir_mock.assert_called()
 
     def test_run_webpack_compilation_failed(self) -> None:
         old_os_path_isdir = os.path.isdir
@@ -1348,21 +1350,25 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
             return old_os_path_isdir(path)
 
         # The webpack compilation processes will be called five times.
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
+        webpack_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_webpack_compiler',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
+        isdir_mock = self.exit_stack.enter_context(
+            mock.patch.object(os.path, 'isdir', side_effect=mock_os_path_isdir)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
+        exit_mock = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', side_effect=lambda _: None)
         )
 
         build.run_webpack_compilation()
+
+        webpack_mock.assert_called()
+        isdir_mock.assert_called()
+        exit_mock.assert_called_once_with(1)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self) -> None:
         old_os_path_isdir = os.path.isdir
@@ -1372,26 +1378,23 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 return True
             return old_os_path_isdir(path)
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_webpack_compiler', mock_managed_process
+        webpack_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_webpack_compiler',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
+        main_mock = self.exit_stack.enter_context(
+            mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
+        )
+        ng_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'run_ng_compilation', side_effect=lambda: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
+        isdir_mock = self.exit_stack.enter_context(
+            mock.patch.object(os.path, 'isdir', side_effect=mock_os_path_isdir)
         )
         mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
         self.exit_stack.enter_context(mock_exit)
@@ -1399,67 +1402,58 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         build.build_js_files(True)
 
         mock_exit.assert_not_called()
+        webpack_mock.assert_called()
+        main_mock.assert_called_once_with(args=[])
+        ng_mock.assert_called_once_with()
+        isdir_mock.assert_called()
 
     def test_build_js_files_in_prod_mode(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
-            )
+        run_cmd_mock = self.exit_stack.enter_context(
+            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': ['--prod_env']}],
-            )
+        main_mock = self.exit_stack.enter_context(
+            mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
         )
 
         build.build_js_files(False)
 
+        run_cmd_mock.assert_not_called()
+        main_mock.assert_called_once_with(args=['--prod_env'])
+
     def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
-            )
+        run_cmd_mock = self.exit_stack.enter_context(
+            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': ['--prod_env', '--source_maps']}],
-            )
+        main_mock = self.exit_stack.enter_context(
+            mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
         )
 
         build.build_js_files(False, source_maps=True)
 
+        run_cmd_mock.assert_not_called()
+        main_mock.assert_called_once_with(args=['--prod_env', '--source_maps'])
+
     def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_cmd', lambda *_: None, called=False
+        run_cmd_mock = self.exit_stack.enter_context(
+            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
+        )
+        main_mock = self.exit_stack.enter_context(
+            mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
+        )
+        ng_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'run_ng_compilation', side_effect=lambda: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'run_webpack_compilation',
-                lambda **_: None,
-                expected_kwargs=[{'source_maps': True}],
+        webpack_mock = self.exit_stack.enter_context(
+            mock.patch.object(
+                build, 'run_webpack_compilation', side_effect=lambda **_: None
             )
         )
 
         build.build_js_files(True, source_maps=True)
+
+        run_cmd_mock.assert_not_called()
+        main_mock.assert_called_once_with(args=[])
+        ng_mock.assert_called_once_with()
+        webpack_mock.assert_called_once_with(source_maps=True)

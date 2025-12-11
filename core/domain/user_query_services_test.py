@@ -192,24 +192,8 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
             )
         )
 
-        send_bulk_email_patch = self.swap_with_checks(
-            email_services,
-            'send_bulk_mail',
-            lambda *_: None,
-            expected_args=[
-                (
-                    '%s <%s>'
-                    % (
-                        self.CURRICULUM_ADMIN_USERNAME,
-                        self.CURRICULUM_ADMIN_EMAIL,
-                    ),
-                    [self.NEW_USER_EMAIL],
-                    'subject',
-                    'body',
-                    'body',
-                    None,
-                )
-            ],
+        send_bulk_email_patch = mock.patch.object(
+            email_services, 'send_bulk_mail', side_effect=lambda *_: None
         )
 
         with send_bulk_email_patch:
@@ -220,6 +204,19 @@ class UserQueryServicesTests(test_utils.GenericTestBase):
                 feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
                 1,
             )
+
+        send_bulk_email_patch.assert_called_once_with(
+            '%s <%s>'
+            % (
+                self.CURRICULUM_ADMIN_USERNAME,
+                self.CURRICULUM_ADMIN_EMAIL,
+            ),
+            [self.NEW_USER_EMAIL],
+            'subject',
+            'body',
+            'body',
+            None,
+        )
 
         archived_user_query_model = user_models.UserQueryModel.get_by_id(
             self.USER_QUERY_1_ID

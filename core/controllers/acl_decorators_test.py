@@ -125,13 +125,8 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_mailchimp_webhook_secret_is_none(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        swap_api_key_secrets_return_none = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: None,
-            expected_args=[
-                ('MAILCHIMP_WEBHOOK_SECRET',),
-            ],
+        swap_api_key_secrets_return_none = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: None
         )
 
         with testapp_patch:
@@ -140,6 +135,10 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
                     '/mock_secret_page/%s' % self.secret,
                     expected_status_int=404,
                 )
+
+        swap_api_key_secrets_return_none.assert_called_once_with(
+            'MAILCHIMP_WEBHOOK_SECRET'
+        )
 
         error_msg = (
             'Could not find the resource http://localhost'
@@ -8372,13 +8371,8 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
 
     def test_error_when_android_build_secret_is_none(self) -> None:
         testapp_patch = mock.patch.object(self, 'testapp', self.mock_testapp)
-        swap_api_key_secrets_return_none = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: None,
-            expected_args=[
-                ('ANDROID_BUILD_SECRET',),
-            ],
+        swap_api_key_secrets_return_none = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: None
         )
 
         with testapp_patch:
@@ -8388,6 +8382,10 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
                     expected_status_int=401,
                     headers={'X-ApiKey': 'secret'},
                 )
+
+        swap_api_key_secrets_return_none.assert_called_once_with(
+            'ANDROID_BUILD_SECRET'
+        )
 
         self.assertEqual(
             response['error'],

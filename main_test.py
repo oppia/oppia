@@ -56,7 +56,7 @@ class CloudLoggingTests(test_utils.GenericTestBase):
         emulator_mode_patch = mock.patch.object(
             constants, 'EMULATOR_MODE', False
         )
-        logging_client_patch = self.swap_with_checks(
+        logging_client_patch = mock.patch.object(
             google.cloud.logging, 'Client', MockClient
         )
         with emulator_mode_patch, logging_client_patch:
@@ -102,7 +102,7 @@ class NdbWsgiMiddlewareTests(test_utils.GenericTestBase):
             self.assertEqual(type(global_cache), datastore_services.RedisCache)
             return contextlib.nullcontext()
 
-        get_ndb_context_patch = self.swap_with_checks(
+        get_ndb_context_patch = mock.patch.object(
             datastore_services, 'get_ndb_context', get_ndb_context_mock
         )
 

@@ -34,13 +34,8 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         self.swap_api_key_secrets_return_none = mock.patch.object(
             secrets_services, 'get_secret', None
         )
-        self.swap_api_key_secrets_return_secret = self.swap_with_checks(
-            secrets_services,
-            'get_secret',
-            lambda _: 'azure_key',
-            expected_args=[
-                ('AZURE_TTS_API_KEY',),
-            ],
+        self.swap_api_key_secrets_return_secret = mock.patch.object(
+            secrets_services, 'get_secret', side_effect=lambda _: 'azure_key'
         )
 
     def test_regenerate_speech_from_text_success(self) -> None:
@@ -64,6 +59,9 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'AZURE_TTS_API_KEY'
+        )
 
     def test_should_select_default_language_as_english_and_return_correctly(
         self,
@@ -91,3 +89,6 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
         self.assertTrue(isinstance(result_binary_data, bytes))
         self.assertEqual(result_audio_offsets, mock_word_boundaries)
         self.assertIsNone(result_error)
+        self.swap_api_key_secrets_return_secret.assert_called_once_with(
+            'AZURE_TTS_API_KEY'
+        )
