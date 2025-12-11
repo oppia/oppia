@@ -359,64 +359,6 @@ def generate_random_hexa_str() -> str:
 
 
 @contextlib.contextmanager
-def swap_is_feature_flag_enabled_function(
-    feature_flag_names: List[feature_flag_list.FeatureNames],
-) -> Iterator[None]:
-    """Mocks is_feature_flag_enabled function within the context of a
-    'with' statement. is_feature_flag_enabled will return True for all
-    the features present in feature_flag_names.
-
-    Args:
-        feature_flag_names: List[FeatureNames]. The name of the feature
-            flags for which the value should be returned as True.
-
-    Yields:
-        context. The context with function replaced.
-    """
-
-    def mock_is_feature_flag_enabled(
-        feature_flag_name: str,
-        feature_flag: Optional[  # pylint: disable=unused-argument
-            feature_flag_domain.FeatureFlag
-        ] = None,
-        user_id: Optional[str] = None,  # pylint: disable=unused-argument
-    ) -> bool:
-        """Mocks is_feature_flag_enabled function to return True if the
-        target_feature_flag_name is present in feature_flag_names.
-
-        Args:
-            feature_flag_name: str. The name of the target feature flag.
-            feature_flag: FeatureFlag|None. The feature flag domain model.
-            user_id: str|None. The id of the user, if logged-out user
-                then None.
-
-        Returns:
-            enable_feature_flag: bool. Returns True if the target feature flag
-            name is in feature_flag_names list.
-        """
-        return any(
-            expected_feature_flag_name.value == feature_flag_name
-            for expected_feature_flag_name in feature_flag_names
-        )
-
-    original_is_feature_flag_enabled = getattr(
-        feature_flag_services, 'is_feature_flag_enabled'
-    )
-    setattr(
-        feature_flag_services,
-        'is_feature_flag_enabled',
-        mock_is_feature_flag_enabled,
-    )
-    try:
-        yield
-    finally:
-        setattr(
-            feature_flag_services,
-            'is_feature_flag_enabled',
-            original_is_feature_flag_enabled,
-        )
-
-
 def enable_feature_flags(
     feature_flag_names: List[feature_flag_list.FeatureNames],
 ) -> Callable[
@@ -443,84 +385,43 @@ def enable_feature_flags(
         def wrapper(
             *args: Any, **kwargs: Any
         ) -> _GenericHandlerFunctionReturnType:
-            with swap_is_feature_flag_enabled_function(feature_flag_names):
+            def mock_is_feature_flag_enabled(
+                feature_flag_name: str,
+                feature_flag: Optional[  # pylint: disable=unused-argument
+                    feature_flag_domain.FeatureFlag
+                ] = None,
+                user_id: Optional[
+                    str
+                ] = None,  # pylint: disable=unused-argument
+            ) -> bool:
+                """Mocks is_feature_flag_enabled function to return True if the
+                target_feature_flag_name is present in feature_flag_names.
+
+                Args:
+                    feature_flag_name: str. The name of the target feature flag.
+                    feature_flag: FeatureFlag|None. The feature flag domain model.
+                    user_id: str|None. The id of the user, if logged-out user
+                        then None.
+
+                Returns:
+                    enable_feature_flag: bool. Returns True if the target feature flag
+                    name is in feature_flag_names list.
+                """
+                return any(
+                    expected_feature_flag_name.value == feature_flag_name
+                    for expected_feature_flag_name in feature_flag_names
+                )
+
+            with mock.patch.object(
+                feature_flag_services,
+                'is_feature_flag_enabled',
+                mock_is_feature_flag_enabled,
+            ):
                 return func(*args, **kwargs)
 
         return wrapper
 
     return decorator
-
-
-@contextlib.contextmanager
-def swap_get_platform_parameter_value_function(
-    platform_parameter_name_value_tuples: List[
-        Tuple[
-            platform_parameter_list.ParamName,
-            platform_parameter_domain.PlatformDataTypes,
-        ]
-    ],
-) -> Iterator[None]:
-    """Mocks get_platform_parameter_value function within the context of a
-    'with' statement. get_platform_parameter_value will return the value of
-    the platform parameter if the parameter is present in the
-    platform_parameter_names list.
-
-    Args:
-        platform_parameter_name_value_tuples: List[Tuple[ParamName,
-            PlatformDataTypes]]. The list of the names of the platform
-            parameters and their corresponding values that will be enabled.
-
-    Yields:
-        context. The context with function replaced.
-    """
-
-    def mock_get_platform_parameter_value(
-        parameter_name: str,
-    ) -> platform_parameter_domain.PlatformDataTypes:
-        """Mocks get_platform_parameter_value function to return the value of
-        the platform parameter if the parameter is present in the
-        platform_parameter_names list.
-
-        Args:
-            parameter_name: str. The name of the platform parameter whose
-                value is required.
-
-        Returns:
-            PlatformDataTypes. The value of the platform parameter if the
-            parameter is present in the platform_parameter_names list.
-
-        Raises:
-            Exception. The parameter_name is not present in the
-                platform_parameter_names list.
-        """
-        platform_parameter_name_value_dict = dict(
-            (x.value, y) for x, y in platform_parameter_name_value_tuples
-        )
-        if parameter_name not in platform_parameter_name_value_dict:
-            raise Exception(
-                'The value for the platform parameter %s was needed in this '
-                'test, but not specified in the set_platform_parameters '
-                'decorator. Please use this information in the decorator.'
-                % parameter_name
-            )
-        return platform_parameter_name_value_dict[parameter_name]
-
-    original_get_platform_parameter_value = getattr(
-        platform_parameter_services, 'get_platform_parameter_value'
-    )
-    setattr(
-        platform_parameter_services,
-        'get_platform_parameter_value',
-        mock_get_platform_parameter_value,
-    )
-    try:
-        yield
-    finally:
-        setattr(
-            platform_parameter_services,
-            'get_platform_parameter_value',
-            original_get_platform_parameter_value,
-        )
 
 
 def set_platform_parameters(
@@ -555,8 +456,42 @@ def set_platform_parameters(
         def wrapper(
             *args: Any, **kwargs: Any
         ) -> _GenericHandlerFunctionReturnType:
-            with swap_get_platform_parameter_value_function(
-                platform_parameter_name_value_tuples
+            def mock_get_platform_parameter_value(
+                parameter_name: str,
+            ) -> platform_parameter_domain.PlatformDataTypes:
+                """Mocks get_platform_parameter_value function to return the value of
+                the platform parameter if the parameter is present in the
+                platform_parameter_names list.
+
+                Args:
+                    parameter_name: str. The name of the platform parameter whose
+                        value is required.
+
+                Returns:
+                    PlatformDataTypes. The value of the platform parameter if the
+                    parameter is present in the platform_parameter_names list.
+
+                Raises:
+                    Exception. The parameter_name is not present in the
+                        platform_parameter_names list.
+                """
+                platform_parameter_name_value_dict = dict(
+                    (x.value, y)
+                    for x, y in platform_parameter_name_value_tuples
+                )
+                if parameter_name not in platform_parameter_name_value_dict:
+                    raise Exception(
+                        'The value for the platform parameter %s was needed in this '
+                        'test, but not specified in the set_platform_parameters '
+                        'decorator. Please use this information in the decorator.'
+                        % parameter_name
+                    )
+                return platform_parameter_name_value_dict[parameter_name]
+
+            with mock.patch.object(
+                platform_parameter_services,
+                'get_platform_parameter_value',
+                mock_get_platform_parameter_value,
             ):
                 return func(*args, **kwargs)
 
