@@ -101,8 +101,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             mock.patch.object(common, 'is_port_in_use', lambda _: False)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(sys, 'exit', lambda _: None)
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         common.wait_for_port_to_be_in_use(1)
@@ -110,15 +110,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(
             mock_sleep.call_count, common.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
         )
+        mock_exit.assert_called()
 
     def test_install_third_party_libraries_without_skip(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                install_third_party_libs, 'main', lambda *_, **__: None
-            )
+        mock_main = self.exit_stack.enter_context(
+            mock.patch.object(install_third_party_libs, 'main')
         )
 
         run_e2e_tests.install_third_party_libraries(False)
+
+        mock_main.assert_called()
 
     def test_install_third_party_libraries_with_skip(self) -> None:
         mock_main = self.exit_stack.enter_context(
@@ -130,24 +131,27 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_main.assert_not_called()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: True
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=True
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
 
         with self.assertRaisesRegex(SystemExit, '1'):
             run_e2e_tests.main(args=[])
 
+        mock_is_running.assert_called()
+        mock_portserver.assert_called()
+
     def test_start_tests_when_no_other_instance_running(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -156,56 +160,51 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
         mock_exit = self.exit_stack.enter_context(
@@ -217,6 +216,22 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_exit.assert_called_once_with(0)
         mock_install_libs.assert_called_once_with(False)
         mock_build_js.assert_called_once_with(True)
+        mock_is_running.assert_called()
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='full',
+            chrome_version=None,
+            dev_mode=True,
+            mobile=False,
+            sharding_instances=3,
+            debug_mode=False,
+            stdout=subprocess.PIPE,
+        )
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_webdriverio_server(
@@ -231,9 +246,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 )
             )
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -242,51 +257,46 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_webdriverio_server,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'mobile': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_webdriverio_server,
             )
         )
         args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
@@ -302,14 +312,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_install_libs.assert_called_once_with(False)
         mock_build_js.assert_called_once_with(True)
+        mock_is_running.assert_called()
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='full',
+            chrome_version=None,
+            dev_mode=True,
+            sharding_instances=3,
+            debug_mode=False,
+            mobile=False,
+            stdout=subprocess.PIPE,
+        )
 
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
         self.exit_stack.enter_context(
@@ -322,6 +347,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
         mock_exit.assert_called_once_with(1)
+        mock_portserver.assert_called()
 
     def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -330,18 +356,19 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
+
+        mock_exit.assert_called_once_with(1)
+        mock_portserver.assert_called()
 
     def test_no_rerun_when_tests_flake_with_rerun_unknown(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -353,43 +380,45 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_exit = self.exit_stack.enter_context(
             mock.patch.object(sys, 'exit')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
         mock_exit.assert_called_once_with(1)
+        mock_portserver.assert_called()
 
     def test_no_reruns_off_ci_fail(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
         self.exit_stack.enter_context(
             mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
+
+        mock_exit.assert_called_once_with(1)
+        mock_portserver.assert_called()
 
     def test_no_reruns_off_ci_pass(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 0
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
         self.exit_stack.enter_context(
@@ -402,11 +431,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.main(args=['--suite', 'navigation'])
 
         mock_exit.assert_called_once_with(0)
+        mock_portserver.assert_called()
 
     def test_start_tests_skip_build(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -418,65 +448,58 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_set_constants = self.exit_stack.enter_context(
             mock.patch.object(common, 'set_constants_to_default')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
         mock_webpack_compiler = self.exit_stack.enter_context(
             mock.patch.object(servers, 'managed_webpack_compiler')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         run_e2e_tests.main(args=['--skip_install', '--skip_build'])
@@ -485,11 +508,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_modify_constants.assert_called_once_with(prod_env=False)
         mock_set_constants.assert_called_once_with()
         mock_webpack_compiler.assert_not_called()
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='full',
+            chrome_version=None,
+            dev_mode=True,
+            mobile=False,
+            sharding_instances=3,
+            debug_mode=False,
+            stdout=subprocess.PIPE,
+        )
+        mock_exit.assert_called_once_with(0)
+        mock_is_running.assert_called()
 
     def test_start_tests_in_debug_mode(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -498,62 +538,55 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': True,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         with self.swap_mock_set_constants_to_default:
@@ -561,11 +594,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_install_libs.assert_called_once_with(False)
         mock_build_js.assert_called_once_with(True)
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='full',
+            chrome_version=None,
+            dev_mode=True,
+            mobile=False,
+            sharding_instances=3,
+            debug_mode=True,
+            stdout=subprocess.PIPE,
+        )
+        mock_exit.assert_called_once_with(0)
+        mock_is_running.assert_called()
 
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -574,62 +624,55 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': CHROME_DRIVER_VERSION,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         with self.swap_mock_set_constants_to_default:
@@ -639,11 +682,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_install_libs.assert_called_once_with(False)
         mock_build_js.assert_called_once_with(True)
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='full',
+            chrome_version=CHROME_DRIVER_VERSION,
+            dev_mode=True,
+            mobile=False,
+            sharding_instances=3,
+            debug_mode=False,
+            stdout=subprocess.PIPE,
+        )
+        mock_exit.assert_called_once_with(0)
+        mock_is_running.assert_called()
 
     def test_start_tests_in_webdriverio(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -652,62 +712,55 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_webdriverio = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'collections',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         with self.swap_mock_set_constants_to_default:
@@ -715,11 +768,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         mock_install_libs.assert_called_once_with(False)
         mock_build_js.assert_called_once_with(True)
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_webdriverio.assert_called_once_with(
+            suite_name='collections',
+            chrome_version=None,
+            dev_mode=True,
+            mobile=False,
+            sharding_instances=3,
+            debug_mode=False,
+            stdout=subprocess.PIPE,
+        )
+        mock_exit.assert_called_once_with(0)
+        mock_is_running.assert_called()
 
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'is_oppia_server_already_running', lambda *_: False
+        mock_is_running = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_oppia_server_already_running', return_value=False
             )
         )
         mock_install_libs = self.exit_stack.enter_context(
@@ -728,41 +798,57 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_build_js = self.exit_stack.enter_context(
             mock.patch.object(build, 'build_js_files')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_elasticsearch = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
+        mock_firebase = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_firebase_auth_emulator',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
+        mock_dev_appserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_dev_appserver',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
+        mock_redis = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers,
+                'managed_redis_server',
+                side_effect=mock_managed_process,
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
+        mock_portserver = self.exit_stack.enter_context(
+            mock.patch.object(
+                servers, 'managed_portserver', side_effect=mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
+        mock_datastore = self.exit_stack.enter_context(
+            mock.patch.object(
                 servers,
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
+                side_effect=mock_managed_process,
             )
         )
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
             with self.swap_mock_set_constants_to_default:
                 run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
+
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
+        mock_elasticsearch.assert_called()
+        mock_firebase.assert_called()
+        mock_dev_appserver.assert_called()
+        mock_redis.assert_called()
+        mock_portserver.assert_called()
+        mock_datastore.assert_called()
+        mock_is_running.assert_called()
