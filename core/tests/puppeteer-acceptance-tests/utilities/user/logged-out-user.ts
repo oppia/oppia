@@ -622,13 +622,99 @@ type KeyInput =
 
 export class LoggedOutUser extends BaseUser {
   /**
+   * Waits for Angular to finish any pending async operations.
+   * This ensures the UI is stable before interacting with elements.
+   */
+  private async waitForAngularStability(): Promise<void> {
+    await this.page.evaluate(async () => {
+      const win = window as unknown as {
+        getAllAngularTestabilities?: () => {
+          whenStable: (cb: () => void) => void;
+        }[];
+      };
+      const testabilities = win.getAllAngularTestabilities?.();
+      if (testabilities?.[0]) {
+        await new Promise<void>(resolve =>
+          testabilities[0].whenStable(() => resolve())
+        );
+      }
+    });
+  }
+
+  /**
+   * Clicks an element using JavaScript's native click() method.
+   * This ensures Angular properly handles the event in its change detection
+   * cycle, which is more reliable than Puppeteer's simulated clicks for
+   * Angular components like the sidebar.
+   */
+  private async clickWithJavaScript(selector: string): Promise<void> {
+    await this.waitForElementToStabilize(selector);
+    await this.page.evaluate((sel: string) => {
+      const element = document.querySelector(sel) as HTMLElement;
+      if (element) {
+        element.click();
+      }
+    }, selector);
+  }
+
+  /**
    * Opens the mobile sidebar and waits for the animation to complete.
    * This ensures the sidebar is fully visible before interacting with elements
    * inside it.
+   *
+   * @throws Error if sidebar is already open (indicates a test logic error).
    */
   private async openMobileSidebar(): Promise<void> {
-    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
-    await this.page.waitForSelector(mobileSidebarOpenSelector, {visible: true});
+    // Assert precondition: sidebar should be closed.
+    const sidebarAlreadyOpen = await this.page.$(mobileSidebarOpenSelector);
+    if (sidebarAlreadyOpen) {
+      throw new Error(
+        'openMobileSidebar() called but sidebar is already open. ' +
+          'This indicates a test logic error.'
+      );
+    }
+
+    await this.page.waitForSelector(mobileNavbarOpenSidebarButton, {
+      visible: true,
+    });
+
+    // Check if navbar is hidden (e.g., scrolled up via Headroom).
+    const buttonRect = await this.page.$eval(
+      mobileNavbarOpenSidebarButton,
+      el => {
+        const rect = el.getBoundingClientRect();
+        return {y: rect.y, height: rect.height};
+      }
+    );
+
+    // If navbar is hidden (scrolled up), scroll to top to make it visible.
+    if (buttonRect.y < 0) {
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+      // Wait for Headroom to show the navbar.
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const el = document.querySelector(selector);
+          if (!el) {
+            return false;
+          }
+          const rect = el.getBoundingClientRect();
+          return rect.y >= 0 && rect.height > 0;
+        },
+        {timeout: 5000},
+        mobileNavbarOpenSidebarButton
+      );
+    }
+
+    // Wait for Angular to be stable before clicking.
+    await this.waitForAngularStability();
+
+    // Use JavaScript click to ensure Angular handles the event properly.
+    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+
+    await this.page.waitForSelector(mobileSidebarOpenSelector, {
+      visible: true,
+    });
+
     // Wait for the sidebar slide animation to complete by checking element
     // position stability.
     await this.waitForElementToStabilize(mobileSidebarOpenSelector);
@@ -637,10 +723,67 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Closes the mobile sidebar and waits for the animation to complete.
    * This ensures the sidebar is fully hidden before continuing.
+   *
+   * @throws Error if sidebar is already closed (indicates a test logic error).
    */
   private async closeMobileSidebar(): Promise<void> {
-    await this.clickOnElementWithSelector(mobileNavbarOpenSidebarButton);
+    // Assert precondition: sidebar should be open.
+    const sidebarOpen = await this.page.$(mobileSidebarOpenSelector);
+    if (!sidebarOpen) {
+      throw new Error(
+        'closeMobileSidebar() called but sidebar is already closed. ' +
+          'This indicates a test logic error.'
+      );
+    }
+
+    // Use JavaScript click to ensure Angular handles the event properly.
+    await this.clickWithJavaScript(mobileNavbarOpenSidebarButton);
+
     await this.page.waitForSelector(mobileSidebarOpenSelector, {hidden: true});
+
+    // Wait for the sidebar slide-out animation to complete.
+    await this.waitForSidebarAnimationToComplete();
+  }
+
+  /**
+   * Waits for the sidebar animation to complete by monitoring its position.
+   * Unlike waitForElementToStabilize, this works for elements that are
+   * animating off-screen (not visible).
+   */
+  private async waitForSidebarAnimationToComplete(): Promise<void> {
+    const sidebarSelector = '.oppia-sidebar-menu';
+
+    // First check if the sidebar element exists.
+    const sidebarExists = await this.page.$(sidebarSelector);
+    if (!sidebarExists) {
+      return;
+    }
+
+    let previousBox = await this.page.$eval(sidebarSelector, el =>
+      el.getBoundingClientRect()
+    );
+    if (!previousBox || previousBox.x === undefined) {
+      return;
+    }
+
+    const startTime = Date.now();
+    const timeout = 5000;
+
+    // Poll until position stabilizes or timeout.
+    while (Date.now() - startTime < timeout) {
+      await this.page.waitForTimeout(100);
+      const currentBox = await this.page.$eval(sidebarSelector, el =>
+        el.getBoundingClientRect()
+      );
+
+      if (
+        Math.abs(previousBox.x - currentBox.x) < 1 &&
+        Math.abs(previousBox.y - currentBox.y) < 1
+      ) {
+        return;
+      }
+      previousBox = currentBox;
+    }
   }
 
   /**
@@ -1090,7 +1233,17 @@ export class LoggedOutUser extends BaseUser {
         visible: true,
       });
       await this.openMobileSidebar();
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+
+      // Wait for Angular to be stable before clicking the expand button.
+      await this.waitForAngularStability();
+
+      // Use JavaScript click for sidebar menu items.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+
+      // Wait for the About submenu to expand and the About button to be visible.
+      await this.page.waitForSelector(mobileSidebarAboutButton, {
+        visible: true,
+      });
       await this.clickButtonToNavigateToNewPage(
         mobileSidebarAboutButton,
         aboutUrl
@@ -1194,10 +1347,16 @@ export class LoggedOutUser extends BaseUser {
         visible: true,
       });
       await this.openMobileSidebar();
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
-      await this.clickOnElementWithSelector(
+
+      // Wait for Angular to be stable before clicking.
+      await this.waitForAngularStability();
+
+      // Use JavaScript click for sidebar menu items.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+      await this.clickWithJavaScript(
         mobileSidebarExpandImpactReportSubMenuButton
       );
+
       await this.openExternalLinkBySelectorAndText(
         mobileSidebarImpactReportButton,
         '2024',
@@ -1214,8 +1373,9 @@ export class LoggedOutUser extends BaseUser {
         impactReport2022Url
       );
 
-      // Close Navbar once links are verified.
-      await this.clickOnElementWithSelector(mobileSidebarExpandAboutMenuButton);
+      // Collapse the About menu before closing sidebar.
+      await this.clickWithJavaScript(mobileSidebarExpandAboutMenuButton);
+
       await this.closeMobileSidebar();
     } else {
       await this.page.waitForSelector(navbarAboutTab, {
