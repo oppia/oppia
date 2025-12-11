@@ -16,12 +16,12 @@
 """Unit tests for scripts/run_e2e_tests.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import contextlib
 import subprocess
 import sys
 import time
+from unittest import mock
 
 from core.tests import test_utils
 from scripts import (
@@ -121,16 +121,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_e2e_tests.install_third_party_libraries(False)
 
     def test_install_third_party_libraries_with_skip(self) -> None:
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                install_third_party_libs,
-                'main',
-                lambda *_, **__: None,
-                called=False,
-            )
+        mock_main = self.exit_stack.enter_context(
+            mock.patch.object(install_third_party_libs, 'main')
         )
 
         run_e2e_tests.install_third_party_libraries(True)
+
+        mock_main.assert_not_called()
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         self.exit_stack.enter_context(
@@ -153,21 +150,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -221,13 +208,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 ],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=[])
+
+        mock_exit.assert_called_once_with(0)
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
 
     def test_work_with_non_ascii_chars(self) -> None:
         def mock_managed_webdriverio_server(
@@ -470,13 +459,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 servers, 'managed_redis_server', mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webpack_compiler',
-                mock_managed_process,
-                called=False,
-            )
+        mock_webpack_compiler = self.exit_stack.enter_context(
+            mock.patch.object(servers, 'managed_webpack_compiler')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -515,6 +499,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         )
 
         run_e2e_tests.main(args=['--skip_install', '--skip_build'])
+
+        mock_webpack_compiler.assert_not_called()
 
     def test_start_tests_in_debug_mode(self) -> None:
         self.exit_stack.enter_context(

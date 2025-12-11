@@ -15,11 +15,11 @@
 """Unit tests for setup.py."""
 
 from __future__ import annotations
-from unittest import mock
 
 import builtins
 import os
 import sys
+from unittest import mock
 
 from core import feconf
 from core.tests import test_utils
@@ -48,11 +48,10 @@ class SetupTests(test_utils.GenericTestBase):
 
         dummy_file_object = open('dummy_requirements.txt', encoding='utf-8')
 
-        swap_open = self.swap_with_checks(
+        mock_open = mock.patch.object(
             builtins,
             'open',
             lambda *unused_args, **unused_kwargs: dummy_file_object,
-            expected_args=(('requirements.txt',),),
         )
 
         # The expected packages should not include comments or hashes.
@@ -62,22 +61,7 @@ class SetupTests(test_utils.GenericTestBase):
             'module3==4.3.4',
         ]
 
-        swap_setup = self.swap_with_checks(
-            setuptools,
-            'setup',
-            lambda **unused_kwargs: None,
-            expected_args=(),
-            expected_kwargs=[
-                {
-                    'name': 'oppia-beam-job',
-                    'version': feconf.OPPIA_VERSION,
-                    'description': 'Oppia Apache Beam package',
-                    'install_requires': required_packages,
-                    'packages': setuptools.find_packages(),
-                    'include_package_data': True,
-                }
-            ],
-        )
+        mock_setup = mock.patch.object(setuptools, 'setup')
 
         dummy_path = [
             path
@@ -85,15 +69,24 @@ class SetupTests(test_utils.GenericTestBase):
             if common.GOOGLE_CLOUD_SDK_HOME not in path
         ]
 
-        swap_path = mock.patch.object(sys, 'path', dummy_path)
+        mock_path = mock.patch.object(sys, 'path', dummy_path)
 
-        with swap_setup, swap_path, swap_open:
+        with mock_setup, mock_path, mock_open:
             # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
             # sys.path when we run backend tests. We use a swap as we
             # need to remove these dirs to import setup.
             import setup
 
             setup.main()
+
+        mock_setup.assert_called_once_with(
+            name='oppia-beam-job',
+            version=feconf.OPPIA_VERSION,
+            description='Oppia Apache Beam package',
+            install_requires=required_packages,
+            packages=setuptools.find_packages(),
+            include_package_data=True,
+        )
 
         dummy_file_object.close()
         os.remove('dummy_requirements.txt')
