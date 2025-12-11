@@ -238,8 +238,7 @@ const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
-const learnSomethingNewSectionSelector =
-  '.e2e-test-learn-something-new-section';
+const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
@@ -258,7 +257,7 @@ const learnerDashSelectors: Record<string, Record<string, string>> = {
     heading: '.e2e-test-learner-topic-summary-tile-title',
   },
   lessonCard: {
-    content: '.e2e-test-lesson-card',
+    content: '.e2e-test-redesigned-lesson-card-container',
     heading: '.e2e-test-lesson-card-title',
     button: '.e2e-test-resume-lesson-btn',
     progress: '.e2e-test-progress-lesson',
