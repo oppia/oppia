@@ -35,8 +35,7 @@ if MYPY:  # pragma: no cover
 
 
 class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
-    """Beam job that removes story references in TopicModel which no longer exist,
-    and logs only the removed references."""
+    """Removes canonical story references in TopicModel which no longer exist."""
 
     # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
     # apache_beam library and absences of stubs in Typeshed, forces MyPy to
@@ -76,7 +75,7 @@ class RemoveHangingStoryReferencesJob(base_jobs.JobBase):
                 )
                 yield topic_model, log
             else:
-                # Nothing removed skip logging and returning model.
+                # No hanging story references were found, so we skip logging and just return the model unchanged.
                 yield topic_model, None
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
