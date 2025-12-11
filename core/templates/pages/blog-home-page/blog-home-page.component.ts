@@ -196,9 +196,16 @@ export class BlogHomePageComponent implements OnInit {
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
-          this.blogPostSummaries = this.blogPostSummaries.concat(
-            data.blogPostSummaryDicts
-          );
+          while (this.blogPostSummaries.length < offset) {
+            this.blogPostSummaries.push(
+              undefined as unknown as BlogPostSummary
+            );
+          }
+
+          data.blogPostSummaryDicts.forEach((summary, index) => {
+            this.blogPostSummaries[offset + index] = summary;
+          });
+
           this.selectBlogPostSummariesToShow();
           this.calculateLastPostOnPageNum(
             this.page,
@@ -220,7 +227,10 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadPage(): void {
-    if (this.blogPostSummaries.length < this.firstPostOnPageNum) {
+    if (
+      this.blogPostSummaries.length < this.firstPostOnPageNum ||
+      this.blogPostSummaries[this.firstPostOnPageNum - 1] === undefined
+    ) {
       this.showBlogPostCardsLoadingScreen = true;
       if (!this.searchPageIsActive) {
         this.loadMoreBlogPostSummaries(this.firstPostOnPageNum - 1);
@@ -293,6 +303,7 @@ export class BlogHomePageComponent implements OnInit {
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
     if (this.searchQuery === '' && this.selectedTags.length === 0) {
+      this.searchPageIsActive = false;
       this.loadInitialBlogHomePageData();
       this.windowRef.nativeWindow.history.pushState({}, '', '/blog');
       return;
