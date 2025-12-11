@@ -292,25 +292,8 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '-E',
         # Disable security for the local ElasticSearch server.
         'xpack.security.enabled=false',
-        # Elasticsearch 8 uses stricter default disk watermarks than ES 7.
-        # In ES 7, we could disable disk-based shard allocation with
-        # `cluster.routing.allocation.disk.threshold_enabled=false`.
-        # This flag is **deprecated in ES 8** and can only be true, so we cannot disable it anymore.
-        # To mimic the old ES 7 behavior (prevent unexpected shard relocation or read-only indices),
-        # we increase the disk watermarks for our local dev environment.
-        # See: https://www.elastic.co/guide/en/elasticsearch/reference/8.19/migrating-8.0.html
-        # Low watermark: prevents new shard allocations when disk usage exceeds this percentage.
-        '-E',
-        'cluster.routing.allocation.disk.watermark.low=85%',
-        # High watermark: triggers shard relocation to nodes with more free space.
-        '-E',
-        'cluster.routing.allocation.disk.watermark.high=95%',
-        # Flood-stage: indices become read-only to prevent data loss if usage exceeds this threshold.
-        '-E',
-        'cluster.routing.allocation.disk.watermark.flood_stage=97%',
-        # TODO: Remove the tag below once disk watermark checks are implemented and
-        #       proper error handling is added to surface "watermark reached" errors
-        #       (low/high/flood-stage) during Elasticsearch startup and runtime.
+        # Disable the disk threshold checks. These checks can cause issues on
+        # machines with low disk space.
         '-E',
         'cluster.routing.allocation.disk.threshold_enabled=false',
     ]
