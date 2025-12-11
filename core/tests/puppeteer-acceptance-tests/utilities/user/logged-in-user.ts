@@ -84,7 +84,7 @@ const communityLessonsCollapsed =
 const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
-const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
+const progressSectionSelector = '.e2e-test-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
 const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
 const editProfilePictureButton = '.e2e-test-photo-clickable';
@@ -119,8 +119,6 @@ const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 const lessonTileTitleSelector =
   '.e2e-test-topic-name-in-learner-story-summary-tile';
-const progressSectionSelector = '.e2e-test-progress-section';
-const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
 const goalsSectionSelector = '.e2e-test-goals-section';
 const homeSectionSelector = '.e2e-test-home-section';
 const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
@@ -465,8 +463,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOnElementWithSelector(mobileProgressSectionButton);
+      await this.page.waitForSelector(progressSectionSelector);
+      await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -475,7 +473,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(progressSectionSelector);
         } else {
           throw error;
         }
@@ -561,8 +559,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOnElementWithSelector(mobileProgressSectionButton);
+      await this.page.waitForSelector(progressSectionSelector);
+      await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -571,7 +569,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(progressSectionSelector);
         } else {
           throw error;
         }
@@ -640,8 +638,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileGoalsSectionSelector);
-      await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
+      await this.page.waitForSelector(goalsSectionSelector);
+      await this.clickOnElementWithSelector(goalsSectionSelector);
 
       try {
         await this.page.waitForSelector(currentGoalsSectionSelector, {
@@ -650,7 +648,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
+          await this.clickOnElementWithSelector(goalsSectionSelector);
         } else {
           throw error;
         }
