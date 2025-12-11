@@ -643,9 +643,8 @@ class ManagedProcessTests(test_utils.TestBase):
                 ],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove, called=False)
-        )
+        mock_remove = mock.patch.object(os, 'remove', mock_os_remove)
+        self.exit_stack.enter_context(mock_remove)
 
         self.exit_stack.enter_context(servers.managed_redis_server())
 
@@ -657,6 +656,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
 
         self.exit_stack.close()
+
+        mock_remove.assert_not_called()
 
     def test_managed_redis_server_deletes_redis_dump_when_it_exists(
         self,

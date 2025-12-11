@@ -1329,14 +1329,15 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 servers, 'managed_webpack_compiler', mock_managed_process
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
+        mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
+        self.exit_stack.enter_context(mock_exit)
         self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
         )
 
         build.run_webpack_compilation()
+
+        mock_exit.assert_not_called()
 
     def test_run_webpack_compilation_failed(self) -> None:
         old_os_path_isdir = os.path.isdir
@@ -1392,11 +1393,12 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             self.swap_with_checks(os.path, 'isdir', mock_os_path_isdir)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
+        mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
+        self.exit_stack.enter_context(mock_exit)
 
         build.build_js_files(True)
+
+        mock_exit.assert_not_called()
 
     def test_build_js_files_in_prod_mode(self) -> None:
         self.exit_stack.enter_context(
