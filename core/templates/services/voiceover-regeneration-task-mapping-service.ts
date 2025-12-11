@@ -34,7 +34,7 @@ export class VoiceoverRegenerationTaskMappingService {
   public languageAccentToContentStatusMap: LanguageAccentToContentStatusMap =
     {};
 
-  private statusSubject = new BehaviorSubject<LanguageAccentToContentStatusMap>(
+  public statusSubject = new BehaviorSubject<LanguageAccentToContentStatusMap>(
     {}
   );
   public status$ = this.statusSubject.asObservable();

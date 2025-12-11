@@ -25,6 +25,7 @@ import {
   flush,
   discardPeriodicTasks,
 } from '@angular/core/testing';
+import {Subscription} from 'rxjs';
 import {VoiceoverRegenerationTaskMappingService} from './voiceover-regeneration-task-mapping-service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -119,4 +120,61 @@ describe('Voiceover regeneration task mapping service', () => {
       )
     ).toBe('SUCCEEDED');
   });
+
+  it('should unsubscribe previous polling, call initial fetch, and poll repeatedly', fakeAsync(() => {
+    const status2 = {'en-US': {content_0: 'SUCCEEDED'}};
+
+    const fetchLatestVoiceoverRegenerationStatusSpy = spyOn(
+      voiceoverBackendApiService,
+      'fetchLatestVoiceoverRegenerationStatusAsync'
+    );
+    fetchLatestVoiceoverRegenerationStatusSpy.and.returnValue(
+      Promise.resolve(status2)
+    );
+
+    const fakeSub = new Subscription();
+    spyOn(fakeSub, 'unsubscribe');
+    voiceoverRegenerationTaskMappingService.pollingSub = fakeSub;
+
+    spyOn(
+      voiceoverRegenerationTaskMappingService,
+      'getLatestVoiceoverRegenerationStatus'
+    ).and.callThrough();
+
+    voiceoverRegenerationTaskMappingService.startPolling();
+
+    expect(fakeSub.unsubscribe).toHaveBeenCalled();
+
+    expect(
+      voiceoverRegenerationTaskMappingService.getLatestVoiceoverRegenerationStatus
+    ).toHaveBeenCalled();
+
+    expect(
+      voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync
+    ).toHaveBeenCalledTimes(1);
+
+    tick(5000);
+    discardPeriodicTasks();
+
+    expect(
+      voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync
+    ).toHaveBeenCalledTimes(2);
+
+    tick();
+
+    expect(
+      voiceoverRegenerationTaskMappingService.languageAccentToContentStatusMap
+    ).toEqual(status2);
+
+    let emittedValue = null;
+    voiceoverRegenerationTaskMappingService.statusSubject.subscribe(
+      v => (emittedValue = v)
+    );
+
+    tick(5000);
+    tick();
+    discardPeriodicTasks();
+
+    expect(emittedValue).toEqual(status2);
+  }));
 });
