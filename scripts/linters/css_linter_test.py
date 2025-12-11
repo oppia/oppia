@@ -84,7 +84,9 @@ class ThirdPartyCSSLintChecksManagerTests(test_utils.LinterTestBase):
         ) -> scripts_test_utils.PopenStub:
             return scripts_test_utils.PopenStub(stdout=b'True', stderr=b'True')
 
-        popen_patch = self.swap_with_checks(subprocess, 'Popen', mock_popen)
+        popen_patch = mock.patch.object(
+            subprocess, 'Popen', side_effect=mock_popen
+        )
 
         third_party_linter = css_linter.ThirdPartyCSSLintChecksManager(
             [VALID_CSS_FILEPATH]

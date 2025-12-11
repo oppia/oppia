@@ -176,27 +176,21 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         ) -> None:  # pylint: disable=unused-argument
             pass
 
-        run_patch = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_run,
-            expected_args=[
-                (
-                    [
-                        'pip-sync',
-                        'requirements_dev.txt',
-                        '--pip-args',
-                        '--require-hashes --no-deps',
-                    ],
-                ),
-            ],
-            expected_kwargs=[
-                {'check': True, 'encoding': 'utf-8'},
-            ],
-        )
+        run_patch = mock.patch.object(subprocess, 'run', side_effect=mock_run)
 
         with run_patch:
             install_python_dev_dependencies.install_dev_dependencies()
+
+        run_patch.assert_called_once_with(
+            [
+                'pip-sync',
+                'requirements_dev.txt',
+                '--pip-args',
+                '--require-hashes --no-deps',
+            ],
+            check=True,
+            encoding='utf-8',
+        )
 
     def test_uninstall_dev_dependencies(self) -> None:
 
@@ -205,20 +199,16 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         ) -> None:  # pylint: disable=unused-argument
             pass
 
-        run_patch = self.swap_with_checks(
-            subprocess,
-            'run',
-            mock_run,
-            expected_args=[
-                (['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],),
-            ],
-            expected_kwargs=[
-                {'check': True, 'encoding': 'utf-8'},
-            ],
-        )
+        run_patch = mock.patch.object(subprocess, 'run', side_effect=mock_run)
 
         with run_patch:
             install_python_dev_dependencies.uninstall_dev_dependencies()
+
+        run_patch.assert_called_once_with(
+            ['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],
+            check=True,
+            encoding='utf-8',
+        )
 
     def test_compile_pip_requirements_no_change(self) -> None:
 

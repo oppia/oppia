@@ -349,11 +349,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 'mock_read called with unexpected path %s' % path
             )
 
-        listdir_patch = self.swap_with_checks(
-            os,
-            'listdir',
-            mock_listdir,
-            expected_args=[(other_files_linter.WORKFLOWS_DIR,)],
+        listdir_patch = mock.patch.object(
+            os, 'listdir', side_effect=mock_listdir
         )
         read_patch = mock.patch.object(FILE_CACHE, 'read', mock_read)
 
@@ -368,6 +365,8 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 FILE_CACHE
             ).check_github_workflows_have_name()
             self.assertEqual(task_results.get_report(), expected)
+
+        listdir_patch.assert_called_once_with(other_files_linter.WORKFLOWS_DIR)
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(

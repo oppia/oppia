@@ -1134,13 +1134,8 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(
             mock.patch.object(subprocess, 'check_output', side_effect=OSError)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common,
-                'wait_for_port_to_be_in_use',
-                lambda _: None,
-                called=False,
-            )
+        mock_wait = self.exit_stack.enter_context(
+            mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
 
         expected_regexp = 'Failed to execute "google-chrome --version" command'
@@ -1148,6 +1143,7 @@ class ManagedProcessTests(test_utils.TestBase):
             self.exit_stack.enter_context(servers.managed_webdriverio_server())
 
         self.assertEqual(len(popen_calls), 0)
+        mock_wait.assert_not_called()
 
     def test_managed_webdriverio_with_invalid_sharding_instances(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -1364,8 +1360,8 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         check_output_patch = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        url_open_patch = self.swap_with_checks(
-            common, 'url_open', mock_url_open, expected_args=[(expected_url,)]
+        url_open_patch = mock.patch.object(
+            common, 'url_open', side_effect=mock_url_open
         )
 
         with check_output_patch, url_open_patch:
@@ -1373,6 +1369,8 @@ class GetChromedriverVersionTests(test_utils.TestBase):
                 servers.get_chromedriver_version(),
                 '72.0.3626.69',
             )
+
+        url_open_patch.assert_called_once_with(expected_url)
 
     def test_chrome_115_and_later_returns_chrome_version(self) -> None:
         def mock_check_output(_: List[str]) -> bytes:
@@ -1393,11 +1391,9 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             )
 
     def test_run_ng_compilation_successfully(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: True, expected_kwargs=[]
-        )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
+        swap_isdir = mock.patch.object(os.path, 'isdir', return_value=True)
+        swap_ng_build = mock.patch.object(
+            servers, 'managed_ng_build', side_effect=mock_context_manager
         )
         with self.print_patch, swap_ng_build, swap_isdir:
             servers.run_ng_compilation()
@@ -1406,17 +1402,15 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             'Failed to complete ng build compilation, exiting...',
             self.print_arr,
         )
+        swap_isdir.assert_called()
+        swap_ng_build.assert_called()
 
     def test_run_ng_compilation_failed(self) -> None:
-        swap_isdir = self.swap_with_checks(
-            os.path, 'isdir', lambda _: False, expected_kwargs=[]
+        swap_isdir = mock.patch.object(os.path, 'isdir', return_value=False)
+        swap_ng_build = mock.patch.object(
+            servers, 'managed_ng_build', side_effect=mock_context_manager
         )
-        swap_ng_build = self.swap_with_checks(
-            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,)]
-        )
+        swap_sys_exit = mock.patch.object(sys, 'exit')
         with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()
 
@@ -1424,6 +1418,9 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             'Failed to complete ng build compilation, exiting...',
             self.print_arr,
         )
+        swap_isdir.assert_called()
+        swap_ng_build.assert_called()
+        swap_sys_exit.assert_called_once_with(1)
 
     def test_subprocess_error_results_in_failed_ng_build(self) -> None:
         class MockFailedCompiler:
@@ -1445,24 +1442,16 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
             return MockFailedCompilerContextManager()
 
-        swap_ng_build = self.swap_with_checks(
-            servers,
-            'managed_ng_build',
-            mock_failed_context_manager,
-            expected_args=[],
+        swap_ng_build = mock.patch.object(
+            servers, 'managed_ng_build', side_effect=mock_failed_context_manager
         )
-        swap_isdir = self.swap_with_checks(
-            os.path,
-            'isdir',
-            lambda _: False,
-            expected_args=[
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-                ('dist/oppia-angular',),
-            ],
-        )
-        swap_sys_exit = self.swap_with_checks(
-            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
-        )
+        swap_isdir = mock.patch.object(os.path, 'isdir', return_value=False)
+        swap_sys_exit = mock.patch.object(sys, 'exit')
         with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
             servers.run_ng_compilation()
+
+        swap_ng_build.assert_called()
+        self.assertEqual(swap_isdir.call_count, 3)
+        swap_isdir.assert_called_with('dist/oppia-angular')
+        self.assertEqual(swap_sys_exit.call_count, 3)
+        swap_sys_exit.assert_called_with(1)
