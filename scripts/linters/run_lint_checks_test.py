@@ -78,8 +78,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.sys_patch = mock.patch.object(sys, 'exit', mock_exit)
-        self.install_patch = self.swap_with_checks(
-            install_third_party_libs, 'main', mock_install_third_party_libs_main
+        self.install_patch = mock.patch.object(
+            install_third_party_libs,
+            'main',
+            side_effect=mock_install_third_party_libs_main,
         )
 
     def test_main_with_no_files(self) -> None:
@@ -102,6 +104,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout
         )
+        self.install_patch.assert_called()
 
     def test_main_with_no_args(self) -> None:
         def mock_get_changed_filepaths() -> List[str]:
@@ -120,6 +123,7 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         self.assert_same_list_elements(
             ['No files to check'], self.linter_stdout
         )
+        self.install_patch.assert_called()
 
     def test_main_with_non_other_shard(self) -> None:
         mock_shards = {
@@ -139,11 +143,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         shards_patch = mock.patch.object(run_lint_checks, 'SHARDS', mock_shards)
 
-        get_filenames_from_path_patch = self.swap_with_checks(
+        get_filenames_from_path_patch = mock.patch.object(
             run_lint_checks,
             '_get_filepaths_from_path',
-            mock_get_filepaths_from_path,
-            expected_args=[(prefix,) for prefix in mock_shards['1']],
+            side_effect=mock_get_filepaths_from_path,
         )
 
         with self.print_patch, self.sys_patch, shards_patch:
@@ -151,6 +154,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                 with get_filenames_from_path_patch:
                     run_lint_checks.main(args=['--shard', '1'])
         self.assertFalse(all_checks_passed(self.linter_stdout))
+        self.install_patch.assert_called()
+        for prefix in mock_shards['1']:
+            get_filenames_from_path_patch.assert_any_call(prefix)
 
     def test_main_with_invalid_shards(self) -> None:
         def mock_get_filepaths_from_path(

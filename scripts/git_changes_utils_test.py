@@ -79,21 +79,24 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-                (['git', 'config', '--get', 'remote.upstream.url'],),
-            ],
+            side_effect=mock_popen,
         )
         with popen_patch:
             self.assertEqual(
                 git_changes_utils.get_upstream_git_repository_remote_name(),
                 'upstream',
             )
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.upstream.url']
+        )
 
     def test_get_upstream_remote_name_with_error_in_obtaining_remote(
         self,
@@ -113,15 +116,16 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[(['git', 'remote'],)],
+            side_effect=mock_popen,
         )
         with popen_patch, communicate_patch:
             with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 git_changes_utils.get_upstream_git_repository_remote_name()
+
+        popen_patch.assert_called_once_with(['git', 'remote'])
 
     def test_get_upstream_remote_name_with_error_in_obtaining_remote_url(
         self,
@@ -155,20 +159,21 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             process_for_remote_url, 'communicate', mock_communicate
         )
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-            ],
+            side_effect=mock_popen,
         )
 
         with communicate_patch:
             with popen_patch:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                     git_changes_utils.get_upstream_git_repository_remote_name()
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
 
     def test_get_upstream_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -180,14 +185,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote..url'],),
-            ],
+            side_effect=mock_popen,
         )
         with popen_patch, self.assertRaisesRegex(
             Exception,
@@ -202,6 +203,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'https://github.com/oppia/oppia.git\'\n',
         ):
             git_changes_utils.get_upstream_git_repository_remote_name()
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(['git', 'config', '--get', 'remote..url'])
 
     def test_get_upstream_remote_name_with_multiple_remotes(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -230,15 +234,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-                (['git', 'config', '--get', 'remote.origintwo.url'],),
-            ],
+            side_effect=mock_popen,
         )
 
         with popen_patch, self.assertRaisesRegex(
@@ -255,6 +254,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'the main \'upstream\' remote.\n',
         ):
             git_changes_utils.get_upstream_git_repository_remote_name()
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origintwo.url']
+        )
 
     def test_get_local_remote_name_without_errors(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -283,21 +290,24 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-                (['git', 'config', '--get', 'remote.upstream.url'],),
-            ],
+            side_effect=mock_popen,
         )
         with popen_patch:
             self.assertEqual(
                 git_changes_utils.get_local_git_repository_remote_name(),
                 'origin',
             )
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.upstream.url']
+        )
 
     def test_get_local_remote_name_with_error_in_obtaining_remote(self) -> None:
         def mock_communicate() -> Tuple[bytes, bytes]:
@@ -317,15 +327,16 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[(['git', 'remote'],)],
+            side_effect=mock_popen,
         )
         with popen_patch, communicate_patch:
             with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                 git_changes_utils.get_local_git_repository_remote_name()
+
+        popen_patch.assert_called_once_with(['git', 'remote'])
 
     def test_get_local_remote_name_with_error_in_obtaining_remote_url(
         self,
@@ -357,20 +368,21 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             process_for_remote_url, 'communicate', mock_communicate
         )
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-            ],
+            side_effect=mock_popen,
         )
 
         with communicate_patch:
             with popen_patch:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                     git_changes_utils.get_local_git_repository_remote_name()
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
 
     def test_get_local_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -382,14 +394,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote..url'],),
-            ],
+            side_effect=mock_popen,
         )
         with popen_patch, self.assertRaisesRegex(
             Exception,
@@ -404,6 +412,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             '\"The URL of your fork of Oppia GitHub repository\"\'\n',
         ):
             git_changes_utils.get_local_git_repository_remote_name()
+
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(['git', 'config', '--get', 'remote..url'])
 
     def test_get_local_remote_name_with_multiple_remotes(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -432,15 +443,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = self.swap_with_checks(
+        popen_patch = mock.patch.object(
             subprocess,
             'Popen',
-            mock_popen,
-            expected_args=[
-                (['git', 'remote'],),
-                (['git', 'config', '--get', 'remote.origin.url'],),
-                (['git', 'config', '--get', 'remote.origintwo.url'],),
-            ],
+            side_effect=mock_popen,
         )
 
         with popen_patch, self.assertRaisesRegex(
@@ -458,19 +464,24 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ):
             git_changes_utils.get_local_git_repository_remote_name()
 
+        popen_patch.assert_any_call(['git', 'remote'])
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origin.url']
+        )
+        popen_patch.assert_any_call(
+            ['git', 'config', '--get', 'remote.origintwo.url']
+        )
+
     def test_git_diff_name_status_without_error(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[
-                (['git', 'diff', '--name-status', 'left', 'right', '--'],)
-            ],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch:
@@ -482,19 +493,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ],
             )
 
+        subprocess_patch.assert_called_once_with(
+            ['git', 'diff', '--name-status', 'left', 'right', '--']
+        )
+
     def test_git_diff_name_status_with_error(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str],
         ) -> Tuple[str, str]:
             return ('M\tfile1\nA\tfile2', 'test_oppia_error')
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[
-                (['git', 'diff', '--name-status', 'left', 'right', '--'],)
-            ],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch, self.assertRaisesRegex(
@@ -502,17 +514,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ):
             git_changes_utils.git_diff_name_status('left', 'right')
 
+        subprocess_patch.assert_called_once_with(
+            ['git', 'diff', '--name-status', 'left', 'right', '--']
+        )
+
     def test_git_diff_name_status_with_no_left_and_right(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'diff', '--name-status'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch:
@@ -524,29 +539,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ],
             )
 
+        subprocess_patch.assert_called_once_with(
+            ['git', 'diff', '--name-status']
+        )
+
     def test_git_diff_name_status_with_diff_filter(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str],
         ) -> Tuple[bytes, None]:
             return (b'M\tfile1\nA\tfile2', None)
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[
-                (
-                    [
-                        'git',
-                        'diff',
-                        '--name-status',
-                        '--diff-filter=filter',
-                        'left',
-                        'right',
-                        '--',
-                    ],
-                )
-            ],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch:
@@ -559,6 +565,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     git_changes_utils.FileDiff(status=b'A', name=b'file2'),
                 ],
             )
+
+        subprocess_patch.assert_called_once_with(
+            [
+                'git',
+                'diff',
+                '--name-status',
+                '--diff-filter=filter',
+                'left',
+                'right',
+                '--',
+            ]
+        )
 
     def test_git_diff_name_status_with_empty_left_should_error(self) -> None:
         with self.assertRaisesRegex(
@@ -615,23 +633,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
             return 'Merge Base'
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'pull', 'remote'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
-        git_diff_patch = self.swap_with_checks(
+        git_diff_patch = mock.patch.object(
             git_changes_utils,
             'git_diff_name_status',
-            mock_git_diff_name_status,
-            expected_args=[('Merge Base', 'local branch')],
+            side_effect=mock_git_diff_name_status,
         )
-        get_merge_base_patch = self.swap_with_checks(
+        get_merge_base_patch = mock.patch.object(
             git_changes_utils,
             'get_merge_base',
-            mock_get_merge_base,
-            expected_args=[('remote/local branch', 'local branch')],
+            side_effect=mock_get_merge_base,
         )
         curr_dir_patch = mock.patch.object(
             common, 'CURR_DIR', '/usr/opensource/oppia'
@@ -645,6 +660,12 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     ),
                     expected_file_diffs,
                 )
+
+        subprocess_patch.assert_called_once_with(['git', 'pull', 'remote'])
+        git_diff_patch.assert_called_once_with('Merge Base', 'local branch')
+        get_merge_base_patch.assert_called_once_with(
+            'remote/local branch', 'local branch'
+        )
 
     def test_compare_to_remote_with_file_not_in_oppia_directory_should_error(
         self,
@@ -669,23 +690,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         def mock_get_merge_base(unused_left: str, unused_right: str) -> str:
             return 'Merge Base'
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'pull', 'remote'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
-        git_diff_patch = self.swap_with_checks(
+        git_diff_patch = mock.patch.object(
             git_changes_utils,
             'git_diff_name_status',
-            mock_git_diff_name_status,
-            expected_args=[('Merge Base', 'local branch')],
+            side_effect=mock_git_diff_name_status,
         )
-        get_merge_base_patch = self.swap_with_checks(
+        get_merge_base_patch = mock.patch.object(
             git_changes_utils,
             'get_merge_base',
-            mock_get_merge_base,
-            expected_args=[('remote/local branch', 'local branch')],
+            side_effect=mock_get_merge_base,
         )
         curr_dir_patch = mock.patch.object(
             common, 'CURR_DIR', '/usr/opensource/oppia'
@@ -701,21 +719,30 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     'remote', 'local branch', 'remote/local branch'
                 )
 
+        subprocess_patch.assert_called_once_with(['git', 'pull', 'remote'])
+        git_diff_patch.assert_called_once_with('Merge Base', 'local branch')
+        get_merge_base_patch.assert_called_once_with(
+            'remote/local branch', 'local branch'
+        )
+
     def test_get_merge_base_reports_error(self) -> None:
         def mock_start_subprocess_for_result(
             unused_cmd_tokens: List[str],
         ) -> Tuple[None, str]:
             return None, 'Test'
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'merge-base', 'A', 'B'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch, self.assertRaisesRegex(ValueError, 'Test'):
             git_changes_utils.get_merge_base('A', 'B')
+
+        subprocess_patch.assert_called_once_with(
+            ['git', 'merge-base', 'A', 'B']
+        )
 
     def test_get_merge_base_returns_merge_base(self) -> None:
         def mock_start_subprocess_for_result(
@@ -723,15 +750,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> Tuple[bytes, None]:
             return b'Test', None
 
-        subprocess_patch = self.swap_with_checks(
+        subprocess_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'merge-base', 'A', 'B'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with subprocess_patch:
             self.assertEqual(git_changes_utils.get_merge_base('A', 'B'), 'Test')
+
+        subprocess_patch.assert_called_once_with(
+            ['git', 'merge-base', 'A', 'B']
+        )
 
     def test_extract_acmrt_files_with_empty_file_diffs(self) -> None:
         self.assertEqual(
@@ -820,11 +850,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_patch = mock.patch.object(
             common, 'get_current_branch_name', mock_get_branch
         )
-        compare_to_remote_patch = self.swap_with_checks(
+        compare_to_remote_patch = mock.patch.object(
             git_changes_utils,
             'compare_to_remote',
-            mock_compare_to_remote,
-            expected_args=[('remote', 'branch-1', 'remote/branch-1')],
+            side_effect=mock_compare_to_remote,
         )
         extract_files_patch = mock.patch.object(
             git_changes_utils,
@@ -854,6 +883,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 {'branch-1': (['A:file1', 'M:file2'], ['file1', 'file2'])},
             )
 
+        compare_to_remote_patch.assert_called_once_with(
+            'remote', 'branch-1', 'remote/branch-1'
+        )
+
     def test_get_changed_files_with_no_remote_branch(self) -> None:
         def mock_get_branch() -> str:
             return 'branch-1'
@@ -876,11 +909,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_patch = mock.patch.object(
             common, 'get_current_branch_name', mock_get_branch
         )
-        compare_to_remote_patch = self.swap_with_checks(
+        compare_to_remote_patch = mock.patch.object(
             git_changes_utils,
             'compare_to_remote',
-            mock_compare_to_remote,
-            expected_args=[('upstream', 'branch-1', 'upstream/develop')],
+            side_effect=mock_compare_to_remote,
         )
         extract_files_patch = mock.patch.object(
             git_changes_utils,
@@ -920,6 +952,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                             )
                         },
                     )
+
+        compare_to_remote_patch.assert_called_once_with(
+            'upstream', 'branch-1', 'upstream/develop'
+        )
 
     def test_get_staged_acmrt_files(self) -> None:
         def mock_git_diff_name_status() -> List[git_changes_utils.FileDiff]:
@@ -997,11 +1033,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_patch = mock.patch.object(
             common, 'get_current_branch_name', mock_get_branch
         )
-        start_subprocess_for_result_patch = self.swap_with_checks(
+        start_subprocess_for_result_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'show-ref', 'branch1'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with get_branch_patch, start_subprocess_for_result_patch:
@@ -1017,6 +1052,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ],
             )
 
+        start_subprocess_for_result_patch.assert_called_once_with(
+            ['git', 'show-ref', 'branch1']
+        )
+
     def test_get_refs_without_stdin_should_use_current_branch_raises_error(
         self,
     ) -> None:  # pylint: disable=line-too-long
@@ -1031,16 +1070,19 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_branch_patch = mock.patch.object(
             common, 'get_current_branch_name', mock_get_branch
         )
-        start_subprocess_for_result_patch = self.swap_with_checks(
+        start_subprocess_for_result_patch = mock.patch.object(
             common,
             'start_subprocess_for_result',
-            mock_start_subprocess_for_result,
-            expected_args=[(['git', 'show-ref', 'branch1'],)],
+            side_effect=mock_start_subprocess_for_result,
         )
 
         with get_branch_patch, start_subprocess_for_result_patch:
             with self.assertRaisesRegex(ValueError, 'Error'):
                 git_changes_utils.get_refs()
+
+        start_subprocess_for_result_patch.assert_called_once_with(
+            ['git', 'show-ref', 'branch1']
+        )
 
     def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
         self.assertEqual(
@@ -1064,15 +1106,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return True
             return False
 
-        os_path_exists_patch = self.swap_with_checks(
+        os_path_exists_patch = mock.patch.object(
             os.path,
             'exists',
-            mock_os_path_exists,
-            expected_args=[
-                ('test/file1_test.py',),
-                ('test/file2_test.py',),
-                ('test/file3_test.py',),
-            ],
+            side_effect=mock_os_path_exists,
         )
         with os_path_exists_patch:
             self.assertEqual(
@@ -1081,6 +1118,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ),
                 set(['test.file1_test']),
             )
+
+        os_path_exists_patch.assert_any_call('test/file1_test.py')
+        os_path_exists_patch.assert_any_call('test/file2_test.py')
+        os_path_exists_patch.assert_any_call('test/file3_test.py')
 
     def test_get_python_dot_test_files_from_diff_with_no_test_file(
         self,
@@ -1104,15 +1145,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 return True
             return False
 
-        os_path_exists_patch = self.swap_with_checks(
+        os_path_exists_patch = mock.patch.object(
             os.path,
             'exists',
-            mock_os_path_exists,
-            expected_args=[
-                ('test/file1_test.py',),
-                ('test/file2_test.py',),
-                ('test/file3_test.py',),
-            ],
+            side_effect=mock_os_path_exists,
         )
 
         with os_path_exists_patch:
@@ -1123,18 +1159,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 set(['test.file1_test', 'test.file2_test']),
             )
 
+        os_path_exists_patch.assert_any_call('test/file1_test.py')
+        os_path_exists_patch.assert_any_call('test/file2_test.py')
+        os_path_exists_patch.assert_any_call('test/file3_test.py')
+
     def test_get_python_dot_test_files_from_diff_with_non_existing_test_file(
         self,
     ) -> None:
-        os_path_exists_patch = self.swap_with_checks(
+        os_path_exists_patch = mock.patch.object(
             os.path,
             'exists',
             lambda _: False,
-            expected_args=[
-                ('test/file1_test.py',),
-                ('test/file2_test.py',),
-                ('test/file3_test.py',),
-            ],
         )
 
         with os_path_exists_patch:
@@ -1144,6 +1179,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 ),
                 set(),
             )
+
+        os_path_exists_patch.assert_any_call('test/file1_test.py')
+        os_path_exists_patch.assert_any_call('test/file2_test.py')
+        os_path_exists_patch.assert_any_call('test/file3_test.py')
 
     def test_get_changed_python_test_files(self) -> None:
         git_refs = [
@@ -1210,32 +1249,20 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         get_refs_patch = mock.patch.object(
             git_changes_utils, 'get_refs', mock_get_refs
         )
-        get_changed_files_patch = self.swap_with_checks(
+        get_changed_files_patch = mock.patch.object(
             git_changes_utils,
             'get_changed_files',
-            mock_get_changed_files,
-            expected_args=[(git_refs, 'remote')],
+            side_effect=mock_get_changed_files,
         )
         get_staged_acmrt_files_patch = mock.patch.object(
             git_changes_utils,
             'get_staged_acmrt_files',
             mock_get_staged_acmrt_files,
         )
-        get_python_dot_test_files_from_diff_patch = self.swap_with_checks(
+        get_python_dot_test_files_from_diff_patch = mock.patch.object(
             git_changes_utils,
             'get_python_dot_test_files_from_diff',
-            mock_get_python_dot_test_files_from_diff,
-            expected_args=[
-                ([b'test/file1.py', b'file2.ts', b'test/file3.py'],),
-                (
-                    [
-                        b'test/file1.py',
-                        b'file2.ts',
-                        b'test/file3.py',
-                        b'test/file4.py',
-                    ],
-                ),
-            ],
+            side_effect=mock_get_python_dot_test_files_from_diff,
         )
         get_parent_branch_name_for_diff_patch = mock.patch.object(
             git_changes_utils,
@@ -1255,6 +1282,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                                 'test.file4_test.py',
                             },
                         )
+
+        get_changed_files_patch.assert_called_once_with(git_refs, 'remote')
+        get_python_dot_test_files_from_diff_patch.assert_any_call(
+            [b'test/file1.py', b'file2.ts', b'test/file3.py']
+        )
+        get_python_dot_test_files_from_diff_patch.assert_any_call(
+            [b'test/file1.py', b'file2.ts', b'test/file3.py', b'test/file4.py']
+        )
 
     def test_get_changed_python_test_files_without_remote(self) -> None:
         def mock_get_remote_name() -> str:

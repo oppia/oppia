@@ -630,18 +630,13 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(
             mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                subprocess,
-                'check_call',
-                lambda _: 0,
-                expected_args=[
-                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
-                ],
+        mock_exists = self.exit_stack.enter_context(
+            mock.patch.object(
+                os.path, 'exists', side_effect=mock_os_path_exists
             )
+        )
+        mock_check_call = self.exit_stack.enter_context(
+            mock.patch.object(subprocess, 'check_call', return_value=0)
         )
         mock_remove = mock.patch.object(os, 'remove', mock_os_remove)
         self.exit_stack.enter_context(mock_remove)
@@ -658,6 +653,10 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.close()
 
         mock_remove.assert_not_called()
+        mock_exists.assert_called()
+        mock_check_call.assert_called_once_with(
+            [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
+        )
 
     def test_managed_redis_server_deletes_redis_dump_when_it_exists(
         self,
@@ -681,21 +680,16 @@ class ManagedProcessTests(test_utils.TestBase):
         self.exit_stack.enter_context(
             mock.patch.object(common, 'wait_for_port_to_be_in_use')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove)
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                subprocess,
-                'check_call',
-                lambda _: 0,
-                expected_args=[
-                    ([common.REDIS_CLI_PATH, 'shutdown', 'nosave'],)
-                ],
+        mock_exists = self.exit_stack.enter_context(
+            mock.patch.object(
+                os.path, 'exists', side_effect=mock_os_path_exists
             )
+        )
+        mock_remove = self.exit_stack.enter_context(
+            mock.patch.object(os, 'remove', side_effect=mock_os_remove)
+        )
+        mock_check_call = self.exit_stack.enter_context(
+            mock.patch.object(subprocess, 'check_call', return_value=0)
         )
 
         self.exit_stack.enter_context(servers.managed_redis_server())
@@ -707,7 +701,11 @@ class ManagedProcessTests(test_utils.TestBase):
             '%s %s' % (common.REDIS_SERVER_PATH, common.REDIS_CONF_PATH),
         )
         self.assertEqual(popen_calls[0].kwargs, {'shell': True})
-        self.assertEqual(mock_os_remove.call_count, 1)
+        self.assertEqual(mock_remove.call_count, 1)
+        mock_exists.assert_called()
+        mock_check_call.assert_called_once_with(
+            [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
+        )
 
     def test_managed_web_browser_on_linux_os(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
@@ -822,10 +820,12 @@ class ManagedProcessTests(test_utils.TestBase):
 
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_with_checks(os.path, 'exists', mock_os_path_exists)
+            mock.patch.object(
+                os.path, 'exists', side_effect=mock_os_path_exists
+            )
         )
         self.exit_stack.enter_context(
-            self.swap_with_checks(os, 'remove', mock_os_remove)
+            mock.patch.object(os, 'remove', side_effect=mock_os_remove)
         )
 
         proc = self.exit_stack.enter_context(servers.managed_portserver())

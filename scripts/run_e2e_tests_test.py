@@ -85,14 +85,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         mock_sleep = self.exit_stack.enter_context(
             mock.patch.object(time, 'sleep')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(common, 'is_port_in_use', mock_is_port_in_use)
+        mock_is_port_in_use = self.exit_stack.enter_context(
+            mock.patch.object(
+                common, 'is_port_in_use', side_effect=mock_is_port_in_use
+            )
         )
 
         common.wait_for_port_to_be_in_use(1)
 
         self.assertEqual(num_var, 11)
         self.assertEqual(mock_sleep.call_count, 10)
+        mock_is_port_in_use.assert_called()
 
     def test_wait_for_port_to_be_in_use_when_port_failed_to_open(self) -> None:
         mock_sleep = self.exit_stack.enter_context(
