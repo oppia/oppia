@@ -49,6 +49,7 @@
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
         "core.controllers.android_test",
+        "core.controllers.android_platform_handlers_test",
         "core.jobs.batch_jobs.translation_migration_jobs_test",
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
