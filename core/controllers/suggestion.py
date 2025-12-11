@@ -1277,7 +1277,7 @@ def _get_target_id_to_skill_opportunity_dict(
     for opp_id, skill in opportunity_id_to_skill.items():
         opportunity_dict = opportunity_id_to_opportunity_dict[opp_id]
         # A failsafe is required by Mypy due to the structure of
-        # the code, skill and opportunity_dict can't be None.
+        # the code; skill and opportunity_dict can't be None.
         assert opportunity_dict is not None
         opportunity_dict['skill_rubrics'] = [
             rubric.to_dict() for rubric in skill.rubrics

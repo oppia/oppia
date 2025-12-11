@@ -176,7 +176,6 @@ class ExplorationHandler(
         )
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
-
         # User settings are always created when a new user is created.
         assert user_settings is not None
         if user_settings.last_started_state_editor_tutorial:
