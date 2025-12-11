@@ -236,21 +236,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -310,6 +300,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             [line.decode('utf-8') for line in lines], ['sample', '✓', 'output']
         )
 
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
+
     def test_rerun_when_tests_fail_with_rerun_yes(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
@@ -322,13 +315,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
+
+        mock_exit.assert_called_once_with(1)
 
     def test_no_rerun_when_tests_flake_with_rerun_no(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -357,10 +350,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(1,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -369,6 +360,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
+
+        mock_exit.assert_called_once_with(1)
 
     def test_no_reruns_off_ci_fail(self) -> None:
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
@@ -402,13 +395,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.exit_stack.enter_context(
             mock.patch.object(run_e2e_tests, 'run_tests', mock_run_tests)
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys, 'exit', lambda _: None, expected_args=[(0,)]
-            )
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit')
         )
 
         run_e2e_tests.main(args=['--suite', 'navigation'])
+
+        mock_exit.assert_called_once_with(0)
 
     def test_start_tests_skip_build(self) -> None:
         self.exit_stack.enter_context(
@@ -416,26 +409,14 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(True,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common,
-                'modify_constants',
-                lambda *_, **__: None,
-                expected_kwargs=[{'prod_env': False}],
-            )
+        mock_modify_constants = self.exit_stack.enter_context(
+            mock.patch.object(common, 'modify_constants')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'set_constants_to_default', lambda: None
-            )
+        mock_set_constants = self.exit_stack.enter_context(
+            mock.patch.object(common, 'set_constants_to_default')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -500,6 +481,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         run_e2e_tests.main(args=['--skip_install', '--skip_build'])
 
+        mock_install_libs.assert_called_once_with(True)
+        mock_modify_constants.assert_called_once_with(prod_env=False)
+        mock_set_constants.assert_called_once_with()
         mock_webpack_compiler.assert_not_called()
 
     def test_start_tests_in_debug_mode(self) -> None:
@@ -508,21 +492,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -585,27 +559,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=['--debug_mode'])
 
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
+
     def test_start_tests_in_with_chromedriver_flag(self) -> None:
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -670,27 +637,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 args=['--chrome_driver_version', CHROME_DRIVER_VERSION]
             )
 
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
+
     def test_start_tests_in_webdriverio(self) -> None:
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -753,27 +713,20 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with self.swap_mock_set_constants_to_default:
             run_e2e_tests.main(args=['--suite', 'collections'])
 
+        mock_install_libs.assert_called_once_with(False)
+        mock_build_js.assert_called_once_with(True)
+
     def test_do_not_run_with_test_non_mobile_suite_in_mobile_mode(self) -> None:
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 common, 'is_oppia_server_already_running', lambda *_: False
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                run_e2e_tests,
-                'install_third_party_libraries',
-                lambda _: None,
-                expected_args=[(False,)],
-            )
+        mock_install_libs = self.exit_stack.enter_context(
+            mock.patch.object(run_e2e_tests, 'install_third_party_libraries')
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'build_js_files',
-                lambda *_, **__: None,
-                expected_args=[(True,)],
-            )
+        mock_build_js = self.exit_stack.enter_context(
+            mock.patch.object(build, 'build_js_files')
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
