@@ -19,6 +19,7 @@
 import {NgModule} from '@angular/core';
 import {RouterModule} from '@angular/router';
 import {SharedComponentsModule} from 'components/shared-component.module';
+import {FormsModule} from '@angular/forms';
 import {ToastrModule} from 'ngx-toastr';
 import {InteractionExtensionsModule} from 'interactions/interactions.module';
 import {toastrConfig} from 'pages/oppia-root/app.module';
@@ -31,6 +32,7 @@ import {CreatorStatsReportModalComponent} from './modal-templates/creator-stats-
   imports: [
     InteractionExtensionsModule,
     SharedComponentsModule,
+    FormsModule,
     ToastrModule.forRoot(toastrConfig),
     NgbModule,
     RouterModule.forChild([

@@ -6780,6 +6780,22 @@ export default {
         }
       ]
     },
+    "CREATOR_STATS": {
+      "ROUTE": "creator-stats",
+      "TITLE": "Creator Stats | Oppia",
+      "META": [
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "description",
+          "CONTENT": "Analyze creator performance: views, ratings, engagement trends, starts/completions, and more."
+        },
+        {
+          "PROPERTY_TYPE": "itemprop",
+          "PROPERTY_VALUE": "og:description",
+          "CONTENT": "Analyze creator performance: views, ratings, engagement trends, starts/completions, and more."
+        }
+      ]
+    },
     "CONTRIBUTOR_DASHBOARD": {
       "ROUTE": "contributor-dashboard",
       "TITLE": "Contributor Dashboard | Oppia",

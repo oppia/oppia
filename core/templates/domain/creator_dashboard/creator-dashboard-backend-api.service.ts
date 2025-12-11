@@ -203,6 +203,64 @@ export class CreatorDashboardBackendApiService {
     return this._fetchDashboardDataAsync();
   }
 
+  async fetchCreatorStatsReportAsync(): Promise<{
+    summary: {
+      num_ratings: number;
+      average_ratings: number | null;
+      total_plays: number;
+      total_open_feedback: number;
+      total_subscribers: number;
+      creator_completion_rate: number | null;
+      weekly_series?: Array<{
+        date: string;
+        num_ratings: number;
+        average_ratings: number | null;
+        total_plays: number;
+      }>;
+    };
+    explorations: Array<{
+      id: string;
+      title: string;
+      num_open_threads: number;
+      average_rating: number | null;
+      plays: number;
+      num_starts?: number;
+      num_completions?: number;
+      completion_rate?: number | null;
+      last_updated_msec: number;
+    }>;
+  }> {
+    return this.http
+      .get<{
+        summary: {
+          num_ratings: number;
+          average_ratings: number | null;
+          total_plays: number;
+          total_open_feedback: number;
+          total_subscribers: number;
+          creator_completion_rate: number | null;
+          weekly_series?: Array<{
+            date: string;
+            num_ratings: number;
+            average_ratings: number | null;
+            total_plays: number;
+          }>;
+        };
+        explorations: Array<{
+          id: string;
+          title: string;
+          num_open_threads: number;
+          average_rating: number | null;
+          plays: number;
+          num_starts?: number;
+          num_completions?: number;
+          completion_rate?: number | null;
+          last_updated_msec: number;
+        }>;
+      }>('/creatorstatsreport')
+      .toPromise();
+  }
+
   async postExplorationViewAsync(newViewType: string): Promise<void> {
     return this.http
       .post<void>('/creatordashboardhandler/data', {

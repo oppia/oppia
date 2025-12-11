@@ -428,6 +428,19 @@ class CreatorStatsReportHandler(
                 feedback_thread_analytics
             ),
         }
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.user_id)
+        weekly_series = []
+        for item in weekly_stats:
+            for dt, stats in item.items():
+                weekly_series.append(
+                    {
+                        'date': dt,
+                        'num_ratings': stats.get('num_ratings', 0),
+                        'average_ratings': stats.get('average_ratings'),
+                        'total_plays': stats.get('total_plays', 0),
+                    }
+                )
+        summary['weekly_series'] = weekly_series
         avg_summary_val = summary.get('average_ratings')
         if isinstance(avg_summary_val, (int, float)):
             summary['average_ratings'] = _round_avg(float(avg_summary_val))
@@ -465,6 +478,17 @@ class CreatorStatsReportHandler(
                 if isinstance(avg_val, (int, float))
                 else None
             )
+            exp_obj = exp_fetchers.get_exploration_by_id(exploration['id'])
+            exp_stats = stats_services.get_exploration_stats(
+                exploration['id'], exp_obj.version
+            )
+            exp_starts = exp_stats.num_starts
+            exp_completions = exp_stats.num_completions
+            exp_completion_rate = (
+                round((exp_completions / exp_starts) * 100, 2)
+                if exp_starts > 0
+                else None
+            )
             explorations.append(
                 {
                     'id': exploration['id'],
@@ -474,6 +498,9 @@ class CreatorStatsReportHandler(
                     ],
                     'average_rating': avg_rounded,
                     'plays': exploration['num_views'],
+                    'num_starts': exp_starts,
+                    'num_completions': exp_completions,
+                    'completion_rate': exp_completion_rate,
                     'last_updated_msec': exploration['last_updated_msec'],
                 }
             )
@@ -547,7 +574,7 @@ class CreatorStatsCsvHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
         )
         lines.append(
-            'Exploration ID,Title,Open Threads,Average Rating,Plays,Last Updated'
+            'Exploration ID,Title,Open Threads,Average Rating,Plays,Starts,Completions,Completion Rate (%),Last Updated'
         )
         for ind, exp in enumerate(exp_summary_dicts):
             feedback_analytics_dict = feedback_thread_analytics[ind].to_dict()
@@ -561,6 +588,17 @@ class CreatorStatsCsvHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             last_updated = utils.get_human_readable_time_string(
                 exp['last_updated_msec']
             )
+            exp_obj = exp_fetchers.get_exploration_by_id(exp['id'])
+            exp_stats = stats_services.get_exploration_stats(
+                exp['id'], exp_obj.version
+            )
+            exp_starts = exp_stats.num_starts
+            exp_completions = exp_stats.num_completions
+            exp_completion_rate = (
+                round((exp_completions / exp_starts) * 100, 2)
+                if exp_starts > 0
+                else ''
+            )
             lines.append(
                 ','.join(
                     [
@@ -569,6 +607,9 @@ class CreatorStatsCsvHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                         str(feedback_analytics_dict['num_open_threads']),
                         avg_str,
                         str(exp['num_views']),
+                        str(exp_starts),
+                        str(exp_completions),
+                        str(exp_completion_rate),
                         '"' + last_updated + '"',
                     ]
                 )

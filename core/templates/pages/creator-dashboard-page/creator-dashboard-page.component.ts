@@ -36,8 +36,10 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
 import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {Router} from '@angular/router';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {CreatorStatsReportModalComponent} from './modal-templates/creator-stats-report-modal.component';
+
 import {UserInfo} from 'domain/user/user-info.model';
 
 @Component({
@@ -101,8 +103,11 @@ export class CreatorDashboardPageComponent {
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
     private windowRef: WindowRef,
-    private ngbModal: NgbModal
+    private ngbModal: NgbModal,
+    private router: Router
   ) {}
+
+  PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
 
   EXP_PUBLISH_TEXTS = {
     defaultText:
@@ -350,13 +355,23 @@ export class CreatorDashboardPageComponent {
   }
 
   openStatsReportModal(): void {
-    const modalRef = this.ngbModal.open(CreatorStatsReportModalComponent, {
-      size: 'lg',
-    });
-    const cmp = modalRef.componentInstance as CreatorStatsReportModalComponent;
-    cmp.dashboardStats = this.dashboardStats;
-    cmp.creatorCompletionRate = this.creatorCompletionRate;
-    cmp.subscribersCount = this.subscribersList.length;
-    cmp.explorationsList = this.explorationsList;
+    const modalRef: NgbModalRef = this.ngbModal.open(
+      CreatorStatsReportModalComponent,
+      {
+        backdrop: true,
+        windowClass: 'creator-stats-modal',
+        size: 'xl',
+      }
+    );
+    modalRef.componentInstance.dashboardStats = this.dashboardStats;
+    modalRef.componentInstance.creatorCompletionRate =
+      this.creatorCompletionRate;
+    modalRef.componentInstance.subscribersCount =
+      this.subscribersList?.length || 0;
+    modalRef.componentInstance.explorationsList = this.explorationsList;
+    modalRef.result.then(
+      () => {},
+      () => {}
+    );
   }
 }

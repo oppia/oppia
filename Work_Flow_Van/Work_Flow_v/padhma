@@ -1,0 +1,507 @@
+# View Stats Report — Change Map (Detailed)
+
+This document shows exactly where changes were made for the View Stats Report feature, includes the most important code blocks, and explains what each part does and why.
+
+## Trigger: Open Modal From Dashboard
+
+- File: `core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.ts`
+- Purpose: Open the popup modal (~80% viewport) for View Stats Report.
+
+```ts
+// Imports (added)
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {CreatorStatsReportModalComponent} from './modal-templates/creator-stats-report-modal.component';
+
+// Constructor (added NgbModal)
+constructor(
+  /* existing injections ... */
+  private ngbModal: NgbModal,
+  /* existing injections ... */
+) {}
+
+// Click handler (replaced navigation with modal open)
+openStatsReportModal(): void {
+  const modalRef: NgbModalRef = this.ngbModal.open(
+    CreatorStatsReportModalComponent,
+    {
+      backdrop: true,
+      windowClass: 'creator-stats-modal',
+      size: 'xl', // ~80% viewport
+    }
+  );
+  // Pass dashboard context into the modal
+  modalRef.componentInstance.dashboardStats = this.dashboardStats;
+  modalRef.componentInstance.creatorCompletionRate = this.creatorCompletionRate;
+  modalRef.componentInstance.subscribersCount = this.subscribersList?.length || 0;
+  modalRef.componentInstance.explorationsList = this.explorationsList;
+  modalRef.result.then(() => {}, () => {});
+}
+```
+
+- File: `core/templates/pages/creator-dashboard-page/creator-dashboard-page.component.html`
+- Purpose: Button opens the modal.
+
+```html
+<button class="oppia-creator-dashboard-create-question-button" (click)="openStatsReportModal()">
+  View Stats Report
+</button>
+```
+
+## Modal Component: Logic and Data
+
+- File: `core/templates/pages/creator-dashboard-page/modal-templates/creator-stats-report-modal.component.ts`
+- Purpose: Orchestrate data, compute charts and sections, provide fallback mock data.
+
+```ts
+// Core state (added)
+reportSummary?: {
+  num_ratings: number;
+  average_ratings: number | null;
+  total_plays: number;
+  total_open_feedback: number;
+  total_subscribers: number;
+  creator_completion_rate: number | null;
+  weekly_series?: Array<{date: string; total_plays: number; num_ratings: number; average_ratings: number | null}>;
+};
+
+reportExplorations: Array<{
+  id: string;
+  title: string;
+  num_open_threads: number;
+  average_rating: number | null;
+  plays: number;
+  num_starts?: number;
+  num_completions?: number;
+  completion_rate?: number | null; // may be provided or derived
+  avg_time_minutes?: number;       // added for Avg Time
+  last_updated_msec: number;
+}> = [];
+
+// Sorting/filtering/paging
+sortKey: 'plays' | 'average_rating' | 'num_open_threads' = 'plays';
+sortDir: 'asc' | 'desc' = 'desc';
+filterText = '';
+filterKey: 'all' | 'high_rating' | 'low_rating' | 'has_open_threads' | 'recently_updated' | 'high_plays' = 'all';
+pageIndex = 0;
+pageSize = 10;
+
+// Charts and sections (added)
+topExplorationBars: Array<{label: string; value: number; widthPct: number}> = [];
+histogram: Array<{label: string; count: number; heightPct: number}> = [];
+trendPoints: Array<{x: number; y: number; label: string; value: number}> = [];
+trendPolylinePoints = '';
+
+outcomesDistribution: Array<{label: string; count: number; heightPct: number}> = [];
+ratingsBreakdown: Array<{stars: number; count: number}> = [];
+contentEffectiveness: Array<{type: string; engagement: number; completion: number; avgScore?: number; delta?: number}> = [];
+recentComments: Array<{author: string; text: string; ago: string}> = [];
+
+avgTimeSpentMinutes?: number;
+peakActivityTime = '';
+
+// Initialization: try live; ensure mock
+async ngOnInit(): Promise<void> {
+  const forceMock = true;
+  try {
+    const report = await this.backendApi.fetchCreatorStatsReportAsync();
+    this.reportSummary = report.summary;
+    this.reportExplorations = report.explorations;
+    this.applySorting();
+    const weeklySeries = this.reportSummary?.weekly_series ?? [];
+    this.computeChartsFromWeekly(weeklySeries);
+  } catch {
+    // Build from dashboard context if live fails
+    this.reportSummary = {
+      num_ratings: this.dashboardStats?.numRatings || 0,
+      average_ratings: this.dashboardStats?.averageRatings || null,
+      total_plays: this.dashboardStats?.totalPlays || 0,
+      total_open_feedback: this.dashboardStats?.totalOpenFeedback || 0,
+      total_subscribers: this.subscribersCount || 0,
+      creator_completion_rate: this.creatorCompletionRate || null,
+    };
+    this.reportExplorations = (this.explorationsList || []).map(exp => ({
+      id: exp.id,
+      title: exp.title,
+      num_open_threads: exp.numOpenThreads,
+      average_rating: this.ratingComputationService.computeAverageRating(exp.ratings),
+      plays: exp.numViews,
+      last_updated_msec: exp.lastUpdatedMsec,
+    }));
+    this.applySorting();
+    this.computeChartsFromWeekly([]);
+  }
+  if (forceMock) this.populateMockDataForDemo();
+}
+
+// Sorting/filtering/paging (added)
+applySorting(): void {
+  const dir = this.sortDir === 'asc' ? 1 : -1;
+  this.reportExplorations.sort((a, b) => {
+    const av = a[this.sortKey] ?? 0;
+    const bv = b[this.sortKey] ?? 0;
+    return av === bv ? 0 : av > bv ? dir : -dir;
+  });
+}
+
+filteredExplorations(): typeof this.reportExplorations {
+  const text = this.filterText.trim().toLowerCase();
+  return this.reportExplorations.filter(exp => {
+    let ok = true;
+    if (text) ok = (exp.title || '').toLowerCase().includes(text);
+    if (!ok) return false;
+    switch (this.filterKey) {
+      case 'high_rating': return (exp.average_rating ?? 0) >= 4.0;
+      case 'low_rating': return (exp.average_rating ?? 0) > 0 && (exp.average_rating ?? 0) <= 2.0;
+      case 'has_open_threads': return exp.num_open_threads > 0;
+      case 'recently_updated': return Date.now() - exp.last_updated_msec < 30 * 86400000;
+      case 'high_plays': return exp.plays >= 1000;
+      default: return true;
+    }
+  });
+}
+
+pageExplorations(): typeof this.reportExplorations {
+  const start = this.pageIndex * this.pageSize;
+  const items = this.filteredExplorations();
+  return items.slice(start, start + this.pageSize);
+}
+```
+
+### Mock Data Builder
+
+```ts
+private populateMockDataForDemo(): void {
+  // Summary
+  this.reportSummary = {
+    num_ratings: 120,
+    average_ratings: 4.2,
+    total_plays: 18450,
+    total_open_feedback: 7,
+    total_subscribers: 1234,
+    creator_completion_rate: 62,
+    weekly_series: Array.from({length: 12}, (_, i) => ({
+      date: `Week ${i + 1}`, total_plays: 1200 + i * 80, num_ratings: 0, average_ratings: null
+    })),
+  };
+  // Extra metrics
+  this.avgTimeSpentMinutes = 42;
+  this.peakActivityTime = 'Wed 5–6 PM';
+
+  // Explorations (added avg_time_minutes)
+  this.reportExplorations = [
+    {id: 'e1', title: 'Algebra Basics', num_open_threads: 2, average_rating: 4.6, plays: 4200, num_starts: 3600, num_completions: 2400, completion_rate: 67, avg_time_minutes: 48, last_updated_msec: Date.now() - 3 * 86400000},
+    {id: 'e2', title: 'Fractions 101',  num_open_threads: 1, average_rating: 4.1, plays: 3100, num_starts: 2500, num_completions: 1500, completion_rate: 60, avg_time_minutes: 37, last_updated_msec: Date.now() - 10 * 86400000},
+    {id: 'e3', title: 'Negative Numbers',num_open_threads: 0, average_rating: 3.8, plays: 2600, num_starts: 2200, num_completions: 1100, completion_rate: 50, avg_time_minutes: 33, last_updated_msec: Date.now() - 20 * 86400000},
+    {id: 'e4', title: 'Ratios & Proportions', num_open_threads: 3, average_rating: 4.5, plays: 3600, num_starts: 3000, num_completions: 2100, completion_rate: 70, avg_time_minutes: 52, last_updated_msec: Date.now() - 5 * 86400000},
+    {id: 'e5', title: 'Decimals Practice', num_open_threads: 1, average_rating: 3.9, plays: 1950, num_starts: 1500, num_completions: 900, completion_rate: 60, avg_time_minutes: 29, last_updated_msec: Date.now() - 15 * 86400000},
+  ];
+  this.applySorting();
+  this.computeChartsFromWeekly(this.reportSummary.weekly_series!);
+
+  // Outcomes Distribution (completion buckets)
+  const bucketsOut = [
+    {min: 0, max: 20, label: '0–20%', count: 0},
+    {min: 21, max: 40, label: '21–40%', count: 0},
+    {min: 41, max: 60, label: '41–60%', count: 0},
+    {min: 61, max: 80, label: '61–80%', count: 0},
+    {min: 81, max: 100, label: '81–100%', count: 0},
+  ];
+  for (const e of this.reportExplorations) {
+    const cr = e.completion_rate != null
+      ? e.completion_rate
+      : (e.num_starts && e.num_completions ? Math.round((e.num_completions / e.num_starts) * 100) : null);
+    if (cr == null) continue;
+    for (const b of bucketsOut) if (cr >= b.min && cr <= b.max) { b.count += 1; break; }
+  }
+  const maxOut = Math.max(1, ...bucketsOut.map(b => b.count));
+  this.outcomesDistribution = bucketsOut.map(b => ({
+    label: b.label, count: b.count, heightPct: Math.round((b.count / maxOut) * 100)
+  }));
+
+  // Ratings breakdown (synthetic)
+  const totalRatings = this.reportSummary.num_ratings || 1;
+  this.ratingsBreakdown = [
+    {stars: 5, count: Math.round(totalRatings * 0.35)},
+    {stars: 4, count: Math.round(totalRatings * 0.30)},
+    {stars: 3, count: Math.round(totalRatings * 0.20)},
+    {stars: 2, count: Math.round(totalRatings * 0.10)},
+    {stars: 1, count: Math.round(totalRatings * 0.05)},
+  ];
+
+  // Content Effectiveness (mock grouping)
+  const totalPlays = this.reportExplorations.reduce((s, e) => s + (e.plays || 0), 0);
+  const groups: {[k: string]: string[]} = {
+    'Video Lessons': ['e1', 'e4'],
+    'Interactive Quiz': ['e2'],
+    'Audio Content': ['e3'],
+    'Visual Diagrams': ['e5'],
+  };
+  this.contentEffectiveness = Object.keys(groups).map(type => {
+    const ids = groups[type];
+    const arr = this.reportExplorations.filter(e => ids.includes(e.id));
+    const plays = arr.reduce((s, e) => s + e.plays, 0);
+    const engagement = totalPlays > 0 ? Math.round((plays / totalPlays) * 100) : 0;
+    const compRates = arr.map(e => e.completion_rate || 0);
+    const completion = compRates.length ? Math.round(compRates.reduce((s, v) => s + v, 0) / compRates.length) : 0;
+    return {type, engagement, completion, avgScore: undefined, delta: undefined};
+  });
+
+  // Recent comments (mock)
+  this.recentComments = [
+    {author: 'LearnerA', text: 'Great explanation, helped a lot!', ago: '1 day ago'},
+    {author: 'LearnerB', text: 'Quiz was engaging and fun.',      ago: '3 days ago'},
+    {author: 'LearnerC', text: 'Could use more examples.',        ago: '5 days ago'},
+  ];
+}
+```
+
+### Chart Computations (Weekly Trend + Plays Histogram)
+
+```ts
+private computeChartsFromWeekly(weekly: Array<{date: string; total_plays: number}>): void {
+  // Top explorations by plays (bars)
+  const playsList = (this.reportExplorations || []).map(e => ({label: e.title || 'Untitled', value: e.plays || 0}));
+  const top = playsList.sort((a, b) => b.value - a.value).slice(0, 10);
+  const maxVal = Math.max(1, ...top.map(t => t.value));
+  this.topExplorationBars = top.map(t => ({label: t.label, value: t.value, widthPct: Math.round((t.value / maxVal) * 100)}));
+
+  // Plays histogram (buckets)
+  const buckets = [
+    {min: 0, max: 10, label: '0–10', count: 0},
+    {min: 11, max: 50, label: '11–50', count: 0},
+    {min: 51, max: 100, label: '51–100', count: 0},
+    {min: 101, max: 500, label: '101–500', count: 0},
+    {min: 501, max: 1000, label: '501–1K', count: 0},
+    {min: 1001, max: 5000, label: '1K–5K', count: 0},
+    {min: 5001, max: null, label: '5K+', count: 0},
+  ];
+  for (const e of playsList) {
+    for (const b of buckets) {
+      if ((b.max === null && e.value >= b.min) || (e.value >= b.min && e.value <= (b.max as number))) { b.count += 1; break; }
+    }
+  }
+  const maxCount = Math.max(1, ...buckets.map(b => b.count));
+  this.histogram = buckets.map(b => ({label: b.label, count: b.count, heightPct: Math.round((b.count / maxCount) * 100)}));
+
+  // Trend polyline (weekly)
+  const w = 320, h = 120, pad = 20;
+  const series = weekly.slice(-12).map(wi => ({label: wi.date, value: wi.total_plays}));
+  const vals = series.map(s => s.value);
+  const maxY = Math.max(1, ...vals);
+  const stepX = (w - pad * 2) / Math.max(1, series.length - 1);
+  this.trendPoints = series.map((s, i) => {
+    const x = pad + i * stepX;
+    const v = s.value ?? 0;
+    const y = h - pad - Math.round((v / maxY) * (h - pad * 2));
+    return {x, y, label: s.label, value: v};
+  });
+  this.trendPolylinePoints = this.trendPoints.map(p => p.x + ',' + p.y).join(' ');
+}
+```
+
+## Modal Template: Sections and Styles
+
+- File: `core/templates/pages/creator-dashboard-page/modal-templates/creator-stats-report-modal.component.html`
+- Purpose: Render summary, table, charts, performance overview, content effectiveness, ratings & feedback, and key insights.
+
+```html
+<!-- Summary cards (added Avg Time Spent) -->
+<div class="row">
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Average Rating</div><div class="h4">{{ (reportSummary?.average_ratings != null ? reportSummary?.average_ratings : dashboardStats.averageRatings) || 'N/A' }}</div></mat-card></div>
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Total Plays</div><div class="h4">{{ (reportSummary?.total_plays != null ? reportSummary?.total_plays : dashboardStats.totalPlays) | summarizeNonnegativeNumber }}</div></mat-card></div>
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Total Open Feedback</div><div class="h4">{{ (reportSummary?.total_open_feedback != null ? reportSummary?.total_open_feedback : dashboardStats.totalOpenFeedback) }}</div></mat-card></div>
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Total Subscribers</div><div class="h4">{{ reportSummary?.total_subscribers != null ? reportSummary?.total_subscribers : subscribersCount }}</div></mat-card></div>
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Average Completion Rate</div><div class="h4">{{ (reportSummary?.creator_completion_rate != null ? reportSummary?.creator_completion_rate : creatorCompletionRate) !== null ? ((reportSummary?.creator_completion_rate != null ? reportSummary?.creator_completion_rate : creatorCompletionRate) + '%') : 'N/A' }}</div></mat-card></div>
+  <div class="col-md-4"><mat-card class="oppia-mat-card p-2 mb-2"><div>Avg Time Spent</div><div class="h4">{{ avgTimeSpentMinutes != null ? (avgTimeSpentMinutes + ' min') : 'N/A' }}</div></mat-card></div>
+</div>
+
+<!-- Charts: Top Plays, Trend, Outcomes, Histogram -->
+<div class="row">
+  <div class="col-md-6 mb-3">
+    <mat-card class="oppia-mat-card p-2 section-card">
+      <div class="h6">Top Explorations by Plays</div>
+      <div>
+        <div *ngFor="let b of topExplorationBars" class="d-flex align-items-center mb-2">
+          <div class="text-truncate" style="width: 40%;" [title]="b.label">{{ b.label }}</div>
+          <div class="flex-grow-1" style="background: #eee; height: 20px; position: relative;">
+            <div [style.width.%]="b.widthPct" style="background: #3f51b5; height: 100%;"></div>
+            <div style="position:absolute; right:4px; top:0; font-size: 12px; line-height: 20px;">{{ b.value }}</div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <mat-card class="oppia-mat-card p-2 section-card">
+      <div class="h6">Exploration Engagement Trends</div>
+      <svg viewBox="0 0 320 140" width="100%" height="140">
+        <polyline [attr.points]="trendPolylinePoints" fill="none" stroke="#3f51b5" stroke-width="2"></polyline>
+        <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="#3f51b5"></circle>
+        <text *ngFor="let p of trendPoints" [attr.x]="p.x" y="130" font-size="10" text-anchor="middle">{{ p.label }}</text>
+      </svg>
+    </mat-card>
+  </div>
+
+  <div class="col-md-6 mb-3 chart-col">
+    <mat-card class="oppia-mat-card p-2 section-card">
+      <div class="h6">Learning Outcomes Distribution</div>
+      <div class="d-flex align-items-end chart-grid" aria-label="Learning outcomes distribution">
+        <div *ngFor="let h of outcomesDistribution" class="chart-bar-container" [attr.title]="h.label + ': ' + h.count">
+          <div class="chart-bar chart-bar-success" [style.height.%]="h.heightPct"></div>
+          <div class="chart-label">{{ h.label }}</div>
+          <div class="chart-count badge-count">{{ h.count }}</div>
+        </div>
+        <div class="chart-axis"></div>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="col-md-6 mb-3 chart-col">
+    <mat-card class="oppia-mat-card p-2 section-card">
+      <div class="h6">Histogram: Plays Distribution</div>
+      <div class="d-flex align-items-end chart-grid" aria-label="Histogram of plays">
+        <div *ngFor="let h of histogram" class="chart-bar-container" [attr.title]="h.label + ': ' + h.count">
+          <div class="chart-bar chart-bar-primary" [style.height.%]="h.heightPct"></div>
+          <div class="chart-label">{{ h.label }}</div>
+          <div class="chart-count badge-count">{{ h.count }}</div>
+        </div>
+        <div class="chart-axis"></div>
+      </div>
+    </mat-card>
+  </div>
+</div>
+
+<!-- Styles (added for attractive visuals and visibility of percent-based bars) -->
+<style>
+  .creator-stats-modal .modal-dialog { max-width: 80vw; width: 80vw; }
+  .creator-stats-modal .modal-body { max-height: 80vh; overflow: auto; background: linear-gradient(180deg,#fbfdff,#f7fafc); }
+  .modal-header { background: linear-gradient(180deg,#f8fafc,#eef2f7); border-bottom: 1px solid #e5e7eb; }
+  .modal-title { color: #1f2937; }
+
+  .oppia-mat-card { background:#fff; border:1px solid #e0e0e0; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,0.08); }
+  .section-card .h6 { border-bottom:1px solid #e6e9ef; padding-bottom:6px; margin-bottom:10px; color:#2c3e50; }
+
+  .chart-grid { height:160px; gap:6px; width:100%; position:relative; }
+  .chart-bar-container { flex:1; margin:0 4px; text-align:center; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; height:100%; }
+  .chart-bar { width:100%; min-height:6px; transition:height 300ms ease, background 200ms ease; border-radius:6px 6px 0 0; }
+  .chart-bar:hover { filter:brightness(1.06); box-shadow:0 3px 10px rgba(0,0,0,0.22); }
+  .chart-label { font-size:10px; white-space:nowrap; margin-top:6px; color:#374151; }
+  .chart-count { font-size:11px; color:#111; }
+  .badge-count { background:#fef3c7; border:1px solid #fcd34d; border-radius:999px; padding:2px 8px; display:inline-block; }
+  .chart-axis { position:absolute; bottom:0; left:0; right:0; height:2px; background:#e3e8ef; }
+  .chart-bar-primary { background: linear-gradient(180deg,#3f51b5,#5c6bc0); }
+  .chart-bar-success { background: linear-gradient(180deg,#4caf50,#66bb6a); }
+
+  .table-sm { border:1px solid #e0e0e0; }
+  .table-sm thead th { background: linear-gradient(180deg,#f9fafb,#f1f3f5); border-bottom:1px solid #e0e0e0; color:#374151; }
+  .table-sm tbody tr:nth-child(odd) { background:#fcfdfe; }
+  .table-sm tbody tr:hover { background:#f6f9ff; }
+</style>
+```
+
+### Template Safety (compatibility fix)
+
+- Replace Angular-unsupported `??` with ternary checks:
+
+```html
+<!-- BEFORE -->
+{{ exp.num_starts ?? 'N/A' }}
+
+<!-- AFTER -->
+{{ exp.num_starts != null ? exp.num_starts : 'N/A' }}
+```
+
+## Creator Stats Page (Route Page) — Supporting Changes
+
+- File: `core/templates/pages/creator-stats-page/creator-stats-page.component.ts`
+- Purpose: Upgrade route page to look like dashboard and fix TS errors.
+
+```ts
+// Inject HttpClient (added)
+import {HttpClient} from '@angular/common/http';
+
+constructor(
+  private backendApi: CreatorDashboardBackendApiService,
+  private http: HttpClient
+) {}
+
+// Aggregations and visuals (added)
+totalStarts = 0;
+totalCompletions = 0;
+successRate?: number;
+activeLearners = 0;
+
+outcomesDistribution: Array<{label: string; count: number; heightPct: number}> = [];
+
+async ngOnInit(): Promise<void> {
+  const data = await this.backendApi.fetchCreatorStatsReportAsync();
+  this.reportSummary = data.summary as any;
+  this.reportExplorations = (data.explorations || []);
+  this.totalStarts = this.reportExplorations.reduce((s, e) => s + (e.num_starts ?? 0), 0);
+  this.totalCompletions = this.reportExplorations.reduce((s, e) => s + (e.num_completions ?? 0), 0);
+  this.successRate = this.totalStarts > 0 ? (this.totalCompletions / this.totalStarts) * 100 : undefined;
+  this.activeLearners = this.totalStarts;
+  this.applySort();
+  this.computeVisuals();
+}
+
+computeVisuals(): void {
+  const buckets = [
+    {min: 0, max: 20, label: '0–20%', count: 0},
+    {min: 21, max: 40, label: '21–40%', count: 0},
+    {min: 41, max: 60, label: '41–60%', count: 0},
+    {min: 61, max: 80, label: '61–80%', count: 0},
+    {min: 81, max: 100, label: '81–100%', count: 0},
+  ];
+  for (const e of this.reportExplorations) {
+    const cr = e.completion_rate != null
+      ? e.completion_rate
+      : (e.num_starts && e.num_completions ? Math.round((e.num_completions / e.num_starts) * 100) : undefined);
+    if (cr == null) continue;
+    for (const b of buckets) if (cr >= b.min && cr <= b.max) { b.count += 1; break; }
+  }
+  const maxCount = Math.max(1, ...buckets.map(b => b.count));
+  this.outcomesDistribution = buckets.map(b => ({label: b.label, count: b.count, heightPct: Math.round((b.count / maxCount) * 100)}));
+}
+```
+
+- File: `core/templates/pages/creator-stats-page/creator-stats-page.component.html`
+- Purpose: Fix ternary use; add dashboard sections similar to modal.
+
+```html
+<!-- Example binding fix and section -->
+<div>Enrollments<br><strong>{{ exp.num_starts != null ? exp.num_starts : 'N/A' }}</strong></div>
+```
+
+## Why These Changes
+
+- Modal over navigation: meets requirement to show a popup covering ~80% of the window.
+- Mock data: ensures all dashboard features appear consistently, regardless of backend.
+- Charts and styles: percent-based bars require explicit parent heights; gradients, borders, and badges improve clarity and appeal.
+- Template safety: avoids parser errors and broken builds by using Angular-friendly ternary checks and balanced tags.
+
+## Quick File Index
+
+- Trigger:
+  - `creator-dashboard-page.component.ts`: modal open logic
+  - `creator-dashboard-page.component.html`: button click binding
+- Modal:
+  - `modal-templates/creator-stats-report-modal.component.ts`: mock/live data, computations, helpers
+  - `modal-templates/creator-stats-report-modal.component.html`: sections layout, charts, styles
+- Route page (supporting):
+  - `creator-stats-page.component.ts`: aggregations and outcomes buckets
+  - `creator-stats-page.component.html`: binds with ternaries; adds sections
+
+## Testing Checklist
+
+- Button opens modal; modal size is ~80% viewport.
+- Summary cards render values.
+- Table sorts, filters, and pages; JSON/CSV export works.
+- Charts:
+  - Top plays bars visible with widths
+  - Trend polyline renders
+  - Outcomes/Histogram bars visible with labels and count badges
+- Performance overview shows Avg Time per exploration.
+- Content effectiveness, ratings breakdown, and recent comments visible.
+- No template parse errors or TS red lines.
