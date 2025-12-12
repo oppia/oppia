@@ -599,19 +599,19 @@ export class BaseUser {
       ) {
         // FIX IMPLEMENTATION: Stabilize the element before clicking to fix the race condition.
 
-        // 1. Ensure the element is visible on the screen.
+        // Ensure the element is visible on the screen.
         await this.page.evaluate(
           el => (el as HTMLElement).scrollIntoView(),
           matOptionElement
         );
 
-        // 2. Perform a robust click using page.evaluate() to force the click
+        // Perform a robust click using page.evaluate() to force the click.
         await this.page.evaluate(
           el => (el as HTMLElement).click(),
           matOptionElement
         );
 
-        // 3. Add a mandatory small pause
+        // Add a mandatory small pause.
         await this.page.waitForTimeout(100);
 
         break;
