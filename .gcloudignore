@@ -25,6 +25,7 @@ local_compiled_js_for_test/
 node_modules/
 scripts/
 stubs/
+tmp/
 third_party/python_libs/
 typings/
 # Some third_party static scripts are directly imported, namely: jquery,

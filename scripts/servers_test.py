@@ -555,12 +555,17 @@ class ManagedProcessTests(test_utils.TestBase):
             popen_calls[0].program_args,
             '%s/bin/elasticsearch -q' % common.ES_PATH,
         )
+        repo_root = os.path.dirname(os.path.dirname(__file__))
+        expected_java_opts = (
+            '-Xms100m -Xmx500m -Djava.io.tmpdir=%s'
+            % os.path.join(repo_root, 'tmp', 'elasticsearch')
+        )
         self.assertEqual(
             popen_calls[0].kwargs,
             {
                 'shell': True,
                 'env': {
-                    'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
+                    'ES_JAVA_OPTS': expected_java_opts,
                     'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
                 },
             },

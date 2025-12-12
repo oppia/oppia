@@ -21,6 +21,7 @@ import errno
 import getpass
 import io
 import json
+import logging
 import os
 import platform
 import re
@@ -78,6 +79,65 @@ OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 OPPIA_TOOLS_DIR_ABS_PATH = os.path.abspath(OPPIA_TOOLS_DIR)
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 THIRD_PARTY_PYTHON_LIBS_DIR = os.path.join(THIRD_PARTY_DIR, 'python_libs')
+# Ensure INFO logs are visible on stdout in developer scripts.
+logging.basicConfig(level=logging.INFO)
+
+# Ensure repository-local temp directory is available and used by subprocesses
+# (pip, yarn, native wheels) when TMPDIR is not already set by the user.
+# We prefer `TMPDIR` (Unix) since it is respected by most build tools.
+_REPO_TMP_DIR = os.path.join(CURR_DIR, 'tmp')
+try:
+    prev_tmp = os.environ.get('TMPDIR') or '/tmp'
+    if os.environ.get('TMPDIR') is None:
+        os.makedirs(_REPO_TMP_DIR, exist_ok=True)
+        os.environ['TMPDIR'] = _REPO_TMP_DIR
+        # Also set common Windows/Unix fallback env vars to increase coverage
+        # for libraries that read `TMP` or `TEMP` instead of `TMPDIR`.
+        os.environ.setdefault('TMP', _REPO_TMP_DIR)
+        os.environ.setdefault('TEMP', _REPO_TMP_DIR)
+except Exception:
+    # Do not fail script initialization if we cannot create the dir; fall
+    # back to system tmpdir.
+    pass
+
+
+def cleanup_repo_tmp(older_than_minutes: int = 10) -> None:
+    """Remove ephemeral repo-local tmp directories named `tmp*` older than
+    `older_than_minutes` minutes.
+
+    This is intended to remove pip/yarn unpack directories (e.g. tmp23pb4wmk)
+    while preserving important service directories such as `elasticsearch`.
+    The function is conservative: it only removes entries whose name starts
+    with "tmp" and whose mtime is older than the configured threshold.
+    """
+    try:
+        if not os.path.isdir(_REPO_TMP_DIR):
+            return
+
+        now = time.time()
+        cutoff = now - (older_than_minutes * 60)
+        for name in os.listdir(_REPO_TMP_DIR):
+            if not name.startswith('tmp'):
+                continue
+
+            path = os.path.join(_REPO_TMP_DIR, name)
+            try:
+                st = os.stat(path)
+            except FileNotFoundError:
+                continue
+
+            # Skip recent dirs.
+            if st.st_mtime > cutoff:
+                continue
+
+            # Be cautious: only remove directories (not files) matching tmp*.
+            if os.path.isdir(path):
+                logging.info('Removing old repo tmp dir: %s', path)
+                shutil.rmtree(path, ignore_errors=True)
+    except Exception:
+        logging.exception('Failed to cleanup repo tmp dir')
+
+
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR_ABS_PATH, 'google-cloud-sdk-500.0.0', 'google-cloud-sdk'
 )

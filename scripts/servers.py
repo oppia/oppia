@@ -20,6 +20,7 @@ import contextlib
 import json
 import logging
 import os
+import pathlib
 import re
 import shutil
 import signal
@@ -42,6 +43,8 @@ from typing import (
     Sequence,
     Union,
 )
+
+_REPO_ROOT = pathlib.Path(__file__).parent.parent
 
 
 # Here we use type Any because the argument 'popen_kwargs' can accept an
@@ -291,17 +294,29 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
+    # Ensure the ES data directory exists and create a dedicated tmp dir
+    # under the repository tmp directory so Elasticsearch / the JVM does
+    # not write into system /tmp.
+    os.makedirs(common.ES_PATH_DATA_DIR, exist_ok=True)
+    es_tmp_dir = os.path.join(_REPO_ROOT, 'tmp', 'elasticsearch')
+    os.makedirs(es_tmp_dir, exist_ok=True)
+    logging.info('ES_TMPDIR_BEFORE_START: %s', es_tmp_dir)
+
     es_args = [
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
         '-q',
     ]
-    # Override the default path to ElasticSearch config files.
+    # Override the default path to ElasticSearch config files and force
+    # the JVM temporary directory to our repo-local tmp directory.
     es_env = {
         'ES_PATH_CONF': common.ES_PATH_CONFIG_DIR,
-        # Set the minimum heap size to 100 MB and maximum to 500 MB.
-        'ES_JAVA_OPTS': '-Xms100m -Xmx500m',
+        # Set the minimum heap size to 100 MB and maximum to 500 MB, and
+        # force java.io.tmpdir to a controlled location so files are not
+        # written to /tmp and can be cleaned up when the server stops.
+        'ES_JAVA_OPTS': f'-Xms100m -Xmx500m -Djava.io.tmpdir={es_tmp_dir}',
     }
+
     # OK to use shell=True here because we are passing string literals and
     # constants, so there is no risk of a shell-injection attack.
     proc_context = managed_process(
@@ -310,9 +325,17 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         env=es_env,
         shell=True,
     )
-    with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
-        yield proc
+    try:
+        with proc_context as proc:
+            common.wait_for_port_to_be_in_use(feconf.ES_LOCALHOST_PORT)
+            yield proc
+    finally:
+        # Attempt to clean up the temporary directory we created for ES.
+        try:
+            if os.path.exists(es_tmp_dir):
+                shutil.rmtree(es_tmp_dir)
+        except Exception:
+            logging.exception('Failed to remove ElasticSearch tmp dir')
 
 
 @contextlib.contextmanager

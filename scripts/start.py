@@ -309,6 +309,14 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # well.
     if not parsed_args.skip_install:
         install_third_party_libs.main()
+        # Clean up old ephemeral repo tmp directories (pip/yarn unpack dirs)
+        # created during installs. We keep this conservative: only delete
+        # entries starting with 'tmp' older than 10 minutes.
+        try:
+            common.cleanup_repo_tmp(older_than_minutes=10)
+        except Exception:
+            # Don't fail start if cleanup fails.
+            pass
 
     build_args = get_build_args(parsed_args)
     try:
