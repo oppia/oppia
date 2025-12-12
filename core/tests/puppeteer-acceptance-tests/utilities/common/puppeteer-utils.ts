@@ -589,27 +589,35 @@ export class BaseUser {
    * @param value The value of the mat-option to select.
    */
   async selectMatOption(value: string): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log('[FLAKY-DEBUG] Waiting for mat-option elements to appear...');
     await this.page.waitForSelector('mat-option');
     const matOptionElements = await this.page.$$('mat-option');
+
     for (const matOptionElement of matOptionElements) {
       if (
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        // eslint-disable-next-line no-console
-        console.log('[FLAKY-DEBUG] Clicking mat-option with value:', value);
+        // FIX IMPLEMENTATION: Stabilize the element before clicking to fix the race condition.
 
-        await matOptionElement.click();
+        // 1. Ensure the element is visible on the screen.
+        await this.page.evaluate(
+          el => (el as HTMLElement).scrollIntoView(),
+          matOptionElement
+        );
+
+        // 2. Perform a robust click using page.evaluate() to force the click
+        await this.page.evaluate(
+          el => (el as HTMLElement).click(),
+          matOptionElement
+        );
+
+        // 3. Add a mandatory small pause
+        await this.page.waitForTimeout(100);
+
         break;
       }
     }
 
-    // eslint-disable-next-line no-console
-    console.log(
-      '[FLAKY-DEBUG] Waiting for mat-option dropdown to disappear...'
-    );
     await this.page.waitForSelector('mat-option', {
       hidden: true,
     });
