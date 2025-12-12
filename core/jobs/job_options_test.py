@@ -22,6 +22,7 @@ import os
 import tempfile
 from unittest import mock
 
+from core.constants import constants
 from core.jobs import job_options
 from core.tests import test_utils
 
@@ -50,12 +51,8 @@ class JobOptionsTests(test_utils.TestBase):
         repo_path = '/fake/repo'
         beam_tmp = os.path.join(repo_path, 'tmp', 'beam')
         with (
-            mock.patch.dict(job_options.constants, {'DEV_MODE': True}),
-            mock.patch.dict(
-                os.environ, {'TMPDIR': os.path.join(repo_path, 'tmp')}
-            ),
+            mock.patch.dict(constants, {'DEV_MODE': True}),
             mock.patch('os.getcwd', return_value=repo_path),
-            mock.patch('os.path.abspath', side_effect=lambda p: p),
             mock.patch('os.makedirs') as mock_makedirs,
             mock.patch.object(tempfile, 'tempdir', None),
             mock.patch('logging.getLogger') as mock_logger,
@@ -63,9 +60,6 @@ class JobOptionsTests(test_utils.TestBase):
             options = job_options.JobOptions()
 
             mock_makedirs.assert_called_once_with(beam_tmp, exist_ok=True)
-            self.assertEqual(os.environ['TMPDIR'], beam_tmp)
-            self.assertEqual(os.environ['TMP'], beam_tmp)
-            self.assertEqual(os.environ['TEMP'], beam_tmp)
             self.assertEqual(tempfile.tempdir, beam_tmp)
             mock_logger.return_value.info.assert_called_once_with(
                 'Using repo-local Beam tmpdir: %s', beam_tmp
@@ -85,7 +79,7 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_no_repo_tmp_when_not_dev_mode(self) -> None:
         with (
-            mock.patch.dict(job_options.constants, {'DEV_MODE': False}),
+            mock.patch.dict(constants, {'DEV_MODE': False}),
             mock.patch.dict(os.environ, {'TMPDIR': '/tmp'}),
             mock.patch('os.getcwd', return_value='/fake/repo'),
             mock.patch('os.path.abspath', side_effect=lambda p: p),
@@ -109,8 +103,9 @@ class JobOptionsTests(test_utils.TestBase):
 
     def test_no_repo_tmp_when_tmpdir_not_repo_local(self) -> None:
         repo_path = '/fake/repo'
+        beam_tmp = os.path.join(repo_path, 'tmp', 'beam')
         with (
-            mock.patch.dict(job_options.constants, {'DEV_MODE': True}),
+            mock.patch.dict(constants, {'DEV_MODE': True}),
             mock.patch.dict(os.environ, {'TMPDIR': '/system/tmp'}),
             mock.patch('os.getcwd', return_value=repo_path),
             mock.patch('os.path.abspath', side_effect=lambda p: p),
@@ -118,45 +113,7 @@ class JobOptionsTests(test_utils.TestBase):
         ):
             options = job_options.JobOptions()
 
-            mock_makedirs.assert_not_called()
-            self.assertEqual(
-                options.view_as(
-                    pipeline_options.GoogleCloudOptions
-                ).temp_location,
-                'gs://dev-project-id-beam-jobs-temp/',
-            )
-            self.assertEqual(
-                options.view_as(
-                    pipeline_options.GoogleCloudOptions
-                ).staging_location,
-                'gs://dev-project-id-beam-jobs-staging/',
-            )
-
-    def test_env_setting_failure_handled_gracefully(self) -> None:
-        repo_path = '/fake/repo'
-        beam_tmp = os.path.join(repo_path, 'tmp', 'beam')
-        with (
-            mock.patch.dict(job_options.constants, {'DEV_MODE': True}),
-            mock.patch.dict(
-                os.environ, {'TMPDIR': os.path.join(repo_path, 'tmp')}
-            ),
-            mock.patch('os.getcwd', return_value=repo_path),
-            mock.patch('os.path.abspath', side_effect=lambda p: p),
-            mock.patch('os.makedirs'),
-            mock.patch.object(tempfile, 'tempdir', None),
-        ):
-            # Simulate failure by making os.environ assignment fail.
-            original_setitem = os.environ.__setitem__
-
-            def failing_setitem(key, value):
-                if key in ['TMPDIR', 'TMP', 'TEMP']:
-                    raise OSError('Simulated failure')
-                return original_setitem(key, value)
-
-            with mock.patch.object(os.environ, '__setitem__', failing_setitem):
-                options = job_options.JobOptions()
-
-            # Should still set temp_location and staging_location.
+            mock_makedirs.assert_called_once_with(beam_tmp, exist_ok=True)
             self.assertEqual(
                 options.view_as(
                     pipeline_options.GoogleCloudOptions

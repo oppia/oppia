@@ -76,38 +76,15 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             )
         oppia_project_id = app_identity_services.get_application_id()
         assert isinstance(oppia_project_id, str)
-        # Determine an appropriate temp_location for Beam. In the developer
-        # environment, this should be opensource/oppia/tmp. In production,
-        # this should be a GCS path.
-        default_temp_location = (
-            feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id
-        )
-        default_staging_location = (
-            feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id
-        )
 
-        # If it's a dev environment, and TMPDIR points inside the repo, use
-        # a repo-local tmp for Beam temp files so they are deterministic and
-        # easier to clean up during local development.
+        # In dev mode, make sure the process uses the repository's tmp dir,
+        # rather than the filesystem's /tmp.
         repo_tmp_dir = None
         if constants.DEV_MODE and not feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER:
             try:
-                tmpdir_env = os.environ.get('TMPDIR') or os.environ.get('TMP')
-                if tmpdir_env and os.getcwd() in os.path.abspath(tmpdir_env):
-                    repo_tmp_dir = os.path.join(os.getcwd(), 'tmp', 'beam')
-                    os.makedirs(repo_tmp_dir, exist_ok=True)
-            except Exception:
-                repo_tmp_dir = None
-
-        # If a repo-local Beam tmp was selected, make sure the process uses it
-        # as the system tempdir so python tempfile and Beam's temporary
-        # directories are created under the repository (not /tmp).
-        if repo_tmp_dir:
-            try:
-                os.environ['TMPDIR'] = repo_tmp_dir
-                os.environ['TMP'] = repo_tmp_dir
-                os.environ['TEMP'] = repo_tmp_dir
+                repo_tmp_dir = os.path.join(os.getcwd(), 'tmp', 'beam')
                 tempfile.tempdir = repo_tmp_dir
+                os.makedirs(repo_tmp_dir, exist_ok=True)
                 logging.getLogger(__name__).info(
                     'Using repo-local Beam tmpdir: %s', repo_tmp_dir
                 )
@@ -121,8 +98,19 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             # Needed by GoogleCloudOptions.
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
-            temp_location=(repo_tmp_dir or default_temp_location),
-            staging_location=(repo_tmp_dir or default_staging_location),
+            # Determine an appropriate temp_location for Beam. In the developer
+            # environment, this should be opensource/oppia/tmp. In production,
+            # this should be a GCS path.
+            temp_location=(
+                repo_tmp_dir
+                or (feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id)
+            ),
+            staging_location=(
+                repo_tmp_dir
+                or (
+                    feconf.DATAFLOW_STAGING_LOCATION_TEMPLATE % oppia_project_id
+                )
+            ),
             # The 'use_runner_v2' is used since some of our jobs require
             # the v2 of the runner. See the docs:
             # https://cloud.google.com/dataflow/docs/guides/deploying-a-pipeline#dataflow-runner-v2
