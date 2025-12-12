@@ -955,5 +955,5 @@ export class MusicNotesInputComponent
   }
 }
 
-// music interaction is not working well.
+// Music interaction is not working well.
 // We will probably deprecate it, since it's rarely used.
