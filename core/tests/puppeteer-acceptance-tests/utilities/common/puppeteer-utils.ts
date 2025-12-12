@@ -16,7 +16,13 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle, CDPSession} from 'puppeteer';
+import puppeteer, {
+  Page,
+  Browser,
+  Viewport,
+  ElementHandle,
+  CDPSession,
+} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
