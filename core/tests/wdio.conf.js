@@ -29,20 +29,12 @@ var suites = {
     './core/tests/webdriverio_desktop/**/*.js',
   ],
 
-  accessibility: [
-    './core/tests/webdriverio/accessibility.js'
-  ],
-
   additionalEditorFeatures: [
     './core/tests/webdriverio_desktop/additionalEditorFeatures.js'
   ],
 
   additionalEditorFeaturesModals: [
     './core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js'
-  ],
-
-  additionalPlayerFeatures: [
-    './core/tests/webdriverio_desktop/additionalPlayerFeatures.js'
   ],
 
   blog: [
@@ -55,14 +47,6 @@ var suites = {
 
   contributorAdminDashboard: [
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
-  ],
-
-  contributorDashboard: [
-    './core/tests/webdriverio_desktop/contributorDashboard.js'
-  ],
-
-  coreEditorAndPlayerFeatures: [
-    './core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js'
   ],
 
   creatorDashboard: [
@@ -95,10 +79,6 @@ var suites = {
 
   navigation: [
     './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
-  profileMenu: [
-    './core/tests/webdriverio/profileMenuFlow.js'
   ],
 
   publication: [
@@ -256,26 +236,23 @@ exports.config = {
    * @param {Array.<String>} specs   List of spec file paths that are to be run
    * @param {Object}         browser instance of created browser/device session
    */
-  before: function() {
+  before: async function() {
     // eslint-disable-next-line eqeqeq
     mobileViewportArg = process.env.MOBILE == 'true';
 
     // eslint-disable-next-line eqeqeq
     if (mobileViewportArg) {
-      browser.setWindowSize(600, 1000);
+      await browser.setWindowSize(600, 1000);
     } else {
       // Set a wide enough window size for the navbar in the library pages to
       // display fully.
-      browser.setWindowSize(1285, 1000);
+      await browser.setWindowSize(1285, 1000);
     }
 
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
     FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
-
-    // Navigate to the splash page so that tests can begin on an Angular page.
-    browser.url('http://localhost:8181');
   },
   /**
     * Function to be executed before a test (in Mocha/Jasmine only)
