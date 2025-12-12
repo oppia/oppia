@@ -70,11 +70,11 @@
     </div>
     <button type="button"
             [disabled]="isCardContentLengthLimitReached()"
-            class="btn btn-success oppia-save-state-item-button e2e-test-save-state-content float-right"
+            class="btn btn-success oppia-save-state-item-button e2e-test-save-state-content float-end"
             (click)="onSaveContentButtonClicked()">
       {{ stateContentSaveButtonPlaceholder }}
     </button>
-    <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
+    <button type="button" class="btn btn-secondary float-end" (click)="cancelEdit()">Cancel</button>
     <div class="oppia-clear"></div>
   </div>
 </div>

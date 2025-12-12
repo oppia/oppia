@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import importlib.metadata
 import itertools
 import json
 import os
@@ -26,12 +27,11 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
-import pkg_resources
 from typing import Dict, List, Optional, Set, Tuple
 
 
@@ -54,31 +54,20 @@ class Distribution:
             metadata_dict: dict(str: str). The stringified metadata contents of
                 the library.
         """
-        self.project_name = library_name
+        self.name = library_name
         self.version = version_string
         self.metadata_dict = metadata_dict
 
-    def has_metadata(self, key: str) -> bool:
-        """Returns whether the given metadata key exists.
+    def read_text(self, filename: str) -> Optional[str]:
+        """Returns the contents of the given metadata file.
 
         Args:
-            key: str. The key corresponding to the metadata.
+            filename: str. The filename corresponding to the metadata.
 
         Returns:
-            bool. Whether the metadata exists.
+            str|None. The contents of the metadata file, or None if not found.
         """
-        return key in self.metadata_dict
-
-    def get_metadata(self, key: str) -> str:
-        """The contents of the corresponding metadata.
-
-        Args:
-            key: str. The key corresponding to the metadata.
-
-        Returns:
-            str. The contents of the metadata.
-        """
-        return self.metadata_dict[key]
+        return self.metadata_dict.get(filename)
 
 
 class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
@@ -105,46 +94,24 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-        self.file_arr: List[str] = []
+        def mock_prepend_comment_to_requirements_file() -> None:
+            pass
 
-        def mock_write(msg: str) -> None:
-            self.file_arr.append(msg)
-
-        class MockFile:
-            def seek(  # pylint: disable=missing-docstring
-                self, start: int, stop: int
-            ) -> None:
-                pass
-
-            def read(self) -> str:  # pylint: disable=missing-docstring
-                return ''
-
-            def write(  # pylint: disable=missing-docstring
-                self, buf: str
-            ) -> None:
-                mock_write(buf)
-
-        class MockOpenFile:
-            def __init__(
-                self, path: Optional[str] = None, mode: Optional[str] = None
-            ) -> None:
-                self.path = path
-                self.mode = mode
-
-            def __enter__(self) -> MockFile:
-                return MockFile()
-
-            def __exit__(self, *args: int) -> None:
-                pass
-
-        self.open_file_swap = self.swap(utils, 'open_file', MockOpenFile)
+        self.swap_prepend_comment = self.swap(
+            install_python_prod_dependencies,
+            'prepend_comment_to_requirements_file',
+            mock_prepend_comment_to_requirements_file,
+        )
 
         self.cmd_token_list: List[List[str]] = []
 
         def mock_check_call(
             cmd_tokens: List[str], **_kwargs: str
         ) -> scripts_test_utils.PopenStub:  # pylint: disable=unused-argument
-            if cmd_tokens and cmd_tokens[0].endswith('%spython' % os.path.sep):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('%spython' % os.path.sep)
+                or cmd_tokens[0].endswith('%spython3' % os.path.sep)
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -153,7 +120,10 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return scripts_test_utils.PopenStub()
 
         def mock_run(cmd_tokens: List[str], **_kwargs: str) -> str:
-            if cmd_tokens and cmd_tokens[0].endswith('python'):
+            if cmd_tokens and (
+                cmd_tokens[0].endswith('python')
+                or cmd_tokens[0].endswith('python3')
+            ):
                 # Some commands use the path to the Python executable. To make
                 # specifying expected commands easier, replace these with just
                 # "python".
@@ -225,7 +195,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
         def mock_find_distributions(  # pylint: disable=unused-argument
-            paths: List[str],
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -263,7 +233,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ]
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         with swap_requirements, swap_find_distributions:
             self.assertEqual(
@@ -321,7 +291,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
-            with self.open_file_swap, swap_get_mismatches:
+            with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -393,24 +363,32 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             mock_get_mismatches,
         )
 
-        with self.swap_check_call, self.swap_Popen, self.open_file_swap:
+        with self.swap_check_call, self.swap_Popen, self.swap_prepend_comment:
             with swap_get_mismatches, swap_validate_metadata_directories:
                 with self.swap_run:
                     install_python_prod_dependencies.main()
 
+        # Check that the pip-compile command was run first.
         self.assertEqual(
-            self.cmd_token_list,
+            self.cmd_token_list[0],
             [
-                [
-                    'pip-compile',
-                    '--no-emit-index-url',
-                    '--quiet',
-                    '--strip-extras',
-                    '--generate-hashes',
-                    'requirements.in',
-                    '--output-file',
-                    'requirements.txt',
-                ],
+                'pip-compile',
+                '--no-emit-index-url',
+                '--quiet',
+                '--strip-extras',
+                '--generate-hashes',
+                'requirements.in',
+                '--output-file',
+                'requirements.txt',
+            ],
+        )
+
+        # Check that all the expected install commands were run (order doesn't
+        # matter for the install commands since dependencies can be processed
+        # in any order).
+        self.assertCountEqual(
+            self.cmd_token_list[1:],
+            [
                 [
                     'python',
                     '-m',
@@ -498,7 +476,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
-            with self.open_file_swap, swap_get_mismatches:
+            with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -534,55 +512,46 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ],
         )
 
-    def test_main_adds_comment_to_start_of_requirements(self) -> None:
-        def mock_get_mismatches() -> (
-            install_python_prod_dependencies.MismatchType
-        ):
-            return {}
-
-        def mock_validate_metadata_directories() -> None:
-            pass
-
-        swap_validate_metadata_directories = self.swap(
-            install_python_prod_dependencies,
-            'validate_metadata_directories',
-            mock_validate_metadata_directories,
-        )
-        swap_get_mismatches = self.swap(
-            install_python_prod_dependencies,
-            'get_mismatches',
-            mock_get_mismatches,
+    def test_prepend_comment_to_requirements_file(self) -> None:
+        """Test that the comment is correctly prepended to the requirements
+        file. This tests the extracted function directly using a temporary
+        file.
+        """
+        # Create a temporary file with some initial content.
+        initial_content = 'flask==1.0.0\nrequests==2.0.0\n'
+        expected_comment = (
+            '# Developers: Please do not modify this auto-generated file. If\n'
+            '# you want to add, remove, upgrade, or downgrade libraries,\n'
+            '# please change the `requirements.in` file, and then follow\n'
+            '# the instructions there to regenerate this file.\n'
         )
 
-        expected_lines = [
-            '# Developers: Please do not modify this auto-generated file.'
-            ' If\n# you want to add, remove, upgrade, or downgrade libraries,'
-            '\n# please change the `requirements.in` file, and then follow\n#'
-            ' the instructions there to regenerate this file.\n'
-        ]
-        self.assertEqual(self.file_arr, [])
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.txt', delete=False, encoding='utf-8'
+        ) as temp_file:
+            temp_file.write(initial_content)
+            temp_file_path = temp_file.name
 
-        with self.swap_check_call, self.open_file_swap, self.swap_run:
-            with swap_get_mismatches, swap_validate_metadata_directories:
-                install_python_prod_dependencies.main()
+        try:
+            # Swap the path to use our temporary file.
+            swap_requirements_path = self.swap(
+                common,
+                'COMPILED_REQUIREMENTS_FILE_PATH',
+                temp_file_path,
+            )
 
-        self.assertEqual(self.file_arr, expected_lines)
+            with swap_requirements_path:
+                install_python_prod_dependencies.prepend_comment_to_requirements_file()
 
-        self.assertEqual(
-            self.cmd_token_list,
-            [
-                [
-                    'pip-compile',
-                    '--no-emit-index-url',
-                    '--quiet',
-                    '--strip-extras',
-                    '--generate-hashes',
-                    'requirements.in',
-                    '--output-file',
-                    'requirements.txt',
-                ],
-            ],
-        )
+            # Read the file and verify the content.
+            with open(temp_file_path, 'r', encoding='utf-8') as f:
+                result_content = f.read()
+
+            self.assertEqual(
+                result_content, '%s%s' % (expected_comment, initial_content)
+            )
+        finally:
+            os.remove(temp_file_path)
 
     def test_main_without_library_mismatches_calls_correct_functions(
         self,
@@ -613,7 +582,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
         swap_print = self.swap(builtins, 'print', mock_print)
         with self.swap_run, swap_get_mismatches, swap_print:
-            with swap_validate_metadata_directories, self.open_file_swap:
+            with swap_validate_metadata_directories, self.swap_prepend_comment:
                 install_python_prod_dependencies.main()
 
         self.assertEqual(
@@ -703,7 +672,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
-            with swap_validate_metadata_directories, self.open_file_swap:
+            with swap_validate_metadata_directories, self.swap_prepend_comment:
                 with swap_rm_tree, swap_list_dir, swap_is_dir, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -777,12 +746,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
 
     def test_correct_metadata_directory_names_do_not_throw_error(self) -> None:
-        def mock_find_distributions(
-            unused_paths: List[str],
+        def mock_find_distributions(  # pylint: disable=unused-argument
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency-1', '1.5.1', {}),
                 Distribution('dependency2', '5.0.0', {}),
+                Distribution('dependency3-hyphenated', '3.4.0', {}),
+                Distribution('dependency4.multi-word-suffix', '1.1.2', {}),
                 Distribution('dependency-5', '0.5.3', {}),
                 Distribution(
                     'dependency6',
@@ -805,6 +776,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return [
                 'dependency-1-1.5.1.dist-info',
                 'dependency2-5.0.0.egg-info',
+                'dependency3.hyphenated-3.4.0.dist-info',
+                'dependency4.multi_word_suffix-1.1.2.dist-info',
                 'dependency-5-0.5.3-py3.10.egg-info',
                 'dependency_6-0.5.3-py3.10.egg-info',
             ]
@@ -813,7 +786,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -824,8 +797,8 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
     def test_exception_raised_when_metadata_directory_names_are_missing(
         self,
     ) -> None:
-        def mock_find_distributions(
-            unused_paths: List[str],
+        def mock_find_distributions(  # pylint: disable=unused-argument
+            path: Optional[List[str]] = None,
         ) -> List[Distribution]:
             return [
                 Distribution('dependency1', '1.5.1', {}),
@@ -862,7 +835,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             return True
 
         swap_find_distributions = self.swap(
-            pkg_resources, 'find_distributions', mock_find_distributions
+            importlib.metadata, 'distributions', mock_find_distributions
         )
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
@@ -889,7 +862,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         library_name_pattern = re.compile(
             r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
         )
-        with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -995,12 +970,22 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
     def test_normalize_python_library_name(self) -> None:
         expected_normalized_names = [
-            ('backports-tarfile', 'backports.tarfile'),
-            ('backports-tarfile-2', 'backports.tarfile-2'),
+            ('backports-tarfile', 'backports-tarfile'),
+            ('backports.tarfile', 'backports-tarfile'),
+            ('backports_tarfile', 'backports-tarfile'),
+            ('backports-tarfile-2', 'backports-tarfile-2'),
+            (
+                'keyrings.google_artifactregistry_auth',
+                'keyrings-google-artifactregistry-auth',
+            ),
             ('apache-beam[gcp]', 'apache-beam'),
             ('Pillow', 'pillow'),
             ('pylatexenc', 'pylatexenc'),
             ('PyYAML', 'pyyaml'),
+            ('importlib-metadata', 'importlib-metadata'),
+            ('importlib_metadata', 'importlib-metadata'),
+            ('typing-extensions', 'typing-extensions'),
+            ('typing_extensions', 'typing-extensions'),
         ]
 
         for lib_name, expected_normalized_name in expected_normalized_names:
@@ -1024,7 +1009,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(common.REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -1045,7 +1030,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
