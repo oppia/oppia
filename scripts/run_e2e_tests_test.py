@@ -513,7 +513,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             )
         )
 
-        run_e2e_tests.main(args=['--skip-install', '--skip-build'])
+        run_e2e_tests.main(args=['--skip_install', '--skip_build'])
 
     def test_start_tests_in_debug_mode(self) -> None:
         self.exit_stack.enter_context(

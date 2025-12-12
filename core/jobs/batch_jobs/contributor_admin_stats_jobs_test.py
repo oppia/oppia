@@ -33,26 +33,32 @@ from core.jobs.batch_jobs import contributor_admin_stats_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Mapping, Type
+from typing import Any, Final, List, Mapping, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
         exp_models,
+        opportunity_models,
         story_models,
         suggestion_models,
         topic_models,
     )
 
-(exp_models, story_models, suggestion_models, topic_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.STORY,
-            models.Names.SUGGESTION,
-            models.Names.TOPIC,
-        ]
-    )
+(
+    exp_models,
+    opportunity_models,
+    story_models,
+    suggestion_models,
+    topic_models,
+) = models.Registry.import_models(
+    [
+        models.Names.EXPLORATION,
+        models.Names.OPPORTUNITY,
+        models.Names.STORY,
+        models.Names.SUGGESTION,
+        models.Names.TOPIC,
+    ]
 )
 
 
@@ -1162,6 +1168,59 @@ class ContributorDashboardTest(job_test_utils.JobTestBase):
             'topic2', 'name1', 2, 1
         )
 
+        self.exp_opportunity_model_1 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.target_id,
+            topic_id='topic1',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='story1',
+            story_title='story title',
+            topic_name='name1',
+        )
+        self.exp_opportunity_model_2 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.target_id_2,
+            topic_id='topic2',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='story2',
+            story_title='story title',
+            topic_name='name2',
+        )
+        self.exp_opportunity_model_3 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.target_id_3,
+            topic_id='topic3',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='story3',
+            story_title='story title',
+            topic_name='name3',
+        )
+        self.exp_opportunity_model_4 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id=self.target_id,
+            topic_id='topic4',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='story4',
+            story_title='story title',
+            topic_name='name4',
+        )
+        self.skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id=self.target_id,
+            skill_description='A skill description',
+            question_count=3,
+        )
+        self.skill_opportunity_model_2 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id=self.target_id_2,
+            skill_description='A skill description',
+            question_count=2,
+        )
+
 
 class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
@@ -1206,22 +1265,11 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_suggestion_accepted_model.update_timestamps()
         self.translation_suggestion_in_review_model.update_timestamps()
         self.translation_suggestion_in_review_model_user3.update_timestamps()
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-        self.topic_model_3.update_timestamps()
-        self.topic_model_4.update_timestamps()
-        self.exp_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.exp_3.update_timestamps()
-        self.exp_4.update_timestamps()
-        self.story_1.update_timestamps()
-        self.story_2.update_timestamps()
-        self.story_3.update_timestamps()
-        self.story_4.update_timestamps()
-        self.exp_context_1.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.exp_context_3.update_timestamps()
-        self.exp_context_4.update_timestamps()
+        self.exp_opportunity_model_1.update_timestamps()
+        self.exp_opportunity_model_2.update_timestamps()
+        self.exp_opportunity_model_3.update_timestamps()
+        self.skill_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_2.update_timestamps()
 
         self.put_multi(
             [
@@ -1258,22 +1306,11 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 self.translation_suggestion_accepted_model,
                 self.translation_suggestion_in_review_model,
                 self.translation_suggestion_in_review_model_user3,
-                self.topic_model_1,
-                self.topic_model_2,
-                self.topic_model_3,
-                self.topic_model_4,
-                self.exp_1,
-                self.exp_2,
-                self.exp_3,
-                self.exp_4,
-                self.story_1,
-                self.story_2,
-                self.story_3,
-                self.story_4,
-                self.exp_context_1,
-                self.exp_context_2,
-                self.exp_context_3,
-                self.exp_context_4,
+                self.exp_opportunity_model_1,
+                self.exp_opportunity_model_2,
+                self.exp_opportunity_model_3,
+                self.skill_opportunity_model_1,
+                self.skill_opportunity_model_2,
             ]
         )
 
@@ -1603,17 +1640,14 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                     edited_by_reviewer=False,
                 ).put()
 
-        self.topic_model_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.story_2.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.put_multi(
-            [self.topic_model_1, self.exp_2, self.story_2, self.exp_context_2]
-        )
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_1.put()
         self.question_contribution_model_1.update_timestamps()
         self.question_contribution_model_1.put()
+        self.skill_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_1.put()
+        self.exp_opportunity_model_2.update_timestamps()
+        self.exp_opportunity_model_2.put()
 
         self.assert_job_output_is(
             [
@@ -1644,199 +1678,72 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
 
-    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_question_suggestion(
-        self,
-    ) -> None:  # pylint: disable=line-too-long
-        self.question_contribution_model_1.update_timestamps()
-        self.question_contribution_model_2.update_timestamps()
-        self.question_contribution_model_5.update_timestamps()
+    def test_job_give_error_outputs(self) -> None:
         self.question_suggestion_rejected_model.update_timestamps()
-        self.question_suggestion_accepted_with_edits_model.update_timestamps()
-        self.question_suggestion_accepted_model.update_timestamps()
-        self.question_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps()  # pylint: disable=line-too-long
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-
-        self.put_multi(
-            [
-                self.question_contribution_model_1,
-                self.question_contribution_model_2,
-                self.question_contribution_model_5,
-                self.question_suggestion_rejected_model,
-                self.question_suggestion_accepted_with_edits_model,
-                self.question_suggestion_accepted_model,
-                self.question_suggestion_accepted_model_with_incomplete_contribution_stats,  # pylint: disable=line-too-long
-                self.topic_model_1,
-                self.topic_model_2,
-            ]
-        )
-
-        # The model is only created for user1, and not for user4. The job also
-        # prints the debugging logs for user4.
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='Question Submitter Models SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout=(
-                        'Question submitter ID: user4.\nUnique skill IDs '
-                        'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
-                        '-- Topic ID: topic2\nUnique topic IDs with contribution '
-                        'stats: \n- topic1\nUnique valid topic IDs with '
-                        'contribution stats: \n- topic1\n'
-                    )
-                ),
-            ]
-        )
-
-        # Check for QuestionSubmitterTotalContributionStatsModel.
-        question_submitter_all_models = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get_all()
-        )
-        self.assertEqual(1, question_submitter_all_models.count())
-
-        question_submitter_total_stats = (
-            suggestion_models.QuestionSubmitterTotalContributionStatsModel.get(
-                'user1'
-            )
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert question_submitter_total_stats is not None
-        self.assertItemsEqual(
-            ['topic1', 'topic2'],
-            question_submitter_total_stats.topic_ids_with_question_submissions,
-        )
-        self.assertEqual(
-            ['accepted', 'accepted_with_edits', 'rejected'],
-            question_submitter_total_stats.recent_review_outcomes,
-        )
-
-    def test_job_does_not_creates_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(
-        self,
-    ) -> None:  # pylint: disable=line-too-long
-        self.translation_contribution_model_1.update_timestamps()
-        self.translation_contribution_model_2.update_timestamps()
-        self.translation_contribution_model_4.update_timestamps()
-        self.translation_contribution_model_6.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
-        self.translation_suggestion_accepted_with_edits_model.update_timestamps()  # pylint: disable=line-too-long
-        self.translation_suggestion_accepted_model.update_timestamps()
-        self.translation_suggestion_in_review_model_user4.update_timestamps()
-        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps()  # pylint: disable=line-too-long
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-        self.topic_model_3.update_timestamps()
-        self.exp_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.exp_3.update_timestamps()
-        self.story_1.update_timestamps()
-        self.story_2.update_timestamps()
-        self.story_3.update_timestamps()
-        self.exp_context_1.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.exp_context_3.update_timestamps()
+        self.exp_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_1.update_timestamps()
 
         self.put_multi(
             [
-                self.translation_contribution_model_1,
-                self.translation_contribution_model_2,
-                self.translation_contribution_model_4,
-                self.translation_contribution_model_6,
+                self.question_suggestion_rejected_model,
                 self.translation_suggestion_rejected_model_user1,
-                self.translation_suggestion_accepted_with_edits_model,
-                self.translation_suggestion_accepted_model,
-                self.translation_suggestion_in_review_model_user4,
-                self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats,  # pylint: disable=line-too-long
-                self.topic_model_1,
-                self.topic_model_2,
-                self.topic_model_3,
-                self.exp_1,
-                self.exp_2,
-                self.exp_3,
-                self.story_1,
-                self.story_2,
-                self.story_3,
-                self.exp_context_1,
-                self.exp_context_2,
-                self.exp_context_3,
+                self.exp_opportunity_model_1,
+                self.skill_opportunity_model_1,
             ]
         )
 
-        # The model is only created for user1, and not for user4. The job also
-        # prints the debugging logs for user4.
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout='Translation Submitter Models SUCCESS: 1'
+                    stderr=(
+                        'ERROR: \"Unable to create total question contribution '
+                        'stats for contributor id(user1): min() arg is an '
+                        'empty sequence\": 1'
+                    )
                 ),
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'Translation submitter ID: user4, Language code: hi\n'
-                        'Unique exp IDs with translation suggestion: \n- exp1\n-- '
-                        'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
-                        'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
-                        'IDs with contribution stats: \n- topic2\nUnique valid '
-                        'topic IDs with contribution stats: \n- topic2\n'
+                    stderr=(
+                        'ERROR: \"Unable to create total translation contribution '
+                        'stats for contributor id(user1) and language code(hi): '
+                        'min() arg is an empty sequence\": 1'
                     )
                 ),
             ]
         )
 
-        # Check for TranslationSubmitterTotalContributionStatsModel.
-        translation_submitter_all_models = (
-            suggestion_models.TranslationSubmitterTotalContributionStatsModel.get_all()
-        )
-        self.assertEqual(1, translation_submitter_all_models.count())
+    def test_skip_generation_if_users_are_deleted(self) -> None:
+        suggestion_models.GeneralSuggestionModel(
+            id=1,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='pid_1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=True,
+        ).put()
 
-        translation_submitter_total_stats = suggestion_models.TranslationSubmitterTotalContributionStatsModel.get(
-            'hi', 'user1'
-        )
-        # Ruling out the possibility of None for mypy type checking.
-        assert translation_submitter_total_stats is not None
-        self.assertItemsEqual(
-            ['topic1', 'topic2', 'topic3'],
-            translation_submitter_total_stats.topic_ids_with_translation_submissions,
-        )
-        self.assertEqual(
-            ['accepted', 'accepted_with_edits', 'rejected'],
-            translation_submitter_total_stats.recent_review_outcomes,
-        )
+        suggestion_models.GeneralSuggestionModel(
+            id=2,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='pid_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+        ).put()
 
-    def test_job_does_not_creates_stats_if_no_contribution_stats_model_exist(
-        self,
-    ) -> None:  # pylint: disable=line-too-long
-        self.translation_suggestion_accepted_with_edits_model.update_timestamps()  # pylint: disable=line-too-long
-        self.topic_model_2.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.story_2.update_timestamps()
-        self.exp_context_2.update_timestamps()
-
-        self.put_multi(
-            [
-                self.translation_suggestion_accepted_with_edits_model,
-                self.topic_model_2,
-                self.exp_2,
-                self.story_2,
-                self.exp_context_2,
-            ]
-        )
-
-        # The model is only created for user1, and not for user4. The job also
-        # prints the debugging logs for user4.
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout=(
-                        'Translation submitter ID: user1, Language code: hi\n'
-                        'Unique exp IDs with translation suggestion: \n- exp2\n-- '
-                        'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
-                        'IDs with contribution stats: \nUnique valid topic IDs '
-                        'with contribution stats: \n'
-                    )
-                )
-            ]
-        )
+        self.assert_job_output_is_empty()
 
 
 class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
@@ -1877,22 +1784,11 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
         self.translation_suggestion_accepted_with_edits_model.update_timestamps()  # pylint: disable=line-too-long
         self.translation_suggestion_accepted_model.update_timestamps()
         self.translation_suggestion_in_review_model_user3.update_timestamps()
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-        self.topic_model_3.update_timestamps()
-        self.topic_model_4.update_timestamps()
-        self.exp_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.exp_3.update_timestamps()
-        self.exp_4.update_timestamps()
-        self.story_1.update_timestamps()
-        self.story_2.update_timestamps()
-        self.story_3.update_timestamps()
-        self.story_4.update_timestamps()
-        self.exp_context_1.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.exp_context_3.update_timestamps()
-        self.exp_context_4.update_timestamps()
+        self.exp_opportunity_model_1.update_timestamps()
+        self.exp_opportunity_model_2.update_timestamps()
+        self.exp_opportunity_model_3.update_timestamps()
+        self.skill_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_2.update_timestamps()
 
         self.put_multi(
             [
@@ -1923,22 +1819,11 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 self.translation_suggestion_accepted_with_edits_model,
                 self.translation_suggestion_accepted_model,
                 self.translation_suggestion_in_review_model_user3,
-                self.topic_model_1,
-                self.topic_model_2,
-                self.topic_model_3,
-                self.topic_model_4,
-                self.exp_1,
-                self.exp_2,
-                self.exp_3,
-                self.exp_4,
-                self.story_1,
-                self.story_2,
-                self.story_3,
-                self.story_4,
-                self.exp_context_1,
-                self.exp_context_2,
-                self.exp_context_3,
-                self.exp_context_4,
+                self.exp_opportunity_model_1,
+                self.exp_opportunity_model_2,
+                self.exp_opportunity_model_3,
+                self.skill_opportunity_model_1,
+                self.skill_opportunity_model_2,
             ]
         )
 
@@ -1992,17 +1877,14 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 edited_by_reviewer=True,
             ).put()
 
-        self.topic_model_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.story_2.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.put_multi(
-            [self.topic_model_1, self.exp_2, self.story_2, self.exp_context_2]
-        )
         self.translation_contribution_model_1.update_timestamps()
         self.translation_contribution_model_1.put()
         self.question_contribution_model_1.update_timestamps()
         self.question_contribution_model_1.put()
+        self.skill_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_1.put()
+        self.exp_opportunity_model_2.update_timestamps()
+        self.exp_opportunity_model_2.put()
 
         self.assert_job_output_is(
             [
@@ -2015,123 +1897,72 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
             ]
         )
 
-    def test_job_does_not_audits_stats_if_contribution_stats_model_does_not_exist_for_a_suggestion(
-        self,
-    ) -> None:  # pylint: disable=line-too-long
-
-        self.question_contribution_model_1.update_timestamps()
-        self.question_contribution_model_2.update_timestamps()
-        self.question_contribution_model_5.update_timestamps()
+    def test_job_give_error_outputs(self) -> None:
         self.question_suggestion_rejected_model.update_timestamps()
-        self.question_suggestion_accepted_with_edits_model.update_timestamps()
-        self.question_suggestion_accepted_model.update_timestamps()
-        self.question_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps()  # pylint: disable=line-too-long
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-
-        self.put_multi(
-            [
-                self.question_contribution_model_1,
-                self.question_contribution_model_2,
-                self.question_contribution_model_5,
-                self.question_suggestion_rejected_model,
-                self.question_suggestion_accepted_with_edits_model,
-                self.question_suggestion_accepted_model,
-                self.question_suggestion_accepted_model_with_incomplete_contribution_stats,  # pylint: disable=line-too-long
-                self.topic_model_1,
-                self.topic_model_2,
-            ]
-        )
-
-        # The model is only created for user1, and not for user4. The job also
-        # prints the debugging logs for user4.
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stdout='Question Submitter Models SUCCESS: 1'
-                ),
-                job_run_result.JobRunResult(
-                    stdout=(
-                        'Question submitter ID: user4.\nUnique skill IDs '
-                        'with question suggestion: \n- exp1\n-- Topic ID: topic1\n'
-                        '-- Topic ID: topic2\nUnique topic IDs with contribution '
-                        'stats: \n- topic1\nUnique valid topic IDs with '
-                        'contribution stats: \n- topic1\n'
-                    )
-                ),
-            ]
-        )
-
-    def test_job_does_not_audits_stats_if_contribution_stats_model_does_not_exist_for_a_translation_suggestion(
-        self,
-    ) -> None:  # pylint: disable=line-too-long
-        self.translation_contribution_model_1.update_timestamps()
-        self.translation_contribution_model_2.update_timestamps()
-        self.translation_contribution_model_4.update_timestamps()
-        self.translation_contribution_model_6.update_timestamps()
         self.translation_suggestion_rejected_model_user1.update_timestamps()
-        self.translation_suggestion_accepted_with_edits_model.update_timestamps()  # pylint: disable=line-too-long
-        self.translation_suggestion_accepted_model.update_timestamps()
-        self.translation_suggestion_in_review_model_user4.update_timestamps()
-        self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats.update_timestamps()  # pylint: disable=line-too-long
-        self.topic_model_1.update_timestamps()
-        self.topic_model_2.update_timestamps()
-        self.topic_model_3.update_timestamps()
-        self.exp_1.update_timestamps()
-        self.exp_2.update_timestamps()
-        self.exp_3.update_timestamps()
-        self.story_1.update_timestamps()
-        self.story_2.update_timestamps()
-        self.story_3.update_timestamps()
-        self.exp_context_1.update_timestamps()
-        self.exp_context_2.update_timestamps()
-        self.exp_context_3.update_timestamps()
+        self.exp_opportunity_model_1.update_timestamps()
+        self.skill_opportunity_model_1.update_timestamps()
 
         self.put_multi(
             [
-                self.translation_contribution_model_1,
-                self.translation_contribution_model_2,
-                self.translation_contribution_model_4,
-                self.translation_contribution_model_6,
+                self.question_suggestion_rejected_model,
                 self.translation_suggestion_rejected_model_user1,
-                self.translation_suggestion_accepted_with_edits_model,
-                self.translation_suggestion_accepted_model,
-                self.translation_suggestion_in_review_model_user4,
-                self.transaltion_suggestion_accepted_model_with_incomplete_contribution_stats,  # pylint: disable=line-too-long
-                self.topic_model_1,
-                self.topic_model_2,
-                self.topic_model_3,
-                self.exp_1,
-                self.exp_2,
-                self.exp_3,
-                self.story_1,
-                self.story_2,
-                self.story_3,
-                self.exp_context_1,
-                self.exp_context_2,
-                self.exp_context_3,
+                self.exp_opportunity_model_1,
+                self.skill_opportunity_model_1,
             ]
         )
 
-        # The model is only created for user1, and not for user4. The job also
-        # prints the debugging logs for user4.
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult(
-                    stdout='Translation Submitter Models SUCCESS: 1'
+                    stderr=(
+                        'ERROR: "Unable to create total question contribution '
+                        'stats for contributor id(user1): min() arg is an '
+                        'empty sequence": 1'
+                    )
                 ),
                 job_run_result.JobRunResult(
-                    stdout=(
-                        'Translation submitter ID: user4, Language code: hi\n'
-                        'Unique exp IDs with translation suggestion: \n- exp1\n-- '
-                        'Story ID: story1\n---- Topic ID: topic1\n- exp2\n-- '
-                        'Story ID: story2\n---- Topic ID: topic2\nUnique topic '
-                        'IDs with contribution stats: \n- topic2\nUnique valid '
-                        'topic IDs with contribution stats: \n- topic2\n'
+                    stderr=(
+                        'ERROR: "Unable to create total translation contribution '
+                        'stats for contributor id(user1) and language code(hi): '
+                        'min() arg is an empty sequence": 1'
                     )
                 ),
             ]
         )
+
+    def test_skip_audit_if_users_are_deleted(self) -> None:
+        suggestion_models.GeneralSuggestionModel(
+            id=1,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id=self.target_id_2,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id='pid_1',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code='hi',
+            edited_by_reviewer=True,
+        ).put()
+
+        suggestion_models.GeneralSuggestionModel(
+            id=2,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_SKILL,
+            target_id=self.target_id,
+            target_version_at_submission=self.target_version_at_submission,
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='pid_2',
+            final_reviewer_id='reviewer_2',
+            change_cmd=self.change_cmd,
+            score_category=self.score_category,
+            language_code=None,
+            edited_by_reviewer=False,
+        ).put()
+
+        self.assert_job_output_is_empty()
 
 
 class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
@@ -2267,6 +2098,1162 @@ class AuditAndLogIncorretDataInContributorAdminStatsJobTests(
                 ),
                 job_run_result.JobRunResult(
                     stdout=('LOGGED TRANSLATION SUGGESTION COUNT SUCCESS: 3')
+                ),
+            ]
+        )
+
+
+class ValidateTotalContributionStatsJobTests(ContributorDashboardTest):
+    """Tests for ValidateTotalContributionStatsJob."""
+
+    JOB_CLASS = contributor_admin_stats_jobs.ValidateTotalContributionStatsJob
+
+    def test_empty_storage(self) -> None:
+        self.assert_job_output_is_empty()
+
+    def test_successful_validation_emits_one_translation_and_one_question(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID,
+            name='t',
+            canonical_name='t',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t',
+            canonical_story_references=[
+                {'story_id': 'story1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=1,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            language_code=self.LANGUAGE_CODE,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=3,
+            submitted_translation_word_count=30,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
+            contribution_dates=self.CONTRIBUTION_DATES,
+        )
+        contrib.update_timestamps()
+        models_to_put.append(contrib)
+
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expY',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_1.update_timestamps()
+        models_to_put.append(skill_opportunity_model_1)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            sugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expX',
+                target_version_at_submission=1,
+                status=status,
+                author_id=self.CONTRIBUTOR_USER_ID,
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='translation.X',
+                language_code=self.LANGUAGE_CODE,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(sugg)
+
+        total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id=f'{self.LANGUAGE_CODE}.{self.CONTRIBUTOR_USER_ID}',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_translation_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=[
+                'accepted',
+                'accepted_with_edits',
+                'rejected',
+            ],
+            recent_performance=0,
+            overall_accuracy=round(1 / 3 * 100, 2),
+            submitted_translations_count=3,
+            submitted_translation_word_count=30,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        total.update_timestamps()
+        models_to_put.append(total)
+
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=2,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=3,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            qsugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expY',
+                target_version_at_submission=1,
+                status=status,
+                author_id=self.CONTRIBUTOR_USER_ID,
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='question.X',
+                language_code=None,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(qsugg)
+
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id=self.CONTRIBUTOR_USER_ID,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_question_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=[
+                'accepted',
+                'accepted_with_edits',
+                'rejected',
+            ],
+            recent_performance=(1 + 1 - 2 * 1),
+            overall_accuracy=round(1 / 3 * 100, 2),
+            submitted_questions_count=3,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            rejected_questions_count=1,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_total.update_timestamps()
+        models_to_put.append(q_total)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Valid Translation Submitter Models SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='Valid Question Submitter Models SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_skip_validation_if_users_are_deleted(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID,
+            name='t',
+            canonical_name='t',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t',
+            canonical_story_references=[
+                {'story_id': 'story1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_1 = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expY',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_1.update_timestamps()
+        models_to_put.append(skill_opportunity_model_1)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            sugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expX',
+                target_version_at_submission=1,
+                status=status,
+                author_id='pid_1',
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='translation.X',
+                language_code=self.LANGUAGE_CODE,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(sugg)
+
+        for status, edited in [
+            ('accepted', False),
+            ('accepted', True),
+            ('rejected', False),
+        ]:
+            qsugg = self.create_model(
+                suggestion_models.GeneralSuggestionModel,
+                suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                target_id='expY',
+                target_version_at_submission=1,
+                status=status,
+                author_id='pid_1',
+                final_reviewer_id='rev',
+                change_cmd={},
+                score_category='question.X',
+                language_code=None,
+                edited_by_reviewer=edited,
+                created_on=datetime.datetime.utcnow(),
+            )
+            models_to_put.append(qsugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is_empty()
+
+    def test_failed_validation_for_translation_triggers_all_failure_conditions(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        bad_contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            contributor_user_id='user123',
+            language_code='zz',
+            topic_id='topic1',
+            submitted_translations_count=5,
+            submitted_translation_word_count=50,
+            accepted_translations_count=2,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=20,
+            rejected_translations_count=1,
+            rejected_translation_word_count=5,
+            contribution_dates=self.CONTRIBUTION_DATES,
+        )
+        bad_contrib.update_timestamps()
+        models_to_put.append(bad_contrib)
+
+        exp_opportunity_model_1 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp1',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_1.update_timestamps()
+        models_to_put.append(exp_opportunity_model_1)
+
+        exp_opportunity_model_2 = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp2',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_2.update_timestamps()
+        models_to_put.append(exp_opportunity_model_2)
+
+        gs1 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp1',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='user123',
+            final_reviewer_id='rev1',
+            change_cmd={},
+            score_category='translation.X',
+            language_code='zz',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.combine(
+                self.CONTRIBUTION_DATES[0], datetime.time.min
+            ),
+        )
+        gs2 = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp2',
+            target_version_at_submission=1,
+            status='rejected',
+            author_id='user123',
+            final_reviewer_id='rev1',
+            change_cmd={},
+            score_category='translation.Y',
+            language_code='zz',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.combine(
+                self.CONTRIBUTION_DATES[1], datetime.time.min
+            ),
+        )
+        models_to_put.extend([gs1, gs2])
+
+        bad_total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id='zz.user123',
+            language_code='zz',
+            contributor_id='user123',
+            topic_ids_with_translation_submissions=['other_topic'],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_translations_count=1,
+            submitted_translation_word_count=0,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            first_contribution_date=self.CONTRIBUTION_DATES[1],
+            last_contribution_date=self.CONTRIBUTION_DATES[0],
+        )
+        bad_total.update_timestamps()
+        models_to_put.append(bad_total)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Invalid Total Translation Submitter Models FAILED: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: \"\nValidation failed for '
+                        'TranslationSubmitterTotalContributionStatsModel '
+                        'zz.user123:\n'
+                        '-> missing topic_ids {\'topic1\'} in total stats\n'
+                        '-> field submitted_translations_count aggregated 5 != '
+                        'total 1\n'
+                        '-> field submitted_translation_word_count aggregated 50 '
+                        '!= total 0\n'
+                        '-> field accepted_translations_count aggregated 2 != '
+                        'total 1\n'
+                        '-> field '
+                        'accepted_translations_without_reviewer_edits_count '
+                        'aggregated 1 != total 0\n'
+                        '-> field accepted_translation_word_count aggregated 20 '
+                        '!= total 0\n'
+                        '-> field rejected_translations_count aggregated 1 != '
+                        'total 0\n'
+                        '-> field rejected_translation_word_count aggregated 5 != '
+                        'total 0\n'
+                        '-> first contribution 2022-05-02 != 2023-04-02\n'
+                        '-> last contribution 2023-04-02 != 2022-05-02\n'
+                        '-> recent outcomes [\'accepted\', \'rejected\'] != []\n'
+                        '-> recent performance -1 != 0\n'
+                        '-> accuracy 100.0 != 0.0\n\": 1'
+                    )
+                ),
+            ]
+        )
+
+    def test_failed_validation_for_question_triggers_all_failure_conditions(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # types.
+        models_to_put: List[Any] = []
+
+        # 1) Create the TopicModel so the contrib is considered "valid".
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id='topic_q',
+            name='QTopic',
+            canonical_name='QTopic',
+            description='desc',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='qtopic',
+            canonical_story_references=[
+                {'story_id': 'story1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        # 2) Create real QuestionContributionStatsModel for topic 'topic_q'.
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='user_q',
+            topic_id='topic_q',
+            submitted_questions_count=3,
+            accepted_questions_count=2,
+            accepted_questions_without_reviewer_edits_count=1,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        skill_opportunity_model_q = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='exp_q',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_q.update_timestamps()
+        models_to_put.append(skill_opportunity_model_q)
+
+        # 3) Create rejected GeneralSuggestionModel for the recent outcomes.
+        qsugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_q',
+            target_version_at_submission=1,
+            status='rejected',
+            author_id='user_q',
+            final_reviewer_id='rev_q',
+            change_cmd={},
+            score_category='question.Y',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.combine(
+                self.CONTRIBUTION_DATES[0], datetime.time.min
+            ),
+        )
+        models_to_put.append(qsugg)
+
+        # 4) Build a QuestionSubmitterTotalContributionStatsModel.
+        bad_q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id='user_q',
+            contributor_id='user_q',
+            topic_ids_with_question_submissions=['other_topic'],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=self.CONTRIBUTION_DATES[1],
+            last_contribution_date=self.CONTRIBUTION_DATES[0],
+        )
+        bad_q_total.update_timestamps()
+        models_to_put.append(bad_q_total)
+
+        # 5) Persist all of them.
+        self.put_multi(models_to_put)
+
+        # 7) We expect two question‐failure results in sequence.
+        self.assert_job_output_is(
+            [
+                # Count of invalids (always on stdout, even for errors).
+                job_run_result.JobRunResult(
+                    stdout='Invalid Total Question Submitter Models FAILED: 1'
+                ),
+                # The detailed stderr log.
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: \"\nValidation failed for '
+                        'QuestionSubmitterTotalContributionStatsModel user_q:\n'
+                        '-> missing topic_ids {\'topic_q\'} in total stats\n'
+                        '-> field submitted_questions_count aggregated 3 != total '
+                        '1\n'
+                        '-> field accepted_questions_count aggregated 2 != total '
+                        '1\n'
+                        '-> field accepted_questions_without_reviewer_edits_count '
+                        'aggregated 1 != total 0\n'
+                        '-> field rejected_questions_count 1 != total 0\n'
+                        f'-> first contribution {self.CONTRIBUTION_DATES[0]} != '
+                        f'{self.CONTRIBUTION_DATES[1]}\n'
+                        f'-> last contribution {self.CONTRIBUTION_DATES[1]} != '
+                        f'{self.CONTRIBUTION_DATES[0]}\n'
+                        '-> recent outcomes [\'rejected\'] != []\n'
+                        '-> recent performance -2 != 0\n'
+                        '-> accuracy 100.0 != 0.0\n\": 1'
+                    )
+                ),
+            ]
+        )
+
+    def test_more_than_hundred_translation_and_question_suggestions(
+        self,
+    ) -> None:
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+        recent_review_outcomes: List[str] = []
+
+        exp_opportunity_model_x = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='expX',
+            topic_id='topicx',
+            chapter_title='irelevant',
+            content_count=1,
+            story_id='storyx',
+            story_title='story title',
+            topic_name='namex',
+        )
+        exp_opportunity_model_x.update_timestamps()
+        models_to_put.append(exp_opportunity_model_x)
+
+        skill_opportunity_model_x = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='expX',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity_model_x.update_timestamps()
+        models_to_put.append(skill_opportunity_model_x)
+
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='expX',
+            target_version_at_submission=1,
+            status='review',
+            author_id=self.CONTRIBUTOR_USER_ID,
+            change_cmd={},
+            score_category='translation.X',
+            language_code=self.LANGUAGE_CODE,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+        models_to_put.append(sugg)
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='expX',
+            target_version_at_submission=1,
+            status='review',
+            author_id=self.CONTRIBUTOR_USER_ID,
+            change_cmd={},
+            score_category='translation.X',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+        models_to_put.append(sugg)
+
+        for i in range(150):
+            if i < 100:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+            elif 100 <= i < 125:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=True,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='accepted',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=True,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+            else:
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='rejected',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=self.LANGUAGE_CODE,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+                sugg = self.create_model(
+                    suggestion_models.GeneralSuggestionModel,
+                    suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+                    target_type=feconf.ENTITY_TYPE_EXPLORATION,
+                    target_id='expX',
+                    target_version_at_submission=1,
+                    status='rejected',
+                    author_id=self.CONTRIBUTOR_USER_ID,
+                    final_reviewer_id='rev',
+                    change_cmd={},
+                    score_category='translation.X',
+                    language_code=None,
+                    edited_by_reviewer=False,
+                    created_on=datetime.datetime.utcnow(),
+                )
+                models_to_put.append(sugg)
+
+        for i in range(100):
+            if i < 50:
+                recent_review_outcomes.append('accepted')
+            elif 50 <= i < 75:
+                recent_review_outcomes.append('accepted_with_edits')
+            else:
+                recent_review_outcomes.append('rejected')
+
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id=self.TOPIC_ID,
+            name='t',
+            canonical_name='t',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t',
+            canonical_story_references=[
+                {'story_id': 'story1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fragm',
+        )
+        models_to_put.append(topic)
+
+        contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=1,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            language_code=self.LANGUAGE_CODE,
+            topic_id=self.TOPIC_ID,
+            submitted_translations_count=27,
+            submitted_translation_word_count=270,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=25,
+            rejected_translation_word_count=250,
+            contribution_dates=self.CONTRIBUTION_DATES,
+        )
+        contrib.update_timestamps()
+        models_to_put.append(contrib)
+
+        total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id=f'{self.LANGUAGE_CODE}.{self.CONTRIBUTOR_USER_ID}',
+            language_code=self.LANGUAGE_CODE,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_translation_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=25,
+            overall_accuracy=round(1 / 27 * 100, 2),
+            submitted_translations_count=27,
+            submitted_translation_word_count=270,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=1,
+            accepted_translation_word_count=10,
+            rejected_translations_count=25,
+            rejected_translation_word_count=250,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        total.update_timestamps()
+        models_to_put.append(total)
+
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=2,
+            contributor_user_id=self.CONTRIBUTOR_USER_ID,
+            topic_id=self.TOPIC_ID,
+            submitted_questions_count=27,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id=self.CONTRIBUTOR_USER_ID,
+            contributor_id=self.CONTRIBUTOR_USER_ID,
+            topic_ids_with_question_submissions=[self.TOPIC_ID],
+            recent_review_outcomes=recent_review_outcomes,
+            recent_performance=25,
+            overall_accuracy=round(1 / 27 * 100, 2),
+            submitted_questions_count=27,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=1,
+            rejected_questions_count=25,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_total.update_timestamps()
+        models_to_put.append(q_total)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Valid Translation Submitter Models SUCCESS: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stdout='Valid Question Submitter Models SUCCESS: 1'
+                ),
+            ]
+        )
+
+    def test_translation_skip_recent_and_accuracy_when_zero_submissions(
+        self,
+    ) -> None:
+        # 1) Create a valid TopicModel.
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id='t0',
+            name='t0',
+            canonical_name='t0',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='t0',
+            canonical_story_references=[
+                {'story_id': 's1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='f0',
+        )
+        topic.update_timestamps()
+
+        # 2) No TranslationContributionStatsModel at all (so sums = 0).
+        # 3) One TranslationSubmitterTotalContributionStatsModel with
+        #    submitted_translations_count = 0.
+        total = self.create_model(
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel,
+            id='en.userX',
+            language_code='en',
+            contributor_id='userX',
+            topic_ids_with_translation_submissions=[],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_translations_count=0,
+            submitted_translation_word_count=0,
+            accepted_translations_count=0,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=0,
+            rejected_translations_count=0,
+            rejected_translation_word_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None,
+        )
+        total.update_timestamps()
+
+        self.put_multi([topic, total])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Valid Translation Submitter Models SUCCESS: 1'
+                )
+            ]
+        )
+
+    def test_question_skip_date_when_no_valid_contributions(self) -> None:
+        # 1) Create a valid TopicModel but no QuestionContributionStatsModel.
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id='q0',
+            name='q0',
+            canonical_name='q0',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='q0',
+            canonical_story_references=[
+                {'story_id': 's1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='f0',
+        )
+        topic.update_timestamps()
+
+        # 2) One QuestionSubmitterTotalContributionStatsModel but no
+        #    underlying contributions.
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id='userQ',
+            contributor_id='userQ',
+            topic_ids_with_question_submissions=[],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None,
+        )
+        q_total.update_timestamps()
+
+        self.put_multi([topic, q_total])
+
+        # Should succeed—no date‐related errors when there are no contributions.
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Valid Question Submitter Models SUCCESS: 1'
+                )
+            ]
+        )
+
+    def test_question_skip_accuracy_when_zero_submissions(self) -> None:
+        # Build on previous: create one minimal contribution and total=0.
+        contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            contributor_user_id='uZ',
+            topic_id='qZ',
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None,
+        )
+        contrib.update_timestamps()
+
+        q_total = self.create_model(
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel,
+            id='uZ',
+            contributor_id='uZ',
+            topic_ids_with_question_submissions=['qZ'],
+            recent_review_outcomes=[],
+            recent_performance=0,
+            overall_accuracy=0.0,
+            submitted_questions_count=0,
+            accepted_questions_count=0,
+            accepted_questions_without_reviewer_edits_count=0,
+            rejected_questions_count=0,
+            first_contribution_date=None,
+            last_contribution_date=None,
+        )
+        q_total.update_timestamps()
+
+        # We still need a valid topic to avoid the "missing topic_ids" error.
+        topic = self.create_model(
+            topic_models.TopicModel,
+            id='qZ',
+            name='qZ',
+            canonical_name='qZ',
+            description='d',
+            story_reference_schema_version=1,
+            uncategorized_skill_ids=['skill1'],
+            subtopic_schema_version=1,
+            next_subtopic_id=1,
+            language_code='en',
+            url_fragment='qZ',
+            canonical_story_references=[
+                {'story_id': 's1', 'story_is_published': False}
+            ],
+            page_title_fragment_for_web='fz',
+        )
+        topic.update_timestamps()
+
+        self.put_multi([topic, contrib, q_total])
+
+        # Should pass, because the accuracy branch is skipped when zero.
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Valid Question Submitter Models SUCCESS: 1'
+                )
+            ]
+        )
+
+    def test_translation_missing_total_emits_missing_log(self) -> None:
+        # Test missing TranslationSubmitterTotalContributionStatsModel.
+
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        # 1) Create an exploration opportunity so the suggestion is considered.
+        exp_opportunity = self.create_model(
+            opportunity_models.ExplorationOpportunitySummaryModel,
+            id='exp_missing_total',
+            topic_id='topic_missing',
+            chapter_title='irrelevant',
+            content_count=1,
+            story_id='story_missing',
+            story_title='story title',
+            topic_name='topic_missing',
+        )
+        exp_opportunity.update_timestamps()
+        models_to_put.append(exp_opportunity)
+
+        # 2) TranslationContributionStatsModel.
+        contrib = self.create_model(
+            suggestion_models.TranslationContributionStatsModel,
+            id=101,
+            contributor_user_id='u1',
+            language_code='lang1',
+            topic_id='topic_missing',
+            submitted_translations_count=2,
+            submitted_translation_word_count=20,
+            accepted_translations_count=1,
+            accepted_translations_without_reviewer_edits_count=0,
+            accepted_translation_word_count=10,
+            rejected_translations_count=1,
+            rejected_translation_word_count=10,
+            contribution_dates=self.CONTRIBUTION_DATES,
+        )
+        contrib.update_timestamps()
+        models_to_put.append(contrib)
+
+        # 3) One GeneralSuggestionModel for translation authored by u1/lang1.
+        sugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=102,
+            suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_missing_total',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='u1',
+            final_reviewer_id='rev',
+            change_cmd={},
+            score_category='translation.X',
+            language_code='lang1',
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+        models_to_put.append(sugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Missing Total Translation Submitter Models FAILED: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: \"Missing '
+                        'TranslationSubmitterTotalContributionStatsModel for key '
+                        '(\'u1\', \'lang1\'):\n'
+                        '-> TranslationContributionStatsModel:\n'
+                        '--101\n'
+                        '-> Translation GeneralSuggestionModel:\n'
+                        '--102\n\": 1'
+                    )
+                ),
+            ]
+        )
+
+    def test_question_missing_total_emits_missing_log(self) -> None:
+        # Test missing QuestionSubmitterTotalContributionStatsModel.
+
+        # Here we use type Any because this list contains models of various
+        # kinds.
+        models_to_put: List[Any] = []
+
+        # 1) Create a skill opportunity so the suggestion is considered.
+        skill_opportunity = self.create_model(
+            opportunity_models.SkillOpportunityModel,
+            id='exp_q_missing',
+            skill_description='A skill description',
+            question_count=1,
+        )
+        skill_opportunity.update_timestamps()
+        models_to_put.append(skill_opportunity)
+
+        # 2) QuestionContributionStatsModel (no matching total intentionally).
+        q_contrib = self.create_model(
+            suggestion_models.QuestionContributionStatsModel,
+            id=202,
+            contributor_user_id='uq',
+            topic_id='topic_q_missing',
+            submitted_questions_count=1,
+            accepted_questions_count=1,
+            accepted_questions_without_reviewer_edits_count=0,
+            first_contribution_date=self.CONTRIBUTION_DATES[0],
+            last_contribution_date=self.CONTRIBUTION_DATES[1],
+        )
+        q_contrib.update_timestamps()
+        models_to_put.append(q_contrib)
+
+        # 3) One GeneralSuggestionModel for question authored by uq.
+        qsugg = self.create_model(
+            suggestion_models.GeneralSuggestionModel,
+            id=203,
+            suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
+            target_type=feconf.ENTITY_TYPE_EXPLORATION,
+            target_id='exp_q_missing',
+            target_version_at_submission=1,
+            status='accepted',
+            author_id='uq',
+            final_reviewer_id='rev_q',
+            change_cmd={},
+            score_category='question.X',
+            language_code=None,
+            edited_by_reviewer=False,
+            created_on=datetime.datetime.utcnow(),
+        )
+        models_to_put.append(qsugg)
+
+        self.put_multi(models_to_put)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult(
+                    stdout='Missing Total Question Submitter Models FAILED: 1'
+                ),
+                job_run_result.JobRunResult(
+                    stderr=(
+                        'ERROR: \"Missing '
+                        'QuestionSubmitterTotalContributionStatsModel for '
+                        'key uq:\n'
+                        '-> QuestionContributionStatsModel:\n'
+                        '--202\n'
+                        '-> Question GeneralSuggestionModel:\n'
+                        '--203\n\": 1'
+                    )
                 ),
             ]
         )

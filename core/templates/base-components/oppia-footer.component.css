@@ -3,6 +3,7 @@
   compilation, here are sme additional rules that can be added to the CSS files:
   https://rtlcss.com/learn/usage-guide/control-directives .
 */
+
 .oppia-footer-container {
   margin-left: auto;
   margin-right: auto;
@@ -59,6 +60,8 @@
 .oppia-footer-container hr {
   border: 1px solid #fff;
   display: none;
+  margin: 1rem 0;
+  opacity: 1; 
   width: 100%;
 }
 
@@ -180,7 +183,7 @@
   padding-right: 10px;
 }
 
-.mr-30 {
+.me-30 {
   margin-right: 30px;
 }
 
@@ -195,7 +198,7 @@
     padding-right: 0;
   }
 
-  .col.mr-30 {
+  .col.me-30 {
     margin-right: 0;
   }
 

@@ -11,7 +11,7 @@
              role="button"
              tabindex="0">
           <i *ngIf="isEditable"
-             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-end"
              title="Edit Study Guide Section">
           </i>
         </div>
@@ -25,7 +25,7 @@
   </div>
 
   <div *ngIf="isEditable && headingEditorIsOpen">
-    <form class="form-inline"
+    <form class="d-flex align-items-center"
           (submit)="saveSection(true)">
       <div class="oppia-rule-details-header">
         <strong>Section Heading</strong>
@@ -67,7 +67,7 @@
              role="button"
              tabindex="0">
           <i *ngIf="isEditable"
-             class="fas fa-pencil-alt oppia-editor-edit-icon float-right"
+             class="fas fa-pencil-alt oppia-editor-edit-icon float-end"
              title="Edit Study Guide Section">
           </i>
         </div>
@@ -81,7 +81,7 @@
   </div>
 
   <div *ngIf="isEditable && contentEditorIsOpen" class="section-content-part">
-    <form class="form-inline"
+    <form class="d-flex align-items-center"
           (submit)="saveSection(false)">
       <div class="oppia-rule-details-header">
         <strong>Section Content</strong>
