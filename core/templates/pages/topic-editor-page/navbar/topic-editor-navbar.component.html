@@ -1,4 +1,4 @@
-<ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-right"
+<ul class="oppia-navbar-desktop nav navbar-nav oppina-navbar-nav float-end"
     *ngIf="topic && topicRights.canEditTopic()">
   <li class="oppia-navbar-dropdown-menu">
     <div ngbDropdown>
@@ -7,7 +7,8 @@
             [matTooltipDisabled]="isWarningTooltipDisabled()"
             aria-label="List that shows issues preventing to save changes to the topic"
             class="w-100">
-        <button class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-left"
+        <button type="button"
+                class="btn btn-light oppia-save-changes-button e2e-test-save-topic-button float-start"
                 [ngClass]="{'btn-success': topicIsSaveable}"
                 (click)="saveChanges()"
                 [disabled]="!topicIsSaveable">
@@ -15,8 +16,8 @@
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon oppia-topic-editor-save-icon"
                alt="Save Topic">
             </i>
-            <span class="oppia-save-publish-button-label float-left">Save Changes</span>
-            <span class="d-none d-md-block float-left oppia-change-count"
+            <span class="oppia-save-publish-button-label float-start">Save Changes</span>
+            <span class="d-none d-md-block float-start oppia-change-count"
                   *ngIf="changeListLength">
               ({{ changeListLength }})
             </span>
