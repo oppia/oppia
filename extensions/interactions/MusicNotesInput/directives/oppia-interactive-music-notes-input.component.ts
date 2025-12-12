@@ -202,18 +202,10 @@ export class MusicNotesInputComponent
     });
   }
 
-  // Remove a specific note with given noteId from noteSequence. If given
-  // noteId is not in noteSequence, nothing will be removed.
-  removeNotesFromNoteSequenceWithId(noteId: string): void {
-    this.placedNotes = this.placedNotes.filter(note => note.id !== noteId);
-  }
-
   // Sorts noteSequence elements according to the return value of the
   // compareNoteStarts function.
   _sortNoteSequence(): void {
-    this.placedNotes.sort(
-      (a, b) => (a.position?.x ?? 0) - (b.position?.x ?? 0)
-    );
+    this.noteSequence.sort(this.compareNoteStarts);
   }
 
   updateNoteSequenceFromPlacedNotes(): void {
@@ -392,6 +384,9 @@ export class MusicNotesInputComponent
       this.updateNoteSequenceFromPlacedNotes();
     }
   }
+
+  // Remove a specific note with given noteId from noteSequence. If given
+  // noteId is not in noteSequence, nothing will be removed.
 
   _removeNotesFromNoteSequenceWithId(noteId: string): void {
     this.placedNotes = this.placedNotes.filter(note => note.id !== noteId);
