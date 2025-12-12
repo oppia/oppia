@@ -334,3 +334,41 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
         self.assertEqual(lint_task_report[0].name, 'ESLint')
         self.assertEqual(lint_task_report[0].trimmed_messages, [])
+
+    def test_validate_eslint_failure(self) -> None:
+        """A test that validate ESLint failure."""
+
+        def mock_exists(path: str) -> bool:
+            return True
+
+        mock_output = f"""
+        {INVALID_TS_FILEPATH}
+        10:5  error  Something bad  @typescript-eslint/no-unused-vars
+        11:3  error  Another issue  @typescript-eslint/no-redeclare
+
+        ✖ 2 problems (2 errors, 0 warnings)
+        """
+
+        def mock_popen(*args, **kwargs):
+            return MockProcess(
+                returncode=1, stdout=mock_output.encode("utf-8"), stderr=b""
+            )
+
+        exists_swap = self.swap(os.path, "exists", mock_exists)
+        popen_swap = self.swap(subprocess, "Popen", mock_popen)
+
+        with exists_swap, popen_swap:
+            lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
+                [INVALID_TS_FILEPATH]
+            ).perform_all_lint_checks()
+
+        expected_messages = [
+            '10:5    Something bad',
+            '11:3    Another issue',
+        ]
+
+        self.validate(
+            lint_task_report=lint_task_report,
+            expected_messages=expected_messages,
+            failed_count=1,
+        )
