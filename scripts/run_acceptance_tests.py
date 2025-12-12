@@ -23,7 +23,6 @@ import shutil
 import subprocess
 import sys
 
-from core.constants import constants
 from scripts import build, common, servers
 
 from typing import Final, List, Optional, Tuple
@@ -38,7 +37,7 @@ The root folder MUST be named 'oppia'.
 )
 
 _PARSER.add_argument(
-    '--skip-build',
+    '--skip_build',
     help='If true, skips building files. The default value is false.',
     action='store_true',
 )
@@ -130,11 +129,10 @@ def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
 
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
-        if constants.EMULATOR_MODE:
-            stack.enter_context(servers.managed_firebase_auth_emulator())
-            stack.enter_context(
-                servers.managed_cloud_datastore_emulator(clear_datastore=True)
-            )
+        stack.enter_context(servers.managed_firebase_auth_emulator())
+        stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True)
+        )
 
         app_yaml_path = 'app.yaml' if args.prod_env else 'app_dev.yaml'
         stack.enter_context(

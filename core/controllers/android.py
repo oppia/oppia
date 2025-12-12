@@ -508,3 +508,103 @@ class AndroidActivityHandler(
                 activities.append(response_dict)
 
         self.render_json(activities)
+
+
+class AndroidPlatformParametersHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that returns Android platform parameters for testing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'android_min_version_code_for_recommending_app_update': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_version_code': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+            'android_min_supported_api_level': {
+                'schema': {'type': 'int'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns platform parameters as a JSON array of objects.
+
+        This is a temporary implementation that allows query parameters to override
+        defaults. Schema validation ensures that invalid parameter values result in
+        a 400 error response.
+
+        Each list item has:
+            - name (str): the parameter name.
+            - value (int): the resolved parameter value.
+
+        Query parameters may override defaults.
+        """
+        assert self.normalized_request is not None
+
+        defaults = {
+            'android_min_version_code_for_recommending_app_update': 0,
+            'android_min_supported_version_code': 0,
+            'android_min_supported_api_level': 21,
+        }
+
+        result = []
+        for name, default_value in defaults.items():
+            override = self.normalized_request.get(name)
+            value = override if override is not None else default_value
+            result.append({'name': name, 'value': value})
+
+        self.render_json(result)
+
+
+class AndroidFeatureFlagsHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Handler that returns Android feature flags for testing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            'android_enable_fast_language_switching_in_lesson': {
+                'schema': {'type': 'bool'},
+                'default_value': None,
+            },
+        }
+    }
+
+    @acl_decorators.open_access
+    def get(self) -> None:
+        """Returns Android feature flags as a JSON list of objects.
+
+        Each item in the returned list has the structure:
+            {
+                'name': str,       # The name of the feature flag.
+                'enabled': bool    # Whether the flag is enabled.
+            }
+
+        Query parameters may override the default values. Schema validation
+        ensures that each override is a valid boolean; invalid values result in
+        a 400 error.
+        """
+        assert self.normalized_request is not None
+
+        defaults = {
+            'android_enable_fast_language_switching_in_lesson': False,
+        }
+
+        result = []
+        for name, default_enabled in defaults.items():
+            override = self.normalized_request.get(name)
+            enabled = override if override is not None else default_enabled
+            result.append({'name': name, 'enabled': enabled})
+
+        self.render_json(result)

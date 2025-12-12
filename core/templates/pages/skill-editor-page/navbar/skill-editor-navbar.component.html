@@ -1,4 +1,4 @@
-<ul class="nav navbar-nav oppia-navbar-nav float-right"
+<ul class="nav navbar-nav oppia-navbar-nav float-end"
     id="skill-editor-navbar-desktop"
     *ngIf="!isLoadingSkill()">
   <li class="oppia-publish-button-container"
@@ -12,8 +12,8 @@
           <span title="Publish Changes">
             <i class="fas fa-save md-18 md-dark oppia-save-publish-button-icon">
             </i>
-            <span class="oppia-save-publish-button-label float-left e2e-test-publish-skill-changes-button">Publish Changes</span>
-            <span class="d-none d-md-block float-left oppia-changes-count-text e2e-test-changes-count-text"
+            <span class="oppia-save-publish-button-label float-start e2e-test-publish-skill-changes-button">Publish Changes</span>
+            <span class="d-none d-md-block float-start oppia-changes-count-text e2e-test-changes-count-text"
                   *ngIf="getChangeListCount() > 0">
               ({{getChangeListCount()}})
             </span>
