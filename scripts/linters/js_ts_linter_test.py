@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import multiprocessing
 import os
-import shutil
 import subprocess
 
 from core.tests import test_utils
