@@ -16,7 +16,13 @@
  * @fileoverview Utility File for the Acceptance Tests.
  */
 
-import puppeteer, {Page, Browser, Viewport, ElementHandle} from 'puppeteer';
+import puppeteer, {
+  Page,
+  Browser,
+  Viewport,
+  ElementHandle,
+  CDPSession,
+} from 'puppeteer';
 import testConstants from './test-constants';
 import isElementClickable from '../../functions/is-element-clickable';
 import {ConsoleReporter} from './console-reporter';
@@ -78,6 +84,9 @@ export class BaseUser {
   page!: Page;
   pages: Page[] = [];
   browserObject!: Browser;
+  cdpSession?: CDPSession;
+  sigTermHandler?: () => void;
+  sigIntHandler?: () => void;
   userHasAcceptedCookies: boolean = false;
   email: string | null = null;
   username: string | null = null;
@@ -204,12 +213,26 @@ export class BaseUser {
           await this.screenRecorder.start(fullScreenRecordingPath);
 
           // Ensure recording is stopped when the test fails.
-          process.on('SIGTERM', async () => {
-            await this.screenRecorder.stop();
-          });
-          process.on('SIGINT', async () => {
-            await this.screenRecorder.stop();
-          });
+          this.sigTermHandler = () => {
+            this.screenRecorder
+              ?.stop()
+              .catch(error =>
+                showMessage(
+                  `Error while stopping screen recording on SIGTERM for ${this.username}: ${error}`
+                )
+              );
+          };
+          this.sigIntHandler = () => {
+            this.screenRecorder
+              ?.stop()
+              .catch(error =>
+                showMessage(
+                  `Error while stopping screen recording on SIGINT for ${this.username}: ${error}`
+                )
+              );
+          };
+          process.on('SIGTERM', this.sigTermHandler);
+          process.on('SIGINT', this.sigIntHandler);
         }
 
         // Set up Download Folder.
@@ -221,8 +244,8 @@ export class BaseUser {
         }
 
         // Enable download behavior using Chrome DevTools Protocol (CDP).
-        const client = await this.page.target().createCDPSession();
-        await client.send('Page.setDownloadBehavior', {
+        this.cdpSession = await this.page.target().createCDPSession();
+        await this.cdpSession.send('Page.setDownloadBehavior', {
           behavior: 'allow',
           downloadPath: downloadDir,
         });
@@ -818,6 +841,40 @@ export class BaseUser {
           `Error while taking screenshot for ${this.username ?? 'unknown user'}: ${error}`
         );
       }
+    }
+    // Remove process signal handlers that were registered for screen
+    // recording to avoid keeping the Node event loop alive.
+    if (this.sigTermHandler) {
+      try {
+        process.off('SIGTERM', this.sigTermHandler);
+      } catch (e) {
+        // Ignore if unable to remove.
+      }
+      this.sigTermHandler = undefined;
+    }
+    if (this.sigIntHandler) {
+      try {
+        process.off('SIGINT', this.sigIntHandler);
+      } catch (e) {
+        // Ignore if unable to remove.
+      }
+      this.sigIntHandler = undefined;
+    }
+
+    // Detach any active CDP session to close the underlying websocket and
+    // allow Node to exit cleanly.
+    if (this.cdpSession) {
+      try {
+        await this.cdpSession.detach();
+        showMessage(
+          `Detached CDP session for ${this.username ?? 'unknown user'}.`
+        );
+      } catch (error) {
+        showMessage(
+          `Error detaching CDP session for ${this.username}: ${error}`
+        );
+      }
+      this.cdpSession = undefined;
     }
     await this.browserObject.close();
     showMessage(`Browser closed for ${this.username ?? 'unknown user'}.`);

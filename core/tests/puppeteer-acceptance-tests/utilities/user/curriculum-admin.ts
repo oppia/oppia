@@ -972,6 +972,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(photoUploadModal, {hidden: true});
     await this.clickOnElementWithSelector(createSubtopicButton);
     await this.saveTopicDraft(topicName);
+    await this.waitForNetworkIdle();
     showMessage(`Subtopic ${title} is created.`);
   }
 
@@ -2906,7 +2907,9 @@ export class CurriculumAdmin extends TopicManager {
     await this.saveTopicDraft(topicName);
 
     await this.createSkillForTopic(skillName, topicName);
+    await this.waitForNetworkIdle();
     await this.createQuestionsForSkill(skillName, 10);
+    await this.waitForNetworkIdle();
     await this.assignSkillToSubtopicInTopicEditor(
       skillName,
       subtopicName,
@@ -2915,6 +2918,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.addSkillToDiagnosticTest(skillName, topicName);
     await this.togglePracticeTabCheckbox();
     await this.saveTopicDraft(topicName);
+    await this.waitForNetworkIdle();
 
     await this.createSubtopicWithStudyGuideForTopic(
       'Subtracting Numbers',
@@ -2927,6 +2931,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.saveTopicDraft(topicName);
 
     await this.createSkillForTopic('Skill 2', topicName, false);
+    await this.waitForNetworkIdle();
     await this.assignSkillToSubtopicInTopicEditor(
       'Skill 2',
       'Subtracting Numbers',
@@ -2934,6 +2939,7 @@ export class CurriculumAdmin extends TopicManager {
     );
 
     await this.publishDraftTopic(topicName);
+    await this.waitForNetworkIdle();
   }
 
   /**
