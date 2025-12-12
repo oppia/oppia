@@ -3862,33 +3862,20 @@ export class TopicManager extends BaseUser {
   async expectQuestionToBeVisible(
     question: string
   ): Promise<ElementHandle<Element>> {
-    // eslint-disable-next-line no-console
-    console.log('[FLAKY-DEBUG] Checking visibility of question list...');
     await this.expectElementToBeVisible(questionTextSelector);
-
     const questionElements = await this.page.$$(questionTextSelector);
-    // eslint-disable-next-line no-console
-    console.log(
-      `[FLAKY-DEBUG] Total questions found: ${questionElements.length}`
-    );
     let requiredQuestionElement: ElementHandle<Element> | null = null;
     for (const questionElement of questionElements) {
       const questionText = await questionElement.evaluate(el =>
         el.textContent?.trim()
       );
-      // eslint-disable-next-line no-console
-      console.log(`[FLAKY-DEBUG] Checking question text: "${questionText}"`);
       if (questionText === question) {
-        // eslint-disable-next-line no-console
-        console.log('[FLAKY-DEBUG] Target question matched.');
         requiredQuestionElement = questionElement;
         break;
       }
     }
 
     if (!requiredQuestionElement) {
-      // eslint-disable-next-line no-console
-      console.log(`[FLAKY-DEBUG] ERROR: Question "${question}" not found.`);
       throw new Error(`Question ${question} not found.`);
     }
 
