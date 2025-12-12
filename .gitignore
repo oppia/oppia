@@ -80,3 +80,5 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
+
+yarn.lock
