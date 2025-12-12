@@ -296,7 +296,7 @@ def mock_load_template(
         filepath = get_filepath_from_filename(filename, 'src')
     if filepath is None:
         raise Exception('No file exists for the given file name.')
-    with utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
 
@@ -344,7 +344,7 @@ def get_storage_model_classes() -> Iterator[Type[base_models.BaseModel]]:
                     yield clazz
 
 
-def generate_random_hexa_str() -> str:  # docker: no cover
+def generate_random_hexa_str() -> str:
     """Generate 32 character random string that looks like hex number.
 
     Returns:
@@ -2127,7 +2127,7 @@ class AppEngineTestBase(TestBase):
         storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
-        # Mock set_constans_to_default method to throw an exception.
+        # Mock set_constants_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.
         self.contextManager = self.swap(
@@ -2219,11 +2219,16 @@ class AppEngineTestBase(TestBase):
         )
 
     def mock_set_constants_to_default(self) -> None:
-        """Change constants file in the test could lead to other
-        tests fail. Mock set_constants_to_default method in your test
-        will suppress this exception.
+        """Mock implementation of set_constants_to_default for tests.
+
+        Directly changing the shared constants file in your test can cause
+        problems. Mocking common.set_constants_to_default() in your test will
+        suppress this exception.
         """
-        raise Exception('Please mock this method in the test.')
+        raise Exception(
+            'Tests should mock common.set_constants_to_default() to avoid '
+            'modifying the constants file during tests.'
+        )
 
     @contextlib.contextmanager
     def mock_datetime_utcnow(
