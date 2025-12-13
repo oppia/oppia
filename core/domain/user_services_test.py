@@ -655,9 +655,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'avatar',
             'gravatar_example.png',
         )
-        with utils.open_file(
-            expected_gravatar_filepath, 'rb', encoding=None
-        ) as f:
+        with open(expected_gravatar_filepath, 'rb', encoding=None) as f:
             expected_gravatar = f.read()
 
         with requests_mock.Mocker() as requests_mocker:
