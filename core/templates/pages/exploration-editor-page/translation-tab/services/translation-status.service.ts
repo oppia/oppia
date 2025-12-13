@@ -215,7 +215,7 @@ export class TranslationStatusService implements OnInit {
             this._getContentAvailabilityStatus(contentId);
           if (
             !availabilityStatus.available ||
-            !availabilityStatus.needsUpdate
+            availabilityStatus?.needsUpdate
           ) {
             noTranslationCount++;
             if (
