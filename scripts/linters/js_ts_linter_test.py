@@ -161,7 +161,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
 
     def test_get_linters_with_success(self) -> None:
-        third_party = js_ts_linter.get_linters(
+        third_party, _ = js_ts_linter.get_linters(
             [VALID_JS_FILEPATH], [VALID_TS_FILEPATH]
         )
         self.assertTrue(
@@ -319,7 +319,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertEqual(lint_task_report[0].trimmed_messages, [])
 
     def test_validate_eslint_failure(self) -> None:
-        """A test that validate ESLint failure."""
+        """A test that validates ESLint failure."""
 
         def mock_exists(unused_path: str) -> bool:
             return True
