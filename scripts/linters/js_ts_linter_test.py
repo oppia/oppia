@@ -146,20 +146,6 @@ class JsTsLintTests(test_utils.LinterTestBase):
         expected_messages = ['SUCCESS  ESLint check passed']
         self.validate(lint_task_report, expected_messages, 0)
 
-    def test_custom_linter_with_no_files(self) -> None:
-        lint_task_report = js_ts_linter.JsTsLintChecksManager(
-            [], [], FILE_CACHE
-        ).perform_all_lint_checks()
-        self.assertEqual(
-            [
-                'There are no JavaScript or Typescript files to lint.',
-                'SUCCESS  JS TS lint check passed',
-            ],
-            lint_task_report[0].get_report(),
-        )
-        self.assertEqual('JS TS lint', lint_task_report[0].name)
-        self.assertFalse(lint_task_report[0].failed)
-
     def test_third_party_linter_with_no_files(self) -> None:
         lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
             []
@@ -175,11 +161,8 @@ class JsTsLintTests(test_utils.LinterTestBase):
         self.assertFalse(lint_task_report[0].failed)
 
     def test_get_linters_with_success(self) -> None:
-        custom_linter, third_party = js_ts_linter.get_linters(
-            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH], FILE_CACHE
-        )
-        self.assertTrue(
-            isinstance(custom_linter, js_ts_linter.JsTsLintChecksManager)
+        third_party = js_ts_linter.get_linters(
+            [VALID_JS_FILEPATH], [VALID_TS_FILEPATH]
         )
         self.assertTrue(
             isinstance(
