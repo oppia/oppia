@@ -1,14 +1,3 @@
-.oppia-footer ul li a {
-  color: #fff;
-  /* Ensures text is white */
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.oppia-footer ul li a:hover {
-  color: #fff;
-  text-decoration: underline;
-}
 
 /*
   NOTE to developers: We generate RTL CSS from this file in the webpack
@@ -372,3 +361,4 @@
   font-size: 10px;
   text-align: right;
 }
+
