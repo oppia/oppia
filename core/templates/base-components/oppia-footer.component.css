@@ -1,4 +1,3 @@
-
 /*
   NOTE to developers: We generate RTL CSS from this file in the webpack
   compilation, here are sme additional rules that can be added to the CSS files:
@@ -27,11 +26,6 @@
   font-weight: 600;
 }
 
-.oppia-footer-container a:focus {
-  outline: 2px solid #fff;
-  text-decoration: underline;
-}
-
 /* Force all links in the footer lists to have a pointer and underline on hover */
 .oppia-footer ul li a {
   color: #fff;
@@ -42,6 +36,11 @@
 
 .oppia-footer ul li a:hover {
   color: #fff;
+  text-decoration: underline;
+}
+
+.oppia-footer-container a:focus {
+  outline: 2px solid #fff;
   text-decoration: underline;
 }
 
@@ -361,4 +360,3 @@
   font-size: 10px;
   text-align: right;
 }
-
