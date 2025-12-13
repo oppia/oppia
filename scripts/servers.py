@@ -294,13 +294,10 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
     if os.path.exists(common.ES_PATH_DATA_DIR):
         shutil.rmtree(common.ES_PATH_DATA_DIR)
 
-    # Ensure the ES data directory exists and create a dedicated tmp dir
-    # under the repository tmp directory so Elasticsearch / the JVM does
-    # not write into system /tmp.
-    os.makedirs(common.ES_PATH_DATA_DIR, exist_ok=True)
-    es_tmp_dir = os.path.join(_REPO_ROOT, 'tmp', 'elasticsearch')
+    # Create a dedicated tmp dir under the repository tmp directory so
+    # Elasticsearch / the JVM does not write into system /tmp.
+    es_tmp_dir = os.path.join(common.REPO_TMP_DIR, 'elasticsearch')
     os.makedirs(es_tmp_dir, exist_ok=True)
-    logging.info('ES_TMPDIR_BEFORE_START: %s', es_tmp_dir)
 
     es_args = [
         '%s/bin/elasticsearch' % common.ES_PATH,
@@ -331,11 +328,8 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
             yield proc
     finally:
         # Attempt to clean up the temporary directory we created for ES.
-        try:
-            if os.path.exists(es_tmp_dir):
-                shutil.rmtree(es_tmp_dir)
-        except Exception:
-            logging.exception('Failed to remove ElasticSearch tmp dir')
+        if os.path.exists(es_tmp_dir):
+            shutil.rmtree(es_tmp_dir)
 
 
 @contextlib.contextmanager

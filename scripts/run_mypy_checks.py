@@ -39,7 +39,6 @@ EXCLUDED_DIRECTORIES: Final = [
     # used as resources for the tests.
     'core/tests/build_sources/',
     'core/tests/data/',
-    'tmp/',
 ]
 
 CONFIG_FILE_PATH: Final = os.path.join('.', 'mypy.ini')

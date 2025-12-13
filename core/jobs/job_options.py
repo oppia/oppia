@@ -78,11 +78,14 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         assert isinstance(oppia_project_id, str)
 
         # In dev mode, make sure the process uses the repository's tmp dir,
-        # rather than the filesystem's /tmp.
+        # rather than the filesystem's /tmp. The repo tmp dir is in
+        # oppia/../oppia-tmpfiles.
         repo_tmp_dir = None
         if constants.DEV_MODE and not feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER:
             try:
-                repo_tmp_dir = os.path.join(os.getcwd(), 'tmp', 'beam')
+                repo_tmp_dir = os.path.join(
+                    os.getcwd(), os.pardir, 'oppia-tmpfiles', 'beam'
+                )
                 tempfile.tempdir = repo_tmp_dir
                 os.makedirs(repo_tmp_dir, exist_ok=True)
                 logging.getLogger(__name__).info(
@@ -99,8 +102,8 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
             project=oppia_project_id,
             region=feconf.GOOGLE_APP_ENGINE_REGION,
             # Determine an appropriate temp_location for Beam. In the developer
-            # environment, this should be opensource/oppia/tmp. In production,
-            # this should be a GCS path.
+            # environment, this should be oppia/../oppia-tmpfiles. In
+            # production, this should be a GCS path.
             temp_location=(
                 repo_tmp_dir
                 or (feconf.DATAFLOW_TEMP_LOCATION_TEMPLATE % oppia_project_id)

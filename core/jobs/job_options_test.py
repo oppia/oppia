@@ -49,7 +49,7 @@ class JobOptionsTests(test_utils.TestBase):
         self,
     ) -> None:
         repo_path = '/fake/repo'
-        beam_tmp = os.path.join(repo_path, 'tmp', 'beam')
+        beam_tmp = os.path.join(repo_path, os.pardir, 'oppia-tmpfiles', 'beam')
         with (
             mock.patch.dict(constants, {'DEV_MODE': True}),
             mock.patch('os.getcwd', return_value=repo_path),

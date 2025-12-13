@@ -1359,6 +1359,112 @@ class CommonTests(test_utils.GenericTestBase):
             with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                 self.assertEqual(json.loads(hashes_file.read()), {})
 
+    def test_cleanup_repo_tmp(self) -> None:
+        """Test cleanup_repo_tmp removes old tmp directories correctly."""
+        # Mock time.time to return a fixed time
+        now = 1000000
+        cutoff = now - (10 * 60)  # 10 minutes ago
+
+        # Create mock stat objects
+        old_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff - 1, 0))
+        recent_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff + 1, 0))
+
+        check_calls = {
+            'rmtree_calls': [],
+            'log_calls': [],
+        }
+
+        def mock_time_time() -> float:
+            return now
+
+        def mock_isdir(path: str) -> bool:
+            if path == common.REPO_TMP_DIR:
+                return True
+            # tmp_old_dir is a dir, tmp_old_file is not
+            return path.endswith('tmp_old_dir')
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return [
+                'tmp_old_dir',
+                'tmp_recent_dir',
+                'tmp_old_file',
+                'not_tmp_dir',
+            ]
+
+        def mock_stat(path: str) -> os.stat_result:
+            if 'old' in path:
+                return old_stat
+            elif 'recent' in path:
+                return recent_stat
+            else:
+                raise FileNotFoundError("File not found")
+
+        def mock_rmtree(path: str, ignore_errors: bool = False) -> None:
+            check_calls['rmtree_calls'].append(path)
+
+        def mock_logging_info(msg: str, path: str) -> None:
+            check_calls['log_calls'].append((msg, path))
+
+        time_swap = self.swap(time, 'time', mock_time_time)
+        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        stat_swap = self.swap(os, 'stat', mock_stat)
+        rmtree_swap = self.swap(shutil, 'rmtree', mock_rmtree)
+        log_swap = self.swap(logging, 'info', mock_logging_info)
+
+        with (
+            time_swap
+        ), isdir_swap, listdir_swap, stat_swap, rmtree_swap, log_swap:
+            common.cleanup_repo_tmp(10)
+
+        # Should remove only tmp_old_dir (old and is dir)
+        self.assertEqual(
+            check_calls['rmtree_calls'],
+            [os.path.join(common.REPO_TMP_DIR, 'tmp_old_dir')],
+        )
+        self.assertEqual(
+            check_calls['log_calls'],
+            [
+                (
+                    'Removing old repo tmp dir: %s',
+                    os.path.join(common.REPO_TMP_DIR, 'tmp_old_dir'),
+                )
+            ],
+        )
+
+    def test_cleanup_repo_tmp_no_repo_dir(self) -> None:
+        """Test cleanup_repo_tmp returns early when repo tmp dir doesn't exist."""
+
+        def mock_isdir(path: str) -> bool:
+            return False
+
+        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        with isdir_swap:
+            # Should not raise or do anything.
+            common.cleanup_repo_tmp()
+
+    def test_cleanup_repo_tmp_exception_handling(self) -> None:
+        """Test cleanup_repo_tmp handles exceptions gracefully."""
+        check_calls = {'exception_logged': False}
+
+        def mock_isdir(path: str) -> bool:
+            return True
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            raise Exception("Mock exception")
+
+        def mock_logging_exception(msg: str) -> None:
+            check_calls['exception_logged'] = True
+
+        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        log_swap = self.swap(logging, 'exception', mock_logging_exception)
+
+        with isdir_swap, listdir_swap, log_swap:
+            common.cleanup_repo_tmp()
+
+        self.assertTrue(check_calls['exception_logged'])
+
 
 class UrlRetrieveTests(CommonTests):
     """Test the methods related to retrieving URLs."""

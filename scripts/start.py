@@ -312,11 +312,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         # Clean up old ephemeral repo tmp directories (pip/yarn unpack dirs)
         # created during installs. We keep this conservative: only delete
         # entries starting with 'tmp' older than 10 minutes.
-        try:
-            common.cleanup_repo_tmp(older_than_minutes=10)
-        except Exception:
-            # Don't fail start if cleanup fails.
-            pass
+        common.cleanup_repo_tmp(older_than_minutes=10)
 
     build_args = get_build_args(parsed_args)
     try:

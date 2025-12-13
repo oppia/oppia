@@ -65,11 +65,6 @@ temp-tsconfig-strict.json
 # via build.py and should not be committed to the repo.
 build/*
 
-# Repo-local temporary directory for extracted native libs. This is used
-# for deterministic cleanup of temporary files created by third-party libraries
-# (e.g. Azure / Elasticsearch).
-tmp/
-
 # .python-version is generated dynamically so needs to be ignored.
 .python-version
 # app.yaml is generated dynamically so needs to be ignored.
