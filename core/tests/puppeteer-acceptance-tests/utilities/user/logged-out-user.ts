@@ -1724,7 +1724,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Blog page using the oppia website footer.
    */
   async clickOnBlogLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
+    await this.clickAndWaitForNavigation(footerBlogLink, true);
   }
 
   /**
