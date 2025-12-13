@@ -216,7 +216,7 @@ export class BaseUser {
             followNewTab: true,
             fps: 25,
             ffmpeg_Path: ffmpegPath,
-            record: mobile ? 'screenshot' : 'screencast',
+            record: 'screencast',
             // Below dimensions are of recorded video.
             videoFrame: {
               width: frameWidth,
