@@ -65,7 +65,7 @@ import {RteHelperModalComponent} from 'services/editor-customization.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {CkEditorInitializerService} from 'components/forms/text-input/ck-editor-initializer.service';
+import {CkEditorInitializerService} from '../../../services/ck-editor-initializer.service';
 import {AlertsService} from 'services/alerts.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {
@@ -249,14 +249,14 @@ describe('Schema based editor', () => {
     }
 
     constructor(
-      protected override changeDetectorRef: ChangeDetectorRef,
-      protected override ngbModal: NgbModal,
-      protected override windowRef: WindowRef,
-      protected override imageUploadHelperService: ImageUploadHelperService,
-      protected override imageLocalStorageService: ImageLocalStorageService,
-      protected override ckEditorInitializerService: CkEditorInitializerService,
-      protected override alertsService: AlertsService,
-      protected override assetsBackendApiService: AssetsBackendApiService
+      protected changeDetectorRef: ChangeDetectorRef,
+      protected ngbModal: NgbModal,
+      protected windowRef: WindowRef,
+      protected imageUploadHelperService: ImageUploadHelperService,
+      protected imageLocalStorageService: ImageLocalStorageService,
+      protected ckEditorInitializerService: CkEditorInitializerService,
+      protected alertsService: AlertsService,
+      protected assetsBackendApiService: AssetsBackendApiService
     ) {
       super(
         changeDetectorRef,
