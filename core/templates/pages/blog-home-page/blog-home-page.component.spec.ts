@@ -24,6 +24,7 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
+import {AppConstants} from 'app.constants';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {MaterialModule} from 'modules/material.module';
@@ -841,6 +842,29 @@ describe('Blog home page component', () => {
       );
     }));
 
+    it('should not show alert when fetching initial blog home page data fails with a non-fatal error code', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogHomePageDataAsync'
+      ).and.returnValue(
+        Promise.reject({
+          error: {error: 'Backend error'},
+          status: 403,
+        })
+      );
+
+      component.loadInitialBlogHomePageData();
+
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).toHaveBeenCalledWith('0');
+
+      tick();
+
+      expect(alertsService.addWarning).not.toHaveBeenCalled();
+    }));
+
     it(
       'should use reject handler if fetching data for loading more published' +
         'blog post fails',
@@ -869,6 +893,33 @@ describe('Blog home page component', () => {
         );
       })
     );
+
+    it(
+      'should not show alert when loading more blog posts fails ' +
+        'with a non-fatal error code',
+      fakeAsync(() => {
+        spyOn(alertsService, 'addWarning');
+        spyOn(
+          blogHomePageBackendApiService,
+          'fetchBlogHomePageDataAsync'
+        ).and.returnValue(
+          Promise.reject({
+            error: {error: 'Backend error'},
+            status: 403,
+          })
+        );
+
+        component.loadMoreBlogPostSummaries(1);
+
+        expect(
+          blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+        ).toHaveBeenCalledWith('1');
+
+        tick();
+
+        expect(alertsService.addWarning).not.toHaveBeenCalled();
+      })
+    );
   });
 
   it('should tell searching status', () => {
@@ -883,5 +934,13 @@ describe('Blog home page component', () => {
     ).and.returnValue('image_url');
 
     expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
+  });
+
+  it('should unsubscribe from subscriptions when component is destroyed', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+
+    component.ngOnDestroy();
+
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
