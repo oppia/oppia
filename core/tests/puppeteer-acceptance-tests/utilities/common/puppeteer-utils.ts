@@ -25,6 +25,7 @@ import {showMessage} from './show-message';
 
 var path = require('path');
 var fs = require('fs');
+var childProcess = require('child_process');
 
 import {toMatchImageSnapshot} from 'jest-image-snapshot';
 import {PuppeteerScreenRecorder} from 'puppeteer-screen-recorder';
@@ -90,17 +91,50 @@ export class BaseUser {
   }
 
   /**
+   * Safely stops the screen recorder if it has been started.
+   * This swallows CDP/protocol errors that can occur if the page/session
+   * has already been closed; catches and logs but does not rethrow.
+   */
+  async stopScreenRecorderIfAny(): Promise<void> {
+    if (this.screenRecorder) {
+      try {
+        await this.screenRecorder.stop();
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          'Screen recorder stop failed (ignored):',
+          err && (err as Error).message ? (err as Error).message : err
+        );
+      } finally {
+        // Ensure we don't attempt to stop it again. Use a safe cast so
+        // TypeScript understands we're intentionally clearing this field.
+        (
+          this as unknown as {screenRecorder?: PuppeteerScreenRecorder}
+        ).screenRecorder = undefined;
+      }
+    }
+  }
+
+  /**
    * This is a function that opens a new browser instance for the user.
    */
   async openBrowser(): Promise<Page> {
-    const args: string[] = [
-      '--window-size=1920,1080',
-      '--use-fake-ui-for-media-stream',
-    ];
-
     const headless = process.env.HEADLESS === 'true';
     const mobile = process.env.MOBILE === 'true';
     const specName = process.env.SPEC_NAME;
+
+    const windowSizeArg = mobile
+      ? '--window-size=360,800'
+      : '--window-size=1920,1080';
+    // Position the window at the top-left of the virtual display and disable
+    // infobars to reduce chrome UI that can interfere with visuals.
+    const args: string[] = [
+      windowSizeArg,
+      '--window-position=0,0',
+      '--disable-infobars',
+      '--use-fake-ui-for-media-stream',
+    ];
+
     /**
      * Here we are disabling the site isolation trials because it is causing
      * tests to fail while running in non headless mode (see
@@ -117,6 +151,19 @@ export class BaseUser {
          * every test passes on both modes. */
         headless,
         args,
+        // Provide a default viewport to Puppeteer so pages are created with
+        // the correct dimensions immediately (this eliminates the brief
+        // flash where the page loads at the wrong size before setViewport
+        // is applied).
+        defaultViewport: mobile
+          ? {
+              width: 360,
+              height: 800,
+              deviceScaleFactor: 2,
+              isMobile: true,
+              hasTouch: true,
+            }
+          : {width: 1920, height: 1080},
       })
       .then(async browser => {
         this.startTimeInMilliseconds = Date.now();
@@ -131,24 +178,10 @@ export class BaseUser {
         this.page = await browser.newPage();
         this.pages.push(this.page);
 
-        if (mobile) {
-          // This is the default viewport and user agent settings for iPhone 6.
-          await this.page.setViewport({
-            width: 375,
-            height: 667,
-            deviceScaleFactor: 2,
-            isMobile: true,
-            hasTouch: true,
-            isLandscape: false,
-          });
-          await this.page.setUserAgent(
-            'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) ' +
-              'AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 ' +
-              'Mobile/15A372 Safari/604.1'
-          );
-        } else {
-          this.page.setViewport({width: 1920, height: 1080});
-        }
+        // Compute video frame size from the current page viewport.
+        const viewport = this.page.viewport();
+        const frameWidth = (viewport as Viewport).width;
+        const frameHeight = (viewport as Viewport).height;
 
         // Enable Video Recording.
         if (process.env.VIDEO_RECORDING_IS_ENABLED === '1') {
@@ -169,16 +202,26 @@ export class BaseUser {
             fs.mkdirSync(outputDir, {recursive: true});
           }
 
+          // Resolve ffmpeg path if provided or available on PATH.
+          let ffmpegPath: string | null = null;
+          try {
+            ffmpegPath =
+              process.env.FFMPEG_PATH ||
+              childProcess.execSync('which ffmpeg').toString().trim();
+          } catch {
+            ffmpegPath = null;
+          }
+
           const config = {
-            followNewTab: false,
+            followNewTab: true,
             fps: 25,
-            ffmpeg_Path: null,
+            ffmpeg_Path: ffmpegPath,
+            record: mobile ? 'screenshot' : 'screencast',
             // Below dimensions are of recorded video.
             videoFrame: {
-              width: 1280,
-              height: 720,
+              width: frameWidth,
+              height: frameHeight,
             },
-            aspectRatio: '16:9',
             videoCrf: 18,
             videoCodec: 'libx264',
             videoPreset: 'medium',
@@ -189,8 +232,12 @@ export class BaseUser {
             waitForFrameBeforeStart: 2000,
             waitForFrameAfterPageLoad: 2000,
             maxRetries: 3, // Add retry mechanism.
+            // Add reporting and slightly more verbose logs from ffmpeg so we can
+            // diagnose empty-stream failures.
             ffmpegFlags: [
-              // Additional ffmpeg flags for stability.
+              '-report',
+              '-loglevel',
+              'info',
               '-movflags',
               '+faststart',
               '-max_muxing_queue_size',
@@ -201,15 +248,73 @@ export class BaseUser {
           const fullScreenRecordingPath = path.join(outputDir, outputFileName);
           showMessage(`Saving screen recording to ${fullScreenRecordingPath}`);
           this.screenRecorder = new PuppeteerScreenRecorder(this.page, config);
-          await this.screenRecorder.start(fullScreenRecordingPath);
 
-          // Ensure recording is stopped when the test fails.
-          process.on('SIGTERM', async () => {
-            await this.screenRecorder.stop();
-          });
-          process.on('SIGINT', async () => {
-            await this.screenRecorder.stop();
-          });
+          const sleep = (ms: number) =>
+            new Promise(resolve => setTimeout(resolve, ms));
+
+          // Try to start the recorder and perform a short health check to make
+          // sure ffmpeg receives at least some data. If the output file stays
+          // empty, retry a few times before giving up.
+          const maxStartAttempts = 4;
+          let started = false;
+          for (let attempt = 1; attempt <= maxStartAttempts; attempt++) {
+            try {
+              await this.screenRecorder.start(fullScreenRecordingPath);
+              // Wait a bit after start to allow the page to render and send frames.
+              // eslint-disable-next-line no-await-in-loop
+              await sleep(3000);
+              started = true;
+              break;
+            } catch (err) {
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Recorder start attempt ${attempt} failed:`,
+                err && (err as Error).message ? (err as Error).message : err
+              );
+              if (attempt < maxStartAttempts) {
+                // eslint-disable-next-line no-await-in-loop
+                await sleep(1000 * attempt);
+              }
+            }
+          }
+
+          if (!started) {
+            // eslint-disable-next-line no-console
+            console.warn(
+              'Failed to start screen recorder after all attempts; disabling recording for this run.'
+            );
+            // Dump any ffmpeg report files from the output dir to help debugging.
+            try {
+              const dirFiles = fs.readdirSync(outputDir || '.');
+              const ffLogs = dirFiles.filter(
+                (f: string) =>
+                  f.toLowerCase().includes('ffmpeg') ||
+                  f.toLowerCase().endsWith('.log')
+              );
+              for (const lf of ffLogs) {
+                try {
+                  const p = path.join(outputDir, lf);
+                  const contents = fs.readFileSync(p, 'utf-8');
+                  // eslint-disable-next-line no-console
+                  console.warn(
+                    `=== FFLOG: ${p} ===\n${contents.substring(0, 32 * 1024)}\n=== END FFLOG: ${p} ===`
+                  );
+                } catch (e) {
+                  // Ignore.
+                }
+              }
+            } catch (e) {
+              // Ignore.
+            }
+          } else {
+            // Ensure recording is stopped when the test fails.
+            process.on('SIGTERM', async () => {
+              await this.stopScreenRecorderIfAny();
+            });
+            process.on('SIGINT', async () => {
+              await this.stopScreenRecorderIfAny();
+            });
+          }
         }
 
         // Set up Download Folder.
@@ -235,6 +340,12 @@ export class BaseUser {
             throw new Error(`Unexpected alert: ${alertText}`);
           }
         });
+
+        // Stop recorder if page closes to avoid CDP errors.
+        this.page.on('close', async () => {
+          await this.stopScreenRecorderIfAny();
+        });
+
         this.setupDebugTools();
       });
 

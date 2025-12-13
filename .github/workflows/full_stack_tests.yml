@@ -240,10 +240,6 @@ jobs:
         # once all suites are fixed. Please don't remove the always() check.
         if: ${{ steps.check_skip.outputs.SKIP_SUITE != 'true' && always() }}
         timeout-minutes: 30
-        # TODO(#23106): Currently, video recording failure interfares with
-        # acceptance tests, making acceptance test suite fail even if sub-tests
-        # passes. Once fixed, enable video recording by updating
-        # VIDEO_RECORDING_IS_ENABLED=0 to VIDEO_RECORDING_IS_ENABLED=1 in run block.
         uses: ./.github/actions/run-a-specific-acceptance-test
         with:
           test-suite: ${{ matrix.suite.name }}

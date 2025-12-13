@@ -107,7 +107,7 @@
     "prettier": "^3.2.5",
     "protoc-gen-ts": "^0.3.4",
     "puppeteer": "^13.0.0",
-    "puppeteer-screen-recorder": "2.1.2",
+    "puppeteer-screen-recorder": "3.0.6",
     "reflect-metadata": "^0.1.12",
     "rtlcss": "^3.5.0",
     "sourcemapped-stacktrace": "^1.1.11",
