@@ -1160,7 +1160,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'Title')
 
         # Store a dummy image in filesystem.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1430,7 +1430,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_topic(self) -> None:
         # Save a dummy image on filesystem, to be used as thumbnail.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -3586,7 +3586,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_thumbnail_filename(self.topic, 'img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -3619,7 +3619,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
