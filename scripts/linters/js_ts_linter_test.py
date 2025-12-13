@@ -338,7 +338,7 @@ class JsTsLintTests(test_utils.LinterTestBase):
     def test_validate_eslint_failure(self) -> None:
         """A test that validate ESLint failure."""
 
-        def mock_exists(path: str) -> bool:
+        def mock_exists(unused_path: str) -> bool:
             return True
 
         mock_output = f"""
@@ -349,13 +349,15 @@ class JsTsLintTests(test_utils.LinterTestBase):
         ✖ 2 problems (2 errors, 0 warnings)
         """
 
-        def mock_popen(*args, **kwargs):
+        def mock_popen(  # pylint: disable=unused-argument
+            *args: str, **kwargs: str
+        ) -> MockProcess:
             return MockProcess(
-                returncode=1, stdout=mock_output.encode("utf-8"), stderr=b""
+                returncode=1, stdout=mock_output.encode('utf-8'), stderr=b''
             )
 
-        exists_swap = self.swap(os.path, "exists", mock_exists)
-        popen_swap = self.swap(subprocess, "Popen", mock_popen)
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
 
         with exists_swap, popen_swap:
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(

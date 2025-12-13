@@ -119,7 +119,7 @@ class JsTsLintChecksManager(linter_utils.BaseLinter):
         # Compiles all typescript files into COMPILED_TYPESCRIPT_TMP_PATH.
         compile_all_ts_files()
 
-        linter_stdout = []
+        linter_stdout: List[concurrent_task_utils.TaskResult] = []
 
         # Clear temp compiled typescript files.
         shutil.rmtree(COMPILED_TYPESCRIPT_TMP_PATH, ignore_errors=True)
