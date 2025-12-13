@@ -212,4 +212,4 @@ def get_linters(
 
     third_party_linter = ThirdPartyJsTsLintChecksManager(js_ts_file_paths)
 
-    return third_party_linter
+    return third_party_linter, None
