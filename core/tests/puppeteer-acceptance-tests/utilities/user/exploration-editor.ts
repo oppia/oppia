@@ -1793,11 +1793,8 @@ export class ExplorationEditor extends BaseUser {
         break;
       case INTERACTION_TYPES.TEXT_INPUT:
         await this.clickOnElementWithSelector(addResponseOptionButton);
-
         await this.page.waitForSelector(textInputInteractionOption);
-
         await this.page.type(textInputInteractionOption, answer);
-
         break;
       case INTERACTION_TYPES.FRACTION_INPUT:
         await this.page.waitForSelector(intEditorField, {
