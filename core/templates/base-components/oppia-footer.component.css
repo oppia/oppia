@@ -34,13 +34,13 @@
   text-decoration: none;
 }
 
-.oppia-footer ul li a:hover {
-  color: #fff;
+.oppia-footer-container a:focus {
+  outline: 2px solid #fff;
   text-decoration: underline;
 }
 
-.oppia-footer-container a:focus {
-  outline: 2px solid #fff;
+.oppia-footer ul li a:hover {
+  color: #fff;
   text-decoration: underline;
 }
 
