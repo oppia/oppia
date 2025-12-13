@@ -155,8 +155,8 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
     await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
     await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('needs update');
-    // Stale voiceovers should count as incomplete
-    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('(1/3)');
+    // Stale voiceovers should count as incomplete.
+    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('1/3');
     await voiceoverSubmitter.expectNodeWariningSignToBeVisible(true);
 
     // Mark voiceover as up to date.
