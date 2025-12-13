@@ -111,6 +111,7 @@ describe('Logged-in User', function () {
       'loggedInUser1',
       'logged_in_user1@example.com'
     );
+    await UserFactory.closeSuperAdminBrowser();
   }, 1500000); // Setup taking longer than default timeout.
 
   it(
