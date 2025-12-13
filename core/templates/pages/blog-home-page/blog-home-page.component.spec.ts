@@ -24,7 +24,6 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {MaterialModule} from 'modules/material.module';
@@ -760,6 +759,31 @@ describe('Blog home page component', () => {
       expect(component.lastPostOnPageNum).toBe(2);
 
       expect(alertsService.addWarning).not.toHaveBeenCalled();
+    }));
+
+    it('should fill gaps with undefined when loading blog posts with an offset greater than array length', fakeAsync(() => {
+      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 1;
+      blogHomePageDataObject.numOfPublishedBlogPosts = 5;
+      blogHomePageDataObject.blogPostSummaryDicts = [blogPostSummaryObject];
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogHomePageDataAsync'
+      ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+
+      component.blogPostSummaries = [blogPostSummaryObject];
+      component.totalBlogPosts = 5;
+      component.page = 1;
+
+      // Load data at offset 3 when array only has 1 element.
+      // This should fill indices 1 and 2 with undefined.
+      component.loadMoreBlogPostSummaries(3);
+      tick();
+
+      expect(component.blogPostSummaries.length).toBe(4);
+      expect(component.blogPostSummaries[0]).toEqual(blogPostSummaryObject);
+      expect(component.blogPostSummaries[1]).toBeUndefined();
+      expect(component.blogPostSummaries[2]).toBeUndefined();
+      expect(component.blogPostSummaries[3]).toEqual(blogPostSummaryObject);
     }));
 
     it('should load data for page on changing page', () => {
