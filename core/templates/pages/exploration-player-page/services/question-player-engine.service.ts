@@ -361,7 +361,6 @@ export class QuestionPlayerEngineService {
       newState = oldState;
     }
 
-    // FIX: Changed 'const' to 'let' because it is reassigned later.
     let questionHtml = this.makeQuestion(newState!, [
       oldParams,
       {

@@ -153,7 +153,6 @@ export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, AfterContentChecked
 {
-  // Fixed: Added '!' for definite assignment assertion
   customizationArgSpecs!: CustomizationArgSpecsInterface[];
   originalContentIdToContent!: object;
   hasCustomizationArgs!: boolean;
@@ -184,12 +183,10 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    // Fixed: Added 'as any' to handle index access
     return (INTERACTION_SPECS as any)[interactionId].name;
   }
 
   getDescription(interactionId: string): string {
-    // Fixed: Added 'as any'
     return (INTERACTION_SPECS as any)[interactionId].description;
   }
 
@@ -200,12 +197,10 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningsList(): Warning[] {
-    // Fixed: Added 'as any' for INTERACTION_SPECS access
     const validationServiceName: string =
       (INTERACTION_SPECS as any)[this.stateInteractionIdService.displayed].id +
       'ValidationService';
 
-    // Fixed: Added 'as any' for INTERACTION_SERVICE_MAPPING access
     let validationService = this.injector.get(
       (INTERACTION_SERVICE_MAPPING as any)[validationServiceName]
     );
@@ -227,8 +222,6 @@ export class CustomizeInteractionModalComponent
   onChangeInteractionId(newInteractionId: string): void {
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
-
-    // Fixed: Added 'as any'
     let interactionSpec = (INTERACTION_SPECS as any)[newInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
@@ -398,12 +391,12 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        // Fixed: Added 'as any' for indexing
+
         (contentIdToContent as any)[subtitledHtmlValue.contentId] =
           subtitledHtmlValue.html;
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        // Fixed: Added 'as any' for indexing
+
         (contentIdToContent as any)[subtitledUnicodeValue.contentId] =
           subtitledUnicodeValue.unicode;
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
@@ -413,7 +406,6 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    // Fixed: Added 'as any'
     const caSpecs = (INTERACTION_SPECS as any)[interactionId]
       .customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed;
@@ -502,7 +494,7 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
-      // Fixed: Added 'as any'
+
       let interactionSpec = (INTERACTION_SPECS as any)[
         this.stateInteractionIdService.savedMemento
       ];
