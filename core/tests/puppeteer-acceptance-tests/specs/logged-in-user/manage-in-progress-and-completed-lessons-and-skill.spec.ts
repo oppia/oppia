@@ -105,7 +105,7 @@ describe('Logged-in User', function () {
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-    await UserFactory.closeAllBrowsers();
+    await curriculumAdmin.closeBrowser();
 
     loggedInUser = await UserFactory.createNewUser(
       'loggedInUser1',
