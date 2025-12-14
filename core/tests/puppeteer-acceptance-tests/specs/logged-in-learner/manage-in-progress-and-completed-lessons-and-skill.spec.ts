@@ -115,7 +115,7 @@ describe('Logged-in Learner', function () {
       'logged_in_learner1@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 1500000); // Setup taking longer than default timeout.
+  }, 2500000); // Setup taking longer than default timeout.
 
   it(
     'should display empty progress message when no lessons are in progress',
