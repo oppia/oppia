@@ -278,9 +278,6 @@ class VoiceoverRegenerationTaskMapping:
             content_id_list: List[str]. The list of content IDs for which
                 voiceovers need to be regenerated.
         """
-        if language_accent_code in self.language_accent_to_content_status_map:
-            return
-
         content_status_map = {}
         for content_id in content_id_list:
             content_status_map[content_id] = (

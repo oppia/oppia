@@ -233,23 +233,28 @@ def resolve_multiple_cloud_task_runs_for_exploration(
                     content_id,
                     regeneration_status,
                 ) in content_status_map.items():
+
                     if content_id not in reference_content_status_map:
                         reference_content_status_map[content_id] = (
                             regeneration_status
                         )
-                    elif reference_content_status_map[content_id] in [
-                        'PENDING',
-                        'RUNNING',
-                        'FAILED_AND_AWAITING_RETRY',
-                    ]:
-                        # If any voiceover-regeneration request is not
-                        # concluded, its status should be used as the final
-                        # status for the content.
                         continue
-                    else:
-                        reference_content_status_map[content_id] = (
-                            regeneration_status
-                        )
+
+                    if (
+                        reference_content_status_map[content_id] == 'FAILED'
+                        or regeneration_status == 'FAILED'
+                    ):
+                        reference_content_status_map[content_id] = 'FAILED'
+                    elif (
+                        reference_content_status_map[content_id] == 'GENERATING'
+                        or regeneration_status == 'GENERATING'
+                    ):
+                        reference_content_status_map[content_id] = 'GENERATING'
+                    elif (
+                        reference_content_status_map[content_id] == 'SUCCEEDED'
+                        and regeneration_status == 'SUCCEEDED'
+                    ):
+                        reference_content_status_map[content_id] = 'SUCCEEDED'
 
     return reference_language_accent_to_content_status_map
 

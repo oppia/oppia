@@ -67,7 +67,7 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         task_run_id = 'task_run_id'
         exploration_id = 'exploration_id'
         language_accent_to_content_status_map = {
-            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+            'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
         }
         voiceover_regeneration_task_mapping = (
             cloud_task_domain.VoiceoverRegenerationTaskMapping(
@@ -168,10 +168,19 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         task_run_id_2 = 'task_run_id_2'
         exploration_id = 'exploration_id'
         language_accent_to_content_status_map_1 = {
-            'en-US': {'content_0': 'GENERATING', 'content_1': 'SUCCEEDED'}
+            'en-US': {
+                'content_0': 'GENERATING',
+                'content_1': 'SUCCEEDED',
+                'content_2': 'GENERATING',
+            }
         }
         language_accent_to_content_status_map_2 = {
-            'en-US': {'content_0': 'FAILED', 'content_1': 'SUCCEEDED'}
+            'en-US': {
+                'content_0': 'FAILED',
+                'content_1': 'SUCCEEDED',
+                'content_2': 'SUCCEEDED',
+                'content_3': 'GENERATING',
+            }
         }
         voiceover_regeneration_task_mapping_1 = (
             cloud_task_domain.VoiceoverRegenerationTaskMapping(
@@ -196,7 +205,12 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             ]
         )
         language_accent_to_content_status_map = {
-            'en-US': {'content_0': 'FAILED', 'content_1': 'SUCCEEDED'}
+            'en-US': {
+                'content_0': 'FAILED',
+                'content_1': 'SUCCEEDED',
+                'content_2': 'GENERATING',
+                'content_3': 'GENERATING',
+            }
         }
 
         self.assertDictEqual(
@@ -225,4 +239,41 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
             voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
                 function_name
             )
+        )
+
+    def test_should_create_voiceover_regeneration_task_with_status_generating(
+        self,
+    ) -> None:
+        exploration_id = 'exp_id'
+        cloud_task_id = 'cloud_task_id'
+        language_code_to_contents_mapping = {
+            'en': {'content_0': 'Hello world!', 'content_1': 'First card.'},
+            'hi': {'content_0': 'हैलो वर्ल्ड!', 'content_1': 'पहला कार्ड.'},
+        }
+        language_code_to_autogeneratable_accent_codes = {
+            'en': ['en-US'],
+            'hi': ['hi-IN'],
+        }
+
+        voiceover_cloud_task_run_mapping = voiceover_cloud_task_services.create_voiceover_regeneration_task_with_status_generating(
+            exploration_id,
+            cloud_task_id,
+            language_code_to_contents_mapping,
+            language_code_to_autogeneratable_accent_codes,
+        )
+
+        expected_language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'GENERATING', 'content_1': 'GENERATING'},
+            'hi-IN': {'content_0': 'GENERATING', 'content_1': 'GENERATING'},
+        }
+
+        self.assertEqual(
+            voiceover_cloud_task_run_mapping.language_accent_to_content_status_map,
+            expected_language_accent_to_content_status_map,
+        )
+        self.assertEqual(
+            voiceover_cloud_task_run_mapping.exploration_id, exploration_id
+        )
+        self.assertEqual(
+            voiceover_cloud_task_run_mapping.task_run_id, cloud_task_id
         )
