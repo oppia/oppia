@@ -1652,10 +1652,8 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             """
         )
 
-        # We don't want to call visit_functiondef, since that will invoke all checks.
         checker = self.checker_test_object.checker
 
-        # Directly call only the indentation check.
         with self.checker_test_object.assertNoMessages():
             checker.check_docstring_section_indentation(func_node)
 
@@ -4595,8 +4593,6 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             """
         )
         compare_node = if_node.test
-        # Here, operand.value does not exist (since 'y' is a Name node),
-        # so 'value' in vars(operand)' is False.
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
 
@@ -5287,7 +5283,6 @@ class PreventStringConcatenationCheckerTests(unittest.TestCase):
         )
 
         expression_node = node.value
-        # Since the operator is '-', the condition (node.op == '+') is `False.
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_binop(expression_node)
 
