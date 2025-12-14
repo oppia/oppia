@@ -82,18 +82,14 @@ class JobOptions(pipeline_options.PipelineOptions):  # type: ignore[misc]
         # oppia/../oppia-tmpfiles.
         repo_tmp_dir = None
         if constants.DEV_MODE and not feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER:
-            try:
-                repo_tmp_dir = os.path.join(
-                    os.getcwd(), os.pardir, 'oppia-tmpfiles', 'beam'
-                )
-                tempfile.tempdir = repo_tmp_dir
-                os.makedirs(repo_tmp_dir, exist_ok=True)
-                logging.getLogger(__name__).info(
-                    'Using repo-local Beam tmpdir: %s', repo_tmp_dir
-                )
-            except Exception:
-                # Best-effort only; fall back to system defaults on failure.
-                pass
+            repo_tmp_dir = os.path.join(
+                os.getcwd(), os.pardir, 'oppia-tmpfiles', 'beam'
+            )
+            tempfile.tempdir = repo_tmp_dir
+            os.makedirs(repo_tmp_dir, exist_ok=True)
+            logging.getLogger(__name__).info(
+                'Using repo-local Beam tmpdir: %s', repo_tmp_dir
+            )
 
         super().__init__(
             # Needed by PipelineOptions.

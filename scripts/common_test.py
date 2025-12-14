@@ -41,7 +41,7 @@ from urllib import request as urlrequest
 from core.tests import test_utils
 
 import yaml
-from typing import Dict, Generator, List, Literal, NoReturn, Tuple
+from typing import Generator, List, Literal, NoReturn, Tuple
 
 from . import common
 
@@ -1446,7 +1446,6 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_cleanup_repo_tmp_exception_handling(self) -> None:
         """Test cleanup_repo_tmp handles exceptions gracefully."""
-        check_calls: Dict[str, bool] = {'exception_logged': False}
 
         def mock_isdir(unused_path: str) -> bool:
             return True
@@ -1454,17 +1453,12 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_listdir(unused_path: str) -> List[str]:
             raise Exception('Mock exception')
 
-        def mock_logging_exception(unused_msg: str) -> None:
-            check_calls['exception_logged'] = True
-
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
-        log_swap = self.swap(logging, 'exception', mock_logging_exception)
 
-        with isdir_swap, listdir_swap, log_swap:
-            common.cleanup_repo_tmp()
-
-        self.assertTrue(check_calls['exception_logged'])
+        with isdir_swap, listdir_swap:
+            with self.assertRaisesRegex(Exception, 'Mock exception'):
+                common.cleanup_repo_tmp()
 
 
 class UrlRetrieveTests(CommonTests):
