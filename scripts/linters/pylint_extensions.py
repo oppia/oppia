@@ -63,6 +63,7 @@ EXCLUDED_PHRASES: Final = [
 ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
     'pylint:',
     'isort:',
+    'ruff:',
     'type: ignore',
     'pragma:',
     'https:',

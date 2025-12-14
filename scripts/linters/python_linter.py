@@ -22,8 +22,8 @@ import ast
 import io
 import os
 import re
+import subprocess
 
-import isort.api
 import pycodestyle
 from pylint import lint
 from pylint.reporters import text
@@ -146,29 +146,51 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             name, errors_found, error_messages, full_error_messages
         )
 
-    def check_import_order(self) -> concurrent_task_utils.TaskResult:
+    def check_import_order_and_format(
+        self,
+    ) -> concurrent_task_utils.TaskResult:
         """This function is used to check that each file
-        has imports placed in alphabetical order.
+        has imports placed in alphabetical order and proper formatting
+        using Ruff.
 
         Returns:
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        name = 'Import order'
+        name = 'Ruff format and import order'
         error_messages = []
         files_to_check = self.all_filepaths
         failed = False
-        stdout = io.StringIO()
-        with linter_utils.redirect_stdout(stdout):
-            for filepath in files_to_check:
-                # This line prints the error message along with file path
-                # and returns True if it finds an error else returns False.
-                if not isort.api.check_file(filepath, show_diff=True):
-                    failed = True
 
-            if failed:
-                error_message = stdout.getvalue()
-                error_messages.append(error_message)
+        # Check formatting with ruff format --check
+        try:
+            result = subprocess.run(
+                ['python', '-m', 'ruff', 'format', '--check'] + files_to_check,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode != 0:
+                failed = True
+                error_messages.append(result.stdout + result.stderr)
+        except Exception as e:
+            failed = True
+            error_messages.append(f'Error running ruff format: {str(e)}')
+
+        # Check import order and other linting with ruff check
+        try:
+            result = subprocess.run(
+                ['python', '-m', 'ruff', 'check'] + files_to_check,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode != 0:
+                failed = True
+                error_messages.append(result.stdout + result.stderr)
+        except Exception as e:
+            failed = True
+            error_messages.append(f'Error running ruff check: {str(e)}')
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages
@@ -201,7 +223,7 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
         )
 
         linter_stdout.append(self.lint_py_files())
-        linter_stdout.append(self.check_import_order())
+        linter_stdout.append(self.check_import_order_and_format())
         linter_stdout.append(check_jobs_imports(batch_jobs_dir, jobs_registry))
 
         return linter_stdout

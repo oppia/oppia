@@ -261,7 +261,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Use of "fmt: off" is prohibited. All code must be formatted by Black.'
+                'Use of "fmt: off" is prohibited. All code must be formatted by Ruff.'
             ],
             lint_task_report.trimmed_messages,
         )
@@ -275,7 +275,7 @@ class GeneralLintTests(test_utils.LinterTestBase):
         lint_task_report = linter.check_bad_patterns()
         self.assert_same_list_elements(
             [
-                'Use of "fmt: skip" is prohibited. All code must be formatted by Black.'
+                'Use of "fmt: skip" is prohibited. All code must be formatted by Ruff.'
             ],
             lint_task_report.trimmed_messages,
         )
