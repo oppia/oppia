@@ -43,15 +43,7 @@ runs:
           SERVER_ARGS='-screen 0, 1920x1080x24'
         fi
 
-        (
-          xvfb-run -a --server-args="$SERVER_ARGS"
-          python -m scripts.run_acceptance_tests
-            --skip_build
-            --suite=${{ inputs.test-suite }}
-            ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
-            --prod_env
-            --server_log_level=info
-        ) | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
+        xvfb-run -a --server-args="$SERVER_ARGS" python -m scripts.run_acceptance_tests --skip_build --suite=${{ inputs.test-suite }} ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }} --prod_env --server_log_level=info | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
     - name: Upload test logs
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
