@@ -253,13 +253,14 @@ export class ExplorationSaveService {
     let contentIds: string[] = [];
     for (let change of changeList) {
       if (change.hasOwnProperty('content_id')) {
-        let contentId = (change as ExplorationChangeEditTranslation).content_id;
+        let contentId = (change as ExplorationChangeEditTranslation)
+          .content_id as string;
         contentIds.push(contentId);
       }
       if (change.hasOwnProperty('new_value')) {
         let newValue = (change as ExplorationChangeEditStateProperty)
           .new_value as SubtitledHtmlBackendDict;
-        contentIds.push(newValue.content_id);
+        contentIds.push(newValue.content_id as string);
       }
     }
     return contentIds;
