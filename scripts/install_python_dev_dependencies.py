@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import difflib
 import os
+import shutil
 import subprocess
 import sys
 
@@ -28,7 +29,6 @@ from typing import List, Optional
 
 INSTALLATION_TOOL_VERSIONS = {
     'pip': '25.3',
-    'pip-tools': '7.5.2',
     'setuptools': '80.9.0',
 }
 REQUIREMENTS_DEV_FILE_PATH = 'requirements_dev.in'
@@ -106,10 +106,10 @@ def install_dev_dependencies() -> None:
     """Install dev dependencies from COMPILED_REQUIREMENTS_DEV_FILE_PATH."""
     subprocess.run(
         [
-            'pip-sync',
+            'uv',
+            'pip',
+            'sync',
             COMPILED_REQUIREMENTS_DEV_FILE_PATH,
-            '--pip-args',
-            '--require-hashes --no-deps',
         ],
         check=True,
         encoding='utf-8',
@@ -136,6 +136,13 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
         str. The diff between the original and compiled requirements files, as
         a string containing newlines.
     """
+    if not shutil.which('uv'):
+        raise RuntimeError(
+            'uv is required for dependency compilation. Please install it with:\n'
+            'python -m pip install --user pipx\n'
+            'python -m pipx ensurepath\n'
+            'pipx install uv==0.9.17'
+        )
     with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = list(f.readlines())
     # Warning: In some CI environments, running this command seems to add
@@ -145,14 +152,16 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     # passed here. We account for that later below when computing the diff.
     subprocess.run(
         [
-            'pip-compile',
-            '--no-emit-index-url',
-            '--quiet',
-            '--strip-extras',
-            '--generate-hashes',
+            'uv',
+            'pip',
+            'compile',
             requirements_path,
-            '--output-file',
+            '-o',
             compiled_path,
+            '--generate-hashes',
+            '--no-emit-index-url',
+            '--strip-extras',
+            '--quiet',
         ],
         check=True,
         encoding='utf-8',
@@ -164,14 +173,10 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     # cert=None might be passed), so we skip the pip-compile line and those
     # above it when computing the diff.
     old_pip_compile_line_index = [
-        i
-        for i, value in enumerate(old_compiled)
-        if value.startswith('#    pip-compile')
+        i for i, value in enumerate(old_compiled) if 'uv pip compile' in value
     ][0]
     new_pip_compile_line_index = [
-        i
-        for i, value in enumerate(new_compiled)
-        if value.startswith('#    pip-compile')
+        i for i, value in enumerate(new_compiled) if 'uv pip compile' in value
     ][0]
     diff = list(
         difflib.unified_diff(

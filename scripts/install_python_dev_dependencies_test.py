@@ -176,10 +176,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             expected_args=[
                 (
                     [
-                        'pip-sync',
+                        'uv',
+                        'pip',
+                        'sync',
                         'requirements_dev.txt',
-                        '--pip-args',
-                        '--require-hashes --no-deps',
                     ],
                 ),
             ],
@@ -222,7 +222,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             return io.StringIO(
-                '#    pip-compile --generate-hashes\nmock file contents'
+                '#    uv pip compile --generate-hashes\nmock file contents'
             )
 
         run_swap = self.swap_with_checks(
@@ -232,14 +232,16 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             expected_args=[
                 (
                     [
-                        'pip-compile',
-                        '--no-emit-index-url',
-                        '--quiet',
-                        '--strip-extras',
-                        '--generate-hashes',
+                        'uv',
+                        'pip',
+                        'compile',
                         'requirements_dev.in',
-                        '--output-file',
+                        '-o',
                         'requirements_dev.txt',
+                        '--generate-hashes',
+                        '--no-emit-index-url',
+                        '--strip-extras',
+                        '--quiet',
                     ],
                 ),
             ],
@@ -279,7 +281,7 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
             counter.append(1)
             return io.StringIO(
-                f'#    pip-compile --generate-hashes\nmock file {len(counter)}'
+                f'#    uv pip compile --generate-hashes\nmock file {len(counter)}'
             )
 
         run_swap = self.swap_with_checks(
@@ -289,14 +291,16 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             expected_args=[
                 (
                     [
-                        'pip-compile',
-                        '--no-emit-index-url',
-                        '--quiet',
-                        '--strip-extras',
-                        '--generate-hashes',
+                        'uv',
+                        'pip',
+                        'compile',
                         'requirements_dev.in',
-                        '--output-file',
+                        '-o',
                         'requirements_dev.txt',
+                        '--generate-hashes',
+                        '--no-emit-index-url',
+                        '--strip-extras',
+                        '--quiet',
                     ],
                 ),
             ],
@@ -323,6 +327,27 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 'requirements_dev.in', 'requirements_dev.txt'
             )
         self.assertTrue(change)
+
+    def test_compile_pip_requirements_uv_not_found(self) -> None:
+        """Test that compile_pip_requirements raises RuntimeError when uv is not found."""
+        import shutil
+
+        which_swap = self.swap_with_checks(
+            shutil,
+            'which',
+            lambda cmd: None if cmd == 'uv' else shutil.which(cmd),
+        )
+
+        with which_swap:
+            with self.assertRaises(RuntimeError) as context:
+                install_python_dev_dependencies.compile_pip_requirements(
+                    'requirements_dev.in', 'requirements_dev.txt'
+                )
+
+        self.assertIn(
+            'uv is required for dependency compilation', str(context.exception)
+        )
+        self.assertIn('pipx install uv==0.9.17', str(context.exception))
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:

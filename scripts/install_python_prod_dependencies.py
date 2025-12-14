@@ -566,25 +566,27 @@ def pip_install(
 def _pip_install_requirements(
     install_path: str, requirements_path: str
 ) -> None:
-    """Installs third party libraries from requirements files with pip.
+    """Installs third party libraries from requirements files with uv.
 
     Args:
         install_path: str. The installation path for the packages.
         requirements_path: str. The path to the requirements file.
     """
-    verify_pip_is_installed()
-    _run_pip_command(
+    subprocess.run(
         [
+            'uv',
+            'pip',
             'install',
-            '--require-hashes',
-            '--no-deps',
-            '--target',
-            install_path,
-            '--no-dependencies',
             '-r',
             requirements_path,
+            '--target',
+            install_path,
+            '--require-hashes',
+            '--no-deps',
             '--upgrade',
-        ]
+        ],
+        check=True,
+        encoding='utf-8',
     )
 
 
