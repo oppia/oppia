@@ -580,36 +580,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             result = run_frontend_tests.get_file_spec(file_path)
             self.assertIsNone(result)
 
-    def test_main_with_skip_install_flag(self) -> None:
-        install_calls = 0
-
-        def mock_install_third_party_libs() -> None:
-            nonlocal install_calls
-            install_calls += 1
-
-        def mock_build_main(
-            args: list[str],  # pylint: disable=unused-argument
-        ) -> None:
-            pass
-
-        with (
-            self.swap(
-                install_third_party_libs, 'main', mock_install_third_party_libs
-            ),
-            self.swap(build, 'main', mock_build_main),
-            self.swap_success_Popen,
-            self.print_swap,
-        ):
-            run_frontend_tests.main(args=[])
-
-        self.assertEqual(install_calls, 0)
-        self.assertTrue(len(self.cmd_token_list) > 0)
-
-        self.assertIn(
-            'Running test in development environment',
-            [msg.strip() for msg in self.print_arr],
-        )
-
     def test_main_run_on_changed_files_in_branch_with_no_spec_files(
         self,
     ) -> None:

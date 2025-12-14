@@ -764,36 +764,29 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.exit_stack.enter_context(
                 self.swap(build, 'build_js_files', lambda *_, **__: None)
             )
-            for server in [
-                'managed_redis_server',
-                'managed_elasticsearch_dev_server',
-                'managed_dev_appserver',
-                'managed_webdriverio_server',
-                'managed_cloud_datastore_emulator',
-            ]:
-                self.exit_stack.enter_context(
-                    self.swap(
-                        servers,
-                        server,
-                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
-                    )
-                )
 
-            self.exit_stack.enter_context(
-                self.swap_with_checks(
-                    servers,
-                    'managed_firebase_auth_emulator',
-                    lambda *a, **k: contextlib.nullcontext(FakeProc()),
-                    called=False,
-                )
-            )
-            self.exit_stack.enter_context(
-                self.swap_with_checks(
-                    servers,
+            self._swap_servers(
+                [
+                    'managed_redis_server',
+                    'managed_elasticsearch_dev_server',
+                    'managed_dev_appserver',
+                    'managed_webdriverio_server',
                     'managed_cloud_datastore_emulator',
-                    lambda *a, **k: contextlib.nullcontext(FakeProc()),
-                    called=False,
-                )
+                    'managed_firebase_auth_emulator',
+                ],
+                default_fn=lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                special_overrides={
+                    'managed_firebase_auth_emulator': (
+                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                        None,
+                        False,
+                    ),
+                    'managed_cloud_datastore_emulator': (
+                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                        None,
+                        False,
+                    ),
+                },
             )
 
             args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
@@ -851,20 +844,23 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 self.swap(build, 'build_js_files', lambda *_, **__: None)
             )
 
-            for server in [
-                'managed_redis_server',
-                'managed_elasticsearch_dev_server',
-                'managed_dev_appserver',
-                'managed_webdriverio_server',
-                'managed_cloud_datastore_emulator',
-            ]:
-                self.exit_stack.enter_context(
-                    self.swap(
-                        servers,
-                        server,
+            self._swap_servers(
+                [
+                    'managed_redis_server',
+                    'managed_elasticsearch_dev_server',
+                    'managed_dev_appserver',
+                    'managed_webdriverio_server',
+                    'managed_cloud_datastore_emulator',
+                ],
+                default_fn=lambda *a, **k: contextlib.nullcontext(fake_proc),
+                special_overrides={
+                    'managed_cloud_datastore_emulator': (
                         lambda *a, **k: contextlib.nullcontext(fake_proc),
-                    )
-                )
+                        None,
+                        False,
+                    ),
+                },
+            )
 
             args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
                 args=[]

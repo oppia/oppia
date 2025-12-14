@@ -792,19 +792,17 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with mock.patch.object(
             subprocess, 'check_output', autospec=True
         ) as mock_check_output:
-            mock_check_output.return_value = 'feature-branch'
+            mock_check_output.return_value = 'old-branch'
 
-            changed_branch = pre_push_hook.ChangedBranch('feature-branch')
-
-            self.assertTrue(changed_branch.is_same_branch)
-            self.assertEqual(changed_branch.new_branch, 'feature-branch')
-
-            mock_check_output.reset_mock()
-
-            with changed_branch:
+            with pre_push_hook.ChangedBranch('old-branch'):
                 pass
 
-            mock_check_output.assert_not_called()
+            self.assertEqual(mock_check_output.call_count, 1)
+
+            mock_check_output.assert_called_once_with(
+                ['git', 'symbolic-ref', '-q', '--short', 'HEAD'],
+                encoding='utf-8',
+            )
 
     def test_main_skips_linter_when_files_to_lint_is_empty(self) -> None:
         parse_args_swap = self.swap(
@@ -825,6 +823,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         get_changed_files_swap = self.swap(
             git_changes_utils,
             'get_changed_files',
+            # 'modified1.py' is a modified file, but it is not considered a file to lint,
+            # so the set of files to lint is empty and the linter should be skipped.
             lambda *args, **kwargs: {'feature-branch': (['modified1.py'], [])},
         )
         has_uncommitted_files_swap = self.swap(

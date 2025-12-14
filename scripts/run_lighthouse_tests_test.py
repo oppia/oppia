@@ -21,6 +21,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 from core.constants import constants
 from core.tests import test_utils
@@ -777,55 +778,35 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(
         self,
     ) -> None:
-        mock_dir_path = os.path.join(os.getcwd(), '..', 'lhci-puppeteer-video')
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fake_cwd = os.path.join(temp_dir, 'cwd')
+            os.mkdir(fake_cwd)
 
-        exists_calls = 0
-        mkdir_calls = 0
+            expected_dir = os.path.join(fake_cwd, '..', 'lhci-puppeteer-video')
 
-        def mock_exists(path: str) -> bool:
-            nonlocal exists_calls
-            if path == mock_dir_path:
-                exists_calls += 1
-                return False
-            return True
+            self.assertFalse(os.path.exists(expected_dir))
 
-        def mock_mkdir(path: str) -> None:
-            nonlocal mkdir_calls
-            if path == mock_dir_path:
-                mkdir_calls += 1
+            class MockProcess:
+                def __init__(self, *args: object, **kwargs: object) -> None:
+                    self.returncode = 0
 
-        # Here we use object because subprocess.Popen can receive arbitrary arguments.
-        class MockProcess:
-            """Mock subprocess.Popen for testing."""
+                def communicate(self) -> tuple[bytes, bytes]:
+                    return (b'topic:123\n', b'')
 
-            def __init__(
-                self,
-                *unused_args: object,
-                **unused_kwargs: object,
-            ) -> None:
-                self.returncode = 0
+            with (
+                self.swap(os, 'getcwd', lambda: fake_cwd),
+                self.swap(subprocess, 'Popen', MockProcess),
+                self.swap(
+                    run_lighthouse_tests,
+                    'get_entity',
+                    lambda line: ('topic', '123') if 'topic' in line else None,
+                ),
+                self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node'),
+                self.print_swap,
+            ):
+                entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(
+                    record=True
+                )
 
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (b'topic:123\n', b'')
-
-        with (
-            self.print_swap,
-            self.swap(os.path, 'exists', mock_exists),
-            self.swap(os, 'mkdir', mock_mkdir),
-            self.swap(subprocess, 'Popen', MockProcess),
-            self.swap(
-                run_lighthouse_tests,
-                'get_entity',
-                lambda line: ('topic', '123') if 'topic' in line else None,
-            ),
-            self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node'),
-        ):
-            entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(
-                record=True
-            )
-
-        self.assertEqual(exists_calls, 1)
-        self.assertEqual(mkdir_calls, 1)
-        self.assertEqual(entities, {'topic': '123'})
+            self.assertTrue(os.path.isdir(expected_dir))
+            self.assertEqual(entities, {'topic': '123'})
