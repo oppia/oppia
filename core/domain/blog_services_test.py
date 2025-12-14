@@ -39,8 +39,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
-og_search_services = search_services
-search_services = models.Registry.import_search_services()
+elastic_search_services = models.Registry.import_search_services()
 
 
 class BlogServicesUnitTests(test_utils.GenericTestBase):
@@ -391,12 +390,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(updated_blog_post.tags, ['one', 'two'])
 
-        try:
-            blog_services.update_blog_post(
-                self.blog_post_a_id, self.change_dict_one
-            )
-        except Exception as e:
-            self.fail(f'update_blog_post() raised Exception unexpectedly: {e}')
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_one
+        )
 
         updated_blog_post = blog_services.get_blog_post_by_id(
             self.blog_post_a_id
@@ -723,7 +719,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter
+            elastic_search_services, 'add_documents_to_index', add_docs_counter
         )
 
         for i in range(5):
@@ -747,7 +743,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             blog_services, 'get_blog_post_summary_models_by_ids', lambda ids: []
         ), self.swap(
-            og_search_services, 'index_blog_post_summaries', mock_index_func
+            search_services, 'index_blog_post_summaries', mock_index_func
         ):
             blog_services.index_blog_post_summaries_given_ids(
                 ['nonexistent_id']
@@ -782,7 +778,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter
+            elastic_search_services, 'add_documents_to_index', add_docs_counter
         )
 
         with add_docs_swap:
@@ -1385,7 +1381,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             pass
 
         with self.swap(
-            search_services,
+            elastic_search_services,
             'delete_documents_from_index',
             _mock_delete_documents_from_index,
         ):
@@ -1440,7 +1436,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             return [DummyModel()]
 
         with self.swap(
-            og_search_services,
+            search_services,
             'search_blog_post_summaries',
             mock_search_blog_post_summaries,
         ), self.swap(

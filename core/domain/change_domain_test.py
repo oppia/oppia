@@ -37,7 +37,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_validate_cmd_with_missing_required_attribute_raises(self) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
@@ -58,7 +58,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_validate_cmd_with_extra_attribute_raises(self) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
@@ -81,7 +81,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
@@ -100,7 +100,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_validate_cmd_with_deprecated_value_behavior(self) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
@@ -122,7 +122,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_validate_cmd_passes_when_no_allowed_values(self) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
@@ -140,7 +140,7 @@ class ChangeDomainTests(test_utils.GenericTestBase):
 
     def test_validate_cmd_with_invalid_allowed_value_raises(self) -> None:
         # Here we use cast because we need to tell the type checker that this
-        # dictionary conforms to the ValidCmdDict TypedDict. Without cast,
+        # dictionary confirms to the ValidCmdDict TypedDict. Without cast,
         # mypy cannot infer that this dict satisfies all required keys and types
         # of ValidCmdDict in this test context.
         cmd_spec = cast(
