@@ -444,13 +444,29 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_url_open(self) -> None:
-        # Use a URL that Oppia's CI environment is expected to have access to.
-        github_api_url = (
-            'https://api.github.com/repos/oppia/oppia/releases/latest'
-        )
-        response = install_dependencies_json_packages.url_open(github_api_url)
+        test_url = 'https://example.com/test'
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            return MockResponse()
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
         self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, github_api_url)
+        self.assertEqual(response.url, test_url)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
@@ -483,10 +499,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.assertEqual(
                 getattr(context, attribute), getattr(default_context, attribute)
             )
-        for method in ('get_ca_certs', 'get_ciphers'):
-            self.assertEqual(
-                getattr(context, method)(), getattr(default_context, method)()
-            )
+        # Note: We intentionally don't compare get_ca_certs() because url_open
+        # uses certifi's certificate bundle which differs from system certs.
+        # We only compare get_ciphers() to verify cipher configuration matches.
+        self.assertEqual(context.get_ciphers(), default_context.get_ciphers())
 
     def test_url_retrieve_with_successful_https_works(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

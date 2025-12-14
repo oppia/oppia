@@ -27,8 +27,8 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 
-from core import utils
 from core.tests import test_utils
 from scripts import common, install_python_prod_dependencies, scripts_test_utils
 
@@ -94,39 +94,14 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         self.print_swap = self.swap(builtins, 'print', mock_print)
 
-        self.file_arr: List[str] = []
+        def mock_prepend_comment_to_requirements_file() -> None:
+            pass
 
-        def mock_write(msg: str) -> None:
-            self.file_arr.append(msg)
-
-        class MockFile:
-            def seek(  # pylint: disable=missing-docstring
-                self, start: int, stop: int
-            ) -> None:
-                pass
-
-            def read(self) -> str:  # pylint: disable=missing-docstring
-                return ''
-
-            def write(  # pylint: disable=missing-docstring
-                self, buf: str
-            ) -> None:
-                mock_write(buf)
-
-        class MockOpenFile:
-            def __init__(
-                self, path: Optional[str] = None, mode: Optional[str] = None
-            ) -> None:
-                self.path = path
-                self.mode = mode
-
-            def __enter__(self) -> MockFile:
-                return MockFile()
-
-            def __exit__(self, *args: int) -> None:
-                pass
-
-        self.open_file_swap = self.swap(utils, 'open_file', MockOpenFile)
+        self.swap_prepend_comment = self.swap(
+            install_python_prod_dependencies,
+            'prepend_comment_to_requirements_file',
+            mock_prepend_comment_to_requirements_file,
+        )
 
         self.cmd_token_list: List[List[str]] = []
 
@@ -316,7 +291,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
-            with self.open_file_swap, swap_get_mismatches:
+            with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -388,7 +363,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             mock_get_mismatches,
         )
 
-        with self.swap_check_call, self.swap_Popen, self.open_file_swap:
+        with self.swap_check_call, self.swap_Popen, self.swap_prepend_comment:
             with swap_get_mismatches, swap_validate_metadata_directories:
                 with self.swap_run:
                     install_python_prod_dependencies.main()
@@ -501,7 +476,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
 
         swap_remove_dir = self.swap(shutil, 'rmtree', mock_remove_dir)
         with self.swap_check_call, self.swap_Popen, swap_remove_dir:
-            with self.open_file_swap, swap_get_mismatches:
+            with self.swap_prepend_comment, swap_get_mismatches:
                 with swap_validate_metadata_directories, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -537,55 +512,46 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
             ],
         )
 
-    def test_main_adds_comment_to_start_of_requirements(self) -> None:
-        def mock_get_mismatches() -> (
-            install_python_prod_dependencies.MismatchType
-        ):
-            return {}
-
-        def mock_validate_metadata_directories() -> None:
-            pass
-
-        swap_validate_metadata_directories = self.swap(
-            install_python_prod_dependencies,
-            'validate_metadata_directories',
-            mock_validate_metadata_directories,
-        )
-        swap_get_mismatches = self.swap(
-            install_python_prod_dependencies,
-            'get_mismatches',
-            mock_get_mismatches,
+    def test_prepend_comment_to_requirements_file(self) -> None:
+        """Test that the comment is correctly prepended to the requirements
+        file. This tests the extracted function directly using a temporary
+        file.
+        """
+        # Create a temporary file with some initial content.
+        initial_content = 'flask==1.0.0\nrequests==2.0.0\n'
+        expected_comment = (
+            '# Developers: Please do not modify this auto-generated file. If\n'
+            '# you want to add, remove, upgrade, or downgrade libraries,\n'
+            '# please change the `requirements.in` file, and then follow\n'
+            '# the instructions there to regenerate this file.\n'
         )
 
-        expected_lines = [
-            '# Developers: Please do not modify this auto-generated file.'
-            ' If\n# you want to add, remove, upgrade, or downgrade libraries,'
-            '\n# please change the `requirements.in` file, and then follow\n#'
-            ' the instructions there to regenerate this file.\n'
-        ]
-        self.assertEqual(self.file_arr, [])
+        with tempfile.NamedTemporaryFile(
+            mode='w', suffix='.txt', delete=False, encoding='utf-8'
+        ) as temp_file:
+            temp_file.write(initial_content)
+            temp_file_path = temp_file.name
 
-        with self.swap_check_call, self.open_file_swap, self.swap_run:
-            with swap_get_mismatches, swap_validate_metadata_directories:
-                install_python_prod_dependencies.main()
+        try:
+            # Swap the path to use our temporary file.
+            swap_requirements_path = self.swap(
+                common,
+                'COMPILED_REQUIREMENTS_FILE_PATH',
+                temp_file_path,
+            )
 
-        self.assertEqual(self.file_arr, expected_lines)
+            with swap_requirements_path:
+                install_python_prod_dependencies.prepend_comment_to_requirements_file()
 
-        self.assertEqual(
-            self.cmd_token_list,
-            [
-                [
-                    'pip-compile',
-                    '--no-emit-index-url',
-                    '--quiet',
-                    '--strip-extras',
-                    '--generate-hashes',
-                    'requirements.in',
-                    '--output-file',
-                    'requirements.txt',
-                ],
-            ],
-        )
+            # Read the file and verify the content.
+            with open(temp_file_path, 'r', encoding='utf-8') as f:
+                result_content = f.read()
+
+            self.assertEqual(
+                result_content, '%s%s' % (expected_comment, initial_content)
+            )
+        finally:
+            os.remove(temp_file_path)
 
     def test_main_without_library_mismatches_calls_correct_functions(
         self,
@@ -616,7 +582,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         )
         swap_print = self.swap(builtins, 'print', mock_print)
         with self.swap_run, swap_get_mismatches, swap_print:
-            with swap_validate_metadata_directories, self.open_file_swap:
+            with swap_validate_metadata_directories, self.swap_prepend_comment:
                 install_python_prod_dependencies.main()
 
         self.assertEqual(
@@ -706,7 +672,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
 
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
-            with swap_validate_metadata_directories, self.open_file_swap:
+            with swap_validate_metadata_directories, self.swap_prepend_comment:
                 with swap_rm_tree, swap_list_dir, swap_is_dir, self.swap_run:
                     install_python_prod_dependencies.main()
 
@@ -896,7 +862,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         library_name_pattern = re.compile(
             r'^[a-zA-Z0-9_.-]+(\[[^\[^\]]+\])*$|^\s*--hash=sha256:.*$|\\$'
         )
-        with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -1041,7 +1009,7 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(common.REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(common.REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
@@ -1062,7 +1030,9 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         normalized_library_names: Set[str] = set()
-        with utils.open_file(common.COMPILED_REQUIREMENTS_FILE_PATH, 'r') as f:
+        with open(
+            common.COMPILED_REQUIREMENTS_FILE_PATH, 'r', encoding='utf-8'
+        ) as f:
             lines = f.readlines()
             for line in lines:
                 trimmed_line = line.strip()
