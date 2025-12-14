@@ -171,13 +171,21 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
 
     # The options to pip-compile sometimes differ on regeneration (e.g.
     # cert=None might be passed), so we skip the pip-compile line and those
-    # above it when computing the diff.
-    old_pip_compile_line_index = [
-        i for i, value in enumerate(old_compiled) if 'uv pip compile' in value
-    ][0]
-    new_pip_compile_line_index = [
-        i for i, value in enumerate(new_compiled) if 'uv pip compile' in value
-    ][0]
+    # above it when computing the diff. Different versions/tools may write
+    # slightly different headers (e.g. pip-compile, pip compile, or uv pip
+    # compile), so we search for a small set of markers and fall back to
+    # starting at the top of the file if none are found.
+    def _find_compile_line_index(lines: list[str]) -> int:
+        markers = ('uv pip compile', 'pip-compile', 'pip compile')
+        for i, value in enumerate(lines):
+            lower = value.lower()
+            if any(marker in lower for marker in markers):
+                return i
+        # If we can't find a suitable marker, fall back to the first line.
+        return 0
+
+    old_pip_compile_line_index = _find_compile_line_index(old_compiled)
+    new_pip_compile_line_index = _find_compile_line_index(new_compiled)
     diff = list(
         difflib.unified_diff(
             old_compiled[old_pip_compile_line_index + 1 :],

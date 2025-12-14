@@ -25,10 +25,11 @@ import os
 import subprocess
 import sys
 
-from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
 from typing import Dict, Generator, List, Optional
+
+from core.tests import test_utils
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
@@ -348,6 +349,98 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'uv is required for dependency compilation', str(context.exception)
         )
         self.assertIn('pipx install uv==0.9.17', str(context.exception))
+
+    def test_compile_handles_legacy_pip_compile_header(monkeypatch):
+        def mock_run(*_args, **_kwargs):
+            pass
+
+        def mock_open(*_args, **_kwargs):
+            return io.StringIO(
+                '#    pip-compile --generate-hashes\nmock file contents'
+            )
+
+        monkeypatch.setattr(subprocess, 'run', mock_run)
+        monkeypatch.setattr(builtins, 'open', mock_open)
+
+        change = install_python_dev_dependencies.compile_pip_requirements(
+            'requirements_dev.in', 'requirements_dev.txt'
+        )
+        assert not change
+
+    def test_compile_handles_missing_header(monkeypatch):
+        def mock_run(*_args, **_kwargs):
+            pass
+
+        def mock_open(*_args, **_kwargs):
+            return io.StringIO('some-package==1.2.3\n')
+
+        monkeypatch.setattr(subprocess, 'run', mock_run)
+        monkeypatch.setattr(builtins, 'open', mock_open)
+
+        change = install_python_dev_dependencies.compile_pip_requirements(
+            'requirements_dev.in', 'requirements_dev.txt'
+        )
+        assert bool(change)
+
+    def test_compile_pip_requirements_handles_legacy_pip_compile_header(
+        self,
+    ) -> None:
+        """Ensure we don't crash if the compiled file was generated with
+        pip-compile (legacy header format).
+        """
+
+        def mock_run(
+            *_args: str, **_kwargs: str
+        ) -> None:  # pylint: disable=unused-argument
+            pass
+
+        def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
+            # Simulate an older pip-compile header with 'pip-compile'.
+            return io.StringIO(
+                '#    pip-compile --generate-hashes\nmock file contents'
+            )
+
+        run_swap = self.swap_with_checks(
+            subprocess,
+            'run',
+            mock_run,
+            expected_args=[
+                (
+                    [
+                        'uv',
+                        'pip',
+                        'compile',
+                        'requirements_dev.in',
+                        '-o',
+                        'requirements_dev.txt',
+                        '--generate-hashes',
+                        '--no-emit-index-url',
+                        '--strip-extras',
+                        '--quiet',
+                    ],
+                ),
+            ],
+            expected_kwargs=[
+                {'check': True, 'encoding': 'utf-8'},
+            ],
+        )
+        open_swap = self.swap_with_checks(
+            builtins,
+            'open',
+            mock_open,
+            expected_args=[
+                ('requirements_dev.txt', 'r'),
+                ('requirements_dev.txt', 'r'),
+            ],
+            expected_kwargs=[{'encoding': 'utf-8'}, {'encoding': 'utf-8'}],
+        )
+
+        with run_swap, open_swap:
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
+        # Our mocked files don't change between runs, so we expect no diff.
+        self.assertFalse(change)
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:
