@@ -28,6 +28,14 @@ environment setup and troubleshooting.
 
   python -m scripts.install_third_party_libs
 
+- Install uv for faster dependency compilation (replaces pip-tools):
+
+  python -m pip install pipx
+
+  python -m pipx ensurepath
+
+  pipx install uv==0.9.17
+
 - Run backend unit tests locally:
 
   python -m scripts.run_backend_tests --test_target <path_or_testname>
