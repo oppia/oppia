@@ -1518,9 +1518,25 @@ class UrlRetrieveTests(CommonTests):
         github_api_url = (
             'https://api.github.com/repos/oppia/oppia/releases/latest'
         )
-        response = common.url_open(github_api_url)
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, github_api_url)
+
+        class MockResponse:
+            def __init__(self) -> None:
+                self.url = github_api_url
+
+            def getcode(self) -> int:
+                """Return the HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            """Mock urlopen to return a successful response."""
+            self.assertEqual(url, github_api_url)
+            self._assert_ssl_context_matches_default(context)
+            return MockResponse()
+
+        with self.swap(urlrequest, 'urlopen', mock_urlopen):
+            response = common.url_open(github_api_url)
+            self.assertEqual(response.getcode(), 200)
+            self.assertEqual(response.url, github_api_url)
 
     def test_url_retrieve_tries_curl_at_outset(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
