@@ -63,6 +63,13 @@ runs:
         pipx install uv==0.9.17
       shell: bash
 
+    - name: Create and activate venv
+      run: |
+        python -m venv venv
+        echo "VIRTUAL_ENV=$PWD/venv" >> $GITHUB_ENV
+        echo "$PWD/venv/bin" >> $GITHUB_PATH
+      shell: bash
+
     - name: Install third-party Python dev dependencies
       if: steps.restore_python_dev_dependencies_cache.outputs.cache-hit == false
       uses: nick-fields/retry@v3
