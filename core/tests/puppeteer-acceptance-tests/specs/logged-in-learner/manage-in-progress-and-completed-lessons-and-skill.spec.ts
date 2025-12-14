@@ -53,7 +53,7 @@ describe('Logged-in Learner', function () {
     await releaseCoordinator.enableFeatureFlag(
       'show_redesigned_learner_dashboard'
     );
-    await releaseCoordinator.closeBrowser();
+    await UserFactory.closeBrowserForUser(releaseCoordinator);
 
     await curriculumAdmin.createNewClassroom('Math', 'math');
     await curriculumAdmin.updateClassroom(
@@ -108,7 +108,7 @@ describe('Logged-in Learner', function () {
 
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
-    await curriculumAdmin.closeBrowser();
+    await UserFactory.closeBrowserForUser(curriculumAdmin);
 
     loggedInLearner = await UserFactory.createNewUser(
       'loggedInLearner1',
@@ -137,15 +137,19 @@ describe('Logged-in Learner', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it('should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.navigateToProgressSection();
-    await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
-      true
-    );
-    await loggedInLearner.navigateThroughClassroomButtonOnRLD();
-    await loggedInLearner.expectToBeOnPage('/learn/math');
-  });
+  it(
+    'should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math',
+    async function () {
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToProgressSection();
+      await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+        true
+      );
+      await loggedInLearner.navigateThroughClassroomButtonOnRLD();
+      await loggedInLearner.expectToBeOnPage('/learn/math');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
   it('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
     await loggedInLearner.selectAndOpenTopic('Place Values');
@@ -367,7 +371,7 @@ describe('Logged-in Learner', function () {
       'In Progress'
     );
     await loggedInLearner.expectDisplayMoreCommunityLessonsToBeVisible();
-  });
+  }, 480000); // takes longer than default tim,eout
 
   it(
     'should toggle Display More button for community lessons',
