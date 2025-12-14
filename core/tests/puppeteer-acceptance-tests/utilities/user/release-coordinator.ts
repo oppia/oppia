@@ -560,47 +560,50 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
+   * Clicks on "View Output" of the latest beam job run.
+   */
+  async viewJobOutput(): Promise<void> {
+    await this.clickOnElementWithText('View Output');
+    await this.expectElementToBeVisible(beamJobOutputDialogSelector);
+  }
+
+  /**
    * Views and copies the output of a job.
    */
   async viewAndCopyJobOutput(): Promise<string> {
-    try {
-      // OverridePermissions is used to allow clipboard access.
-      const context = await this.browserObject.defaultBrowserContext();
-      await context.overridePermissions('http://localhost:8181', [
-        'clipboard-read',
-        'clipboard-write',
-      ]);
-      const pages = await this.browserObject.pages();
-      this.page = pages[pages.length - 1];
+    await this.viewJobOutput();
+    await this.page.waitForSelector(beamJobRunOutputSelector, {
+      visible: true,
+    });
 
-      await this.clickOnElementWithText('View Output');
-      await this.page.waitForSelector(beamJobRunOutputSelector, {
-        visible: true,
-      });
+    // OverridePermissions is used to allow clipboard access.
+    const context = await this.browserObject.defaultBrowserContext();
+    await context.overridePermissions('http://localhost:8181', [
+      'clipboard-read',
+      'clipboard-write',
+    ]);
+    const pages = await this.browserObject.pages();
+    this.page = pages[pages.length - 1];
 
-      // Getting the output text directly from the element.
-      const output = await this.page.$eval(
-        beamJobRunOutputSelector,
-        el => el.textContent
-      );
+    // Getting the output text directly from the element.
+    const output = await this.page.$eval(
+      beamJobRunOutputSelector,
+      el => el.textContent
+    );
 
-      await this.clickOnElementWithSelector(copyOutputButton);
+    await this.clickOnElementWithSelector(copyOutputButton);
 
-      // Reading the clipboard data.
-      const clipboardData = await this.page.evaluate(async () => {
-        return await navigator.clipboard.readText();
-      });
+    // Reading the clipboard data.
+    const clipboardData = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
 
-      if (clipboardData !== output) {
-        throw new Error('Data was not copied correctly');
-      }
-      showMessage('Data was copied correctly');
-
-      return output;
-    } catch (error) {
-      console.error('An error occurred:', error);
-      throw error;
+    if (clipboardData !== output) {
+      throw new Error('Data was not copied correctly');
     }
+    showMessage('Data was copied correctly');
+
+    return output;
   }
 
   /**
