@@ -797,6 +797,17 @@ def managed_webdriverio_server(
     else:
         os.environ['MOBILE'] = 'false'
 
+    # Temporarily unset TMPDIR and related env vars to prevent Chrome from using
+    # a repo-specific tmp dir that may cause issues with devtools port reading.
+    # On CI, access to the repo-specific tmp dir is slower and the file might
+    # not be available quickly enough for Chrome to read it, causing startup
+    # errors in webdriverio tests.
+    saved_tmp_vars = {}
+    for var in ['TMPDIR', 'TMP', 'TEMP']:
+        if var in os.environ:
+            saved_tmp_vars[var] = os.environ[var]
+            del os.environ[var]
+
     webdriverio_args = [
         common.NPX_BIN_PATH,
         # This flag ensures tests fail if the `waitFor()` calls time out.
@@ -837,6 +848,8 @@ def managed_webdriverio_server(
         with managed_webdriverio_proc as proc:
             yield proc
     finally:
+        for var, value in saved_tmp_vars.items():
+            os.environ[var] = value
         del os.environ['MOBILE']
 
 

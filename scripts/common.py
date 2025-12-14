@@ -101,11 +101,11 @@ except Exception:
     pass
 
 
-def cleanup_repo_tmp(older_than_minutes: int = 10) -> None:
-    """Remove ephemeral repo-local tmp directories named `tmp*` older than
+def cleanup_repo_tmp(older_than_minutes: int = 5) -> None:
+    """Remove ephemeral repo-local tmp directories and files named `tmp*` older than
     `older_than_minutes` minutes.
 
-    This is intended to remove pip/yarn unpack directories (e.g. tmp23pb4wmk)
+    This is intended to remove pip/yarn unpack directories/files (e.g. tmp23pb4wmk)
     while preserving important service directories such as `elasticsearch`.
     The function is conservative: it only removes entries whose name starts
     with "tmp" and whose mtime is older than the configured threshold.
@@ -126,14 +126,17 @@ def cleanup_repo_tmp(older_than_minutes: int = 10) -> None:
             except FileNotFoundError:
                 continue
 
-            # Skip recent dirs.
+            # Skip recent entries.
             if st.st_mtime > cutoff:
                 continue
 
-            # Be cautious: only remove directories (not files) matching tmp*.
+            # Be cautious: remove directories and files matching tmp*.
             if os.path.isdir(path):
                 logging.info('Removing old repo tmp dir: %s', path)
                 shutil.rmtree(path, ignore_errors=True)
+            elif os.path.isfile(path):
+                logging.info('Removing old repo tmp file: %s', path)
+                os.remove(path)
     except Exception:
         logging.exception('Failed to cleanup repo tmp dir')
 
