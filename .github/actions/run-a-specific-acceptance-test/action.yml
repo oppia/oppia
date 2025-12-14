@@ -32,18 +32,9 @@ runs:
     - name: Run ${{ inputs.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test ${{ inputs.test-suite }}
       id: run-acceptance-test
       shell: bash
-      # We use xvfb-run to create a virtual screen to run tests without headless mode.
-      # Numbers in 1920x1080x24 represent screen width, height and color depth respectively.
       run: |
         set -o pipefail;
-        VIDEO_RECORDING_IS_ENABLED=${{ inputs.enable-screen-recording && '1' || '0' }}
-        if [ "${{ inputs.viewport-type }}" = "mobile" ]; then
-          SERVER_ARGS='-screen 0, 720x1600x24'
-        else
-          SERVER_ARGS='-screen 0, 1920x1080x24'
-        fi
-
-        xvfb-run -a --server-args="$SERVER_ARGS" python -m scripts.run_acceptance_tests --skip_build --suite=${{ inputs.test-suite }} ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }} --prod_env --server_log_level=info | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
+        VIDEO_RECORDING_IS_ENABLED=${{ inputs.enable-screen-recording && '1' || '0' }} python -m scripts.run_acceptance_tests --skip_build --suite=${{ inputs.test-suite }} ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }} --prod_env --server_log_level=info --headless | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
     - name: Upload test logs
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
