@@ -939,6 +939,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -1203,6 +1212,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -1242,6 +1260,15 @@ class AdminHandler(
             Exception. Cannot reload a collection in production.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s'
@@ -1269,6 +1296,15 @@ class AdminHandler(
             Exception. Environment is not DEVMODE.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations'
@@ -1282,22 +1318,34 @@ class AdminHandler(
                 'The Science of Superheroes',
             ]
             exploration_ids_to_publish = []
-            for i in range(num_dummy_exps_to_generate):
-                title = random.choice(possible_titles)
-                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
-                new_exploration_id = exp_fetchers.get_new_exploration_id()
-                exploration = exp_domain.Exploration.create_default_exploration(
-                    new_exploration_id,
-                    title=title,
-                    category=category,
-                    objective='Dummy Objective',
-                )
-                exp_services.save_new_exploration(self.user_id, exploration)
-                if i <= num_dummy_exps_to_publish - 1:
-                    exploration_ids_to_publish.append(new_exploration_id)
-                    rights_manager.publish_exploration(
-                        self.user, new_exploration_id
+
+            # Process in batches to avoid Redis connection pool exhaustion
+            BATCH_SIZE = 10
+            for batch_start in range(0, num_dummy_exps_to_generate, BATCH_SIZE):
+                batch_end = min(batch_start + BATCH_SIZE, num_dummy_exps_to_generate)
+
+                for i in range(batch_start, batch_end):
+                    title = random.choice(possible_titles)
+                    category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
+                    new_exploration_id = exp_fetchers.get_new_exploration_id()
+                    exploration = exp_domain.Exploration.create_default_exploration(
+                        new_exploration_id,
+                        title=title,
+                        category=category,
+                        objective='Dummy Objective',
                     )
+                    exp_services.save_new_exploration(self.user_id, exploration)
+                    if i <= num_dummy_exps_to_publish - 1:
+                        exploration_ids_to_publish.append(new_exploration_id)
+                        rights_manager.publish_exploration(
+                            self.user, new_exploration_id
+                        )
+
+                # Log progress
+                logging.info(
+                    f'[ADMIN] Processed batch: {batch_start + 1}-{batch_end} '
+                    f'of {num_dummy_exps_to_generate} explorations'
+                )
             exp_services.index_explorations_given_ids(
                 exploration_ids_to_publish
             )
@@ -1317,6 +1365,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -1611,6 +1668,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
@@ -1964,6 +2030,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if (feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles) and (
                 not user_services.can_submit_question_suggestions(self.user_id)
@@ -2142,6 +2217,15 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
+        
+        # Enforce maximum limit to prevent server crashes
+        MAX_EXPLORATIONS = 100
+        if num_dummy_exps_to_generate > MAX_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_EXPLORATIONS} dummy explorations. '
+                f'Requested: {num_dummy_exps_to_generate}'
+            )
+
         if constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
