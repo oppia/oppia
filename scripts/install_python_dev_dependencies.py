@@ -146,7 +146,7 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     with open(compiled_path, 'r', encoding='utf-8') as f:
         old_compiled = list(f.readlines())
     # Warning: In some CI environments, running this command seems to add
-    # --cert=None --client-cert=None --pip-args=None flags to the pip-compile
+    # --cert=None --client-cert=None --pip-args=None flags to the compile
     # command referenced at the start of the compiled requirements file. It is
     # not clear why this happens, since these args are not explicitly being
     # passed here. We account for that later below when computing the diff.
@@ -169,14 +169,15 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     with open(compiled_path, 'r', encoding='utf-8') as f:
         new_compiled = list(f.readlines())
 
-    # The options to pip-compile sometimes differ on regeneration (e.g.
-    # cert=None might be passed), so we skip the pip-compile line and those
+    # The options to the compile step sometimes differ on regeneration (e.g.
+    # cert=None might be passed), so we skip the compile line and those
     # above it when computing the diff. Different versions/tools may write
-    # slightly different headers (e.g. pip-compile, pip compile, or uv pip
-    # compile), so we search for a small set of markers and fall back to
-    # starting at the top of the file if none are found.
+    # slightly different headers, so we search for a small set of markers and
+    # fall back to starting at the top of the file if none are found.
     def _find_compile_line_index(lines: list[str]) -> int:
-        markers = ('uv pip compile', 'pip-compile', 'pip compile')
+        # Look for known compile command patterns. We only keep a small,
+        # generic set of markers to detect the auto-generated header line.
+        markers = ('uv pip compile', 'compile')
         for i, value in enumerate(lines):
             lower = value.lower()
             if any(marker in lower for marker in markers):

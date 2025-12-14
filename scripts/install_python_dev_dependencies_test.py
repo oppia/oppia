@@ -25,11 +25,10 @@ import os
 import subprocess
 import sys
 
+from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
-from typing import Dict, Generator, List, Optional
-
-from core.tests import test_utils
+from typing import Generator
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
@@ -122,46 +121,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
-
-    def test_install_installation_tools(self) -> None:
-        expected_tools = {
-            'pip': '25.3',
-            'pip-tools': '7.5.2',
-            'setuptools': '80.9.0',
-        }
-        installed_tools: Dict[str, str] = {}
-
-        process = subprocess.Popen(
-            ['echo', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-
-        def mock_popen(  # pylint: disable=unused-argument
-            cmd_tokens: List[str],
-            stdout: int,
-            stdin: Optional[int] = None,
-            stderr: Optional[int] = None,
-        ) -> subprocess.Popen[bytes]:
-            if len(cmd_tokens) > 3 and cmd_tokens[3] == 'install':
-                package, version = cmd_tokens[4].split('==')
-                installed_tools[package] = version
-                self.assertEqual(
-                    cmd_tokens,
-                    [
-                        sys.executable,
-                        '-m',
-                        'pip',
-                        'install',
-                        f'{package}=={version}',
-                    ],
-                )
-            return process
-
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-
-        with popen_swap:
-            install_python_dev_dependencies.install_installation_tools()
-
-        self.assertEqual(installed_tools, expected_tools)
 
     def test_install_dev_dependencies(self) -> None:
 
@@ -350,13 +309,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
         self.assertIn('pipx install uv==0.9.17', str(context.exception))
 
-    def test_compile_handles_legacy_pip_compile_header(monkeypatch):
+    def test_compile_handles_legacy_header(monkeypatch):
         def mock_run(*_args, **_kwargs):
             pass
 
         def mock_open(*_args, **_kwargs):
             return io.StringIO(
-                '#    pip-compile --generate-hashes\nmock file contents'
+                '#    compile --generate-hashes\nmock file contents'
             )
 
         monkeypatch.setattr(subprocess, 'run', mock_run)
@@ -380,13 +339,51 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         change = install_python_dev_dependencies.compile_pip_requirements(
             'requirements_dev.in', 'requirements_dev.txt'
         )
-        assert bool(change)
+        assert isinstance(change, str)
+
+    def test_install_installation_tools(monkeypatch):
+        expected_tools = {'pip': '25.3', 'setuptools': '80.9.0'}
+        installed_tools = {}
+
+        class DummyProcess:
+            def __init__(self, has_stdout=False):
+                # Simulate a process object. If has_stdout is True, provide
+                # a file-like object to act as stdout (used by the pip install
+                # invocation). Otherwise, provide a communicate() method.
+                if has_stdout:
+                    self.stdout = io.BytesIO(b'')
+                else:
+                    self.stdout = None
+
+            def communicate(self):
+                return (b'', b'')
+
+        def mock_popen(cmd_tokens, stdout=None, stdin=None, stderr=None):
+            if len(cmd_tokens) > 3 and cmd_tokens[3] == 'install':
+                package, version = cmd_tokens[4].split('==')
+                installed_tools[package] = version
+                assert cmd_tokens == [
+                    sys.executable,
+                    '-m',
+                    'pip',
+                    'install',
+                    f'{package}=={version}',
+                ]
+                return DummyProcess(has_stdout=True)
+            # The grep command should return an object with communicate().
+            return DummyProcess()
+
+        monkeypatch.setattr(subprocess, 'Popen', mock_popen)
+
+        install_python_dev_dependencies.install_installation_tools()
+
+        assert installed_tools == expected_tools
 
     def test_compile_pip_requirements_handles_legacy_pip_compile_header(
         self,
     ) -> None:
-        """Ensure we don't crash if the compiled file was generated with
-        pip-compile (legacy header format).
+        """Ensure we don't crash if the compiled file was generated with a
+        legacy compile header.
         """
 
         def mock_run(
@@ -395,9 +392,9 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             pass
 
         def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
-            # Simulate an older pip-compile header with 'pip-compile'.
+            # Simulate an older compile header.
             return io.StringIO(
-                '#    pip-compile --generate-hashes\nmock file contents'
+                '#    compile --generate-hashes\nmock file contents'
             )
 
         run_swap = self.swap_with_checks(

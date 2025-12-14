@@ -29,7 +29,7 @@ runs:
       id: restore_python_dev_dependencies_cache
       uses: actions/cache@v4
       # We need to include install_python_dev_dependencies.py in the cache key
-      # because it has the version numbers for pip, pip-tools and setuptools.
+      # because it has the version numbers for pip and setuptools.
       with:
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'requirements_dev.txt', 'scripts/install_python_dev_dependencies.py') }}
         path: |
@@ -125,8 +125,8 @@ runs:
         # for some useful context on cases in which restore-keys is useful.
         #
         # Note that we need to include install_python_dev_dependencies.py in
-        # the cache key because it has the version numbers for pip, pip-tools
-        # and setuptools. We include scripts/common.py because it has version
+        # the cache key because it has the version numbers for pip and
+        # setuptools. We include scripts/common.py because it has version
         # numbers for dependencies like Elasticsearch.
         key: ${{ runner.os }}-proddeps-${{ hashFiles('/home/runner/work/.pyversion', 'yarn.lock', 'requirements_dev.txt', 'requirements.txt', 'dependencies.json',  'scripts/install_python_dev_dependencies.py', 'scripts/common.py') }}
         path: |
