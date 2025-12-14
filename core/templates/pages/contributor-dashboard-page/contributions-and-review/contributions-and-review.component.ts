@@ -56,7 +56,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -204,7 +204,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private windowRef: WindowRef
   ) {}
 
   getQuestionContributionsSummary(
@@ -630,6 +631,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   switchToTab(tabType: string, subType: string): void {
+    this.windowRef.nativeWindow.scrollTo(0, 0);
     this.activeTabType = tabType;
     this.dropdownShown = false;
     this.activeDropdownTabChoice = this.getActiveDropdownTabText(

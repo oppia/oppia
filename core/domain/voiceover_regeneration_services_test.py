@@ -235,7 +235,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         mimetype = 'audio/mpeg'
 
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
         fs.commit(
@@ -288,7 +288,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         mimetype = 'audio/mpeg'
 
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
         fs.commit(
@@ -351,7 +351,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             voiceover_filename_for_binary,
         )
         mimetype = 'audio/mpeg'
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
         fs.commit(
             '%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype

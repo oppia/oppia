@@ -18,11 +18,11 @@
 
 from __future__ import annotations
 
+import builtins
 import io
 import multiprocessing
 import os
 
-from core import utils
 from core.tests import test_utils
 
 from typing import Final, List, Tuple
@@ -58,8 +58,10 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
 
-        def mock_open_file(
-            path: str, unused_permissions: List[str]
+        def mock_open(
+            path: str,
+            _: List[str],
+            encoding: str = 'utf-8',  # pylint: disable=unused-argument
         ) -> io.StringIO:
             if path == other_files_linter.DEPENDENCIES_JSON_FILE_PATH:
                 file = self.dependencies_file
@@ -70,7 +72,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         def mock_listdir(unused_path: str) -> List[str]:
             return self.files_in_typings_dir
 
-        self.open_file_swap = self.swap(utils, 'open_file', mock_open_file)
+        self.open_swap = self.swap(builtins, 'open', mock_open)
         self.listdir_swap = self.swap(os, 'listdir', mock_listdir)
 
     def test_check_valid_pattern_in_app_dev_yaml(self) -> None:
@@ -208,7 +210,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -223,7 +225,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         expected_error_messages = [
             'SUCCESS  Third party type defs check passed'
         ]
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -236,7 +238,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
     def test_check_third_party_libs_type_defs_multiple(self) -> None:
         self.files_in_typings_dir.append('guppy-defs-0.2.d.ts')
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap, self.print_swap:
+        with self.open_swap, self.listdir_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -261,7 +263,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap:
+        with self.open_swap, self.listdir_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
@@ -287,7 +289,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'nerdamer-defs-0.6.d.ts',
         ]
         expected_error_messages = 'FAILED  Third party type defs check failed'
-        with self.open_file_swap, self.listdir_swap, self.print_swap:
+        with self.open_swap, self.listdir_swap, self.print_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_third_party_libs_type_defs()
