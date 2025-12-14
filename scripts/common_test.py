@@ -41,7 +41,7 @@ from urllib import request as urlrequest
 from core.tests import test_utils
 
 import yaml
-from typing import Dict, Generator, List, Literal, NoReturn, Tuple, Union
+from typing import Dict, Generator, List, Literal, NoReturn, Tuple
 
 from . import common
 
@@ -1366,7 +1366,7 @@ class CommonTests(test_utils.GenericTestBase):
         now = 1000000
         cutoff = now - (10 * 60)
 
-        # Create mock stat objects
+        # Create mock stat objects.
         old_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff - 1, 0))
         recent_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff + 1, 0))
 
@@ -1379,7 +1379,6 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_isdir(path: str) -> bool:
             if path == common.REPO_TMP_DIR:
                 return True
-            # tmp_old_dir is a dir, tmp_old_file is not
             return path.endswith('tmp_old_dir')
 
         def mock_listdir(unused_path: str) -> List[str]:
@@ -1399,8 +1398,9 @@ class CommonTests(test_utils.GenericTestBase):
                 raise FileNotFoundError('File not found')
 
         def mock_rmtree(
-            path: str, ignore_errors: bool = False
-        ) -> None:  # pylint: disable=unused-argument
+            path: str,
+            ignore_errors: bool = False,  # pylint: disable=unused-argument
+        ) -> None:
             rmtree_calls.append(path)
 
         def mock_logging_info(msg: str, path: str) -> None:
