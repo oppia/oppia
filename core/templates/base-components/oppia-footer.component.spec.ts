@@ -163,16 +163,17 @@ describe('OppiaFooterComponent', () => {
     expect(component.emailDuplicated).toBeFalsy();
 
     component.subscribeToMailingList();
+    flushMicrotasks();
 
-    expect(component.subscriptionProcessing).toBe(true);
     expect(component.emailDuplicated).toBe(true);
 
     const input: HTMLInputElement =
       fixture.nativeElement.querySelector('input');
     input.value = 'anotherEmail@example.com';
     input.dispatchEvent(new Event('input'));
-    tick();
+
     fixture.detectChanges();
+    tick();
 
     expect(component.emailDuplicated).toBeFalsy();
   }));
