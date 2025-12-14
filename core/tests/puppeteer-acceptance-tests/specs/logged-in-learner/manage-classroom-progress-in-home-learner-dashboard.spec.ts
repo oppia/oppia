@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for home tab of learner dashboard, specfically
- * interactions with components that use classroom data.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ *  LI.1. Sign up for an account
+ *  LI.3. Track progress and get recommendations for next steps on the Learner Dashboard
+ * L1.10  Start Lessons from the Home tab in redesigned Learner Dashboard
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -30,8 +34,8 @@ import {showMessage} from '../../utilities/common/show-message';
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
-describe('Logged-in User', function () {
-  let loggedInUser: LoggedInUser & LoggedOutUser;
+describe('Logged-In Learner', function () {
+  let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
   let releaseCoordinator: ReleaseCoordinator;
   const chapterIds: string[] = [];
@@ -116,9 +120,9 @@ describe('Logged-in User', function () {
     await curriculumAdmin.publishStoryDraft();
     await curriculumAdmin.closeBrowser();
 
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser1',
-      'logged_in_user1@example.com'
+    loggedInLearner = await UserFactory.createNewUser(
+      'loggedInLearner1',
+      'logged_in_learner1@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
   }, 1500000); // Setup taking longer than default timeout.
@@ -126,31 +130,33 @@ describe('Logged-in User', function () {
   it(
     'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
         'Home'
       );
 
-      await loggedInUser.expectLearnerGreetingsToBe('Welcome, loggedInUser1!');
+      await loggedInLearner.expectLearnerGreetingsToBe(
+        'Welcome, loggedInLearner1!'
+      );
 
-      await loggedInUser.expectElementsToBePresentInRLD(
+      await loggedInLearner.expectElementsToBePresentInRLD(
         ['Learn Something New'],
         'tabSection'
       );
-      await loggedInUser.expectElementsToBePresentInRLD(
+      await loggedInLearner.expectElementsToBePresentInRLD(
         ["Topics available in Oppia's Classroom"],
         'cardDisplay'
       );
-      await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+      await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
         true
       );
 
-      await loggedInUser.expectNumberOfElementsToBe(
+      await loggedInLearner.expectNumberOfElementsToBe(
         '.e2e-test-learer-topic-summary-tile',
         2
       );
 
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTab',
         __dirname
       );
@@ -161,9 +167,9 @@ describe('Logged-in User', function () {
   it(
     'should navigate directly to math classroom',
     async function () {
-      await loggedInUser.navigateToClassroomFromLearnerDashboard('math');
-      await loggedInUser.expectToBeOnPage('learn/math');
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.navigateToClassroomFromLearnerDashboard('math');
+      await loggedInLearner.expectToBeOnPage('learn/math');
+      await loggedInLearner.expectScreenshotToMatch(
         'mathClassroomPage',
         __dirname
       );
@@ -175,10 +181,10 @@ describe('Logged-in User', function () {
   it(
     'should navigate directly to the Place Values topic in the math classroom',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToTopicPageByCard('Place Values');
-      await loggedInUser.expectToBeOnPage('learn/math/place-values');
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToTopicPageByCard('Place Values');
+      await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+      await loggedInLearner.expectScreenshotToMatch(
         'placeValuesTopicPage',
         __dirname
       );
@@ -188,176 +194,176 @@ describe('Logged-in User', function () {
   );
 
   it('should display in-progress and recommended lessons after starting a lesson', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToTopicPageByCard('Place Values');
-    await loggedInUser.expectToBeOnPage('learn/math/place-values');
-    await loggedInUser.selectChapterWithinStoryToLearn(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToTopicPageByCard('Place Values');
+    await loggedInLearner.expectToBeOnPage('learn/math/place-values');
+    await loggedInLearner.selectChapterWithinStoryToLearn(
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
     // Did not finish the chapter,So still in  In-progress section.
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
       'tabSection'
     );
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter1AndRecommendedForYouChapter2',
       __dirname
     );
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 1: What are the Place Values'],
       0
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Recommended for you',
       ['Chapter 2: Find the Value of a Number'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
     );
 
-    await loggedInUser.expectToBeOnLessonPage(
+    await loggedInLearner.expectToBeOnLessonPage(
       'Chapter 1: What are the Place Values',
       chapterIds[0]
     );
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.expectScreenshotToMatch(
       'lessonPageOfChapter1',
       __dirname
     );
   });
 
   it('should not recommend any lessons if currently on last lesson', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter2AndRecommendedForYouChapter3',
       __dirname
     );
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 2: Find the Value of a Number'],
       0
     );
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Recommended for you',
       ['Chapter 3: Comparing Numbers'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter3AndRecommendedForYouChapter4',
       __dirname
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 3: Comparing Numbers'],
       0
     );
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Recommended for you',
       ['Chapter 4: Rounding Numbers part 1'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter4AndRecommendedForYouChapter5',
       __dirname
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 4: Rounding Numbers part 1'],
       0
     );
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Recommended for you',
       ['Chapter 5: Rounding Numbers part 2'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 4: Rounding Numbers part 1'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter5AndRecommendedForYouChapter6',
       __dirname
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 5: Rounding Numbers part 2'],
       0
     );
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lessons in progress',
       'Chapter 5: Rounding Numbers part 2'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndNoRecommendedForYouChapter',
       __dirname
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Lessons in progress',
       ['Chapter 6: Extra chapter'],
       0
     );
 
-    await loggedInUser.expectElementsNotToBePresentInRLD(
+    await loggedInLearner.expectElementsNotToBePresentInRLD(
       ['Recommended for you'],
       'cardDisplay'
     );
@@ -366,20 +372,20 @@ describe('Logged-in User', function () {
   it(
     'should be able to see community lessons in In Progress section if not completed fully',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+      await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 1');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 1');
+      await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
+      await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
 
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.continueToNextCard();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
         __dirname
       );
-      await loggedInUser.expectLessonCardProgressToBe(
+      await loggedInLearner.expectLessonCardProgressToBe(
         'Lessons in progress',
         ['Chapter 6: Extra chapter', 'Explore Title 1'],
         0
@@ -389,26 +395,26 @@ describe('Logged-in User', function () {
   );
 
   it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 2');
-    await loggedInUser.addLessonToPlayLater('Explore Title 2', true);
-    await loggedInUser.expectToastMessage(
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
+    await loggedInLearner.addLessonToPlayLater('Explore Title 2', true);
+    await loggedInLearner.expectToastMessage(
       "Successfully added to your 'Play Later' list."
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['Continue where you left off', 'Learn Something New'],
       'tabSection'
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       [
         'Lessons in progress',
         "Topics available in Oppia's Classroom",
@@ -417,13 +423,13 @@ describe('Logged-in User', function () {
       'cardDisplay'
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Lesson you saved for later',
       'Explore Title 2'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
     showMessage('Completed final test');

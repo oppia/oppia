@@ -13,8 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance tests for learner dashboard functionalities, specifically to
- * verify the visibility and correctness of Progress section, Progress percentage, Completed lessons, Skills and skill progress percentages.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ *
+ *  LI.2. Set goals on the Learner Dashboard
+ * Start a Goal and see the changes in the Goals Tab as we progress in a story
  */
 
 import testConstants from '../../utilities/common/test-constants';
@@ -29,8 +32,8 @@ import {TopicManager} from '../../utilities/user/topic-manager';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 const ROLES = testConstants.Roles;
 
-describe('Logged-in User', function () {
-  let loggedInUser: LoggedInUser & LoggedOutUser;
+describe('Logged-in Learner', function () {
+  let loggedInLearner: LoggedInUser & LoggedOutUser;
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
 
@@ -107,9 +110,9 @@ describe('Logged-in User', function () {
     await curriculumAdmin.publishStoryDraft();
     await curriculumAdmin.closeBrowser();
 
-    loggedInUser = await UserFactory.createNewUser(
-      'loggedInUser1',
-      'logged_in_user1@example.com'
+    loggedInLearner = await UserFactory.createNewUser(
+      'loggedInLearner1',
+      'logged_in_learner1@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
   }, 1500000); // Setup taking longer than default timeout.
@@ -117,16 +120,16 @@ describe('Logged-in User', function () {
   it(
     'should display empty progress message when no lessons are in progress',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
         'Home'
       );
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectSidebarTabToBeActiveAndContainButtonsInOrder(
+      await loggedInLearner.navigateToProgressSection();
+      await loggedInLearner.expectSidebarTabToBeActiveAndContainButtonsInOrder(
         'Progress'
       );
-      await loggedInUser.expectProgressSectionToBeEmptyInNewLD();
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.expectProgressSectionToBeEmptyInNewLD();
+      await loggedInLearner.expectScreenshotToMatch(
         'emptyProgressSection',
         __dirname
       );
@@ -135,142 +138,142 @@ describe('Logged-in User', function () {
   );
 
   it('should select "Or Explore All Lessons in Classroom" button and navigate to /learn/math', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
-    await loggedInUser.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
       true
     );
-    await loggedInUser.navigateThroughClassroomButtonOnRLD();
-    await loggedInUser.expectToBeOnPage('/learn/math');
+    await loggedInLearner.navigateThroughClassroomButtonOnRLD();
+    await loggedInLearner.expectToBeOnPage('/learn/math');
   });
 
   it('should select Place Values Topic and play "Chapter 1: What are the Place Values?" but do not finish and see It in Progress Section', async function () {
-    await loggedInUser.selectAndOpenTopic('Place Values');
-    await loggedInUser.selectChapterWithinStoryToLearn(
+    await loggedInLearner.selectAndOpenTopic('Place Values');
+    await loggedInLearner.selectChapterWithinStoryToLearn(
       "Jamie's Adventures in the Arcade",
       'What are the Place Values'
     );
-    await loggedInUser.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.expectScreenshotToMatch(
       'ProgressSectionInProgressWithOnlyChapter01',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['In Progress'],
       'tabSection'
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 1: What are the Place Values'],
       0,
       'In Progress'
     );
-    await loggedInUser.expectSkillCardProgressToBe(
+    await loggedInLearner.expectSkillCardProgressToBe(
       'Skills',
       ['Place Values'],
       0
     );
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Classroom Lessons',
       'Chapter 1: What are the Place Values'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectScreenshotToMatch(
       'ProgressSectionInProgressWithOnlyChapter02',
       __dirname
     );
-    await loggedInUser.navigateToSkillByCard('Skills', 'Place Values');
+    await loggedInLearner.navigateToSkillByCard('Skills', 'Place Values');
   });
 
   it("should complete all the lessons of Place Value's Story and see Chapter 1 in the Completed Lessons section", async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 2: Find the Value of a Number'],
       0,
       'In Progress'
     );
-    await loggedInUser.expectSkillCardProgressToBe(
+    await loggedInLearner.expectSkillCardProgressToBe(
       'Skills',
       ['Place Values'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Classroom Lessons',
       'Chapter 2: Find the Value of a Number'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 3: Comparing Numbers'],
       0,
       'In Progress'
     );
-    await loggedInUser.expectSkillCardProgressToBe(
+    await loggedInLearner.expectSkillCardProgressToBe(
       'Skills',
       ['Place Values'],
       0
     );
 
-    await loggedInUser.navigateToLessonByCard(
+    await loggedInLearner.navigateToLessonByCard(
       'Classroom Lessons',
       'Chapter 3: Comparing Numbers'
     );
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.expectExplorationCompletionToastMessage(
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
       'Congratulations for completing this lesson!'
     );
 
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.expectScreenshotToMatch(
       'inProgressTabCompletedSection',
       __dirname
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['Completed'],
       'tabSection'
     );
-    await loggedInUser.expectElementsToBePresentInRLD(
+    await loggedInLearner.expectElementsToBePresentInRLD(
       ['Classroom Lessons', 'Skills'],
       'cardDisplay'
     );
 
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Classroom Lessons',
       ['Chapter 1: What are the Place Values'],
       100,
       'Completed'
     );
-    await loggedInUser.expectSkillCardProgressToBe(
+    await loggedInLearner.expectSkillCardProgressToBe(
       'Skills',
       ['Place Values'],
       0
@@ -280,20 +283,20 @@ describe('Logged-in User', function () {
   it(
     'should be able to see community lesson in Progress Tab',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToCommunityLibraryOnNavbar();
-      await loggedInUser.expectToBeOnCommunityLibraryPage();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+      await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-      await loggedInUser.searchForLessonInSearchBar('Explore Title 1');
-      await loggedInUser.playLessonFromSearchResults('Explore Title 1');
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
+      await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
+      await loggedInLearner.continueToNextCard();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToProgressSection();
+      await loggedInLearner.expectScreenshotToMatch(
         'learnerDashboardProgressTabCommunityLessonsExploreTitle1',
         __dirname
       );
-      await loggedInUser.expectLessonCardProgressToBe(
+      await loggedInLearner.expectLessonCardProgressToBe(
         'Community Lessons',
         ['Explore Title 1'],
         0,
@@ -304,53 +307,53 @@ describe('Logged-in User', function () {
   );
 
   it('should be able to see community lessons in Progress Tab and "Display More" Button', async function () {
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
 
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 2');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 2');
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 2');
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 3');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 3');
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 3');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 3');
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 4');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 4');
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 4');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 4');
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 5');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 5');
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 5');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 5');
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-    await loggedInUser.navigateToCommunityLibraryOnNavbar();
-    await loggedInUser.expectToBeOnCommunityLibraryPage();
-    await loggedInUser.searchForLessonInSearchBar('Explore Title 6');
-    await loggedInUser.playLessonFromSearchResults('Explore Title 6');
-    await loggedInUser.continueToNextCard();
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToProgressSection();
-    await loggedInUser.expectScreenshotToMatch(
+    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
+    await loggedInLearner.expectToBeOnCommunityLibraryPage();
+    await loggedInLearner.searchForLessonInSearchBar('Explore Title 6');
+    await loggedInLearner.playLessonFromSearchResults('Explore Title 6');
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectScreenshotToMatch(
       'learnerDashboardProgressTabCommunityLessons6Lessons',
       __dirname
     );
-    await loggedInUser.expectCommunityLessonsCollapsed();
-    await loggedInUser.expectLessonCardProgressToBe(
+    await loggedInLearner.expectCommunityLessonsCollapsed();
+    await loggedInLearner.expectLessonCardProgressToBe(
       'Community Lessons',
       [
         'Explore Title 6',
@@ -363,25 +366,25 @@ describe('Logged-in User', function () {
       0,
       'In Progress'
     );
-    await loggedInUser.expectDisplayMoreCommunityLessonsToBeVisible();
+    await loggedInLearner.expectDisplayMoreCommunityLessonsToBeVisible();
   });
 
   it(
     'should toggle Display More button for community lessons',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToProgressSection();
 
       // Initial state.
-      await loggedInUser.expectCommunityLessonsCollapsed();
+      await loggedInLearner.expectCommunityLessonsCollapsed();
 
       // Expand.
-      await loggedInUser.toggleDisplayMoreCommunityLessons();
-      await loggedInUser.expectCommunityLessonsExpanded();
+      await loggedInLearner.toggleDisplayMoreCommunityLessons();
+      await loggedInLearner.expectCommunityLessonsExpanded();
 
       // Collapse again.
-      await loggedInUser.toggleDisplayMoreCommunityLessons();
-      await loggedInUser.expectCommunityLessonsCollapsed();
+      await loggedInLearner.toggleDisplayMoreCommunityLessons();
+      await loggedInLearner.expectCommunityLessonsCollapsed();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -389,36 +392,36 @@ describe('Logged-in User', function () {
   it(
     'should be able to see completed Community Lessons in the Completed section of Progress Tab',
     async function () {
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
-      await loggedInUser.expectElementsToBePresentInRLD(
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToProgressSection();
+      await loggedInLearner.expectElementsToBePresentInRLD(
         ['In Progress', 'Completed'],
         'tabSection'
       );
 
-      await loggedInUser.navigateToLessonByCard(
+      await loggedInLearner.navigateToLessonByCard(
         'Community Lessons',
         'Explore Title 6',
         'In Progress'
       );
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.continueToNextCard();
-      await loggedInUser.expectExplorationCompletionToastMessage(
+      await loggedInLearner.continueToNextCard();
+      await loggedInLearner.continueToNextCard();
+      await loggedInLearner.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson!'
       );
 
-      await loggedInUser.navigateToLearnerDashboard();
-      await loggedInUser.navigateToProgressSection();
+      await loggedInLearner.navigateToLearnerDashboard();
+      await loggedInLearner.navigateToProgressSection();
 
-      await loggedInUser.expectScreenshotToMatch(
+      await loggedInLearner.expectScreenshotToMatch(
         'communityLessonExploreTitle6InCompletedSectionOfProgressTab',
         __dirname
       );
-      await loggedInUser.expectElementsToBePresentInRLD(
+      await loggedInLearner.expectElementsToBePresentInRLD(
         ['In Progress', 'Completed'],
         'tabSection'
       );
-      await loggedInUser.expectElementsToBePresentInRLD(
+      await loggedInLearner.expectElementsToBePresentInRLD(
         [
           'Community Lessons',
           'Classroom Lessons',
@@ -427,7 +430,7 @@ describe('Logged-in User', function () {
         ],
         'cardDisplay'
       );
-      await loggedInUser.expectLessonCardProgressToBe(
+      await loggedInLearner.expectLessonCardProgressToBe(
         'Community Lessons',
         [
           'Explore Title 5',
@@ -439,7 +442,7 @@ describe('Logged-in User', function () {
         0,
         'In Progress'
       );
-      await loggedInUser.expectLessonCardProgressToBe(
+      await loggedInLearner.expectLessonCardProgressToBe(
         'Community Lessons',
         ['Explore Title 6'],
         100,
