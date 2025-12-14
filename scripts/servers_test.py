@@ -140,14 +140,14 @@ class ManagedProcessTests(test_utils.TestBase):
     @contextlib.contextmanager
     def swap_managed_cloud_datastore_emulator_io_operations(
         self, data_dir_exists: bool
-    ) -> Iterator[Tuple[test_utils.CallCounter, test_utils.CallCounter]]:
+    ) -> Iterator[Tuple[mock.Mock, mock.Mock]]:
         """Safely swaps IO operations used by managed_cloud_datastore_emulator.
 
         Args:
             data_dir_exists: bool. Return value of os.path.exists(DATA_DIR).
 
         Yields:
-            tuple(CallCounter, CallCounter). CallCounter instances for rmtree
+            tuple(Mock, Mock). Mock instances for rmtree
             and makedirs.
         """
         old_exists = os.path.exists
@@ -161,11 +161,15 @@ class ManagedProcessTests(test_utils.TestBase):
         new_exists = lambda p: (
             data_dir_exists if is_data_dir(p) else old_exists(p)
         )
-        new_rmtree = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_rmtree(p, **kw)
+        new_rmtree = mock.Mock(
+            side_effect=lambda p, **kw: (
+                None if is_data_dir(p) else old_rmtree(p, **kw)
+            )
         )
-        new_makedirs = test_utils.CallCounter(
-            lambda p, **kw: None if is_data_dir(p) else old_makedirs(p, **kw)
+        new_makedirs = mock.Mock(
+            side_effect=lambda p, **kw: (
+                None if is_data_dir(p) else old_makedirs(p, **kw)
+            )
         )
 
         with contextlib.ExitStack() as exit_stack:
@@ -615,11 +619,13 @@ class ManagedProcessTests(test_utils.TestBase):
         original_os_remove = os.remove
         original_os_path_exists = os.path.exists
 
-        @test_utils.CallCounter
-        def mock_os_remove(path: str) -> None:
-            if path == common.REDIS_DUMP_PATH:
-                return
-            original_os_remove(path)
+        mock_os_remove = mock.Mock(
+            side_effect=lambda path: (
+                None
+                if path == common.REDIS_DUMP_PATH
+                else original_os_remove(path)
+            )
+        )
 
         def mock_os_path_exists(path: str) -> None:
             if path == common.REDIS_DUMP_PATH:
@@ -664,11 +670,13 @@ class ManagedProcessTests(test_utils.TestBase):
         original_os_remove = os.remove
         original_os_path_exists = os.path.exists
 
-        @test_utils.CallCounter
-        def mock_os_remove(path: str) -> None:
-            if path == common.REDIS_DUMP_PATH:
-                return
-            original_os_remove(path)
+        mock_os_remove = mock.Mock(
+            side_effect=lambda path: (
+                None
+                if path == common.REDIS_DUMP_PATH
+                else original_os_remove(path)
+            )
+        )
 
         def mock_os_path_exists(path: str) -> Optional[bool]:
             if path == common.REDIS_DUMP_PATH:
@@ -806,11 +814,13 @@ class ManagedProcessTests(test_utils.TestBase):
         original_os_remove = os.remove
         original_os_path_exists = os.path.exists
 
-        @test_utils.CallCounter
-        def mock_os_remove(path: str) -> None:
-            if path == common.PORTSERVER_SOCKET_FILEPATH:
-                return
-            original_os_remove(path)
+        mock_os_remove = mock.Mock(
+            side_effect=lambda path: (
+                None
+                if path == common.PORTSERVER_SOCKET_FILEPATH
+                else original_os_remove(path)
+            )
+        )
 
         def mock_os_path_exists(path: str) -> Optional[bool]:
             if path == common.PORTSERVER_SOCKET_FILEPATH:
@@ -1364,13 +1374,13 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             common, 'url_open', side_effect=mock_url_open
         )
 
-        with check_output_patch, url_open_patch:
+        with check_output_patch as check_output_mock, url_open_patch as url_open_mock:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '72.0.3626.69',
             )
 
-        url_open_patch.assert_called_once_with(expected_url)
+        url_open_mock.assert_called_once_with(expected_url)
 
     def test_chrome_115_and_later_returns_chrome_version(self) -> None:
         def mock_check_output(_: List[str]) -> bytes:
@@ -1384,7 +1394,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         )
         url_open_patch = mock.patch.object(common, 'url_open', mock_url_open)
 
-        with check_output_patch, url_open_patch:
+        with check_output_patch as check_output_mock, url_open_patch as url_open_mock:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '115.0.3626.123',
@@ -1395,15 +1405,15 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         swap_ng_build = mock.patch.object(
             servers, 'managed_ng_build', side_effect=mock_context_manager
         )
-        with self.print_patch, swap_ng_build, swap_isdir:
+        with self.print_patch, swap_ng_build as swap_ng_build_mock, swap_isdir as swap_isdir_mock:
             servers.run_ng_compilation()
 
         self.assertNotIn(
             'Failed to complete ng build compilation, exiting...',
             self.print_arr,
         )
-        swap_isdir.assert_called()
-        swap_ng_build.assert_called()
+        swap_isdir_mock.assert_called()
+        swap_ng_build_mock.assert_called()
 
     def test_run_ng_compilation_failed(self) -> None:
         swap_isdir = mock.patch.object(os.path, 'isdir', return_value=False)
@@ -1411,16 +1421,16 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             servers, 'managed_ng_build', side_effect=mock_context_manager
         )
         swap_sys_exit = mock.patch.object(sys, 'exit')
-        with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_patch, swap_ng_build as swap_ng_build_mock, swap_isdir as swap_isdir_mock, swap_sys_exit as swap_sys_exit_mock:
             servers.run_ng_compilation()
 
         self.assertIn(
             'Failed to complete ng build compilation, exiting...',
             self.print_arr,
         )
-        swap_isdir.assert_called()
-        swap_ng_build.assert_called()
-        swap_sys_exit.assert_called_once_with(1)
+        swap_isdir_mock.assert_called()
+        swap_ng_build_mock.assert_called()
+        swap_sys_exit_mock.assert_called_once_with(1)
 
     def test_subprocess_error_results_in_failed_ng_build(self) -> None:
         class MockFailedCompiler:
@@ -1447,11 +1457,11 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         )
         swap_isdir = mock.patch.object(os.path, 'isdir', return_value=False)
         swap_sys_exit = mock.patch.object(sys, 'exit')
-        with self.print_patch, swap_ng_build, swap_isdir, swap_sys_exit:
+        with self.print_patch, swap_ng_build as swap_ng_build_mock, swap_isdir as swap_isdir_mock, swap_sys_exit as swap_sys_exit_mock:
             servers.run_ng_compilation()
 
-        swap_ng_build.assert_called()
-        self.assertEqual(swap_isdir.call_count, 3)
-        swap_isdir.assert_called_with('dist/oppia-angular')
-        self.assertEqual(swap_sys_exit.call_count, 3)
-        swap_sys_exit.assert_called_with(1)
+        swap_ng_build_mock.assert_called()
+        self.assertEqual(swap_isdir_mock.call_count, 3)
+        swap_isdir_mock.assert_called_with('dist/oppia-angular')
+        self.assertEqual(swap_sys_exit_mock.call_count, 3)
+        swap_sys_exit_mock.assert_called_with(1)

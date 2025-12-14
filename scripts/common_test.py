@@ -656,7 +656,7 @@ class CommonTests(test_utils.GenericTestBase):
         ) -> MockResponse:
             return MockResponse()
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        urlopen_swap = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
 
         with urlopen_swap:
             # Should not raise an exception.
@@ -682,8 +682,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_sleep(unused_seconds: int) -> None:
             pass
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        urlopen_swap = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = mock.patch.object(time, 'sleep', mock_sleep)
 
         with urlopen_swap, sleep_swap:
             common.wait_for_firebase_emulator_to_be_ready(9099)
@@ -699,8 +699,8 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_sleep(unused_seconds: int) -> None:
             pass
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        urlopen_swap = mock.patch.object(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = mock.patch.object(time, 'sleep', mock_sleep)
 
         with urlopen_swap, sleep_swap:
             with self.assertRaisesRegex(
@@ -952,17 +952,17 @@ class CommonTests(test_utils.GenericTestBase):
         def mock_compile(unused_arg: str) -> NoReturn:
             raise ValueError('Exception raised from compile()')
 
-        with mock.patch.object(
-            re, 'compile', side_effect=mock_compile
-        ) as mock_compile_obj:
-            with self.assertRaisesRegex(
-                ValueError, re.escape('Exception raised from compile()')
-            ), mock_compile_obj:
+        with self.assertRaisesRegex(
+            ValueError, re.escape('Exception raised from compile()')
+        ):
+            with mock.patch.object(
+                re, 'compile', side_effect=mock_compile
+            ) as mock_compile_obj:
                 common.inplace_replace_file(
                     origin_filepath, '"DEV_MODE": .*', '"DEV_MODE": true,'
                 )
 
-        mock_compile_obj.assert_called_once_with()
+        mock_compile_obj.assert_called_once_with('"DEV_MODE": .*')
         self.assertFalse(os.path.isfile(new_filepath))
         with open(origin_filepath, 'r', encoding='utf-8') as f:
             new_content = f.readlines()
@@ -1042,7 +1042,9 @@ class CommonTests(test_utils.GenericTestBase):
         self.assertTrue(raised_once)
 
     def test_write_stdout_safe_with_oserror(self) -> None:
-        write_patch = mock.patch.object(os, 'write', OSError('OS error'))
+        write_patch = mock.patch.object(
+            os, 'write', side_effect=OSError('OS error')
+        )
         with write_patch, self.assertRaisesRegex(OSError, 'OS error'):
             common.write_stdout_safe('test')
 
@@ -1248,6 +1250,7 @@ class CommonTests(test_utils.GenericTestBase):
         with open(mock_feconf_path, 'w', encoding='utf-8') as tmp:
             tmp.write('ENABLE_MAINTENANCE_MODE = True')
         self.contextManager.__exit__(None, None, None)
+        del self.contextManager
         with constants_path_patch, feconf_path_patch:
             common.set_constants_to_default()
             with open(

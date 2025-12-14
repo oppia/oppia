@@ -357,7 +357,6 @@ def generate_random_hexa_str() -> str:
     return ''.join(random.choices(characters, k=32))
 
 
-@contextlib.contextmanager
 def enable_feature_flags(
     feature_flag_names: List[feature_flag_list.FeatureNames],
 ) -> Callable[
