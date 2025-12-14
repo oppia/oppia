@@ -53,10 +53,6 @@ class DummyFailJob(base_jobs.JobBase):
             PCollection. A PCollection containing a single JobRunResult with
             stderr indicating failure.
         """
-        return self.pipeline | 'Create failure result' >> beam.Create(
-            [
-                job_run_result.JobRunResult.as_stderr(
-                    'ERROR: Dummy job failed as expected'
-                )
-            ]
-        )
+        # We need to failed job using expection, if we just pass "Fail" in output
+        # the job will still pass, but with different output.
+        raise Exception('DummyFailJob intentionally failed.')
