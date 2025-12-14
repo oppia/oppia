@@ -706,6 +706,50 @@ def wait_for_port_to_be_in_use(port_number: int) -> None:
         sys.exit(1)
 
 
+def wait_for_firebase_emulator_to_be_ready(
+    port_number: int, timeout_secs: int = MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS
+) -> None:
+    """Wait until the Firebase Auth emulator is ready to accept requests.
+
+    This function performs an HTTP health check to verify that the emulator
+    is actually responding, not just that the port is open. This is more
+    robust than just checking if the port is in use, as the emulator might
+    bind the port but crash during initialization.
+
+    Args:
+        port_number: int. The port number where the emulator is running.
+        timeout_secs: int. Maximum time to wait for the emulator to be ready.
+
+    Raises:
+        Exception. If the emulator fails to become ready within the timeout.
+    """
+    emulator_url = 'http://localhost:%d/' % port_number
+    waited_seconds = 0
+
+    while waited_seconds < timeout_secs:
+        try:
+            # The Firebase Auth emulator responds to GET requests at the root
+            # URL when it's ready.
+            response = urlrequest.urlopen(emulator_url, timeout=5)
+            if response.status == 200:
+                print(
+                    'Firebase Auth emulator is ready on port %d.' % port_number
+                )
+                return
+        except (urlerror.URLError, client.HTTPException, socket.timeout):
+            # The emulator is not yet ready, keep waiting.
+            pass
+
+        time.sleep(1)
+        waited_seconds += 1
+
+    raise Exception(
+        'Firebase Auth emulator failed to become ready on port %d '
+        'within %d seconds. This may indicate the emulator crashed during '
+        'initialization.' % (port_number, timeout_secs)
+    )
+
+
 def wait_for_port_to_not_be_in_use(port_number: int) -> bool:
     """Wait until the port is closed or
     MAX_WAIT_TIME_FOR_PORT_TO_CLOSE_SECS seconds.
