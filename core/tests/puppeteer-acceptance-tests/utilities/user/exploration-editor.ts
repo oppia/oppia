@@ -3757,7 +3757,7 @@ export class ExplorationEditor extends BaseUser {
         `Could not find clickable background for card: ${cardName}`
       );
     }
-    await clickOnElement(nodeBackground);
+    await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
