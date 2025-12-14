@@ -787,10 +787,19 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.assertFalse(os.path.exists(expected_dir))
 
             class MockProcess:
-                def __init__(self, *args: object, **kwargs: object) -> None:
+                # Here we use object because subprocess.Popen can receive arbitrary
+                # positional and keyword arguments, and their concrete types are not
+                # relevant for this test.
+                def __init__(
+                    self,
+                    *unused_args: object,
+                    **unused_kwargs: object,
+                ) -> None:
                     self.returncode = 0
 
-                def communicate(self) -> tuple[bytes, bytes]:
+                def communicate(
+                    self,
+                ) -> tuple[bytes, bytes]:  # pylint: disable=missing-docstring
                     return (b'topic:123\n', b'')
 
             with (
