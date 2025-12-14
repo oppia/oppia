@@ -674,10 +674,15 @@ class InstallBackendPythonLibsTests(test_utils.GenericTestBase):
         swap_rm_tree = self.swap(shutil, 'rmtree', mock_rm)
         swap_list_dir = self.swap(os, 'listdir', mock_list_dir)
         swap_is_dir = self.swap(os.path, 'isdir', mock_is_dir)
+        swap_which = self.swap(
+            shutil, 'which', lambda cmd: '/usr/bin/uv' if cmd == 'uv' else None
+        )
 
         with self.swap_check_call, self.swap_Popen, swap_get_mismatches:
             with swap_validate_metadata_directories, self.swap_prepend_comment:
-                with swap_rm_tree, swap_list_dir, swap_is_dir, self.swap_run:
+                with (
+                    swap_rm_tree
+                ), swap_list_dir, swap_is_dir, self.swap_run, swap_which:
                     install_python_prod_dependencies.main()
 
         self.assertItemsEqual(

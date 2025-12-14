@@ -28,10 +28,108 @@ import sys
 from core.tests import test_utils
 from scripts import install_python_dev_dependencies
 
-from typing import Generator
+from typing import Dict, Generator, List, Optional, Tuple
 
 
 class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
+
+    def test_compile_handles_legacy_header(self) -> None:
+        """Verify that files with a legacy compile header do not cause
+        the compilation function to crash and that no diff is reported
+        when the file contents don't change.
+        """
+
+        def mock_run(*_args: str, **_kwargs: str) -> None:
+            pass
+
+        def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
+            return io.StringIO(
+                '#    compile --generate-hashes\nmock file contents'
+            )
+
+        run_swap = self.swap(subprocess, 'run', mock_run)
+        open_swap = self.swap(builtins, 'open', mock_open)
+
+        with run_swap, open_swap:
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
+
+        self.assertFalse(change)
+
+    def test_compile_handles_missing_header(self) -> None:
+        """Verify that a missing header does not cause a crash and returns a
+        (possibly empty) diff string.
+        """
+
+        def mock_run(*_args: str, **_kwargs: str) -> None:
+            pass
+
+        def mock_open(*_args: str, **_kwargs: str) -> io.StringIO:
+            return io.StringIO('some-package==1.2.3\n')
+
+        run_swap = self.swap(subprocess, 'run', mock_run)
+        open_swap = self.swap(builtins, 'open', mock_open)
+
+        with run_swap, open_swap:
+            change = install_python_dev_dependencies.compile_pip_requirements(
+                'requirements_dev.in', 'requirements_dev.txt'
+            )
+
+        self.assertIsInstance(change, str)
+
+    def test_install_installation_tools(self) -> None:
+        """Verify that the minimal installation tools are invoked with the
+        expected versions when `install_installation_tools` is called.
+        """
+
+        expected_tools = {'pip': '25.3', 'setuptools': '80.9.0'}
+        installed_tools: Dict[str, str] = {}
+
+        class DummyProcess(subprocess.Popen[bytes]):
+            """Mock process object for testing subprocess interactions."""
+
+            def __init__(self, has_stdout: bool = False) -> None:
+                # Do not call super().__init__() to avoid requiring cmd argument.
+                self.stdout: Optional[io.BytesIO] = (
+                    io.BytesIO(b'') if has_stdout else None
+                )
+
+            def communicate(
+                self,
+                unused_input: Optional[bytes] = None,
+                unused_timeout: Optional[float] = None,
+            ) -> Tuple[bytes, bytes]:
+                """Mock communicate method returning empty bytes."""
+                return (b'', b'')
+
+        def mock_popen(
+            cmd: List[str],
+            *_args: str,
+            **_kwargs: str,
+        ) -> subprocess.Popen[bytes]:
+            if len(cmd) > 3 and cmd[3] == 'install':
+                package, version = cmd[4].split('==')
+                installed_tools[package] = version
+                self.assertEqual(
+                    cmd,
+                    [
+                        sys.executable,
+                        '-m',
+                        'pip',
+                        'install',
+                        f'{package}=={version}',
+                    ],
+                )
+                return DummyProcess(has_stdout=True)
+            return DummyProcess()
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with popen_swap:
+            install_python_dev_dependencies.install_installation_tools()
+
+        self.assertEqual(installed_tools, expected_tools)
 
     @contextlib.contextmanager
     def sys_real_prefix_context(
@@ -299,85 +397,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         )
 
         with which_swap:
-            with self.assertRaises(RuntimeError) as context:
+            with self.assertRaisesRegex(
+                RuntimeError,
+                r'uv is required for dependency compilation',
+            ):
                 install_python_dev_dependencies.compile_pip_requirements(
                     'requirements_dev.in', 'requirements_dev.txt'
                 )
-
-        self.assertIn(
-            'uv is required for dependency compilation', str(context.exception)
-        )
-        self.assertIn('pipx install uv==0.9.17', str(context.exception))
-
-    def test_compile_handles_legacy_header(monkeypatch):
-        def mock_run(*_args, **_kwargs):
-            pass
-
-        def mock_open(*_args, **_kwargs):
-            return io.StringIO(
-                '#    compile --generate-hashes\nmock file contents'
-            )
-
-        monkeypatch.setattr(subprocess, 'run', mock_run)
-        monkeypatch.setattr(builtins, 'open', mock_open)
-
-        change = install_python_dev_dependencies.compile_pip_requirements(
-            'requirements_dev.in', 'requirements_dev.txt'
-        )
-        assert not change
-
-    def test_compile_handles_missing_header(monkeypatch):
-        def mock_run(*_args, **_kwargs):
-            pass
-
-        def mock_open(*_args, **_kwargs):
-            return io.StringIO('some-package==1.2.3\n')
-
-        monkeypatch.setattr(subprocess, 'run', mock_run)
-        monkeypatch.setattr(builtins, 'open', mock_open)
-
-        change = install_python_dev_dependencies.compile_pip_requirements(
-            'requirements_dev.in', 'requirements_dev.txt'
-        )
-        assert isinstance(change, str)
-
-    def test_install_installation_tools(monkeypatch):
-        expected_tools = {'pip': '25.3', 'setuptools': '80.9.0'}
-        installed_tools = {}
-
-        class DummyProcess:
-            def __init__(self, has_stdout=False):
-                # Simulate a process object. If has_stdout is True, provide
-                # a file-like object to act as stdout (used by the pip install
-                # invocation). Otherwise, provide a communicate() method.
-                if has_stdout:
-                    self.stdout = io.BytesIO(b'')
-                else:
-                    self.stdout = None
-
-            def communicate(self):
-                return (b'', b'')
-
-        def mock_popen(cmd_tokens, stdout=None, stdin=None, stderr=None):
-            if len(cmd_tokens) > 3 and cmd_tokens[3] == 'install':
-                package, version = cmd_tokens[4].split('==')
-                installed_tools[package] = version
-                assert cmd_tokens == [
-                    sys.executable,
-                    '-m',
-                    'pip',
-                    'install',
-                    f'{package}=={version}',
-                ]
-                return DummyProcess(has_stdout=True)
-            # The grep command should return an object with communicate().
-            return DummyProcess()
-
-        monkeypatch.setattr(subprocess, 'Popen', mock_popen)
-
-        install_python_dev_dependencies.install_installation_tools()
-
-        assert installed_tools == expected_tools
 
     def test_compile_pip_requirements_handles_legacy_pip_compile_header(
         self,

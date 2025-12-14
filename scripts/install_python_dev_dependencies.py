@@ -135,6 +135,9 @@ def compile_pip_requirements(requirements_path: str, compiled_path: str) -> str:
     Returns:
         str. The diff between the original and compiled requirements files, as
         a string containing newlines.
+
+    Raises:
+        RuntimeError. The `uv` executable is not available on the PATH.
     """
     if not shutil.which('uv'):
         raise RuntimeError(
