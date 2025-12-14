@@ -19,7 +19,6 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WebpackRTLPlugin = require('webpack-rtl-plugin');
 var path = require('path');
 var webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
