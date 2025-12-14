@@ -41,7 +41,7 @@ from urllib import request as urlrequest
 from core.tests import test_utils
 
 import yaml
-from typing import Generator, List, Literal, NoReturn, Tuple
+from typing import Dict, Generator, List, Literal, NoReturn, Tuple, Union
 
 from . import common
 
@@ -1362,18 +1362,16 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_cleanup_repo_tmp(self) -> None:
         """Test cleanup_repo_tmp removes old tmp directories correctly."""
-        # Mock time.time to return a fixed time
+        # Mock time.time to return a fixed time. `cutoff` is 10 minutes ago.
         now = 1000000
-        cutoff = now - (10 * 60)  # 10 minutes ago
+        cutoff = now - (10 * 60)
 
         # Create mock stat objects
         old_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff - 1, 0))
         recent_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff + 1, 0))
 
-        check_calls = {
-            'rmtree_calls': [],
-            'log_calls': [],
-        }
+        rmtree_calls: List[str] = []
+        log_calls: List[Tuple[str, str]] = []
 
         def mock_time_time() -> float:
             return now
@@ -1398,13 +1396,15 @@ class CommonTests(test_utils.GenericTestBase):
             elif 'recent' in path:
                 return recent_stat
             else:
-                raise FileNotFoundError("File not found")
+                raise FileNotFoundError('File not found')
 
-        def mock_rmtree(path: str, ignore_errors: bool = False) -> None:
-            check_calls['rmtree_calls'].append(path)
+        def mock_rmtree(
+            path: str, ignore_errors: bool = False
+        ) -> None:  # pylint: disable=unused-argument
+            rmtree_calls.append(path)
 
         def mock_logging_info(msg: str, path: str) -> None:
-            check_calls['log_calls'].append((msg, path))
+            log_calls.append((msg, path))
 
         time_swap = self.swap(time, 'time', mock_time_time)
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
@@ -1420,11 +1420,11 @@ class CommonTests(test_utils.GenericTestBase):
 
         # Should remove only tmp_old_dir (old and is dir)
         self.assertEqual(
-            check_calls['rmtree_calls'],
+            rmtree_calls,
             [os.path.join(common.REPO_TMP_DIR, 'tmp_old_dir')],
         )
         self.assertEqual(
-            check_calls['log_calls'],
+            log_calls,
             [
                 (
                     'Removing old repo tmp dir: %s',
@@ -1436,7 +1436,7 @@ class CommonTests(test_utils.GenericTestBase):
     def test_cleanup_repo_tmp_no_repo_dir(self) -> None:
         """Test cleanup_repo_tmp returns early when repo tmp dir doesn't exist."""
 
-        def mock_isdir(path: str) -> bool:
+        def mock_isdir(unused_path: str) -> bool:
             return False
 
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
@@ -1446,15 +1446,15 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_cleanup_repo_tmp_exception_handling(self) -> None:
         """Test cleanup_repo_tmp handles exceptions gracefully."""
-        check_calls = {'exception_logged': False}
+        check_calls: Dict[str, bool] = {'exception_logged': False}
 
-        def mock_isdir(path: str) -> bool:
+        def mock_isdir(unused_path: str) -> bool:
             return True
 
         def mock_listdir(unused_path: str) -> List[str]:
-            raise Exception("Mock exception")
+            raise Exception('Mock exception')
 
-        def mock_logging_exception(msg: str) -> None:
+        def mock_logging_exception(unused_msg: str) -> None:
             check_calls['exception_logged'] = True
 
         isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
