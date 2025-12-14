@@ -851,8 +851,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         exit_swap = self.swap(sys, 'exit', exit_mock)
 
         mock_changed_branch = mock.MagicMock()
-        mock_changed_branch.__enter__.return_value = None
-        mock_changed_branch.__exit__.return_value = None
         changed_branch_swap = self.swap(
             pre_push_hook, 'ChangedBranch', lambda _: mock_changed_branch
         )
