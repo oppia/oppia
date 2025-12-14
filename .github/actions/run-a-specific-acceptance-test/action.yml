@@ -51,9 +51,7 @@ runs:
             ${{ inputs.viewport-type == 'mobile' && '--mobile' || '' }}
             --prod_env
             --server_log_level=info
-            | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
-        )
-
+        ) | tee acceptance_test_${{ inputs.modified-suite-name-for-uploads || '' }}.log
     - name: Upload test logs
       # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
       # which requires all previous jobs/steps to have succeeded. This is not what we want.
