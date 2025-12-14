@@ -30,11 +30,9 @@ environment setup and troubleshooting.
 
 - Install uv for faster dependency compilation:
 
-python -m pip install pipx
-
-python -m pipx ensurepath
-
-pipx install uv==0.9.17
+  python -m pip install pipx
+  python -m pipx ensurepath
+  pipx install uv==0.9.17
 
 - Run backend unit tests locally:
 

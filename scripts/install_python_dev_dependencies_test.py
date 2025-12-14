@@ -78,59 +78,6 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
 
         self.assertIsInstance(change, str)
 
-    def test_install_installation_tools(self) -> None:
-        """Verify that the minimal installation tools are invoked with the
-        expected versions when `install_installation_tools` is called.
-        """
-
-        expected_tools = {'pip': '25.3', 'setuptools': '80.9.0'}
-        installed_tools: Dict[str, str] = {}
-
-        class DummyProcess(subprocess.Popen[bytes]):
-            """Mock process object for testing subprocess interactions."""
-
-            def __init__(self, has_stdout: bool = False) -> None:
-                # Do not call super().__init__() to avoid requiring cmd argument.
-                self.stdout: Optional[io.BytesIO] = (
-                    io.BytesIO(b'') if has_stdout else None
-                )
-
-            def communicate(
-                self,
-                unused_input: Optional[bytes] = None,
-                unused_timeout: Optional[float] = None,
-            ) -> Tuple[bytes, bytes]:
-                """Mock communicate method returning empty bytes."""
-                return (b'', b'')
-
-        def mock_popen(
-            cmd: List[str],
-            *_args: str,
-            **_kwargs: str,
-        ) -> subprocess.Popen[bytes]:
-            if len(cmd) > 3 and cmd[3] == 'install':
-                package, version = cmd[4].split('==')
-                installed_tools[package] = version
-                self.assertEqual(
-                    cmd,
-                    [
-                        sys.executable,
-                        '-m',
-                        'pip',
-                        'install',
-                        f'{package}=={version}',
-                    ],
-                )
-                return DummyProcess(has_stdout=True)
-            return DummyProcess()
-
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-
-        with popen_swap:
-            install_python_dev_dependencies.install_installation_tools()
-
-        self.assertEqual(installed_tools, expected_tools)
-
     @contextlib.contextmanager
     def sys_real_prefix_context(
         self,
@@ -219,6 +166,59 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         environ_swap = self.swap(os, 'environ', {'GITHUB_ACTION': '1'})
         with prefix_swap, base_prefix_swap, real_prefix_manager, environ_swap:
             install_python_dev_dependencies.check_python_env_is_suitable()
+
+    def test_install_installation_tools(self) -> None:
+        """Verify that the minimal installation tools are invoked with the
+        expected versions when `install_installation_tools` is called.
+        """
+
+        expected_tools = {'pip': '25.3', 'setuptools': '80.9.0'}
+        installed_tools: Dict[str, str] = {}
+
+        class DummyProcess(subprocess.Popen[bytes]):
+            """Mock process object for testing subprocess interactions."""
+
+            def __init__(self, has_stdout: bool = False) -> None:
+                # Do not call super().__init__() to avoid requiring cmd argument.
+                self.stdout: Optional[io.BytesIO] = (
+                    io.BytesIO(b'') if has_stdout else None
+                )
+
+            def communicate(
+                self,
+                unused_input: Optional[bytes] = None,
+                unused_timeout: Optional[float] = None,
+            ) -> Tuple[bytes, bytes]:
+                """Mock communicate method returning empty bytes."""
+                return (b'', b'')
+
+        def mock_popen(
+            cmd: List[str],
+            *_args: str,
+            **_kwargs: str,
+        ) -> subprocess.Popen[bytes]:
+            if len(cmd) > 3 and cmd[3] == 'install':
+                package, version = cmd[4].split('==')
+                installed_tools[package] = version
+                self.assertEqual(
+                    cmd,
+                    [
+                        sys.executable,
+                        '-m',
+                        'pip',
+                        'install',
+                        f'{package}=={version}',
+                    ],
+                )
+                return DummyProcess(has_stdout=True)
+            return DummyProcess()
+
+        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
+
+        with popen_swap:
+            install_python_dev_dependencies.install_installation_tools()
+
+        self.assertEqual(installed_tools, expected_tools)
 
     def test_install_dev_dependencies(self) -> None:
 
