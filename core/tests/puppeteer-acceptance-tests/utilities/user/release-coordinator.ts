@@ -619,8 +619,7 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
-   * Closes the output modal.
-   * @returns {Promise<void>}
+   * Closes the output modal by clicking on "Close" button.
    */
   async closeOutputModal(): Promise<void> {
     await this.expectElementToBeVisible(beamJobCloseOuputButtonSelector);

@@ -89,6 +89,7 @@ describe('Release Coordinator', function () {
   });
 
   it('should be able to handle beam job (failure)', async function () {
+    await releaseCoordinator.closeOutputModal();
     await releaseCoordinator.selectAndRunJob(DUMMY_FAIL_BEAM_JOB);
     await releaseCoordinator.waitForJobToComplete();
     await releaseCoordinator.expectJobStatusToBeSuccessful(
