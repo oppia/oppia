@@ -105,7 +105,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
         communicate_swap = self.swap(process, 'communicate', mock_communicate)
 
-        def mock_popen(  # pylint: disable=unused-argument
+        def mock_popen(   # pylint: disable=unused-argument
             cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
