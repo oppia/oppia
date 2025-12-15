@@ -1020,17 +1020,17 @@ class BuildTests(test_utils.GenericTestBase):
                 with generate_python_package_patch:
                     build.main(args=['--prod_env'])
 
-        build.build_using_webpack.assert_called_once_with(
-            build.WEBPACK_PROD_CONFIG
-        )
-        build.build_using_ng.assert_called_once_with()
-        common.modify_constants.assert_called_once_with(
-            prod_env=True,
-            emulator_mode=True,
-            maintenance_mode=False,
-        )
-        build.generate_python_package.assert_called_once_with()
-        build.clean.assert_called_once_with()
+                    build.build_using_webpack.assert_called_once_with(
+                        build.WEBPACK_PROD_CONFIG
+                    )
+                    build.build_using_ng.assert_called_once_with()
+                    common.modify_constants.assert_called_once_with(
+                        prod_env=True,
+                        emulator_mode=True,
+                        maintenance_mode=False,
+                    )
+                    build.generate_python_package.assert_called_once_with()
+                    build.clean.assert_called_once_with()
 
     def test_build_with_prod_source_maps(self) -> None:
         ensure_files_exist_patch = mock.patch.object(
@@ -1064,20 +1064,20 @@ class BuildTests(test_utils.GenericTestBase):
                     with build_using_ng_patch, install_third_party_libs_patch:
                         build.main(args=['--prod_env', '--source_maps'])
 
-        build.build_using_webpack.assert_called_once_with(
-            build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-        )
-        build.build_using_ng.assert_called_once_with()
-        common.modify_constants.assert_called_once_with(
-            prod_env=True,
-            emulator_mode=True,
-            maintenance_mode=False,
-        )
-        build.clean.assert_called_once_with()
-        install_python_dev_dependencies.main.assert_called_once_with(
-            ['--uninstall']
-        )
-        install_third_party_libs.main.assert_called_once_with()
+                        build.build_using_webpack.assert_called_once_with(
+                            build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
+                        )
+                        build.build_using_ng.assert_called_once_with()
+                        common.modify_constants.assert_called_once_with(
+                            prod_env=True,
+                            emulator_mode=True,
+                            maintenance_mode=False,
+                        )
+                        build.clean.assert_called_once_with()
+                        install_python_dev_dependencies.main.assert_called_once_with(
+                            ['--uninstall']
+                        )
+                        install_third_party_libs.main.assert_called_once_with()
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1262,10 +1262,12 @@ class BuildTests(test_utils.GenericTestBase):
         with ng_build_patch, get_file_count_patch:
             build.build_using_ng()
 
-        servers.managed_ng_build.assert_called_once_with(
-            use_prod_env=True, watch_mode=False
-        )
-        build.get_file_count.assert_called_once_with('dist/oppia-angular-prod')
+            servers.managed_ng_build.assert_called_once_with(
+                use_prod_env=True, watch_mode=False
+            )
+            build.get_file_count.assert_called_once_with(
+                'dist/oppia-angular-prod'
+            )
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self,
@@ -1293,10 +1295,12 @@ class BuildTests(test_utils.GenericTestBase):
             ):
                 build.build_using_ng()
 
-        servers.managed_ng_build.assert_called_once_with(
-            use_prod_env=True, watch_mode=False
-        )
-        build.get_file_count.assert_called_once_with('dist/oppia-angular-prod')
+            servers.managed_ng_build.assert_called_once_with(
+                use_prod_env=True, watch_mode=False
+            )
+            build.get_file_count.assert_called_once_with(
+                'dist/oppia-angular-prod'
+            )
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
@@ -1329,8 +1333,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
                 side_effect=mock_managed_process,
             )
         )
-        mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
-        self.exit_stack.enter_context(mock_exit)
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', mock.Mock())
+        )
         isdir_mock = self.exit_stack.enter_context(
             mock.patch.object(os.path, 'isdir', side_effect=mock_os_path_isdir)
         )
@@ -1396,8 +1401,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         isdir_mock = self.exit_stack.enter_context(
             mock.patch.object(os.path, 'isdir', side_effect=mock_os_path_isdir)
         )
-        mock_exit = mock.patch.object(sys, 'exit', lambda _: None)
-        self.exit_stack.enter_context(mock_exit)
+        mock_exit = self.exit_stack.enter_context(
+            mock.patch.object(sys, 'exit', mock.Mock())
+        )
 
         build.build_js_files(True)
 
@@ -1409,7 +1415,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_prod_mode(self) -> None:
         run_cmd_mock = self.exit_stack.enter_context(
-            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
+            mock.patch.object(
+                common, 'run_cmd', mock.Mock(side_effect=lambda *_: None)
+            )
         )
         main_mock = self.exit_stack.enter_context(
             mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
@@ -1422,7 +1430,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_prod_mode_with_source_maps(self) -> None:
         run_cmd_mock = self.exit_stack.enter_context(
-            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
+            mock.patch.object(
+                common, 'run_cmd', mock.Mock(side_effect=lambda *_: None)
+            )
         )
         main_mock = self.exit_stack.enter_context(
             mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
@@ -1435,7 +1445,9 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
 
     def test_webpack_compilation_in_dev_mode_with_source_maps(self) -> None:
         run_cmd_mock = self.exit_stack.enter_context(
-            mock.patch.object(common, 'run_cmd', side_effect=lambda *_: None)
+            mock.patch.object(
+                common, 'run_cmd', mock.Mock(side_effect=lambda *_: None)
+            )
         )
         main_mock = self.exit_stack.enter_context(
             mock.patch.object(build, 'main', side_effect=lambda *_, **__: None)
