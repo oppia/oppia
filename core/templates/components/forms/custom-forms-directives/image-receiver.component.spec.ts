@@ -20,6 +20,8 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {MatIconModule} from '@angular/material/icon';
 import {RouterModule} from '@angular/router';
 
+import {APP_BASE_HREF} from '@angular/common';
+
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {IdGenerationService} from 'services/id-generation.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
@@ -58,7 +60,8 @@ describe('ImageReceiverComponent', () => {
       providers: [
         BlogDashboardPageService,
         {provide: WindowRef, useValue: windowRef},
-        {provide: APP_BASE_REF, useValue: '/'},
+
+        {provide: APP_BASE_HREF, useValue: '/'},
       ],
     }).compileComponents();
   }));

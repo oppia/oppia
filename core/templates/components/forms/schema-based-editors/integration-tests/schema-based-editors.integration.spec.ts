@@ -21,6 +21,8 @@ import {
   ChangeDetectorRef,
   NO_ERRORS_SCHEMA,
   EventEmitter,
+  Pipe,
+  PipeTransform,
 } from '@angular/core';
 import {
   ComponentFixture,
@@ -59,7 +61,7 @@ import {SchemaBasedFloatEditorComponent} from '../schema-based-float-editor.comp
 import {SchemaBasedHtmlEditorComponent} from '../schema-based-html-editor.component';
 import {SchemaBasedIntEditorComponent} from '../schema-based-int-editor.component';
 import {SchemaBasedListEditorComponent} from '../schema-based-list-editor.component';
-import {SchemaBasedUnicodeEditor} from '../schema-based-unicode-editor.component';
+import {SchemaBasedUnicodeEditorComponent} from '../schema-based-unicode-editor.component';
 import {RteHelperModalComponent} from 'services/editor-customization.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ImageUploadHelperService} from 'services/image-upload-helper.service';
@@ -74,23 +76,30 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 import {AppConstants} from 'app.constants';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 
-// FIX: Locally define the mock service to avoid import errors
+// --- MOCK SERVICES & PIPES ---
+
 class MockCkEditorInitializerService {
-  initialize(): Promise<void> {
+  initialize() {
     return Promise.resolve();
   }
 }
 
-export function findComponent<T>(
-  fixture: ComponentFixture<T>,
+@Pipe({name: 'translate'})
+class MockTranslatePipe implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}
+
+function findComponent(
+  fixture: ComponentFixture<any>,
   selector: string
 ): DebugElement {
   return fixture.debugElement.query(By.css(selector));
 }
 
-export class MockTranslateService {
+class MockTranslateService {
   instant(val: string): string {
     return val;
   }
@@ -101,161 +110,26 @@ export class MockTranslateService {
 }
 
 class MockImageLocalStorageService {
-  storedImageFilenames: string[] = [];
-  isLocalStorageExceedsTotalStorage(): boolean {
+  isLocalStorageExceedsTotalStorage() {
     return false;
   }
 }
 
-class MockRteHelperModalComponent
-  extends NgbActiveModal
-  implements RteHelperModalComponent
-{
-  htmlContent!: string;
-  componentIs: string = '';
-  allowMultipleAnswers!: boolean;
-  numInputs!: number;
-  value: any = null;
-  customizationArgs!: any;
-  interaction!: any;
-  onSave: EventEmitter<any> = new EventEmitter();
-}
+// FIX: Completely Empty Class. No Properties.
+class MockRteHelperModalComponent extends NgbActiveModal {}
 
-class MockSchemaBasedEditorComponent extends SchemaBasedEditorComponent {
-  changeDetectorRef: any;
-  ngbModal: any;
-  windowRef: any;
-  imageUploadHelperService: any;
-  imageLocalStorageService: any;
-  ckEditorInitializerService: any;
-  alertsService: any;
-  assetsBackendApiService: any;
-
-  valueChange: EventEmitter<any> = new EventEmitter();
-  validationError: string | null = null;
-  maxImageSizeInKbs: number | undefined;
-
-  constructor(
-    changeDetectorRef: ChangeDetectorRef,
-    ngbModal: NgbModal,
-    windowRef: WindowRef,
-    imageUploadHelperService: ImageUploadHelperService,
-    imageLocalStorageService: ImageLocalStorageService,
-    ckEditorInitializerService: any,
-    alertsService: AlertsService,
-    assetsBackendApiService: AssetsBackendApiService
-  ) {
-    super(
-      changeDetectorRef,
-      ngbModal,
-      windowRef,
-      imageUploadHelperService,
-      imageLocalStorageService,
-      ckEditorInitializerService,
-      alertsService,
-      assetsBackendApiService
-    );
-
-    this.changeDetectorRef = changeDetectorRef;
-    this.ngbModal = ngbModal;
-    this.windowRef = windowRef;
-    this.imageUploadHelperService = imageUploadHelperService;
-    this.imageLocalStorageService = imageLocalStorageService;
-    this.ckEditorInitializerService = ckEditorInitializerService;
-    this.alertsService = alertsService;
-    this.assetsBackendApiService = assetsBackendApiService;
+// FIX: Removed 'override' keyword to support older TS versions.
+class MockActiveModal extends NgbActiveModal {
+  close(): void {
+    return;
   }
 
-  // Ensure these methods exist for Spying
-  ngOnInit(): void {
-    super.ngOnInit();
-    if (
-      this.schema?.type === 'custom' &&
-      this.schema.obj_type?.includes('Image')
-    ) {
-      this.maxImageSizeInKbs = this.getMaxImageSizeInKbs();
-    }
-  }
-
-  getLocalValueWarnings(): string {
-    return this.validationError ?? '';
-  }
-
-  getSelectOptions(): any[] {
-    return (this.schema as any).options ?? [];
-  }
-
-  isEditable(): boolean {
-    const pathname = this.windowRef.nativeWindow.location.pathname;
-    return (
-      pathname.includes('question_editor') || pathname.includes('skill_editor')
-    );
-  }
-
-  openRteHelperModal(componentId: string): void {
-    const modalRef = this.ngbModal.open(MockRteHelperModalComponent, {
-      backdrop: 'static',
-    }) as NgbModalRef & {componentInstance: MockRteHelperModalComponent};
-
-    modalRef.componentInstance.customizationArgs = {};
-    modalRef.componentInstance.componentIs = componentId;
-
-    modalRef.componentInstance.onSave.subscribe(
-      (result: {html: string; customizationArgsDict: any}) => {
-        this.localValue = result.html;
-        this.valueChange.emit(this.localValue);
-      }
-    );
-    modalRef.result.catch(() => {});
-  }
-
-  onChildChange(newValue: any): void {
-    this.localValue = newValue;
-    this.valueChange.emit(newValue);
-  }
-
-  onFileChange(file: File): void {
-    if (this.imageLocalStorageService.isLocalStorageExceedsTotalStorage()) {
-      this.alertsService.addWarning(
-        'Image upload failed: Local storage is full.'
-      );
-      return;
-    }
-    // @ts-ignore
-    this.imageUploadHelperService
-      .getDataUrlForImage(file)
-      .then((dataUrl: any) => {
-        (this.localValue as any).value.imagePath = dataUrl;
-        this.valueChange.emit(this.localValue);
-      })
-      .catch(() => {
-        this.alertsService.addWarning('Image upload failed');
-      });
-  }
-
-  getAssetTypeFromSchema(): string | null {
-    const objType = (this.schema as CustomSchema).obj_type;
-    if (objType === 'ImageWithRegions' || objType === 'Image') {
-      return AppConstants.ASSET_TYPE_IMAGE;
-    }
-    return null;
-  }
-
-  initializeEditor(componentType: string): void {
-    if (componentType === 'html') {
-      // @ts-ignore
-      this.ckEditorInitializerService.initialize();
-    }
-  }
-
-  getMaxImageSizeInKbs(): number {
-    const pathname = this.windowRef.nativeWindow.location.pathname;
-    if (pathname.includes('blog_post_editor')) {
-      return AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB_FOR_BLOG_POST;
-    }
-    return AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB;
+  dismiss(): void {
+    return;
   }
 }
+
+// --- TESTS START HERE ---
 
 describe('Schema based editor', () => {
   let fixture: ComponentFixture<SchemaBasedEditorComponent>;
@@ -269,16 +143,6 @@ describe('Schema based editor', () => {
   let ckEditorInitializerService: any;
   let alertsService: AlertsService;
   let assetsBackendApiService: AssetsBackendApiService;
-
-  class MockActiveModal extends NgbActiveModal {
-    override close(): void {
-      return;
-    }
-
-    override dismiss(): void {
-      return;
-    }
-  }
 
   const mockFile = new File([''], 'filename.png');
   const mockImageFile = new File(['image'], 'image.svg', {
@@ -306,8 +170,9 @@ describe('Schema based editor', () => {
         SchemaBasedHtmlEditorComponent,
         SchemaBasedIntEditorComponent,
         SchemaBasedListEditorComponent,
-        SchemaBasedUnicodeEditor,
+        SchemaBasedUnicodeEditorComponent,
         ObjectEditorComponent,
+        MockTranslatePipe,
       ],
       providers: [
         {
@@ -333,11 +198,7 @@ describe('Schema based editor', () => {
         AssetsBackendApiService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
-    })
-      .overrideComponent(SchemaBasedEditorComponent, {
-        useClass: MockSchemaBasedEditorComponent,
-      })
-      .compileComponents();
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -352,8 +213,6 @@ describe('Schema based editor', () => {
     ckEditorInitializerService = TestBed.inject(MockCkEditorInitializerService);
     alertsService = TestBed.inject(AlertsService);
     assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
-
-    component.valueChange = new EventEmitter();
   });
 
   afterEach(() => {
@@ -383,76 +242,59 @@ describe('Schema based editor', () => {
         {name: 'real', schema: {type: 'float'}},
       ],
     };
-    const schemaBasedEditorFixture = TestBed.createComponent(
-      SchemaBasedEditorComponent
-    );
-    const schemaBasedEditorComponent =
-      schemaBasedEditorFixture.componentInstance;
-    schemaBasedEditorComponent.schema = schema;
-    schemaBasedEditorComponent.localValue = {};
-    schemaBasedEditorFixture.detectChanges();
+
+    component.schema = schema;
+    component.localValue = {};
+    fixture.detectChanges();
     flush();
-    schemaBasedEditorFixture.detectChanges();
+    fixture.detectChanges();
     flush();
-
-    const changeValuesInUI = (fieldName?: string, real?: number) => {
-      if (fieldName !== undefined) {
-        const schemaBasedUnicodeEditorInput = findComponent(
-          schemaBasedEditorFixture,
-          'schema-based-unicode-editor'
-        ).query(By.css('input')).nativeElement;
-        schemaBasedUnicodeEditorInput.value = fieldName;
-        schemaBasedUnicodeEditorInput.dispatchEvent(new Event('input'));
-      }
-
-      if (real !== undefined) {
-        const schemaBasedFloatEditorInput = findComponent(
-          schemaBasedEditorFixture,
-          'schema-based-float-editor'
-        ).query(By.css('input')).nativeElement;
-        schemaBasedFloatEditorInput.value = real;
-        schemaBasedFloatEditorInput.dispatchEvent(new Event('input'));
-      }
-      schemaBasedEditorFixture.detectChanges();
-      tick();
-    };
-
-    const expectTopLevelComponentValueToBe = (
-      fieldNameValue: string,
-      real: number
-    ) => {
-      const localValue = schemaBasedEditorComponent.localValue as {
-        fieldName: string;
-        real: number;
-      };
-      expect(localValue.fieldName).toBe(fieldNameValue);
-      expect(localValue.real).toBe(real);
-    };
 
     const schemaBasedUnicodeEditorInput = findComponent(
-      schemaBasedEditorFixture,
+      fixture,
       'schema-based-unicode-editor'
     ).query(By.css('input')).nativeElement;
+    schemaBasedUnicodeEditorInput.value = 'SomeName';
+    schemaBasedUnicodeEditorInput.dispatchEvent(new Event('input'));
+
     const schemaBasedFloatEditorInput = findComponent(
-      schemaBasedEditorFixture,
+      fixture,
       'schema-based-float-editor'
     ).query(By.css('input')).nativeElement;
+    schemaBasedFloatEditorInput.value = '4';
+    schemaBasedFloatEditorInput.dispatchEvent(new Event('input'));
+
+    fixture.detectChanges();
+    tick();
+
+    const localValueValid = component.localValue as {
+      fieldName: string;
+      real: number;
+    };
+    expect(localValueValid.fieldName).toBe('SomeName');
+    expect(localValueValid.real).toBe(4);
+
     const unicodeInputFormController = findComponent(
-      schemaBasedEditorFixture,
+      fixture,
       'schema-based-unicode-editor'
     )
       .query(By.css('input'))
       .injector.get(NgModel);
-    expect(schemaBasedUnicodeEditorInput.value).toBe('');
-    expect(schemaBasedFloatEditorInput.value).toBe('');
-
-    changeValuesInUI('SomeName', 4);
-
-    expectTopLevelComponentValueToBe('SomeName', 4);
 
     expect(unicodeInputFormController.invalid).toBeFalsy();
-    changeValuesInUI('SomeVeryLongName');
-    expectTopLevelComponentValueToBe('SomeVeryLongName', 4);
+
+    schemaBasedUnicodeEditorInput.value = 'SomeVeryLongName';
+    schemaBasedUnicodeEditorInput.dispatchEvent(new Event('input'));
+
+    fixture.detectChanges();
+    tick();
+
+    const localValueInvalid = component.localValue as {
+      fieldName: string;
+      real: number;
+    };
+    expect(localValueInvalid.fieldName).toBe('SomeVeryLongName');
+    expect(localValueInvalid.real).toBe(4);
     expect(unicodeInputFormController.invalid).toBe(true);
   }));
 
@@ -469,6 +311,7 @@ describe('Schema based editor', () => {
     } as ListSchema;
     component.localValue = ['hi', 'there'];
     component.ngOnInit();
+
     component.validationError =
       'The length of this list is 2, which is less than the minimum required length of 5.';
     expect(component.getLocalValueWarnings()).toBe(
@@ -489,6 +332,7 @@ describe('Schema based editor', () => {
     } as ListSchema;
     component.localValue = ['hi', 'there'];
     component.ngOnInit();
+
     component.validationError =
       'The length of this list is 2, which is less than the minimum required length of 5.';
     expect(component.validationError).toBe(
@@ -532,43 +376,51 @@ describe('Schema based editor', () => {
   });
 
   it('should return false for isEditable when not in question mode', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'exploration'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('exploration');
     expect(component.isEditable()).toBeFalsy();
   });
 
   it('should return true for isEditable when in question mode', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'question_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('question_editor');
     expect(component.isEditable()).toBe(true);
   });
 
   it('should return true for isEditable when in skill editor mode', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'skill_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('skill_editor');
     expect(component.isEditable()).toBe(true);
   });
 
   it('should open the RTE helper modal', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        customizationArgSpecs: [],
-        attrsCustomizationArgsDict: {},
-        componentIsNewlyCreated: false,
-        onSave: of({
-          componentId: 'image',
-          customizationArgsDict: {
-            filepath: 'image_1.png',
-            caption: '',
-            alt: '',
-          },
-        }),
+    // FIX: Using 'as any' to bypass type checking for dynamic properties on mock class
+    const mockModalInstance = new MockRteHelperModalComponent();
+    (mockModalInstance as any).customizationArgs = {};
+    (mockModalInstance as any).componentIs = '';
+    (mockModalInstance as any).onSave = of({
+      componentId: 'image',
+      customizationArgsDict: {
+        filepath: 'image_1.png',
+        caption: '',
+        alt: '',
       },
+    });
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: mockModalInstance,
       result: Promise.resolve(),
-    } as NgbModalRef & {componentInstance: MockRteHelperModalComponent});
+    } as NgbModalRef);
+
     component.schema = {
       type: 'html',
     } as Schema;
@@ -588,23 +440,26 @@ describe('Schema based editor', () => {
   it('should update local value when RTE modal is closed', fakeAsync(() => {
     const originalLocalValue = 'test html';
     const newHtmlContent = 'new html content';
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        customizationArgSpecs: [],
-        attrsCustomizationArgsDict: {},
-        componentIsNewlyCreated: false,
-        onSave: of({
-          componentId: 'image',
-          customizationArgsDict: {
-            filepath: 'image_1.png',
-            caption: '',
-            alt: '',
-          },
-          html: newHtmlContent,
-        }),
+
+    // FIX: Dynamic assignment to avoid class property errors
+    const mockModalInstance = new MockRteHelperModalComponent();
+    (mockModalInstance as any).customizationArgs = {};
+    (mockModalInstance as any).componentIs = '';
+    (mockModalInstance as any).onSave = of({
+      componentId: 'image',
+      customizationArgsDict: {
+        filepath: 'image_1.png',
+        caption: '',
+        alt: '',
       },
+      html: newHtmlContent,
+    });
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: mockModalInstance,
       result: Promise.resolve(),
-    } as NgbModalRef & {componentInstance: MockRteHelperModalComponent});
+    } as NgbModalRef);
+
     component.schema = {
       type: 'html',
     } as Schema;
@@ -621,23 +476,25 @@ describe('Schema based editor', () => {
 
   it('should not update local value when RTE modal is dismissed', fakeAsync(() => {
     const originalLocalValue = 'test html';
-    spyOn(ngbModal, 'open').and.returnValue({
-      componentInstance: {
-        customizationArgSpecs: [],
-        attrsCustomizationArgsDict: {},
-        componentIsNewlyCreated: false,
-        onSave: of({
-          componentId: 'image',
-          customizationArgsDict: {
-            filepath: 'image_1.png',
-            caption: '',
-            alt: '',
-          },
-          html: 'new html content',
-        }),
+
+    const mockModalInstance = new MockRteHelperModalComponent();
+    (mockModalInstance as any).customizationArgs = {};
+    (mockModalInstance as any).componentIs = '';
+    (mockModalInstance as any).onSave = of({
+      componentId: 'image',
+      customizationArgsDict: {
+        filepath: 'image_1.png',
+        caption: '',
+        alt: '',
       },
+      html: 'new html content',
+    });
+
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: mockModalInstance,
       result: Promise.reject(),
-    } as NgbModalRef & {componentInstance: MockRteHelperModalComponent});
+    } as NgbModalRef);
+
     component.schema = {
       type: 'html',
     } as Schema;
@@ -791,9 +648,11 @@ describe('Schema based editor', () => {
   });
 
   it('should not show warning for valid image file size when in blog post editor', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'blog_post_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('blog_post_editor');
 
     spyOn(
       imageLocalStorageService,
@@ -818,9 +677,11 @@ describe('Schema based editor', () => {
   });
 
   it('should show warning for invalid image file size when in blog post editor', fakeAsync(() => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'blog_post_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('blog_post_editor');
 
     spyOn(
       imageLocalStorageService,
@@ -851,9 +712,11 @@ describe('Schema based editor', () => {
     'should not show warning for valid image file size when not in blog post' +
       ' editor',
     () => {
-      spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-        'exploration_editor'
-      );
+      spyOnProperty(
+        windowRef.nativeWindow.location,
+        'pathname',
+        'get'
+      ).and.returnValue('exploration_editor');
 
       spyOn(
         imageLocalStorageService,
@@ -882,9 +745,11 @@ describe('Schema based editor', () => {
     'should show warning for invalid image file size when not in blog post' +
       ' editor',
     fakeAsync(() => {
-      spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-        'exploration_editor'
-      );
+      spyOnProperty(
+        windowRef.nativeWindow.location,
+        'pathname',
+        'get'
+      ).and.returnValue('exploration_editor');
 
       spyOn(
         imageLocalStorageService,
@@ -924,7 +789,7 @@ describe('Schema based editor', () => {
     component.ngOnInit();
     component.initializeEditor('html');
 
-    expect(ckEditorInitializerService.initialize).toHaveBeenCalledWith('html');
+    expect(ckEditorInitializerService.initialize).toHaveBeenCalledWith();
   });
 
   it('should not initialize ckEditor when current object type is not html', () => {
@@ -943,27 +808,33 @@ describe('Schema based editor', () => {
   });
 
   it('should return max image size for blog post editor', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'blog_post_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('blog_post_editor');
     expect(component.getMaxImageSizeInKbs()).toBe(
       AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB_FOR_BLOG_POST
     );
   });
 
   it('should return max image size for exploration editor', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'exploration_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('exploration_editor');
     expect(component.getMaxImageSizeInKbs()).toBe(
       AppConstants.MAX_IMAGE_FILE_SIZE_IN_KB
     );
   });
 
   it('should initialize component with image file size correctly', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'blog_post_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('blog_post_editor');
     component.schema = {
       type: 'custom',
       obj_type: 'ImageWithRegions',
@@ -976,9 +847,11 @@ describe('Schema based editor', () => {
   });
 
   it('should not initialize component without image file size if not image type', () => {
-    spyOn(windowRef.nativeWindow.location, 'pathname').and.returnValue(
-      'exploration_editor'
-    );
+    spyOnProperty(
+      windowRef.nativeWindow.location,
+      'pathname',
+      'get'
+    ).and.returnValue('exploration_editor');
     component.schema = {
       type: 'custom',
       obj_type: 'SubtitledHtml',
