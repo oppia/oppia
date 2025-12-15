@@ -1,6 +1,6 @@
-import {Component, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
 
 type ReportExploration = {
   id: string;
@@ -22,7 +22,7 @@ export class CreatorStatsPageComponent implements OnInit {
   constructor(
     private backendApi: CreatorDashboardBackendApiService,
     private http: HttpClient
-  ) {}
+  ) { }
 
   reportSummary?: {
     num_ratings: number;
@@ -62,16 +62,16 @@ export class CreatorStatsPageComponent implements OnInit {
   pageSize = 10;
   pageNumber = 1;
 
-  topExplorationBars: Array<{label: string; value: number; widthPct: number}> =
+  topExplorationBars: Array<{ label: string; value: number; widthPct: number }> =
     [];
-  histogram: Array<{label: string; count: number; heightPct: number}> = [];
+  histogram: Array<{ label: string; count: number; heightPct: number }> = [];
   selectedExplorationId: string = 'all';
   outcomesDistribution: Array<{
     label: string;
     count: number;
     heightPct: number;
   }> = [];
-  trendPoints: Array<{x: number; y: number; label: string; value: number}> = [];
+  trendPoints: Array<{ x: number; y: number; label: string; value: number }> = [];
   trendPolylinePoints = '';
   weeklyWindow = 12;
 
@@ -81,8 +81,8 @@ export class CreatorStatsPageComponent implements OnInit {
   activeLearners: number = 0;
   avgTimeSpentHours?: number;
 
-  ratingsBreakdown: Array<{stars: number; count: number}> = [];
-  recentComments: Array<{author: string; text: string; ago: string}> = [];
+  ratingsBreakdown: Array<{ stars: number; count: number }> = [];
+  recentComments: Array<{ author: string; text: string; ago: string }> = [];
   contentEffectiveness: Array<{
     type: string;
     engagement: number;
@@ -129,11 +129,11 @@ export class CreatorStatsPageComponent implements OnInit {
         counts[4] += r['5'] || 0;
       }
       this.ratingsBreakdown = [
-        {stars: 5, count: counts[4]},
-        {stars: 4, count: counts[3]},
-        {stars: 3, count: counts[2]},
-        {stars: 2, count: counts[1]},
-        {stars: 1, count: counts[0]},
+        { stars: 5, count: counts[4] },
+        { stars: 4, count: counts[3] },
+        { stars: 3, count: counts[2] },
+        { stars: 2, count: counts[1] },
+        { stars: 1, count: counts[0] },
       ];
       this.computeContentEffectiveness(exps);
       await this.fetchRecentComments();
@@ -204,7 +204,7 @@ export class CreatorStatsPageComponent implements OnInit {
       -this.weeklyWindow
     );
     this.computeChartsFromWeekly(
-      weekly.map(wi => ({date: wi.date, total_plays: wi.total_plays || 0}))
+      weekly.map(wi => ({ date: wi.date, total_plays: wi.total_plays || 0 }))
     );
 
     const buckets: Array<{
@@ -213,12 +213,12 @@ export class CreatorStatsPageComponent implements OnInit {
       label: string;
       count: number;
     }> = [
-      {min: 0, max: 20, label: '0–20%', count: 0},
-      {min: 21, max: 40, label: '21–40%', count: 0},
-      {min: 41, max: 60, label: '41–60%', count: 0},
-      {min: 61, max: 80, label: '61–80%', count: 0},
-      {min: 81, max: 100, label: '81–100%', count: 0},
-    ];
+        { min: 0, max: 20, label: '0–20%', count: 0 },
+        { min: 21, max: 40, label: '21–40%', count: 0 },
+        { min: 41, max: 60, label: '41–60%', count: 0 },
+        { min: 61, max: 80, label: '61–80%', count: 0 },
+        { min: 81, max: 100, label: '81–100%', count: 0 },
+      ];
     for (const e of this.reportExplorations) {
       const cr =
         e.completion_rate != null
@@ -243,7 +243,7 @@ export class CreatorStatsPageComponent implements OnInit {
   }
 
   private computeContentEffectiveness(exps: any[]): void {
-    const groups: {[k: string]: any[]} = {
+    const groups: { [k: string]: any[] } = {
       Video: [],
       Quiz: [],
       Audio: [],
@@ -328,7 +328,7 @@ export class CreatorStatsPageComponent implements OnInit {
           .toPromise()
       );
       const results = await Promise.allSettled(reqs);
-      const comments: Array<{author: string; text: string; ago: string}> = [];
+      const comments: Array<{ author: string; text: string; ago: string }> = [];
       for (const r of results) {
         if (r.status === 'fulfilled') {
           const arr = (r.value.feedback_thread_dicts || []).filter(
@@ -352,11 +352,11 @@ export class CreatorStatsPageComponent implements OnInit {
         }
       }
       this.recentComments = comments;
-    } catch {}
+    } catch { }
   }
 
   private computeChartsFromWeekly(
-    weekly: Array<{date: string; total_plays: number}>
+    weekly: Array<{ date: string; total_plays: number }>
   ): void {
     const playsList = (this.reportExplorations || []).map(e => ({
       label: e.title || 'Untitled',
@@ -376,14 +376,14 @@ export class CreatorStatsPageComponent implements OnInit {
       label: string;
       count: number;
     }> = [
-      {min: 0, max: 10, label: '0–10', count: 0},
-      {min: 11, max: 50, label: '11–50', count: 0},
-      {min: 51, max: 100, label: '51–100', count: 0},
-      {min: 101, max: 500, label: '101–500', count: 0},
-      {min: 501, max: 1000, label: '501–1K', count: 0},
-      {min: 1001, max: 5000, label: '1K–5K', count: 0},
-      {min: 5001, max: null, label: '5K+', count: 0},
-    ];
+        { min: 0, max: 10, label: '0–10', count: 0 },
+        { min: 11, max: 50, label: '11–50', count: 0 },
+        { min: 51, max: 100, label: '51–100', count: 0 },
+        { min: 101, max: 500, label: '101–500', count: 0 },
+        { min: 501, max: 1000, label: '501–1K', count: 0 },
+        { min: 1001, max: 5000, label: '1K–5K', count: 0 },
+        { min: 5001, max: null, label: '5K+', count: 0 },
+      ];
     for (const e of playsList) {
       for (const b of buckets) {
         if (
@@ -403,9 +403,12 @@ export class CreatorStatsPageComponent implements OnInit {
     }));
 
     const w = 320;
-    const h = 120;
+    const h = 140;
     const pad = 20;
-    const series = weekly.map(wi => ({label: wi.date, value: wi.total_plays}));
+    const series = weekly.map((wi, idx) => ({
+      label: this.weeklyWindow > 8 ? `W${idx + 1}` : wi.date,
+      value: wi.total_plays
+    }));
     const vals = series.map(s => s.value);
     const maxY = Math.max(1, ...vals);
     const stepX = (w - pad * 2) / Math.max(1, series.length - 1);
@@ -413,7 +416,7 @@ export class CreatorStatsPageComponent implements OnInit {
       const x = pad + i * stepX;
       const v = s.value ?? 0;
       const y = h - pad - Math.round((v / maxY) * (h - pad * 2));
-      return {x, y, label: s.label, value: v};
+      return { x, y, label: s.label, value: v };
     });
     this.trendPolylinePoints = this.trendPoints
       .map(p => p.x + ',' + p.y)

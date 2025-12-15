@@ -5,8 +5,10 @@
         <div class="h6 mb-3">Sections</div>
         <ul class="list-unstyled">
           <li><a href="#" (click)="setTab('analytics')" [class.fw-bold]="tab==='analytics'">Analytics</a></li>
-          <li class="mt-2"><a href="#" (click)="setTab('posts')" [class.fw-bold]="tab==='posts'">Posts Management</a></li>
-          <li class="mt-2"><a href="#" (click)="setTab('financials')" [class.fw-bold]="tab==='financials'">Financials</a></li>
+          <li class="mt-2"><a href="#" (click)="setTab('posts')" [class.fw-bold]="tab==='posts'">Posts Management</a>
+          </li>
+          <li class="mt-2"><a href="#" (click)="setTab('financials')"
+              [class.fw-bold]="tab==='financials'">Financials</a></li>
         </ul>
         <div class="mt-3">
           <label class="form-label mb-1">Search</label>
@@ -36,18 +38,18 @@
     <div class="col-md-9">
       <div *ngIf="tab==='analytics'">
         <div class="p-3 mb-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
-          <div class="d-flex" style="gap:12px;">
-            <div class="flex-grow-1">
-              <label class="form-label mb-1">Date Range</label>
-              <select class="form-select" [(ngModel)]="weeklyWindow" (ngModelChange)="computeVisuals()">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <label class="form-label mb-1 small">Date Range</label>
+              <select class="form-select form-select-sm" [(ngModel)]="weeklyWindow" (ngModelChange)="computeVisuals()">
                 <option [ngValue]="4">Last 4 weeks</option>
                 <option [ngValue]="8">Last 8 weeks</option>
                 <option [ngValue]="12">Last 12 weeks</option>
               </select>
             </div>
-            <div class="flex-grow-1">
-              <label class="form-label mb-1">Exploration</label>
-              <select class="form-select" [(ngModel)]="selectedExplorationId">
+            <div class="col-md-6">
+              <label class="form-label mb-1 small">Exploration</label>
+              <select class="form-select form-select-sm" [(ngModel)]="selectedExplorationId">
                 <option value="all">All Explorations</option>
                 <option *ngFor="let exp of reportExplorations" [value]="exp.id">{{ exp.title }}</option>
               </select>
@@ -71,14 +73,16 @@
             <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="text-muted">Completion Rate</div>
               <div class="h3">
-                {{ (successRate != null ? (successRate.toFixed(1) + '%') : (reportSummary?.creator_completion_rate != null ? (reportSummary?.creator_completion_rate + '%') : 'N/A')) }}
+                {{ (successRate != null ? (successRate.toFixed(1) + '%') : (reportSummary?.creator_completion_rate !=
+                null ? (reportSummary?.creator_completion_rate + '%') : 'N/A')) }}
               </div>
             </div>
           </div>
           <div class="col-md-2 mb-3">
             <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="text-muted">Average Rating</div>
-              <div class="h3">{{ (reportSummary?.average_ratings != null ? reportSummary?.average_ratings : 'N/A') }}</div>
+              <div class="h3">{{ (reportSummary?.average_ratings != null ? reportSummary?.average_ratings : 'N/A') }}
+              </div>
             </div>
           </div>
           <div class="col-md-2 mb-3">
@@ -96,23 +100,23 @@
         </div>
 
         <div class="p-3 mb-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
-          <div class="d-flex align-items-center mb-2">
-            <div class="h6 mb-0">Explorations</div>
-            <div class="ms-auto d-flex align-items-center" style="gap:8px;">
-              <label class="form-label mb-0">Sort</label>
-              <select class="form-select form-select-sm" [(ngModel)]="sortKey" (ngModelChange)="applySort()">
-                <option value="plays">Plays</option>
-                <option value="average_rating">Avg Rating</option>
-                <option value="num_open_threads">Open Threads</option>
-                <option value="completion_rate">Completion Rate</option>
-                <option value="last_updated_msec">Last Updated</option>
-                <option value="title">Title</option>
-              </select>
-              <select class="form-select form-select-sm" [(ngModel)]="sortDir" (ngModelChange)="applySort()">
-                <option value="desc">Desc</option>
-                <option value="asc">Asc</option>
-              </select>
-            </div>
+          <div class="d-flex align-items-center mb-2 flex-wrap" style="gap:8px;">
+            <div class="h6 mb-0 me-auto">Explorations</div>
+            <label class="form-label mb-0 small">Sort</label>
+            <select class="form-select form-select-sm" style="width:auto;" [(ngModel)]="sortKey"
+              (ngModelChange)="applySort()">
+              <option value="plays">Plays</option>
+              <option value="average_rating">Avg Rating</option>
+              <option value="num_open_threads">Open Threads</option>
+              <option value="completion_rate">Completion Rate</option>
+              <option value="last_updated_msec">Last Updated</option>
+              <option value="title">Title</option>
+            </select>
+            <select class="form-select form-select-sm" style="width:auto;" [(ngModel)]="sortDir"
+              (ngModelChange)="applySort()">
+              <option value="desc">Desc</option>
+              <option value="asc">Asc</option>
+            </select>
           </div>
           <div class="table-responsive">
             <table class="table table-sm">
@@ -135,9 +139,11 @@
                   <td>{{ exp.num_starts != null ? exp.num_starts : 'N/A' }}</td>
                   <td>{{ exp.num_completions != null ? exp.num_completions : 'N/A' }}</td>
                   <td>
-                    {{ exp.completion_rate !== null && exp.completion_rate !== undefined ? (exp.completion_rate + '%') : 'N/A' }}
+                    {{ exp.completion_rate !== null && exp.completion_rate !== undefined ? (exp.completion_rate + '%') :
+                    'N/A' }}
                   </td>
-                  <td>{{ (exp.average_rating !== null && exp.average_rating !== undefined) ? exp.average_rating : 'N/A' }}</td>
+                  <td>{{ (exp.average_rating !== null && exp.average_rating !== undefined) ? exp.average_rating : 'N/A'
+                    }}</td>
                   <td>{{ exp.num_open_threads }}</td>
                   <td>{{ exp.last_updated_msec | date: 'medium' }}</td>
                 </tr>
@@ -161,11 +167,13 @@
             <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="h6">Top Explorations by Plays</div>
               <div>
-                <div *ngFor="let b of topExplorationBars" class="d-flex align-items-center mb-2" title="{{ b.label }}: {{ b.value }}">
+                <div *ngFor="let b of topExplorationBars" class="d-flex align-items-center mb-2"
+                  title="{{ b.label }}: {{ b.value }}">
                   <div class="text-truncate" style="width: 40%;" [title]="b.label">{{ b.label }}</div>
                   <div class="flex-grow-1" style="background: #eee; height: 20px; position: relative;">
                     <div [style.width.%]="b.widthPct" style="background: #3f51b5; height: 100%;"></div>
-                    <div style="position:absolute; right:4px; top:0; font-size: 12px; line-height: 20px;">{{ b.value }}</div>
+                    <div style="position:absolute; right:4px; top:0; font-size: 12px; line-height: 20px;">{{ b.value }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -174,16 +182,20 @@
           <div class="col-md-6 mb-3">
             <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="h6">Exploration Engagement Trends</div>
-              <svg viewBox="0 0 320 140" width="100%" height="140">
+              <svg viewBox="0 0 320 180" width="100%" height="180" style="overflow: visible;">
                 <polyline [attr.points]="trendPolylinePoints" fill="none" stroke="#3f51b5" stroke-width="2"></polyline>
-                <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="#3f51b5" [attr.title]="p.label + ': ' + p.value"></circle>
-                <text *ngFor="let p of trendPoints" [attr.x]="p.x" y="130" font-size="10" text-anchor="middle">{{ p.label }}</text>
+                <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="3" fill="#3f51b5"
+                  [attr.title]="p.label + ': ' + p.value"></circle>
+                <text *ngFor="let p of trendPoints" [attr.x]="p.x" [attr.y]="155" font-size="9" text-anchor="end"
+                  [attr.transform]="'rotate(-45 ' + p.x + ' 155)'">{{ p.label }}</text>
               </svg>
               <div class="row mt-2">
                 <div class="col-6">
                   <div class="p-2" style="background:#f8fff5;border:1px solid #e6f5e6;border-radius:6px;">
                     <div class="text-muted">Success Rate</div>
-                    <div class="h5">{{ successRate != null ? (successRate.toFixed(1) + '%') : (reportSummary?.creator_completion_rate != null ? (reportSummary?.creator_completion_rate + '%') : 'N/A') }}</div>
+                    <div class="h5">{{ successRate != null ? (successRate.toFixed(1) + '%') :
+                      (reportSummary?.creator_completion_rate != null ? (reportSummary?.creator_completion_rate + '%') :
+                      'N/A') }}</div>
                   </div>
                 </div>
                 <div class="col-6">
@@ -199,7 +211,8 @@
             <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="h6">Learning Outcomes Distribution</div>
               <div class="d-flex align-items-end" style="height: 140px;">
-                <div *ngFor="let h of outcomesDistribution" style="flex:1; margin: 0 4px; text-align: center;" [attr.title]="h.label + ': ' + h.count">
+                <div *ngFor="let h of outcomesDistribution" style="flex:1; margin: 0 4px; text-align: center;"
+                  [attr.title]="h.label + ': ' + h.count">
                   <div [style.height.%]="h.heightPct" style="background: #4caf50;"></div>
                   <div style="font-size: 10px; white-space: nowrap;">{{ h.label }}</div>
                   <div style="font-size: 10px;">{{ h.count }}</div>
@@ -209,7 +222,8 @@
 
             <div class="p-3 mt-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
               <div class="h6">Exploration Performance Overview</div>
-              <div *ngFor="let exp of pagedExplorations()" class="p-2 mb-2" style="border:1px solid #f0f0f0;border-radius:6px;">
+              <div *ngFor="let exp of pagedExplorations()" class="p-2 mb-2"
+                style="border:1px solid #f0f0f0;border-radius:6px;">
                 <div class="d-flex align-items-center">
                   <div class="h6 mb-0 flex-grow-1">{{ exp.title }}</div>
                   <div class="text-success" *ngIf="exp.completion_rate != null">↑ {{ exp.completion_rate }}%</div>
@@ -217,7 +231,8 @@
                 <div class="d-flex mt-2" style="gap:24px;">
                   <div>Views<br><strong>{{ exp.plays }}</strong></div>
                   <div>Enrollments<br><strong>{{ exp.num_starts != null ? exp.num_starts : 'N/A' }}</strong></div>
-                  <div>Completion<br><strong>{{ exp.completion_rate != null ? (exp.completion_rate + '%') : 'N/A' }}</strong></div>
+                  <div>Completion<br><strong>{{ exp.completion_rate != null ? (exp.completion_rate + '%') : 'N/A'
+                      }}</strong></div>
                   <div>Avg Time<br><strong>N/A</strong></div>
                   <div>Feedback<br><strong>{{ exp.num_open_threads }}</strong></div>
                 </div>
@@ -229,7 +244,8 @@
                 <div class="p-3" style="background:#fff;border:1px solid #eee;border-radius:8px;">
                   <div class="h6">Content Effectiveness</div>
                   <div class="d-flex flex-column" style="gap:8px;">
-                    <div *ngFor="let c of contentEffectiveness" class="p-2" style="border:1px solid #f0f0f0;border-radius:6px;">
+                    <div *ngFor="let c of contentEffectiveness" class="p-2"
+                      style="border:1px solid #f0f0f0;border-radius:6px;">
                       <div class="d-flex">
                         <div class="flex-grow-1">{{ c.type }}</div>
                         <div class="text-success" *ngIf="c.delta != null">+{{ c.delta }}%</div>
@@ -248,17 +264,21 @@
                   <div class="h6">Ratings & Feedback</div>
                   <div class="row">
                     <div class="col-6">
-                      <div *ngFor="let r of ratingsBreakdown" class="d-flex align-items-center mb-2" title="{{ r.stars }}★: {{ r.count }}">
+                      <div *ngFor="let r of ratingsBreakdown" class="d-flex align-items-center mb-2"
+                        title="{{ r.stars }}★: {{ r.count }}">
                         <div style="width:80px;">{{ r.stars }}★</div>
                         <div class="flex-grow-1" style="background:#eee;height:12px;position:relative;">
-                          <div [style.width.%]="(r.count || 0) > 0 ? Math.min(100, Math.round((r.count / (reportSummary?.num_ratings || 1)) * 100)) : 0" style="background:#ffb300;height:12px;"></div>
+                          <div
+                            [style.width.%]="(r.count || 0) > 0 ? Math.min(100, Math.round((r.count / (reportSummary?.num_ratings || 1)) * 100)) : 0"
+                            style="background:#ffb300;height:12px;"></div>
                         </div>
                         <div style="width:40px; text-align:right;">{{ r.count }}</div>
                       </div>
                     </div>
                     <div class="col-6">
                       <div class="h6">Recent Comments</div>
-                      <div *ngFor="let c of recentComments" class="mb-2" style="border-bottom:1px solid #f0f0f0; padding-bottom:8px;">
+                      <div *ngFor="let c of recentComments" class="mb-2"
+                        style="border-bottom:1px solid #f0f0f0; padding-bottom:8px;">
                         <div>★ ★ ★ ★ ☆</div>
                         <div class="small text-muted">{{ c.author }} • {{ c.ago }}</div>
                         <div>{{ c.text }}</div>
@@ -309,4 +329,3 @@
 
 <div class="p-3" *ngIf="loading">Loading…</div>
 <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
-
