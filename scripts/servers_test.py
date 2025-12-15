@@ -429,7 +429,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_firebase_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            self.swap_to_always_return(
+                common, 'wait_for_firebase_emulator_to_be_ready'
+            )
         )
 
         self.exit_stack.enter_context(servers.managed_firebase_auth_emulator())
