@@ -821,19 +821,19 @@ export class BaseUser {
     // Stop the screen recorder with a timeout to prevent hanging.
     if (this.screenRecorder) {
       try {
-        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 30000;
-        await Promise.race([
-          this.screenRecorder.stop(),
-          new Promise((_, reject) =>
-            setTimeout(
-              () => reject(new Error('Screen recorder stop timed out')),
-              SCREEN_RECORDER_STOP_TIMEOUT_MS
-            )
-          ),
-        ]);
-        showMessage(
-          `Screen recording stopped for ${this.username ?? 'unknown user'}.`
-        );
+        // Fire and forget - don't await the screen recorder stop
+        this.screenRecorder
+          .stop()
+          .then(() => {
+            showMessage(
+              `Screen recording stopped for ${this.username ?? 'unknown user'}.`
+            );
+          })
+          .catch(error => {
+            showMessage(
+              `Error while stopping screen recording for ${this.username}: ${error}`
+            );
+          });
       } catch (error) {
         showMessage(
           `Error while stopping screen recording for ${this.username}: ${error}`

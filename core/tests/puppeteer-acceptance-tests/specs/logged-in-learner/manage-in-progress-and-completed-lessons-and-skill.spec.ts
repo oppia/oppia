@@ -371,7 +371,7 @@ describe('Logged-in Learner', function () {
       'In Progress'
     );
     await loggedInLearner.expectDisplayMoreCommunityLessonsToBeVisible();
-  }, 480000); // takes longer than default tim,eout
+  }, 480000); // Takes longer than default timeout.
 
   it(
     'should toggle Display More button for community lessons',
@@ -393,68 +393,59 @@ describe('Logged-in Learner', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  it(
-    'should be able to see completed Community Lessons in the Completed section of Progress Tab',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToProgressSection();
-      await loggedInLearner.expectElementsToBePresentInRLD(
-        ['In Progress', 'Completed'],
-        'tabSection'
-      );
+  it('should be able to see completed Community Lessons in the Completed section of Progress Tab', async function () {
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.expectElementsToBePresentInRLD(
+      ['In Progress', 'Completed'],
+      'tabSection'
+    );
 
-      await loggedInLearner.navigateToLessonByCard(
-        'Community Lessons',
-        'Explore Title 6',
-        'In Progress'
-      );
-      await loggedInLearner.continueToNextCard();
-      await loggedInLearner.continueToNextCard();
-      await loggedInLearner.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson!'
-      );
+    await loggedInLearner.navigateToLessonByCard(
+      'Community Lessons',
+      'Explore Title 6',
+      'In Progress'
+    );
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.expectExplorationCompletionToastMessage(
+      'Congratulations for completing this lesson!'
+    );
 
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToProgressSection();
+    await loggedInLearner.navigateToLearnerDashboard();
+    await loggedInLearner.navigateToProgressSection();
 
-      await loggedInLearner.expectScreenshotToMatch(
-        'communityLessonExploreTitle6InCompletedSectionOfProgressTab',
-        __dirname
-      );
-      await loggedInLearner.expectElementsToBePresentInRLD(
-        ['In Progress', 'Completed'],
-        'tabSection'
-      );
-      await loggedInLearner.expectElementsToBePresentInRLD(
-        [
-          'Community Lessons',
-          'Classroom Lessons',
-          'Community Lessons',
-          'Skills',
-        ],
-        'cardDisplay'
-      );
-      await loggedInLearner.expectLessonCardProgressToBe(
-        'Community Lessons',
-        [
-          'Explore Title 5',
-          'Explore Title 4',
-          'Explore Title 3',
-          'Explore Title 2',
-          'Explore Title 1',
-        ],
-        0,
-        'In Progress'
-      );
-      await loggedInLearner.expectLessonCardProgressToBe(
-        'Community Lessons',
-        ['Explore Title 6'],
-        100,
-        'Completed'
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
+    await loggedInLearner.expectScreenshotToMatch(
+      'communityLessonExploreTitle6InCompletedSectionOfProgressTab',
+      __dirname
+    );
+    await loggedInLearner.expectElementsToBePresentInRLD(
+      ['In Progress', 'Completed'],
+      'tabSection'
+    );
+    await loggedInLearner.expectElementsToBePresentInRLD(
+      ['Community Lessons', 'Classroom Lessons', 'Community Lessons', 'Skills'],
+      'cardDisplay'
+    );
+    await loggedInLearner.expectLessonCardProgressToBe(
+      'Community Lessons',
+      [
+        'Explore Title 5',
+        'Explore Title 4',
+        'Explore Title 3',
+        'Explore Title 2',
+        'Explore Title 1',
+      ],
+      0,
+      'In Progress'
+    );
+    await loggedInLearner.expectLessonCardProgressToBe(
+      'Community Lessons',
+      ['Explore Title 6'],
+      100,
+      'Completed'
+    );
+  }, 420000); // Takes longer to run than default timeout.
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
