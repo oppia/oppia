@@ -237,7 +237,7 @@ describe('Tutor card component', () => {
       'updateCompletedChaptersCount'
     ).and.returnValue(Promise.resolve());
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
-      '1'
+      1
     );
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
@@ -304,6 +304,32 @@ describe('Tutor card component', () => {
     );
   }));
 
+  it('should set chapterCount = 0 and log error for other errors', fakeAsync(() => {
+    const error500 = { status: 500, message: 'Internal Server Error' };
+
+    componentInstance.displayedCard = mockDisplayedCard;
+
+    spyOn(chapterProgressService, 'updateCompletedChaptersCount')
+      .and.returnValue(Promise.reject(error500));
+    spyOn(console, 'error').and.stub();
+    
+    spyOnProperty(conversationFlowService, 'onOppiaFeedbackAvailable', 'get')
+      .and.returnValue(new Subject<void>());
+
+    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown').and.returnValue(false);
+    spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
+
+    fixture.detectChanges();
+    tick();
+
+    expect(componentInstance.completedChaptersCount).toBe(0);
+    expect(console.error).toHaveBeenCalledWith(
+      'Error loading the chapter count',
+      error500
+    );
+  }));
+
+
   it('should correctly initialize state and progress bar after async chapter count update', fakeAsync(() => {
     const expectedCount = 5;
     const expectedShouldShowProgressBar = true;
@@ -340,6 +366,7 @@ describe('Tutor card component', () => {
       expectedShouldShowProgressBar
     );
   }));
+
 
   it('should render the Milestone Completion Message when shouldShowProgressBar is FALSE', () => {
     componentInstance.displayedCard = mockDisplayedCard
