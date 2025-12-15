@@ -42,7 +42,7 @@ CUSTOMIZATION OPTIONS
 5. To lint a specific list of file extensions. Separate file
     extensions by spaces
         python -m scripts.linters.run_lint_checks
-            --only-check-file-extensions py js
+            --only_check_file_extensions py js
 
 6. To run a shard of the lint tests
         python -m scripts.linters.run_lint_checks --shard shard_name
@@ -63,7 +63,6 @@ import subprocess
 import sys
 import threading
 
-from core import utils
 from scripts import common
 
 from typing import Dict, List, Optional, Set, Tuple, cast
@@ -113,7 +112,7 @@ _EXCLUSIVE_GROUP.add_argument(
     action='store_true',
 )
 _PARSER.add_argument(
-    '--only-check-file-extensions',
+    '--only_check_file_extensions',
     nargs='+',
     choices=['html', 'css', 'js', 'ts', 'py', 'other'],
     help='specific file extensions to be linted. Space separated list. '
@@ -131,10 +130,10 @@ class FileCache:
 
     def __init__(self) -> None:
         self._CACHE_DATA_DICT: Dict[
-            Tuple[str, utils.TextModeTypes], Tuple[str, Tuple[str, ...]]
+            Tuple[str, common.TextModeTypes], Tuple[str, Tuple[str, ...]]
         ] = {}
 
-    def read(self, filepath: str, mode: utils.TextModeTypes = 'r') -> str:
+    def read(self, filepath: str, mode: common.TextModeTypes = 'r') -> str:
         """Returns the data read from the file in unicode form.
 
         Args:
@@ -147,7 +146,7 @@ class FileCache:
         return self._get_data(filepath, mode)[0]
 
     def readlines(
-        self, filepath: str, mode: utils.TextModeTypes = 'r'
+        self, filepath: str, mode: common.TextModeTypes = 'r'
     ) -> Tuple[str, ...]:
         """Returns the tuple containing data line by line as read from the
         file in unicode form.
@@ -164,7 +163,7 @@ class FileCache:
         return line_by_line_content
 
     def _get_data(
-        self, filepath: str, mode: utils.TextModeTypes
+        self, filepath: str, mode: common.TextModeTypes
     ) -> Tuple[str, Tuple[str, ...]]:
         """Returns the collected data from the file corresponding to the given
         filepath.
@@ -180,7 +179,7 @@ class FileCache:
         """
         key = (filepath, mode)
         if key not in self._CACHE_DATA_DICT:
-            with utils.open_file(filepath, mode, newline='') as f:
+            with open(filepath, mode, newline='', encoding='utf-8') as f:
                 lines = f.readlines()
                 self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
         return self._CACHE_DATA_DICT[key]
