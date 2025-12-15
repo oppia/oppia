@@ -520,7 +520,8 @@ export class ReleaseCoordinator extends BaseUser {
    * @param {string} jobName - The name of the job to run.
    */
   async selectAndRunJob(jobName: string): Promise<void> {
-    await this.page.waitForSelector(jobInputField, {visible: true});
+    await this.expectElementToBeVisible(jobInputField);
+    await this.clearAllTextFrom(jobInputField);
     await this.typeInInputField(jobInputField, jobName);
     await this.page.keyboard.press('Enter');
     await this.page.waitForSelector(startNewJobButton, {visible: true});
