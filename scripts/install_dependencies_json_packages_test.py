@@ -217,11 +217,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         errors) can raise exceptions, but those scenarios are intentionally not
         covered here.
 
-        Args:
-            None.
-
         Raises:
-            AssertionError: Raised if any of the helper functions (download,
+            AssertionError. Raised if any of the helper functions (download,
                 extract, remove, rename) are called, or if the function does not
                 short-circuit when the target directory exists.
         """
@@ -263,11 +260,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         to delete. Other paths (such as repeated failures, BadZipFile, or OS-level
         errors) are outside the scope of this test.
 
-        Args:
-            None.
-
         Raises:
-            AssertionError: Raised if the retry logic is not executed as expected
+            AssertionError. Raised if the retry logic is not executed as expected
                 (for example, if url_open is not called, remove() is called when it
                 should not be, or the zipfile initialization count is not equal to
                 the expected number of attempts).

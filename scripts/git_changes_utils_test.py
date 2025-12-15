@@ -105,7 +105,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
         communicate_swap = self.swap(process, 'communicate', mock_communicate)
 
-        def mock_popen(   # pylint: disable=unused-argument
+        def mock_popen(  # pylint: disable=unused-argument
             cmd_tokens: List[str], stdout: int, stderr: int
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
@@ -1092,7 +1092,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             return (b'local_sha1 local_ref', b'')
 
         with tempfile.NamedTemporaryFile() as temp_stdin_file:
-            with open(temp_stdin_file.name, 'r') as f:
+            with open(temp_stdin_file.name, 'r', encoding='utf-8') as f:
                 with self.swap(sys, 'stdin', f), self.swap(
                     sys.stdin, 'isatty', lambda: False
                 ), self.swap(
