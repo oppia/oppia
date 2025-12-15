@@ -2682,9 +2682,39 @@ export class ExplorationEditor extends BaseUser {
       // any errors or success states are rendered.
       await this.waitForPageToFullyLoad();
 
-      // Check for error modal before waiting for success element.
-      // If an error occurred (e.g., Elasticsearch failure), the error modal
-      // will be present instead of the success modal.
+      // Wait for exploration ID element with increased timeout to handle
+      // cases where backend processing takes longer (e.g., Elasticsearch indexing).
+      try {
+        await this.page.waitForSelector(explorationIdElement, {
+          visible: true,
+          timeout: 60000,
+        });
+      } catch (error) {
+        // If timeout occurs, check for error modal before throwing.
+        const errorSavingExplorationElement = await this.page.$(
+          errorSavingExplorationModal
+        );
+        if (errorSavingExplorationElement) {
+          const errorText = await this.page.$eval(
+            errorSavingExplorationModal,
+            el => el.textContent?.trim() || ''
+          );
+          throw new Error(
+            `Publish failed with error: ${errorText}. This may be due to ` +
+              'backend issues (e.g., Elasticsearch disk space).'
+          );
+        }
+        // If no error modal found but exploration ID didn't appear,
+        // throw a more descriptive error.
+        throw new Error(
+          'Publish failed: Exploration ID did not appear after 60 seconds. ' +
+            'This may be due to backend issues (e.g., Elasticsearch disk space). ' +
+            'Original error: ' +
+            (error instanceof Error ? error.message : String(error))
+        );
+      }
+
+      // Check for error modal one more time (in case it appeared after success check).
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
       );
@@ -2699,12 +2729,6 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
-      // Wait for exploration ID element with increased timeout to handle
-      // cases where backend processing takes longer (e.g., Elasticsearch indexing).
-      await this.page.waitForSelector(explorationIdElement, {
-        visible: true,
-        timeout: 60000,
-      });
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
         element => (element as HTMLElement).innerText
