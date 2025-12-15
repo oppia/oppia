@@ -345,9 +345,8 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_swap, self.sys_swap:
-            with self.oppia_is_dockerized_swap:
-                with self.install_swap, subprocess_swap:
-                    run_lint_checks.main()
+            with self.install_swap, subprocess_swap:
+                run_lint_checks.main()
 
     def test_get_linters_for_file_extension_with_unhandled_extension(
         self,

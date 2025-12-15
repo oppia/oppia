@@ -242,7 +242,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
 
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w', encoding='utf-8') as tmp:
             tmp.write(
                 """if (a > 1 and b > 2)  # comment without colon
                     print(a)
@@ -264,7 +264,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
         filename = temp_file.name
-        with utils.open_file(filename, 'w') as tmp:
+        with open(filename, 'w', encoding='utf-8') as tmp:
             tmp.write(
                 """self.post_json(a * b  # comment
     )
