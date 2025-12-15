@@ -2678,7 +2678,33 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(explorationConfirmPublishButton);
-      await this.page.waitForSelector(explorationIdElement);
+      // Wait for page to fully load after clicking publish button to ensure
+      // any errors or success states are rendered.
+      await this.waitForPageToFullyLoad();
+
+      // Check for error modal before waiting for success element.
+      // If an error occurred (e.g., Elasticsearch failure), the error modal
+      // will be present instead of the success modal.
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        const errorText = await this.page.$eval(
+          errorSavingExplorationModal,
+          el => el.textContent?.trim() || ''
+        );
+        throw new Error(
+          `Publish failed with error: ${errorText}. This may be due to ` +
+            'backend issues (e.g., Elasticsearch disk space).'
+        );
+      }
+
+      // Wait for exploration ID element with increased timeout to handle
+      // cases where backend processing takes longer (e.g., Elasticsearch indexing).
+      await this.page.waitForSelector(explorationIdElement, {
+        visible: true,
+        timeout: 60000,
+      });
       const explorationIdUrl = await this.page.$eval(
         explorationIdElement,
         element => (element as HTMLElement).innerText
