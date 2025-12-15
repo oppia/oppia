@@ -76,6 +76,7 @@ const userGroupCreateErrorSelector = '.e2e-test-user-group-save-error';
 const removeUserGroupButtonSelector = '.e2e-test-remove-user-group-button';
 const beamJobsTableSelector = '.e2e-test-beam-jobs-table';
 const beamJobStatusSelectorPrefix = '.e2e-test-job-status-';
+const beamJobOutputDialogSelector = '.e2e-test-view-beam-job-output-dialog';
 
 export class ReleaseCoordinator extends BaseUser {
   /**
