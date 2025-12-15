@@ -137,6 +137,7 @@ describe('Pretest question backend API service', function () {
           },
           linked_skill_id: null,
           card_is_checkpoint: true,
+          inapplicable_skill_misconception_ids: [],
         },
         language_code: 'en',
         version: 1,
