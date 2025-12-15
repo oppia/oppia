@@ -21,10 +21,6 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DUMMY_PASS_BEAM_JOB = 'DummyPassJob';
@@ -35,8 +31,6 @@ const DUMMY_FAIL_BEAM_JOB_ERROR =
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationEditor: ExplorationEditor;
-  let explorationId: string;
 
   beforeAll(async function () {
     releaseCoordinator = await UserFactory.createNewUser(
@@ -44,26 +38,6 @@ describe('Release Coordinator', function () {
       'releaseCoordinator@example.com',
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
-
-    explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
-
-    // Creating data for the beam job.
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
-      'We will be learning Expressions today.'
-    );
-    await explorationEditor.addMathInteraction(
-      INTERACTION_TYPES.NUMERIC_EXPRESSION
-    );
-    await explorationEditor.closeInteractionResponseModal();
-
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.getExplorationId();
   });
 
   it('should be able to visit release coordinator page', async function () {
