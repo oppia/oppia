@@ -299,7 +299,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'extensions/objects/templates/svg-editor.component.spec.ts',
     'extensions/objects/templates/svg-editor.component.ts',
     'extensions/rich_text_components/rte-output-display.component.ts',
-    'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts', 
+    'extensions/visualizations/oppia-visualization-click-hexbins.directive.ts',
 ]
 # pylint: enable=line-too-long, single-line-pragma
 
