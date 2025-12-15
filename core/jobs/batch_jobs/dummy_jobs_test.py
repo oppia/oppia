@@ -47,6 +47,6 @@ class DummyFailJobTests(job_test_utils.JobTestBase):
     def test_dummy_fail_job_outputs_failure(self) -> None:
         """Test that DummyFailJob outputs a failure result."""
         with self.assertRaisesRegex(
-            Exception, "DummyFailJob intentionally failed"
+            Exception, 'DummyFailJob intentionally failed.'
         ):
             self.run_job()
