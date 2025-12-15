@@ -1721,6 +1721,10 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         }
 
         self.assertIsNotNone(voiceover_regeneration_task_mapping_model)
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover_regeneration_task_mapping_model is not None
+
         self.assertEqual(
             voiceover_regeneration_task_mapping_model.language_accent_to_content_status_map,
             expected_language_accent_to_content_status_map,
