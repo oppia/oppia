@@ -26,10 +26,7 @@
           </a>
         </div>
         <div class="slider-section" *ngIf="progressBarIsShown">
-          <div *ngIf="audioLoadingIndicatorIsShown">
-            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          </div>
-          <div *ngIf="!audioLoadingIndicatorIsShown">
+          <div>
             <oppia-audio-slider [value]="this.currentVoiceoverTime"
                                 [dir]="isLanguageRTL() ? 'rtl' : 'ltr'"
                                 [max]="this.totalVoiceoverDurationSecs"
