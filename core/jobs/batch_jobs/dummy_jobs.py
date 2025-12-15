@@ -53,6 +53,6 @@ class DummyFailJob(base_jobs.JobBase):
             PCollection. A PCollection containing a single JobRunResult with
             stderr indicating failure.
         """
-        # We need to failed job using expection, if we just pass "Fail" in output
-        # the job will still pass, but with different output.
+        # An exception is required to fail the job. Writing "Fail" to the
+        # output will not fail the job; it only changes the output.
         raise Exception('DummyFailJob intentionally failed.')
