@@ -296,7 +296,7 @@ def mock_load_template(
         filepath = get_filepath_from_filename(filename, 'src')
     if filepath is None:
         raise Exception('No file exists for the given file name.')
-    with utils.open_file(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         return f.read()
 
 

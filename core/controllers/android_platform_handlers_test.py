@@ -46,11 +46,14 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
 
         mapping = {item['name']: item['value'] for item in response}
 
-        self.assertEqual(mapping, {
-            'android_min_version_code_for_recommending_app_update': 0,
-            'android_min_supported_version_code': 0,
-            'android_min_supported_api_level': 40,
-        })
+        self.assertEqual(
+            mapping,
+            {
+                'android_min_version_code_for_recommending_app_update': 0,
+                'android_min_supported_version_code': 0,
+                'android_min_supported_api_level': 40,
+            },
+        )
 
     def test_platform_parameters_multiple_overrides(self) -> None:
         response = self.get_json(
@@ -61,11 +64,14 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
 
         mapping = {item['name']: item['value'] for item in response}
 
-        self.assertEqual(mapping, {
-            'android_min_version_code_for_recommending_app_update': 0,
-            'android_min_supported_version_code': 120,
-            'android_min_supported_api_level': 33,
-        })
+        self.assertEqual(
+            mapping,
+            {
+                'android_min_version_code_for_recommending_app_update': 0,
+                'android_min_supported_version_code': 120,
+                'android_min_supported_api_level': 33,
+            },
+        )
 
     def test_platform_parameters_parse_error(self) -> None:
         self.get_json(
@@ -77,9 +83,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
         response = self.get_json('/android_feature_flags')
         mapping = {item['name']: item['enabled'] for item in response}
 
-        self.assertEqual(mapping, {
-            'android_enable_fast_language_switching_in_lesson': False
-        })
+        self.assertEqual(
+            mapping, {'android_enable_fast_language_switching_in_lesson': False}
+        )
 
     def test_feature_flags_override(self) -> None:
         response = self.get_json(
@@ -87,9 +93,9 @@ class AndroidPlatformHandlersTests(test_utils.GenericTestBase):
         )
         mapping = {item['name']: item['enabled'] for item in response}
 
-        self.assertEqual(mapping, {
-            'android_enable_fast_language_switching_in_lesson': True
-        })
+        self.assertEqual(
+            mapping, {'android_enable_fast_language_switching_in_lesson': True}
+        )
 
     def test_feature_flags_parse_error(self) -> None:
         self.get_json(
