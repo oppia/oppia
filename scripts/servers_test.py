@@ -658,7 +658,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.exit_stack.close()
 
-        mock_remove.assert_not_called()
+        mock_os_remove.assert_not_called()
         mock_exists.assert_called()
         mock_check_call.assert_called_once_with(
             [common.REDIS_CLI_PATH, 'shutdown', 'nosave']
@@ -778,7 +778,9 @@ class ManagedProcessTests(test_utils.TestBase):
             mock.patch.object(common, 'OS_NAME', 'Linux')
         )
         mock_create_managed_web_browser = mock.patch.object(
-            servers, 'create_managed_web_browser', Exception(web_browser_error)
+            servers,
+            'create_managed_web_browser',
+            side_effect=Exception(web_browser_error),
         )
 
         with mock_create_managed_web_browser:

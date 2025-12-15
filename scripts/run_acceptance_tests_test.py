@@ -176,17 +176,24 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
             subprocess.Popen, 'communicate', mock_communicate
         )
 
-        with os_path_exists_patch, shutil_rmtree_patch, process_patch:
-            with shutil_copytree_patch, communicate_patch:
+        with (
+            os_path_exists_patch
+        ), shutil_rmtree_patch as rmtree_mock, process_patch as popen_mock:
+            with shutil_copytree_patch as copytree_mock, communicate_patch:
                 run_acceptance_tests.compile_test_ts_files()
 
         # Assertions for the mocks.
-        shutil.rmtree.assert_called_once_with(build_dir_path)
-        shutil.copytree.assert_called_once_with(
+        rmtree_mock.assert_called_once_with(build_dir_path)
+        copytree_mock.assert_called_once_with(
             os.path.join(puppeteer_acceptance_tests_dir_path, 'data'),
             os.path.join(build_dir_path, 'data'),
         )
-        subprocess.Popen.assert_called_once_with(expected_cmd)
+        popen_mock.assert_called_once_with(
+            expected_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True,
+        )
 
     def test_start_tests_when_other_instances_not_stopped(self) -> None:
         is_running_mock = self.exit_stack.enter_context(
@@ -283,7 +290,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
         is_running_mock.assert_called()
-        build_js_mock.assert_called_once_with(True)
+        build_js_mock.assert_called_once_with(True, source_maps=False)
         elasticsearch_mock.assert_called()
         firebase_mock.assert_called()
         appserver_mock.assert_called()
@@ -379,7 +386,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
         )
 
         is_running_mock.assert_called()
-        build_js_mock.assert_called_once_with(True)
+        build_js_mock.assert_called_once_with(True, source_maps=False)
         elasticsearch_mock.assert_called()
         firebase_mock.assert_called()
         appserver_mock.assert_called()
@@ -562,7 +569,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
         is_running_mock.assert_called()
-        build_js_mock.assert_called_once_with(True)
+        build_js_mock.assert_called_once_with(True, source_maps=False)
         elasticsearch_mock.assert_called()
         firebase_mock.assert_called()
         appserver_mock.assert_called()
@@ -642,7 +649,7 @@ class RunAcceptanceTestsTests(test_utils.GenericTestBase):
                 run_acceptance_tests.main(args=['--suite', 'testSuite'])
 
         is_running_mock.assert_called()
-        build_js_mock.assert_called_once_with(True)
+        build_js_mock.assert_called_once_with(True, source_maps=False)
         elasticsearch_mock.assert_called()
         firebase_mock.assert_called()
         appserver_mock.assert_called()

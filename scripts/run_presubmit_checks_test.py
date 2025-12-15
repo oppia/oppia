@@ -123,9 +123,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
-            with self.swap_backend_tests, self.swap_frontend_tests:
-                run_presubmit_checks.main(args=['-b', specified_branch])
+        with self.print_patch, (
+            swap_check_output
+        ), self.swap_run_lint_checks as mock_run_lint, self.swap_backend_tests as mock_backend, self.swap_frontend_tests as mock_frontend:
+            run_presubmit_checks.main(args=['-b', specified_branch])
 
         for script in self.scripts_called:
             self.assertTrue(script)
@@ -136,11 +137,9 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
-        self.swap_run_lint_checks.assert_called_once_with(args=[])
-        self.swap_backend_tests.assert_called_once_with(args=[])
-        self.swap_frontend_tests.assert_called_once_with(
-            args=['--run_minified_tests']
-        )
+        mock_run_lint.assert_called_once_with(args=[])
+        mock_backend.assert_called_once_with(args=[])
+        mock_frontend.assert_called_once_with(args=['--run_minified_tests'])
 
     def test_run_presubmit_checks_when_current_branch_exists_on_remote_origin(
         self,
@@ -169,9 +168,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
-            with self.swap_backend_tests, self.swap_frontend_tests:
-                run_presubmit_checks.main(args=[])
+        with self.print_patch, (
+            swap_check_output
+        ), self.swap_run_lint_checks as mock_run_lint, self.swap_backend_tests as mock_backend, self.swap_frontend_tests as mock_frontend:
+            run_presubmit_checks.main(args=[])
 
         for script in self.scripts_called:
             self.assertTrue(script)
@@ -182,11 +182,9 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Frontend tests passed.', self.print_arr)
         self.assertIn('Backend tests passed.', self.print_arr)
-        self.swap_run_lint_checks.assert_called_once_with(args=[])
-        self.swap_backend_tests.assert_called_once_with(args=[])
-        self.swap_frontend_tests.assert_called_once_with(
-            args=['--run_minified_tests']
-        )
+        mock_run_lint.assert_called_once_with(args=[])
+        mock_backend.assert_called_once_with(args=[])
+        mock_frontend.assert_called_once_with(args=['--run_minified_tests'])
 
     def test_frontend_tests_are_not_run_when_no_frontend_files_are_changed(
         self,
@@ -215,9 +213,10 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         swap_check_output = mock.patch.object(
             subprocess, 'check_output', mock_check_output
         )
-        with self.print_patch, swap_check_output, self.swap_run_lint_checks:
-            with self.swap_backend_tests:
-                run_presubmit_checks.main(args=[])
+        with self.print_patch, (
+            swap_check_output
+        ), self.swap_run_lint_checks as mock_run_lint, self.swap_backend_tests as mock_backend:
+            run_presubmit_checks.main(args=[])
 
         self.assertFalse(self.scripts_called['run_frontend_tests'])
         self.assertTrue(self.scripts_called['run_lint_checks'])
@@ -228,5 +227,5 @@ class RunPresubmitChecksTests(test_utils.GenericTestBase):
         )
         self.assertIn('Backend tests passed.', self.print_arr)
         self.assertNotIn('Frontend tests passed.', self.print_arr)
-        self.swap_run_lint_checks.assert_called_once_with(args=[])
-        self.swap_backend_tests.assert_called_once_with(args=[])
+        mock_run_lint.assert_called_once_with(args=[])
+        mock_backend.assert_called_once_with(args=[])

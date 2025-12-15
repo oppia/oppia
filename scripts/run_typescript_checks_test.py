@@ -346,9 +346,9 @@ class TypescriptChecksTests(test_utils.GenericTestBase):
         def mock_exit(code: int) -> None:
             raise SystemExit(code)
 
-        exit_patch = mock.patch.object(sys, 'exit', side_effect=mock_exit)
-
-        with popen_patch, print_patch, exit_patch:
+        with popen_patch, print_patch, mock.patch.object(
+            sys, 'exit', side_effect=mock_exit
+        ) as exit_patch:
             with self.assertRaisesRegex(SystemExit, '1'):
                 run_typescript_checks.run_typescript_type_tests()
 

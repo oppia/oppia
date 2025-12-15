@@ -191,14 +191,14 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, swap_popen:
+        with self.print_patch, swap_popen as popen_mock:
             run_lighthouse_tests.run_lighthouse_puppeteer_script()
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr
         )
 
-        subprocess.Popen.assert_called_once_with(self.puppeteer_bash_command)
+        popen_mock.assert_called_once_with(self.puppeteer_bash_command)
 
     def test_run_lighthouse_puppeteer_script_failed(self) -> None:
         class MockTask:
@@ -226,7 +226,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, self.swap_sys_exit, swap_popen:
+        with self.print_patch, self.swap_sys_exit, swap_popen as popen_mock:
             run_lighthouse_tests.run_lighthouse_puppeteer_script()
 
         self.assertIn('Return code: 1', self.print_arr)
@@ -236,7 +236,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
 
-        subprocess.Popen.assert_called_once_with(self.puppeteer_bash_command)
+        popen_mock.assert_called_once_with(self.puppeteer_bash_command)
 
     def test_puppeteer_script_succeeds_when_recording_succeeds(self) -> None:
         class MockTask:
@@ -265,7 +265,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, swap_popen, swap_isfile:
+        with self.print_patch, swap_popen as popen_mock, swap_isfile:
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn(
@@ -279,7 +279,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             self.print_arr,
         )
 
-        subprocess.Popen.assert_called_once_with(
+        popen_mock.assert_called_once_with(
             self.puppeteer_bash_command + self.extra_args
         )
 
@@ -310,7 +310,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, self.swap_sys_exit, swap_popen, swap_isfile:
+        with self.print_patch, self.swap_sys_exit, swap_popen as popen_mock, (
+            swap_isfile
+        ):
             run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
 
         self.assertIn('Return code: 1', self.print_arr)
@@ -323,32 +325,32 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Resulting puppeteer video saved at %s' % self.extra_args[1],
             self.print_arr,
         )
-        swap_popen.assert_called_once_with(
+        popen_mock.assert_called_once_with(
             self.puppeteer_bash_command + self.extra_args
         )
 
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
 
-        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir as isdir_mock:
             run_lighthouse_tests.run_webpack_compilation()
 
         self.assertNotIn(
             'Failed to complete webpack compilation, exiting...', self.print_arr
         )
-        swap_isdir.assert_called_once_with()
+        isdir_mock.assert_called_once_with()
 
     def test_run_webpack_compilation_failed(self) -> None:
         swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: False)
 
-        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir as isdir_mock:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
 
         self.assertIn(
             'Failed to complete webpack compilation, exiting...', self.print_arr
         )
-        swap_isdir.assert_called_once_with()
+        isdir_mock.assert_called_once_with()
 
     def test_subprocess_error_results_in_failed_webpack_compilation(
         self,
@@ -379,13 +381,13 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
         swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: False)
 
-        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
+        with self.print_patch, self.swap_webpack_compiler as webpack_mock, swap_isdir as isdir_mock:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
 
         self.assertIn('Subprocess execution failed.', self.print_arr)
-        self.swap_webpack_compiler.assert_called_once_with()
-        swap_isdir.assert_called_once_with()
+        webpack_mock.assert_called_once_with()
+        isdir_mock.assert_called_once_with()
 
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
@@ -415,12 +417,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         os.environ['LIGHTHOUSE_URLS_TO_RUN'] = (
             'http://localhost:8181/, http://localhost:8181/about'
         )
-        with self.print_patch, swap_popen:
+        with self.print_patch, swap_popen as popen_mock:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE
             )
 
-        swap_popen.assert_called_once_with(
+        popen_mock.assert_called_once_with(
             *(self.lighthouse_check_bash_command,)
         )
 
@@ -454,12 +456,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, self.swap_sys_exit, swap_popen:
+        with self.print_patch, self.swap_sys_exit, swap_popen as popen_mock:
             run_lighthouse_tests.run_lighthouse_checks(
                 LIGHTHOUSE_MODE_PERFORMANCE
             )
 
-        swap_popen.assert_called_once_with(
+        popen_mock.assert_called_once_with(
             *(self.lighthouse_check_bash_command,)
         )
 
@@ -502,7 +504,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
+                with self.swap_ng_build, self.print_patch:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with self.lighthouse_pages_json_filepath_patch:
                             run_lighthouse_tests.main(
@@ -566,7 +568,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
-                        with swap_popen, swap_run_lighthouse_tests:
+                        with (
+                            swap_popen
+                        ), swap_run_lighthouse_tests as run_checks_mock:
                             with self.lighthouse_pages_json_filepath_patch:
                                 run_lighthouse_tests.main(
                                     args=['--mode', 'performance']
@@ -583,7 +587,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                     expected_all_lighthouse_urls,
                                 )
 
-        swap_run_lighthouse_tests.assert_called_once_with(*('performance',))
+        run_checks_mock.assert_called_once_with(*('performance',))
 
         self.assertIn('Building files in production mode.', self.print_arr)
         self.assertIn(
@@ -630,7 +634,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
                     with self.swap_firebase_auth_emulator, swap_build:
-                        with swap_popen, swap_run_lighthouse_tests:
+                        with (
+                            swap_popen
+                        ), swap_run_lighthouse_tests as run_checks_mock:
                             with self.lighthouse_pages_json_filepath_patch:
                                 run_lighthouse_tests.main(
                                     args=[
@@ -667,9 +673,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script completed successfully.', self.print_arr
         )
 
-        run_lighthouse_tests.run_lighthouse_checks.assert_called_once_with(
-            'performance'
-        )
+        run_checks_mock.assert_called_once_with('performance')
         build.main.assert_called_once_with(args=['--prod_env'])
         servers.managed_dev_appserver.assert_called_once_with(
             port=GOOGLE_APP_ENGINE_PORT,
@@ -705,23 +709,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = mock.patch.object(
             build, 'main', side_effect=lambda args: None
         )
-        swap_emulator_mode = mock.patch.object(
-            constants, 'EMULATOR_MODE', False
-        )
-        with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
-            with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
-                    with self.swap_redis_server, swap_run_lighthouse_tests:
-                        with self.lighthouse_pages_json_filepath_patch:
-                            run_lighthouse_tests.main(
-                                args=[
-                                    '--mode',
-                                    'performance',
-                                    '--skip_build',
-                                    '--pages',
-                                    'splash',
-                                ]
-                            )
+        with self.swap_redis_server, swap_run_lighthouse_tests as run_checks_mock:
+            with self.lighthouse_pages_json_filepath_patch:
+                run_lighthouse_tests.main(
+                    args=[
+                        '--mode',
+                        'performance',
+                        '--skip_build',
+                        '--pages',
+                        'splash',
+                    ]
+                )
 
         self.assertIn(
             'Building files in production mode skipping webpack build.',
@@ -731,9 +729,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             'Puppeteer script completed successfully.', self.print_arr
         )
 
-        run_lighthouse_tests.run_lighthouse_checks.assert_called_once_with(
-            'performance'
-        )
+        run_checks_mock.assert_called_once_with('performance')
         build.main.assert_called_once_with(args=[])
 
     def test_main_function_calls_puppeteer_record(self) -> None:
@@ -791,7 +787,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
 
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, swap_dev_appserver:
-                with self.swap_ng_build, swap_emulator_mode, self.print_patch:
+                with self.swap_ng_build, self.print_patch:
                     with self.swap_redis_server, swap_run_lighthouse_tests:
                         with swap_run_puppeteer_script:
                             with self.lighthouse_pages_json_filepath_patch:
@@ -813,7 +809,5 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         run_lighthouse_tests.run_lighthouse_puppeteer_script.assert_called_once_with(
             True
         )
-        run_lighthouse_tests.run_lighthouse_checks.assert_called_once_with(
-            'performance'
-        )
+        run_checks_mock.assert_called_once_with('performance')
         build.main.assert_called_once_with(args=[])

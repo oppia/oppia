@@ -69,16 +69,16 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
         shutil.rmtree('dummy_dir')
 
     def test_get_skip_files_list(self) -> None:
-        swap_open = mock.patch.object(
+        with mock.patch.object(
             builtins,
             'open',
             return_value=self.dummy_file_object,
-        )
-
-        with swap_open:
+        ) as swap_open:
             returned_list = third_party_size_check.get_skip_files_list()
 
-        swap_open.assert_called_once_with('.gcloudignore', 'r')
+        swap_open.assert_called_once_with(
+            '.gcloudignore', 'r', encoding='utf-8'
+        )
 
         skipped_files = ['random_file.py', 'new_file.py']
         expected_skipped_files_list = [
@@ -88,19 +88,23 @@ class ThirdPartySizeCheckTests(test_utils.GenericTestBase):
 
     def test_get_skip_files_list_throws_error(self) -> None:
         err = IOError('XYZ error.')
-        print_patch = mock.patch.object(builtins, 'print')
 
         def mock_open(*unused_args: str, **unused_kwargs: str) -> None:
             raise err
 
-        swap_open = mock.patch.object(builtins, 'open', side_effect=mock_open)
-        swap_sys_exit = mock.patch.object(sys, 'exit')
-
-        with swap_open, swap_sys_exit, print_patch:
+        with mock.patch.object(
+            builtins, 'open', side_effect=mock_open
+        ) as swap_open, mock.patch.object(
+            sys, 'exit'
+        ) as swap_sys_exit, mock.patch.object(
+            builtins, 'print'
+        ) as print_patch:
             third_party_size_check.get_skip_files_list()
 
         print_patch.assert_called_once_with(err)
-        swap_open.assert_called_once_with('.gcloudignore', 'r')
+        swap_open.assert_called_once_with(
+            '.gcloudignore', 'r', encoding='utf-8'
+        )
         swap_sys_exit.assert_called_once_with(1)
 
     def test_check_size_in_dir(self) -> None:

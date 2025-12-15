@@ -119,7 +119,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
             with mock_open_obj:
                 returned_time = run_portserver.get_process_start_time(pid)
 
-        mock_open_obj.assert_called_once_with('/proc/12345/stat', 'r')
+        mock_open_obj.assert_called_once_with(
+            '/proc/12345/stat', 'r', encoding='utf-8'
+        )
         self.assertEqual(returned_time, 0)
 
     def test_get_process_start_time(self) -> None:
@@ -136,7 +138,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
             with mock_open_obj:
                 returned_time = run_portserver.get_process_start_time(pid)
 
-        mock_open_obj.assert_called_once_with('/proc/12345/stat', 'r')
+        mock_open_obj.assert_called_once_with(
+            '/proc/12345/stat', 'r', encoding='utf-8'
+        )
         self.assertEqual(returned_time, 11)
         dummy_file_object.close()
 
@@ -152,7 +156,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
             with mock_open_obj:
                 returned_text = run_portserver.get_process_command_line(pid)
 
-        mock_open_obj.assert_called_once_with('/proc/12345/cmdline', 'r')
+        mock_open_obj.assert_called_once_with(
+            '/proc/12345/cmdline', 'r', encoding='utf-8'
+        )
         self.assertEqual(returned_text, '')
 
     def test_get_process_command_line(self) -> None:
@@ -168,7 +174,9 @@ class RunPortserverTests(test_utils.GenericTestBase):
             with mock_open_obj:
                 returned_text = run_portserver.get_process_command_line(pid)
 
-        mock_open_obj.assert_called_once_with('/proc/12345/cmdline', 'r')
+        mock_open_obj.assert_called_once_with(
+            '/proc/12345/cmdline', 'r', encoding='utf-8'
+        )
         self.assertEqual(returned_text, expected_text)
 
         dummy_file_object.close()
@@ -493,14 +501,14 @@ class RunPortserverTests(test_utils.GenericTestBase):
             return data
 
         with mock.patch.object(
-            builtins, 'hasattr', side_effect=lambda *unused_args: False
-        ) as mock_hasattr:
-            swap_socket = mock.patch.object(
-                socket, 'socket', lambda *unused_args: MockSocket()
-            )
+            os, 'remove', side_effect=lambda _: None
+        ) as mock_remove:
             with mock.patch.object(
-                os, 'remove', side_effect=lambda _: None
-            ) as mock_remove:
+                builtins, 'hasattr', side_effect=lambda *unused_args: False
+            ) as mock_hasattr:
+                swap_socket = mock.patch.object(
+                    socket, 'socket', lambda *unused_args: MockSocket()
+                )
                 with swap_socket, mock_hasattr, mock_remove:
                     server = run_portserver.Server(dummy_handler, path)
                     # Here we use cast because server.socket is a MockSocket
