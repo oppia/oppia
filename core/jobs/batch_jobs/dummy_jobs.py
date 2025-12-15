@@ -47,10 +47,10 @@ class DummyFailJob(base_jobs.JobBase):
     """Dummy job that does nothing and outputs a fail status."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection with a single failure result.
+        """Fails the job.
 
         Raises:
-            Exception. Always.
+            Exception. Intentionally raised to fail the job.
         """
         # An exception is required to fail the job. Writing "Fail" to the
         # output will not fail the job; it only changes the output.
