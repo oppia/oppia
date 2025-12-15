@@ -797,9 +797,9 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                 ) -> None:
                     self.returncode = 0
 
-                def communicate(
+                def communicate(  # pylint: disable=missing-docstring
                     self,
-                ) -> tuple[bytes, bytes]:  # pylint: disable=missing-docstring
+                ) -> tuple[bytes, bytes]:
                     return (b'topic:123\n', b'')
 
             with (
