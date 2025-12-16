@@ -436,7 +436,7 @@ describe('Tutor card component', () => {
       '.milestone-progress-bar-inner'
     );
 
-    expect(innerBar.style.width).toBe('60%'); // Check the data binding
+    expect(innerBar.style.width).toBe('60%');
 
     let milestoneMessage = fixture.nativeElement.querySelector(
       '.milestone-message-star-container'
