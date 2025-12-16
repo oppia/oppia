@@ -15,7 +15,7 @@
              [ngbTooltip]="!isAudioAvailableInCurrentLanguageAccent() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:selectedLanguageAccentDescription}) : ''"
              placement="right">
             <i class="fas oppia-audio-controls-button-icon" tabindex="0" aria-label="Press enter to Listen to the Lesson"
-               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguageAccent() || audioIsLoading}">
+               [ngClass]="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle e2e-test-play-circle': !isAudioPlaying(), 'fa-pause-circle e2e-test-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguageAccent() || audioLoadingIndicatorIsShown}">
             </i>
           </a>
           <a (click)="onForwardButtonClicked()">
