@@ -54,7 +54,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         with mock.patch.object(
             opportunity_services,
             'is_exploration_available_for_contribution',
-            True,
+            return_value=True,
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 
@@ -64,7 +64,7 @@ class ExplorationPlaythroughRecordingFeatureTest(ExplorationFeaturesTestBase):
         with mock.patch.object(
             opportunity_services,
             'is_exploration_available_for_contribution',
-            False,
+            return_value=False,
         ):
             json_response = self.get_json(exploration_features_url(self.EXP_ID))
 

@@ -100,7 +100,7 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             )
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with mock.patch.object(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
+        with mock.patch.dict(constants, {'NUM_QUESTIONS_PER_PAGE': 2}):
             json_response = self.get_json(
                 '%s/%s,%s?offset=0'
                 % (

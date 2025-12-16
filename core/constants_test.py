@@ -44,9 +44,7 @@ class ConstantsTests(test_utils.GenericTestBase):
         with mock.patch.object(
             pkgutil,
             'get_data',
-            FileNotFoundError(
-                'No such file or directory: \'assets/non_exist.xy\''
-            ),
+            return_value=None,
         ):
             with self.assertRaisesRegex(
                 FileNotFoundError,
@@ -58,7 +56,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_binary_file_in_package_returns_the_content(self) -> None:
         """Test get_package_file_contents with imaginary binary file."""
-        with mock.patch.object(pkgutil, 'get_data', 'File data'):
+        with mock.patch.object(pkgutil, 'get_data', return_value='File data'):
             self.assertEqual(
                 constants.get_package_file_contents(
                     'assets', 'non_exist.xy', binary_mode=True
@@ -86,7 +84,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_file_in_package_returns_the_content(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with mock.patch.object(pkgutil, 'get_data', b'File data'):
+        with mock.patch.object(pkgutil, 'get_data', return_value=b'File data'):
             self.assertEqual(
                 constants.get_package_file_contents('assets', 'non_exist.xy'),
                 'File data',
@@ -94,7 +92,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_loading_file_in_non_existent_package_throws_error(self) -> None:
         """Test get_package_file_contents with imaginary file."""
-        with mock.patch.object(pkgutil, 'get_data', None):
+        with mock.patch.object(pkgutil, 'get_data', return_value=None):
             with self.assertRaisesRegex(
                 FileNotFoundError,
                 'No such file or directory: \'assets/non_exist.xy\'',
@@ -194,7 +192,7 @@ class ConstantsTests(test_utils.GenericTestBase):
 
     def test_constants_can_be_set(self) -> None:
         """Test __setattr__ to see if constants can be set as needed."""
-        with mock.patch.object(
-            constants.constants, 'TESTING_CONSTANT', 'test_2'
+        with mock.patch.dict(
+            constants.constants, {'TESTING_CONSTANT': 'test_2'}
         ):
             self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')

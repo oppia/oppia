@@ -61,11 +61,11 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'request',
             side_effect=lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
         )
-        with firebase_domains_patch, request_patch:
+        with firebase_domains_patch, request_patch as request_mock:
             response = self.get_json(url, params)
             self.assertDictEqual(response, {'key': 'val'})
 
-        request_patch.assert_called_once_with(
+        request_mock.assert_called_once_with(
             'GET',
             f'{self.MOCK_FIREBASE_DOMAIN}{url}',
             params=params,
@@ -93,7 +93,7 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
             'request',
             side_effect=lambda *args, **kwargs: self.MOCK_FIREBASE_RESPONSE,
         )
-        with firebase_domains_patch, request_patch:
+        with firebase_domains_patch, request_patch as request_mock:
             response = self.post_task(url, payload, headers)
 
             for header, value in self.MOCK_FIREBASE_RESPONSE.headers.items():
@@ -105,7 +105,7 @@ class FirebaseProxyPageTest(test_utils.GenericTestBase):
                 else:
                     self.assertEqual(response.headers[header], value)
 
-        request_patch.assert_called_once_with(
+        request_mock.assert_called_once_with(
             'POST',
             f'{self.MOCK_FIREBASE_DOMAIN}{url}',
             data=payload,

@@ -626,7 +626,7 @@ class UtilsTests(test_utils.GenericTestBase):
             )
 
     def test_get_asset_dir_prefix_with_prod_mode(self) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants, {'DEV_MODE': False}):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')
 
     def test_base64_from_int(self) -> None:

@@ -60,7 +60,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         message = exception.format('http://localhost', self.EDITOR_USERNAME)
         error = {'error': message, 'status_code': 404}
         with mock.patch.object(
-            user_services, 'get_user_settings_from_username', False
+            user_services, 'get_user_settings_from_username', return_value=False
         ):
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
             self.login(self.EDITOR_EMAIL)
@@ -106,7 +106,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
 
     def test_user_does_have_fully_registered_account(self) -> None:
         with mock.patch.object(
-            user_services, 'has_fully_registered_account', True
+            user_services, 'has_fully_registered_account', return_value=True
         ):
             self.login(self.EDITOR_EMAIL)
             self.get_html_response(

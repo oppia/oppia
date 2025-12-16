@@ -403,7 +403,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             with mock.patch.object(
                 story_domain.Story,
                 'get_prerequisite_skill_ids_for_exp_id',
-                None,
+                return_value=None,
             ):
                 json_response = self.get_json(
                     '%s/%s?story_url_fragment=title'
@@ -3245,8 +3245,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
         ):
             self.put_json(
                 '%s/%s/%s'
@@ -3264,8 +3264,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=404,
             )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
@@ -3349,8 +3349,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
 
         csrf_token = self.get_new_csrf_token()
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
@@ -3398,8 +3398,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             state_reference = stats_services.get_state_reference_for_question(
                 question_id

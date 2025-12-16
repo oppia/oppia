@@ -744,7 +744,9 @@ class SubtopicMasteryDataHandlerTest(test_utils.GenericTestBase):
         topic_id_2 = topic_fetchers.get_new_topic_id()
 
         with mock.patch.object(
-            topic_fetchers, 'get_topics_by_ids', [None, 'random_topic']
+            topic_fetchers,
+            'get_topics_by_ids',
+            return_value=[None, 'random_topic'],
         ):
             json_response = self.get_json(
                 '%s' % feconf.SUBTOPIC_MASTERY_DATA_URL,

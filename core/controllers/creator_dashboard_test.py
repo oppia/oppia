@@ -624,7 +624,7 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_upload_exploration(self) -> None:
-        with mock.patch.object(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
+        with mock.patch.dict(constants, {'ALLOW_YAML_FILE_UPLOAD': True}):
             self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 

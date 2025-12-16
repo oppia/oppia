@@ -3956,8 +3956,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
         ):
             response = self.get_json(
                 '%s/%s/%s'
@@ -3968,8 +3968,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
@@ -4027,8 +4027,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference
@@ -4058,8 +4058,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
         ):
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s'
@@ -4072,8 +4072,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 ),
                 expected_status_int=404,
             )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
@@ -4150,8 +4150,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer,
             self.answer_details,
         )
-        with mock.patch.object(
-            constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', True
+        with mock.patch.dict(
+            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference

@@ -207,10 +207,11 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('exploration', '0', filename), 'image/png'
-        )
-        self.assertEqual(response.body, raw_image)
+        with mock.patch.dict(constants, {'EMULATOR_MODE': True}):
+            response = self.get_custom_response(
+                self._get_image_url('exploration', '0', filename), 'image/png'
+            )
+            self.assertEqual(response.body, raw_image)
 
         # Page context: Topic.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -230,10 +231,11 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        response = self.get_custom_response(
-            self._get_image_url('topic', topic_id, filename), 'image/png'
-        )
-        self.assertEqual(response.body, raw_image)
+        with mock.patch.dict(constants, {'EMULATOR_MODE': True}):
+            response = self.get_custom_response(
+                self._get_image_url('topic', topic_id, filename), 'image/png'
+            )
+            self.assertEqual(response.body, raw_image)
 
         # Page context: Story.
         self.login(self.CURRICULUM_ADMIN_EMAIL)
@@ -583,7 +585,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        with mock.patch.object(constants, 'EMULATOR_MODE', False):
+        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
             self.get_json(
                 '/assetsdevhandler/exploration/0/assets/image/myfile.png',
                 expected_status_int=404,
@@ -1069,38 +1071,41 @@ class FaviconHandlerTest(test_utils.GenericTestBase):
     """Test for the FaviconHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        response = self.get_html_response(
-            '/favicon.ico', expected_status_int=302
-        )
-        self.assertEqual(
-            'http://localhost:8181/assetsstatic/favicon.ico',
-            response.headers['location'],
-        )
+        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+            response = self.get_html_response(
+                '/favicon.ico', expected_status_int=302
+            )
+            self.assertEqual(
+                'https://storage.googleapis.com/dev-project-id-static/favicon.ico',
+                response.headers['location'],
+            )
 
 
 class RobotsTxtHandlerTest(test_utils.GenericTestBase):
     """Test for the RobotsTxtHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        response = self.get_html_response(
-            '/robots.txt', expected_status_int=302
-        )
-        self.assertEqual(
-            'http://localhost:8181/assetsstatic/robots.txt',
-            response.headers['location'],
-        )
+        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+            response = self.get_html_response(
+                '/robots.txt', expected_status_int=302
+            )
+            self.assertEqual(
+                'https://storage.googleapis.com/dev-project-id-static/robots.txt',
+                response.headers['location'],
+            )
 
 
 class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
     """Test for the CopyrightImagesHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        response = self.get_html_response(
-            '/assets/copyrighted-images/general/mascot.svg',
-            expected_status_int=302,
-        )
-        self.assertEqual(
-            'http://localhost:8181/assetsstatic/copyrighted-images/'
-            'general/mascot.svg',
-            response.headers['location'],
-        )
+        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+            response = self.get_html_response(
+                '/assets/copyrighted-images/general/mascot.svg',
+                expected_status_int=302,
+            )
+            self.assertEqual(
+                'https://storage.googleapis.com/dev-project-id-static/copyrighted-images/'
+                'general/mascot.svg',
+                response.headers['location'],
+            )
