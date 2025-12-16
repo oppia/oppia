@@ -117,6 +117,15 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     )
 
 
+def _get_branch_name() -> str:
+    """Returns the branch name from constants.
+
+    Returns:
+        str. The branch name.
+    """
+    return constants.BRANCH_NAME
+
+
 def _create_evaluation_context_for_server() -> (
     platform_parameter_domain.EvaluationContext
 ):
@@ -129,9 +138,9 @@ def _create_evaluation_context_for_server() -> (
         open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8')
     )['version']
     # We want to make sure that the branch is the release branch.
-    if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:
+    if not _get_branch_name() == '' and 'release' in _get_branch_name():
         # We only need current app version so we can drop the 'release' part.
-        current_app_version = constants.BRANCH_NAME.split('release-')[1]
+        current_app_version = _get_branch_name().split('release-')[1]
         # We want to replace the '-' with the '.' for the version name.
         # If the branch is the hotfix branch then we would require to further
         # split it up and do the replacement for the version name. In the end,

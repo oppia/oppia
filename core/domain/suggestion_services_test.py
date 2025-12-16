@@ -452,7 +452,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # score of the author of that suggestion is increased by 1. Therefore,
         # by setting that increment to minimum score required to review, we can
         # ensure that the email is sent.
-        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+        with mock.patch.object(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True, create=True
+        ):
             with mock.patch.object(
                 feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True
             ):
@@ -510,7 +512,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         # score of the author of that suggestion is increased by 1. This is
         # less than the minimum score required to review so an email should not
         # be sent.
-        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+        with mock.patch.object(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True, create=True
+        ):
             with mock.patch.object(
                 feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True
             ):
@@ -561,7 +565,9 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             )
         )
 
-        with mock.patch.object(feconf, 'ENABLE_RECORDING_OF_SCORES', True):
+        with mock.patch.object(
+            feconf, 'ENABLE_RECORDING_OF_SCORES', True, create=True
+        ):
             self.mock_accept_suggestion(
                 self.suggestion_id,
                 self.reviewer_id,

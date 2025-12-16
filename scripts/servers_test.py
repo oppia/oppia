@@ -1376,7 +1376,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
             common, 'url_open', side_effect=mock_url_open
         )
 
-        with check_output_patch as check_output_mock, url_open_patch as url_open_mock:
+        with check_output_patch, url_open_patch as url_open_mock:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '72.0.3626.69',
@@ -1396,7 +1396,7 @@ class GetChromedriverVersionTests(test_utils.TestBase):
         )
         url_open_patch = mock.patch.object(common, 'url_open', mock_url_open)
 
-        with check_output_patch as check_output_mock, url_open_patch as url_open_mock:
+        with check_output_patch, url_open_patch:
             self.assertEqual(
                 servers.get_chromedriver_version(),
                 '115.0.3626.123',

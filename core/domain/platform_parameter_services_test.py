@@ -140,7 +140,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_create_evaluation_context_for_client_returns_correct_context(
         self,
     ) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', True):
+        with mock.patch.object(constants, 'DEV_MODE', True, create=True):
             context = parameter_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',
@@ -179,15 +179,9 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                 False,
             )
 
-            with mock.patch.object(constants, 'BRANCH_NAME', ''):
-                self.assertTrue(
-                    parameter_services.get_platform_parameter_value(
-                        self.param_c.name
-                    )
-                )
-
-            with mock.patch.object(
-                constants, 'BRANCH_NAME', 'release-3-3-1-hotfix-5'
+            with mock.patch(
+                'core.domain.platform_parameter_services._get_branch_name',
+                return_value='',
             ):
                 self.assertTrue(
                     parameter_services.get_platform_parameter_value(
@@ -195,7 +189,20 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
                     )
                 )
 
-            with mock.patch.object(constants, 'BRANCH_NAME', 'release-3-3-1'):
+            with mock.patch(
+                'core.domain.platform_parameter_services._get_branch_name',
+                return_value='release-3-3-1-hotfix-5',
+            ):
+                self.assertTrue(
+                    parameter_services.get_platform_parameter_value(
+                        self.param_c.name
+                    )
+                )
+
+            with mock.patch(
+                'core.domain.platform_parameter_services._get_branch_name',
+                return_value='release-3-3-1',
+            ):
                 self.assertTrue(
                     parameter_services.get_platform_parameter_value(
                         self.param_c.name
@@ -247,7 +254,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
             param_dict  # type: ignore[arg-type]
         )
         swap_get_platform_parameter = mock.patch.object(
-            registry.Registry, 'get_platform_parameter', parameter
+            registry.Registry, 'get_platform_parameter', return_value=parameter
         )
 
         with swap_get_platform_parameter, self.assertRaisesRegex(

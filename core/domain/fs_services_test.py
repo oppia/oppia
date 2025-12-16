@@ -282,7 +282,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         ) as f:
             original_image_content = f.read()
 
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.object(constants, 'DEV_MODE', False, create=True):
             fs = fs_services.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID
             )
@@ -335,7 +335,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         ) as f:
             image_content = f.read()
 
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.object(constants, 'DEV_MODE', False, create=True):
             fs = fs_services.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID
             )
@@ -414,7 +414,7 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
     """Unit tests for get_static_asset_url."""
 
     def test_function_returns_correct_url_for_emulator_mode(self) -> None:
-        with mock.patch.object(constants, 'EMULATOR_MODE', True):
+        with mock.patch.object(constants, 'EMULATOR_MODE', True, create=True):
             self.assertEqual(
                 fs_services.get_static_asset_url('robots.txt'),
                 'http://localhost:8181/assetsstatic/robots.txt',
@@ -429,7 +429,7 @@ class GetStaticAssetUrlTests(test_utils.GenericTestBase):
         ]
     )
     def test_function_returns_correct_url_for_non_emulator_mode(self) -> None:
-        with mock.patch.object(constants, 'EMULATOR_MODE', False):
+        with mock.patch.object(constants, 'EMULATOR_MODE', False, create=True):
             with mock.patch.object(
                 app_identity_services,
                 'get_application_id',

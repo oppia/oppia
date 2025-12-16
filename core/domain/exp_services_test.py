@@ -534,7 +534,9 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of explorations that can fit on the search
         # results page is maintained by the summaries function.
-        with mock.patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
+        with mock.patch.object(
+            feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3, create=True
+        ):
             # Need to load 3 pages to find all of the explorations. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all explorations are returned. We validate the correct

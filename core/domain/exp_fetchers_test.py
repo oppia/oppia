@@ -178,7 +178,9 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'does not match the latest schema version %s'
             % (self.EXP_1_ID, '1', feconf.CURRENT_STATE_SCHEMA_VERSION, '61')
         )
-        with mock.patch.object(feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61):
+        with mock.patch.object(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 61, create=True
+        ):
             with self.assertRaisesRegex(Exception, error_regex):
                 (
                     exp_fetchers.get_multiple_versioned_exp_interaction_ids_mapping_by_version(

@@ -921,7 +921,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             'No collection summary model exists for the given id:'
             ' Invalid_collection_id',
         ):
-            with mock.patch.object(rights_manager, 'publish_collection', True):
+            with mock.patch.object(
+                rights_manager, 'publish_collection', return_value=None
+            ):
                 collection_services.publish_collection_and_update_user_profiles(
                     system_user, 'Invalid_collection_id'
                 )
@@ -1033,7 +1035,9 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     ) -> None:
         # Ensure the maximum number of collections that can fit on the search
         # results page is maintained by the summaries function.
-        with mock.patch.object(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2):
+        with mock.patch.object(
+            feconf, 'SEARCH_RESULTS_PAGE_SIZE', 2, create=True
+        ):
             # Need to load 3 pages to find all of the collections. Since the
             # returned order is arbitrary, we need to concatenate the results
             # to ensure all collections are returned. We validate the correct
@@ -2460,7 +2464,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
         with add_docs_patch:
             collection_services.index_collections_given_ids(all_collection_ids)
 
-        self.assertEqual(add_docs_counter.call_count, 1)
+        self.assertEqual(add_docs_counter.times_called, 1)
 
 
 class CollectionSummaryTests(CollectionServicesUnitTests):
@@ -2662,7 +2666,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection.last_updated = None
 
         with mock.patch.object(
-            collection_services, 'get_collection_by_id', collection
+            collection_services, 'get_collection_by_id', return_value=collection
         ):
             with self.assertRaisesRegex(
                 Exception,
@@ -2680,7 +2684,7 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
         collection.created_on = None
 
         with mock.patch.object(
-            collection_services, 'get_collection_by_id', collection
+            collection_services, 'get_collection_by_id', return_value=collection
         ):
             with self.assertRaisesRegex(
                 Exception,

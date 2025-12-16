@@ -705,7 +705,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         user_settings.created_on = None
 
         with mock.patch.object(
-            user_services, 'get_user_settings', user_settings
+            user_services, 'get_user_settings', return_value=user_settings
         ):
             with self.assertRaisesRegex(
                 Exception, 'No data available for when the user was created on.'
@@ -806,13 +806,11 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     ) -> None:
         wipeout_service.run_user_deletion(self.pending_deletion_request)
 
-        send_email_patch = mock.patch.object(
+        with mock.patch.object(
             email_manager,
             'send_account_deleted_email',
             side_effect=lambda x, y: None,
-        )
-
-        with send_email_patch:
+        ) as send_email_patch:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -872,11 +870,9 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             'The Wipeout process failed for the user with ID \'%s\' '
             'and email \'%s\'.' % (self.user_1_id, self.USER_1_EMAIL)
         )
-        send_email_patch = mock.patch.object(
+        with mock.patch.object(
             email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
-        )
-
-        with send_email_patch:
+        ) as send_email_patch:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -923,7 +919,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 wipeout_domain.USER_VERIFICATION_FAILURE,
             )
 
-        send_email_patch.assert_not_called()
+        self.assertFalse(send_email_patch.called)
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id)
@@ -6361,16 +6357,15 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             self.assertIn(self.user_1_id, self.email_bodies[1])
 
     def test_repeated_deletion_is_successful_when_emails_disabled(self) -> None:
-        send_mail_to_admin_patch = mock.patch.object(
+        with mock.patch.object(
             email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
-        )
-        with send_mail_to_admin_patch:
+        ) as send_mail_to_admin_patch:
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-        send_mail_to_admin_patch.assert_not_called()
+        self.assertFalse(send_mail_to_admin_patch.called)
 
     @test_utils.set_platform_parameters(
         [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
@@ -6488,14 +6483,13 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     def test_verification_when_user_is_not_deleted_emails_disabled(
         self,
     ) -> None:
-        send_mail_to_admin_patch = mock.patch.object(
+        with mock.patch.object(
             email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
-        )
-        with send_mail_to_admin_patch:
+        ) as send_mail_to_admin_patch:
             wipeout_service.check_completion_of_user_deletion()
         self.assertEqual(len(self.email_bodies), 0)
 
-        send_mail_to_admin_patch.assert_not_called()
+        self.assertFalse(send_mail_to_admin_patch.called)
 
     @test_utils.set_platform_parameters(
         [

@@ -19990,6 +19990,7 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
                 'edits_allowed',
                 'new_property',
             ],
+            create=True,
         )
         error_message = (
             'A new metadata property %s was added to the Exploration '
