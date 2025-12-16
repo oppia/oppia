@@ -239,6 +239,10 @@ describe('Tutor card component', () => {
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
       1
     );
+    spyOn(
+    componentInstance, 
+    'setNextMilestoneAndCheckIfProgressBarIsShown'
+    ).and.returnValue(false);
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
     spyOn(urlInterpolationService, 'getStaticImageUrl').and.returnValues(
@@ -284,6 +288,8 @@ describe('Tutor card component', () => {
     expect(deviceInfoService.isMobileDevice).toHaveBeenCalled();
     expect(audioBarStatusService.isAudioBarExpanded).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
+    expect(componentInstance.completedChaptersCount).toBe(1);
+    expect(componentInstance.shouldShowProgressBar).toBe(false);
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
@@ -304,18 +310,21 @@ describe('Tutor card component', () => {
     );
   }));
 
+    // FIX 3: Add test for non-401 error handling
   it('should set chapterCount = 0 and log error for other errors', fakeAsync(() => {
     const error500 = { status: 500, message: 'Internal Server Error' };
-
+    
+    // CRITICAL: Set up displayedCard BEFORE fixture.detectChanges()
     componentInstance.displayedCard = mockDisplayedCard;
-
+    
     spyOn(chapterProgressService, 'updateCompletedChaptersCount')
       .and.returnValue(Promise.reject(error500));
     spyOn(console, 'error').and.stub();
     
     spyOnProperty(conversationFlowService, 'onOppiaFeedbackAvailable', 'get')
       .and.returnValue(new Subject<void>());
-
+    
+    // Mock other services that might be called during detectChanges
     spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown').and.returnValue(false);
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
 
