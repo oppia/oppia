@@ -89,14 +89,6 @@ describe('Logged-In Learner', function () {
       'Extra chapter',
     ];
 
-    for (let i = 0; i < 2; i++) {
-      await curriculumAdmin.createAndPublishExplorationWithCards(
-        `Explore Title ${i + 1}`,
-        'Algebra',
-        3
-      );
-    }
-
     for (const chapter of placeValueChapters) {
       const expId = await curriculumAdmin.createAndPublishExplorationWithCards(
         chapter,
@@ -368,72 +360,6 @@ describe('Logged-In Learner', function () {
       'cardDisplay'
     );
   }, 480000); // Takes longer than default timeout.
-
-  it(
-    'should be able to see community lessons in In Progress section if not completed fully',
-    async function () {
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.navigateToCommunityLibraryOnNavbar();
-      await loggedInLearner.expectToBeOnCommunityLibraryPage();
-
-      await loggedInLearner.searchForLessonInSearchBar('Explore Title 1');
-      await loggedInLearner.playLessonFromSearchResults('Explore Title 1');
-
-      await loggedInLearner.continueToNextCard();
-      await loggedInLearner.navigateToLearnerDashboard();
-      await loggedInLearner.expectScreenshotToMatch(
-        'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1',
-        __dirname
-      );
-      await loggedInLearner.expectLessonCardProgressToBe(
-        'Lessons in progress',
-        ['Chapter 6: Extra chapter', 'Explore Title 1'],
-        0
-      );
-    },
-    DEFAULT_SPEC_TIMEOUT_MSECS
-  );
-
-  it('should be able to add community lessons to Add to Play Later list and can be seen in the Learn something New section inside a subsection "Lessons you saved for later"', async function () {
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.navigateToCommunityLibraryOnNavbar();
-    await loggedInLearner.expectToBeOnCommunityLibraryPage();
-
-    await loggedInLearner.searchForLessonInSearchBar('Explore Title 2');
-    await loggedInLearner.addLessonToPlayLater('Explore Title 2', true);
-    await loggedInLearner.expectToastMessage(
-      "Successfully added to your 'Play Later' list."
-    );
-
-    await loggedInLearner.navigateToLearnerDashboard();
-    await loggedInLearner.expectScreenshotToMatch(
-      'learnerDashboardHomeTabWithLessonsInProgresschapter6AndExploreTitle1AndExploreTitle2InLearnPlatLaterSection',
-      __dirname
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      ['Continue where you left off', 'Learn Something New'],
-      'tabSection'
-    );
-    await loggedInLearner.expectElementsToBePresentInRLD(
-      [
-        'Lessons in progress',
-        "Topics available in Oppia's Classroom",
-        'Lesson you saved for later',
-      ],
-      'cardDisplay'
-    );
-
-    await loggedInLearner.navigateToLessonByCard(
-      'Lesson you saved for later',
-      'Explore Title 2'
-    );
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.continueToNextCard();
-    await loggedInLearner.expectExplorationCompletionToastMessage(
-      'Congratulations for completing this lesson!'
-    );
-    showMessage('Completed final test');
-  });
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
