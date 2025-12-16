@@ -237,6 +237,8 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                         'uv',
                         'pip',
                         'sync',
+                        '--python',
+                        sys.executable,
                         'requirements_dev.txt',
                     ],
                 ),

@@ -109,6 +109,8 @@ def install_dev_dependencies() -> None:
             'uv',
             'pip',
             'sync',
+            '--python',
+            sys.executable,
             COMPILED_REQUIREMENTS_DEV_FILE_PATH,
         ],
         check=True,
