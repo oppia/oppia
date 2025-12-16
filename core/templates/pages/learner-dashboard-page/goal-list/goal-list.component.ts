@@ -59,7 +59,7 @@ export class GoalListComponent implements OnInit {
   }
 
   getStoryProgress(story: StorySummary): number {
-    const nodes = story.getStoryNodes();
+    const nodes = story.getAllNodes();
     if (nodes.length === 0) {
       return 0;
     }
