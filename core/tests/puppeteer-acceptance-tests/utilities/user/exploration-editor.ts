@@ -3593,6 +3593,16 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
       });
       await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+      // Wait for autosave to complete before clicking the discard button.
+      // The discard button is disabled during autosave.
+      await this.page.waitForFunction(
+        (selector: string) => {
+          const button = document.querySelector(selector);
+          return button && !(button as HTMLButtonElement).disabled;
+        },
+        {},
+        mobileDiscardButtonSelector
+      );
       await this.clickOnElementWithSelector(mobileDiscardButtonSelector);
     } else {
       await this.page.waitForSelector(discardDraftDropdownSelector, {
