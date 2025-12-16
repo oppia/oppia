@@ -14,5 +14,6 @@
             "karmaConfFilePath": "${workspaceFolder}/karma.conf.js"
         }
     ],
-    "testExplorer.codeLens": true
+    "testExplorer.codeLens": true,
+    "kiroAgent.configureMCP": "Disabled"
 }

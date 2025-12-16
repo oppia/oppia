@@ -32,10 +32,10 @@ if (typeof Object.create !== 'function') {
   (function () {
     // Using interface to define a constructable function for IE8 polyfill.
     interface Constructor {
-      new (): object;
+      new(): object;
       prototype: object;
     }
-    var F = function () {} as unknown as Constructor;
+    var F = function () { } as unknown as Constructor;
     Object.create = function (o: object) {
       if (arguments.length > 1) {
         throw new Error('Second argument for Object.create() is not supported');
@@ -170,7 +170,7 @@ if (navigator.mediaDevices.getUserMedia === undefined) {
 
 // Object.entries() polyfill for Chrome 53 and below.
 if (!Object.entries) {
-  Object.entries = <T>(obj: {[s: string]: T} | ArrayLike<T>): [string, T][] => {
+  Object.entries = <T>(obj: { [s: string]: T } | ArrayLike<T>): [string, T][] => {
     let objectProperties = Object.keys(obj);
     let i = objectProperties.length;
     let objectEntriesArray = new Array(i) as [string, T][]; // Preallocate the array.
@@ -178,7 +178,7 @@ if (!Object.entries) {
     while (i--) {
       objectEntriesArray[i] = [
         objectProperties[i],
-        (obj as {[key: string]: T})[objectProperties[i]],
+        (obj as { [key: string]: T })[objectProperties[i]],
       ];
     }
     return objectEntriesArray;
