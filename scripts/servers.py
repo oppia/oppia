@@ -269,7 +269,12 @@ def managed_firebase_auth_emulator(
         emulator_args, human_readable_name='Firebase Emulator', shell=True
     )
     with proc_context as proc:
-        common.wait_for_port_to_be_in_use(feconf.FIREBASE_EMULATOR_PORT)
+        # Verify that the emulator is actually responding to HTTP requests, not
+        # just that the port is open. This prevents race conditions where the
+        # emulator binds the port but crashes during initialization.
+        common.wait_for_firebase_emulator_to_be_ready(
+            feconf.FIREBASE_EMULATOR_PORT
+        )
         yield proc
 
 
@@ -290,6 +295,13 @@ def managed_elasticsearch_dev_server() -> Iterator[psutil.Process]:
         '%s/bin/elasticsearch' % common.ES_PATH,
         # -q is the quiet flag.
         '-q',
+        '-E',
+        # Disable security for the local ElasticSearch server.
+        'xpack.security.enabled=false',
+        # Disable the disk threshold checks. These checks can cause issues on
+        # machines with low disk space.
+        '-E',
+        'cluster.routing.allocation.disk.threshold_enabled=false',
     ]
     # Override the default path to ElasticSearch config files.
     es_env = {
