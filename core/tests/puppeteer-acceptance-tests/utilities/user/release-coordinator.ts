@@ -570,7 +570,7 @@ export class ReleaseCoordinator extends BaseUser {
   }
 
   /**
-   * Views and copies the output of a job.
+   * View and copy the output of a job.
    */
   async viewAndCopyJobOutput(): Promise<string> {
     await this.viewJobOutput();
@@ -587,7 +587,7 @@ export class ReleaseCoordinator extends BaseUser {
     const pages = await this.browserObject.pages();
     this.page = pages[pages.length - 1];
 
-    // Getting the output text directly from the element.
+    // Get the output text directly from the element.
     const output = await this.page.$eval(
       beamJobRunOutputSelector,
       el => el.textContent
@@ -595,13 +595,17 @@ export class ReleaseCoordinator extends BaseUser {
 
     await this.clickOnElementWithSelector(copyOutputButton);
 
-    // Reading the clipboard data.
+    // Read the clipboard data.
     const clipboardData = await this.page.evaluate(async () => {
       return await navigator.clipboard.readText();
     });
 
     if (clipboardData !== output) {
-      throw new Error('Data was not copied correctly');
+      throw new Error(
+        'Data was not copied correctly\n' +
+          `Expected: "${output}"\n` +
+          `Actual: "${clipboardData}"`
+      );
     }
     showMessage('Data was copied correctly');
 
