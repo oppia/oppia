@@ -2144,8 +2144,7 @@ class Story:
             else:
                 raise ValueError(
                     'The node with id %s is the starting node for the story, '
-                    'change the starting node before deleting it.' % node_id)
-            
+                    'change the starting node before deleting it.' % node_id)            
         delete_node = self.story_contents.nodes[node_index]
         delete_node_destination_ids = delete_node.destination_node_ids
         for node in self.story_contents.nodes:
@@ -2426,7 +2425,7 @@ class Story:
 
         self.delete_node(story_node_to_move.id)
         story_content_nodes.insert(to_index, story_node_to_move)
-    
+
         if to_index == 0:
             # Node is moved to the start of the storyline.
             self.update_initial_node(story_node_to_move.id)
