@@ -390,8 +390,6 @@ export class TutorCardComponent {
         return true;
       }
     }
-
-    return false;
   }
 
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {
