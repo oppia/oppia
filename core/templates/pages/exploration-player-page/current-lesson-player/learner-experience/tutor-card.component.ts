@@ -390,8 +390,8 @@ export class TutorCardComponent {
         return true;
       }
     }
-  /* istanbul ignore next */
-    return false
+    /* istanbul ignore next */
+    return false;
   }
 
   isMilestoneReachedAndMilestoneMessageToBeDisplayed(): boolean {

@@ -57,9 +57,8 @@ import {UserInfo} from '../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
-import { Subject } from 'rxjs';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-
+import {Subject} from 'rxjs';
+import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 
 class MockWindowRef {
   nativeWindow = {
@@ -137,7 +136,7 @@ describe('Tutor card component', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule,NoopAnimationsModule],
+      imports: [HttpClientTestingModule, NoopAnimationsModule],
       declarations: [TutorCardComponent, MockTranslatePipe],
       providers: [
         AudioBarStatusService,
@@ -240,8 +239,8 @@ describe('Tutor card component', () => {
       1
     );
     spyOn(
-    componentInstance, 
-    'setNextMilestoneAndCheckIfProgressBarIsShown'
+      componentInstance,
+      'setNextMilestoneAndCheckIfProgressBarIsShown'
     ).and.returnValue(false);
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(true);
     spyOn(audioBarStatusService, 'isAudioBarExpanded').and.returnValue(true);
@@ -310,22 +309,27 @@ describe('Tutor card component', () => {
     );
   }));
 
-    // FIX 3: Add test for non-401 error handling
   it('should set chapterCount = 0 and log error for other errors', fakeAsync(() => {
-    const error500 = { status: 500, message: 'Internal Server Error' };
-    
-    // CRITICAL: Set up displayedCard BEFORE fixture.detectChanges()
+    const error500 = {status: 500, message: 'Internal Server Error'};
+
     componentInstance.displayedCard = mockDisplayedCard;
-    
-    spyOn(chapterProgressService, 'updateCompletedChaptersCount')
-      .and.returnValue(Promise.reject(error500));
+
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.reject(error500));
     spyOn(console, 'error').and.stub();
-    
-    spyOnProperty(conversationFlowService, 'onOppiaFeedbackAvailable', 'get')
-      .and.returnValue(new Subject<void>());
-    
-    // Mock other services that might be called during detectChanges
-    spyOn(componentInstance, 'setNextMilestoneAndCheckIfProgressBarIsShown').and.returnValue(false);
+
+    spyOnProperty(
+      conversationFlowService,
+      'onOppiaFeedbackAvailable',
+      'get'
+    ).and.returnValue(new Subject<void>());
+
+    spyOn(
+      componentInstance,
+      'setNextMilestoneAndCheckIfProgressBarIsShown'
+    ).and.returnValue(false);
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
 
     fixture.detectChanges();
@@ -338,15 +342,15 @@ describe('Tutor card component', () => {
     );
   }));
 
-
   it('should correctly initialize state and progress bar after async chapter count update', fakeAsync(() => {
     const expectedCount = 5;
     const expectedShouldShowProgressBar = true;
-    componentInstance.displayedCard = mockDisplayedCard
+    componentInstance.displayedCard = mockDisplayedCard;
 
-    spyOn(chapterProgressService, 'updateCompletedChaptersCount').and.returnValue(
-      Promise.resolve()
-    );
+    spyOn(
+      chapterProgressService,
+      'updateCompletedChaptersCount'
+    ).and.returnValue(Promise.resolve());
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
       expectedCount
     );
@@ -356,16 +360,16 @@ describe('Tutor card component', () => {
     ).and.returnValue(expectedShouldShowProgressBar);
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
     spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
-      new Subject<void>() 
+      new Subject<void>()
     );
 
-    fixture.detectChanges(); 
+    fixture.detectChanges();
 
     expect(
       chapterProgressService.updateCompletedChaptersCount
     ).toHaveBeenCalledWith(true);
 
-    tick(); 
+    tick();
 
     expect(componentInstance.completedChaptersCount).toBe(expectedCount);
     expect(
@@ -376,30 +380,38 @@ describe('Tutor card component', () => {
     );
   }));
 
-
   it('should render the Milestone Completion Message when shouldShowProgressBar is FALSE', () => {
-    componentInstance.displayedCard = mockDisplayedCard
+    componentInstance.displayedCard = mockDisplayedCard;
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
-    spyOn(componentInstance, 'getMilestoneMessageIsToBeDisplayed').and.returnValue(true);
-    spyOn(componentInstance, 'generateMilestoneMessage').and.returnValue('Great Job!');
+    spyOn(
+      componentInstance,
+      'getMilestoneMessageIsToBeDisplayed'
+    ).and.returnValue(true);
+    spyOn(componentInstance, 'generateMilestoneMessage').and.returnValue(
+      'Great Job!'
+    );
 
     componentInstance.shouldShowProgressBar = false;
     spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
-    new Subject<void>() 
+      new Subject<void>()
     );
 
     fixture.detectChanges();
 
-    let milestoneMessage = fixture.nativeElement.querySelector('.milestone-message-star-container');
+    let milestoneMessage = fixture.nativeElement.querySelector(
+      '.milestone-message-star-container'
+    );
     expect(milestoneMessage).not.toBeNull();
 
-    let progressBar = fixture.nativeElement.querySelector('.milestone-progress-bar-container');
+    let progressBar = fixture.nativeElement.querySelector(
+      '.milestone-progress-bar-container'
+    );
     expect(progressBar).toBeNull();
   });
 
   it('should render the Progress Bar when shouldShowProgressBar is TRUE', () => {
-    componentInstance.displayedCard = mockDisplayedCard
+    componentInstance.displayedCard = mockDisplayedCard;
 
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(true);
     spyOn(deviceInfoService, 'isMobileDevice').and.returnValue(false);
@@ -409,27 +421,39 @@ describe('Tutor card component', () => {
     componentInstance.nextMilestoneChapterCount = 5;
 
     spyOn(conversationFlowService, 'onOppiaFeedbackAvailable').and.returnValue(
-      new Subject<void>() 
+      new Subject<void>()
     );
 
     fixture.detectChanges();
 
-    let progressBar = fixture.nativeElement.querySelector('.milestone-message-progress-bar-container');
+    let progressBar = fixture.nativeElement.querySelector(
+      '.milestone-message-progress-bar-container'
+    );
 
     expect(progressBar).not.toBeNull();
 
-    let innerBar = fixture.nativeElement.querySelector('.milestone-progress-bar-inner');
+    let innerBar = fixture.nativeElement.querySelector(
+      '.milestone-progress-bar-inner'
+    );
 
     expect(innerBar.style.width).toBe('60%'); // Check the data binding
 
-    let milestoneMessage = fixture.nativeElement.querySelector('.milestone-message-star-container');
-    let completionDiv = fixture.nativeElement.querySelector('.milestone-message-star-container');
+    let milestoneMessage = fixture.nativeElement.querySelector(
+      '.milestone-message-star-container'
+    );
+    let completionDiv = fixture.nativeElement.querySelector(
+      '.milestone-message-star-container'
+    );
 
     expect(completionDiv).not.toBeNull();
     expect(milestoneMessage).not.toBeNull();
 
-    let completionMessageText = fixture.nativeElement.querySelector('.milestone-message-text');
-    let progressMessageWrapper = fixture.nativeElement.querySelector('.milestone-progress-message');
+    let completionMessageText = fixture.nativeElement.querySelector(
+      '.milestone-message-text'
+    );
+    let progressMessageWrapper = fixture.nativeElement.querySelector(
+      '.milestone-progress-message'
+    );
 
     expect(completionMessageText).not.toBeNull();
     expect(progressMessageWrapper).not.toBeNull();
