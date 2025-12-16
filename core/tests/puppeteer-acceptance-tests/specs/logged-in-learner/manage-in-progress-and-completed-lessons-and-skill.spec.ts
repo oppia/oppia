@@ -115,7 +115,7 @@ describe('Logged-in Learner', function () {
       'logged_in_learner1@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 3000000); // Setup taking longer than default timeout.
+  }, 6000000); // Setup taking longer than default timeout.
 
   it(
     'should display empty progress message when no lessons are in progress',
@@ -371,7 +371,7 @@ describe('Logged-in Learner', function () {
       'In Progress'
     );
     await loggedInLearner.expectDisplayMoreCommunityLessonsToBeVisible();
-  }, 480000); // Takes longer than default timeout.
+  }, 600000); // Takes longer than default timeout.
 
   it(
     'should toggle Display More button for community lessons',

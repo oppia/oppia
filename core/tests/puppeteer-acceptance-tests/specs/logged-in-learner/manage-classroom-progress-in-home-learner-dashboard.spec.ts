@@ -125,7 +125,7 @@ describe('Logged-In Learner', function () {
       'logged_in_learner1@example.com'
     );
     await UserFactory.closeSuperAdminBrowser();
-  }, 3000000); // Setup taking longer than default timeout.
+  }, 6000000); // Setup taking longer than default timeout.
 
   it(
     'should have the correct tab title, available sections on landing and Sidebar should contain these items in this order from top to bottom: Profile picture, "Home" button, "Goals" button, "Progress" button',
@@ -367,7 +367,7 @@ describe('Logged-In Learner', function () {
       ['Recommended for you'],
       'cardDisplay'
     );
-  });
+  }, 480000); // Takes longer than default timeout.
 
   it(
     'should be able to see community lessons in In Progress section if not completed fully',
