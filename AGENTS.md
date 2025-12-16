@@ -30,7 +30,7 @@ environment setup and troubleshooting.
 
 - Run backend unit tests locally:
 
-  python -m scripts.run_backend_tests --test_target <path_or_testname>
+  python -m scripts.run_backend_tests --test_target <path_or_testname> --skip_install
 
   (This is the same test runner used by CI.)
 
@@ -64,8 +64,8 @@ Code quality and testing standards:
 
 - Test coverage: Maintain 100% line and branch coverage for all new or modified
   code. Always add tests for new functionality.
-- Type safety: Never use `Any` or `unknown` types in TypeScript. Use specific,
-  well-defined types.
+- Type safety: Never use `Any` or `unknown` types in TypeScript. Never use
+  `Any` in backend Python typing. Use specific, well-defined types.
 - Documentation: Document anything that is not obvious. Add comments explaining
   the "why" behind non-obvious decisions, not just the "what".
 - Pylint disables: Never use whole-file pylint disables (e.g., at the top of a
@@ -94,7 +94,7 @@ Integration points / external dependencies:
 Small examples for agents to be effective quickly:
 
 -- To run a focused backend test for a file locally:
-`python -m scripts.run_backend_tests --test_target <path_or_testname>`.
+`python -m scripts.run_backend_tests --test_target <path_or_testname> --skip_install`.
 -- When editing frontend deps or build config locally: install Node 16 (nvm),
 then run `yarn install --pure-lockfile` from `assets/` and follow the steps
 for running frontend scripts described on the wiki.

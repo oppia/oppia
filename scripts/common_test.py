@@ -107,6 +107,18 @@ class CommonTests(test_utils.GenericTestBase):
         with self.swap(common, 'OS_NAME', 'Linux'):
             self.assertFalse(common.is_windows_os())
 
+    def test_repo_tmp_dir_env_vars_setup(self) -> None:
+        """Test that environment variables are set when TMPDIR is not set."""
+        # This test verifies that the module-level code that sets
+        # TMPDIR, TMP, and TEMP environment variables is executed correctly.
+        # Since the module code runs at import time, we verify that at least
+        # TMPDIR is set to REPO_TMP_DIR (TMP and TEMP may have been set by
+        # the module-level code).
+        self.assertEqual(os.environ.get('TMPDIR'), common.REPO_TMP_DIR)
+        # Also verify that TMP and TEMP are set as fallbacks.
+        self.assertEqual(os.environ.get('TMP'), common.REPO_TMP_DIR)
+        self.assertEqual(os.environ.get('TEMP'), common.REPO_TMP_DIR)
+
     def test_run_cmd(self) -> None:
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
@@ -1459,6 +1471,72 @@ class CommonTests(test_utils.GenericTestBase):
         with isdir_swap, listdir_swap:
             with self.assertRaisesRegex(Exception, 'Mock exception'):
                 common.cleanup_repo_tmp()
+
+    def test_cleanup_repo_tmp_removes_old_files(self) -> None:
+        """Test cleanup_repo_tmp removes old tmp files correctly."""
+        # Mock time.time to return a fixed time. `cutoff` is 5 minutes ago.
+        now = 1000000
+        cutoff = now - (5 * 60)
+
+        # Create mock stat objects.
+        old_stat = os.stat_result((0, 0, 0, 0, 0, 0, 0, 0, cutoff - 1, 0))
+
+        remove_calls: List[str] = []
+        log_calls: List[Tuple[str, str]] = []
+
+        def mock_time_time() -> float:
+            return now
+
+        def mock_isdir(path: str) -> bool:
+            if path == common.REPO_TMP_DIR:
+                return True
+            # All entries are files, not directories.
+            return False
+
+        def mock_listdir(unused_path: str) -> List[str]:
+            return ['tmp_old_file']
+
+        def mock_stat(unused_path: str) -> os.stat_result:
+            return old_stat
+
+        def mock_isfile(path: str) -> bool:
+            return path.endswith('tmp_old_file')
+
+        def mock_remove(path: str) -> None:
+            remove_calls.append(path)
+
+        def mock_logging_info(msg: str, path: str) -> None:
+            log_calls.append((msg, path))
+
+        time_swap = self.swap(time, 'time', mock_time_time)
+        isdir_swap = self.swap(os.path, 'isdir', mock_isdir)
+        listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        stat_swap = self.swap(os, 'stat', mock_stat)
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        remove_swap = self.swap(os, 'remove', mock_remove)
+        log_swap = self.swap(logging, 'info', mock_logging_info)
+
+        with (
+            time_swap
+        ), (
+            isdir_swap
+        ), listdir_swap, stat_swap, isfile_swap, remove_swap, log_swap:
+            common.cleanup_repo_tmp(5)
+
+        # Should remove old tmp file.
+        self.assertEqual(
+            remove_calls,
+            [os.path.join(common.REPO_TMP_DIR, 'tmp_old_file')],
+        )
+        self.assertEqual(
+            log_calls,
+            [
+                (
+                    'Removing old repo tmp file: %s',
+                    os.path.join(common.REPO_TMP_DIR, 'tmp_old_file'),
+                )
+            ],
+        )
 
 
 class UrlRetrieveTests(CommonTests):
