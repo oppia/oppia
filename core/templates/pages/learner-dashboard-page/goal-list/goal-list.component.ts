@@ -59,10 +59,16 @@ export class GoalListComponent implements OnInit {
   }
 
   getStoryProgress(story: StorySummary): number {
-    return (
-      (story.getCompletedNodeTitles().length / story.getNodeTitles().length) *
-      100
-    );
+    const nodes = story.getStoryNodes();
+    if (nodes.length === 0) {
+      return 0;
+    }
+
+    const totalProgress = nodes.reduce((sum, node) => {
+      return sum + this.getChapterProgress(node);
+    }, 0);
+
+    return Math.round(totalProgress / nodes.length);
   }
 
   getChapterProgress(storyNode: StoryNode): number {
