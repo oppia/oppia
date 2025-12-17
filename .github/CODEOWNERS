@@ -57,7 +57,6 @@
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
-/core/templates/services/angular-services.index.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-head.service*.ts @oppia/lace-frontend-reviewers
