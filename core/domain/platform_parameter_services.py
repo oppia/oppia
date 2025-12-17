@@ -28,7 +28,7 @@ from core.constants import constants
 from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
-from typing import Dict, Final, List
+from typing import Dict, Final, List, cast
 
 DATA_TYPE_TO_SCHEMA_TYPE: Dict[str, str] = {
     'number': 'float',
@@ -123,7 +123,10 @@ def _get_branch_name() -> str:
     Returns:
         str. The branch name.
     """
-    return constants.BRANCH_NAME
+    # Here we use cast because constants.BRANCH_NAME is typed as Any in the
+    # Constants class due to its dynamic nature, but we know it's always
+    # a string from assets/constants.ts.
+    return cast(str, constants.BRANCH_NAME)
 
 
 def _create_evaluation_context_for_server() -> (

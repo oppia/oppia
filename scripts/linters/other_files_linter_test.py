@@ -360,13 +360,15 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             'FAILED  Github workflow steps have a name check failed',
         ]
 
-        with listdir_patch, read_patch:
-            task_results = other_files_linter.CustomLintChecksManager(
-                FILE_CACHE
-            ).check_github_workflows_have_name()
-            self.assertEqual(task_results.get_report(), expected)
-
-        listdir_patch.assert_called_once_with(other_files_linter.WORKFLOWS_DIR)
+        with listdir_patch as listdir_mock:
+            with read_patch:
+                task_results = other_files_linter.CustomLintChecksManager(
+                    FILE_CACHE
+                ).check_github_workflows_have_name()
+                self.assertEqual(task_results.get_report(), expected)
+                listdir_mock.assert_called_once_with(
+                    other_files_linter.WORKFLOWS_DIR
+                )
 
     def test_perform_all_lint_checks(self) -> None:
         lint_task_report = other_files_linter.CustomLintChecksManager(

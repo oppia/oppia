@@ -68,7 +68,7 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_subprocess_popen
         )
 
-        with self.print_patch, self.compile_and_check_typescript_patch:
+        with self.print_patch, self.compile_and_check_typescript_patch as compile_mock:
             with subprocess_popen_patch:
                 generate_root_files_mapping.main()
                 self.assertEqual(
@@ -79,9 +79,9 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
                         'Root files mapping generated successfully!',
                     ],
                 )
-        self.compile_and_check_typescript_patch.assert_called_once_with(
-            generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
-        )
+                compile_mock.assert_called_once_with(
+                    generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
+                )
 
     def test_generate_root_files_mapping_failure(self) -> None:
         def mock_communicate() -> tuple[bytes, bytes]:
@@ -110,10 +110,11 @@ class GenerateRootFilesMappingTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_subprocess_popen
         )
 
-        with self.compile_and_check_typescript_patch, communicate_patch:
-            with subprocess_popen_patch:
-                with self.assertRaisesRegex(Exception, 'Error'):
-                    generate_root_files_mapping.main()
-        self.compile_and_check_typescript_patch.assert_called_once_with(
-            generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
-        )
+        with self.compile_and_check_typescript_patch as compile_mock:
+            with communicate_patch:
+                with subprocess_popen_patch:
+                    with self.assertRaisesRegex(Exception, 'Error'):
+                        generate_root_files_mapping.main()
+                    compile_mock.assert_called_once_with(
+                        generate_root_files_mapping.TEST_DEPENDENCIES_TSCONFIG_FILEPATH
+                    )

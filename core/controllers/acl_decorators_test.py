@@ -130,15 +130,12 @@ class IsSourceMailChimpDecoratorTests(test_utils.GenericTestBase):
         )
 
         with testapp_patch:
-            with swap_api_key_secrets_return_none:
+            with swap_api_key_secrets_return_none as swap_mock:
                 response = self.get_json(
                     '/mock_secret_page/%s' % self.secret,
                     expected_status_int=404,
                 )
-
-        swap_api_key_secrets_return_none.assert_called_once_with(
-            'MAILCHIMP_WEBHOOK_SECRET'
-        )
+                swap_mock.assert_called_once_with('MAILCHIMP_WEBHOOK_SECRET')
 
         error_msg = (
             'Could not find the resource http://localhost'
@@ -8376,16 +8373,13 @@ class IsFromOppiaAndroidBuildDecoratorTests(test_utils.GenericTestBase):
         )
 
         with testapp_patch:
-            with swap_api_key_secrets_return_none:
+            with swap_api_key_secrets_return_none as swap_mock:
                 response = self.get_json(
                     '/mock_secret_page',
                     expected_status_int=401,
                     headers={'X-ApiKey': 'secret'},
                 )
-
-        swap_api_key_secrets_return_none.assert_called_once_with(
-            'ANDROID_BUILD_SECRET'
-        )
+                swap_mock.assert_called_once_with('ANDROID_BUILD_SECRET')
 
         self.assertEqual(
             response['error'],

@@ -98,13 +98,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_patch, self.sys_patch:
-            with self.install_patch:
+            with self.install_patch as install_mock:
                 with all_filepath_patch:
                     run_lint_checks.main()
-        self.assert_same_list_elements(
-            ['No files to check'], self.linter_stdout
-        )
-        self.install_patch.assert_called()
+                    self.assert_same_list_elements(
+                        ['No files to check'], self.linter_stdout
+                    )
+                    install_mock.assert_called()
 
     def test_main_with_no_args(self) -> None:
         def mock_get_changed_filepaths() -> List[str]:
@@ -117,13 +117,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_patch, self.sys_patch:
-            with self.install_patch:
+            with self.install_patch as install_mock:
                 with get_changed_filepaths_patch:
                     run_lint_checks.main()
-        self.assert_same_list_elements(
-            ['No files to check'], self.linter_stdout
-        )
-        self.install_patch.assert_called()
+                    self.assert_same_list_elements(
+                        ['No files to check'], self.linter_stdout
+                    )
+                    install_mock.assert_called()
 
     def test_main_with_non_other_shard(self) -> None:
         mock_shards = {
@@ -150,13 +150,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_patch, self.sys_patch, shards_patch:
-            with self.install_patch:
-                with get_filenames_from_path_patch:
+            with self.install_patch as install_mock:
+                with get_filenames_from_path_patch as get_filenames_mock:
                     run_lint_checks.main(args=['--shard', '1'])
-        self.assertFalse(all_checks_passed(self.linter_stdout))
-        self.install_patch.assert_called()
-        for prefix in mock_shards['1']:
-            get_filenames_from_path_patch.assert_any_call(prefix)
+                    self.assertFalse(all_checks_passed(self.linter_stdout))
+                    install_mock.assert_called()
+                    for prefix in mock_shards['1']:
+                        get_filenames_mock.assert_any_call(prefix)
 
     def test_main_with_invalid_shards(self) -> None:
         def mock_get_filepaths_from_path(
@@ -186,13 +186,12 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
         )
 
         with self.print_patch, self.sys_patch, install_patch, shards_patch:
-            with get_filenames_from_path_patch:
+            with get_filenames_from_path_patch as get_filenames_mock:
                 with self.assertRaisesRegex(
                     RuntimeError, 'mock_file in multiple shards'
                 ):
                     run_lint_checks.main(args=['--shard', '1'])
-
-        get_filenames_from_path_patch.assert_called_once_with('a/')
+                get_filenames_mock.assert_called_once_with('a/')
 
     def test_main_with_other_shard(self) -> None:
         def mock_get_filepaths_from_path(
@@ -225,13 +224,13 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
 
         with self.print_patch, self.sys_patch, shards_patch:
             with self.install_patch:
-                with get_filenames_from_path_patch:
+                with get_filenames_from_path_patch as get_filenames_mock:
                     run_lint_checks.main(
                         args=['--shard', run_lint_checks.OTHER_SHARD_NAME]
                     )
-        get_filenames_from_path_patch.assert_any_call(os.getcwd())
-        get_filenames_from_path_patch.assert_any_call('a/')
-        self.assertFalse(all_checks_passed(self.linter_stdout))
+                    get_filenames_mock.assert_any_call(os.getcwd())
+                    get_filenames_mock.assert_any_call('a/')
+                    self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self) -> None:
         with self.print_patch, self.sys_patch:

@@ -227,12 +227,11 @@ class CheckFrontendCoverageTests(test_utils.GenericTestBase):
                 'end_of_record',
             ]
         )
-        not_fully_covered_files_patch = mock.patch.object(
-            check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
-        )
 
         with self.exists_patch, self.open_patch, self.print_patch:
-            with not_fully_covered_files_patch, self.capture_logging() as logs:
+            with mock.patch.object(
+                check_frontend_test_coverage, 'NOT_FULLY_COVERED_FILENAMES', []
+            ), self.capture_logging() as logs:
                 with self.assertRaisesRegex(SystemExit, '1'):
                     check_frontend_test_coverage.check_coverage_changes()
                 self.assertEqual(

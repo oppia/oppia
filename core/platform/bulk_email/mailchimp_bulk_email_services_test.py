@@ -257,14 +257,14 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             side_effect=lambda _: None,
         )
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with swap_get_secret:
+            with swap_get_secret as mock_get_secret:
                 self.assertIsNone(
                     mailchimp_bulk_email_services._get_mailchimp_class()  # pylint: disable=protected-access
                 )
                 self.assertItemsEqual(
                     logs, ['Mailchimp API key is not available.']
                 )
-        swap_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
+                mock_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
 
     def test_get_mailchimp_class_errors_when_username_is_not_available(
         self,
@@ -275,12 +275,12 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             side_effect=lambda _: 'key',
         )
         with self.capture_logging(min_level=logging.ERROR) as logs:
-            with swap_get_secret:
+            with swap_get_secret as mock_get_secret:
                 self.assertIsNone(
                     mailchimp_bulk_email_services._get_mailchimp_class()  # pylint: disable=protected-access
                 )
                 self.assertItemsEqual(logs, ['Mailchimp username is not set.'])
-        swap_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
+                mock_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
 
     def test_add_or_update_user_status_returns_false_when_username_is_none(
         self,
@@ -290,13 +290,13 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             'get_secret',
             side_effect=lambda _: 'key',
         )
-        with swap_get_secret:
+        with swap_get_secret as mock_get_secret:
             self.assertFalse(
                 mailchimp_bulk_email_services.add_or_update_user_status(
                     'sample_email', {}, 'Web', can_receive_email_updates=True
                 )
             )
-        swap_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
+            mock_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
 
     def test_permanently_delete_user_from_list_when_username_is_none(
         self,
@@ -306,11 +306,11 @@ class MailchimpServicesUnitTests(test_utils.GenericTestBase):
             'get_secret',
             side_effect=lambda _: 'key',
         )
-        with swap_get_secret:
+        with swap_get_secret as mock_get_secret:
             mailchimp_bulk_email_services.permanently_delete_user_from_list(
                 'sample_email'
             )
-        swap_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
+            mock_get_secret.assert_called_once_with(*('MAILCHIMP_API_KEY',))
 
     @test_utils.set_platform_parameters(
         [

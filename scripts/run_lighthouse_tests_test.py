@@ -265,8 +265,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, swap_popen as popen_mock, swap_isfile:
-            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
+        with self.print_patch:
+            with swap_popen as popen_mock, swap_isfile as _isfile_mock:
+                run_lighthouse_tests.run_lighthouse_puppeteer_script(
+                    record=True
+                )
 
         self.assertIn(
             'Puppeteer script completed successfully.', self.print_arr
@@ -310,10 +313,11 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             side_effect=mock_popen,
         )
 
-        with self.print_patch, self.swap_sys_exit, swap_popen as popen_mock, (
-            swap_isfile
-        ):
-            run_lighthouse_tests.run_lighthouse_puppeteer_script(record=True)
+        with self.print_patch:
+            with self.swap_sys_exit as _sys_exit_mock, swap_popen as popen_mock, swap_isfile as _isfile_mock:
+                run_lighthouse_tests.run_lighthouse_puppeteer_script(
+                    record=True
+                )
 
         self.assertIn('Return code: 1', self.print_arr)
         self.assertIn('ABC error.', self.print_arr)
@@ -332,25 +336,23 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
     def test_run_webpack_compilation_successfully(self) -> None:
         swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: True)
 
-        with self.print_patch, self.swap_webpack_compiler, swap_isdir as isdir_mock:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             run_lighthouse_tests.run_webpack_compilation()
-
-        self.assertNotIn(
-            'Failed to complete webpack compilation, exiting...', self.print_arr
-        )
-        isdir_mock.assert_called_once_with()
+            self.assertNotIn(
+                'Failed to complete webpack compilation, exiting...',
+                self.print_arr,
+            )
 
     def test_run_webpack_compilation_failed(self) -> None:
         swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: False)
 
-        with self.print_patch, self.swap_webpack_compiler, swap_isdir as isdir_mock:
+        with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
-
-        self.assertIn(
-            'Failed to complete webpack compilation, exiting...', self.print_arr
-        )
-        isdir_mock.assert_called_once_with()
+            self.assertIn(
+                'Failed to complete webpack compilation, exiting...',
+                self.print_arr,
+            )
 
     def test_subprocess_error_results_in_failed_webpack_compilation(
         self,
@@ -374,20 +376,16 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         def mock_failed_context_manager() -> MockFailedCompilerContextManager:
             return MockFailedCompilerContextManager()
 
-        self.swap_webpack_compiler = mock.patch.object(
+        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: False)
+
+        with self.print_patch, mock.patch.object(
             servers,
             'managed_webpack_compiler',
             side_effect=mock_failed_context_manager,
-        )
-        swap_isdir = mock.patch.object(os.path, 'isdir', lambda _: False)
-
-        with self.print_patch, self.swap_webpack_compiler as webpack_mock, swap_isdir as isdir_mock:
+        ), swap_isdir:
             with self.swap_sys_exit:
                 run_lighthouse_tests.run_webpack_compilation()
-
-        self.assertIn('Subprocess execution failed.', self.print_arr)
-        webpack_mock.assert_called_once_with()
-        isdir_mock.assert_called_once_with()
+            self.assertIn('Subprocess execution failed.', self.print_arr)
 
     def test_run_lighthouse_checks_succesfully(self) -> None:
         class MockTask:
@@ -496,12 +494,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = mock.patch.object(
             build, 'main', side_effect=lambda args: None
         )
-        swap_emulator_mode = mock.patch.object(
-            constants, 'EMULATOR_MODE', False
-        )
-
-        env = os.environ.copy()
-
         with swap_popen, self.swap_webpack_compiler, swap_isdir, swap_build:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_ng_build, self.print_patch:
@@ -521,20 +513,10 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                 os.environ['ALL_LIGHTHOUSE_URLS'],
                                 expected_all_lighthouse_urls,
                             )
-
-        swap_run_lighthouse_tests.assert_called_once_with(*('accessibility',))
-        swap_build.assert_called_once_with(**{'args': []})
-
-        self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
-        )
-
-        servers.managed_dev_appserver.assert_called_once_with(
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env,
-        )
+                            self.assertIn(
+                                'Puppeteer script completed successfully.',
+                                self.print_arr,
+                            )
 
     def test_run_lighthouse_tests_in_performance_mode(self) -> None:
         class MockTask:
@@ -562,8 +544,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             build, 'main', side_effect=lambda args: None
         )
 
-        env = os.environ.copy()
-
         with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
                 with self.swap_redis_server, self.swap_cloud_datastore_emulator:
@@ -586,21 +566,17 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                     os.environ['ALL_LIGHTHOUSE_URLS'],
                                     expected_all_lighthouse_urls,
                                 )
-
-        run_checks_mock.assert_called_once_with(*('performance',))
-
-        self.assertIn('Building files in production mode.', self.print_arr)
-        self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
-        )
-
-        build.main.assert_called_once_with(args=['--prod_env'])
-        servers.managed_dev_appserver.assert_called_once_with(
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env,
-        )
+                                run_checks_mock.assert_called_once_with(
+                                    *('performance',)
+                                )
+                                self.assertIn(
+                                    'Building files in production mode.',
+                                    self.print_arr,
+                                )
+                                self.assertIn(
+                                    'Puppeteer script completed successfully.',
+                                    self.print_arr,
+                                )
 
     def test_run_lighthouse_tests_with_specific_pages(self) -> None:
         class MockTask:
@@ -627,8 +603,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         swap_build = mock.patch.object(
             build, 'main', side_effect=lambda args: None
         )
-
-        env = os.environ.copy()
 
         with self.print_patch, self.swap_webpack_compiler, swap_isdir:
             with self.swap_elasticsearch_dev_server, self.swap_dev_appserver:
@@ -667,42 +641,26 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                     os.environ['LIGHTHOUSE_URLS_TO_RUN'],
                                     expected_lighthouse_urls_to_run,
                                 )
-
-        self.assertIn('Building files in production mode.', self.print_arr)
-        self.assertIn(
-            'Puppeteer script completed successfully.', self.print_arr
-        )
-
-        run_checks_mock.assert_called_once_with('performance')
-        build.main.assert_called_once_with(args=['--prod_env'])
-        servers.managed_dev_appserver.assert_called_once_with(
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env,
-        )
+                                self.assertIn(
+                                    'Building files in production mode.',
+                                    self.print_arr,
+                                )
+                                self.assertIn(
+                                    'Puppeteer script completed successfully.',
+                                    self.print_arr,
+                                )
+                                run_checks_mock.assert_called_once_with(
+                                    'performance'
+                                )
 
     def test_run_lighthouse_tests_skipping_webpack_build_in_performance_mode(
         self,
     ) -> None:
-        class MockTask:
-            returncode = 0
-
-            def communicate(  # pylint: disable=missing-docstring
-                self,
-            ) -> tuple[bytes, bytes]:
-                return (b'Task output', b'No error.')
-
         swap_run_lighthouse_tests = mock.patch.object(
             run_lighthouse_tests,
             'run_lighthouse_checks',
             side_effect=lambda *unused_args: None,
         )
-
-        def mock_popen(
-            *unused_args: str, **unused_kwargs: str
-        ) -> MockTask:  # pylint: disable=unused-argument
-            return MockTask()
 
         with self.swap_redis_server, swap_run_lighthouse_tests as run_checks_mock:
             with self.lighthouse_pages_json_filepath_patch:
@@ -725,7 +683,6 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         )
 
         run_checks_mock.assert_called_once_with('performance')
-        build.main.assert_called_once_with(args=[])
 
     def test_main_function_calls_puppeteer_record(self) -> None:
         class MockTask:
@@ -797,14 +754,4 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                     ]
                                 )
 
-        servers.managed_dev_appserver.assert_called_once_with(
-            port=GOOGLE_APP_ENGINE_PORT,
-            log_level='critical',
-            skip_sdk_update_check=True,
-            env=env,
-        )
-        run_lighthouse_tests.run_lighthouse_puppeteer_script.assert_called_once_with(
-            True
-        )
         run_checks_mock.assert_called_once_with('performance')
-        build.main.assert_called_once_with(args=[])

@@ -51,18 +51,17 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
 
-        result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_speech_synthesis_services.regenerate_speech_from_text(
-                plaintext, language_accent_code
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
+            result_binary_data, result_audio_offsets, result_error = (
+                dev_mode_speech_synthesis_services.regenerate_speech_from_text(
+                    plaintext, language_accent_code
+                )
             )
-        )
 
-        self.assertTrue(isinstance(result_binary_data, bytes))
-        self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertIsNone(result_error)
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'AZURE_TTS_API_KEY'
-        )
+            self.assertTrue(isinstance(result_binary_data, bytes))
+            self.assertEqual(result_audio_offsets, mock_word_boundaries)
+            self.assertIsNone(result_error)
+            mock_get_secret.assert_called_once_with('AZURE_TTS_API_KEY')
 
     def test_should_select_default_language_as_english_and_return_correctly(
         self,
@@ -81,15 +80,14 @@ class AzureSpeechSynthesisSimulationTests(test_utils.GenericTestBase):
             {'token': 'text', 'audio_offset_msecs': 400.0},
         ]
 
-        result_binary_data, result_audio_offsets, result_error = (
-            dev_mode_speech_synthesis_services.regenerate_speech_from_text(
-                plaintext, language_accent_code
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
+            result_binary_data, result_audio_offsets, result_error = (
+                dev_mode_speech_synthesis_services.regenerate_speech_from_text(
+                    plaintext, language_accent_code
+                )
             )
-        )
 
-        self.assertTrue(isinstance(result_binary_data, bytes))
-        self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertIsNone(result_error)
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'AZURE_TTS_API_KEY'
-        )
+            self.assertTrue(isinstance(result_binary_data, bytes))
+            self.assertEqual(result_audio_offsets, mock_word_boundaries)
+            self.assertIsNone(result_error)
+            mock_get_secret.assert_called_once_with('AZURE_TTS_API_KEY')

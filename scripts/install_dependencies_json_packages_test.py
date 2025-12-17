@@ -462,12 +462,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self._assert_ssl_context_matches_default(context)
             return MockResponse()
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
-        with urlopen_swap:
+        with mock.patch.object(urlrequest, 'urlopen', mock_urlopen):
             response = install_dependencies_json_packages.url_open(test_url)
-        self.assertEqual(response.getcode(), 200)
-        self.assertEqual(response.url, test_url)
+            self.assertEqual(response.getcode(), 200)
+            self.assertEqual(response.url, test_url)
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext

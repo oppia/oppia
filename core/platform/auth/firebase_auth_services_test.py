@@ -36,7 +36,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
+from typing import Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -134,13 +134,13 @@ class FirebaseAdminSdkStub:
         with contextlib.ExitStack() as swap_stack:
             for name in self._IMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(
-                    test.swap(firebase_auth, name, getattr(self, name))
+                    mock.patch.object(firebase_auth, name, getattr(self, name))
                 )
 
             for name in self._UNIMPLEMENTED_SDK_FUNCTION_NAMES:
                 swap_stack.enter_context(
-                    test.swap_to_always_raise(
-                        firebase_auth, name, NotImplementedError
+                    mock.patch.object(
+                        firebase_auth, name, side_effect=NotImplementedError
                     )
                 )
 
@@ -635,11 +635,12 @@ class FirebaseAdminSdkStub:
             msg='Unexpected Firebase accounts exists: uids=%r' % (found,),
         )
 
+    # Here we use object because mock.patch.object() returns a _patch instance that yields MagicMock on __enter__, but we use object as the inner type since the specific return value type is not statically determinable.
     def mock_delete_users_error(
         self,
         batch_error_pattern: Tuple[Optional[Exception]] = (None,),
         individual_error_pattern: Tuple[Optional[bool]] = (None,),
-    ) -> ContextManager[None]:
+    ) -> object:
         """Returns a context in which `delete_users` fails according to the
         given patterns.
 
@@ -697,13 +698,16 @@ class FirebaseAdminSdkStub:
             return self._create_delete_users_result_fragile(errors)
 
         assert self._test is not None
-        return self._test.swap(firebase_auth, 'delete_users', mock_delete_users)
+        return mock.patch.object(
+            firebase_auth, 'delete_users', mock_delete_users
+        )
 
+    # Here we use object because mock.patch.object() returns a _patch instance that yields MagicMock on __enter__, but we use object as the inner type since the specific return value type is not statically determinable.
     def mock_import_users_error(
         self,
         batch_error_pattern: Tuple[Optional[Exception]] = (None,),
         individual_error_pattern: Tuple[Optional[str]] = (None,),
-    ) -> ContextManager[None]:
+    ) -> object:
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
@@ -764,7 +768,9 @@ class FirebaseAdminSdkStub:
             )
 
         assert self._test is not None
-        return self._test.swap(firebase_auth, 'import_users', mock_import_users)
+        return mock.patch.object(
+            firebase_auth, 'import_users', mock_import_users
+        )
 
     def _encode_user_claims(self, uid: str) -> str:
         """Returns encoded claims for the given user.
@@ -1646,10 +1652,11 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         self.user_id = user_settings.user_id
         firebase_auth_services.mark_user_for_deletion(self.user_id)
 
+    # Here we use object because mock.patch.object() returns a _patch instance.
     def swap_get_users_to_return_non_empty_users_result(
         self,
-    ) -> ContextManager[None]:
-        """Swaps the get_user function so that it always fails."""
+    ) -> object:
+        """Swaps the get_users function to return a non-empty users result."""
         return mock.patch.object(
             firebase_auth,
             'get_users',
@@ -1658,16 +1665,22 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
             ),
         )
 
-    def swap_get_users_to_raise_error(self) -> ContextManager[None]:
-        """Swaps the get_user function so that it always fails."""
+    # Here we use object because mock.patch.object() returns a _patch instance.
+    def swap_get_users_to_raise_error(
+        self,
+    ) -> object:
+        """Swaps the get_users function to raise an error."""
         return mock.patch.object(
             firebase_auth,
             'get_users',
             firebase_exceptions.FirebaseError(message='error', code='E111'),
         )
 
-    def swap_delete_user_to_always_fail(self) -> ContextManager[None]:
-        """Swaps the delete_user function so that it always fails."""
+    # Here we use object because the return type of mock.patch.object() varies.
+    def swap_delete_user_to_always_fail(
+        self,
+    ) -> object:
+        """Swaps the delete_user function to always fail."""
         return mock.patch.object(
             firebase_auth, 'delete_user', side_effect=self.UNKNOWN_ERROR
         )
@@ -1702,7 +1715,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
     def test_delete_external_auth_associations_when_delete_user_fails(
         self,
     ) -> None:
-        with self.swap_delete_user_to_always_fail():
+        with mock.patch.object(
+            firebase_auth, 'delete_user', side_effect=self.UNKNOWN_ERROR
+        ):
             firebase_auth_services.delete_external_auth_associations(
                 self.user_id
             )
@@ -1722,7 +1737,13 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
         self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
 
-        with self.swap_get_users_to_return_non_empty_users_result():
+        with mock.patch.object(
+            firebase_auth,
+            'get_users',
+            firebase_auth.GetUsersResult(
+                [firebase_auth.UserRecord({'localId': 'id'})], []
+            ),
+        ):
             self.assertFalse(
                 firebase_auth_services.verify_external_auth_associations_are_deleted(
                     self.user_id
@@ -1742,7 +1763,11 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
         self.firebase_sdk_stub.assert_is_not_user(self.AUTH_ID)
 
-        with self.swap_get_users_to_raise_error():
+        with mock.patch.object(
+            firebase_auth,
+            'get_users',
+            firebase_exceptions.FirebaseError(message='error', code='E111'),
+        ):
             with self.capture_logging() as logs:
                 self.assertFalse(
                     firebase_auth_services.verify_external_auth_associations_are_deleted(

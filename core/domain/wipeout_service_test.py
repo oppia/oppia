@@ -911,7 +911,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', side_effect=lambda x, y: None
         )
 
-        with send_email_patch:
+        with send_email_patch as mock_send_email:
             self.assertEqual(
                 wipeout_service.run_user_deletion_completion(
                     self.pending_deletion_request
@@ -919,7 +919,7 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
                 wipeout_domain.USER_VERIFICATION_FAILURE,
             )
 
-        self.assertFalse(send_email_patch.called)
+            self.assertFalse(mock_send_email.called)
 
         self.assertIsNotNone(
             user_models.UserSettingsModel.get_by_id(self.user_1_id)

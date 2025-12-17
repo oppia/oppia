@@ -2854,16 +2854,15 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
             'generate_topic_summary',
             side_effect=topic_services.generate_topic_summary,
         )
-        with generate_topic_summary_patch:
+        with generate_topic_summary_patch as generate_mock:
             self.put_json(
                 feconf.REGENERATE_TOPIC_SUMMARIES_URL,
                 {},
                 csrf_token=csrf_token,
                 expected_status_int=200,
             )
-
-        generate_topic_summary_patch.assert_any_call(topic_id_1)
-        generate_topic_summary_patch.assert_any_call(topic_id_2)
+            generate_mock.assert_any_call(topic_id_1)
+            generate_mock.assert_any_call(topic_id_2)
 
 
 class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):

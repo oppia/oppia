@@ -79,24 +79,22 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-        with popen_patch:
+        ) as popen_mock:
             self.assertEqual(
                 git_changes_utils.get_upstream_git_repository_remote_name(),
                 'upstream',
             )
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.upstream.url']
-        )
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origin.url']
+            )
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.upstream.url']
+            )
 
     def test_get_upstream_remote_name_with_error_in_obtaining_remote(
         self,
@@ -116,16 +114,15 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-        with popen_patch, communicate_patch:
-            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
-                git_changes_utils.get_upstream_git_repository_remote_name()
-
-        popen_patch.assert_called_once_with(['git', 'remote'])
+        ) as popen_mock:
+            with communicate_patch:
+                with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                    git_changes_utils.get_upstream_git_repository_remote_name()
+                popen_mock.assert_called_once_with(['git', 'remote'])
 
     def test_get_upstream_remote_name_with_error_in_obtaining_remote_url(
         self,
@@ -166,14 +163,13 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         )
 
         with communicate_patch:
-            with popen_patch:
+            with popen_patch as popen_mock:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                     git_changes_utils.get_upstream_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
+                popen_mock.assert_any_call(['git', 'remote'])
+                popen_mock.assert_any_call(
+                    ['git', 'config', '--get', 'remote.origin.url']
+                )
 
     def test_get_upstream_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -185,27 +181,28 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         ) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
             return process_for_remote
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-        with popen_patch, self.assertRaisesRegex(
-            Exception,
-            'Error: Please set the git \'upstream\' repository.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If \'upstream\' is listed in the command output, then run the '
-            'command \'git remote set-url upstream '
-            'https://github.com/oppia/oppia.git\'\n'
-            '2b. If \'upstream\' is not listed in the command output, then run '
-            'the command \'git remote add upstream '
-            'https://github.com/oppia/oppia.git\'\n',
-        ):
-            git_changes_utils.get_upstream_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(['git', 'config', '--get', 'remote..url'])
+        ) as popen_mock:
+            with self.assertRaisesRegex(
+                Exception,
+                'Error: Please set the git \'upstream\' repository.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2a. If \'upstream\' is listed in the command output, then run the '
+                'command \'git remote set-url upstream '
+                'https://github.com/oppia/oppia.git\'\n'
+                '2b. If \'upstream\' is not listed in the command output, then run '
+                'the command \'git remote add upstream '
+                'https://github.com/oppia/oppia.git\'\n',
+            ):
+                git_changes_utils.get_upstream_git_repository_remote_name()
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote..url']
+            )
 
     def test_get_upstream_remote_name_with_multiple_remotes(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -234,34 +231,32 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-
-        with popen_patch, self.assertRaisesRegex(
-            Exception,
-            'Error: Please keep only one remote branch for oppia:develop.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references. There will be '
-            'multiple remotes with the main oppia github reopsitory url, but we'
-            ' want to make sure that there is only one main \'upstream\' remote'
-            ' that uses the url https://github.com/oppia/oppia.git. Please use '
-            'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have the url https://github.com/oppia/oppia.git except for '
-            'the main \'upstream\' remote.\n',
-        ):
-            git_changes_utils.get_upstream_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origintwo.url']
-        )
+        ) as popen_mock:
+            with self.assertRaisesRegex(
+                Exception,
+                'Error: Please keep only one remote branch for oppia:develop.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2. This command will list the remote references. There will be '
+                'multiple remotes with the main oppia github reopsitory url, but we'
+                ' want to make sure that there is only one main \'upstream\' remote'
+                ' that uses the url https://github.com/oppia/oppia.git. Please use '
+                'the command, \'git remote remove <remote_name>\' on all remotes '
+                'that have the url https://github.com/oppia/oppia.git except for '
+                'the main \'upstream\' remote.\n',
+            ):
+                git_changes_utils.get_upstream_git_repository_remote_name()
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origin.url']
+            )
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origintwo.url']
+            )
 
     def test_get_local_remote_name_without_errors(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -290,24 +285,22 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-        with popen_patch:
+        ) as popen_mock:
             self.assertEqual(
                 git_changes_utils.get_local_git_repository_remote_name(),
                 'origin',
             )
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.upstream.url']
-        )
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origin.url']
+            )
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.upstream.url']
+            )
 
     def test_get_local_remote_name_with_error_in_obtaining_remote(self) -> None:
         def mock_communicate() -> Tuple[bytes, bytes]:
@@ -332,11 +325,11 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'Popen',
             side_effect=mock_popen,
         )
-        with popen_patch, communicate_patch:
-            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
-                git_changes_utils.get_local_git_repository_remote_name()
-
-        popen_patch.assert_called_once_with(['git', 'remote'])
+        with popen_patch as popen_mock:
+            with communicate_patch:
+                with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                    git_changes_utils.get_local_git_repository_remote_name()
+                popen_mock.assert_called_once_with(['git', 'remote'])
 
     def test_get_local_remote_name_with_error_in_obtaining_remote_url(
         self,
@@ -368,21 +361,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             process_for_remote_url, 'communicate', mock_communicate
         )
 
-        popen_patch = mock.patch.object(
-            subprocess,
-            'Popen',
-            side_effect=mock_popen,
-        )
-
         with communicate_patch:
-            with popen_patch:
+            with mock.patch.object(
+                subprocess,
+                'Popen',
+                side_effect=mock_popen,
+            ) as popen_mock:
                 with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
                     git_changes_utils.get_local_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
+                popen_mock.assert_any_call(['git', 'remote'])
+                popen_mock.assert_any_call(
+                    ['git', 'config', '--get', 'remote.origin.url']
+                )
 
     def test_get_local_remote_name_with_no_remote_set(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -399,22 +389,24 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'Popen',
             side_effect=mock_popen,
         )
-        with popen_patch, self.assertRaisesRegex(
-            Exception,
-            'Error: Please set the git \'origin\' repository.\n'
-            'To do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2a. If \'origin\' is listed in the command output, then run the '
-            'command \'git remote set-url origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n'
-            '2b. If \'origin\' is not listed in the command output, then run '
-            'the command \'git remote add origin '
-            '\"The URL of your fork of Oppia GitHub repository\"\'\n',
-        ):
-            git_changes_utils.get_local_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(['git', 'config', '--get', 'remote..url'])
+        with popen_patch as popen_mock:
+            with self.assertRaisesRegex(
+                Exception,
+                'Error: Please set the git \'origin\' repository.\n'
+                'To do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2a. If \'origin\' is listed in the command output, then run the '
+                'command \'git remote set-url origin '
+                '\"The URL of your fork of Oppia GitHub repository\"\'\n'
+                '2b. If \'origin\' is not listed in the command output, then run '
+                'the command \'git remote add origin '
+                '\"The URL of your fork of Oppia GitHub repository\"\'\n',
+            ):
+                git_changes_utils.get_local_git_repository_remote_name()
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote..url']
+            )
 
     def test_get_local_remote_name_with_multiple_remotes(self) -> None:
         process_for_remote = subprocess.Popen(
@@ -443,34 +435,32 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             else:
                 return process_for_remote
 
-        popen_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'Popen',
             side_effect=mock_popen,
-        )
-
-        with popen_patch, self.assertRaisesRegex(
-            Exception,
-            'Error: Please keep only one remote branch for your Oppia fork.'
-            '\nTo do that follow these steps:\n'
-            '1. Run the command \'git remote -v\'\n'
-            '2. This command will list the remote references. There will be '
-            'multiple remotes for an Oppia fork, but we'
-            ' want to make sure that there is only one main \'origin\' remote'
-            ' that uses an Oppia fork URL. Please use '
-            'the command, \'git remote remove <remote_name>\' on all remotes '
-            'that have an Oppia fork URL except for '
-            'the main \'origin\' remote.\n',
-        ):
-            git_changes_utils.get_local_git_repository_remote_name()
-
-        popen_patch.assert_any_call(['git', 'remote'])
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origin.url']
-        )
-        popen_patch.assert_any_call(
-            ['git', 'config', '--get', 'remote.origintwo.url']
-        )
+        ) as popen_mock:
+            with self.assertRaisesRegex(
+                Exception,
+                'Error: Please keep only one remote branch for your Oppia fork.'
+                '\nTo do that follow these steps:\n'
+                '1. Run the command \'git remote -v\'\n'
+                '2. This command will list the remote references. There will be '
+                'multiple remotes for an Oppia fork, but we'
+                ' want to make sure that there is only one main \'origin\' remote'
+                ' that uses an Oppia fork URL. Please use '
+                'the command, \'git remote remove <remote_name>\' on all remotes '
+                'that have an Oppia fork URL except for '
+                'the main \'origin\' remote.\n',
+            ):
+                git_changes_utils.get_local_git_repository_remote_name()
+            popen_mock.assert_any_call(['git', 'remote'])
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origin.url']
+            )
+            popen_mock.assert_any_call(
+                ['git', 'config', '--get', 'remote.origintwo.url']
+            )
 
     def test_git_diff_name_status_without_error(self) -> None:
         def mock_start_subprocess_for_result(
@@ -484,7 +474,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch:
+        with subprocess_patch as subprocess_mock:
             self.assertEqual(
                 git_changes_utils.git_diff_name_status('left', 'right'),
                 [
@@ -492,10 +482,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     git_changes_utils.FileDiff(status=b'A', name=b'file2'),
                 ],
             )
-
-        subprocess_patch.assert_called_once_with(
-            ['git', 'diff', '--name-status', 'left', 'right', '--']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'diff', '--name-status', 'left', 'right', '--']
+            )
 
     def test_git_diff_name_status_with_error(self) -> None:
         def mock_start_subprocess_for_result(
@@ -509,14 +498,12 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch, self.assertRaisesRegex(
-            ValueError, 'test_oppia_error'
-        ):
-            git_changes_utils.git_diff_name_status('left', 'right')
-
-        subprocess_patch.assert_called_once_with(
-            ['git', 'diff', '--name-status', 'left', 'right', '--']
-        )
+        with subprocess_patch as subprocess_mock:
+            with self.assertRaisesRegex(ValueError, 'test_oppia_error'):
+                git_changes_utils.git_diff_name_status('left', 'right')
+            subprocess_mock.assert_called_once_with(
+                ['git', 'diff', '--name-status', 'left', 'right', '--']
+            )
 
     def test_git_diff_name_status_with_no_left_and_right(self) -> None:
         def mock_start_subprocess_for_result(
@@ -530,7 +517,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch:
+        with subprocess_patch as subprocess_mock:
             self.assertEqual(
                 git_changes_utils.git_diff_name_status(),
                 [
@@ -538,10 +525,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     git_changes_utils.FileDiff(status=b'A', name=b'file2'),
                 ],
             )
-
-        subprocess_patch.assert_called_once_with(
-            ['git', 'diff', '--name-status']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'diff', '--name-status']
+            )
 
     def test_git_diff_name_status_with_diff_filter(self) -> None:
         def mock_start_subprocess_for_result(
@@ -555,7 +541,7 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch:
+        with subprocess_patch as subprocess_mock:
             self.assertEqual(
                 git_changes_utils.git_diff_name_status(
                     'left', 'right', 'filter'
@@ -565,18 +551,17 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     git_changes_utils.FileDiff(status=b'A', name=b'file2'),
                 ],
             )
-
-        subprocess_patch.assert_called_once_with(
-            [
-                'git',
-                'diff',
-                '--name-status',
-                '--diff-filter=filter',
-                'left',
-                'right',
-                '--',
-            ]
-        )
+            subprocess_mock.assert_called_once_with(
+                [
+                    'git',
+                    'diff',
+                    '--name-status',
+                    '--diff-filter=filter',
+                    'left',
+                    'right',
+                    '--',
+                ]
+            )
 
     def test_git_diff_name_status_with_empty_left_should_error(self) -> None:
         with self.assertRaisesRegex(
@@ -652,7 +637,11 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             common, 'CURR_DIR', '/usr/opensource/oppia'
         )
 
-        with subprocess_patch, git_diff_patch, get_merge_base_patch:
+        with (
+            subprocess_patch as subprocess_mock,
+            git_diff_patch as git_diff_mock,
+            get_merge_base_patch as merge_base_mock,
+        ):
             with curr_dir_patch:
                 self.assertEqual(
                     git_changes_utils.compare_to_remote(
@@ -660,12 +649,11 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     ),
                     expected_file_diffs,
                 )
-
-        subprocess_patch.assert_called_once_with(['git', 'pull', 'remote'])
-        git_diff_patch.assert_called_once_with('Merge Base', 'local branch')
-        get_merge_base_patch.assert_called_once_with(
-            'remote/local branch', 'local branch'
-        )
+            subprocess_mock.assert_called_once_with(['git', 'pull', 'remote'])
+            git_diff_mock.assert_called_once_with('Merge Base', 'local branch')
+            merge_base_mock.assert_called_once_with(
+                'remote/local branch', 'local branch'
+            )
 
     def test_compare_to_remote_with_file_not_in_oppia_directory_should_error(
         self,
@@ -709,21 +697,27 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             common, 'CURR_DIR', '/usr/opensource/oppia'
         )
 
-        with subprocess_patch, git_diff_patch, get_merge_base_patch:
-            with curr_dir_patch, self.assertRaisesRegex(
-                ValueError,
-                'Error: The file /usr/directory/file2.py is not inside the '
-                'oppia directory.',
+        with (
+            subprocess_patch as subprocess_mock,
+            git_diff_patch as git_diff_mock,
+            get_merge_base_patch as merge_base_mock,
+        ):
+            with (
+                curr_dir_patch,
+                self.assertRaisesRegex(
+                    ValueError,
+                    'Error: The file /usr/directory/file2.py is not inside the '
+                    'oppia directory.',
+                ),
             ):
                 git_changes_utils.compare_to_remote(
                     'remote', 'local branch', 'remote/local branch'
                 )
-
-        subprocess_patch.assert_called_once_with(['git', 'pull', 'remote'])
-        git_diff_patch.assert_called_once_with('Merge Base', 'local branch')
-        get_merge_base_patch.assert_called_once_with(
-            'remote/local branch', 'local branch'
-        )
+            subprocess_mock.assert_called_once_with(['git', 'pull', 'remote'])
+            git_diff_mock.assert_called_once_with('Merge Base', 'local branch')
+            merge_base_mock.assert_called_once_with(
+                'remote/local branch', 'local branch'
+            )
 
     def test_get_merge_base_reports_error(self) -> None:
         def mock_start_subprocess_for_result(
@@ -737,12 +731,14 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch, self.assertRaisesRegex(ValueError, 'Test'):
+        with (
+            subprocess_patch as subprocess_mock,
+            self.assertRaisesRegex(ValueError, 'Test'),
+        ):
             git_changes_utils.get_merge_base('A', 'B')
-
-        subprocess_patch.assert_called_once_with(
-            ['git', 'merge-base', 'A', 'B']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'merge-base', 'A', 'B']
+            )
 
     def test_get_merge_base_returns_merge_base(self) -> None:
         def mock_start_subprocess_for_result(
@@ -756,12 +752,11 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with subprocess_patch:
+        with subprocess_patch as subprocess_mock:
             self.assertEqual(git_changes_utils.get_merge_base('A', 'B'), 'Test')
-
-        subprocess_patch.assert_called_once_with(
-            ['git', 'merge-base', 'A', 'B']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'merge-base', 'A', 'B']
+            )
 
     def test_extract_acmrt_files_with_empty_file_diffs(self) -> None:
         self.assertEqual(
@@ -861,31 +856,37 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_extract_acmrt_files_from_diff,
         )
 
-        with compare_to_remote_patch, extract_files_patch, get_branch_patch:
-            self.assertEqual(
-                git_changes_utils.get_changed_files(
-                    [
-                        git_changes_utils.GitRef(
-                            local_ref='refs/heads/branch-1',
-                            local_sha1='sha1',
-                            remote_ref='refs/remotes/remote/branch-1',
-                            remote_sha1='rsha1',
+        with compare_to_remote_patch as compare_mock:
+            with extract_files_patch:
+                with get_branch_patch:
+                    self.assertEqual(
+                        git_changes_utils.get_changed_files(
+                            [
+                                git_changes_utils.GitRef(
+                                    local_ref='refs/heads/branch-1',
+                                    local_sha1='sha1',
+                                    remote_ref='refs/remotes/remote/branch-1',
+                                    remote_sha1='rsha1',
+                                ),
+                                git_changes_utils.GitRef(
+                                    local_ref='refs/branch-2',
+                                    local_sha1='sha2',
+                                    remote_ref='remote/branch-2',
+                                    remote_sha1='rsha2',
+                                ),
+                            ],
+                            'remote',
                         ),
-                        git_changes_utils.GitRef(
-                            local_ref='refs/branch-2',
-                            local_sha1='sha2',
-                            remote_ref='remote/branch-2',
-                            remote_sha1='rsha2',
-                        ),
-                    ],
-                    'remote',
-                ),
-                {'branch-1': (['A:file1', 'M:file2'], ['file1', 'file2'])},
-            )
-
-        compare_to_remote_patch.assert_called_once_with(
-            'remote', 'branch-1', 'remote/branch-1'
-        )
+                        {
+                            'branch-1': (
+                                ['A:file1', 'M:file2'],
+                                ['file1', 'file2'],
+                            )
+                        },
+                    )
+                    compare_mock.assert_called_once_with(
+                        'remote', 'branch-1', 'remote/branch-1'
+                    )
 
     def test_get_changed_files_with_no_remote_branch(self) -> None:
         def mock_get_branch() -> str:
@@ -930,32 +931,33 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             lambda: 'develop',
         )
 
-        with compare_to_remote_patch, extract_files_patch, get_branch_patch:
-            with get_upstream_remote_name_patch:
-                with get_parent_branch_name_for_diff_patch:
-                    self.assertEqual(
-                        git_changes_utils.get_changed_files(
-                            [
-                                git_changes_utils.GitRef(
-                                    local_ref='refs/heads/branch-1',
-                                    local_sha1='sha1',
-                                    remote_ref=None,
-                                    remote_sha1=None,
-                                )
-                            ],
-                            'remote',
-                        ),
-                        {
-                            'branch-1': (
-                                ['A:file1', 'M:file2'],
-                                ['file1', 'file2'],
+        with compare_to_remote_patch as compare_mock:
+            with extract_files_patch:
+                with get_branch_patch:
+                    with get_upstream_remote_name_patch:
+                        with get_parent_branch_name_for_diff_patch:
+                            self.assertEqual(
+                                git_changes_utils.get_changed_files(
+                                    [
+                                        git_changes_utils.GitRef(
+                                            local_ref='refs/heads/branch-1',
+                                            local_sha1='sha1',
+                                            remote_ref=None,
+                                            remote_sha1=None,
+                                        )
+                                    ],
+                                    'remote',
+                                ),
+                                {
+                                    'branch-1': (
+                                        ['A:file1', 'M:file2'],
+                                        ['file1', 'file2'],
+                                    )
+                                },
                             )
-                        },
-                    )
-
-        compare_to_remote_patch.assert_called_once_with(
-            'upstream', 'branch-1', 'upstream/develop'
-        )
+                            compare_mock.assert_called_once_with(
+                                'upstream', 'branch-1', 'upstream/develop'
+                            )
 
     def test_get_staged_acmrt_files(self) -> None:
         def mock_git_diff_name_status() -> List[git_changes_utils.FileDiff]:
@@ -1039,7 +1041,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with get_branch_patch, start_subprocess_for_result_patch:
+        with (
+            get_branch_patch,
+            start_subprocess_for_result_patch as subprocess_mock,
+        ):
             self.assertEqual(
                 git_changes_utils.get_refs(),
                 [
@@ -1051,10 +1056,9 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                     )
                 ],
             )
-
-        start_subprocess_for_result_patch.assert_called_once_with(
-            ['git', 'show-ref', 'branch1']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'show-ref', 'branch1']
+            )
 
     def test_get_refs_without_stdin_should_use_current_branch_raises_error(
         self,
@@ -1076,13 +1080,15 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_start_subprocess_for_result,
         )
 
-        with get_branch_patch, start_subprocess_for_result_patch:
+        with (
+            get_branch_patch,
+            start_subprocess_for_result_patch as subprocess_mock,
+        ):
             with self.assertRaisesRegex(ValueError, 'Error'):
                 git_changes_utils.get_refs()
-
-        start_subprocess_for_result_patch.assert_called_once_with(
-            ['git', 'show-ref', 'branch1']
-        )
+            subprocess_mock.assert_called_once_with(
+                ['git', 'show-ref', 'branch1']
+            )
 
     def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
         self.assertEqual(
@@ -1111,17 +1117,16 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             'exists',
             side_effect=mock_os_path_exists,
         )
-        with os_path_exists_patch:
+        with os_path_exists_patch as exists_mock:
             self.assertEqual(
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     [b'test/file1_test.py', b'test/file2.py', b'test/file3.py']
                 ),
                 set(['test.file1_test']),
             )
-
-        os_path_exists_patch.assert_any_call('test/file1_test.py')
-        os_path_exists_patch.assert_any_call('test/file2_test.py')
-        os_path_exists_patch.assert_any_call('test/file3_test.py')
+            exists_mock.assert_any_call('test/file1_test.py')
+            exists_mock.assert_any_call('test/file2_test.py')
+            exists_mock.assert_any_call('test/file3_test.py')
 
     def test_get_python_dot_test_files_from_diff_with_no_test_file(
         self,
@@ -1151,17 +1156,16 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             side_effect=mock_os_path_exists,
         )
 
-        with os_path_exists_patch:
+        with os_path_exists_patch as exists_mock:
             self.assertEqual(
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     [b'test/file1.py', b'test/file2.py', b'test/file3.py']
                 ),
                 set(['test.file1_test', 'test.file2_test']),
             )
-
-        os_path_exists_patch.assert_any_call('test/file1_test.py')
-        os_path_exists_patch.assert_any_call('test/file2_test.py')
-        os_path_exists_patch.assert_any_call('test/file3_test.py')
+            exists_mock.assert_any_call('test/file1_test.py')
+            exists_mock.assert_any_call('test/file2_test.py')
+            exists_mock.assert_any_call('test/file3_test.py')
 
     def test_get_python_dot_test_files_from_diff_with_non_existing_test_file(
         self,
@@ -1169,20 +1173,19 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
         os_path_exists_patch = mock.patch.object(
             os.path,
             'exists',
-            lambda _: False,
+            side_effect=lambda _: False,
         )
 
-        with os_path_exists_patch:
+        with os_path_exists_patch as exists_mock:
             self.assertEqual(
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     [b'test/file1.py', b'test/file2.py', b'test/file3.py']
                 ),
                 set(),
             )
-
-        os_path_exists_patch.assert_any_call('test/file1_test.py')
-        os_path_exists_patch.assert_any_call('test/file2_test.py')
-        os_path_exists_patch.assert_any_call('test/file3_test.py')
+            exists_mock.assert_any_call('test/file1_test.py')
+            exists_mock.assert_any_call('test/file2_test.py')
+            exists_mock.assert_any_call('test/file3_test.py')
 
     def test_get_changed_python_test_files(self) -> None:
         git_refs = [
@@ -1270,9 +1273,15 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_get_parent_branch_name_for_diff,
         )
 
-        with get_remote_name_patch, get_refs_patch, get_changed_files_patch:
+        with (
+            get_remote_name_patch,
+            get_refs_patch,
+            get_changed_files_patch as changed_mock,
+        ):
             with get_staged_acmrt_files_patch:
-                with get_python_dot_test_files_from_diff_patch:
+                with (
+                    get_python_dot_test_files_from_diff_patch as python_test_mock
+                ):
                     with get_parent_branch_name_for_diff_patch:
                         self.assertEqual(
                             git_changes_utils.get_changed_python_test_files(),
@@ -1282,14 +1291,18 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                                 'test.file4_test.py',
                             },
                         )
-
-        get_changed_files_patch.assert_called_once_with(git_refs, 'remote')
-        get_python_dot_test_files_from_diff_patch.assert_any_call(
-            [b'test/file1.py', b'file2.ts', b'test/file3.py']
-        )
-        get_python_dot_test_files_from_diff_patch.assert_any_call(
-            [b'test/file1.py', b'file2.ts', b'test/file3.py', b'test/file4.py']
-        )
+                        changed_mock.assert_called_once_with(git_refs, 'remote')
+                        python_test_mock.assert_any_call(
+                            [b'test/file1.py', b'file2.ts', b'test/file3.py']
+                        )
+                        python_test_mock.assert_any_call(
+                            [
+                                b'test/file1.py',
+                                b'file2.ts',
+                                b'test/file3.py',
+                                b'test/file4.py',
+                            ]
+                        )
 
     def test_get_changed_python_test_files_without_remote(self) -> None:
         def mock_get_remote_name() -> str:
@@ -1301,7 +1314,10 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             mock_get_remote_name,
         )
 
-        with get_remote_name_patch, self.assertRaisesRegex(
-            SystemExit, 'Error: No remote repository found.'
+        with (
+            get_remote_name_patch,
+            self.assertRaisesRegex(
+                SystemExit, 'Error: No remote repository found.'
+            ),
         ):
             git_changes_utils.get_changed_python_test_files()

@@ -71,22 +71,23 @@ class SetupTests(test_utils.GenericTestBase):
 
         mock_path = mock.patch.object(sys, 'path', dummy_path)
 
-        with mock_setup, mock_path, mock_open:
-            # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
-            # sys.path when we run backend tests. We use a swap as we
-            # need to remove these dirs to import setup.
-            import setup
+        with mock_setup as setup_mock:
+            with mock_path:
+                with mock_open:
+                    # Dirs defined in common.GOOGLE_CLOUD_SDK_HOME get added to
+                    # sys.path when we run backend tests. We use a swap as we
+                    # need to remove these dirs to import setup.
+                    import setup
 
-            setup.main()
-
-        mock_setup.assert_called_once_with(
-            name='oppia-beam-job',
-            version=feconf.OPPIA_VERSION,
-            description='Oppia Apache Beam package',
-            install_requires=required_packages,
-            packages=setuptools.find_packages(),
-            include_package_data=True,
-        )
+                    setup.main()
+                    setup_mock.assert_called_once_with(
+                        name='oppia-beam-job',
+                        version=feconf.OPPIA_VERSION,
+                        description='Oppia Apache Beam package',
+                        install_requires=required_packages,
+                        packages=setuptools.find_packages(),
+                        include_package_data=True,
+                    )
 
         dummy_file_object.close()
         os.remove('dummy_requirements.txt')

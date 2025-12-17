@@ -88,30 +88,28 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
-        with self.swap_api_key_secrets_return_secret:
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
                     plaintext, language_accent_code
                 )
             )
 
-        (
-            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            (
+                mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                    speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+                )
             )
-        )
-        (
-            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
-                ssml_text
+            (
+                mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                    ssml_text
+                )
             )
-        )
 
-        self.assertEqual(result_binary_data, mock_audio_data)
-        self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertIsNone(result_error)
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'AZURE_TTS_API_KEY'
-        )
+            self.assertEqual(result_binary_data, mock_audio_data)
+            self.assertEqual(result_audio_offsets, mock_word_boundaries)
+            self.assertIsNone(result_error)
+            mock_get_secret.assert_called_once_with('AZURE_TTS_API_KEY')
 
     def test_raise_exception_when_azure_api_key_is_not_set(self) -> None:
         azure_exception = self.assertRaisesRegex(
@@ -170,30 +168,28 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
-        with self.swap_api_key_secrets_return_secret:
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
                     plaintext, language_accent_code
                 )
             )
 
-        (
-            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            (
+                mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                    speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+                )
             )
-        )
-        (
-            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
-                ssml_text
+            (
+                mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                    ssml_text
+                )
             )
-        )
 
-        self.assertEqual(result_binary_data, mock_audio_data)
-        self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertIsNone(result_error)
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'AZURE_TTS_API_KEY'
-        )
+            self.assertEqual(result_binary_data, mock_audio_data)
+            self.assertEqual(result_audio_offsets, mock_word_boundaries)
+            self.assertIsNone(result_error)
+            mock_get_secret.assert_called_once_with('AZURE_TTS_API_KEY')
 
     def test_regenerate_speech_from_text_failed_for_invalid_credentials(
         self,
@@ -268,30 +264,28 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         mock_word_boundary_instance.audio_offset_list = mock_word_boundaries
         mock_word_boundary_collection.return_value = mock_word_boundary_instance
 
-        with self.swap_api_key_secrets_return_secret:
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
             result_binary_data, result_audio_offsets, result_error = (
                 azure_speech_synthesis_services.regenerate_speech_from_text(
                     plaintext, language_accent_code
                 )
             )
 
-        (
-            mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
-                speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+            (
+                mock_speech_config_instance.set_speech_synthesis_output_format.assert_called_once_with(
+                    speechsdk.SpeechSynthesisOutputFormat.Audio24Khz160KBitRateMonoMp3
+                )
             )
-        )
-        (
-            mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
-                ssml_text
+            (
+                mock_speech_synthesizer_instance.speak_ssml_async.assert_called_once_with(
+                    ssml_text
+                )
             )
-        )
 
-        self.assertEqual(result_binary_data, mock_audio_data)
-        self.assertEqual(result_audio_offsets, mock_word_boundaries)
-        self.assertEqual(result_error, error_details)
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'AZURE_TTS_API_KEY'
-        )
+            self.assertEqual(result_binary_data, mock_audio_data)
+            self.assertEqual(result_audio_offsets, mock_word_boundaries)
+            self.assertEqual(result_error, error_details)
+            mock_get_secret.assert_called_once_with('AZURE_TTS_API_KEY')
 
     def test_should_return_word_boundary_collection_correctly(self) -> None:
         word_boundary_collection = (

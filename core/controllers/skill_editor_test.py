@@ -387,12 +387,11 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_editable_skill_handler_delete_succeeds(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check that admins can delete a skill.
-        skill_has_topics_patch = mock.patch.object(
+        with mock.patch.object(
             topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [],
-        )
-        with skill_has_topics_patch:
+        ):
             self.delete_json(self.url)
         self.logout()
 
@@ -402,15 +401,13 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.CURRICULUM_ADMIN_EMAIL)
         # Check DELETE returns 400 when the skill still has associated
         # questions.
-        skill_has_questions_patch = mock.patch.object(
+        with mock.patch.object(
             skill_services, 'skill_has_associated_questions', lambda x: True
-        )
-        skill_has_topics_patch = mock.patch.object(
+        ), mock.patch.object(
             topic_fetchers,
             'get_all_skill_ids_assigned_to_some_topic',
             lambda: [],
-        )
-        with skill_has_questions_patch, skill_has_topics_patch:
+        ):
             self.delete_json(self.url, expected_status_int=400)
         self.logout()
 

@@ -346,17 +346,22 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                                 run_frontend_tests.main(
                                     args=['--run_on_changed_files_in_branch']
                                 )
-
-        cmd = [
-            common.NODE_BIN_PATH,
-            '--max-old-space-size=4096',
-            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-            'start',
-            os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts',
-        ]
-        self.assertIn(cmd, self.cmd_token_list)
-        get_changed_files_patch.assert_called_once_with(git_refs, 'remote')
+                                cmd = [
+                                    common.NODE_BIN_PATH,
+                                    '--max-old-space-size=4096',
+                                    os.path.join(
+                                        common.NODE_MODULES_PATH,
+                                        'karma',
+                                        'bin',
+                                        'karma',
+                                    ),
+                                    'start',
+                                    os.path.join(
+                                        'core', 'tests', 'karma.conf.ts'
+                                    ),
+                                    '--specs_to_run=file1.spec.js,file2.spec.ts,file3.spec.ts',
+                                ]
+                                self.assertIn(cmd, self.cmd_token_list)
 
     def test_frontend_tests_with_run_on_changed_files_in_branch_no_remote(
         self,

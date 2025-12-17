@@ -415,12 +415,6 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        feature_list_ctx = mock.patch.object(
-            feature_flag_services, 'ALL_FEATURE_FLAGS', []
-        )
-        feature_set_ctx = mock.patch.object(
-            feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([])
-        )
         swap_name_to_description_feature_stage_dict = mock.patch.object(
             feature_flag_registry,
             'FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE',
@@ -432,23 +426,26 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
             },
         )
 
-        with swap_name_to_description_feature_stage_dict:
-            with feature_list_ctx, feature_set_ctx:
-                response = self.put_json(
-                    feconf.FEATURE_FLAGS_URL,
-                    {
-                        'action': 'update_feature_flag',
-                        'feature_flag_name': 'test_feature_1',
-                        'force_enable_for_all_users': False,
-                        'rollout_percentage': 50,
-                        'user_group_ids': [],
-                    },
-                    csrf_token=csrf_token,
-                    expected_status_int=400,
-                )
-                self.assertEqual(
-                    response['error'], 'Unknown feature flag: test_feature_1.'
-                )
+        with swap_name_to_description_feature_stage_dict, mock.patch.object(
+            feature_flag_services, 'ALL_FEATURE_FLAGS', []
+        ), mock.patch.object(
+            feature_flag_services, 'ALL_FEATURES_NAMES_SET', set([])
+        ):
+            response = self.put_json(
+                feconf.FEATURE_FLAGS_URL,
+                {
+                    'action': 'update_feature_flag',
+                    'feature_flag_name': 'test_feature_1',
+                    'force_enable_for_all_users': False,
+                    'rollout_percentage': 50,
+                    'user_group_ids': [],
+                },
+                csrf_token=csrf_token,
+                expected_status_int=400,
+            )
+            self.assertEqual(
+                response['error'], 'Unknown feature flag: test_feature_1.'
+            )
 
         self.logout()
 

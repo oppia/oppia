@@ -67,7 +67,7 @@ class EmailTests(test_utils.GenericTestBase):
         html_body = 'Hi abc,<br> 😂'
         attachments = None
 
-        with self.swap_api_key_secrets_return_secret:
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
@@ -76,9 +76,7 @@ class EmailTests(test_utils.GenericTestBase):
                 html_body,
             )
 
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'MAILGUN_API_KEY'
-        )
+            mock_get_secret.assert_called_once_with('MAILGUN_API_KEY')
 
         expected_data = {
             'from': sender_email,
@@ -120,7 +118,7 @@ class EmailTests(test_utils.GenericTestBase):
         with open(file_path, 'w', encoding='utf-8') as f:
             f.write('This is a test file.')
 
-        with self.swap_api_key_secrets_return_secret:
+        with self.swap_api_key_secrets_return_secret as mock_get_secret:
             resp = mailgun_email_services.send_email_to_recipients(
                 sender_email,
                 recipient_emails,
@@ -130,9 +128,7 @@ class EmailTests(test_utils.GenericTestBase):
                 attachments=attachments,
             )
 
-        self.swap_api_key_secrets_return_secret.assert_called_once_with(
-            'MAILGUN_API_KEY'
-        )
+            mock_get_secret.assert_called_once_with('MAILGUN_API_KEY')
 
         mock_post.assert_called_once()
         _, kwargs = mock_post.call_args

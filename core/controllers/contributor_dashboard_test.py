@@ -2620,13 +2620,12 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
             side_effect=lambda _: MockStats(),
         )
 
-        with swap_get_stats:
+        with swap_get_stats as mock_get_stats:
             response = self.get_json(
                 '/contributorallstatssummaries/%s' % self.NEW_USER_USERNAME
             )
-        self.assertEqual(response, {})
-
-        swap_get_stats.assert_called_once_with(self.new_user_id)
+            self.assertEqual(response, {})
+            mock_get_stats.assert_called_once_with(self.new_user_id)
 
     def test_get_all_stats(self) -> None:
         self.login(self.OWNER_EMAIL)

@@ -1015,22 +1015,29 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'clean', side_effect=lambda: None
         )
 
-        with ensure_files_exist_patch, build_using_webpack_patch, clean_patch:
-            with modify_constants_patch, build_using_ng_patch:
-                with generate_python_package_patch:
+        with (
+            ensure_files_exist_patch,
+            build_using_webpack_patch as webpack_mock,
+            clean_patch as clean_mock,
+        ):
+            with (
+                modify_constants_patch as modify_mock,
+                build_using_ng_patch as ng_mock,
+            ):
+                with generate_python_package_patch as gen_mock:
                     build.main(args=['--prod_env'])
 
-                    build.build_using_webpack.assert_called_once_with(
+                    webpack_mock.assert_called_once_with(
                         build.WEBPACK_PROD_CONFIG
                     )
-                    build.build_using_ng.assert_called_once_with()
-                    common.modify_constants.assert_called_once_with(
+                    ng_mock.assert_called_once_with()
+                    modify_mock.assert_called_once_with(
                         prod_env=True,
                         emulator_mode=True,
                         maintenance_mode=False,
                     )
-                    build.generate_python_package.assert_called_once_with()
-                    build.clean.assert_called_once_with()
+                    gen_mock.assert_called_once_with()
+                    clean_mock.assert_called_once_with()
 
     def test_build_with_prod_source_maps(self) -> None:
         ensure_files_exist_patch = mock.patch.object(
@@ -1058,26 +1065,36 @@ class BuildTests(test_utils.GenericTestBase):
             install_third_party_libs, 'main', side_effect=lambda: None
         )
 
-        with ensure_files_exist_patch, build_using_webpack_patch:
-            with modify_constants_patch, compare_file_count_patch:
-                with clean_patch, install_python_dev_dependencies_patch:
-                    with build_using_ng_patch, install_third_party_libs_patch:
-                        build.main(args=['--prod_env', '--source_maps'])
+        with ensure_files_exist_patch:
+            with build_using_webpack_patch as webpack_mock:
+                with modify_constants_patch as modify_mock:
+                    with compare_file_count_patch:
+                        with clean_patch as clean_mock:
+                            with (
+                                install_python_dev_dependencies_patch as install_dev_mock
+                            ):
+                                with build_using_ng_patch as ng_mock:
+                                    with (
+                                        install_third_party_libs_patch as install_third_mock
+                                    ):
+                                        build.main(
+                                            args=['--prod_env', '--source_maps']
+                                        )
 
-                        build.build_using_webpack.assert_called_once_with(
-                            build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
-                        )
-                        build.build_using_ng.assert_called_once_with()
-                        common.modify_constants.assert_called_once_with(
-                            prod_env=True,
-                            emulator_mode=True,
-                            maintenance_mode=False,
-                        )
-                        build.clean.assert_called_once_with()
-                        install_python_dev_dependencies.main.assert_called_once_with(
-                            ['--uninstall']
-                        )
-                        install_third_party_libs.main.assert_called_once_with()
+                                        webpack_mock.assert_called_once_with(
+                                            build.WEBPACK_PROD_SOURCE_MAPS_CONFIG
+                                        )
+                                        ng_mock.assert_called_once_with()
+                                        modify_mock.assert_called_once_with(
+                                            prod_env=True,
+                                            emulator_mode=True,
+                                            maintenance_mode=False,
+                                        )
+                                        clean_mock.assert_called_once_with()
+                                        install_dev_mock.assert_called_once_with(
+                                            ['--uninstall']
+                                        )
+                                        install_third_mock.assert_called_once_with()
 
     def test_build_with_watcher(self) -> None:
         check_function_calls = {
@@ -1259,15 +1276,11 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_file_count', side_effect=mock_get_file_count
         )
 
-        with ng_build_patch, get_file_count_patch:
+        with ng_build_patch as ng_mock, get_file_count_patch as file_count_mock:
             build.build_using_ng()
 
-            servers.managed_ng_build.assert_called_once_with(
-                use_prod_env=True, watch_mode=False
-            )
-            build.get_file_count.assert_called_once_with(
-                'dist/oppia-angular-prod'
-            )
+            ng_mock.assert_called_once_with(use_prod_env=True, watch_mode=False)
+            file_count_mock.assert_called_once_with('dist/oppia-angular-prod')
 
     def test_build_using_ng_command_with_incorrect_filecount_fails(
         self,
@@ -1289,18 +1302,14 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_file_count', side_effect=mock_get_file_count
         )
 
-        with ng_build_patch, get_file_count_patch:
+        with ng_build_patch as ng_mock, get_file_count_patch as file_count_mock:
             with self.assertRaisesRegex(
                 AssertionError, 'angular generated bundle should be non-empty'
             ):
                 build.build_using_ng()
 
-            servers.managed_ng_build.assert_called_once_with(
-                use_prod_env=True, watch_mode=False
-            )
-            build.get_file_count.assert_called_once_with(
-                'dist/oppia-angular-prod'
-            )
+            ng_mock.assert_called_once_with(use_prod_env=True, watch_mode=False)
+            file_count_mock.assert_called_once_with('dist/oppia-angular-prod')
 
 
 class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):

@@ -342,21 +342,20 @@ class JsTsLintTests(test_utils.LinterTestBase):
                 returncode=1, stdout=mock_output.encode('utf-8'), stderr=b''
             )
 
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        popen_swap = self.swap(subprocess, 'Popen', mock_popen)
-
-        with exists_swap, popen_swap:
+        with mock.patch.object(
+            os.path, 'exists', mock_exists
+        ), mock.patch.object(subprocess, 'Popen', mock_popen):
             lint_task_report = js_ts_linter.ThirdPartyJsTsLintChecksManager(
                 [INVALID_TS_FILEPATH]
             ).perform_all_lint_checks()
 
-        expected_messages = [
-            '10:5    Something bad',
-            '11:3    Another issue',
-        ]
+            expected_messages = [
+                '10:5    Something bad',
+                '11:3    Another issue',
+            ]
 
-        self.validate(
-            lint_task_report=lint_task_report,
-            expected_messages=expected_messages,
-            failed_count=1,
-        )
+            self.validate(
+                lint_task_report=lint_task_report,
+                expected_messages=expected_messages,
+                failed_count=1,
+            )

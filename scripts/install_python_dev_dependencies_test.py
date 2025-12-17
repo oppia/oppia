@@ -74,10 +74,11 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             sys, 'base_prefix', '/home/user/.pyenv/versions/oppia'
         )
         real_prefix_manager = self.sys_real_prefix_context('')
-        environ_patch = mock.patch.object(os, 'environ', {})
         with (
             prefix_patch
-        ), base_prefix_patch, real_prefix_manager, environ_patch:
+        ), base_prefix_patch, real_prefix_manager, mock.patch.object(
+            os, 'environ', {}
+        ):
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_passes_when_in_venv_real_prefix(
@@ -92,10 +93,11 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         real_prefix_manager = self.sys_real_prefix_context(
             '/home/user/.pyenv/versions/oppia'
         )
-        environ_patch = mock.patch.object(os, 'environ', {})
         with (
             prefix_patch
-        ), base_prefix_patch, real_prefix_manager, environ_patch:
+        ), base_prefix_patch, real_prefix_manager, mock.patch.object(
+            os, 'environ', {}
+        ):
             install_python_dev_dependencies.check_python_env_is_suitable()
 
     def test_check_python_env_is_suitable_fails_when_out_of_venv(self) -> None:
@@ -106,11 +108,10 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             sys, 'base_prefix', '/home/user/.pyenv/versions/3.7.10'
         )
         real_prefix_manager = self.sys_real_prefix_context('')
-        environ_patch = mock.patch.object(os, 'environ', {})
         expected_error = 'Oppia must be developed within a virtual environment.'
         with self.assertRaisesRegex(AssertionError, expected_error):
             with prefix_patch, base_prefix_patch, real_prefix_manager:
-                with environ_patch:
+                with mock.patch.object(os, 'environ', {}):
                     (
                         install_python_dev_dependencies.check_python_env_is_suitable()
                     )
@@ -176,21 +177,20 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         ) -> None:  # pylint: disable=unused-argument
             pass
 
-        run_patch = mock.patch.object(subprocess, 'run', side_effect=mock_run)
-
-        with run_patch:
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_run
+        ) as run_patch:
             install_python_dev_dependencies.install_dev_dependencies()
-
-        run_patch.assert_called_once_with(
-            [
-                'pip-sync',
-                'requirements_dev.txt',
-                '--pip-args',
-                '--require-hashes --no-deps',
-            ],
-            check=True,
-            encoding='utf-8',
-        )
+            run_patch.assert_called_once_with(
+                [
+                    'pip-sync',
+                    'requirements_dev.txt',
+                    '--pip-args',
+                    '--require-hashes --no-deps',
+                ],
+                check=True,
+                encoding='utf-8',
+            )
 
     def test_uninstall_dev_dependencies(self) -> None:
 
@@ -199,16 +199,15 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
         ) -> None:  # pylint: disable=unused-argument
             pass
 
-        run_patch = mock.patch.object(subprocess, 'run', side_effect=mock_run)
-
-        with run_patch:
+        with mock.patch.object(
+            subprocess, 'run', side_effect=mock_run
+        ) as run_patch:
             install_python_dev_dependencies.uninstall_dev_dependencies()
-
-        run_patch.assert_called_once_with(
-            ['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],
-            check=True,
-            encoding='utf-8',
-        )
+            run_patch.assert_called_once_with(
+                ['pip', 'uninstall', '-r', 'requirements_dev.txt', '-y'],
+                check=True,
+                encoding='utf-8',
+            )
 
     def test_compile_pip_requirements_no_change(self) -> None:
 
@@ -222,43 +221,39 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 '#    pip-compile --generate-hashes\nmock file contents'
             )
 
-        run_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'run',
             side_effect=mock_run,
-        )
-        open_patch = mock.patch.object(
+        ) as run_mock, mock.patch.object(
             builtins,
             'open',
             side_effect=mock_open,
-        )
-
-        with run_patch, open_patch:
+        ) as open_mock:
             change = install_python_dev_dependencies.compile_pip_requirements(
                 'requirements_dev.in', 'requirements_dev.txt'
             )
-        self.assertFalse(change)
-
-        run_patch.assert_called_once_with(
-            [
-                'pip-compile',
-                '--no-emit-index-url',
-                '--quiet',
-                '--strip-extras',
-                '--generate-hashes',
-                'requirements_dev.in',
-                '--output-file',
-                'requirements_dev.txt',
-            ],
-            check=True,
-            encoding='utf-8',
-        )
-        open_patch.assert_any_call(
-            'requirements_dev.txt', 'r', encoding='utf-8'
-        )
-        open_patch.assert_any_call(
-            'requirements_dev.txt', 'r', encoding='utf-8'
-        )
+            self.assertFalse(change)
+            run_mock.assert_called_once_with(
+                [
+                    'pip-compile',
+                    '--no-emit-index-url',
+                    '--quiet',
+                    '--strip-extras',
+                    '--generate-hashes',
+                    'requirements_dev.in',
+                    '--output-file',
+                    'requirements_dev.txt',
+                ],
+                check=True,
+                encoding='utf-8',
+            )
+            open_mock.assert_any_call(
+                'requirements_dev.txt', 'r', encoding='utf-8'
+            )
+            open_mock.assert_any_call(
+                'requirements_dev.txt', 'r', encoding='utf-8'
+            )
 
     def test_compile_pip_requirements_change(self) -> None:
 
@@ -275,43 +270,39 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
                 f'#    pip-compile --generate-hashes\nmock file {len(counter)}'
             )
 
-        run_patch = mock.patch.object(
+        with mock.patch.object(
             subprocess,
             'run',
             side_effect=mock_run,
-        )
-        open_patch = mock.patch.object(
+        ) as run_mock, mock.patch.object(
             builtins,
             'open',
             side_effect=mock_open,
-        )
-
-        with run_patch, open_patch:
+        ) as open_mock:
             change = install_python_dev_dependencies.compile_pip_requirements(
                 'requirements_dev.in', 'requirements_dev.txt'
             )
-        self.assertTrue(change)
-
-        run_patch.assert_called_once_with(
-            [
-                'pip-compile',
-                '--no-emit-index-url',
-                '--quiet',
-                '--strip-extras',
-                '--generate-hashes',
-                'requirements_dev.in',
-                '--output-file',
-                'requirements_dev.txt',
-            ],
-            check=True,
-            encoding='utf-8',
-        )
-        open_patch.assert_any_call(
-            'requirements_dev.txt', 'r', encoding='utf-8'
-        )
-        open_patch.assert_any_call(
-            'requirements_dev.txt', 'r', encoding='utf-8'
-        )
+            self.assertTrue(change)
+            run_mock.assert_called_once_with(
+                [
+                    'pip-compile',
+                    '--no-emit-index-url',
+                    '--quiet',
+                    '--strip-extras',
+                    '--generate-hashes',
+                    'requirements_dev.in',
+                    '--output-file',
+                    'requirements_dev.txt',
+                ],
+                check=True,
+                encoding='utf-8',
+            )
+            open_mock.assert_any_call(
+                'requirements_dev.txt', 'r', encoding='utf-8'
+            )
+            open_mock.assert_any_call(
+                'requirements_dev.txt', 'r', encoding='utf-8'
+            )
 
     def test_main_passes_with_no_assert_and_no_change(self) -> None:
         def mock_func() -> None:
@@ -341,14 +332,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             side_effect=mock_func,
         )
 
-        with assert_patch, install_tools_patch, compile_patch:
-            with install_dependencies_patch:
+        with assert_patch as assert_mock, install_tools_patch as install_tools_mock, compile_patch as compile_mock:
+            with install_dependencies_patch as install_dependencies_mock:
                 install_python_dev_dependencies.main([])
-
-        assert_patch.assert_called_once()
-        install_tools_patch.assert_called_once()
-        compile_patch.assert_called_once()
-        install_dependencies_patch.assert_not_called()
+                assert_mock.assert_called_once()
+                install_tools_mock.assert_called_once()
+                compile_mock.assert_called_once()
+                install_dependencies_mock.assert_not_called()
 
     def test_main_passes_with_uninstall(self) -> None:
         def mock_compile(*_args: str) -> bool:
@@ -375,14 +365,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             side_effect=lambda: None,
         )
 
-        with assert_patch, install_tools_patch, compile_patch:
-            with uninstall_dependencies_patch:
+        with assert_patch as assert_mock, install_tools_patch as install_tools_mock, compile_patch as compile_mock:
+            with uninstall_dependencies_patch as uninstall_dependencies_mock:
                 install_python_dev_dependencies.main(['--uninstall'])
-
-        assert_patch.assert_called_once()
-        install_tools_patch.assert_called_once()
-        compile_patch.assert_called_once()
-        uninstall_dependencies_patch.assert_called_once()
+                assert_mock.assert_called_once()
+                install_tools_mock.assert_called_once()
+                compile_mock.assert_called_once()
+                uninstall_dependencies_mock.assert_called_once()
 
     def test_main_passes_with_assert_and_no_change(self) -> None:
         def mock_func() -> None:
@@ -412,14 +401,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             side_effect=mock_func,
         )
 
-        with assert_patch, install_tools_patch, compile_patch:
-            with install_dependencies_patch:
+        with assert_patch as assert_mock, install_tools_patch as install_tools_mock, compile_patch as compile_mock:
+            with install_dependencies_patch as install_dependencies_mock:
                 install_python_dev_dependencies.main(['--assert_compiled'])
-
-        assert_patch.assert_called_once()
-        install_tools_patch.assert_called_once()
-        compile_patch.assert_called_once()
-        install_dependencies_patch.assert_not_called()
+                assert_mock.assert_called_once()
+                install_tools_mock.assert_called_once()
+                compile_mock.assert_called_once()
+                install_dependencies_mock.assert_not_called()
 
     def test_main_passes_with_no_assert_and_change(self) -> None:
         def mock_func() -> None:
@@ -449,14 +437,13 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             side_effect=mock_func,
         )
 
-        with assert_patch, install_tools_patch, compile_patch:
-            with install_dependencies_patch:
+        with assert_patch as assert_mock, install_tools_patch as install_tools_mock, compile_patch as compile_mock:
+            with install_dependencies_patch as install_dependencies_mock:
                 install_python_dev_dependencies.main([])
-
-        assert_patch.assert_called_once()
-        install_tools_patch.assert_called_once()
-        compile_patch.assert_called_once()
-        install_dependencies_patch.assert_called_once()
+                assert_mock.assert_called_once()
+                install_tools_mock.assert_called_once()
+                compile_mock.assert_called_once()
+                install_dependencies_mock.assert_called_once()
 
     def test_main_fails_with_assert_and_change(self) -> None:
         def mock_func() -> None:
@@ -491,12 +478,11 @@ class InstallPythonDevDependenciesTests(test_utils.GenericTestBase):
             'requirements_dev.txt was changed'
         )
 
-        with assert_patch, install_tools_patch, compile_patch:
-            with install_dependencies_patch:
+        with assert_patch as assert_mock, install_tools_patch as install_tools_mock, compile_patch as compile_mock:
+            with install_dependencies_patch as install_dependencies_mock:
                 with self.assertRaisesRegex(RuntimeError, error_regex):
                     install_python_dev_dependencies.main(['--assert_compiled'])
-
-        assert_patch.assert_called_once()
-        install_tools_patch.assert_called_once()
-        compile_patch.assert_called_once()
-        install_dependencies_patch.assert_not_called()
+                assert_mock.assert_called_once()
+                install_tools_mock.assert_called_once()
+                compile_mock.assert_called_once()
+                install_dependencies_mock.assert_not_called()

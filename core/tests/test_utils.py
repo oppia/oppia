@@ -4625,6 +4625,15 @@ class CallCounter(FunctionWrapper):
         """
         return self._times_called
 
+    @property
+    def call_count(self) -> int:
+        """Alias for times_called property for compatibility.
+
+        Returns:
+            int. The number of times the wrapped function has been called.
+        """
+        return self._times_called
+
     # Here we use type Any because argument 'args' can accept arbitrary number
     # of function's arguments and these arguments can be of any type.
     def pre_call_hook(self, args: OrderedDict[str, Any]) -> None:
