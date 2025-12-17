@@ -105,6 +105,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
   }
 
   openConceptCard(event: MouseEvent): void {
+    event.preventDefault();
     if (this._shouldOpenRTEModal(event)) {
       return;
     }
