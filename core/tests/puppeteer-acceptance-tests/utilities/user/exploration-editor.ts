@@ -2682,39 +2682,7 @@ export class ExplorationEditor extends BaseUser {
       // any errors or success states are rendered.
       await this.waitForPageToFullyLoad();
 
-      // Wait for exploration ID element with increased timeout to handle
-      // cases where backend processing takes longer (e.g., Elasticsearch indexing).
-      try {
-        await this.page.waitForSelector(explorationIdElement, {
-          visible: true,
-          timeout: 60000,
-        });
-      } catch (error) {
-        // If timeout occurs, check for error modal before throwing.
-        const errorSavingExplorationElement = await this.page.$(
-          errorSavingExplorationModal
-        );
-        if (errorSavingExplorationElement) {
-          const errorText = await this.page.$eval(
-            errorSavingExplorationModal,
-            el => el.textContent?.trim() || ''
-          );
-          throw new Error(
-            `Publish failed with error: ${errorText}. This may be due to ` +
-              'backend issues (e.g., Elasticsearch disk space).'
-          );
-        }
-        // If no error modal found but exploration ID didn't appear,
-        // throw a more descriptive error.
-        throw new Error(
-          'Publish failed: Exploration ID did not appear after 60 seconds. ' +
-            'This may be due to backend issues (e.g., Elasticsearch disk space). ' +
-            'Original error: ' +
-            (error instanceof Error ? error.message : String(error))
-        );
-      }
-
-      // Check for error modal one more time (in case it appeared after success check).
+      // Check for error modal first.
       const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
       );
@@ -2729,11 +2697,66 @@ export class ExplorationEditor extends BaseUser {
         );
       }
 
-      const explorationIdUrl = await this.page.$eval(
-        explorationIdElement,
-        element => (element as HTMLElement).innerText
-      );
-      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      // Wait for the close button to appear, which indicates publishing succeeded.
+      // This is more reliable than waiting for the exploration ID element.
+      try {
+        await this.page.waitForSelector(closePublishedPopUpButton, {
+          visible: true,
+          timeout: 60000,
+        });
+      } catch (error) {
+        // If close button didn't appear, check for error modal again.
+        const errorElement = await this.page.$(errorSavingExplorationModal);
+        if (errorElement) {
+          const errorText = await this.page.$eval(
+            errorSavingExplorationModal,
+            el => el.textContent?.trim() || ''
+          );
+          throw new Error(
+            `Publish failed with error: ${errorText}. This may be due to ` +
+              'backend issues (e.g., Elasticsearch disk space).'
+          );
+        }
+        throw new Error(
+          'Publish failed: Close button did not appear after 60 seconds. ' +
+            'This may be due to backend issues (e.g., Elasticsearch disk space). ' +
+            'Original error: ' +
+            (error instanceof Error ? error.message : String(error))
+        );
+      }
+
+      // Try to get exploration ID from the element first.
+      let explorationId: string | null = null;
+      try {
+        const explorationIdElementHandle =
+          await this.page.$(explorationIdElement);
+        if (explorationIdElementHandle) {
+          const explorationIdUrl = await this.page.$eval(
+            explorationIdElement,
+            element => (element as HTMLElement).innerText
+          );
+          explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+        }
+      } catch (error) {
+        // If element doesn't exist or can't be read, try URL-based approach.
+        showMessage(
+          'Could not get exploration ID from element, trying URL-based approach.'
+        );
+      }
+
+      // Fallback: Get exploration ID from URL if element-based approach failed.
+      if (!explorationId) {
+        try {
+          explorationId = await this.getExplorationId();
+        } catch (error) {
+          throw new Error(
+            'Failed to get exploration ID from both element and URL. ' +
+              'Publishing may have failed. Original error: ' +
+              (error instanceof Error ? error.message : String(error))
+          );
+        }
+      }
+
       await this.waitForElementToStabilize(closePublishedPopUpButton);
       await this.clickOnElementWithSelector(closePublishedPopUpButton);
       await this.expectElementToBeVisible(closePublishedPopUpButton, false);
