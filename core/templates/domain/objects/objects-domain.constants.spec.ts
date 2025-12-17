@@ -16,7 +16,7 @@
  * @fileoverview unit tests for the units object domain constants.
  */
 
-import {create, all} from 'mathjs';
+import {all, create} from 'mathjs';
 import {getCurrencyUnits} from './number-with-units.model';
 import {ObjectsDomainConstants} from './objects-domain.constants';
 
