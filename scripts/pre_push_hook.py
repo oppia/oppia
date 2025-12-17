@@ -23,8 +23,6 @@ To bypass the validation upon `git push` use the following command:
 `git push REMOTE BRANCH --no-verify`
 
 This hook works only on Unix like systems as of now.
-On Vagrant under Windows it will still copy the hook to the .git/hooks dir
-but it will have no effect.
 """
 
 from __future__ import annotations
@@ -355,6 +353,48 @@ def main(args: Optional[List[str]] = None) -> None:
                 continue
 
             if files_to_lint:
+                # Run Black and Prettier on the changed files first so that we
+                # fail early for simple formatting errors and avoid running
+                # the heavier lint/test steps.
+                py_files = [
+                    f.decode('utf-8')
+                    for f in files_to_lint
+                    if f.endswith(b'.py')
+                ]
+                if py_files:
+                    print('Running fast Black check on changed Python files...')
+                    black_cmd = [
+                        PYTHON_CMD,
+                        '-m',
+                        'black',
+                        '--check',
+                    ] + py_files
+                    black_status = run_script_and_get_returncode(black_cmd)
+                    if black_status != 0:
+                        print(
+                            'Push failed: Black formatting issues detected. Run `python -m black <file...>` to fix.'
+                        )
+                        sys.exit(1)
+
+                js_ts_files = [
+                    f.decode('utf-8')
+                    for f in files_to_lint
+                    if f.endswith(b'.js') or f.endswith(b'.ts')
+                ]
+                if js_ts_files:
+                    print(
+                        'Running fast Prettier check on changed JS/TS files...'
+                    )
+                    prettier_cmd = ['npx', 'prettier', '--check'] + js_ts_files
+                    prettier_status = run_script_and_get_returncode(
+                        prettier_cmd
+                    )
+                    if prettier_status != 0:
+                        print(
+                            'Push failed: Prettier formatting issues detected. Run `npx prettier --write <file...>` to fix.'
+                        )
+                        sys.exit(1)
+
                 print('Running backend lint checks...')
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:

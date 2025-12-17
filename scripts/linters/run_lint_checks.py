@@ -660,6 +660,46 @@ def main(args: Optional[List[str]] = None) -> None:
     files = cast(Dict[str, List[str]], multiprocessing.Manager().dict())
     categorize_files(all_filepaths, files)
 
+    # Fast format checks: run Black and Prettier on the changed files first
+    # so we fail fast on trivial formatting issues.
+    py_files = files['.py']
+    if py_files:
+        try:
+            print('Running fast Black check on modified Python files...')
+            black_cmd = [sys.executable, '-m', 'black', '--check'] + py_files
+            subprocess.run(black_cmd, check=True)
+        except subprocess.CalledProcessError:
+            linter_utils.print_failure_message(
+                '\n'.join(
+                    [
+                        '---------------------------',
+                        'Black formatting failed for changed Python files.',
+                        'Run `python -m black <file...>` to fix.',
+                        '---------------------------',
+                    ]
+                )
+            )
+            sys.exit(1)
+
+    js_ts_files = files['.js'] + files['.ts']
+    if js_ts_files:
+        try:
+            print('Running fast Prettier check on modified JS/TS files...')
+            prettier_cmd = ['npx', 'prettier', '--check'] + js_ts_files
+            subprocess.run(prettier_cmd, check=True)
+        except subprocess.CalledProcessError:
+            linter_utils.print_failure_message(
+                '\n'.join(
+                    [
+                        '---------------------------',
+                        'Prettier formatting failed for changed JS/TS files.',
+                        'Run `npx prettier --write <file...>` to fix.',
+                        '---------------------------',
+                    ]
+                )
+            )
+            sys.exit(1)
+
     # Prepare custom tasks.
     custom_max_concurrent_runs = 25
     custom_concurrent_count = min(

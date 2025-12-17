@@ -16,6 +16,25 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: true
 jobs:
+  backend_formatter:
+    name: Backend formatting with black
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Run Black on the codebase
+        run: python -m black --check .
+      - name: Explain how to fix the issue
+        if: ${{ failure() }}
+        run: echo "Black format check failed. Run `python -m black .` to fix formatting."
+      - name: Report failure if failed on oppia/oppia develop branch
+        if: ${{ failure() && github.event_name == 'push' && github.repository == 'oppia/oppia' && github.ref == 'refs/heads/develop'}}
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Black formatting failed on the upstream develop branch."
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
   backend_lint:
     name: Backend
     runs-on: ubuntu-22.04

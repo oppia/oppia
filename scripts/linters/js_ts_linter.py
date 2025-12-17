@@ -149,7 +149,16 @@ class ThirdPartyJsTsLintChecksManager(linter_utils.BaseLinter):
         failed = False
         name = 'ESLint'
 
-        eslint_cmd_args = [node_path, eslint_path, '--quiet']
+        # Use eslint caching to speed up repeated runs.
+        cache_location = os.path.join(os.getcwd(), '.eslintcache')
+        eslint_cmd_args = [
+            node_path,
+            eslint_path,
+            '--quiet',
+            '--cache',
+            '--cache-location',
+            cache_location,
+        ]
         proc_args = eslint_cmd_args + files_to_lint
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE

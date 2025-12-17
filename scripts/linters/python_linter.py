@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import ast
 import io
+import multiprocessing
 import os
 import re
 
@@ -108,8 +109,15 @@ class ThirdPartyPythonLintChecksManager(linter_utils.BaseLinter):
             ]
 
             pylint_report = io.StringIO()
+            # Allow Pylint to use multiple jobs to speed up linting on
+            # multi-core machines. We pick a conservative number of jobs.
+            jobs = max(1, min(4, multiprocessing.cpu_count() // 2))
+            pylint_args = current_files_to_lint + [
+                config_pylint,
+                f'--jobs={jobs}',
+            ]
             pylinter = lint.Run(
-                current_files_to_lint + [config_pylint],
+                pylint_args,
                 reporter=text.TextReporter(pylint_report),
                 exit=False,
             ).linter
