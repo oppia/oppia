@@ -446,13 +446,44 @@ export class BaseUser {
   }
 
   /**
+   * Gets a human-readable description of an element for logging purposes.
+   * If a string selector is provided, returns it directly.
+   * If an ElementHandle is provided, extracts tag name and key attributes.
+   */
+  private async getElementDescription(
+    selector: string | ElementHandle<Element>
+  ): Promise<string> {
+    if (typeof selector === 'string') {
+      return selector;
+    }
+    try {
+      const description = await selector.evaluate(el => {
+        const tag = el.tagName.toLowerCase();
+        const id = el.id ? `#${el.id}` : '';
+        const classes = el.className
+          ? `.${el.className.toString().trim().split(/\s+/).join('.')}`
+          : '';
+        const text = el.textContent?.trim().slice(0, 30) || '';
+        const textSuffix = text
+          ? ` "${text}${el.textContent && el.textContent.trim().length > 30 ? '...' : ''}"`
+          : '';
+        return `<${tag}${id}${classes}>${textSuffix}`;
+      });
+      return description;
+    } catch {
+      return '<detached element>';
+    }
+  }
+
+  /**
    * This function waits for an element to be clickable either by its CSS selector or
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
     selector: string | ElementHandle<Element>
   ): Promise<void> {
-    showMessage(`Checking if element ${selector} is clickable...`);
+    const elementDesc = await this.getElementDescription(selector);
+    showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
         ? await this.page.waitForSelector(selector)
@@ -463,7 +494,7 @@ export class BaseUser {
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);
         error.message =
-          `Element with selector ${selector} took too long to be clickable.\n` +
+          `Element ${elementDesc} took too long to be clickable.\n` +
           'Original Error:\n' +
           error.message;
       }
@@ -787,10 +818,19 @@ export class BaseUser {
     showMessage(
       `Started closing broswer for ${this.username ?? 'unknown user'}.`
     );
-    // Stop the screen recorder.
+    // Stop the screen recorder with a timeout to prevent hanging.
     if (this.screenRecorder) {
       try {
-        await this.screenRecorder.stop();
+        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 30000;
+        await Promise.race([
+          this.screenRecorder.stop(),
+          new Promise((_, reject) =>
+            setTimeout(
+              () => reject(new Error('Screen recorder stop timed out')),
+              SCREEN_RECORDER_STOP_TIMEOUT_MS
+            )
+          ),
+        ]);
         showMessage(
           `Screen recording stopped for ${this.username ?? 'unknown user'}.`
         );
@@ -1727,6 +1767,7 @@ export class BaseUser {
       throw new Error('Element not found');
     }
 
+    const elementDesc = await this.getElementDescription(selector);
     let previousBox = await element.boundingBox();
     const startTime = Date.now();
 
@@ -1737,7 +1778,7 @@ export class BaseUser {
       element =
         typeof selector === 'string' ? await this.page.$(selector) : element;
       if (!element) {
-        showMessage('It seems element has detached.');
+        showMessage(`Element ${elementDesc} seems to have detached.`);
         continue;
       }
       const currentBox = await element.boundingBox();
@@ -1752,14 +1793,16 @@ export class BaseUser {
       }
 
       showMessage(
-        `Waiting for element ${selector} to stabilize...\n` +
-          `Previous Position: ${previousBox?.x?.toFixed(4)}, ${previousBox?.y?.toFixed(4)}\n` +
-          `Current Position: ${currentBox?.x?.toFixed(4)}, ${currentBox?.y?.toFixed(4)}`
+        `Waiting for element ${elementDesc} to stabilize... ` +
+          `moved from (${previousBox?.x?.toFixed(0)}, ${previousBox?.y?.toFixed(0)}) ` +
+          `to (${currentBox?.x?.toFixed(0)}, ${currentBox?.y?.toFixed(0)})`
       );
       previousBox = currentBox;
     }
 
-    showMessage(`Element ${selector} did not stabilize within ${timeout} ms`);
+    showMessage(
+      `Element ${elementDesc} did not stabilize within ${timeout} ms`
+    );
   }
 
   /**
@@ -1855,7 +1898,9 @@ export class BaseUser {
       );
       const newTabPage = await newTarget.page();
       expect(newTabPage).toBeDefined();
-      expect(newTabPage?.url()).toBe(targetPageUrl);
+      // Use startsWith instead of exact match because external sites may add
+      // query parameters (e.g., UTM params, Cloudflare challenge tokens, etc.).
+      expect(newTabPage?.url().startsWith(targetPageUrl)).toBe(true);
       await newTabPage?.close();
     } else {
       showMessage('Anchor target is the same as the current page.');
@@ -1870,8 +1915,13 @@ export class BaseUser {
    * @param {string} expectedMessage - The expected message to match the toast message against.
    */
   async expectToastMessage(expectedMessage: string): Promise<void> {
-    await this.page.waitForSelector(toastMessageSelector, {visible: true});
-    const toastMessageElement = await this.page.$(toastMessageSelector);
+    // The toast message disappears after a few seconds, so we need to process
+    // the toastMessageElement as soon as we receive it. Otherwise, the text
+    // within it may no longer be showing at the time of evaluation.
+    const toastMessageElement = await this.page.waitForSelector(
+      toastMessageSelector,
+      {visible: true}
+    );
     const toastMessage = await this.page.evaluate(
       el => el.textContent.trim(),
       toastMessageElement

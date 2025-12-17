@@ -61,6 +61,7 @@ import {
 import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {delay} from 'rxjs/operators';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockNgbModal {
   open() {
@@ -68,6 +69,12 @@ class MockNgbModal {
       result: Promise.resolve(),
     };
   }
+}
+
+class MockWindowRef {
+  nativeWindow = {
+    scrollTo: (x, y) => {},
+  };
 }
 
 class MockPlatformFeatureService {
@@ -131,6 +138,10 @@ describe('Contributions and review component', () => {
         {
           provide: MatSnackBarRef,
           useClass: MockMatSnackBarRef,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
         },
         PageContextService,
         ContributionAndReviewService,

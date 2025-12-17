@@ -27,7 +27,9 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: './custom-jest-environment.js',
   testTimeout: 300000,
-  bail: 0,
+  // Stop running tests after the first failure to avoid cascading failures
+  // and save CI time.
+  bail: 1,
   transformIgnorePatterns: ['node_modules/(?!expect/)'],
   moduleNameMapper: {
     '^expect$': 'expect/build/index.js',

@@ -34,6 +34,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core.tests import test_utils
@@ -638,6 +639,70 @@ class CommonTests(test_utils.GenericTestBase):
 
         with sleep_swap, is_port_in_use_swap, exit_swap:
             common.wait_for_port_to_be_in_use(9999)
+
+    def test_wait_for_firebase_emulator_to_be_ready_success(self) -> None:
+        class MockResponse:
+            status = 200
+
+        def mock_urlopen(
+            unused_url: str, timeout: int  # pylint: disable=unused-argument
+        ) -> MockResponse:
+            return MockResponse()
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            # Should not raise an exception.
+            common.wait_for_firebase_emulator_to_be_ready(9099)
+
+    def test_wait_for_firebase_emulator_to_be_ready_retries_on_connection_error(
+        self,
+    ) -> None:
+        attempt_count = 0
+
+        class MockResponse:
+            status = 200
+
+        def mock_urlopen(
+            unused_url: str, timeout: int  # pylint: disable=unused-argument
+        ) -> MockResponse:
+            nonlocal attempt_count
+            attempt_count += 1
+            if attempt_count < 3:
+                raise urlerror.URLError('Connection refused')
+            return MockResponse()
+
+        def mock_sleep(unused_seconds: int) -> None:
+            pass
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+
+        with urlopen_swap, sleep_swap:
+            common.wait_for_firebase_emulator_to_be_ready(9099)
+
+        self.assertEqual(attempt_count, 3)
+
+    def test_wait_for_firebase_emulator_to_be_ready_timeout(self) -> None:
+        def mock_urlopen(
+            unused_url: str, timeout: int  # pylint: disable=unused-argument
+        ) -> NoReturn:
+            raise urlerror.URLError('Connection refused')
+
+        def mock_sleep(unused_seconds: int) -> None:
+            pass
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+
+        with urlopen_swap, sleep_swap:
+            with self.assertRaisesRegex(
+                Exception,
+                'Firebase Auth emulator failed to become ready on port 9099',
+            ):
+                common.wait_for_firebase_emulator_to_be_ready(
+                    9099, timeout_secs=5
+                )
 
     def test_permissions_of_file(self) -> None:
         root_temp_dir = tempfile.mkdtemp()
