@@ -132,6 +132,26 @@ describe('Story Viewer Page component', () => {
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve(UserInfo.createFromBackendDict(UserInfoObject))
     );
+    // Mock fetchTopicDataAsync for all tests since ngOnInit calls it
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(
+        ReadOnlyTopic.createFromBackendDict({
+          subtopics: [],
+          skill_descriptions: {},
+          uncategorized_skill_ids: [],
+          degrees_of_mastery: {},
+          canonical_story_dicts: [],
+          additional_story_dicts: [],
+          topic_name: 'Topic Name',
+          topic_id: 'topic_id',
+          topic_description: 'Topic Description',
+          practice_tab_is_displayed: true,
+          meta_tag_content: 'meta tag content',
+          page_title_fragment_for_web: 'topic',
+          classroom_name: 'Math',
+        })
+      )
+    );
   });
 
   beforeEach(() => {
@@ -681,7 +701,17 @@ describe('Story Viewer Page component', () => {
 
   it('should generate correct classroom URL', () => {
     component.classroomUrlFragment = 'math';
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue('/learn/math');
     expect(component.getClassroomUrl()).toBe('/learn/math');
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
+      '/learn/<classroom>',
+      {classroom: 'math'}
+    );
+  });
+
+  it('should return default URL when classroom fragment is null', () => {
+    component.classroomUrlFragment = null;
+    expect(component.getClassroomUrl()).toBe('/learn');
   });
 
   it('should fetch and set classroom name on initialization', fakeAsync(() => {
