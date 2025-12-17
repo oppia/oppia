@@ -222,10 +222,9 @@ def _get_linters_for_file_extension(
     custom_linters.append(custom_linter)
 
     if file_extension_type_js_ts:
-        js_ts_lint_check_manager, third_party_js_ts_linter = (
-            js_ts_linter.get_linters(files['.js'], files['.ts'], file_cache)
+        third_party_js_ts_linter, _ = js_ts_linter.get_linters(
+            files['.js'], files['.ts']
         )
-        custom_linters.append(js_ts_lint_check_manager)
         third_party_linters.append(third_party_js_ts_linter)
 
     elif file_extension_to_lint == 'html':
