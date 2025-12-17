@@ -72,10 +72,19 @@ const removeFromPlayLaterButtonSelector = '.e2e-test-remove-from-playlist-btn';
 const confirmRemovalFromPlayLaterButton =
   '.e2e-test-confirm-delete-interaction';
 const playLaterSectionSelector = '.e2e-test-play-later-section';
+const communityLessonToggleButton = '.e2e-test-toggle-community-lesson-button';
+const communityLessonChevronUp =
+  '.e2e-test-toggle-community-lesson-button .fa-chevron-up';
+const communityLessonChevronDown =
+  '.e2e-test-toggle-community-lesson-button .fa-chevron-down';
+const communityLessonsExpanded =
+  '.e2e-test-card-display-content.card-display-content-shown';
+const communityLessonsCollapsed =
+  '.e2e-test-card-display-content.card-display-content-hidden';
 const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
-const mobileProgressSectionButton = '.e2e-test-mobile-progress-section';
+const progressSectionSelector = '.e2e-test-progress-section';
 const addProfilePictureButton = '.e2e-test-photo-upload-submit';
 const cancelProfileUploadButtonSelector = '.e2e-test-photo-upload-cancel';
 const editProfilePictureButton = '.e2e-test-photo-clickable';
@@ -110,8 +119,6 @@ const desktopCompletedLessonsSectionSelector =
   '.e2e-test-completed-community-lessons-section';
 const lessonTileTitleSelector =
   '.e2e-test-topic-name-in-learner-story-summary-tile';
-const progressSectionSelector = '.e2e-test-progress-section';
-const mobileGoalsSectionSelector = '.e2e-test-mobile-goals-section';
 const goalsSectionSelector = '.e2e-test-goals-section';
 const homeSectionSelector = '.e2e-test-home-section';
 const mobileHomeSectionSelector = '.e2e-test-mobile-home-section';
@@ -216,6 +223,7 @@ const goalTitleSelector = '.e2e-test-goal-title';
 const startGoalButtonSelector = '.e2e-test-start-lesson-button';
 const emptyProgressSectionContainerSelector =
   '.e2e-test-empty-progress-section';
+const emptyProgressSectionMessage = '.e2e-test-empty-progress-message';
 
 // Learner Dashboard > Home Tab Seclectors.
 const hometabSectionHeadingSelector =
@@ -230,8 +238,42 @@ const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
-const learnSomethingNewSectionSelector =
-  '.e2e-test-learn-something-new-section';
+const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const classroomButtonOnRedesignedLearnerDashboard =
+  '.e2e-test-learner-dash-classroom-button';
+const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
+const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
+const learnerDashSelectors: Record<string, Record<string, string>> = {
+  tabSection: {
+    content: '.e2e-test-learner-dash-section',
+    heading: '.e2e-test-learner-dash-section-heading',
+  },
+  cardDisplay: {
+    content: '.e2e-test-card-display',
+    heading: '.e2e-test-card-display-heading',
+  },
+  topicCard: {
+    content: '.e2e-test-learner-topic-summary-tile',
+    heading: '.e2e-test-learner-topic-summary-tile-title',
+  },
+  lessonCard: {
+    content: '.e2e-test-redesigned-lesson-card-container',
+    heading: '.e2e-test-lesson-card-title',
+    button: '.e2e-test-resume-lesson-btn',
+    progress: '.e2e-test-progress-lesson',
+  },
+  skillCard: {
+    content: '.e2e-test-skill-card',
+    heading: '.e2e-test-skill-card-title',
+    button: '.e2e-test-skill-button',
+    progress: '.e2e-test-progress-skill',
+  },
+};
+const tabSelectorMap: Record<string, string> = {
+  Home: '.e2e-test-home-section',
+  Goals: '.e2e-test-goals-section',
+  Progress: '.e2e-test-progress-section',
+};
 
 // Learner Dashboard > Progress section selectors.
 const completedLessonsSectionSelector =
@@ -420,8 +462,8 @@ export class LoggedInUser extends BaseUser {
   async navigateToCommunityLessonsSection(): Promise<void> {
     await this.waitForPageToFullyLoad();
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOnElementWithSelector(mobileProgressSectionButton);
+      await this.page.waitForSelector(progressSectionSelector);
+      await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -430,7 +472,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(progressSectionSelector);
         } else {
           throw error;
         }
@@ -516,8 +558,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToProgressSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileProgressSectionButton);
-      await this.clickOnElementWithSelector(mobileProgressSectionButton);
+      await this.page.waitForSelector(progressSectionSelector);
+      await this.clickOnElementWithSelector(progressSectionSelector);
 
       try {
         await this.page.waitForSelector(mobileCommunityLessonSectionButton, {
@@ -526,7 +568,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileProgressSectionButton);
+          await this.clickOnElementWithSelector(progressSectionSelector);
         } else {
           throw error;
         }
@@ -595,8 +637,8 @@ export class LoggedInUser extends BaseUser {
    */
   async navigateToGoalsSection(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileGoalsSectionSelector);
-      await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
+      await this.page.waitForSelector(goalsSectionSelector);
+      await this.clickOnElementWithSelector(goalsSectionSelector);
 
       try {
         await this.page.waitForSelector(currentGoalsSectionSelector, {
@@ -605,7 +647,7 @@ export class LoggedInUser extends BaseUser {
       } catch (error) {
         if (error instanceof puppeteer.errors.TimeoutError) {
           // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(mobileGoalsSectionSelector);
+          await this.clickOnElementWithSelector(goalsSectionSelector);
         } else {
           throw error;
         }
@@ -1886,6 +1928,96 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies elements' existence on Redesigned Learner Dashboard(learnerDashSelectors).
+   * @param {string[]} expectedTexts - Text content expected in elements.
+   * @param {string} selector - Selector type.
+   * @param {ParentNode} root - Page or element type we're verifying.
+   */
+  async expectElementsToBePresentInRLD(
+    expectedTexts: string[],
+    selector: string,
+    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
+  ): Promise<void> {
+    await this.page.waitForSelector(learnerDashSelectors[selector].heading);
+
+    const allElements =
+      (await root?.$$(learnerDashSelectors[selector].heading)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
+    if (!sectionHeadingTexts.every(text => expectedTexts.includes(text))) {
+      throw new Error(
+        `Expected elements not found: ${expectedTexts.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
+    }
+    showMessage(`Expected elements found: ${expectedTexts.join(', ')}`);
+  }
+
+  /**
+   * Verifies that elements with the given texts DO NOT exist (or are not visible)
+   * for the given selector group of Learner Dashboard (learnerDashSelectors).
+   *
+   * @param expectedTexts - Texts that must NOT appear in the matched elements.
+   * @param selector - Selector type..
+   * @param root - Page or element type we're verifying.
+   */
+  async expectElementsNotToBePresentInRLD(
+    expectedTexts: string[],
+    selectorKey: string,
+    root: puppeteer.Page | puppeteer.ElementHandle | undefined = this.page
+  ): Promise<void> {
+    const selectors = learnerDashSelectors[selectorKey];
+    const headingSelector = selectors.heading;
+    const allElements = (await root?.$$(headingSelector)) ?? [];
+
+    const sectionHeadingTexts: string[] = [];
+    for (const el of allElements) {
+      const isHidden = await el.evaluate(node => {
+        const style = window.getComputedStyle(node as HTMLElement);
+        return style.display === 'none' || style.visibility === 'hidden';
+      });
+      if (isHidden) {
+        continue;
+      }
+
+      const text = await el.evaluate(e => (e.textContent || '').trim());
+      if (text) {
+        sectionHeadingTexts.push(text);
+      }
+    }
+
+    const foundUnexpected = expectedTexts.filter(text =>
+      sectionHeadingTexts.includes(text)
+    );
+
+    if (foundUnexpected.length > 0) {
+      throw new Error(
+        `Unexpected elements found: ${foundUnexpected.join(
+          ', '
+        )} sectionHeadingTexts: ${sectionHeadingTexts.join(', ')}`
+      );
+    }
+
+    showMessage(`Confirmed elements not present: ${expectedTexts.join(', ')}`);
+  }
+
+  /**
    * Adds goals from the goals section in the learner dashboard.
    * @param {string[]} goals - The goals to add.
    */
@@ -3162,6 +3294,379 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Verifies that the desktop sidebar is visible and the given tab is active.
+   * @param {('Home' | 'Goals' | 'Progress')} activeTab - The tab that should be active.
+   */
+  async expectSidebarTabToBeActiveAndContainButtonsInOrder(
+    activeTab: 'Home' | 'Goals' | 'Progress'
+  ): Promise<void> {
+    await this.page.waitForSelector(sidebarSelector, {visible: true});
+
+    await this.isElementVisible(sidebarSelectorPic, true);
+    const buttonTexts = await this.page.$$eval(
+      `${sidebarSelector} .oppia-learner-dash-sidebar_btn`,
+      els => els.map(el => el.textContent?.trim() || '')
+    );
+
+    expect(buttonTexts).toHaveLength(3);
+    expect(buttonTexts[0]).toBe('Home');
+    expect(buttonTexts[1]).toBe('Goals');
+    expect(buttonTexts[2]).toBe('Progress');
+
+    const activeSelector = `${sidebarSelector} ${tabSelectorMap[activeTab]}`;
+
+    const isActive = await this.page.$eval(activeSelector, el =>
+      el.classList.contains('oppia-learner-dash-sidebar_btn--active')
+    );
+
+    expect(isActive).toBe(true);
+  }
+
+  /**
+   * Navigate to any classroom using button in topics available in classroom section.
+   * Currently there is only math.
+   * @param {string} classroom - Classroom.
+   */
+  async navigateToClassroomFromLearnerDashboard(
+    classroom: string
+  ): Promise<void> {
+    await this.isElementVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
+      true
+    );
+    let targetHref = '';
+    const allClassroomButtonElements = await this.page.$$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    for (const buttonElement of allClassroomButtonElements) {
+      const buttonHref = await buttonElement.evaluate(ele =>
+        ele.getAttribute('href')
+      );
+      if (buttonHref?.includes(classroom)) {
+        targetHref = buttonHref;
+        await buttonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+        break;
+      }
+    }
+    if (!targetHref) {
+      throw new Error(`${classroom} is not a valid classroom`);
+    }
+  }
+
+  /**
+   * Navigate directly to topic in math classroom using topic card.
+   * @param {string} topic - Classroom topic.
+   */
+  async navigateToTopicPageByCard(topic: string): Promise<void> {
+    await this.page.waitForFunction(
+      (c: string) => {
+        return Array.from(document.querySelectorAll(c))
+          .map(h => h.textContent?.trim())
+          .includes("Topics available in Oppia's Classroom");
+      },
+      {},
+      learnerDashSelectors.cardDisplay.heading
+    );
+
+    const topicsAvailableInClassroomElement =
+      await this.findChildElementInParent(
+        this.page,
+        learnerDashSelectors.cardDisplay,
+        "Topics available in Oppia's Classroom"
+      );
+
+    const topicCardElement = await this.findChildElementInParent(
+      topicsAvailableInClassroomElement,
+      learnerDashSelectors.topicCard,
+      topic
+    );
+
+    if (topicCardElement) {
+      await topicCardElement.click();
+      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+    } else {
+      throw new Error(`${topic} is not a valid topic`);
+    }
+  }
+
+  /**
+   * Gets subsection element based on title. We need to differentiate parent elements
+   * in progress tab because the subsections are titled the same.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} section - Overarching section.
+   */
+  async findSubsectionElementBasedOnTitle(
+    criteria: string,
+    section: string = 'N/A'
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let sectionElement: puppeteer.Page | puppeteer.ElementHandle | undefined =
+      this.page;
+    if (section === 'In Progress' || section === 'Completed') {
+      try {
+        sectionElement = await this.findChildElementInParent(
+          this.page,
+          learnerDashSelectors.tabSection,
+          section
+        );
+      } catch (e) {
+        showMessage(
+          `Section "${section}" not found with tabSection; falling back to page.`
+        );
+        sectionElement = this.page;
+      }
+    }
+
+    const subsectionElement = await this.findChildElementInParent(
+      sectionElement,
+      learnerDashSelectors.cardDisplay,
+      criteria
+    );
+
+    return subsectionElement;
+  }
+
+  /**
+   * Verifies lesson card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectLessonCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    progress: number,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresentInRLD(
+      expectedTitles,
+      'lessonCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const lessonCardElement = await this.findChildElementInParent(
+        subsectionElement,
+        learnerDashSelectors.lessonCard,
+        title
+      );
+      if (!lessonCardElement) {
+        throw new Error(`Lesson card with title "${title}" was not found.`);
+      }
+
+      const progressText = await lessonCardElement.$eval(
+        learnerDashSelectors.lessonCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
+  }
+
+  /**
+   * Verifies Skill card titles and their progress inside a subsection.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string[]} expectedTitles - Lesson card titles expected.
+   *  @param {number} progress - Expected numeric progress (e.g. 20 for 20%).
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async expectSkillCardProgressToBe(
+    criteria: string,
+    expectedTitles: string[],
+    progress: number,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    await this.expectElementsToBePresentInRLD(
+      expectedTitles,
+      'skillCard',
+      subsectionElement
+    );
+
+    for (const title of expectedTitles) {
+      const skillCardElement = await this.findChildElementInParent(
+        subsectionElement,
+        learnerDashSelectors.skillCard,
+        title
+      );
+      if (!skillCardElement) {
+        throw new Error(`Skill card with title "${title}" was not found.`);
+      }
+
+      const progressText = await skillCardElement.$eval(
+        learnerDashSelectors.skillCard.progress,
+        el => el.textContent?.trim() || ''
+      );
+
+      const match = progressText.match(/\d+/);
+      const numericProgress = match ? parseInt(match[0], 10) : NaN;
+
+      expect(numericProgress).toBe(progress);
+    }
+  }
+  /**
+   * Verifies that "Display More" button on Community Lessons is Visible
+   */
+  async expectDisplayMoreCommunityLessonsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(communityLessonToggleButton, true);
+  }
+
+  /**
+   * Verifies that the Display more button is not toggeled and currently is not Expanded.
+   */
+  async expectCommunityLessonsExpanded(): Promise<void> {
+    await this.expectElementToBeVisible(communityLessonsExpanded, true);
+    await this.expectElementToBeVisible(communityLessonChevronUp, true);
+  }
+  /**
+   * Verifies that the Display more button is toggeled and currently is Expanded.
+   */
+  async expectCommunityLessonsCollapsed(): Promise<void> {
+    await this.expectElementToBeVisible(communityLessonsCollapsed, true);
+    await this.expectElementToBeVisible(communityLessonChevronDown, true);
+  }
+
+  /**
+   * Toggle the "Display More" button on Community Lessons
+   */
+  async toggleDisplayMoreCommunityLessons(): Promise<void> {
+    await this.expectDisplayMoreCommunityLessonsToBeVisible();
+    const buttonElement = await this.page.$(communityLessonToggleButton);
+    if (!buttonElement) {
+      throw new Error('Display More button not found.');
+    }
+    await this.waitForElementToBeClickable(buttonElement);
+    await buttonElement.click();
+  }
+
+  /**
+   * Verifies user is on correct lesson page.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} lessonId - Lesson card id expected.
+   */
+  async expectToBeOnLessonPage(
+    lessonTitle: string,
+    lessonId: string
+  ): Promise<void> {
+    expect(`/explore/${lessonId}`.toLowerCase()).toBe(
+      new URL(this.page.url()).pathname.toLowerCase()
+    );
+    showMessage(`Navigated to ${lessonTitle}`);
+  }
+
+  /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} lessonTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToLessonByCard(
+    criteria: string,
+    lessonTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    const lessonCardElement = await this.findChildElementInParent(
+      subsectionElement,
+      learnerDashSelectors.lessonCard,
+      lessonTitle
+    );
+
+    if (lessonCardElement) {
+      const lessonCardButtonElement = await lessonCardElement.$(
+        learnerDashSelectors.lessonCard.button
+      );
+      if (lessonCardButtonElement) {
+        await lessonCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      }
+    } else {
+      throw new Error(
+        `${lessonTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
+    }
+  }
+
+  /**
+   * Navigates to lesson using lesson card.
+   * @param {string} criteria - Subsection title value to match.
+   * @param {string} skillTitle - Lesson card title expected.
+   * @param {string} section - Overarching section, only needed to differentiate same title subsections in progress tab.
+   */
+  async navigateToSkillByCard(
+    criteria: string,
+    skillTitle: string,
+    section: string = 'N/A'
+  ): Promise<void> {
+    const subsectionElement = await this.findSubsectionElementBasedOnTitle(
+      criteria,
+      section
+    );
+
+    const skillCardElement = await this.findChildElementInParent(
+      subsectionElement,
+      learnerDashSelectors.skillCard,
+      skillTitle
+    );
+
+    if (skillCardElement) {
+      const skillCardButtonElement = await skillCardElement.$(
+        learnerDashSelectors.skillCard.button
+      );
+      if (skillCardButtonElement) {
+        await skillCardButtonElement.click();
+        await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      }
+    } else {
+      throw new Error(
+        `${skillTitle} is not a valid lesson in ${criteria} of ${section} section`
+      );
+    }
+  }
+
+  /**
+   * Function to verify the Or Explore All Lessons in Classroom section in the redesigned learner dashboard is present or not.
+   * @param {boolean} visible - Whether the section should be visible or not.
+   */
+  async expectClassroomButtonOnRedesignedLearnerDashboardToBePresent(
+    visible: boolean = true
+  ): Promise<void> {
+    await this.expectElementToBeVisible(
+      classroomButtonOnRedesignedLearnerDashboard,
+      visible
+    );
+  }
+
+  /**
+   * Function to click on the Or Explore All Lessons in Classroom section in the redesigned learner dashboard
+   */
+  async navigateThroughClassroomButtonOnRLD(): Promise<void> {
+    const goToClassroomButton = await this.page.$(
+      classroomButtonOnRedesignedLearnerDashboard
+    );
+    await goToClassroomButton?.click();
+    await this.waitForNetworkIdle();
+    await this.waitForPageToFullyLoad();
+  }
+
+  /**
    * Function to verify that a specific chapter is present in the Learn Something New section.
    * @param {string} chapterTitle - The title of the chapter to verify.
    */
@@ -3340,6 +3845,12 @@ export class LoggedInUser extends BaseUser {
    */
   async expectProgressSectionToBeEmptyInNewLD(): Promise<void> {
     await this.expectElementToBeVisible(emptyProgressSectionContainerSelector);
+    const expectedMessage =
+      "It looks like you don't have any lessons in progress or completed. Head over to Oppia's Classroom to start your first lesson!";
+    await this.expectTextContentToBe(
+      emptyProgressSectionMessage,
+      expectedMessage
+    );
   }
 
   /**
