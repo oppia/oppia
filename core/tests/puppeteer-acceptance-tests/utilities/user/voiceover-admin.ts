@@ -148,6 +148,30 @@ export class VoiceoverAdmin extends BaseUser {
   }
 
   /**
+   * Function to dismiss welcome modal if it is present. This is useful when
+   * the modal may or may not appear due to race conditions or when it has
+   * already been dismissed earlier in the test flow.
+   */
+  async dismissWelcomeModalIfPresent(): Promise<void> {
+    const MODAL_CHECK_TIMEOUT_MS = 2000;
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: MODAL_CHECK_TIMEOUT_MS,
+      });
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+      showMessage('Tutorial pop-up was present and has been closed.');
+    } catch {
+      // Modal is not present, which is fine - it may have already been
+      // dismissed or not appeared yet.
+      showMessage('Tutorial pop-up was not present, continuing.');
+    }
+  }
+
+  /**
    * Function to navigate to exploration editor.
    * @param explorationUrl - url of the exploration.
    */

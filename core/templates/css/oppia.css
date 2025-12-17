@@ -292,29 +292,102 @@ html {
   */
   font-size: 62.5%;
   height: 100%;
+  /* 
+    Added this line because Bootstrap 5 added smooth scroll default behavior.
+    Reference: https://katalon-inc.my.site.com/support/article/Test-case-failures-due-to-auto-scrolling-in-Bootstrap-5-and-how-to-fix 
+  */
+  scroll-behavior: auto !important;
+}
+/* Override Bootstrap 5's .row rule */
+.container {
+  max-width: 1140px !important;
 }
 
+.row > * {
+  margin-top: revert;
+  padding-left: revert;
+  padding-right: revert;
+}
+
+.row button {
+  width: auto;
+}
+
+.btn-close {
+  color: #000;
+  float: right;
+  height: auto;
+  opacity: 0.7;
+  width: auto;
+}
+button.btn-close {
+  -webkit-appearance: none;
+  border: 0;
+  cursor: pointer;
+  padding: 5px;
+}
+.modal-header .btn-close {
+  height: 5px;
+  margin-top: -2px;
+  width: 3px;
+}
+.modal-footer {
+  flex-wrap: unset;
+}
 body {
   background-color: #e8e7e3;
   color: rgba(0,0,0,0.87);
   font-family: "Roboto", Arial, sans-serif;
   /*
-    A font-size of 1.6em sets the default font-size on Oppia to 16px, though
-    this will scale depending on the user's font-size preferences set via
-    their browser preferences.
+  A font-size of 1.6em sets the default font-size on Oppia to 16px, though
+  this will scale depending on the user's font-size preferences set via
+  their browser preferences.
   */
   font-size: 1.6em;
   height: 100%;
   margin: 0 auto;
   overflow-x: hidden;
   padding: 0;
+  /* 
+   Match Bootstrap 4 default body alignment ensures text starts left-aligned
+   instead of relying on --bs-body-text-align in Bootstrap 5 
+  */
+  text-align: left;
   width: 100%;
+}
+
+.carousel-indicators {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.carousel-indicators li {
+  margin: 0 3px;
 }
 
 legend {
   border-bottom: 1px solid #e5e5e5;
   font-size: 21px;
   margin-bottom: 20px;
+}
+
+/*
+In Bootstrap 5, <select> elements use .form-select instead of .form-control.
+This separates select styling from input/textarea styling, 
+ensuring proper spacing, custom dropdown arrow, and consistent appearance 
+across browsers. Use .form-select for all <select> fields.
+*/
+.form-select {
+  font-size: 14px;
+  min-height: 35px;
+  padding: 6px 12px 6px 12px;
 }
 
 .form-control {
@@ -327,7 +400,7 @@ legend {
   width: 100% !important;
 }
 
-.form-group select {
+.mb-3 select {
   margin-right: 5px;
 }
 
@@ -460,6 +533,7 @@ h3 {
 a {
   color: #0844aa;
   cursor: pointer;
+  text-decoration: none
 }
 
 a:hover {
@@ -541,7 +615,7 @@ p:last-child {
   color: inherit;
   text-decoration: none;
 }
-.open > a {
+.show > a {
   outline: 0;
 }
 
@@ -577,7 +651,7 @@ p:last-child {
   text-decoration: none;
 }
 
-.oppia-navbar-nav .open > a {
+.oppia-navbar-nav .show > a {
   background-color: #fff;
   color: #009688;
 }
@@ -644,13 +718,13 @@ p:last-child {
 .label, .badge {
   margin: auto 4px;
 }
-.label-default, .badge-default {
+.label-default, .bg-secondary {
   background-color: #888;
 }
-.label-info, .badge-info {
+.label-info, .bg-info {
   background-color: #18447e;
 }
-.label-success, .badge-success {
+.label-success, .bg-success {
   background-color: #009688;
 }
 
@@ -757,7 +831,13 @@ textarea {
 .nav-link {
   display: block;
   font-size: 14px;
+  padding: 0.5rem 1rem;
   position: relative;
+}
+.nav-tabs .nav-link {
+  background-color: #e9ecef;
+  border: 1px solid #dee2e6;
+  border-bottom-color: transparent;
 }
 .oppia-navbar-nav > .nav-link {
   padding: 10px 5px;
@@ -844,15 +924,18 @@ textarea {
   padding: 5px 0;
 }
 
-.open > .dropdown-menu {
+.show > .dropdown-menu {
   display: block;
 }
 
-.float-right > .dropdown-menu {
+.float-end > .dropdown-menu {
   left: auto;
   right: 0;
 }
 
+.dropdown-item {
+  color: var(--bs-dropdown-link-color) !important;
+}
 .dropdown-item.active, .dropdown-item:active {
   background-color: transparent;
 }
@@ -1002,7 +1085,7 @@ textarea {
     margin-left: 5px;
     margin-top: 0;
   }
-  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-end {
     display: flex;
     flex-direction: row;
     float: right;
@@ -1010,7 +1093,7 @@ textarea {
   }
 }
 @media (min-width: 767px) and (max-width: 992px) {
-  ul.nav.navbar-nav.oppia-navbar-nav.float-right {
+  ul.nav.navbar-nav.oppia-navbar-nav.float-end {
     display: flex;
     flex-direction: row;
     float: right;
@@ -1663,8 +1746,10 @@ pre.oppia-pre-wrapped-text {
 
 .toast {
   background-color: #f89406;
+  display: block !important;
   font-size: 16px;
   max-width: 550px;
+  transition: none !important;
 }
 
 .toast-success {
@@ -2200,11 +2285,12 @@ oppia-parameter {
   margin-top: 18.7px;
 }
 .modal-header {
+  align-items: unset;
   border-bottom: 1px solid #e5e5e5;
+  justify-content: space-between;
   min-height: 16.42857143px;
   padding: 15px;
 }
-
 .fade.in {
   opacity: 1;
 }
@@ -2517,7 +2603,7 @@ div#ng-curtain {
   padding: 7px 5px 0 5px;
   position: absolute;
   right: 15px;
-  top: 28px;
+  top: 27%;
   width: 100%;
 }
 .oppia-editor-sidebar ngb-accordion .card {
@@ -2619,7 +2705,7 @@ div#ng-curtain {
   border-left-color: #fff;
 }
 
-.oppia-dropdown-submenu.float-left {
+.oppia-dropdown-submenu.float-start {
   float: none;
 }
 
@@ -2768,7 +2854,7 @@ mat-card.preview-conversation-skin-supplemental-card {
   max-width: 560px;
 }
 
-.oppia-settings-container .form-group > label {
+.oppia-settings-container .mb-3 > label {
   padding-left: 0;
   padding-right: 0;
 }
@@ -2822,7 +2908,13 @@ mat-card.preview-conversation-skin-supplemental-card {
 
 .oppia-modal-lesson-information-card .modal-dialog .modal-content {
   border-radius: 4px;
+  height: 600px;
   min-width: 270px;
+  overflow-y: scroll;
+}
+
+.oppia-modal-lesson-information-card .modal-dialog .modal-content::-webkit-scrollbar {
+  display: none;
 }
 
 .oppia-modal-lesson-information-card .modal-dialog .modal-content .mat-card {
