@@ -701,14 +701,14 @@ describe('Story Viewer Page component', () => {
 
   it('should generate correct classroom URL', () => {
     component.classroomUrlFragment = 'math';
-    const urlSpy = spyOn(
-      urlInterpolationService,
-      'interpolateUrl'
-    ).and.returnValue('/learn/math');
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/learn/math'
+    );
     expect(component.getClassroomUrl()).toBe('/learn/math');
-    expect(urlSpy).toHaveBeenCalledWith('/learn/<classroom>', {
-      classroom: 'math',
-    });
+    expect(urlInterpolationService.interpolateUrl).toHaveBeenCalledWith(
+      '/learn/<classroom>',
+      {classroom: 'math'}
+    );
   });
 
   it('should return default URL when classroom fragment is null', () => {
