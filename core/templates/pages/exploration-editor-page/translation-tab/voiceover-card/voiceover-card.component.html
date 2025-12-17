@@ -30,7 +30,7 @@
         </mat-progress-bar>
 
         <span class="voiceover-timer">
-          {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
+          {{roundedManualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
 
         <div class="voiceover-action-buttons">
@@ -84,7 +84,7 @@
                             class="voiceover-progress">
           </mat-progress-bar>
           <span class="voiceover-timer">
-            {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
+            {{roundedAutomaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
           </span>
           <div class="voiceover-action-buttons">
             <button (click)="generateVoiceover()"
@@ -200,16 +200,16 @@
     border: none;
     border-radius: 20px;
     color: #fff;
-    height: 35px;
-    width: 35px;
+    height: 40px;
+    width: 40px;
   }
   .does-not-needs-update-button-icon {
     background-color: #009688;
     border: none;
     border-radius: 20px;
     color: #fff;
-    height: 35px;
-    width: 35px;
+    height: 40px;
+    width: 40px;
   }
   .language-accent-selector {
     width: 350px;
@@ -281,17 +281,16 @@
     border: none;
     border-radius: 20px;
     color: #fff;
-    height: 35px;
-    margin-left: 10px;
-    width: 35px;
+    height: 40px;
+    width: 40px;
   }
   .regenerate-voiceover-button {
     background-color: #009688;
     border: none;
     border-radius: 20px;
     color: #fff;
-    height: 35px;
-    width: 35px;
+    height: 40px;
+    width: 40px;
   }
   .regenerate-voiceover-button:disabled {
     background-color: #a1c5c3;
