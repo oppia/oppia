@@ -91,3 +91,20 @@ oppia-story-viewer-page.oppia-login-or-signup-text {
     display: block;
   }
 }
+
+.oppia-story-viewer-back-to-classroom {
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.oppia-story-viewer-back-to-classroom .back-link {
+  color: #00645c;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.oppia-story-viewer-back-to-classroom .back-link:hover {
+  color: #0844aa;
+  text-decoration: underline;
+}

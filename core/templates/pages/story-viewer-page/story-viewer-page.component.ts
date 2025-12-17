@@ -42,6 +42,7 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
 
 import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -85,6 +86,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   storyNodesTitleTranslationKeys: string[] = [];
   storyNodesDescTranslationKeys: string[] = [];
+  classroomName: string | null = null;
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -96,7 +98,8 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
     private alertsService: AlertsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private topicViewerBackendApiService: TopicViewerBackendApiService
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -214,6 +217,15 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     }
     this.storyUrlFragment = storyUrlFragment;
     this.loaderService.showLoadingScreen('Loading');
+    this.topicViewerBackendApiService
+      .fetchTopicDataAsync(this.topicUrlFragment, this.classroomUrlFragment)
+      .then(readOnlyTopic => {
+        this.classroomName = readOnlyTopic.getClassroomName();
+      })
+      .catch(() => {
+        // Topic data fetch failed, button won't be displayed.
+      });
+
     this.storyViewerBackendApiService
       .fetchStoryDataAsync(
         this.topicUrlFragment,
@@ -319,5 +331,14 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
         this.storyNodesDescTranslationKeys[index]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  getClassroomUrl(): string {
+    if (this.classroomUrlFragment) {
+      return this.urlInterpolationService.interpolateUrl('/learn/<classroom>', {
+        classroom: this.classroomUrlFragment,
+      });
+    }
+    return '/learn';
   }
 }

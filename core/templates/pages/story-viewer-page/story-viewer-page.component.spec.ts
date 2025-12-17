@@ -38,6 +38,9 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
+import {TopicViewerBackendApiService} from 'domain/topic_viewer/topic-viewer-backend-api.service';
+import {ReadOnlyTopic} from 'domain/topic_viewer/read-only-topic.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -64,6 +67,8 @@ describe('Story Viewer Page component', () => {
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
+  let topicViewerBackendApiService: TopicViewerBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
   let _samplePlaythroughObject: StoryPlaythrough;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
@@ -102,6 +107,8 @@ describe('Story Viewer Page component', () => {
     userService = TestBed.get(UserService);
     alertsService = TestBed.get(AlertsService);
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
+    urlInterpolationService = TestBed.get(UrlInterpolationService);
     windowRef = TestBed.get(WindowRef);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateService = TestBed.inject(TranslateService);
@@ -671,4 +678,117 @@ describe('Story Viewer Page component', () => {
       component.isHackyStoryNodeDescTranslationDisplayed(0);
     expect(hackyStoryNodeDescTranslationIsDisplayed).toBe(true);
   });
+
+  it('should generate correct classroom URL', () => {
+    component.classroomUrlFragment = 'math';
+    expect(component.getClassroomUrl()).toBe('/learn/math');
+  });
+
+  it('should fetch and set classroom name on initialization', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story'
+    );
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(_samplePlaythroughObject)
+    );
+
+    const sampleTopicData = ReadOnlyTopic.createFromBackendDict({
+      subtopics: [],
+      skill_descriptions: {},
+      uncategorized_skill_ids: [],
+      degrees_of_mastery: {},
+      canonical_story_dicts: [],
+      additional_story_dicts: [],
+      topic_name: 'Topic Name',
+      topic_id: 'topic_id',
+      topic_description: 'Topic Description',
+      practice_tab_is_displayed: true,
+      meta_tag_content: 'meta tag content',
+      page_title_fragment_for_web: 'topic',
+      classroom_name: 'Math',
+    });
+
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(sampleTopicData)
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.classroomName).toBe('Math');
+    expect(component.classroomUrlFragment).toBe('math');
+  }));
+
+  it('should handle error when fetching topic data fails', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story'
+    );
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(_samplePlaythroughObject)
+    );
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.reject({status: 500, error: 'Server error'})
+    );
+    spyOn(alertsService, 'addWarning').and.callThrough();
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to get topic data: [object Object]'
+    );
+    expect(component.classroomName).toBeNull();
+  }));
+
+  it('should not display back button when classroom name is null', fakeAsync(() => {
+    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
+      'topic'
+    );
+    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
+      'math'
+    );
+    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
+      'story'
+    );
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(_samplePlaythroughObject)
+    );
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(
+        ReadOnlyTopic.createFromBackendDict({
+          subtopics: [],
+          skill_descriptions: {},
+          uncategorized_skill_ids: [],
+          degrees_of_mastery: {},
+          canonical_story_dicts: [],
+          additional_story_dicts: [],
+          topic_name: 'Topic Name',
+          topic_id: 'topic_id',
+          topic_description: 'Topic Description',
+          practice_tab_is_displayed: true,
+          meta_tag_content: 'meta tag content',
+          page_title_fragment_for_web: 'topic',
+          classroom_name: null,
+        })
+      )
+    );
+
+    component.ngOnInit();
+    flushMicrotasks();
+
+    expect(component.classroomName).toBeNull();
+    expect(component.classroomUrlFragment).toBe('math');
+  }));
 });

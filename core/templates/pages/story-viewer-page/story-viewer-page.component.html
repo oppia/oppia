@@ -1,6 +1,11 @@
 <div class="oppia-story-viewer-container e2e-test-story-viewer-container" (click)="focusSkipButton($event.target, isLoggedIn)">
   <div *ngIf="storyIsLoaded">
     <div class="oppia-story-viewer-inner-container">
+      <div *ngIf="classroomName && classroomUrlFragment" class="oppia-story-viewer-back-to-classroom">
+        <a [href]="getClassroomUrl()" class="back-link e2e-test-back-to-classroom-button">
+          ← Back to {{ classroomName }} Classroom
+        </a>
+      </div>
       <div *ngIf="storyPlaythroughObject" class="oppia-story-player-tiles-container">
         <div class="oppia-story-viewer-title e2e-test-story-title">
           <span *ngIf="!isHackyStoryTitleTranslationDisplayed()" tabindex="0">
