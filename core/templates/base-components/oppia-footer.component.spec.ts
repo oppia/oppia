@@ -28,12 +28,14 @@ import {
 import {Router} from '@angular/router';
 
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
@@ -63,6 +65,7 @@ describe('OppiaFooterComponent', () => {
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let ngbModal: MockNgbModal;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -93,6 +96,7 @@ describe('OppiaFooterComponent', () => {
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should get the siteFeedbackFormURL', () => {
