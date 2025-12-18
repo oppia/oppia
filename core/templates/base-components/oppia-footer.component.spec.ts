@@ -321,4 +321,23 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
   }));
+  it('should register About footer link click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+
+    component.onAboutLinkClick();
+
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+  });
+
+  it('should register Teach footer link click event', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+
+    component.onTeachLinkClick();
+
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+  });
 });

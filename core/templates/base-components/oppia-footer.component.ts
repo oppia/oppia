@@ -22,10 +22,12 @@ import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
+import {NavbarAndFooterGATrackingPages} from 'app.constants';
 import {AlertsService} from 'services/alerts.service';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
 
 import './oppia-footer.component.css';
 
@@ -58,7 +60,8 @@ export class OppiaFooterComponent {
     private mailingListBackendApiService: MailingListBackendApiService,
     private platformFeatureService: PlatformFeatureService,
     private router: Router,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private siteAnalyticsService: SiteAnalyticsService
   ) {}
 
   getOppiaBlogUrl(): string {
@@ -129,5 +132,17 @@ export class OppiaFooterComponent {
           this.subscriptionProcessing = false;
         });
     }
+  }
+
+  onAboutLinkClick(): void {
+    this.siteAnalyticsService.registerClickFooterButtonEvent(
+      NavbarAndFooterGATrackingPages.ABOUT
+    );
+  }
+
+  onTeachLinkClick(): void {
+    this.siteAnalyticsService.registerClickFooterButtonEvent(
+      NavbarAndFooterGATrackingPages.TEACH
+    );
   }
 }

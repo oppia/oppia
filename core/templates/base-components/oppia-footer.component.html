@@ -49,7 +49,7 @@
         <p>{{ 'I18N_FOOTER_ABOUT_ALL_CAPS' | translate }}</p>
         <ul>
           <li>
-            <a href="/about" class="e2e-test-footer-about-link">
+            <a href="/about" (click)="onAboutLinkClick()" class="e2e-test-footer-about-link">
               {{ 'I18N_FOOTER_ABOUT' | translate }}
             </a>
           </li>
@@ -79,7 +79,7 @@
             </a>
           </li>
           <li>
-            <a href="/teach" class="e2e-test-teach-link">
+            <a href="/teach" (click)="onTeachLinkClick()" class="e2e-test-teach-link">
               {{ 'I18N_FOOTER_TEACH_PAGE' | translate }}
             </a>
           </li>
