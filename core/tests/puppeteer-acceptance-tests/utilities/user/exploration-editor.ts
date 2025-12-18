@@ -2477,6 +2477,7 @@ export class ExplorationEditor extends BaseUser {
       {},
       `${baseUrl}/create/`
     );
+    await this.waitForPageToFullyLoad();
   }
 
   /**
