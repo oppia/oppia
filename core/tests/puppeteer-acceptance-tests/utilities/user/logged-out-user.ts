@@ -7006,6 +7006,24 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Verifies that the checkpoint bar in the progress reminder modal has the expected
+   * number of completed (color-filled) nodes.
+   * @param expectedCompletedCount - The expected number of completed checkpoint nodes.
+   */
+  async expectCheckpointBarToHaveCompletedNodes(
+    expectedCompletedCount: number
+  ): Promise<void> {
+    await this.page.waitForSelector(progressRemainderModalSelector, {
+      visible: true,
+    });
+    const completedNodes = await this.page.$$('.completed-checkpoint-node');
+    expect(completedNodes.length).toBe(expectedCompletedCount);
+    showMessage(
+      `Checkpoint bar has ${completedNodes.length} completed nodes as expected.`
+    );
+  }
+
+  /**
    * Expects the profile picture to be present.
    */
   async expectProfilePictureToBePresent(): Promise<void> {
