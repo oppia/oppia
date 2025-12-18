@@ -141,21 +141,34 @@ export class HomeTabComponent {
       }
     }
 
-    this.totalLessonCards =
-      (this.incompleteExplorationsList?.length || 0) +
-      (this.incompleteCollectionsList?.length || 0) +
-      this.partiallyLearntTopicsList.reduce(
-        (acc, topic) => acc + topic.getCanonicalStorySummaryDicts().length,
-        0
-      );
-    if (
-      this.hasMultipleUnfinishedPublished &&
-      this.storySummariesWithAvailableNodes.size > 0
-    ) {
-      this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
+    this.totalLessonCards = 0;
+
+    // Check if the Progress section is visible in HTML
+    if (this.getTotalInProgressLessons() > 0) {
+      this.totalLessonCards +=
+        (this.incompleteExplorationsList?.length || 0) +
+        (this.incompleteCollectionsList?.length || 0) +
+        this.partiallyLearntTopicsList.reduce(
+          (acc, topic) => acc + topic.getCanonicalStorySummaryDicts().length,
+          0
+        );
+
+      // Check if Recommended section is visible in HTML
+      if (
+        this.hasMultipleUnfinishedPublished &&
+        this.storySummariesWithAvailableNodes.size > 0
+      ) {
+        this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
+      }
     }
 
-    this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
+    // Check if Playlist section is visible in HTML
+    if (
+      this.isNonemptyObject(this.untrackedTopics) &&
+      !this.isGoalLimitReached()
+    ) {
+      this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
+    }
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
