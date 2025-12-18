@@ -272,7 +272,9 @@ oppia-story-viewer-page-root .oppia-chapter-title {
     display: flex;
     height: 100vh;
     justify-content: space-around;
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     z-index: -1;
   }
 }

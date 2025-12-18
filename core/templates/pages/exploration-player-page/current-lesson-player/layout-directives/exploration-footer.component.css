@@ -135,7 +135,9 @@
   opacity: 0.4;
   position: fixed;
   top: 0;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .oppia-exploration-footer .lesson-info-tooltip-add-ons {

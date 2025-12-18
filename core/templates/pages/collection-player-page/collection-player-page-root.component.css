@@ -57,7 +57,9 @@ over the blank preview card */
     display: flex;
     height: 100vh;
     justify-content: space-around;
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     z-index: -1;
   }
 }

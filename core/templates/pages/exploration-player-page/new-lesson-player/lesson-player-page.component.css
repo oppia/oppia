@@ -72,10 +72,14 @@ attribution-guide {
 
 @media(max-width: 767px) {
   .oppia-new-player-main-content {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .expanded-sidebar {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }

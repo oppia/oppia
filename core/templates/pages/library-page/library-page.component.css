@@ -47,7 +47,9 @@ oppia-library-page .oppia-group-page-header {
   display: block;
   height: 350px;
   margin-top: 36px;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .oppia-library-group-header-container {
@@ -716,23 +718,25 @@ oppia-library-page .oppia-exp-summary-tiles-container {
   min-height: 300px;
   padding-bottom: 24px;
   padding-top: 24px;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Ensure that the summary tiles tiles remain centered. Note that these values
   would need to be updated if the summary tiles are changed. */
 @media (max-width: 844px) {
   oppia-library-page .oppia-exp-summary-tiles-container {
-    margin-left: 5vw;
-    margin-right: 5vw;
-    max-width: 89vw;
-    width: initial;
+    margin-left: 5%;
+    margin-right: 5%;
+    max-width: calc(100% - 10%);
+    width: auto;
   }
 }
 @media (max-width: 632px) {
   oppia-library-page .oppia-exp-summary-tiles-container {
-    margin-left: 2vw;
-    margin-right: 2vw;
-    max-width: 96vw;
+    margin-left: 2%;
+    margin-right: 2%;
+    max-width: calc(100% - 4%);
   }
 }

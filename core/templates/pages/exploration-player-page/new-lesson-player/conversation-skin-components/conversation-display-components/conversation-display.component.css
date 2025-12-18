@@ -20,11 +20,12 @@ oppia-conversation-display .oppia-learner-view-card-top-section {
 oppia-conversation-display .oppia-learner-view-card {
   border-radius: 2px;
   margin-left: 40px ;
-  max-width: 100vw;
+  max-width: 100%;
   padding-bottom: 18px;
   padding-left: 0;
   padding-top: 20px;
   text-align: left;
+  overflow-x: hidden;
 }
 
 oppia-conversation-display .oppia-learner-view-card-top-content {

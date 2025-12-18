@@ -121,7 +121,9 @@
   background-color: #ddedeb;
   margin-left: 50%;
   transform: translateX(-50%);
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .oppia-android-learners-review {

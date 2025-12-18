@@ -80,7 +80,9 @@ oppia-conversation-skin .supplemental-card-parent-container {
     when under 360px to prevent pushing things offscreen. */
 @media(max-width: 360px) {
   .conversation-skin-tutor-card-container {
-    min-width: 100vw;
+    min-width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 

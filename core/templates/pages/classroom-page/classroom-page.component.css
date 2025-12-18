@@ -12,7 +12,9 @@
   height: fit-content;
   justify-content: center;
   position: relative;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .oppia-classroom-page-container .classroom-top {
@@ -25,7 +27,9 @@
   align-items: start;
   display: flex;
   justify-content: center;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .classroom-content-container .classroom-content {

@@ -63,7 +63,9 @@
   gap: 8vw;
   justify-content: center;
   padding: 50px 5vw;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .splash-page .oppia-splash-button {
@@ -134,7 +136,9 @@
   display: flex;
   padding-bottom: 50px;
   padding-top: 40px;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .splash-page .oppia-splash-testimonial-arrow {
@@ -201,7 +205,9 @@
   margin-top: -1px;
   padding-bottom: 15vh;
   padding-top: 20vh;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .splash-page .oppia-splash-section-five {
@@ -223,7 +229,9 @@
   background-color: #fff;
   display: flex;
   padding-top: 50px;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .splash-page .oppia-splash-section-seven-right {
@@ -437,6 +445,8 @@
     display: block;
     height: auto;
     max-height: fit-content;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   .splash-page .image-mobile {
@@ -471,7 +481,8 @@
     margin-left: auto;
     margin-right: auto;
     padding-top: 50px;
-    width: 50vw;
+    width: 50%;
+    max-width: 100%;
   }
 
   .splash-page .oppia-splash-section-seven {
@@ -485,7 +496,8 @@
   }
 
   .splash-page .oppia-splash-section-four-image-mobile {
-    margin-left: 10vw;
+    margin-left: 10%;
+    max-width: 100%;
   }
 
   .splash-page .oppia-splash-section-three {
@@ -493,6 +505,7 @@
     flex-direction: column;
     padding-bottom: 50px;
     padding-top: 15px;
+    width: 100%;
   }
 
   .splash-page .oppia-splash-section-three-left {
@@ -502,6 +515,7 @@
 
   .splash-page .oppia-splash-section-three-right {
     align-self: center;
+    width: 100%;
   }
 
   .splash-page .oppia-splash-section-five-image {
@@ -516,11 +530,14 @@
     margin-left: auto;
     margin-right: auto;
     text-align: center;
+    width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
   .splash-page .oppia-splash-section-six-right,
   .splash-page .oppia-splash-section-seven-left {
-    width: 90vw;
+    width: calc(100% - 10%);
   }
 
   .splash-page .oppia-splash-section-one-left {
@@ -528,7 +545,7 @@
     margin-right: auto;
     margin-top: 7.5vh;
     text-align: center;
-    width: 75vw;
+    width: 75%;
   }
 
   .splash-page .oppia-splash-section-six-right p,
@@ -538,9 +555,11 @@
   }
 
   .splash-page .oppia-splash-section-five-left {
-    margin-right: 10vw;
+    margin-right: 5%;
     text-align: center;
     width: auto;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
   .splash-page .oppia-splash-section-four-left h3,
@@ -573,7 +592,10 @@
   .splash-page .oppia-splash-section-six-left {
     margin-left: auto;
     margin-right: auto;
-    width: 70vw;
+    width: 70%;
+    max-width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 
   .splash-page .splash-icon-text {

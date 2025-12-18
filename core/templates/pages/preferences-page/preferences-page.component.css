@@ -119,7 +119,9 @@ a.export-btn:active {
   flex-direction: row;
   justify-content: center;
   position: sticky;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 .oppia-save-btn-container {
   align-items: center;
@@ -130,7 +132,9 @@ a.export-btn:active {
   .oppia-save-btn-container {
     justify-content: center;
     padding: 10px;
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
   .oppia-save-button {
     width: 100%;

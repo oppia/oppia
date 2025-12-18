@@ -118,12 +118,16 @@ oppia-new-conversation-skin .oppia-button-icon {
 oppia-card-navigation-control {
   bottom: 0;
   position: fixed;
-  width: calc(100vw - 83px);
+  width: calc(100% - 83px);
+  max-width: 100%;
+  overflow-x: hidden;
   z-index: 100;
 }
 
 .expanded-sidebar {
-  width: calc(100vw - 243px);
+  width: calc(100% - 243px);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 .question-player-footer {
@@ -132,11 +136,15 @@ oppia-card-navigation-control {
 
 @media(max-width: 767px) {
   oppia-card-navigation-control {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .expanded-sidebar {
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 }
 
