@@ -327,7 +327,7 @@ describe('Tutor card component', () => {
     ).and.returnValue(new Subject<void>());
 
     expect(componentInstance.shouldShowProgressBar).toBe(false);
-    
+
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
 
     fixture.detectChanges();
@@ -378,18 +378,27 @@ describe('Tutor card component', () => {
     );
   }));
 
-  
   it('should return false (and hit the final return statement) when chapter is 50, it is the last milestone, and the completion message is shown', () => {
-  componentInstance.inStoryMode = true;
-  componentInstance.completedChaptersCount = 50; 
+    componentInstance.inStoryMode = true;
+    componentInstance.completedChaptersCount = 50;
 
-  spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
-  spyOn(componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
-  spyOn(chapterProgressService, 'getChapterCompletedForTheFirstTime').and.returnValue(true);
+    spyOn(
+      componentInstance,
+      'isCompletedChaptersCountGreaterThanLastMilestone'
+    ).and.returnValue(false);
+    spyOn(
+      componentInstance,
+      'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
+    ).and.returnValue(false);
+    spyOn(
+      chapterProgressService,
+      'getChapterCompletedForTheFirstTime'
+    ).and.returnValue(true);
 
-  const shouldShowBar = componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
+    const shouldShowBar =
+      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
 
-  expect(shouldShowBar).toBe(false);
+    expect(shouldShowBar).toBe(false);
   });
 
   it('should render the Milestone Completion Message when shouldShowProgressBar is FALSE', () => {
