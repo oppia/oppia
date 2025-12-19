@@ -631,7 +631,7 @@ export class BaseUser {
         // eslint-disable-next-line no-console
         console.log(`--- Attempting robust click on: ${value} ---`);
 
-        //Added Robust Click.
+        // Added Robust Click.
         await this.clickOnElement(matOptionElement);
 
         // eslint-disable-next-line no-console
