@@ -885,6 +885,10 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
     def test_jpeg_image_yields_false(self) -> None:
         self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
 
+    def test_empty_string_yields_false(self) -> None:
+        """Tests that empty image data returns False."""
+        self.assertFalse(test_utils.check_image_png_or_webp(''))
+
 
 class ElasticSearchStubTests(test_utils.GenericTestBase):
 
