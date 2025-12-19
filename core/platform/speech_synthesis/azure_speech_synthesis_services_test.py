@@ -37,7 +37,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.swap_api_key_secrets_return_none = mock.patch.object(
-            secrets_services, 'get_secret', None
+            secrets_services, 'get_secret', return_value=None
         )
         self.swap_api_key_secrets_return_secret = mock.patch.object(
             secrets_services, 'get_secret', side_effect=lambda _: 'azure_key'

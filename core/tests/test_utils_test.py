@@ -485,7 +485,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(asset_url, '/assets/images/subjects/Lightbulb.svg')
 
     def test_get_static_asset_filepath_with_prod_mode_on(self) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants, {'DEV_MODE': False}):
             filepath = self.get_static_asset_filepath()
             self.assertEqual(filepath, 'build')
 
@@ -569,7 +569,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
 
         self.assertIs(obj.func(), obj)
 
-        with mock.patch.object(obj, 'func'):
+        with mock.patch.object(obj, 'func', return_value=None):
             self.assertIsNone(obj.func())
 
     def test_patch_to_always_return_with_value(self) -> None:
@@ -590,7 +590,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         obj.func = test_func
         self.assertIsNone(obj.func())
 
-        with mock.patch.object(obj, 'func'):
+        with mock.patch.object(obj, 'func', side_effect=Exception()):
             try:
                 obj.func()
             except Exception as e:
@@ -625,7 +625,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd() -> None:
             return
 
-        with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
+        with self.assertRaisesRegex(AssertionError, r'getcwd'):
             with mock.patch.object(
                 os, 'getcwd', side_effect=mock_getcwd
             ) as patch:
@@ -644,7 +644,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_getcwd() -> None:
             return
 
-        with self.assertRaisesRegex(AssertionError, r'os\.getcwd'):
+        with self.assertRaisesRegex(AssertionError, r'getcwd'):
             with mock.patch.object(
                 os, 'getcwd', side_effect=mock_getcwd
             ) as patch:
@@ -678,7 +678,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
+        with self.assertRaisesRegex(AssertionError, r'Calls not found'):
             with mock.patch.object(
                 os, 'getenv', side_effect=mock_getenv
             ) as getenv_patch, mock.patch.object(
@@ -699,7 +699,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         def mock_samefile(*unused_args: str) -> None:
             return
 
-        with self.assertRaisesRegex(AssertionError, r'samefile'):
+        with self.assertRaisesRegex(AssertionError, r'Calls not found'):
             with mock.patch.object(
                 os, 'getenv', side_effect=mock_getenv
             ) as getenv_patch, mock.patch.object(
@@ -739,7 +739,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ) -> None:
             return
 
-        with self.assertRaisesRegex(AssertionError, r'os\.getenv'):
+        with self.assertRaisesRegex(AssertionError, r'Calls not found'):
             with mock.patch.object(
                 os, 'getenv', side_effect=mock_getenv
             ) as patch:

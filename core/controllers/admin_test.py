@@ -120,7 +120,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
-        self.prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        self.prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -1777,7 +1777,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy explorations in production.'
         )
@@ -1853,7 +1853,7 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
         self.login(self.QUESTION_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'Cannot generate dummy question suggestion in production.',
@@ -1959,7 +1959,7 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regex = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy stories in production.'
         )
@@ -2082,7 +2082,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regex = self.assertRaisesRegex(
             Exception, 'Cannot generate dummy chapters in production.'
         )
@@ -2306,7 +2306,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
-        self.prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        self.prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
 
     def test_admins_can_generate_dummy_translation_opportunities(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -4476,7 +4476,7 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new blog post in production mode.'
         )

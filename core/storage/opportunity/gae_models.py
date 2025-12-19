@@ -158,7 +158,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
             page_size + 1, start_cursor=start_cursor
         )
         plus_one_query_models, _, _ = fetch_result
-        more_results = len(plus_one_query_models) == page_size + 1
+        more_results = len(plus_one_query_models) > page_size
 
         # The urlsafe returns bytes and we need to decode them to string.
         return (

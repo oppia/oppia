@@ -199,9 +199,9 @@ def main(cli_args: Optional[List[str]] = None) -> None:
     )
     if args.uninstall:
         uninstall_dev_dependencies()
-    else:
+    elif diff:
         install_dev_dependencies()
-        if args.assert_compiled and diff:
+        if args.assert_compiled:
             raise RuntimeError(
                 'The Python development requirements file '
                 f'{COMPILED_REQUIREMENTS_DEV_FILE_PATH} was changed by the '

@@ -292,7 +292,7 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_flag_name\' must be provided when the action is '

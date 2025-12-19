@@ -143,6 +143,9 @@ class Constants(dict):  # type: ignore[type-arg]
     def __getattr__(self, name: str) -> Any:
         return self[name]
 
+    def __delattr__(self, name: str) -> None:
+        del self[name]
+
     # This is needed for pickling when instances of Constants are passed as
     # part of predicates in Beam jobs.
     # Here we use type Any because this method parses and stores the values of

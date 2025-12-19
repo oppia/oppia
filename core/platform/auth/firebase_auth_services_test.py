@@ -1660,7 +1660,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         return mock.patch.object(
             firebase_auth,
             'get_users',
-            firebase_auth.GetUsersResult(
+            return_value=firebase_auth.GetUsersResult(
                 [firebase_auth.UserRecord({'localId': 'id'})], []
             ),
         )
@@ -1673,7 +1673,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         return mock.patch.object(
             firebase_auth,
             'get_users',
-            firebase_exceptions.FirebaseError(message='error', code='E111'),
+            side_effect=firebase_exceptions.FirebaseError(
+                message='error', code='E111'
+            ),
         )
 
     # Here we use object because the return type of mock.patch.object() varies.
@@ -1740,7 +1742,7 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         with mock.patch.object(
             firebase_auth,
             'get_users',
-            firebase_auth.GetUsersResult(
+            return_value=firebase_auth.GetUsersResult(
                 [firebase_auth.UserRecord({'localId': 'id'})], []
             ),
         ):
@@ -1766,7 +1768,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
         with mock.patch.object(
             firebase_auth,
             'get_users',
-            firebase_exceptions.FirebaseError(message='error', code='E111'),
+            side_effect=firebase_exceptions.FirebaseError(
+                message='error', code='E111'
+            ),
         ):
             with self.capture_logging() as logs:
                 self.assertFalse(

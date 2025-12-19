@@ -1751,10 +1751,11 @@ class AppEngineTestBase(TestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        # Initialize namespace for the storage emulator.
-        storage_services.CLIENT.namespace = self.id()
         # Set up apps for testing.
         self.testapp = webtest.TestApp(main.app_without_context)
+        storage_services.CLIENT.reset()
+        # Initialize namespace for the storage emulator.
+        storage_services.CLIENT.namespace = self.id()
         # Mock set_constants_to_default method to throw an exception.
         # Don't directly change constants file in the test.
         # Mock this method again in your test.

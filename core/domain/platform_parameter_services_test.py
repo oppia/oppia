@@ -140,7 +140,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_create_evaluation_context_for_client_returns_correct_context(
         self,
     ) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', True, create=True):
+        with mock.patch.dict(constants, {'DEV_MODE': True}):
             context = parameter_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',
