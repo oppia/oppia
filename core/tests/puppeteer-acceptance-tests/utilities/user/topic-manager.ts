@@ -3849,6 +3849,7 @@ export class TopicManager extends BaseUser {
     question: string
   ): Promise<ElementHandle<Element>> {
     await this.expectElementToBeVisible(questionTextSelector);
+
     const questionElements = await this.page.$$(questionTextSelector);
     let requiredQuestionElement: ElementHandle<Element> | null = null;
     for (const questionElement of questionElements) {
