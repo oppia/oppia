@@ -186,7 +186,11 @@ def run_shell_cmd(
     last_stdout_str = last_stdout_bytes.decode('utf-8', 'replace')
     last_stderr_str = last_stderr_bytes.decode('utf-8', 'replace')
     last_stdout = last_stdout_str.split('\n')
-
+    
+    # Some backend test runners prefix log output (for example, when running
+    # tests in parallel). This block extracts only those prefixed lines and
+    # re-logs them in a cleaner, more readable format for developers running
+    # tests locally or in CI.
     if LOG_LINE_PREFIX in last_stdout_str:
         concurrent_task_utils.log('')
         for line in last_stdout:
