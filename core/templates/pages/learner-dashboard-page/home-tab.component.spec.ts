@@ -906,4 +906,31 @@ describe('Home tab Component Loader visibility tests', () => {
     expect(component.loadingMessage).toEqual('Loading');
     expect(hideLoadingScreenSpy).not.toHaveBeenCalled();
   });
+  describe('Total Lesson Card Calculation Coverage', () => {
+    it('should NOT count playlist lessons if goal limit is reached', () => {
+      component.totalLessonsInPlaylists = [
+        component.incompleteExplorationsList[0],
+      ];
+      component.untrackedTopics = {Math: [component.currentGoals[0]]};
+      component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
+      component.goalTopicsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
+      component.ngOnInit();
+      expect(component.totalLessonCards).toEqual(0);
+    });
+
+    it('should NOT count recommended lessons if hasMultipleUnfinishedPublished is false', () => {
+      component.storySummariesWithAvailableNodes.add('story_1');
+      component.hasMultipleUnfinishedPublished = false;
+      component.ngOnInit();
+
+      expect(component.totalLessonCards).toEqual(0);
+    });
+    it('should NOT count in-progress lessons if the user has no progress', () => {
+      component.partiallyLearntTopicsList = [];
+      component.incompleteExplorationsList = [];
+      component.incompleteCollectionsList = [];
+      component.ngOnInit();
+      expect(component.totalLessonCards).toEqual(0);
+    });
+  });
 });
