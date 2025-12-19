@@ -131,15 +131,20 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
 
         with self.swap_all_feature_names_set:
             with self.swap_name_to_description_feature_stage_registry_dict:
-                feature_services.update_feature_flag(
-                    self.dev_feature_flag.name, True, 0, []
-                )
-                feature_services.update_feature_flag(
-                    self.test_feature_flag.name, True, 0, []
-                )
-                feature_services.update_feature_flag(
-                    self.prod_feature_flag.name, True, 0, []
-                )
+                with mock.patch.object(
+                    feature_flag_domain,
+                    'get_server_mode',
+                    return_value=FeatureStages.DEV,
+                ):
+                    feature_services.update_feature_flag(
+                        self.dev_feature_flag.name, True, 0, []
+                    )
+                    feature_services.update_feature_flag(
+                        self.test_feature_flag.name, True, 0, []
+                    )
+                    feature_services.update_feature_flag(
+                        self.prod_feature_flag.name, True, 0, []
+                    )
 
     def test_get_all_feature_flags_returns_correct_feature_flags(self) -> None:
         with mock.patch.object(
@@ -346,8 +351,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict, mock.patch.object(
-                constants, 'DEV_MODE', True
+            with self.swap_name_to_description_feature_stage_dict, mock.patch.dict(
+                constants, {'DEV_MODE': True}
             ):
                 self.assertEqual(
                     feature_services.evaluate_all_feature_flag_configs(
@@ -363,7 +368,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_configs_in_test_returns_correct_values(
         self,
     ) -> None:
-        constants_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        constants_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         env_patch = mock.patch.object(
             feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
         )
@@ -388,7 +393,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_get_all_feature_flag_configs_in_prod_returns_correct_values(
         self,
     ) -> None:
-        constants_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        constants_patch = mock.patch.dict(constants, {'DEV_MODE': False})
         env_patch = mock.patch.object(
             feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
         )
@@ -418,8 +423,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict:
-                with mock.patch.object(constants, 'DEV_MODE', True):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
+                with mock.patch.dict(constants, {'DEV_MODE': True}):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
                             self.dev_feature_flag.name, self.owner_id
@@ -434,8 +439,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict:
-                with mock.patch.object(constants, 'DEV_MODE', True):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
+                with mock.patch.dict(constants, {'DEV_MODE': True}):
                     self.assertTrue(
                         feature_services.is_feature_flag_enabled(
                             self.test_feature_flag.name, self.owner_id
@@ -450,13 +455,14 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with mock.patch.object(constants, 'DEV_MODE', True):
-                with self.swap_name_to_description_feature_stage_dict:
-                    self.assertTrue(
-                        feature_services.is_feature_flag_enabled(
-                            self.prod_feature_flag.name, self.owner_id
-                        )
+            with mock.patch.dict(
+                constants, {'DEV_MODE': True}
+            ), self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
+                self.assertTrue(
+                    feature_services.is_feature_flag_enabled(
+                        self.prod_feature_flag.name, self.owner_id
                     )
+                )
 
     def test_evaluate_dev_feature_flag_for_test_server_returns_false(
         self,
@@ -466,16 +472,17 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with mock.patch.object(constants, 'DEV_MODE', False):
-                with self.swap_name_to_description_feature_stage_dict:
-                    with mock.patch.object(
-                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
-                    ):
-                        self.assertFalse(
-                            feature_services.is_feature_flag_enabled(
-                                self.dev_feature_flag.name, self.owner_id
-                            )
+            with mock.patch.dict(
+                constants, {'DEV_MODE': False}
+            ), self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
+                with mock.patch.object(
+                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                ):
+                    self.assertFalse(
+                        feature_services.is_feature_flag_enabled(
+                            self.dev_feature_flag.name, self.owner_id
                         )
+                    )
 
     def test_evaluate_test_feature_flag_for_test_server_returns_true(
         self,
@@ -485,24 +492,25 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         ), mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with mock.patch.object(constants, 'DEV_MODE', False):
-                with self.swap_name_to_description_feature_stage_dict:
-                    with mock.patch.object(
-                        feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
-                    ):
-                        self.assertTrue(
-                            feature_services.is_feature_flag_enabled(
-                                self.test_feature_flag.name, self.owner_id
-                            )
+            with mock.patch.dict(
+                constants, {'DEV_MODE': False}
+            ), self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
+                with mock.patch.object(
+                    feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
+                ):
+                    self.assertTrue(
+                        feature_services.is_feature_flag_enabled(
+                            self.test_feature_flag.name, self.owner_id
                         )
+                    )
 
     def test_evaluate_prod_feature_flag_for_test_server_returns_true(
         self,
     ) -> None:
         with mock.patch.object(
             feature_services, 'ALL_FEATURE_FLAGS', self.feature_name_enums
-        ), mock.patch.object(constants, 'DEV_MODE', False):
-            with self.swap_name_to_description_feature_stage_dict:
+        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 with mock.patch.object(
                     feature_services,
                     'ALL_FEATURES_NAMES_SET',
@@ -521,8 +529,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ) -> None:
         with mock.patch.object(
             feature_services, 'ALL_FEATURE_FLAGS', self.feature_name_enums
-        ), mock.patch.object(constants, 'DEV_MODE', False):
-            with self.swap_name_to_description_feature_stage_dict:
+        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 with mock.patch.object(
                     feature_services,
                     'ALL_FEATURES_NAMES_SET',
@@ -541,8 +549,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ) -> None:
         with mock.patch.object(
             feature_services, 'ALL_FEATURE_FLAGS', self.feature_name_enums
-        ), mock.patch.object(constants, 'DEV_MODE', False):
-            with self.swap_name_to_description_feature_stage_dict:
+        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 with mock.patch.object(
                     feature_services,
                     'ALL_FEATURES_NAMES_SET',
@@ -561,8 +569,8 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     ) -> None:
         with mock.patch.object(
             feature_services, 'ALL_FEATURE_FLAGS', self.feature_name_enums
-        ), mock.patch.object(constants, 'DEV_MODE', False):
-            with self.swap_name_to_description_feature_stage_dict:
+        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 with mock.patch.object(
                     feature_services,
                     'ALL_FEATURES_NAMES_SET',
@@ -579,7 +587,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_feature_flag_flag_is_enabled_when_force_enable_is_set_to_true(
         self,
     ) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             self.assertTrue(
                 feature_services.is_feature_flag_enabled(
                     self.dev_feature_flag.name, self.owner_id
@@ -589,7 +597,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
     def test_feature_flag_enable_for_logged_out_user_with_force_enable_property(
         self,
     ) -> None:
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             self.assertTrue(
                 feature_services.is_feature_flag_enabled(
                     self.dev_feature_flag.name, self.LOGGED_OUT_USER_ID
@@ -600,7 +608,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict:
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name, False, 0, []
                 )
@@ -648,7 +656,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict:
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name,
                     False,
@@ -665,7 +673,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         with mock.patch.object(
             feature_services, 'ALL_FEATURES_NAMES_SET', set(self.feature_names)
         ):
-            with self.swap_name_to_description_feature_stage_dict:
+            with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
                 feature_services.update_feature_flag(
                     self.dev_feature_flag.name, False, 0, [self.USER_GROUP_2]
                 )
@@ -686,7 +694,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
             False,
             False,
         )
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             with mock.patch.object(
                 feature_services,
                 'ALL_FEATURES_NAMES_SET',
@@ -735,7 +743,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         for count in range(1, 1001):
             user_ids_list.append('userid%s' % str(count))
 
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             with mock.patch.object(
                 feature_services,
                 'ALL_FEATURES_NAMES_SET',
@@ -805,7 +813,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
         feature_status_for_users = []
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             with mock.patch.object(
                 feature_services,
                 'ALL_FEATURES_NAMES_SET',
@@ -830,7 +838,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         )
         user_ids = [user_1_id, user_2_id, user_3_id, self.owner_id]
         feature_status_for_users = []
-        with self.swap_name_to_description_feature_stage_dict:
+        with self.swap_name_to_description_feature_stage_dict, self.swap_name_to_description_feature_stage_registry_dict:
             with mock.patch.object(
                 feature_services,
                 'ALL_FEATURES_NAMES_SET',
