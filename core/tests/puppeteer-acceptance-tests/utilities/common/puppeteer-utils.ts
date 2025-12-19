@@ -628,30 +628,21 @@ export class BaseUser {
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        // FIX IMPLEMENTATION: Stabilize the element before clicking to fix the race condition.
+        // eslint-disable-next-line no-console
+        console.log(`--- Attempting robust click on: ${value} ---`);
 
-        // Ensure the element is visible on the screen.
-        await this.page.evaluate(
-          el => (el as HTMLElement).scrollIntoView(),
-          matOptionElement
-        );
+        //Added Robust Click.
+        await this.clickOnElement(matOptionElement);
 
-        // Perform a robust click using page.evaluate() to force the click.
-        await this.page.evaluate(
-          el => (el as HTMLElement).click(),
-          matOptionElement
-        );
-
-        // Add a mandatory small pause.
-        await this.page.waitForTimeout(100);
-
+        // eslint-disable-next-line no-console
+        console.log(`--- Robust click successful for: ${value} ---`);
         break;
       }
     }
 
-    await this.page.waitForSelector('mat-option', {
-      hidden: true,
-    });
+    await this.page.waitForSelector('mat-option', {hidden: true});
+    // eslint-disable-next-line no-console
+    console.log('--- Mat-option dropdown successfully closed ---');
   }
 
   /**
