@@ -123,8 +123,6 @@ def send_mail(
             platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
-    if not server_can_send_emails:
-        raise Exception('This app cannot send emails to users.')
 
     if not _is_email_valid(recipient_email):
         raise ValueError(
