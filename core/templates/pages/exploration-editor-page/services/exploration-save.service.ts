@@ -188,6 +188,9 @@ export class ExplorationSaveService {
             'Changes to this exploration were saved successfully.'
           );
 
+          let changeListAffectsAutoVoiceovers =
+            this.changeListService.doesChangeListAffectAutoVoiceovers();
+
           this.changeListService.discardAllChanges().then(
             () => {
               this._initExplorationPageEventEmitter.emit();
@@ -207,7 +210,8 @@ export class ExplorationSaveService {
 
               if (
                 isExplorationLinkedToStory &&
-                voiceoverRegenerationInBackgroundIsEnabled
+                voiceoverRegenerationInBackgroundIsEnabled &&
+                changeListAffectsAutoVoiceovers
               ) {
                 this.voiceoverBackendApiService.regenerateVoiceoverOnExplorationUpdateAsync(
                   this.explorationDataService.explorationId as string,
@@ -220,6 +224,7 @@ export class ExplorationSaveService {
                     'see the changes.',
                   10000
                 );
+
                 const updatedContentIds =
                   this.getChangeListContentIds(changeList);
                 this.voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks(

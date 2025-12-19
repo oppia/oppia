@@ -279,6 +279,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
           Object.keys(this.supportedLanguageAccentCodesToDescriptions)
             .length !== 0;
         this.saveUpdatedLanguageAccentSupport();
+        this.cdr.detectChanges();
       },
       () => {
         // Note to developers:

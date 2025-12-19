@@ -485,8 +485,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             voiceovers_mapping=new_voiceover_object,
         )
 
-        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
-            'content'
+        entity_voiceovers_object.mark_voiceovers_as_needing_update(
+            'content_0', feconf.VoiceoverType.MANUAL
         )
 
         voiceover = entity_voiceovers_object.voiceovers_mapping['content_0'][
@@ -496,8 +496,8 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         assert voiceover is not None
         self.assertFalse(voiceover.needs_update)
 
-        entity_voiceovers_object.mark_manual_voiceovers_as_needing_update(
-            'content_0'
+        entity_voiceovers_object.mark_voiceovers_as_needing_update(
+            'content_0', feconf.VoiceoverType.MANUAL
         )
 
         voiceover = entity_voiceovers_object.voiceovers_mapping['content_0'][

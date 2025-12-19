@@ -312,8 +312,11 @@ def compute_voiceover_related_change(
                 ):
                     continue
 
-                entity_voiceovers.mark_manual_voiceovers_as_needing_update(
-                    change.content_id
+                entity_voiceovers.mark_voiceovers_as_needing_update(
+                    change.content_id, feconf.VoiceoverType.MANUAL
+                )
+                entity_voiceovers.mark_voiceovers_as_needing_update(
+                    change.content_id, feconf.VoiceoverType.AUTO
                 )
 
         elif change.cmd == exp_domain.CMD_REMOVE_VOICEOVERS:

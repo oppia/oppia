@@ -8,8 +8,15 @@
     </div>
     <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers" class="content-unavailable-warning">
       <i>
-        There is no content available for voiceover in the selected language.
+        No content is available for voiceover in the selected language.
+        As a result, manual or automatic voiceovers cannot be added or regenerated at this state.
       </i>
+    </div>
+    <div *ngIf="doesTranslationForActiveContentNeedsUpdate()" class="content-unavailable-warning">
+      <i>
+        The translation for this content is outdated. Please update the translation before updating the voiceovers.
+      </i>
+
     </div>
   </div>
 
@@ -36,6 +43,7 @@
         <div class="voiceover-action-buttons">
           <button (click)="toggleAudioNeedsUpdate()"
                   class="e2e-test-audio-status-update-button"
+                  [disabled]="doesTranslationForActiveContentNeedsUpdate()"
                   [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
             <mat-icon matTooltip="Audio needs update"
                       *ngIf="manualVoiceover.needsUpdate"
@@ -56,13 +64,13 @@
 
       </div>
 
-      <div *ngIf="manualVoiceover" class="stale-manual-voiceover-warning">
+      <div *ngIf="manualVoiceover && !doesTranslationForActiveContentNeedsUpdate()" class="stale-manual-voiceover-warning">
         <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
       <div class="add-voiceover-button-container" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
-                [disabled]="!contentAvailableForVoiceovers">
+                [disabled]="!contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
           <mat-icon>attach_file</mat-icon>
           ADD MANUAL VOICEOVER
         </button>
@@ -73,7 +81,7 @@
       <h4 class="voiceover-type-heading">Automatic Voiceover (generated using Azure)</h4>
       <div *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
         <div class="voiceovers-component"
-             *ngIf="automaticVoiceover && automaticVoiceover.needsUpdate === false">
+             *ngIf="automaticVoiceover && automaticVoiceoverGenerationStatus !== 'GENERATING'">
           <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
             <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
             <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
@@ -88,7 +96,7 @@
           </span>
           <div class="voiceover-action-buttons">
             <button (click)="generateVoiceover()"
-                    [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers"
+                    [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()"
                     class="regenerate-voiceover-button">
               <mat-icon matTooltip="Regenerate voiceover" *ngIf="!isAutomaticVoiceoverGenerating">
                 sync
@@ -101,22 +109,20 @@
         </div>
         <div *ngIf="automaticVoiceoverGenerationStatus === 'GENERATING'">
           <div class="voiceovers-component">
+            <button class="btn btn-secondary audio-button" [disabled]="true">
+              <mat-icon matTooltip="Play">play_arrow</mat-icon>
+            </button>
             <mat-progress-bar mode="indeterminate"
-                              [value]="automaticVoiceoverProgress"
-                              class="voiceover-progress-loading">
+                              class="voiceover-progress">
             </mat-progress-bar>
             <span class="voiceover-timer">
-              -- / --
+              00:00 / 00:00
             </span>
             <div class="voiceover-action-buttons">
               <button (click)="generateVoiceover()"
-                      mat-icon-button
-                      mat-button
                       [disabled]="true"
                       class="regenerate-voiceover-button">
-                <mat-icon matTooltip="Regenerate voiceover">
-                  sync
-                </mat-icon>
+                <mat-icon>sync</mat-icon>
               </button>
             </div>
           </div>
@@ -131,7 +137,7 @@
              *ngIf="!automaticVoiceover && automaticVoiceoverGenerationStatus !== 'GENERATING'">
           <button (click)="generateVoiceover()"
                   class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
-                  [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
+                  [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
             <span *ngIf="!isAutomaticVoiceoverGenerating">
               <mat-icon>sync</mat-icon>
               GENERATE AUTOMATIC VOICEOVER

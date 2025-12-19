@@ -341,13 +341,12 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else if (voiceoverGenerationStatus === 'FAILED') {
       this.automaticVoiceover = undefined;
       this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
-    } else if (
-      voiceoverGenerationStatus === 'GENERATING' &&
-      this.automaticVoiceover
-    ) {
-      this.automaticVoiceover.needsUpdate = true;
+    } else if (voiceoverGenerationStatus === 'GENERATING') {
       this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
+    } else {
+      this.automaticVoiceoverGenerationStatus = '';
     }
+    this.changeDetectorRef.detectChanges();
   }
 
   updateActiveContent(): void {
@@ -571,10 +570,11 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.enableVoiceoverLoading(voiceoverType);
       this.audioPlayerService.loadAsync(filename).then(() => {
+        this.audioPlayerService.play();
+        this.currentVoiceoverLoadedType = voiceoverType;
         this.disableVoiceoverLoading(voiceoverType);
         this.flipVoiceoverPlayStatus(voiceoverType);
-        this.currentVoiceoverLoadedType = voiceoverType;
-        this.audioPlayerService.play();
+        this.changeDetectorRef.detectChanges();
       });
     }
   }
@@ -640,11 +640,16 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     });
     modalRef.result.then(
       () => {
+        let voiceoversMapping = {};
+        if (this.automaticVoiceover) {
+          voiceoversMapping = {auto: this.automaticVoiceover.toBackendDict()};
+        }
+
         this.manualVoiceover = undefined;
         this.changeListService.editVoiceovers(
           this.activeContentId,
           this.languageAccentCode,
-          {}
+          voiceoversMapping
         );
 
         this.activeEntityVoiceoversInstance.voiceoversMapping[
@@ -795,6 +800,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       ]
         ?.getWrittenTranslation(this.activeContentId)
         ?.getTranslation()
+    );
+  }
+
+  doesTranslationForActiveContentNeedsUpdate(): boolean {
+    return Boolean(
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+        this.languageCode
+      ]?.getWrittenTranslation(this.activeContentId)?.needsUpdate
     );
   }
 
