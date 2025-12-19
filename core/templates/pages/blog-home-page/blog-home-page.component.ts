@@ -172,7 +172,6 @@ export class BlogHomePageComponent implements OnInit {
       this.filterWasUsed = false;
       this.totalBlogPosts = 0;
       this.showBlogPostCardsLoadingScreen = false;
-      this.filterWasUsed = false;
     }
     this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
       (data: BlogHomePageData) => {
