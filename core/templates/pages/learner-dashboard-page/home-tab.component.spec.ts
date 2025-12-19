@@ -908,24 +908,50 @@ describe('Home tab Component Loader visibility tests', () => {
   });
   describe('Total Lesson Card Calculation Coverage', () => {
     it('should NOT count playlist lessons if goal limit is reached', () => {
-      component.totalLessonsInPlaylists = [
-        component.incompleteExplorationsList[0],
-      ];
-      component.untrackedTopics = {Math: [component.currentGoals[0]]};
+      component.currentGoals = [];
+      component.goalTopics = [];
+      component.partiallyLearntTopicsList = [];
+      component.incompleteExplorationsList = [];
+      component.incompleteCollectionsList = [];
+      const dummyExploration = LearnerExplorationSummary.createFromBackendDict({
+        id: 'exp1',
+        title: 'Title',
+        status: 'public',
+        language_code: 'en',
+        category: 'Math',
+        objective: 'Objective',
+        last_updated_msec: 1000,
+        created_on_msec: 1000,
+        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+        human_readable_contributors_summary: {},
+        tags: [],
+        thumbnail_icon_url: 'icon',
+        thumbnail_bg_color: '#fff',
+        activity_type: 'exploration',
+        num_views: 100,
+        community_owned: false,
+      });
+      component.totalLessonsInPlaylists = [dummyExploration];
+      component.untrackedTopics = {Math: [dummyExploration]};
       component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
       component.goalTopicsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
       component.ngOnInit();
       expect(component.totalLessonCards).toEqual(0);
     });
-
     it('should NOT count recommended lessons if hasMultipleUnfinishedPublished is false', () => {
+      component.currentGoals = [];
+      component.goalTopics = [];
+      component.partiallyLearntTopicsList = [];
+      component.incompleteExplorationsList = [];
+      component.incompleteCollectionsList = [];
       component.storySummariesWithAvailableNodes.add('story_1');
       component.hasMultipleUnfinishedPublished = false;
       component.ngOnInit();
-
       expect(component.totalLessonCards).toEqual(0);
     });
     it('should NOT count in-progress lessons if the user has no progress', () => {
+      component.currentGoals = [];
+      component.goalTopics = [];
       component.partiallyLearntTopicsList = [];
       component.incompleteExplorationsList = [];
       component.incompleteCollectionsList = [];

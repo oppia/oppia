@@ -143,7 +143,7 @@ export class HomeTabComponent {
 
     this.totalLessonCards = 0;
 
-    // Check if the Progress section is visible in HTML
+    // Check if the Progress section is visible in HTML.
     if (this.getTotalInProgressLessons() > 0) {
       this.totalLessonCards +=
         (this.incompleteExplorationsList?.length || 0) +
@@ -153,7 +153,7 @@ export class HomeTabComponent {
           0
         );
 
-      // Check if Recommended section is visible in HTML
+      // Check if Recommended section is visible in HTML.
       if (
         this.hasMultipleUnfinishedPublished &&
         this.storySummariesWithAvailableNodes.size > 0
@@ -162,7 +162,7 @@ export class HomeTabComponent {
       }
     }
 
-    // Check if Playlist section is visible in HTML
+    // Check if Playlist section is visible in HTML.
     if (
       this.isNonemptyObject(this.untrackedTopics) &&
       !this.isGoalLimitReached()
