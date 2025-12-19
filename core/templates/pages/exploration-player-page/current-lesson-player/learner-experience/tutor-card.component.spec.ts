@@ -326,10 +326,8 @@ describe('Tutor card component', () => {
       'get'
     ).and.returnValue(new Subject<void>());
 
-    spyOn(
-      componentInstance,
-      'setNextMilestoneAndCheckIfProgressBarIsShown'
-    ).and.returnValue(false);
+    expect(componentInstance.shouldShowProgressBar).toBe(false);
+    
     spyOn(componentInstance, 'isOnTerminalCard').and.returnValue(false);
 
     fixture.detectChanges();
@@ -379,6 +377,20 @@ describe('Tutor card component', () => {
       expectedShouldShowProgressBar
     );
   }));
+
+  
+  it('should return false (and hit the final return statement) when chapter is 50, it is the last milestone, and the completion message is shown', () => {
+  componentInstance.inStoryMode = true;
+  componentInstance.completedChaptersCount = 50; 
+
+  spyOn(componentInstance, 'isCompletedChaptersCountGreaterThanLastMilestone').and.returnValue(false);
+  spyOn(componentInstance, 'isMilestoneReachedAndMilestoneMessageToBeDisplayed').and.returnValue(false);
+  spyOn(chapterProgressService, 'getChapterCompletedForTheFirstTime').and.returnValue(true);
+
+  const shouldShowBar = componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown();
+
+  expect(shouldShowBar).toBe(false);
+  });
 
   it('should render the Milestone Completion Message when shouldShowProgressBar is FALSE', () => {
     componentInstance.displayedCard = mockDisplayedCard;
@@ -441,11 +453,7 @@ describe('Tutor card component', () => {
     let milestoneMessage = fixture.nativeElement.querySelector(
       '.milestone-message-star-container'
     );
-    let completionDiv = fixture.nativeElement.querySelector(
-      '.milestone-message-star-container'
-    );
 
-    expect(completionDiv).not.toBeNull();
     expect(milestoneMessage).not.toBeNull();
 
     let completionMessageText = fixture.nativeElement.querySelector(
