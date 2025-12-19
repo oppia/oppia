@@ -20,10 +20,10 @@ import {
   CollectionSummary,
   CollectionSummaryBackendDict,
 } from 'domain/collection/collection-summary.model';
-import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
-import {CreatorExplorationSummary} from 'domain/summary/creator-exploration-summary.model';
-import {ProfileSummary} from 'domain/user/profile-summary.model';
-import {CreatorDashboardPageComponent} from './creator-dashboard-page.component';
+import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
+import { ProfileSummary } from 'domain/user/profile-summary.model';
+import { CreatorDashboardPageComponent } from './creator-dashboard-page.component';
 import {
   ComponentFixture,
   fakeAsync,
@@ -34,17 +34,17 @@ import {
   CreatorDashboardBackendApiService,
   CreatorDashboardData,
 } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import {CsrfTokenService} from 'services/csrf-token.service';
-import {UserService} from 'services/user.service';
-import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
-import {UserInfo} from 'domain/user/user-info.model';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
-import {NO_ERRORS_SCHEMA, Pipe} from '@angular/core';
-import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {SortByPipe} from 'filters/string-utility-filters/sort-by.pipe';
-import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { UserService } from 'services/user.service';
+import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
+import { UserInfo } from 'domain/user/user-info.model';
+import { MockTranslatePipe } from 'tests/unit-test-utils';
+import { NO_ERRORS_SCHEMA, Pipe } from '@angular/core';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SortByPipe } from 'filters/string-utility-filters/sort-by.pipe';
+import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
 
-@Pipe({name: 'truncate'})
+@Pipe({ name: 'truncate' })
 class MockTruncatePipe {
   transform(value: string, params: Object | undefined): string {
     return value;
@@ -105,13 +105,13 @@ describe('Creator Dashboard Page Component', () => {
     // ref: https://github.com/jasmine/jasmine/issues/1415
     Object.defineProperty(window, 'innerWidth', {
       get: () => undefined,
-      set: () => {},
+      set: () => { },
     });
   }));
 
   it(
     'should get the correct exploration editor page URL corresponding to a' +
-      ' given exploration ID',
+    ' given exploration ID',
     () => {
       let explorationId = '1';
       expect(component.getExplorationUrl(explorationId)).toBe(
@@ -122,7 +122,7 @@ describe('Creator Dashboard Page Component', () => {
 
   it(
     'should get the correct collection editor page URL corresponding to a' +
-      ' given collection ID',
+    ' given collection ID',
     () => {
       let collectionId = '1';
       expect(component.getCollectionUrl(collectionId)).toBe(
@@ -148,8 +148,8 @@ describe('Creator Dashboard Page Component', () => {
   });
 
   it(
-    'should get complete thumbail icon path corresponding to a given' +
-      ' relative path',
+    'should get complete thumbnail icon path corresponding to a given' +
+    ' relative path',
     () => {
       expect(component.getCompleteThumbnailIconUrl('/path/to/icon.png')).toBe(
         '/assets/images/path/to/icon.png'
@@ -165,7 +165,7 @@ describe('Creator Dashboard Page Component', () => {
 
   it(
     'should create new exploration when clicked on CREATE' +
-      ' EXPLORATION button',
+    ' EXPLORATION button',
     () => {
       spyOn(explorationCreationService, 'createNewExploration');
       component.createNewExploration();
@@ -259,8 +259,8 @@ describe('Creator Dashboard Page Component', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0,
         },
@@ -273,8 +273,8 @@ describe('Creator Dashboard Page Component', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0,
         },
@@ -302,8 +302,8 @@ describe('Creator Dashboard Page Component', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0,
         },
@@ -316,8 +316,8 @@ describe('Creator Dashboard Page Component', () => {
           author_name: '',
           change: {
             state_name: '',
-            new_value: {html: ''},
-            old_value: {html: ''},
+            new_value: { html: '' },
+            old_value: { html: '' },
           },
           last_updated_msecs: 0,
         },
@@ -336,8 +336,8 @@ describe('Creator Dashboard Page Component', () => {
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats
             ? CreatorDashboardStats.createFromBackendDict(
-                dashboardData.last_week_stats
-              )
+              dashboardData.last_week_stats
+            )
             : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(subscriber =>
@@ -361,7 +361,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should save the exploration format view in the backend when creator' +
-        ' changes the format view',
+      ' changes the format view',
       () => {
         let spyObj = spyOn(
           creatorDashboardBackendApiService,
@@ -377,7 +377,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should reverse the sort order of explorations when the creator' +
-        ' re-selects the current sorting type',
+      ' re-selects the current sorting type',
       () => {
         expect(component.isCurrentSortDescending).toBeTrue();
         expect(component.currentSortType).toBe('numOpenThreads');
@@ -388,7 +388,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should update the exploration sort order based on the' +
-        ' option chosen by the creator',
+      ' option chosen by the creator',
       () => {
         component.setExplorationsSortingOptions('new_open');
         expect(component.currentSortType).toBe('new_open');
@@ -397,7 +397,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should reverse the sort order of subscriptions when the creator' +
-        ' re-selects the current sorting type',
+      ' re-selects the current sorting type',
       () => {
         expect(component.isCurrentSubscriptionSortDescending).toBeTrue();
         expect(component.currentSubscribersSortType).toBe('username');
@@ -408,7 +408,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should update the subscription sort order based on the' +
-        ' option chosen by the creator',
+      ' option chosen by the creator',
       () => {
         component.setSubscriptionSortingOptions('new_subscriber');
         expect(component.currentSubscribersSortType).toBe('new_subscriber');
@@ -428,7 +428,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should sort exploration list by untitled explorations when title' +
-        ' is not provided and exploration is private',
+      ' is not provided and exploration is private',
       () => {
         expect(component.currentSortType).toBe('numOpenThreads');
         component.setExplorationsSortingOptions('title');
@@ -440,7 +440,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should sort exploration list by options that is not last update' +
-        ' when trying to sort by number of views',
+      ' when trying to sort by number of views',
       () => {
         component.setExplorationsSortingOptions('ratings');
         expect(component.currentSortType).toBe('ratings');
@@ -451,7 +451,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should sort exploration list by last updated when last updated' +
-        ' value is provided',
+      ' value is provided',
       () => {
         component.setExplorationsSortingOptions('lastUpdatedMsec');
         expect(component.currentSortType).toBe('lastUpdatedMsec');
@@ -466,7 +466,7 @@ describe('Creator Dashboard Page Component', () => {
 
     it(
       'should not sort exploration list by options that is not last update' +
-        ' when trying to sort by number of views',
+      ' when trying to sort by number of views',
       () => {
         component.setExplorationsSortingOptions('numViews');
         expect(component.currentSortType).toBe('numViews');
@@ -560,12 +560,12 @@ describe('Creator Dashboard Page Component', () => {
           // Because lastWeekStats may be null.
           lastWeekStats: dashboardData.last_week_stats
             ? CreatorDashboardStats.createFromBackendDict(
-                // This throws "Argument of type 'null' is not assignable to
-                // parameter of type 'object'." We need to suppress this error
-                // because of the need to test validations.
-                // @ts-ignore
-                dashboardData.last_week_stats
-              )
+              // This throws "Argument of type 'null' is not assignable to
+              // parameter of type 'object'." We need to suppress this error
+              // because of the need to test validations.
+              // @ts-ignore
+              dashboardData.last_week_stats
+            )
             : null,
           displayPreference: dashboardData.display_preference,
           subscribersList: dashboardData.subscribers_list.map(subscriber =>
