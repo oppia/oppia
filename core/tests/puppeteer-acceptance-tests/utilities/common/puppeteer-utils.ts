@@ -42,6 +42,8 @@ const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
+const oskContainerSelector = '.e2e-test-osk-container';
+const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -2122,6 +2124,23 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Checks if the on screen keyboard is visible.
+   */
+  async isOnScreenKeyboardVisible(): Promise<boolean> {
+    return await this.isElementVisible(oskContainerSelector);
+  }
+
+  /**
+   * Hides the on screen keyboard.
+   */
+  async hideOSK(): Promise<void> {
+    await this.expectElementToBeVisible(oskContainerSelector);
+    await this.expectElementToBeVisible(hideOSKButtonSelector);
+    await this.clickOnElementWithSelector(hideOSKButtonSelector);
+    await this.expectElementToBeVisible(hideOSKButtonSelector, false);
   }
 }
 
