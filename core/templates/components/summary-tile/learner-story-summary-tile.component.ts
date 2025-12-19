@@ -117,10 +117,23 @@ export class LearnerStorySummaryTileComponent implements OnInit {
     this.completedNodeCount = this.storySummary.getCompletedNodeTitles().length;
 
     const allNodes = this.storySummary.getAllNodes();
-    if (allNodes.length > this.completedNodeCount) {
-      this.storyNode = allNodes[this.completedNodeCount];
+    const visibleNodes = allNodes.filter(
+      node => node.getStatus() !== AppConstants.STORY_NODE_STATUS_DRAFT
+    );
+
+    const visibleNodeTitles = visibleNodes.map(n => n.getTitle());
+
+    this.nodeCount = visibleNodes.length;
+    this.completedNodeCount = this.storySummary
+      .getCompletedNodeTitles()
+      .filter(title => visibleNodeTitles.includes(title)).length;
+
+    if (visibleNodes.length > this.completedNodeCount) {
+      this.storyNode = visibleNodes[this.completedNodeCount];
     }
+
     this.statusIsPublished = this.storyNode?.getPublishedStatus();
+
     this.storyProgress = Math.floor(
       (this.completedNodeCount / this.nodeCount) * 100
     );
