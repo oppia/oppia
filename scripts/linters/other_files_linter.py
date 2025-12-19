@@ -23,8 +23,6 @@ import json
 import os
 import re
 
-from core import utils
-
 import yaml
 from typing import Any, Dict, Final, List, Tuple, TypedDict
 
@@ -164,9 +162,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        package = json.load(utils.open_file(PACKAGE_JSON_FILE_PATH, 'r'))[
-            'dependencies'
-        ]
+        package = json.load(
+            open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8')
+        )['dependencies']
 
         files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), 'typings'))
 
