@@ -906,80 +906,56 @@ describe('Home tab Component Loader visibility tests', () => {
     expect(component.loadingMessage).toEqual('Loading');
     expect(hideLoadingScreenSpy).not.toHaveBeenCalled();
   });
-  describe('Total Lesson Card Calculation Coverage', () => {
-    it('should NOT count playlist lessons if goal limit is reached', () => {
-      // 1. Setup: Initialize basic lists
+  describe('Final Coverage Checks (Loader & Initialization)', () => {
+    it('should handle undefined lists without crashing and hide loader', () => {
+      component.incompleteExplorationsList =
+        undefined as unknown as LearnerExplorationSummary[];
+      component.incompleteCollectionsList =
+        undefined as unknown as CollectionSummary[];
+      component.totalLessonsInPlaylists = undefined as unknown as (
+        | LearnerExplorationSummary
+        | CollectionSummary
+      )[];
       component.currentGoals = [];
-      component.goalTopics = [];
       component.partiallyLearntTopicsList = [];
-      component.incompleteExplorationsList = [];
-      component.incompleteCollectionsList = [];
-
-      // 2. Setup: Playlist data
-      const dummyExploration = LearnerExplorationSummary.createFromBackendDict({
-        id: 'exp1',
-        title: 'Title',
-        status: 'public',
+      component.goalTopics = [];
+      component.untrackedTopics = {};
+      spyOn(component, 'getTotalInProgressLessons').and.returnValue(1);
+      spyOn(component, 'isNonemptyObject').and.returnValue(true);
+      spyOn(component, 'isGoalLimitReached').and.returnValue(false);
+      spyOn(loaderService, 'hideLoadingScreen');
+      component.ngOnInit();
+      expect(component.totalLessonCards).toEqual(0);
+      expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+    });
+    it('should deduplicate topics in continueWhereYouLeftOffList', () => {
+      const topic = LearnerTopicSummary.createFromBackendDict({
+        id: 't1',
+        name: 'Topic 1',
         language_code: 'en',
-        category: 'Math',
-        objective: 'Objective',
-        last_updated_msec: 1000,
-        created_on_msec: 1000,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        human_readable_contributors_summary: {},
-        tags: [],
-        thumbnail_icon_url: 'icon',
+        description: 'desc',
+        version: 1,
+        story_titles: [],
+        total_published_node_count: 0,
+        thumbnail_filename: 'img.svg',
         thumbnail_bg_color: '#fff',
-        activity_type: 'exploration',
-        num_views: 100,
-        community_owned: false,
+        classroom_name: 'math',
+        classroom_url_fragment: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [],
+        url_fragment: 'topic-1',
+        subtopics: [],
+        degrees_of_mastery: {},
+        skill_descriptions: {},
       });
-      component.totalLessonsInPlaylists = [dummyExploration];
-
-      // 3. Setup: untrackedTopics (Needed to enter the IF condition)
-      // We use a dummy object so isNonemptyObject returns true
-      component.untrackedTopics = {Math: []};
-
-      // 4. Setup: Force Goal Limit to be Reached
-      // We spy on the method directly to ensure it returns TRUE
-      spyOn(component, 'isGoalLimitReached').and.returnValue(true);
-
-      // 5. Run Init
-      component.ngOnInit();
-
-      // 6. Assert
-      expect(component.totalLessonCards).toEqual(0);
-    });
-
-    it('should NOT count recommended lessons if hasMultipleUnfinishedPublished is false', () => {
-      component.currentGoals = [];
-      component.goalTopics = [];
-      component.partiallyLearntTopicsList = [];
+      component.currentGoals = [topic];
+      component.partiallyLearntTopicsList = [topic];
       component.incompleteExplorationsList = [];
       component.incompleteCollectionsList = [];
-      // FIX: Initialize untrackedTopics to empty object to prevent crash
-      component.untrackedTopics = {};
-
-      component.storySummariesWithAvailableNodes.add('story_1');
-      component.hasMultipleUnfinishedPublished = false;
-
-      component.ngOnInit();
-
-      expect(component.totalLessonCards).toEqual(0);
-    });
-
-    it('should NOT count in-progress lessons if the user has no progress', () => {
-      component.currentGoals = [];
       component.goalTopics = [];
-      component.partiallyLearntTopicsList = [];
-      component.incompleteExplorationsList = [];
-      component.incompleteCollectionsList = [];
-      // FIX: Initialize untrackedTopics to empty object to prevent crash
       component.untrackedTopics = {};
-
       component.ngOnInit();
-
-      expect(component.totalLessonCards).toEqual(0);
+      expect(component.continueWhereYouLeftOffList.length).toEqual(1);
     });
   });
 });
