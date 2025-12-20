@@ -177,17 +177,10 @@ def permanently_delete_user_from_list(user_email: str) -> None:
             mailchimp_audience_id, subscriber_hash
         )
     except mailchimpclient.MailChimpError as error:
-        # This has to be done since the message can only be accessed from
-        # MailChimpError by error.message in Python2, but this is deprecated in
-        # Python3.
-        # In Python3, the message can be accessed directly by KeyError
-        # (https://github.com/VingtCinq/python-mailchimp/pull/65), so as a
-        # workaround for Python2, the 'message' attribute is obtained by
-        # str() and then it is converted to dict. This works in Python3 as well.
-        error_message = ast.literal_eval(str(error))
-        # Ignore if the error corresponds to "User does not exist".
-        if error_message['status'] != 404:
-            raise Exception(error_message['detail']) from error
+        error_message = error.args[0]
+
+        if error_message.get("status") != 404:
+            raise Exception(error_message.get("detail")) from error
 
 
 def add_or_update_user_status(
