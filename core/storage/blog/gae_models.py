@@ -42,7 +42,7 @@ class BlogPostModelDataDict(TypedDict):
     url_fragment: str
     tags: List[str]
     thumbnail_filename: str
-    published_on: float
+    published_on: float | None
 
 
 class BlogAuthorDetailsModelDict(TypedDict):
@@ -228,15 +228,18 @@ class BlogPostModel(base_models.BaseModel):
             cls.get_all().filter(cls.author_id == user_id).fetch()
         )
         for blog_post_model in blog_post_models:
+            published_on = None
+            if blog_post_model.published_on is not None:
+                published_on = utils.get_time_in_millisecs(
+                    blog_post_model.published_on
+                )
             user_data[blog_post_model.id] = {
                 'title': blog_post_model.title,
                 'content': blog_post_model.content,
                 'url_fragment': blog_post_model.url_fragment,
                 'tags': blog_post_model.tags,
                 'thumbnail_filename': blog_post_model.thumbnail_filename,
-                'published_on': utils.get_time_in_millisecs(
-                    blog_post_model.published_on
-                ),
+                'published_on': published_on,
             }
 
         return user_data

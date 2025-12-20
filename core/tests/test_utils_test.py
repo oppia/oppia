@@ -864,6 +864,15 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual('en', coordinator_rights_model[0].language_id)
         self.assertEqual('hi', coordinator_rights_model[1].language_id)
 
+    def test_mock_set_constants_to_default_raises_exception(self) -> None:
+        """Test that mock_set_constants_to_default raises an exception."""
+        with self.assertRaisesRegex(
+            Exception,
+            r'Tests should mock common\.set_constants_to_default\(\) to avoid '
+            r'modifying the constants file during tests\.',
+        ):
+            self.mock_set_constants_to_default()
+
 
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
@@ -885,7 +894,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index2')
         with self.assertRaisesRegex(
             elasticsearch.RequestError,
-            r'RequestError\(400, \'resource_already_exists_exception\'\)',
+            r'resource_already_exists_exception: index',
         ):
             stub.mock_create_index('index1')
 
@@ -893,10 +902,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete('index1', 'some_id')
 
@@ -905,7 +911,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub.mock_create_index('index1')
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            r'NotFoundError\(404,',
+            r'document not found: \[index1\]\[doc_id\]',
         ):
             stub.mock_delete('index1', 'doc_id')
 
@@ -913,10 +919,7 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
         stub = test_utils.ElasticSearchStub()
         with self.assertRaisesRegex(
             elasticsearch.NotFoundError,
-            (
-                r'NotFoundError\(404, \'index_not_found_exception\', '
-                r'\'no such index \[index1\]\', index1, index_or_alias\)'
-            ),
+            r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
 

@@ -358,14 +358,14 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       learnerGroupFeatureIsEnabledPromise,
     ])
       .then(() => {
+        this.totalLessonsInPlaylists = [
+          ...this.explorationPlaylist,
+          ...this.collectionPlaylist,
+        ];
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
-          this.communityLessonsDataLoaded = true;
-          this.totalLessonsInPlaylists = [
-            ...this.explorationPlaylist,
-            ...this.collectionPlaylist,
-          ];
           // So that focus is applied after the loading screen has dissapeared.
+          this.communityLessonsDataLoaded = true;
           this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
         }, 0);
       })

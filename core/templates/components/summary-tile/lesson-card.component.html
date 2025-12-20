@@ -1,4 +1,4 @@
-<div class="lesson-card-container e2e-test-redesigned-lesson-card-container"  *ngIf="!isRecommendation || statusIsPublished">
+<div class="lesson-card-container e2e-test-redesigned-lesson-card-container"  *ngIf="allNodes?.length !==0 && (!isRecommendation || statusIsPublished ||!isSerialChapterFeatureLearnerFlagEnabled())">
   <div class="align-items-center d-flex justify-content-center lesson-card-img relative rounded-top w-100" [ngStyle]="{'background-color': imgColor}">
     <img alt="" class="h-100" [src]="imgUrl">
     <div class="d-flex flex-column lesson-card-tags w-100">
@@ -16,20 +16,20 @@
   <div class="bg-white d-flex flex-column lesson-card-info justify-content-between">
     <div class="d-flex flex-column flex-grow">
       <div class="lesson-card-title-container mt-1 e2e-test-lesson-title">
-        <p class="lesson-card-title mb-0"> {{ title }} </p>
+        <p class="e2e-test-lesson-card-title lesson-card-title mb-0"> {{ title }} </p>
       </div>
       <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
       <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
-      <circle-progress [percent]="progress"> </circle-progress>
+      <circle-progress class="e2e-test-progress-lesson" [percent]="progress"> </circle-progress>
       <a [href]="lessonUrl"
-         *ngIf="statusIsPublished || isSavedSection || !isSerialChapterFeatureLearnerFlagEnabled()"
+         *ngIf="statusIsPublished || isSavedSection || isCommunityLesson || !isSerialChapterFeatureLearnerFlagEnabled()"
          class="align-items-center d-inline-flex justify-content-center lesson-card-button text-decoration-none e2e-test-resume-lesson-btn"
          target="_self">
         {{ getButtonTranslationKey() | translate }}
       </a>
-      <span *ngIf="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished && !isSavedSection"
+      <span *ngIf="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished && !isSavedSection && !isCommunityLesson"
             class="align-items-center d-inline-flex justify-content-center lesson-card-button upcoming"
             [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null" >
             {{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }}

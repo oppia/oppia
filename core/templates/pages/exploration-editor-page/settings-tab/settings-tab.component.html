@@ -70,7 +70,7 @@
                   </mat-select>
                 </mat-form-field>
                 <div>
-                  <span class="form-text secondary-info-text" tabindex="0">
+                  <span class="form-text d-block secondary-info-text" tabindex="0">
                     <em>
                       Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
                     </em>
@@ -94,7 +94,7 @@
                   </mat-form-field>
                 </div>
                 <div>
-                  <span class="form-text secondary-info-text">
+                  <span class="form-text  d-block secondary-info-text">
                     <em>This is the first card the learner sees when playing your exploration.</em>
                   </span>
                 </div>
@@ -107,7 +107,7 @@
                     <mat-form-field appearance="fill">
                       <mat-label for="explorationTags" class="d-block">Tags</mat-label>
                       <mat-chip-list #chipList>
-                        <span class="sr-only" tabindex="0">Tags help learners discover your exploration when searching.</span>
+                        <span class="visually-hidden" tabindex="0">Tags help learners discover your exploration when searching.</span>
                         <mat-chip *ngFor="let tags of explorationTags" (removed)="remove(tags)">
                           {{ tags }}
                           <mat-icon matChipRemove class="update-cross-icon">cancel</mat-icon>
@@ -128,12 +128,12 @@
                 </div>
               </div>
               <div>
-                <span class="form-text secondary-info-text">
+                <span class="form-text d-block secondary-info-text">
                   <em>Tags help learners discover your exploration when searching.</em>
                 </span>
               </div>
             </div>
-            <div class="text-right">
+            <div class="text-end">
               <button type="button" class="btn btn-secondary e2e-test-open-preview-summary-modal"
                       (click)="previewSummaryTile()"
                       title="Preview this exploration's summary card">
@@ -145,7 +145,7 @@
 
         <div *ngIf="!editabilityService.isEditable()">
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-start">
               <label for="explorationTitle">
                 Title
               </label>
@@ -158,7 +158,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-start">
               <label for="explorationObjective">
                 Goal
               </label>
@@ -171,7 +171,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-start">
               <label for="explorationCategory">
                 Category
               </label>
@@ -184,7 +184,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-start">
               <label for="explorationLanguageCode">Language</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
@@ -193,7 +193,7 @@
           </div>
 
           <div class="row">
-            <div class="col-lg-2 col-md-2 col-sm-2 float-left">
+            <div class="col-lg-2 col-md-2 col-sm-2 float-start">
               <label for="explorationInitStateName">First State</label>
             </div>
             <div class="col-lg-10 col-md-10 col-sm-10">
@@ -235,10 +235,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text">
+        <span class="form-text  d-block secondary-info-text">
           Parameters are values that change as the learner moves between cards (<a href="http://oppia.github.io/#/Parameters" target="_blank" rel="noopener">more info</a>).
         </span>
-        <span class="form-text secondary-info-text" *ngIf="explorationIsLinkedToStory">
+        <span class="form-text d-block secondary-info-text" *ngIf="explorationIsLinkedToStory">
           Explorations in a story cannot have parameters enabled.
         </span>
       </div>
@@ -252,9 +252,9 @@
               </label>
               <div>
                 <div class="oppia-on-off-switch">
-                  <input type="checkbox" class="sr-only" *ngIf="isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()" checked>
+                  <input type="checkbox" class="visually-hidden" *ngIf="isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()" checked>
                   <input type="checkbox" *ngIf="isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()" checked>
-                  <input type="checkbox" class="sr-only" *ngIf="!isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()">
+                  <input type="checkbox" class="visually-hidden" *ngIf="!isAutomaticTextToSpeechEnabled()" (click)="toggleAutomaticTextToSpeech()" aria-label="Automatic Text-to-speech" tabindex="0" (keydown.enter)="toggleAutomaticTextToSpeech()">
                   <input type="checkbox" *ngIf="!isAutomaticTextToSpeechEnabled()" class="oppia-on-off-switch-checkbox" id="text-speech-switch" (click)="toggleAutomaticTextToSpeech()">
                   <label class="oppia-on-off-switch-label e2e-test-on-off-switch" for="text-speech-switch">
                     <span class="oppia-on-off-switch-inner"></span>
@@ -263,7 +263,7 @@
                 </div>
               </div>
             </div>
-            <span class="form-text secondary-info-text" tabindex="0">
+            <span class="form-text d-block secondary-info-text" tabindex="0">
               Automatic text-to-speech generates audio from your content for learners to listen to. It is recommended that you disable this feature if creating an exploration whose content consists of multiple languages.
             </span>
           </div>
@@ -335,9 +335,9 @@
 
         <div *ngIf="canModifyRoles" [hidden]="!(isRolesFormOpen)">
           <strong>Add or Change Role</strong>
-          <div class="form-group">
+          <div class="mb-3">
             <form>
-              <label for="newMemberUsername">Username of invited user</label>
+              <label for="newMemberUsername" class="form-label">Username of invited user</label>
               <div>
                 <mat-form-field class="example-full-width" appearance="fill">
                   <mat-label>username</mat-label>
@@ -345,7 +345,7 @@
                 </mat-form-field>
               </div>
               <br>
-              <label for="newMemberRole" tabindex="0">Role of invited user</label>
+              <label for="newMemberRole" class="form-label" tabindex="0">Role of invited user</label>
               <div>
                 <mat-form-field appearance="fill">
                   <mat-select class="e2e-test-role-select" [(ngModel)]="newMemberRole" name="newMemberRole">
@@ -356,7 +356,7 @@
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
-                <span class="form-text" tabindex="0">
+                <span class="form-text d-block" tabindex="0">
                   <p>Note that managers also have the permissions of collaborators, collaborators also have the permissions of playtesters, and playtesters also have the permissions of viewers.</p>
                 </span>
               </div>
@@ -420,10 +420,10 @@
         </div>
 
         <div *ngIf="canManageVoiceArtist" [hidden]="!(isVoiceoverFormOpen)">
-          <div class="form-group">
+          <div class="mb-3">
             <form>
               <div>
-                <label>Add new voice artist: </label>
+                <label class="form-label">Add new voice artist: </label>
                 <input id="newVoicAartistUsername"
                        class="form-control e2e-test-new-voice-artist-username"
                        [(ngModel)]="newVoicAartistUsername"
@@ -523,9 +523,9 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" aria-label="feedback email" type="checkbox" class="sr-only" (click)="unmuteFeedbackNotifications()">
+              <input *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" aria-label="feedback email" type="checkbox" class="visually-hidden" (click)="unmuteFeedbackNotifications()">
               <input span *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" (click)="unmuteFeedbackNotifications()">
-              <input *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="sr-only" checked (click)="muteFeedbackNotifications()">
+              <input *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="visually-hidden" checked (click)="muteFeedbackNotifications()">
               <input span *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox" id="feedback-switch" checked (click)="muteFeedbackNotifications()">
               <label class="oppia-on-off-switch-label e2e-test-enable-fallbacks" for="feedback-switch">
                 <span class="oppia-on-off-switch-inner"></span>
@@ -534,10 +534,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text  d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new feedback for this exploration.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areFeedbackNotificationsMuted()" tabindex="0">
           You have muted feedback notifications for this exploration. You will not receive an email when new feedback is submitted.
         </span>
       </div>
@@ -549,9 +549,9 @@
           </label>
           <div>
             <div class="oppia-on-off-switch">
-              <input *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="sr-only" aria-label="Suggestion emails" (click)="unmuteSuggestionNotifications()">
+              <input *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" aria-label="Suggestion emails" (click)="unmuteSuggestionNotifications()">
               <input span *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" (click)="unmuteSuggestionNotifications()">
-              <input *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="sr-only" checked aria-label="Suggestion emails" (click)="muteSuggestionNotifications()">
+              <input *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="visually-hidden" checked aria-label="Suggestion emails" (click)="muteSuggestionNotifications()">
               <input span *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" type="checkbox" class="oppia-on-off-switch-checkbox e2e-test-enable-fallbacks" id="suggestion-switch" checked (click)="muteSuggestionNotifications()">
               <label class="oppia-on-off-switch-label" for="suggestion-switch">
                 <span class="oppia-on-off-switch-inner"></span>
@@ -560,10 +560,10 @@
             </div>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="!userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
           You are currently receiving notifications of new suggestions for this exploration.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="userEmailPreferencesService.areSuggestionNotificationsMuted()" tabindex="0">
           You have muted suggestion notifications for this exploration. You will not receive an email when new suggestion is submitted.
         </span>
       </div>
@@ -630,9 +630,9 @@
         </label>
         <div>
           <div class="oppia-on-off-switch">
-            <input *ngIf="isExplorationEditable()" type="checkbox" class="sr-only" aria-label="allow edits to exploration" checked (click)="disableEdits()">
+            <input *ngIf="isExplorationEditable()" type="checkbox" class="visually-hidden" aria-label="allow edits to exploration" checked (click)="disableEdits()">
             <input span *ngIf="isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" checked (click)="disableEdits()">
-            <input *ngIf="!isExplorationEditable()" type="checkbox" class="sr-only" (click)="enableEdits()" aria-label="allow edits to exploration">
+            <input *ngIf="!isExplorationEditable()" type="checkbox" class="visually-hidden" (click)="enableEdits()" aria-label="allow edits to exploration">
             <input span *ngIf="!isExplorationEditable()" type="checkbox" class="oppia-on-off-switch-checkbox" id="edits-switch" (click)="enableEdits()">
             <label class="oppia-on-off-switch-label" for="edits-switch">
               <span class="oppia-on-off-switch-inner"></span>
@@ -640,10 +640,10 @@
             </label>
           </div>
         </div>
-        <span class="form-text secondary-info-text" *ngIf="isExplorationEditable()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="isExplorationEditable()" tabindex="0">
           Further edits to the exploration are currently allowed.
         </span>
-        <span class="form-text secondary-info-text" *ngIf="!isExplorationEditable()" tabindex="0">
+        <span class="form-text d-block secondary-info-text" *ngIf="!isExplorationEditable()" tabindex="0">
           Further edits to the exploration are no longer allowed.
         </span>
       </div>
@@ -687,7 +687,7 @@
   <mat-card class="oppia-settings-card-container oppia-editor-card">
     <div *ngIf="canShowExploreVersionHistoryButton();" tabindex="0">
       Metadata last changed by <strong>{{ getLastEditedCommitterUsername() }}</strong> at <strong>version {{ getLastEditedVersionNumber() + 1 }} of the exploration</strong>.
-      <a class="text-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
+      <a class="link-primary explore-version-history-button" tabindex="0" (keydown.enter)="onClickExploreVersionHistoryButton()" (click)="onClickExploreVersionHistoryButton()"> More details</a>.
     </div>
     <div *ngIf="!canShowExploreVersionHistoryButton();" tabindex="0">
       <span *ngIf="!validationErrorIsShown">No changes have been made to the exploration metadata after the initial creation of the exploration.</span>
