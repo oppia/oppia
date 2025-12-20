@@ -622,27 +622,20 @@ export class BaseUser {
   async selectMatOption(value: string): Promise<void> {
     await this.page.waitForSelector('mat-option');
     const matOptionElements = await this.page.$$('mat-option');
-
     for (const matOptionElement of matOptionElements) {
       if (
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        // eslint-disable-next-line no-console
-        console.log(`--- Attempting robust click on: ${value} ---`);
-
-        // Added Robust Click.
+        // Use Of ClickonElement
         await this.clickOnElement(matOptionElement);
-
-        // eslint-disable-next-line no-console
-        console.log(`--- Robust click successful for: ${value} ---`);
         break;
       }
     }
 
-    await this.page.waitForSelector('mat-option', {hidden: true});
-    // eslint-disable-next-line no-console
-    console.log('--- Mat-option dropdown successfully closed ---');
+    await this.page.waitForSelector('mat-option', {
+      hidden: true,
+    });
   }
 
   /**
