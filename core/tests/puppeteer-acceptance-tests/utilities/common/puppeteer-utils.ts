@@ -627,7 +627,7 @@ export class BaseUser {
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        // Use Of ClickonElement
+        // Use Of ClickonElement.
         await this.clickOnElement(matOptionElement);
         break;
       }
