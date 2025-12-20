@@ -335,8 +335,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       );
 
     if (voiceoverGenerationStatus === 'SUCCEEDED') {
+      if (this.entityVoiceoversService.isEntityVoiceoverFetchInProgress) {
+        return;
+      }
       this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
         this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
+        this.graphDataService.recompute();
+        this.changeDetectorRef.detectChanges();
       });
     } else if (voiceoverGenerationStatus === 'FAILED') {
       this.automaticVoiceover = undefined;
@@ -346,6 +351,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else {
       this.automaticVoiceoverGenerationStatus = '';
     }
+    this.graphDataService.recompute();
     this.changeDetectorRef.detectChanges();
   }
 
@@ -370,6 +376,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     }
 
     this.updateContentAvailabilityStatusForVoiceovers();
+    this.graphDataService.recompute();
   }
 
   updateContentAvailabilityStatusForVoiceovers(): void {

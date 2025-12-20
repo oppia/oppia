@@ -929,6 +929,10 @@ describe('Exploration save service ' + 'while saving changes', () => {
     spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
       true
     );
+    spyOn(
+      changeListService,
+      'doesChangeListAffectAutoVoiceovers'
+    ).and.returnValue(true);
     let regenerateVoiceoverSpy = spyOn(
       voiceoverBackendApiService,
       'regenerateVoiceoverOnExplorationUpdateAsync'

@@ -329,15 +329,22 @@ def compute_voiceover_related_change(
             )
 
             for entity_voiceovers in all_entity_voiceovers:
-                if entity_voiceovers.language_accent_code in (
-                    language_accent_codes
+                # If the language code is English, it indicates that the
+                # English content was modified, so all associated manual
+                # voiceovers must be marked as needing update.
+                if (
+                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    and entity_voiceovers.language_accent_code
+                    not in language_accent_codes
                 ):
-                    entity_voiceovers.remove_voiceover(
-                        change.content_id, feconf.VoiceoverType.MANUAL
-                    )
-                    entity_voiceovers.remove_voiceover(
-                        change.content_id, feconf.VoiceoverType.AUTO
-                    )
+                    continue
+
+                entity_voiceovers.remove_voiceover(
+                    change.content_id, feconf.VoiceoverType.MANUAL
+                )
+                entity_voiceovers.remove_voiceover(
+                    change.content_id, feconf.VoiceoverType.AUTO
+                )
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
         entity_voiceovers_dict = entity_voiceovers.to_dict()

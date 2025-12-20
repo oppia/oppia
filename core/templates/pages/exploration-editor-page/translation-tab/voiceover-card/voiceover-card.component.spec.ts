@@ -553,8 +553,17 @@ describe('Voiceover card component', () => {
       needs_update: false,
       duration_secs: 10.0,
     };
+    let automaticVoiceoverBackendDict: VoiceoverBackendDict = {
+      filename: 'b.mp3',
+      file_size_bytes: 200000,
+      needs_update: false,
+      duration_secs: 10.0,
+    };
     component.manualVoiceover = Voiceover.createFromBackendDict(
       manualVoiceoverBackendDict
+    );
+    component.automaticVoiceover = Voiceover.createFromBackendDict(
+      automaticVoiceoverBackendDict
     );
 
     let entityId = 'exploration_1';
@@ -994,6 +1003,30 @@ describe('Voiceover card component', () => {
     expect(entityVoiceoversService.fetchEntityVoiceovers).toHaveBeenCalled();
     expect(component.automaticVoiceoverGenerationStatus).toEqual('SUCCEEDED');
   }));
+
+  it(
+    'should not make multiple calls to fetch entity voiceovers if ' +
+      'generation status is SUCCEEDED',
+    fakeAsync(() => {
+      spyOn(
+        voiceoverRegenerationTaskMappingService,
+        'getContentRegenerationStatus'
+      ).and.returnValue('SUCCEEDED');
+      spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
+        Promise.resolve()
+      );
+
+      entityVoiceoversService.isEntityVoiceoverFetchInProgress = true;
+
+      component.updateAutomaticVoiceoverWithRegenerationStatus();
+
+      tick();
+
+      expect(
+        entityVoiceoversService.fetchEntityVoiceovers
+      ).not.toHaveBeenCalled();
+    })
+  );
 
   it('should update automatic voiceover status when generation status is FAILED', fakeAsync(() => {
     spyOn(

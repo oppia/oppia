@@ -532,7 +532,7 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
         assert auto_voiceover is not None
 
         self.assertTrue(manual_voiceover.needs_update)
-        self.assertFalse(auto_voiceover.needs_update)
+        self.assertTrue(auto_voiceover.needs_update)
 
     def test_should_remove_entity_voiceovers(self) -> None:
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -584,7 +584,14 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
                     'language_code': 'en',
                     'content_id': 'content_0',
                 }
-            )
+            ),
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': 'remove_voiceovers',
+                    'language_code': 'hi',
+                    'content_id': 'content_0',
+                }
+            ),
         ]
 
         entity_voiceovers_models = (
