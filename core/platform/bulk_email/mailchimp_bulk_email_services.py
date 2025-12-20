@@ -179,8 +179,8 @@ def permanently_delete_user_from_list(user_email: str) -> None:
     except mailchimpclient.MailChimpError as error:
         error_message = error.args[0]
 
-        if error_message.get("status") != 404:
-            raise Exception(error_message.get("detail")) from error
+        if error_message.get('status') != 404:
+            raise Exception(error_message.get('detail')) from error
 
 
 def add_or_update_user_status(
