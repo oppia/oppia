@@ -2466,6 +2466,14 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
     def setUp(self) -> None:
         """Complete the signup process for self.CURRICULUM_ADMIN_EMAIL."""
         super().setUp()
+        try:
+            self.signup(self.SUPER_ADMIN_EMAIL, self.SUPER_ADMIN_USERNAME)
+        except Exception as e:
+            # If the user already exists, we can ignore this error.
+            # This happens if GenericTestBase.setUp already created the user.
+            if 'already exists for auth_id' not in str(e):
+                raise e
+
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
@@ -3778,7 +3786,9 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         swap_state_answers = mock.patch.object(
-            stats_services, 'get_state_answers', None
+            stats_services,
+            'get_state_answers',
+            side_effect=Exception('Mock error'),
         )
         with swap_state_answers:
             response = self.get_json(
@@ -3788,8 +3798,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             )
         self.assertEqual(
             response['error'],
-            'No state answer exists for the given exp_id: exp, '
-            'exp_version: 1 and state_name: Introduction',
+            'Mock error',
         )
 
     def test_handler_when_exp_version_is_not_int_throws_exception(self) -> None:

@@ -426,6 +426,21 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
             self.stub.verify_external_auth_associations_are_deleted('uid')
         )
 
+    def test_signup_superadmin_user_is_idempotent(self) -> None:
+        """Ensure calling signup_superadmin_user multiple times doesn't
+        raise and leaves a valid superadmin user present.
+        """
+        # First call should create the user.
+        self.signup_superadmin_user()
+        admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+        self.assertIsNotNone(admin_id)
+
+        # Second call should be a no-op and not raise.
+        self.signup_superadmin_user()
+        self.assertEqual(
+            admin_id, self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+        )
+
     def test_delete_association_when_it_is_missing_does_not_raise(self) -> None:
         # Should not raise.
         self.stub.delete_external_auth_associations('does_not_exist')

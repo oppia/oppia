@@ -474,8 +474,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         )
         story = story_fetchers.get_story_by_id(self.story_id_1)
 
+        # Patch the feature-flag check with a callable that returns True.
         feature_flag_patch = mock.patch.object(
-            feature_flag_services, 'is_feature_flag_enabled', True
+            feature_flag_services,
+            'is_feature_flag_enabled',
+            lambda *args, **kwargs: True,
         )
         generate_topic_summary_patch = mock.patch.object(
             topic_services,
@@ -4356,10 +4359,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             None  # type: ignore[assignment]
         )
 
+        # Patch the fetcher to return the precomputed summary when called.
         with mock.patch.object(
             topic_fetchers,
             'get_topic_summary_by_id',
-            topic_summary_without_exp_ids,
+            lambda _topic_id, strict=True: topic_summary_without_exp_ids,
         ):
             story_exp_ids = (
                 topic_services.get_all_published_story_exploration_ids(

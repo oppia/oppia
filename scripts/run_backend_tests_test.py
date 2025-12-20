@@ -178,7 +178,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                     self.coverage_exc_list
                 )
 
-        mock_popen_obj.assert_called_once_with(self.coverage_exc_list)
+        mock_popen_obj.assert_called_once_with(
+            self.coverage_exc_list,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=None,
+        )
 
         self.assertIn('INFO: This is task output.', self.terminal_logs)
         self.assertEqual(expected_result, returned_result)
@@ -206,7 +211,12 @@ class RunBackendTestsTests(test_utils.GenericTestBase):
                 ):
                     run_backend_tests.run_shell_cmd(self.coverage_exc_list)
 
-        mock_popen_obj.assert_called_once_with(self.coverage_exc_list)
+        mock_popen_obj.assert_called_once_with(
+            self.coverage_exc_list,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=None,
+        )
 
     def test_duplicate_test_files_in_shards_throws_error(self) -> None:
 

@@ -196,3 +196,26 @@ class ConstantsTests(test_utils.GenericTestBase):
             constants.constants, {'TESTING_CONSTANT': 'test_2'}
         ):
             self.assertEqual(constants.constants.TESTING_CONSTANT, 'test_2')
+
+    def test_missing_attribute_behaves_like_attribute_error_and_patchable(
+        self,
+    ) -> None:
+        """Test that accessing a missing attribute raises AttributeError and
+        that patch.object can be used to temporarily set an attribute.
+        """
+
+        # Accessing a non-existent attribute should raise AttributeError.
+        with self.assertRaisesRegex(AttributeError, 'NON_EXISTENT_CONSTANT'):
+            _ = constants.constants.NON_EXISTENT_CONSTANT
+
+        # Patch.object should be able to add an attribute temporarily.
+        with mock.patch.object(constants.constants, 'DEV_MODE', True):
+            self.assertTrue(constants.constants.DEV_MODE)
+
+    def test_module_level_constants_are_patchable(self) -> None:
+        """Ensure that module-level constants can be patched using
+        mock.patch.object without raising KeyError.
+        """
+        # Patch the module-level attribute (not the Constants instance).
+        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            self.assertEqual(constants.OPPORTUNITIES_PAGE_SIZE, 1)

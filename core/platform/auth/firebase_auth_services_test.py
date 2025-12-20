@@ -1255,7 +1255,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         always_raise_expired_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
-            error=firebase_auth.ExpiredSessionCookieError('uh-oh', None),
+            side_effect=firebase_auth.ExpiredSessionCookieError('uh-oh', None),
         )
 
         with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
@@ -1276,7 +1276,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         always_raise_revoked_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
-            error=firebase_auth.RevokedSessionCookieError('uh-oh'),
+            side_effect=firebase_auth.RevokedSessionCookieError('uh-oh'),
         )
 
         with always_raise_revoked_session_cookie_error:
@@ -1298,7 +1298,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         always_raise_expired_session_cookie_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
-            error=firebase_auth.UserDisabledError('uh-oh'),
+            side_effect=firebase_auth.UserDisabledError('uh-oh'),
         )
 
         with always_raise_expired_session_cookie_error, self.assertRaisesRegex(
@@ -1317,7 +1317,7 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         always_raise_unknown_error = mock.patch.object(
             firebase_auth,
             'verify_session_cookie',
-            error=firebase_exceptions.UnknownError('uh-oh'),
+            side_effect=firebase_exceptions.UnknownError('uh-oh'),
         )
 
         with always_raise_unknown_error:
@@ -1557,7 +1557,7 @@ class GenericAssociationTests(FirebaseAuthServicesTestBase):
         update_user_patch = mock.patch.object(
             firebase_auth,
             'update_user',
-            error=firebase_exceptions.UnknownError('could not update'),
+            side_effect=firebase_exceptions.UnknownError('could not update'),
         )
         log_capturing_context = self.capture_logging()
 
@@ -1608,7 +1608,7 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         delete_patch = mock.patch.object(
             firebase_auth,
             'delete_user',
-            error=firebase_exceptions.InternalError('could not connect'),
+            side_effect=firebase_exceptions.InternalError('could not connect'),
         )
 
         with delete_patch, self.capture_logging() as logs:

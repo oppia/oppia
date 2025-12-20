@@ -133,6 +133,7 @@ export default {
   },
 
   "MAX_QUESTIONS_FETCHABLE": 800,
+  "OPPORTUNITIES_PAGE_SIZE": 10,
 
   // Sorting categories for contributor admin dashboard.
   "CD_ADMIN_STATS_SORT_OPTIONS": {
@@ -6211,10 +6212,6 @@ export default {
   "MIN_QUESTION_COUNT_FOR_A_DIAGNOSTIC_TEST_SKILL": 3,
 
   "BULK_EMAIL_SERVICE_SIGNUP_URL": "",
-
-  // The default number of opportunities to show on the contributor dashboard
-  // page.
-  "OPPORTUNITIES_PAGE_SIZE": 10,
 
   // The breakpoint for mobile view for contributor dashboard in px.
   // This value must be the same as the one specified in

@@ -141,7 +141,13 @@ class Constants(dict):  # type: ignore[type-arg]
     # Here we use type Any because the return value here refers to the `value`
     # in the __setattr__ method, hence the type Any is used for it.
     def __getattr__(self, name: str) -> Any:
-        return self[name]
+        try:
+            return self[name]
+        except KeyError as e:
+            # Attribute access should raise AttributeError when the attribute
+            # does not exist so that callers using hasattr/getattr behave
+            # correctly (e.g., unittest.mock.patch.object uses hasattr()).
+            raise AttributeError(name) from e
 
     def __delattr__(self, name: str) -> None:
         del self[name]
@@ -173,3 +179,13 @@ constants = Constants(
 release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
+
+# Export the parsed constants as module-level attributes so that code and
+# tests which expect to patch or access constants as attributes on the
+# module (e.g. `mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', ...)`)
+# work correctly. We avoid exposing the entire dict itself and only copy
+# scalar values into the module namespace.
+for _k, _v in constants.items():
+    # Avoid clobbering existing module attributes.
+    if _k not in globals():
+        globals()[_k] = _v

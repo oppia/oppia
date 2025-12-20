@@ -156,7 +156,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     self.assertFalse(all_checks_passed(self.linter_stdout))
                     install_mock.assert_called()
                     for prefix in mock_shards['1']:
-                        get_filenames_mock.assert_any_call(prefix)
+                        get_filenames_mock.assert_any_call(
+                            prefix, namespace=mock.ANY
+                        )
 
     def test_main_with_invalid_shards(self) -> None:
         def mock_get_filepaths_from_path(
@@ -191,7 +193,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     RuntimeError, 'mock_file in multiple shards'
                 ):
                     run_lint_checks.main(args=['--shard', '1'])
-                get_filenames_mock.assert_called_once_with('a/')
+                get_filenames_mock.assert_called_once_with(
+                    'a/', namespace=mock.ANY
+                )
 
     def test_main_with_other_shard(self) -> None:
         def mock_get_filepaths_from_path(
@@ -228,8 +232,10 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
                     run_lint_checks.main(
                         args=['--shard', run_lint_checks.OTHER_SHARD_NAME]
                     )
-                    get_filenames_mock.assert_any_call(os.getcwd())
-                    get_filenames_mock.assert_any_call('a/')
+                    get_filenames_mock.assert_any_call(
+                        os.getcwd(), namespace=mock.ANY
+                    )
+                    get_filenames_mock.assert_any_call('a/', namespace=mock.ANY)
                     self.assertFalse(all_checks_passed(self.linter_stdout))
 
     def test_main_with_files_arg(self) -> None:
