@@ -1718,7 +1718,8 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the About page using the oppia website footer.
    */
   async clickOnAboutLinkInFooter(): Promise<void> {
-    await this.clickAndWaitForNavigation(footerAboutLink, true);
+    await this.page.waitForSelector(footerAboutLink);
+    await this.clickButtonToNavigateToNewPage(footerAboutLink, aboutUrl);
   }
   /**
    * Navigates to the Blog page using the oppia website footer.
@@ -1765,7 +1766,8 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Teach page using the oppia website footer.
    */
   async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
-    await this.clickAndWaitForNavigation(footerTeachLink, true);
+    await this.page.waitForSelector(footerTeachLink);
+    await this.clickButtonToNavigateToNewPage(footerTeachLink, teachUrl);
   }
 
   /**
