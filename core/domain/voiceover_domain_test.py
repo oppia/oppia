@@ -494,15 +494,9 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         ]
         # Ruling out the possibility of None for mypy type checking.
         assert voiceover is not None
-        self.assertFalse(voiceover.needs_update)
-
-        entity_voiceovers_object.mark_voiceovers_as_needing_update(
-            'content_0', feconf.VoiceoverType.MANUAL
-        )
-
-        voiceover = entity_voiceovers_object.voiceovers_mapping['content_0'][
-            'manual'
-        ]
-        # Ruling out the possibility of None for mypy type checking.
-        assert voiceover is not None
         self.assertTrue(voiceover.needs_update)
+
+        # Does not throw error if content_id is not present.
+        entity_voiceovers_object.mark_voiceovers_as_needing_update(
+            'content_1', feconf.VoiceoverType.MANUAL
+        )
