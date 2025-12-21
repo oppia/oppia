@@ -23,7 +23,7 @@ from core.jobs.batch_jobs import audit_invalid_feedback_messages_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Final, Type
+from typing import Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -42,7 +42,7 @@ class AuditInvalidFeedbackMessagesJobTest(job_test_utils.JobTestBase):
     ] = audit_invalid_feedback_messages_jobs.AuditInvalidFeedbackMessagesJob
 
     def test_empty_datastore(self) -> None:
-        """Tests that the job runs successfully on an empty datastore"""
+        """Tests that the job runs successfully on an empty datastore."""
         self.assert_job_output_is_empty()
 
     def test_general_feedback_message_models_with_no_invalid_messages(
