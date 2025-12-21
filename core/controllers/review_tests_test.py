@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     story_domain,
     story_services,
@@ -62,9 +61,11 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
@@ -162,9 +163,11 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],

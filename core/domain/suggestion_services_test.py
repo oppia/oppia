@@ -21,8 +21,7 @@ import random
 import string
 from unittest import mock
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -1701,7 +1700,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             )
         )
         audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         model = opportunity_models.ExplorationOpportunitySummaryModel(
             id='exploration1',
@@ -2262,9 +2262,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_submitted_suggestions_by_offset(
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
-                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                limit=constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
             )
         )
 
@@ -2298,9 +2298,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_submitted_suggestions_by_offset(
                 user_id=self.author_id_1,
                 suggestion_type=feconf.SUGGESTION_TYPE_ADD_QUESTION,
-                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                limit=constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
             )
         )
 
@@ -2422,7 +2422,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
             )
@@ -2509,7 +2509,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 [],
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
             )
@@ -2541,7 +2541,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 None,
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
             )
@@ -2570,7 +2570,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 None,
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
             )
@@ -2605,7 +2605,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
                 language_to_filter,
@@ -2624,7 +2624,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             suggestion_services.get_reviewable_translation_suggestions_by_offset(
                 self.reviewer_id_1,
                 self.opportunity_summary_ids,
-                constants.OPPORTUNITIES_PAGE_SIZE,
+                constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 0,
                 None,
                 language_to_filter,
@@ -2722,9 +2722,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         suggestions, offset = (
             suggestion_services.get_reviewable_question_suggestions_by_offset(
                 self.reviewer_id_1,
-                limit=constants.OPPORTUNITIES_PAGE_SIZE,
+                limit=constants.constants.OPPORTUNITIES_PAGE_SIZE,
                 offset=0,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids=['skill1', 'skill2'],
             )
         )
@@ -3332,7 +3332,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 'Title',
                 [subtopic_skill_id],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic',
             )
@@ -3389,7 +3389,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
             )
             for i in range(3)
@@ -3533,7 +3533,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
             )
             for i in range(2, 4)
@@ -5422,7 +5422,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(
             last_message.text,
-            constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG,
+            constants.constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG,
         )
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         self.assertEqual(
@@ -6601,7 +6601,8 @@ class GetSuggestionsWaitingForReviewInfoToNotifyReviewersUnitTests(
             self.target_id, self.author_id
         )
         audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         model = opportunity_models.ExplorationOpportunitySummaryModel(
             id=exploration.id,
@@ -7390,7 +7391,8 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
             self.target_id, self.author_id
         )
         audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         model = opportunity_models.ExplorationOpportunitySummaryModel(
             id=exploration.id,
@@ -8321,7 +8323,7 @@ class GetSuggestionTypesThatNeedReviewersUnitTests(test_utils.GenericTestBase):
                 'question_state_data': self._create_valid_question_data(
                     'default_state', content_id_generator
                 ).to_dict(),
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION
                 ),

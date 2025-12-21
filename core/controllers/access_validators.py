@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base, editor, reader
 from core.domain import (
     blog_services,
@@ -102,7 +101,7 @@ class ClassroomsPageAccessValidationHandler(
         classrooms = classroom_config_services.get_all_classrooms()
         has_public_classrooms = any(map(lambda c: c.is_published, classrooms))
 
-        if not (has_public_classrooms or constants.DEV_MODE):
+        if not (has_public_classrooms or constants.constants.DEV_MODE):
             raise self.NotFoundException
 
 
@@ -113,19 +112,19 @@ class SubtopicViewerPageRevisionRedirectHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX,
+                        'regex_pattern': constants.constants.VALID_URL_FRAGMENT_REGEX,
                     },
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+                        'max_value': constants.constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
                     },
                 ],
             }
@@ -158,19 +157,19 @@ class SubtopicViewerPageAccessValidationHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
         'subtopic_url_fragment': {
             'schema': {
                 'type': 'basestring',
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_URL_FRAGMENT_REGEX,
+                        'regex_pattern': constants.constants.VALID_URL_FRAGMENT_REGEX,
                     },
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+                        'max_value': constants.constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
                     },
                 ],
             }
@@ -209,8 +208,8 @@ class TopicViewerPageRevisionRedirectHandler(
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -236,8 +235,8 @@ class TopicViewerPageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -293,8 +292,8 @@ class PracticeSessionAccessValidationPage(
     """Validates access to practice seesion page."""
 
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
@@ -399,7 +398,7 @@ class ViewLearnerGroupPageAccessValidationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -475,7 +474,7 @@ class ExplorationPlayerAccessValidationPage(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -545,7 +544,7 @@ class EditLearnerGroupPageAccessValidationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -649,7 +648,7 @@ class BlogAuthorProfilePageAccessValidationHandler(
             'validators': [
                 {
                     'id': 'has_length_at_most',
-                    'max_value': constants.MAX_AUTHOR_NAME_LENGTH,
+                    'max_value': constants.constants.MAX_AUTHOR_NAME_LENGTH,
                 }
             ],
         }
@@ -697,7 +696,7 @@ class SkillEditorPageAccessValidationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -753,7 +752,7 @@ class ExplorationEditorAccessValidationHandlerPage(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -783,7 +782,7 @@ class TopicEditorAccessValidationPage(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -820,7 +819,10 @@ class StoryEditorAccessValidationHandlerPage(
             'schema': {
                 'type': 'basestring',
                 'validators': [
-                    {'id': 'has_length', 'value': constants.STORY_ID_LENGTH}
+                    {
+                        'id': 'has_length',
+                        'value': constants.constants.STORY_ID_LENGTH,
+                    }
                 ],
             }
         }
@@ -845,9 +847,9 @@ class ReviewTestsPageAccessValidationHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
@@ -190,7 +189,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.subtopic_page_id = 'b'
@@ -248,7 +247,7 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 commit_type='create',
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=True,
             )
         )
@@ -268,7 +267,7 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.study_guide_id = 'b'
@@ -326,7 +325,7 @@ class StudyGuideCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
                 commit_type='create',
                 commit_message='Created new SubtopicPageCommitLogEntry',
                 commit_cmds=[{'cmd': 'create_new'}],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=True,
             )
         )

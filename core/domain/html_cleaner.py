@@ -23,8 +23,7 @@ import json
 import logging
 import urllib
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.domain import rte_component_registry
 
 import bleach
@@ -456,10 +455,13 @@ def validate_rte_tags(
         )
 
         url = tag['url-with-value'].replace('&quot;', '').replace(' ', '')
-        if utils.get_url_scheme(url) not in constants.ACCEPTABLE_SCHEMES:
+        if (
+            utils.get_url_scheme(url)
+            not in constants.constants.ACCEPTABLE_SCHEMES
+        ):
             raise utils.ValidationError(
                 'Link should be prefix with acceptable schemas '
-                f'which are {constants.ACCEPTABLE_SCHEMES}'
+                f'which are {constants.constants.ACCEPTABLE_SCHEMES}'
             )
 
     for tag in soup.find_all('oppia-noninteractive-math'):

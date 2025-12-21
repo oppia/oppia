@@ -22,8 +22,7 @@ import datetime
 import json
 import os
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     email_manager,
     exp_domain,
@@ -1205,7 +1204,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     exploration_version = exploration.version
     exploration_title = exploration.title
 
-    if language_code == constants.DEFAULT_LANGUAGE_CODE:
+    if language_code == constants.constants.DEFAULT_LANGUAGE_CODE:
         # Retrieve all English-language contents from the exploration.
         language_code_to_contents_mapping.update(
             extract_english_voiceover_texts_from_exploration(exploration)

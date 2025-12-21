@@ -22,8 +22,7 @@ import enum
 import json
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import change_domain
 
 from typing import (
@@ -72,17 +71,17 @@ ALLOWED_FEATURE_STAGES: Final = [
     FeatureStages.PROD.value,
 ]
 ALLOWED_PLATFORM_TYPES: List[str] = (
-    constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
+    constants.constants.PLATFORM_PARAMETER_ALLOWED_PLATFORM_TYPES
 )
 ALLOWED_APP_VERSION_FLAVORS: List[str] = (
-    constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
+    constants.constants.PLATFORM_PARAMETER_ALLOWED_APP_VERSION_FLAVORS
 )
 
 APP_VERSION_WITH_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+    constants.constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
 )
 APP_VERSION_WITHOUT_HASH_REGEXP: Pattern[str] = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
+    constants.constants.PLATFORM_PARAMETER_APP_VERSION_WITHOUT_HASH_REGEXP
 )
 
 

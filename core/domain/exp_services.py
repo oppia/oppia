@@ -35,8 +35,13 @@ import pprint
 import re
 import zipfile
 
-from core import android_validation_constants, feature_flag_list, feconf, utils
-from core.constants import constants
+from core import (
+    android_validation_constants,
+    constants,
+    feature_flag_list,
+    feconf,
+    utils,
+)
 from core.domain import (
     activity_services,
     caching_services,
@@ -1604,7 +1609,7 @@ def delete_explorations(
     # Remove the explorations from the featured activity references, if
     # necessary.
     activity_services.remove_featured_activities(
-        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids
+        constants.constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids
     )
 
     feedback_services.delete_threads_for_multiple_entities(
@@ -1886,7 +1891,7 @@ def validate_exploration_for_story(
             raise utils.ValidationError(error_string)
         validation_error_messages.append(error_string)
 
-    if exp.category not in constants.ALL_CATEGORIES:
+    if exp.category not in constants.constants.ALL_CATEGORIES:
         error_string = (
             'Expected all explorations in a story to '
             'be of a default category. '
@@ -2456,7 +2461,10 @@ def compute_exploration_contributors_summary(
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
         is_revert = snapshot_metadata['commit_type'] == 'revert'
-        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
+        if (
+            not is_revert
+            and committer_id not in constants.constants.SYSTEM_USER_IDS
+        ):
             contributors_summary[committer_id] += 1
         if current_version == 1:
             break

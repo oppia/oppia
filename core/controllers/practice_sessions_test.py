@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import topic_domain, topic_services, user_services
 from core.tests import test_utils
 
@@ -57,7 +56,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
                 'subtopic_name',
                 [self.skill_id1],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name-one',
             )
@@ -68,7 +67,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
                 'subtopic_name_2',
                 [self.skill_id2],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name-two',
             )
@@ -76,9 +75,9 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         self.topic.next_subtopic_id = 3
         self.topic.skill_ids_for_diagnostic_test = [self.skill_id1]
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
@@ -89,9 +88,9 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -108,16 +107,16 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'fragm',
         )
         topic.thumbnail_filename = 'Topic.svg'
-        topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic.subtopics.append(
             topic_domain.Subtopic(
                 1,
                 'subtopic_name',
                 ['non_existent_skill'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name-three',
             )

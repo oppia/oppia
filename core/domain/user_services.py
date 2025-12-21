@@ -24,8 +24,7 @@ import itertools
 import logging
 import urllib
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     auth_domain,
     auth_services,
@@ -1229,7 +1228,7 @@ def create_new_user(auth_id: str, email: str) -> user_domain.UserSettings:
         [feconf.ROLE_ID_FULL_USER],
         False,
         False,
-        preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+        preferred_language_codes=[constants.constants.DEFAULT_LANGUAGE_CODE],
     )
     _create_new_user_transactional(auth_id, user_settings)
     return user_settings
@@ -1300,7 +1299,9 @@ def create_new_profiles(
             [feconf.ROLE_ID_MOBILE_LEARNER],
             False,
             False,
-            preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE],
+            preferred_language_codes=[
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             pin=modifiable_user_data.pin,
         )
         user_settings.populate_from_modifiable_user_data(modifiable_user_data)
@@ -2700,20 +2701,26 @@ def get_contributor_usernames(
     """
     user_ids = []
     if (
-        category in (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,)
+        category
+        in (constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,)
         and language_code is None
     ):
         raise Exception(
             'The language_code cannot be None if review category is'
             ' \'translation\' or \'voiceover\'.'
         )
-    if category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION:
+    if (
+        category
+        == constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+    ):
         # Ruling out the possibility of None for mypy type checking.
         assert language_code is not None
         user_ids = user_models.UserContributionRightsModel.get_translation_reviewer_user_ids(
             language_code
         )
-    elif category == constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION:
+    elif (
+        category == constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+    ):
         if language_code is not None:
             raise Exception(
                 'Expected language_code to be None, found: %s' % (language_code)
@@ -2721,7 +2728,9 @@ def get_contributor_usernames(
         user_ids = (
             user_models.UserContributionRightsModel.get_question_reviewer_user_ids()
         )
-    elif category == constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION:
+    elif (
+        category == constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+    ):
         user_ids = (
             user_models.UserContributionRightsModel.get_question_submitter_user_ids()
         )

@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import json
 
-from core import feature_flag_list, feconf
-from core.constants import constants
+from core import constants, feature_flag_list, feconf
 from core.domain import (
     learner_group_fetchers,
     learner_group_services,
@@ -303,7 +302,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 'Naming Numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -340,7 +339,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
                 'Intro to negative numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-one',
             )
@@ -369,7 +368,7 @@ class LearnerGroupSearchSyllabusHandlerTests(test_utils.GenericTestBase):
             'learner_group_id': self.learner_group_id,
             'search_keyword': 'Place',
             'search_category': 'All',
-            'search_language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'search_language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
         }
 
         response = self.get_json(
@@ -538,9 +537,11 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -559,9 +560,11 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -580,9 +583,11 @@ class LearnerGroupLearnerProgressHandlerTests(test_utils.GenericTestBase):
             'title': 'Title 3',
             'description': 'Description 3',
             'thumbnail_filename': 'image_3.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -826,9 +831,11 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image_1.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -847,9 +854,11 @@ class LearnerGroupLearnerSpecificProgressHandlerTests(
             'title': 'Title 2',
             'description': 'Description 2',
             'thumbnail_filename': 'image_2.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -1278,7 +1287,7 @@ class LearnerGroupSyllabusHandlerTests(test_utils.GenericTestBase):
                 'Naming Numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )

@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.domain import (
     auth_domain,
     auth_services,
@@ -54,7 +54,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
         self.modifiable_full_user_data = user_domain.ModifiableUserData(
             'full_user_1',
             '12345',
-            [constants.DEFAULT_LANGUAGE_CODE],
+            [constants.constants.DEFAULT_LANGUAGE_CODE],
             None,
             None,
             None,
@@ -64,7 +64,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             user_domain.ModifiableUserData(
                 'profile_user_1',
                 '12345',
-                [constants.DEFAULT_LANGUAGE_CODE],
+                [constants.constants.DEFAULT_LANGUAGE_CODE],
                 None,
                 None,
                 None,
@@ -72,7 +72,7 @@ class AuthServicesTests(test_utils.GenericTestBase):
             user_domain.ModifiableUserData(
                 'profile_user_2',
                 '12345',
-                [constants.DEFAULT_LANGUAGE_CODE],
+                [constants.constants.DEFAULT_LANGUAGE_CODE],
                 None,
                 None,
                 None,

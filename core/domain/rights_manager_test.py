@@ -19,7 +19,7 @@ from __future__ import annotations
 import unittest
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.domain import (
     collection_domain,
     collection_services,
@@ -183,7 +183,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_model = exp_models.ExplorationRightsModel.get('1')
 
         rights_obj = rights_manager.get_activity_rights_from_model(
-            rights_model, constants.ACTIVITY_TYPE_EXPLORATION
+            rights_model, constants.constants.ACTIVITY_TYPE_EXPLORATION
         )
 
         self.assertEqual(rights_obj.id, '1')
@@ -202,7 +202,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager._save_activity_rights(  # pylint: disable=protected-access
                 self.user_id_moderator,
                 exploration_rights,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 'Test commit',
                 [],
             )
@@ -1281,7 +1281,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration('exp1', owner_id)
 
         activity_rights_list = rights_manager._get_activity_rights_where_user_is_owner(  # pylint: disable=protected-access
-            constants.ACTIVITY_TYPE_EXPLORATION, owner_id
+            constants.constants.ACTIVITY_TYPE_EXPLORATION, owner_id
         )
 
         self.assertEqual(len(activity_rights_list), 1)

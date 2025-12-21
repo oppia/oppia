@@ -28,8 +28,7 @@ import json
 import re
 import string
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import change_domain
 
 from typing import Dict, Final, List, Literal, Optional, TypedDict, cast
@@ -534,7 +533,7 @@ class Collection:
         title: str = feconf.DEFAULT_COLLECTION_TITLE,
         category: str = feconf.DEFAULT_COLLECTION_CATEGORY,
         objective: str = feconf.DEFAULT_COLLECTION_OBJECTIVE,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> Collection:
         """Returns a Collection domain object with default values.
 
@@ -714,7 +713,9 @@ class Collection:
             following schema version v2.
         """
         collection_dict['schema_version'] = 2
-        collection_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
+        collection_dict['language_code'] = (
+            constants.constants.DEFAULT_LANGUAGE_CODE
+        )
         collection_dict['tags'] = []
         return collection_dict
 
@@ -1364,7 +1365,7 @@ class Collection:
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag
@@ -1579,7 +1580,7 @@ class CollectionSummary:
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag
@@ -1626,10 +1627,10 @@ class CollectionSummary:
         Returns:
             bool. Whether the collection is private.
         """
-        # Here mypy evaluates constants.ACTIVITY_STATUS_PRIVATE to be Any
+        # Here mypy evaluates constants.constants.ACTIVITY_STATUS_PRIVATE to be Any
         # and due to this, the == is returning Any. So, in order to
         # return bool, we explicitly convert the operation to bool.
-        return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
+        return bool(self.status == constants.constants.ACTIVITY_STATUS_PRIVATE)
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the collection is solely owned by the user.
@@ -1664,7 +1665,7 @@ class CollectionSummary:
             contributor_id: str. ID of the contributor to be added.
         """
         # We don't want to record the contributions of system users.
-        if contributor_id not in constants.SYSTEM_USER_IDS:
+        if contributor_id not in constants.constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
                 self.contributors_summary.get(contributor_id, 0) + 1
             )

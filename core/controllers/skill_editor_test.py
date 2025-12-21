@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     caching_services,
     role_services,
@@ -328,7 +327,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         csrf_token = self.get_new_csrf_token()
         put_payload_copy = self.put_payload.copy()
         put_payload_copy['commit_message'] = 'a' * (
-            constants.MAX_COMMIT_MESSAGE_LENGTH + 1
+            constants.constants.MAX_COMMIT_MESSAGE_LENGTH + 1
         )
         json_response = self.put_json(
             self.url,
@@ -519,13 +518,13 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         new_skill_id = skill_services.get_new_skill_id()
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
             ),
         ]
         skill = skill_domain.Skill.create_default_skill(
@@ -551,13 +550,13 @@ class SkillDescriptionHandlerTest(BaseSkillEditorControllerTests):
         new_skill_id = skill_services.get_new_skill_id()
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
             ),
         ]
         skill = skill_domain.Skill.create_default_skill(
@@ -592,7 +591,7 @@ class DiagnosticTestSkillAssignmentHandlerTest(BaseSkillEditorControllerTests):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

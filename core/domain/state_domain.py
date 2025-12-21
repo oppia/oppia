@@ -26,12 +26,12 @@ import re
 
 from core import (
     android_validation_constants,
+    constants,
     feature_flag_list,
     feconf,
     schema_utils,
     utils,
 )
-from core.constants import constants
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import rules_registry  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
@@ -282,7 +282,7 @@ class AnswerGroup(translation_domain.BaseTranslatableObject):
                 )
 
             if not re.match(
-                constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
+                constants.constants.VALID_SKILL_MISCONCEPTION_ID_REGEX,
                 self.tagged_skill_misconception_id,
             ):
                 raise utils.ValidationError(
@@ -3183,7 +3183,9 @@ class RecordedVoiceovers:
                     )
                 allowed_language_codes = [
                     language['id']
-                    for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                    for language in (
+                        constants.constants.SUPPORTED_AUDIO_LANGUAGES
+                    )
                 ]
                 if language_code not in allowed_language_codes:
                     raise utils.ValidationError(
@@ -3915,7 +3917,7 @@ class State(translation_domain.BaseTranslatableObject):
             )
         if self.solicit_answer_details:
             if self.interaction.id in (
-                constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS
+                constants.constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS
             ):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '

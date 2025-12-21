@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
@@ -92,7 +91,7 @@ class BlogDashboardDataHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_AUTHOR_NAME_LENGTH,
+                        'max_value': constants.constants.MAX_AUTHOR_NAME_LENGTH,
                     }
                 ],
             },
@@ -103,7 +102,7 @@ class BlogDashboardDataHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_AUTHOR_BIO,
+                        'max_value': constants.constants.MAX_CHARS_IN_AUTHOR_BIO,
                     }
                 ],
             },
@@ -221,11 +220,11 @@ class BlogPostHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.BLOG_POST_ID_LENGTH,
+                        'max_value': constants.constants.BLOG_POST_ID_LENGTH,
                     },
                     {
                         'id': 'has_length_at_least',
-                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                        'min_value': constants.constants.BLOG_POST_ID_LENGTH,
                     },
                 ],
             },
@@ -280,7 +279,9 @@ class BlogPostHandler(
         max_no_of_tags = platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )
-        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        list_of_default_tags = (
+            constants.constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        )
 
         blog_post_dict = blog_post.to_dict()
         blog_post_dict_for_dashboard = {
@@ -393,11 +394,11 @@ class BlogPostTitleHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.BLOG_POST_ID_LENGTH,
+                        'max_value': constants.constants.BLOG_POST_ID_LENGTH,
                     },
                     {
                         'id': 'has_length_at_least',
-                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                        'min_value': constants.constants.BLOG_POST_ID_LENGTH,
                     },
                 ],
             }
@@ -411,7 +412,7 @@ class BlogPostTitleHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_CHARS_IN_BLOG_POST_TITLE,
+                            'max_value': constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE,
                         }
                     ],
                 }

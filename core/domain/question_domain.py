@@ -23,8 +23,7 @@ import copy
 import datetime
 import re
 
-from core import feconf, schema_utils, utils
-from core.constants import constants
+from core import constants, feconf, schema_utils, utils
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
@@ -1112,7 +1111,7 @@ class Question(translation_domain.BaseTranslatableObject):
                     for variable in expression_parser.get_variables(rule_input):
                         # Replacing greek letter names with greek symbols.
                         if len(variable) > 1:
-                            variable = constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
+                            variable = constants.constants.GREEK_LETTER_NAMES_TO_SYMBOLS[
                                 variable
                             ]
                         variables.add(variable)
@@ -2065,7 +2064,9 @@ class Question(translation_domain.BaseTranslatableObject):
 
         if not (
             all(
-                re.match(constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem)
+                re.match(
+                    constants.constants.VALID_SKILL_MISCONCEPTION_ID_REGEX, elem
+                )
                 for elem in self.inapplicable_skill_misconception_ids
             )
         ):
@@ -2251,7 +2252,7 @@ class Question(translation_domain.BaseTranslatableObject):
             question_id,
             default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
             skill_ids,
             [],

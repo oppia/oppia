@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 
 from typing import Dict, Mapping, Optional
@@ -201,7 +201,7 @@ class StoryModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         story_commit_log_entry.story_id = self.id

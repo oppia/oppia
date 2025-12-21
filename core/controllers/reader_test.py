@@ -19,8 +19,7 @@ from __future__ import annotations
 import logging
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     collection_domain,
     collection_services,
@@ -1531,7 +1530,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             'Title',
             ['skill_id_1'],
             'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
             21131,
             'dummy-subtopic-one',
         )
@@ -1906,7 +1905,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_0,
             )
         )
@@ -1920,7 +1919,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_1,
             )
         )
@@ -1953,7 +1952,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_0,
             )
         )
@@ -1969,7 +1968,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_1,
             )
         )
@@ -1985,7 +1984,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_STORY,
+                constants.constants.ACTIVITY_TYPE_STORY,
                 self.STORY_ID,
             )
         )
@@ -2001,7 +2000,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID,
             )
         )
@@ -3246,7 +3245,8 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
+            constants.constants,
+            {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False},
         ):
             self.put_json(
                 '%s/%s/%s'
@@ -3265,7 +3265,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=404,
             )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
@@ -3350,7 +3350,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
 
         csrf_token = self.get_new_csrf_token()
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             exploration_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id)
@@ -3399,7 +3399,7 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
             content_id_generator.next_content_id_index,
         )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             state_reference = stats_services.get_state_reference_for_question(
                 question_id

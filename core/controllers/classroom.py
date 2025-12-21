@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_domain,
@@ -39,7 +38,10 @@ class ClassroomTopicSummaryDict(topic_domain.TopicSummaryDict):
 SCHEMA_FOR_CLASSROOM_ID = {
     'type': 'basestring',
     'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+        {
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
+        }
     ],
 }
 
@@ -391,7 +393,7 @@ class ClassroomUrlFragmentHandler(
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -419,7 +421,7 @@ class ClassroomIdHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -471,7 +473,7 @@ class NewClassroomHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_CHARS_IN_CLASSROOM_NAME,
+                            'max_value': constants.constants.MAX_CHARS_IN_CLASSROOM_NAME,
                         },
                         {
                             'id': 'is_nonempty',
@@ -479,7 +481,7 @@ class NewClassroomHandler(
                     ],
                 }
             },
-            'url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+            'url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
         }
     }
 
@@ -626,7 +628,7 @@ class UpdateClassroomIndexMappingHandler(
                                         {
                                             'id': 'is_regex_matched',
                                             'regex_pattern': (
-                                                constants.ENTITY_ID_REGEX
+                                                constants.constants.ENTITY_ID_REGEX
                                             ),
                                         }
                                     ],

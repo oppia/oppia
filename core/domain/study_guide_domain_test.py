@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import state_domain, study_guide_domain
 from core.tests import test_utils
 
@@ -119,7 +118,7 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
             study_guide.sections[0].content.html, '<p>Sample content</p>'
         )
         self.assertEqual(
-            study_guide.language_code, constants.DEFAULT_LANGUAGE_CODE
+            study_guide.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.assertEqual(study_guide.version, 0)
 

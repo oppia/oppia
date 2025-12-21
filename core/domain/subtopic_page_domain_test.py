@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import state_domain, subtopic_page_domain, translation_domain
 from core.tests import test_utils
 
@@ -52,7 +51,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents_schema_version': (
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'version': 0,
         }
         self.assertEqual(
@@ -80,7 +79,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents_schema_version': (
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'version': 0,
         }
         self.assertEqual(subtopic_page.to_dict(), expected_subtopic_page_dict)
@@ -152,7 +151,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents_schema_version': (
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'version': 0,
         }
         self.subtopic_page.update_page_contents_audio(
@@ -179,7 +178,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents_schema_version': (
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'version': 0,
         }
         self.subtopic_page.update_page_contents_html(
@@ -216,7 +215,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'page_contents_schema_version': (
                 feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'version': 0,
         }
 

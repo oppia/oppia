@@ -20,8 +20,7 @@ import copy
 import datetime
 import json
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
@@ -645,7 +644,7 @@ class Rubric:
                 'Expected difficulty to be a string, received %s'
                 % self.difficulty
             )
-        if self.difficulty not in constants.SKILL_DIFFICULTIES:
+        if self.difficulty not in constants.constants.SKILL_DIFFICULTIES:
             raise utils.ValidationError(
                 'Invalid difficulty received for rubric: %s' % self.difficulty
             )
@@ -676,7 +675,7 @@ class Rubric:
                     'received %d chars' % len(explanation)
                 )
         if (
-            self.difficulty == constants.SKILL_DIFFICULTIES[1]
+            self.difficulty == constants.constants.SKILL_DIFFICULTIES[1]
             and len(self.explanations) == 0
         ):
             raise utils.ValidationError(
@@ -1013,13 +1012,13 @@ class Skill:
                 'All 3 difficulties should be addressed in rubrics'
             )
 
-        if difficulties_list != constants.SKILL_DIFFICULTIES:
+        if difficulties_list != constants.constants.SKILL_DIFFICULTIES:
             raise utils.ValidationError(
                 'The difficulties should be ordered as follows [%s, %s, %s]'
                 % (
-                    constants.SKILL_DIFFICULTIES[0],
-                    constants.SKILL_DIFFICULTIES[1],
-                    constants.SKILL_DIFFICULTIES[2],
+                    constants.constants.SKILL_DIFFICULTIES[0],
+                    constants.constants.SKILL_DIFFICULTIES[1],
+                    constants.constants.SKILL_DIFFICULTIES[2],
                 )
             )
 
@@ -1258,7 +1257,7 @@ class Skill:
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
             0,
             None,

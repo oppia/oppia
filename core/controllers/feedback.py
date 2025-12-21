@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     feedback_domain,
@@ -339,7 +338,7 @@ class ThreadHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                        'regex_pattern': constants.constants.VALID_THREAD_ID_REGEX,
                     }
                 ],
             }
@@ -522,7 +521,7 @@ class FeedbackThreadViewEventHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                        'regex_pattern': constants.constants.VALID_THREAD_ID_REGEX,
                     }
                 ],
             }

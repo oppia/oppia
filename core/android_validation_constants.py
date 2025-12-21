@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import re
 
-from core.constants import constants
+from core import constants
 
 # These are the valid interactions that are allowed in an exploration
 # that is to be viewed on the Android app. If, in the future, this is
@@ -76,5 +76,5 @@ INCOMING_ANDROID_FEEDBACK_REPORT_URL = (
 ANDROID_API_KEY = ''
 ANDROID_APP_PACKAGE_NAME = 'org.oppia.android'
 APP_VERSION_WITH_HASH_REGEXP = re.compile(
-    constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
+    constants.constants.PLATFORM_PARAMETER_APP_VERSION_WITH_HASH_REGEXP
 )

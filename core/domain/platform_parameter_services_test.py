@@ -21,8 +21,7 @@ from __future__ import annotations
 import enum
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     caching_services,
     platform_parameter_domain,
@@ -140,7 +139,7 @@ class PlatformFeatureServiceTest(test_utils.GenericTestBase):
     def test_create_evaluation_context_for_client_returns_correct_context(
         self,
     ) -> None:
-        with mock.patch.dict(constants, {'DEV_MODE': True}):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': True}):
             context = parameter_services.create_evaluation_context_for_client(
                 {
                     'platform_type': 'Android',

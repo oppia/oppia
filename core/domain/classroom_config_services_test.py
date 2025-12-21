@@ -24,7 +24,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.domain import classroom_config_domain, classroom_config_services
 from core.platform import models
 from core.tests import test_utils
@@ -222,10 +222,11 @@ class ClassroomServicesTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             classroom_url_fragment,
-            constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS,
+            constants.constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS,
         )
         self.assertEqual(
-            classroom_name, constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS
+            classroom_name,
+            constants.constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS,
         )
 
     def test_get_all_classrooms(self) -> None:

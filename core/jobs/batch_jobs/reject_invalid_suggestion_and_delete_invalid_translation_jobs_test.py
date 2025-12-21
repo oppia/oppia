@@ -20,8 +20,7 @@ reject_invalid_suggestion_and_delete_invalid_translation_jobs.
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import exp_domain, rights_domain, translation_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import (
@@ -594,7 +593,8 @@ class DeleteTranslationsForInvalidContentIDsJobTests(
         )
 
         audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         incomplete_translation_language_codes = audio_language_codes - set(
             ['en']
@@ -746,7 +746,8 @@ class AuditDeleteTranslationsForInvalidContentIDsJobTests(
         )
 
         audio_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         incomplete_translation_language_codes = audio_language_codes - set(
             ['en']

@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     exp_domain,
     question_domain,
@@ -1085,13 +1084,13 @@ class GenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
             ),
         ]
         skill_services.save_new_skill('owner_id', skill)
@@ -2087,13 +2086,13 @@ class AuditGenerateContributionStatsJobTests(job_test_utils.JobTestBase):
         )
         skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
             ),
         ]
         skill_services.save_new_skill('owner_id', skill)

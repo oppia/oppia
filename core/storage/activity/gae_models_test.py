@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -78,7 +78,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
 
         featured_model_instance.activity_references = [
             {
-                'type': constants.ACTIVITY_TYPE_EXPLORATION,
+                'type': constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 'id': '0',
             }
         ]
@@ -93,7 +93,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
             featured_model_instance.activity_references,
             [
                 {
-                    'type': constants.ACTIVITY_TYPE_EXPLORATION,
+                    'type': constants.constants.ACTIVITY_TYPE_EXPLORATION,
                     'id': '0',
                 }
             ],

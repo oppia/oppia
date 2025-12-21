@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 
 from typing import Dict, List
 
@@ -61,8 +61,8 @@ class ActivityReference:
             Exception. The activity type is invalid.
         """
         if self.type not in (
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION,
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION,
         ):
             raise Exception('Invalid activity type: %s' % self.type)
         if not isinstance(self.id, str):

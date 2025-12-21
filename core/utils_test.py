@@ -26,8 +26,7 @@ import time
 import urllib
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.tests import test_utils
 
 from typing import Dict, List, Tuple, Union
@@ -468,7 +467,7 @@ class UtilsTests(test_utils.GenericTestBase):
         lengthy_meta_tag_content = 'a' * 200
         max_length_error = (
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT
+            % constants.constants.MAX_CHARS_IN_META_TAG_CONTENT
         )
 
         with self.assertRaisesRegex(Exception, max_length_error):
@@ -494,7 +493,7 @@ class UtilsTests(test_utils.GenericTestBase):
         lengthy_page_title_fragment_for_web = 'a' * 60
         max_length_error = (
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+            % constants.constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
         )
 
         with self.assertRaisesRegex(Exception, max_length_error):
@@ -505,7 +504,7 @@ class UtilsTests(test_utils.GenericTestBase):
         short_page_title_fragment_for_web = 'name'
         min_length_error = (
             'Page title fragment should not be shorter than %s characters.'
-            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+            % constants.constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
         )
         with self.assertRaisesRegex(Exception, min_length_error):
             utils.require_valid_page_title_fragment_for_web(
@@ -626,7 +625,7 @@ class UtilsTests(test_utils.GenericTestBase):
             )
 
     def test_get_asset_dir_prefix_with_prod_mode(self) -> None:
-        with mock.patch.dict(constants, {'DEV_MODE': False}):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             self.assertEqual(utils.get_asset_dir_prefix(), '/build')
 
     def test_base64_from_int(self) -> None:

@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     caching_services,
     exp_domain,
@@ -324,7 +323,7 @@ class MigrateExplorationJobTests(
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -400,7 +399,7 @@ class MigrateExplorationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -533,7 +532,7 @@ class MigrateExplorationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -620,7 +619,7 @@ class MigrateExplorationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -794,7 +793,7 @@ class AuditExplorationMigrationJobTests(
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -870,7 +869,7 @@ class AuditExplorationMigrationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -993,7 +992,7 @@ class AuditExplorationMigrationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -1337,7 +1336,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -1433,7 +1432,7 @@ class ExpSnapshotsMigrationAuditJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -1749,7 +1748,7 @@ class ExpSnapshotsMigrationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],
@@ -1963,7 +1962,7 @@ class ExpSnapshotsMigrationJobTests(
                 'exploration_model_last_updated': exp_model.last_updated,
                 'exploration_model_created_on': exp_model.created_on,
                 'first_published_msec': None,
-                'status': constants.ACTIVITY_STATUS_PRIVATE,
+                'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
                 'community_owned': False,
                 'owner_ids': [feconf.SYSTEM_COMMITTER_ID],
                 'editor_ids': [],

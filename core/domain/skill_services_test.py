@@ -19,8 +19,7 @@ from __future__ import annotations
 import logging
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     question_domain,
     skill_domain,
@@ -250,13 +249,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             ),
             rubrics=[
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                    constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
                 ),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                    constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
                 ),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                    constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
                 ),
             ],
         )
@@ -287,13 +286,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             {
                 'skill_id_1': [
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                        constants.constants.SKILL_DIFFICULTIES[0],
+                        ['Explanation 1'],
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                        constants.constants.SKILL_DIFFICULTIES[1],
+                        ['Explanation 2'],
                     ).to_dict(),
                     skill_domain.Rubric(
-                        constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                        constants.constants.SKILL_DIFFICULTIES[2],
+                        ['Explanation 3'],
                     ).to_dict(),
                 ],
                 'skill_id_2': None,
@@ -928,7 +930,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange(
                 {
                     'cmd': skill_domain.CMD_UPDATE_RUBRICS,
-                    'difficulty': constants.SKILL_DIFFICULTIES[0],
+                    'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                     'explanations': [
                         '<p>New Explanation 1</p>',
                         '<p>New Explanation 2</p>',
@@ -938,7 +940,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_domain.SkillChange(
                 {
                     'cmd': skill_domain.CMD_UPDATE_RUBRICS,
-                    'difficulty': constants.SKILL_DIFFICULTIES[1],
+                    'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                     'explanations': ['<p>Explanation</p>'],
                 }
             ),
@@ -1747,7 +1749,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

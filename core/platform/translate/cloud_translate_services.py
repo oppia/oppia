@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 
 # To use cloud translate in a local dev environment, use
 # cloud_translate_emulator.
@@ -30,7 +30,7 @@ from google.cloud import translate_v2 as translate
 CLIENT = translate.Client(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE
+        if constants.constants.EMULATOR_MODE
         else auth.default()[0]
     )
 )

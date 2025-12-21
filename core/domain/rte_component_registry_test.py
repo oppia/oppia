@@ -28,8 +28,7 @@ import string
 import struct
 from unittest import mock
 
-from core import feconf, schema_utils, schema_utils_test, utils
-from core.constants import constants
+from core import constants, feconf, schema_utils, schema_utils_test, utils
 from core.domain import object_registry, rte_component_registry
 from core.tests import test_utils
 
@@ -413,7 +412,7 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         )
         inline_component_tag_names_from_constant = [
             'oppia-noninteractive-%s' % element_id
-            for element_id in constants.INLINE_RTE_COMPONENTS
+            for element_id in constants.constants.INLINE_RTE_COMPONENTS
         ]
         self.assertEqual(
             set(inline_component_tag_names),

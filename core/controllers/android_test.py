@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     classroom_config_services,
     exp_domain,
@@ -56,7 +55,9 @@ class InitializeAndroidTestDataHandlerTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
 
     def test_initialize_in_production_raises_exception(self) -> None:
-        prod_mode_patch = mock.patch.object(constants, 'DEV_MODE', False)
+        prod_mode_patch = mock.patch.dict(
+            constants.constants, {'DEV_MODE': False}
+        )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception, 'Cannot load new structures data in production.'
         )

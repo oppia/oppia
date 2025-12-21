@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     learner_progress_services,
@@ -49,9 +48,9 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -120,9 +119,9 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'story_url_fragment': constants.constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
         'node_id': {
             'schema': {
                 'type': 'basestring',
@@ -332,7 +331,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         learner_completed_story = len(completed_node_ids) == len(ordered_nodes)
         learner_at_review_point_in_story = len(exp_summaries) != 0 and (
-            len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
+            len(completed_node_ids)
+            & constants.constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
             == 0
         )
         if questions_available and (

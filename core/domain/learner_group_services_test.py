@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feature_flag_list
-from core.constants import constants
+from core import constants, feature_flag_list
 from core.domain import (
     learner_group_fetchers,
     learner_group_services,
@@ -96,7 +95,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Naming Numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -133,7 +132,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Intro to negative numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-one',
             )
@@ -251,7 +250,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Place',
                 'All',
                 'All',
-                constants.DEFAULT_LANGUAGE_CODE,
+                constants.constants.DEFAULT_LANGUAGE_CODE,
             )
         )
         story_summary_dicts = matching_syllabus['story_summary_dicts']
@@ -274,7 +273,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Naming',
                 'Skill',
                 'All',
-                constants.DEFAULT_LANGUAGE_CODE,
+                constants.constants.DEFAULT_LANGUAGE_CODE,
             )
         )
 
@@ -296,7 +295,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Story test',
                 'Story',
                 'All',
-                constants.DEFAULT_LANGUAGE_CODE,
+                constants.constants.DEFAULT_LANGUAGE_CODE,
             )
         )
         # Story test 1 is already part of the group syllabus
@@ -318,7 +317,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                 'Place',
                 'All',
                 'math',
-                constants.DEFAULT_LANGUAGE_CODE,
+                constants.constants.DEFAULT_LANGUAGE_CODE,
             )
         )
         # No stories or subtopics are returned as the topics were not added
@@ -371,7 +370,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
                     'Place',
                     'All',
                     'All',
-                    constants.DEFAULT_LANGUAGE_CODE,
+                    constants.constants.DEFAULT_LANGUAGE_CODE,
                 )
 
     def test_add_learner_to_learner_group(self) -> None:

@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import io
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
@@ -58,7 +57,7 @@ class AudioUploadHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -147,7 +146,7 @@ class StartedTranslationTutorialEventHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -206,7 +205,7 @@ class VoiceArtistManagementHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }

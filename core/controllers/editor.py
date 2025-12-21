@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import logging
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as objects_validator
 from core.domain import (
@@ -73,7 +72,10 @@ def _require_valid_version(
 SCHEMA_FOR_EXPLORATION_ID = {
     'type': 'basestring',
     'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+        {
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
+        }
     ],
 }
 SCHEMA_FOR_VERSION = {
@@ -132,7 +134,7 @@ class ExplorationHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 },
@@ -345,7 +347,7 @@ class EntityTranslationsBulkHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1385,7 +1387,7 @@ class ImageUploadHandler(
                     'type': 'basestring',
                     'choices': ['thumbnail', 'image'],
                 },
-                'default_value': constants.ASSET_TYPE_IMAGE,
+                'default_value': constants.constants.ASSET_TYPE_IMAGE,
             },
         }
     }
@@ -1702,7 +1704,7 @@ class LearnerAnswerInfoHandler(
         Raises:
             NotFoundException. The page cannot be found.
         """
-        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+        if not constants.constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
         learner_answer_info_data = []
@@ -1781,7 +1783,7 @@ class LearnerAnswerInfoHandler(
             InvalidInputException. Invalid input.
         """
         assert self.normalized_request is not None
-        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+        if not constants.constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:

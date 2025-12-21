@@ -22,8 +22,7 @@ import datetime
 import logging
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import auth_services, user_domain, user_services
 from core.platform import models
 from core.tests import test_utils
@@ -146,7 +145,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -159,7 +160,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias_3',
             'pin': None,
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,

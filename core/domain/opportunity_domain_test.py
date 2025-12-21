@@ -21,7 +21,7 @@ from __future__ import annotations
 import re
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.domain import opportunity_domain
 from core.tests import test_utils
 
@@ -37,7 +37,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             {'id': 'hi-en'},
         ]
         self.mock_supported_audio_languages_context = mock.patch.object(
-            constants,
+            constants.constants,
             'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages,
         )
@@ -64,7 +64,7 @@ class ExplorationOpportunitySummaryDomainTests(test_utils.GenericTestBase):
             )
         # Re-initializing this swap, so that we can use this in test method.
         self.mock_supported_audio_languages_context = mock.patch.object(
-            constants,
+            constants.constants,
             'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages,
         )
@@ -414,7 +414,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
             {'id': 'hi-en'},
         ]
         self.mock_supported_audio_languages_context = mock.patch.object(
-            constants,
+            constants.constants,
             'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages,
         )
@@ -439,7 +439,7 @@ class TranslationOpportunityDomainTest(test_utils.GenericTestBase):
 
     def test_to_and_from_dict_works_correctly(self) -> None:
         with mock.patch.object(
-            constants,
+            constants.constants,
             'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages,
         ):
@@ -519,7 +519,7 @@ class TranslationOpportunityCardInfoDomainTest(test_utils.GenericTestBase):
             {'id': 'hi-en'},
         ]
         self.mock_supported_audio_languages_context = mock.patch.object(
-            constants,
+            constants.constants,
             'SUPPORTED_AUDIO_LANGUAGES',
             self.mock_supported_audio_languages,
         )

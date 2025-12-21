@@ -21,8 +21,7 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     classroom_config_services,
     exp_fetchers,
@@ -166,7 +165,7 @@ def initialize_android_test_data() -> str:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
     fs.commit(
-        '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
+        '%s/test_svg.svg' % constants.constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
         mimetype='image/svg+xml',
     )
@@ -232,7 +231,7 @@ def initialize_android_test_data() -> str:
         raw_image = f.read()
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
     fs.commit(
-        '%s/test_svg.svg' % constants.ASSET_TYPE_THUMBNAIL,
+        '%s/test_svg.svg' % constants.constants.ASSET_TYPE_THUMBNAIL,
         raw_image,
         mimetype='image/svg+xml',
     )
@@ -248,7 +247,7 @@ def initialize_android_test_data() -> str:
     story.update_meta_tag_content('tag')
     story.update_thumbnail_filename('test_svg.svg')
     story.update_thumbnail_bg_color(
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0]
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0]
     )
 
     # Save the previously created structures
@@ -739,7 +738,7 @@ def _create_dummy_question(
         question_id,
         state,
         feconf.CURRENT_STATE_SCHEMA_VERSION,
-        constants.DEFAULT_LANGUAGE_CODE,
+        constants.constants.DEFAULT_LANGUAGE_CODE,
         0,
         linked_skill_ids,
         [],
@@ -762,9 +761,15 @@ def _create_dummy_skill(
         Skill. The dummy skill with given values.
     """
     rubrics = [
-        skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], ['Explanation 1']),
-        skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], ['Explanation 2']),
-        skill_domain.Rubric(constants.SKILL_DIFFICULTIES[2], ['Explanation 3']),
+        skill_domain.Rubric(
+            constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+        ),
+        skill_domain.Rubric(
+            constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+        ),
+        skill_domain.Rubric(
+            constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+        ),
     ]
     skill = skill_domain.Skill.create_default_skill(
         skill_id, skill_description, rubrics

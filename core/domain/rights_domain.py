@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import user_services  # pylint: disable=invalid-import-from
 from core.domain import change_domain
 
@@ -38,8 +37,8 @@ CMD_CHANGE_PRIVATE_VIEWABILITY = feconf.CMD_CHANGE_PRIVATE_VIEWABILITY
 CMD_RELEASE_OWNERSHIP = feconf.CMD_RELEASE_OWNERSHIP
 CMD_UPDATE_FIRST_PUBLISHED_MSEC = feconf.CMD_UPDATE_FIRST_PUBLISHED_MSEC
 
-ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
-ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
+ACTIVITY_STATUS_PRIVATE: str = constants.constants.ACTIVITY_STATUS_PRIVATE
+ACTIVITY_STATUS_PUBLIC: str = constants.constants.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = feconf.ROLE_OWNER
 ROLE_EDITOR = feconf.ROLE_EDITOR

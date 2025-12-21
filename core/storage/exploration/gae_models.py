@@ -23,8 +23,7 @@ import random
 import string
 
 import core.storage.base_model.gae_models as base_models
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
@@ -211,7 +210,7 @@ class ExplorationModel(base_models.VersionedModel):
     objective = datastore_services.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
     language_code = datastore_services.StringProperty(
-        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True
+        default=constants.constants.DEFAULT_LANGUAGE_CODE, indexed=True
     )
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
@@ -635,11 +634,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # The publication status of this exploration.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE,
+        default=constants.constants.ACTIVITY_STATUS_PRIVATE,
         indexed=True,
         choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         ],
     )
 
@@ -767,7 +766,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
         if model_dict['status'] == 'publicized':
-            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+            model_dict['status'] = constants.constants.ACTIVITY_STATUS_PUBLIC
 
         # The voice_artist_ids field was previously named translator_ids. We
         # need to move the values from translator_ids field to voice_artist_ids
@@ -909,7 +908,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE
+                    self.status == constants.constants.ACTIVITY_STATUS_PRIVATE
                 ),
             )
 
@@ -1054,7 +1053,7 @@ class TransientCheckpointUrlModel(base_models.BaseModel):
         for _ in range(base_models.MAX_RETRIES):
             new_id = '%s' % ''.join(
                 random.choice(string.ascii_letters)
-                for _ in range(constants.MAX_PROGRESS_URL_ID_LENGTH)
+                for _ in range(constants.constants.MAX_PROGRESS_URL_ID_LENGTH)
             )
             if not cls.get_by_id(new_id):
                 return new_id
@@ -1114,11 +1113,11 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # The publication status of this exploration.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE,
+        default=constants.constants.ACTIVITY_STATUS_PRIVATE,
         indexed=True,
         choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         ],
     )
 
@@ -1202,7 +1201,10 @@ class ExpSummaryModel(base_models.BaseModel):
         """
         return (
             ExpSummaryModel.query()
-            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC)
+            .filter(
+                ExpSummaryModel.status
+                == constants.constants.ACTIVITY_STATUS_PUBLIC
+            )
             .filter(
                 ExpSummaryModel.deleted  # pylint: disable=singleton-comparison
                 == False
@@ -1227,7 +1229,10 @@ class ExpSummaryModel(base_models.BaseModel):
         """
         return (
             ExpSummaryModel.query()
-            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE)
+            .filter(
+                ExpSummaryModel.status
+                == constants.constants.ACTIVITY_STATUS_PRIVATE
+            )
             .filter(
                 datastore_services.any_of(
                     ExpSummaryModel.owner_ids == user_id,
@@ -1283,7 +1288,10 @@ class ExpSummaryModel(base_models.BaseModel):
         """
         return (
             ExpSummaryModel.query()
-            .filter(ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC)
+            .filter(
+                ExpSummaryModel.status
+                == constants.constants.ACTIVITY_STATUS_PUBLIC
+            )
             .filter(
                 ExpSummaryModel.deleted  # pylint: disable=singleton-comparison
                 == False

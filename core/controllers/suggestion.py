@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     change_domain,
@@ -126,7 +125,10 @@ SCHEMA_FOR_SUBTITLED_HTML_DICT = {
 SCHEMA_FOR_TARGET_ID = {
     'type': 'basestring',
     'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+        {
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
+        }
     ],
 }
 
@@ -370,8 +372,8 @@ class SuggestionToExplorationActionHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.ACTION_ACCEPT_SUGGESTION,
-                        constants.ACTION_REJECT_SUGGESTION,
+                        constants.constants.ACTION_ACCEPT_SUGGESTION,
+                        constants.constants.ACTION_REJECT_SUGGESTION,
                     ],
                 }
             },
@@ -381,7 +383,7 @@ class SuggestionToExplorationActionHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 },
@@ -393,7 +395,7 @@ class SuggestionToExplorationActionHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_REVIEW_MESSAGE_LENGTH,
                         }
                     ],
                 }
@@ -437,7 +439,7 @@ class SuggestionToExplorationActionHandler(
                 'You cannot accept/reject your own suggestion.'
             )
 
-        if action == constants.ACTION_ACCEPT_SUGGESTION:
+        if action == constants.constants.ACTION_ACCEPT_SUGGESTION:
             commit_message = self.normalized_payload.get('commit_message')
             if commit_message is None:
                 raise Exception(
@@ -451,7 +453,7 @@ class SuggestionToExplorationActionHandler(
                 self.normalized_payload['review_message'],
             )
         else:
-            assert action == constants.ACTION_REJECT_SUGGESTION
+            assert action == constants.constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
                 suggestion_id,
                 self.user_id,
@@ -509,7 +511,7 @@ class ResubmitSuggestionHandler(
                                 'validators': [
                                     {
                                         'id': 'has_length_at_most',
-                                        'max_value': constants.MAX_STATE_NAME_LENGTH,
+                                        'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                                     }
                                 ],
                             },
@@ -577,8 +579,8 @@ class SuggestionToSkillActionHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.ACTION_ACCEPT_SUGGESTION,
-                        constants.ACTION_REJECT_SUGGESTION,
+                        constants.constants.ACTION_ACCEPT_SUGGESTION,
+                        constants.constants.ACTION_REJECT_SUGGESTION,
                     ],
                 }
             },
@@ -588,7 +590,7 @@ class SuggestionToSkillActionHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_REVIEW_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_REVIEW_MESSAGE_LENGTH,
                         }
                     ],
                 }
@@ -635,7 +637,7 @@ class SuggestionToSkillActionHandler(
 
         action = self.normalized_payload['action']
 
-        if action == constants.ACTION_ACCEPT_SUGGESTION:
+        if action == constants.constants.ACTION_ACCEPT_SUGGESTION:
             # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
                 suggestion_id,
@@ -662,7 +664,7 @@ class SuggestionToSkillActionHandler(
                 target_image_filenames,
             )
         else:
-            assert action == constants.ACTION_REJECT_SUGGESTION
+            assert action == constants.constants.ACTION_REJECT_SUGGESTION
             suggestion_services.reject_suggestion(
                 suggestion_id,
                 self.user_id,
@@ -829,7 +831,7 @@ class ReviewableSuggestionsHandler(
         """
         if (
             topic_name is None
-            or topic_name == constants.TOPIC_SENTINEL_NAME_ALL
+            or topic_name == constants.constants.TOPIC_SENTINEL_NAME_ALL
         ):
             return None
         topic = topic_fetchers.get_topic_by_name(topic_name)

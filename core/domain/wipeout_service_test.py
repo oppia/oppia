@@ -20,8 +20,7 @@ import datetime
 import logging
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     auth_services,
     collection_services,
@@ -274,7 +273,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -284,7 +285,9 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias3',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -1833,7 +1836,7 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -2262,7 +2265,7 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -2846,27 +2849,27 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.improvements_model_1_id = (
             improvements_models.ExplorationStatsTaskEntryModel.create(
-                entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+                entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 entity_id=self.EXP_1_ID,
                 entity_version=1,
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                target_type=constants.TASK_TARGET_TYPE_STATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                target_type=constants.constants.TASK_TARGET_TYPE_STATE,
                 target_id='State',
                 issue_description=None,
-                status=constants.TASK_STATUS_RESOLVED,
+                status=constants.constants.TASK_STATUS_RESOLVED,
                 resolver_id=self.user_1_id,
             )
         )
         self.improvements_model_2_id = (
             improvements_models.ExplorationStatsTaskEntryModel.create(
-                entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+                entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 entity_id=self.EXP_2_ID,
                 entity_version=1,
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                target_type=constants.TASK_TARGET_TYPE_STATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                target_type=constants.constants.TASK_TARGET_TYPE_STATE,
                 target_id='State',
                 issue_description=None,
-                status=constants.TASK_STATUS_RESOLVED,
+                status=constants.constants.TASK_STATUS_RESOLVED,
                 resolver_id=self.user_1_id,
             )
         )
@@ -2926,25 +2929,25 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_1_ID,
             entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id='State',
             issue_description=None,
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id=self.user_1_id,
         )
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_2_ID,
             entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id='State',
             issue_description=None,
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id=self.user_1_id,
         )
         wipeout_service.pre_delete_user(self.user_1_id)
@@ -2966,11 +2969,11 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
 
         task_entry_id = (
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.EXP_2_ID,
                 1,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 'State',
             )
         )
@@ -3055,7 +3058,7 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -3478,7 +3481,7 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -3837,7 +3840,7 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -4247,7 +4250,7 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -5015,7 +5018,7 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             user_id=self.user_1_id,
             commit_type='create_new',
             commit_cmds=[{}],
-            post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+            post_commit_status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             version=1,
         ).put()
 
@@ -5233,7 +5236,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -5243,7 +5248,9 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias3',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -5632,7 +5639,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -5642,7 +5651,9 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias3',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,

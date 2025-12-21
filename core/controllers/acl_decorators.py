@@ -22,8 +22,13 @@ import functools
 import logging
 import re
 
-from core import android_validation_constants, feature_flag_list, feconf, utils
-from core.constants import constants
+from core import (
+    android_validation_constants,
+    constants,
+    feature_flag_list,
+    feconf,
+    utils,
+)
 from core.controllers import base
 from core.domain import (
     android_services,
@@ -1337,14 +1342,16 @@ def can_manage_contributors_role(
             raise self.NotLoggedInException
 
         if category in [
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
         ]:
             if role_services.ACTION_MANAGE_QUESTION_CONTRIBUTOR_ROLES in (
                 self.user.actions
             ):
                 return handler(self, category, **kwargs)
-        elif category == (constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION):
+        elif category == (
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+        ):
             if role_services.ACTION_MANAGE_TRANSLATION_CONTRIBUTOR_ROLES in (
                 self.user.actions
             ):
@@ -1675,7 +1682,7 @@ def can_view_feedback_thread(
         """
         # This should already be checked by the controller handler
         # argument schemas, but we are adding it here for additional safety.
-        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_pattern = constants.constants.VALID_THREAD_ID_REGEX
         regex_matched = bool(re.match(regex_pattern, thread_id))
         if not regex_matched:
             raise self.InvalidInputException('Not a valid thread id.')
@@ -1747,7 +1754,7 @@ def can_comment_on_feedback_thread(
 
         # This should already be checked by the controller handler
         # argument schemas, but we are adding it here for additional safety.
-        regex_pattern = constants.VALID_THREAD_ID_REGEX
+        regex_pattern = constants.constants.VALID_THREAD_ID_REGEX
         regex_matched = bool(re.match(regex_pattern, thread_id))
         if not regex_matched:
             raise self.InvalidInputException('Not a valid thread id.')

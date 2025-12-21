@@ -23,8 +23,7 @@ import sys
 from types import ModuleType  # pylint: disable=import-only-modules
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 from core.tests import test_utils
 
@@ -362,7 +361,7 @@ class RegistryUnitTest(test_utils.TestBase):
             azure_speech_synthesis_services,
         )
 
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             self.assertEqual(
                 azure_speech_synthesis_services,
                 self.registry_instance.import_speech_synthesis_services(),
@@ -376,7 +375,7 @@ class RegistryUnitTest(test_utils.TestBase):
             feconf,
             'EMAIL_SERVICE_PROVIDER',
             feconf.EMAIL_SERVICE_PROVIDER_MAILGUN,
-        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+        ), mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             from core.platform.email import mailgun_email_services
 
             self.assertEqual(
@@ -390,7 +389,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """
         with mock.patch.object(
             feconf, 'EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), mock.patch.dict(constants, {'DEV_MODE': False}):
+        ), mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid email service provider: invalid service provider',
@@ -405,7 +404,7 @@ class RegistryUnitTest(test_utils.TestBase):
             feconf,
             'BULK_EMAIL_SERVICE_PROVIDER',
             feconf.BULK_EMAIL_SERVICE_PROVIDER_MAILCHIMP,
-        ), mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        ), mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             from core.platform.bulk_email import mailchimp_bulk_email_services
 
             self.assertEqual(
@@ -419,7 +418,7 @@ class RegistryUnitTest(test_utils.TestBase):
         """
         with mock.patch.object(
             feconf, 'BULK_EMAIL_SERVICE_PROVIDER', 'invalid service provider'
-        ), mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        ), mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             with self.assertRaisesRegex(
                 Exception,
                 'Invalid bulk email service provider: invalid service '
@@ -441,7 +440,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudTaskqueue:
             pass
 
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudTaskqueue
             # which is of class type. So because of this MyPy throws an error.
@@ -462,7 +461,7 @@ class RegistryUnitTest(test_utils.TestBase):
 
     def test_import_cloud_translate_services(self) -> None:
         """Tests import cloud translate services function."""
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             from core.platform.translate import cloud_translate_services
 
             self.assertEqual(
@@ -492,7 +491,7 @@ class RegistryUnitTest(test_utils.TestBase):
         class MockCloudStorage:
             pass
 
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             # Here we use cast because sys.modules can only accept ModuleTypes
             # but for testing purposes here we are providing MockCloudStorage
             # which is of class type. So because of this MyPy throws an error.

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     activity_domain,
     activity_services,
@@ -257,7 +256,7 @@ class ExplorationDisplayableSummariesTest(
             'category': 'Algebra',
             'community_owned': False,
             'id': self.EXP_ID_2,
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'num_views': 0,
             'objective': 'An objective',
             'ratings': feconf.get_empty_ratings(),
@@ -443,14 +442,14 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         activity_services.update_featured_activity_references(
             [
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
+                    constants.constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
                 )
             ]
         )
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
+                [constants.constants.DEFAULT_LANGUAGE_CODE]
             )
         )
         self.assertEqual(len(featured_activity_summaries), 1)
@@ -461,7 +460,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
                 'community_owned': False,
                 'tags': [],
                 'thumbnail_icon_url': '/subjects/Algebra.svg',
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
                 'category': 'Algebra',
                 'ratings': feconf.get_empty_ratings(),
@@ -477,23 +476,23 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         activity_services.update_featured_activity_references(
             [
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1
+                    constants.constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_1
                 ),
                 activity_domain.ActivityReference(
-                    constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
+                    constants.constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_2
                 ),
             ]
         )
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
+                [constants.constants.DEFAULT_LANGUAGE_CODE]
             )
         )
         self.assertEqual(len(featured_activity_summaries), 1)
         self.assertDictContainsSubset(
             {
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
             },
             featured_activity_summaries[0],
@@ -515,7 +514,10 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
 
         featured_activity_summaries = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE, self.LANGUAGE_CODE_ES]
+                [
+                    constants.constants.DEFAULT_LANGUAGE_CODE,
+                    self.LANGUAGE_CODE_ES,
+                ]
             )
         )
         self.assertEqual(len(featured_activity_summaries), 2)
@@ -528,7 +530,7 @@ class FeaturedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
         )
         self.assertDictContainsSubset(
             {
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'id': self.EXP_ID_2,
             },
             featured_activity_summaries[1],
@@ -854,7 +856,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
+                [constants.constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
             )
         )
@@ -863,7 +865,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             'thumbnail_bg_color': '#cc4b00',
             'community_owned': False,
             'tags': [],
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'thumbnail_icon_url': '/subjects/Algebra.svg',
             'id': self.EXP_ID_3,
             'category': 'Algebra',
@@ -903,7 +905,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
 
         top_rated_exploration_summaries = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
+                [constants.constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
             )
         )
@@ -914,7 +916,7 @@ class TopRatedExplorationDisplayableSummariesTest(test_utils.GenericTestBase):
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': 'Algebra',
             'ratings': {'1': 0, '3': 0, '2': 0, '5': 1, '4': 0},
@@ -1001,7 +1003,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_1,
             'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
@@ -1015,7 +1017,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_2,
             'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
@@ -1029,7 +1031,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
             'community_owned': False,
             'tags': [],
             'thumbnail_icon_url': '/subjects/Algebra.svg',
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'id': self.EXP_ID_3,
             'category': 'Algebra',
             'ratings': feconf.get_empty_ratings(),
@@ -1101,10 +1103,12 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
         non_existent_activity_ids = [
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_EXPLORATION, non_existent_exploration_id
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
+                non_existent_exploration_id,
             ),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, non_existent_collection_id
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
+                non_existent_collection_id,
             ),
         ]
 
@@ -1131,10 +1135,10 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
         private_activity_ids = [
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
+                constants.constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
             ),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
+                constants.constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
             ),
         ]
 
@@ -1161,10 +1165,10 @@ class ActivityReferenceAccessCheckerTests(test_utils.GenericTestBase):
 
         valid_activity_ids = [
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
+                constants.constants.ACTIVITY_TYPE_EXPLORATION, self.EXP_ID_0
             ),
             activity_domain.ActivityReference(
-                constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
+                constants.constants.ACTIVITY_TYPE_COLLECTION, self.COL_ID_2
             ),
         ]
 

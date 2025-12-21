@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 
 from typing import Final, List, Optional, TypedDict
@@ -31,9 +30,9 @@ from typing import Final, List, Optional, TypedDict
 # with 'invalid-import-from'.
 
 MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT: Final = (
-    constants.MAX_CHARS_IN_BLOG_POST_TITLE
+    constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE
     + len('-')
-    + constants.BLOG_POST_ID_LENGTH
+    + constants.constants.BLOG_POST_ID_LENGTH
 )
 
 
@@ -204,7 +203,7 @@ class BlogPost:
             if not tag:
                 raise utils.ValidationError('Tag should not be empty.')
 
-            if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
+            if not re.match(constants.constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain alphanumeric characters '
                     'and spaces, received: \'%s\'' % tag
@@ -246,16 +245,18 @@ class BlogPost:
         if not isinstance(title, str):
             raise utils.ValidationError('Title should be a string.')
 
-        if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
+        if len(title) > constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
                 'Blog Post title should at most have %d chars, received: %s'
-                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
+                % (constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
             )
 
         if strict:
             if not title:
                 raise utils.ValidationError('Title should not be empty')
-            if not re.match(constants.VALID_BLOG_POST_TITLE_REGEX, title):
+            if not re.match(
+                constants.constants.VALID_BLOG_POST_TITLE_REGEX, title
+            ):
                 raise utils.ValidationError(
                     'Title field contains invalid characters. Only words '
                     '(a-zA-Z0-9(\'!)) separated by spaces, hyphens (-), comma ('
@@ -290,7 +291,9 @@ class BlogPost:
                 % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
             )
 
-        if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
+        if not re.match(
+            constants.constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment
+        ):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field contains invalid characters.'
                 'Only lowercase words, numbers separated by hyphens are'
@@ -419,7 +422,7 @@ class BlogPost:
         Args:
             blog_id: str. The blog post id to validate.
         """
-        if len(blog_id) != constants.BLOG_POST_ID_LENGTH:
+        if len(blog_id) != constants.constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError('Blog ID %s is invalid' % blog_id)
 
 
@@ -561,7 +564,9 @@ class BlogPostSummary:
                 % MAX_CHARS_IN_BLOG_POST_URL_FRAGMENT
             )
 
-        if not re.match(constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment):
+        if not re.match(
+            constants.constants.VALID_URL_BLOG_FRAGMENT_REGEX, url_fragment
+        ):
             raise utils.ValidationError(
                 'Blog Post URL Fragment field contains invalid characters.'
                 'Only lowercase words, numbers separated by hyphens are'
@@ -585,10 +590,10 @@ class BlogPostSummary:
                 'Expected title to be a string, received: %s.' % title
             )
 
-        if len(title) > constants.MAX_CHARS_IN_BLOG_POST_TITLE:
+        if len(title) > constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE:
             raise utils.ValidationError(
                 'blog post title should at most have %d chars, received: %s'
-                % (constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
+                % (constants.constants.MAX_CHARS_IN_BLOG_POST_TITLE, title)
             )
 
         if strict:
@@ -617,7 +622,7 @@ class BlogPostSummary:
             if not tag:
                 raise utils.ValidationError('Tag should not be empty.')
 
-            if not re.match(constants.BLOG_POST_TAG_REGEX, tag):
+            if not re.match(constants.constants.BLOG_POST_TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain alphanumeric characters '
                     'and spaces, received: \'%s\'' % tag
@@ -767,17 +772,19 @@ class BlogAuthorDetails:
         """
         if not author_name:
             raise utils.ValidationError('Empty author name supplied.')
-        if len(author_name) < constants.MIN_AUTHOR_NAME_LENGTH:
+        if len(author_name) < constants.constants.MIN_AUTHOR_NAME_LENGTH:
             raise utils.ValidationError(
                 'Author name should have at least %s characters.'
-                % constants.MIN_AUTHOR_NAME_LENGTH
+                % constants.constants.MIN_AUTHOR_NAME_LENGTH
             )
-        if len(author_name) > constants.MAX_AUTHOR_NAME_LENGTH:
+        if len(author_name) > constants.constants.MAX_AUTHOR_NAME_LENGTH:
             raise utils.ValidationError(
                 'Author name can have at most %s characters.'
-                % constants.MAX_AUTHOR_NAME_LENGTH
+                % constants.constants.MAX_AUTHOR_NAME_LENGTH
             )
-        if not re.match(constants.VALID_AUTHOR_NAME_REGEX, author_name):
+        if not re.match(
+            constants.constants.VALID_AUTHOR_NAME_REGEX, author_name
+        ):
             raise utils.ValidationError(
                 'Author name can only have alphanumeric characters and spaces.'
             )

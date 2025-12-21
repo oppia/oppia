@@ -22,8 +22,7 @@ import datetime
 import enum
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 
 from typing import Final, List, Optional, TypedDict
 
@@ -47,7 +46,7 @@ def get_server_mode() -> ServerMode:
     """
     return (
         ServerMode.DEV
-        if constants.DEV_MODE
+        if constants.constants.DEV_MODE
         else (
             ServerMode.PROD
             if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER

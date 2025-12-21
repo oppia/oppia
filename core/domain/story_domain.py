@@ -22,8 +22,7 @@ import functools
 import json
 import re
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 from core.domain import fs_services  # pylint: disable=invalid-import-from
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
@@ -652,7 +651,7 @@ class StoryNode:
         """
         return (
             thumbnail_bg_color
-            in constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter']
+            in constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter']
         )
 
     @classmethod
@@ -665,7 +664,7 @@ class StoryNode:
         Returns:
             bool. Whether the status is valid or not.
         """
-        return status in constants.ALLOWED_STORY_NODE_STATUS
+        return status in constants.constants.ALLOWED_STORY_NODE_STATUS
 
     @classmethod
     def require_valid_unpublishing_reason(
@@ -680,7 +679,7 @@ class StoryNode:
             bool. Whether the unpublishing reason is valid or not.
         """
         return unpublishing_reason in (
-            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS
+            constants.constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS
         )
 
     def to_dict(self) -> StoryNodeDict:
@@ -1030,12 +1029,12 @@ class StoryNode:
             else None
         )
         if (
-            self.status != constants.STORY_NODE_STATUS_PUBLISHED
+            self.status != constants.constants.STORY_NODE_STATUS_PUBLISHED
             and planned_publication_date_msecs is not None
             and current_time_msecs
             < planned_publication_date_msecs
             < current_time_msecs
-            + (constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
+            + (constants.constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS)
             * 24
             * 3600
             * 1000
@@ -1057,7 +1056,7 @@ class StoryNode:
             else None
         )
         if (
-            self.status != constants.STORY_NODE_STATUS_PUBLISHED
+            self.status != constants.constants.STORY_NODE_STATUS_PUBLISHED
             and planned_publication_date_msecs is not None
             and current_time_msecs > planned_publication_date_msecs
         ):
@@ -1268,7 +1267,7 @@ class StoryContents:
         """
         published_node_count = 0
         for node in self.nodes:
-            if node.status != constants.STORY_NODE_STATUS_PUBLISHED:
+            if node.status != constants.constants.STORY_NODE_STATUS_PUBLISHED:
                 break
             published_node_count += 1
         return published_node_count
@@ -1479,7 +1478,8 @@ class Story:
             bool. Whether the thumbnail background color is valid or not.
         """
         return (
-            thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['story']
+            thumbnail_bg_color
+            in constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['story']
         )
 
     def validate(self) -> None:
@@ -1494,7 +1494,7 @@ class Story:
         utils.require_valid_url_fragment(
             self.url_fragment,
             'Story Url Fragment',
-            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
         )
         utils.require_valid_meta_tag_content(self.meta_tag_content)
         if self.thumbnail_filename is not None:
@@ -1569,7 +1569,7 @@ class Story:
                 'Story id should be a string, received: %s' % story_id
             )
 
-        if len(story_id) != constants.STORY_ID_LENGTH:
+        if len(story_id) != constants.constants.STORY_ID_LENGTH:
             raise utils.ValidationError('Invalid story id.')
 
     @classmethod
@@ -1846,7 +1846,7 @@ class Story:
             feconf.DEFAULT_STORY_NOTES,
             story_contents,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             corresponding_topic_id,
             0,
             url_fragment,
@@ -1931,7 +1931,7 @@ class Story:
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, story_id)
         for index in range(len(story_contents_dict['nodes'])):
             filepath = '%s/%s' % (
-                constants.ASSET_TYPE_THUMBNAIL,
+                constants.constants.ASSET_TYPE_THUMBNAIL,
                 story_contents_dict['nodes'][index]['thumbnail_filename'],
             )
             story_contents_dict['nodes'][index]['thumbnail_size_in_bytes'] = (
@@ -1998,7 +1998,7 @@ class Story:
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL,
+            constants.constants.ASSET_TYPE_THUMBNAIL,
             new_thumbnail_filename,
         )
         if fs.isfile(filepath):
@@ -2179,7 +2179,7 @@ class Story:
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.id)
 
         filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL,
+            constants.constants.ASSET_TYPE_THUMBNAIL,
             new_thumbnail_filename,
         )
         if fs.isfile(filepath):
@@ -2518,7 +2518,7 @@ class StorySummary:
         utils.require_valid_url_fragment(
             self.url_fragment,
             'Story Url Fragment',
-            constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_STORY_URL_FRAGMENT,
         )
 
         if not isinstance(self.title, str):

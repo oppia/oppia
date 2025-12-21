@@ -22,8 +22,7 @@ import copy
 import re
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     skill_services,
     state_domain,
@@ -104,7 +103,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'Naming Numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             ),
@@ -113,7 +112,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'Subtopic Name',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'other-subtopic-url',
             ),
@@ -624,9 +623,11 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                 'parent_topic_id': self.TOPIC_ID_1,
                 'parent_topic_name': 'Place Values',
                 'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                     'subtopic'
-                ][0],
+                ][
+                    0
+                ],
                 'subtopic_mastery': None,
                 'parent_topic_url_fragment': 'abbrev',
                 'classroom_url_fragment': None,

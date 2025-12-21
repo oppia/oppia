@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     change_domain,
     exp_domain,
@@ -1134,7 +1133,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
             translation_counts={},
             incomplete_translation_language_codes=[
                 language['id']
-                for language in constants.SUPPORTED_AUDIO_LANGUAGES
+                for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
             ],
             language_codes_needing_voice_artists=['en'],
         ).put()

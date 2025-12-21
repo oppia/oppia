@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
@@ -33,7 +32,9 @@ from typing import Dict, List, TypedDict
 
 SCHEMA_FOR_STORY_ID = {
     'type': 'basestring',
-    'validators': [{'id': 'has_length', 'value': constants.STORY_ID_LENGTH}],
+    'validators': [
+        {'id': 'has_length', 'value': constants.constants.STORY_ID_LENGTH}
+    ],
 }
 
 
@@ -77,7 +78,7 @@ class EditableStoryDataHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 }
@@ -298,7 +299,7 @@ class StoryUrlFragmentHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
+        'story_url_fragment': constants.constants.SCHEMA_FOR_STORY_URL_FRAGMENTS
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 

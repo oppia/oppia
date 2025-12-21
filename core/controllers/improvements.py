@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf
-from core.constants import constants
+from core import constants, feature_flag_list, feconf
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     exp_fetchers,
@@ -84,7 +83,7 @@ class ExplorationImprovementsHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -140,11 +139,11 @@ class ExplorationImprovementsHandler(
             issue_description = task_entry.get('issue_description', None)
             task_entries_to_put.append(
                 improvements_domain.TaskEntry(
-                    constants.TASK_ENTITY_TYPE_EXPLORATION,
+                    constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                     exploration_id,
                     entity_version,
                     task_type,
-                    constants.TASK_TARGET_TYPE_STATE,
+                    constants.constants.TASK_TARGET_TYPE_STATE,
                     target_id,
                     issue_description,
                     status,
@@ -183,7 +182,7 @@ class ExplorationImprovementsHistoryHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -232,7 +231,7 @@ class ExplorationImprovementsConfigHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }

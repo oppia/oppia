@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
 from core.tests import test_utils
@@ -478,7 +478,9 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
 
     def test_should_pronounce_correctly_for_superscripts(self) -> None:
         math_symbol_pronunciations = (
-            constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get('en', {})
+            constants.constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+                'en', {}
+            )
         )
 
         content = 'x^2 + y^2 = z^3'

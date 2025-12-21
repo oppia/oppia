@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     learner_goals_services,
     learner_progress_services,
@@ -43,7 +42,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -53,7 +52,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -63,7 +62,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -73,7 +72,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -154,7 +153,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_1,
             ),
             {},
@@ -170,7 +169,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_2,
             ),
             {},
@@ -189,7 +188,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_3,
             ),
             {},
@@ -228,7 +227,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
                 '%s/%s/%s'
                 % (
                     feconf.LEARNER_GOALS_DATA_URL,
-                    constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                    constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                     'topic_id_%s' % topic_id,
                 ),
                 {},
@@ -241,7 +240,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 'topic_id_%s' % str(feconf.MAX_CURRENT_GOALS_COUNT + 3),
             ),
             {},
@@ -272,7 +271,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_1,
             )
         )
@@ -286,7 +285,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_2,
             )
         )
@@ -300,7 +299,7 @@ class LearnerGoalsHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_GOALS_DATA_URL,
-                constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 self.TOPIC_ID_1,
             ),
             {},

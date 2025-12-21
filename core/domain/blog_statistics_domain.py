@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 
 from typing import Dict
 
@@ -76,7 +75,7 @@ class BlogPostViewsAggregatedStats:
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id
             )
 
-        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id
             )
@@ -132,7 +131,7 @@ class BlogPostReadsAggregatedStats:
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id
             )
 
-        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog ID %s is invalid' % self.blog_post_id
             )
@@ -212,7 +211,7 @@ class BlogPostReadingTime:
                 'Blog Post ID must be a string, but got %r' % self.blog_post_id
             )
 
-        if len(self.blog_post_id) != constants.BLOG_POST_ID_LENGTH:
+        if len(self.blog_post_id) != constants.constants.BLOG_POST_ID_LENGTH:
             raise utils.ValidationError(
                 'Blog Post ID %s is invalid' % self.blog_post_id
             )

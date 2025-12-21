@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 from core.domain import topic_domain, user_services
 from core.tests import test_utils
 
@@ -45,7 +44,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -78,7 +77,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'uncategorized_skill_ids': [],
             'subtopics': [],
             'next_subtopic_id': 1,
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'story_reference_schema_version': (
                 feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
@@ -273,7 +272,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -551,9 +550,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_subtopic_strict_validation(self) -> None:
         self.topic.thumbnail_filename = 'filename.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.subtopics[0].skill_ids = []
         self.topic.skill_ids_for_diagnostic_test = []
         self._assert_strict_validation_error(
@@ -703,7 +702,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_lengthy_url_fragment(self) -> None:
         self.topic.url_fragment = 'a' * 25
-        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        url_fragment_char_limit = (
+            constants.constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        )
         validation_message = (
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.' % (url_fragment_char_limit, self.topic.url_fragment)
@@ -802,7 +803,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title2',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-title-two',
             )
@@ -930,7 +931,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -939,7 +940,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -957,7 +958,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -966,7 +967,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1051,7 +1052,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -1060,7 +1061,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1101,7 +1102,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -1110,7 +1111,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1141,7 +1142,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -1150,7 +1151,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1183,7 +1184,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -1192,7 +1193,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1460,7 +1461,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-one',
             ),
@@ -1469,7 +1470,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'Another title',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-two',
             ),
@@ -1558,9 +1559,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         exception.
         """
         self.topic.thumbnail_filename = 'filename.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.skill_ids_for_diagnostic_test = []
         error_msg = (
             'The skill_ids_for_diagnostic_test field should not be empty.'
@@ -2090,7 +2091,9 @@ class TopicSummaryTests(test_utils.GenericTestBase):
 
     def test_validation_fails_with_lenghty_url_fragment(self) -> None:
         self.topic_summary.url_fragment = 'a' * 25
-        url_fragment_char_limit = constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        url_fragment_char_limit = (
+            constants.constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT
+        )
         validation_message = (
             'Topic URL Fragment field should not exceed %d characters, '
             'received %s.'

@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.tests import test_utils
 
 
@@ -24,7 +24,7 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
 
     def test_oppia_root_page(self) -> None:
         """Tests access to the unified entry page."""
-        for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+        for page in constants.constants.PAGES_REGISTERED_WITH_FRONTEND.values():
             if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
                 response = self.get_html_response(
                     '/%s' % page['ROUTE'], expected_status_int=200

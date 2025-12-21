@@ -22,8 +22,7 @@ import collections
 import datetime
 import logging
 
-from core import feature_flag_list, feconf
-from core.constants import constants
+from core import constants, feature_flag_list, feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -89,14 +88,15 @@ def get_exploration_opportunity_summary_from_model(
     """
     # We're making sure that the audio language codes in any exploration
     # opportunity domain object match the ones in
-    # constants.SUPPORTED_AUDIO_LANGUAGES.
+    # constants.constants.SUPPORTED_AUDIO_LANGUAGES.
     set_of_all_languages = set(
         model.incomplete_translation_language_codes
         + model.language_codes_needing_voice_artists
         + model.language_codes_with_assigned_voice_artists
     )
     supported_language_codes = set(
-        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        language['id']
+        for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
     )
     missing_language_codes = list(
         supported_language_codes - set_of_all_languages
@@ -303,7 +303,8 @@ def _compute_exploration_incomplete_translation_languages(
         alphabetically.
     """
     audio_language_codes = set(
-        language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+        language['id']
+        for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
     )
     incomplete_translation_language_codes = audio_language_codes - set(
         complete_translation_languages
@@ -630,7 +631,7 @@ def get_translation_opportunities(
             more: bool. If True, there are (probably) more results after this
                 batch. If False, there are no further results after this batch.
     """
-    page_size = constants.OPPORTUNITIES_PAGE_SIZE
+    page_size = constants.constants.OPPORTUNITIES_PAGE_SIZE
     exp_opportunity_summary_models, cursor, more = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_all_translation_opportunities(
             page_size, cursor, language_code, topic_name
@@ -849,7 +850,7 @@ def get_skill_opportunities(
     """
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel.get_skill_opportunities(
-            constants.OPPORTUNITIES_PAGE_SIZE, cursor
+            constants.constants.OPPORTUNITIES_PAGE_SIZE, cursor
         )
     )
     opportunities = []
@@ -912,7 +913,7 @@ def create_skill_opportunity(skill_id: str, skill_description: str) -> None:
 
     questions, _ = (
         question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-            constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0
+            constants.constants.MAX_QUESTIONS_PER_SKILL, [skill_id], 0
         )
     )
     skill_opportunity = opportunity_domain.SkillOpportunity(

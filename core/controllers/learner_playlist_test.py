@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import learner_playlist_services, learner_progress_services
 from core.tests import test_utils
 
@@ -85,7 +84,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_1,
             ),
             {},
@@ -103,7 +102,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_2,
             ),
             {},
@@ -123,7 +122,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_2,
             ),
             payload,
@@ -145,7 +144,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_3,
             ),
             {},
@@ -167,7 +166,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_4,
             ),
             {},
@@ -190,7 +189,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 '%s/%s/%s'
                 % (
                     feconf.LEARNER_PLAYLIST_DATA_URL,
-                    constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.constants.ACTIVITY_TYPE_EXPLORATION,
                     'exp_id_%s' % exp_id,
                 ),
                 {},
@@ -203,7 +202,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 'exp_id_%s'
                 % str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3),
             ),
@@ -223,7 +222,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_1,
             ),
             {},
@@ -241,7 +240,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_2,
             ),
             {},
@@ -261,7 +260,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_2,
             ),
             payload,
@@ -283,7 +282,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_3,
             ),
             {},
@@ -305,7 +304,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_4,
             ),
             {},
@@ -328,7 +327,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
                 '%s/%s/%s'
                 % (
                     feconf.LEARNER_PLAYLIST_DATA_URL,
-                    constants.ACTIVITY_TYPE_COLLECTION,
+                    constants.constants.ACTIVITY_TYPE_COLLECTION,
                     'col_id_%s' % exp_id,
                 ),
                 {},
@@ -341,7 +340,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 'exp_id_%s'
                 % str(feconf.MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT + 3),
             ),
@@ -374,7 +373,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_1,
             )
         )
@@ -390,7 +389,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_1,
             )
         )
@@ -406,7 +405,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_EXPLORATION,
+                constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 self.EXP_ID_2,
             )
         )
@@ -441,7 +440,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_1,
             )
         )
@@ -457,7 +456,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_1,
             )
         )
@@ -473,7 +472,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
             '%s/%s/%s'
             % (
                 feconf.LEARNER_PLAYLIST_DATA_URL,
-                constants.ACTIVITY_TYPE_COLLECTION,
+                constants.constants.ACTIVITY_TYPE_COLLECTION,
                 self.COL_ID_2,
             )
         )

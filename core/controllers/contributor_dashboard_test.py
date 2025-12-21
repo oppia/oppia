@@ -20,8 +20,7 @@ import datetime
 import unittest
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     classroom_config_services,
     exp_domain,
@@ -79,7 +78,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
                 content_html='Content',
             )
@@ -235,7 +234,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_skill_opportunity_data_pagination(self) -> None:
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={},
@@ -301,7 +302,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         # fetched first. Since skill_id_0, skill_id_1, skill_id_2 are not linked
         # to a classroom, another fetch will be made to retrieve skill_id_3,
         # skill_id_4, skill_id_5 to fulfill the page size.
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 3):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 3}
+        ):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={},
@@ -357,7 +360,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         )
 
         # Test when no opportunities are returned.
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 0):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 0}
+        ):
             response = self.get_json(
                 '%s/skill' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={},
@@ -369,7 +374,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_translation_opportunity_data_pagination(self) -> None:
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
             response = self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'hi', 'topic_name': 'topic'},
@@ -400,7 +407,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
     def test_get_translation_opportunity_with_invalid_language_code(
         self,
     ) -> None:
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 params={'language_code': 'invalid_lang_code'},
@@ -408,7 +417,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             )
 
     def test_get_translation_opportunity_without_language_code(self) -> None:
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
             self.get_json(
                 '%s/translation' % feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400,
@@ -453,7 +464,9 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.assertIsInstance(response['next_cursor'], str)
 
     def test_get_opportunity_for_invalid_opportunity_type(self) -> None:
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
             self.get_json(
                 '%s/invalid_opportunity_type'
                 % (feconf.CONTRIBUTOR_OPPORTUNITIES_DATA_URL),
@@ -624,7 +637,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Create exploration opportunity summaries with some items set to None.
         suported_audio_langs_codes = [
-            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+            lang['id'] for lang in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         mock_exp_opp_summaries = {
             '0': opportunity_domain.ExplorationOpportunitySummary(
@@ -740,7 +753,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
         # Pin second opportunity.
         suported_audio_langs_codes = [
-            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+            lang['id'] for lang in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         mock_pinned_lesson_summary = opportunity_domain.ExplorationOpportunitySummary(
             exp_id='0',
@@ -1244,7 +1257,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 [subtopic_skill_id],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic',
             )
@@ -1301,7 +1314,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
                 content_html='Content',
             )
@@ -1322,7 +1335,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -1956,9 +1969,9 @@ class FeaturedTranslationLanguagesHandlerTest(test_utils.GenericTestBase):
     def test_featured_translation_langs_are_present_in_supported_audio_langs(
         self,
     ) -> None:
-        featured_languages = constants.FEATURED_TRANSLATION_LANGUAGES
+        featured_languages = constants.constants.FEATURED_TRANSLATION_LANGUAGES
         suported_audio_langs_codes = [
-            lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+            lang['id'] for lang in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ]
         for language in featured_languages:
             self.assertIn(
@@ -2000,7 +2013,7 @@ class TranslatableTopicNamesHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -2048,7 +2061,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             'Title',
             ['skill_id_3'],
             'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
             21131,
             'dummy-subtopic-three',
         )
@@ -2094,7 +2107,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             'Title',
             ['skill_id_3'],
             'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
             21131,
             'dummy-subtopic-three',
         )
@@ -2141,7 +2154,7 @@ class TranslatableTopicNamesPerClassroomHandlerTest(test_utils.GenericTestBase):
             'Title',
             ['skill_id_3'],
             'image.svg',
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
             21131,
             'dummy-subtopic-three',
         )
@@ -2281,7 +2294,7 @@ class ContributorStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -2595,7 +2608,7 @@ class ContributorAllStatsSummariesHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

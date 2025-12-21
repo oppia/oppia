@@ -21,7 +21,7 @@ import importlib
 from unittest import mock
 
 import main
-from core.constants import constants
+from core import constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -54,7 +54,7 @@ class CloudLoggingTests(test_utils.GenericTestBase):
                 function_calls['setup_logging'] = True
 
         emulator_mode_patch = mock.patch.object(
-            constants, 'EMULATOR_MODE', False
+            constants.constants, 'EMULATOR_MODE', False
         )
         logging_client_patch = mock.patch.object(
             google.cloud.logging, 'Client', MockClient

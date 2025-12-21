@@ -19,8 +19,7 @@ from __future__ import annotations
 import copy
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     opportunity_services,
     question_domain,
@@ -317,8 +316,8 @@ def get_questions_by_skill_ids(
         question_skill_link_models = question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill(  # pylint: disable=line-too-long
             total_question_count,
             skill_ids,
-            constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
-                constants.SKILL_DIFFICULTY_MEDIUM
+            constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                constants.constants.SKILL_DIFFICULTY_MEDIUM
             ],
         )
     else:

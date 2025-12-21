@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import blog_domain, blog_services, user_services
 
@@ -213,7 +212,9 @@ class BlogHomepageDataHandler(
             number_of_published_blog_post_summaries = (
                 blog_services.get_total_number_of_published_blog_post_summaries()
             )
-            list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+            list_of_default_tags = (
+                constants.constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+            )
             self.values.update(
                 {
                     'no_of_blog_post_summaries': (
@@ -241,7 +242,7 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     },
                     {
                         'id': 'has_length_at_least',
-                        'min_value': constants.BLOG_POST_ID_LENGTH,
+                        'min_value': constants.constants.BLOG_POST_ID_LENGTH,
                     },
                 ],
             },
@@ -480,7 +481,9 @@ class BlogPostSearchHandler(
         blog_post_summary_dicts = _get_blog_card_summary_dicts_for_homepage(
             blog_post_summaries
         )
-        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        list_of_default_tags = (
+            constants.constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        )
 
         self.values.update(
             {

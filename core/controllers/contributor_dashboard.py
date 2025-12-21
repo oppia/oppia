@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
@@ -129,14 +128,16 @@ class ContributionOpportunitiesHandler(
         search_cursor = self.normalized_request.get('cursor')
         language_code = self.normalized_request.get('language_code')
 
-        if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL:
+        if opportunity_type == constants.constants.OPPORTUNITY_TYPE_SKILL:
             skill_opportunities, next_cursor, more = (
                 self._get_skill_opportunities_with_corresponding_topic_name(
                     search_cursor
                 )
             )
 
-        elif opportunity_type == constants.OPPORTUNITY_TYPE_TRANSLATION:
+        elif (
+            opportunity_type == constants.constants.OPPORTUNITY_TYPE_TRANSLATION
+        ):
             topic_name = self.normalized_request.get('topic_name')
             if language_code is None:
                 raise self.InvalidInputException
@@ -151,7 +152,8 @@ class ContributionOpportunitiesHandler(
         self.values = {
             'opportunities': (
                 skill_opportunities
-                if opportunity_type == constants.OPPORTUNITY_TYPE_SKILL
+                if opportunity_type
+                == constants.constants.OPPORTUNITY_TYPE_SKILL
                 else translation_opportunities
             ),
             'next_cursor': next_cursor,
@@ -204,7 +206,7 @@ class ContributionOpportunitiesHandler(
         opportunities: List[ClientSideSkillOpportunityDict] = []
         # Fetch opportunities until we have at least a page's worth that
         # correspond to a classroom or there are no more opportunities.
-        while len(opportunities) < constants.OPPORTUNITIES_PAGE_SIZE:
+        while len(opportunities) < constants.constants.OPPORTUNITIES_PAGE_SIZE:
             for skill_opportunity in skill_opportunities:
                 if (
                     skill_opportunity.id
@@ -230,7 +232,8 @@ class ContributionOpportunitiesHandler(
                     opportunities.append(client_side_skill_opportunity_dict)
             if (
                 not more
-                or len(opportunities) >= constants.OPPORTUNITIES_PAGE_SIZE
+                or len(opportunities)
+                >= constants.constants.OPPORTUNITIES_PAGE_SIZE
             ):
                 break
             skill_opportunities, cursor, more = (
@@ -842,7 +845,7 @@ class FeaturedTranslationLanguagesHandler(
         """Handles GET requests."""
         self.render_json(
             {
-                'featured_translation_languages': constants.FEATURED_TRANSLATION_LANGUAGES
+                'featured_translation_languages': constants.constants.FEATURED_TRANSLATION_LANGUAGES
             }
         )
 
@@ -1095,7 +1098,7 @@ class ContributorCertificateHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_USERNAME_LENGTH,
+                        'max_value': constants.constants.MAX_USERNAME_LENGTH,
                     }
                 ],
             }
@@ -1115,7 +1118,7 @@ class ContributorCertificateHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.DATE_REGEX,
+                            'regex_pattern': constants.constants.DATE_REGEX,
                         }
                     ],
                 }
@@ -1126,7 +1129,7 @@ class ContributorCertificateHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.DATE_REGEX,
+                            'regex_pattern': constants.constants.DATE_REGEX,
                         }
                     ],
                 }

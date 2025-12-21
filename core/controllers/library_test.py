@@ -21,8 +21,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     activity_domain,
     activity_services,
@@ -581,7 +580,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         # Load a demo.
         exp_services.load_demo('0')
         exploration_ref = activity_domain.ActivityReference(
-            constants.ACTIVITY_TYPE_EXPLORATION, '0'
+            constants.constants.ACTIVITY_TYPE_EXPLORATION, '0'
         )
         activity_services.update_featured_activity_references([exploration_ref])
 
@@ -811,7 +810,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
 class CategoryConfigTests(test_utils.GenericTestBase):
 
     def test_thumbnail_icons_exist_for_each_category(self) -> None:
-        all_categories = list(constants.CATEGORIES_TO_COLORS.keys())
+        all_categories = list(constants.constants.CATEGORIES_TO_COLORS.keys())
 
         # Test that an icon exists for each default category.
         for category in all_categories:
@@ -832,7 +831,7 @@ class CategoryConfigTests(test_utils.GenericTestBase):
                 'assets',
                 'images',
                 'subjects',
-                '%s.svg' % constants.DEFAULT_THUMBNAIL_ICON,
+                '%s.svg' % constants.constants.DEFAULT_THUMBNAIL_ICON,
             )
         )
 

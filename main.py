@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import android_validation_constants, feconf
-from core.constants import constants
+from core import android_validation_constants, constants, feconf
 from core.controllers import (
     access_validators,
     acl_decorators,
@@ -100,7 +99,7 @@ datastore_services = models.Registry.import_datastore_services()
 
 # Cloud Logging is disabled in emulator mode, since it is unnecessary and
 # creates a lot of noise.
-if not constants.EMULATOR_MODE:
+if not constants.constants.EMULATOR_MODE:
     # Instantiates a client and retrieves a Cloud Logging handler based on the
     # environment you're running in and integrates the handler with the Python
     # logging module.
@@ -1221,7 +1220,7 @@ URLS = [
         r'%s/%s/<exploration_id>'
         % (
             feconf.IMPROVEMENTS_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         ),
         improvements.ExplorationImprovementsHandler,
     ),
@@ -1229,7 +1228,7 @@ URLS = [
         r'%s/%s/<exploration_id>'
         % (
             feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         ),
         improvements.ExplorationImprovementsHistoryHandler,
     ),
@@ -1237,7 +1236,7 @@ URLS = [
         r'%s/%s/<exploration_id>'
         % (
             feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         ),
         improvements.ExplorationImprovementsConfigHandler,
     ),
@@ -1382,7 +1381,7 @@ URLS = [
 ]
 
 # Adding redirects for topic landing pages.
-for subject, topics in constants.AVAILABLE_LANDING_PAGES.items():
+for subject, topics in constants.constants.AVAILABLE_LANDING_PAGES.items():
     for topic in topics:
         URLS.append(
             get_redirect_route(
@@ -1390,7 +1389,7 @@ for subject, topics in constants.AVAILABLE_LANDING_PAGES.items():
             )
         )
 
-if constants.DEV_MODE:
+if constants.constants.DEV_MODE:
     URLS.append(
         get_redirect_route(
             r'/initialize_android_test_data',
@@ -1399,13 +1398,13 @@ if constants.DEV_MODE:
     )
 
 # Adding redirects for all stewards landing pages.
-for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
+for stewards_route in constants.constants.STEWARDS_LANDING_PAGE['ROUTES']:
     URLS.append(
         get_redirect_route(r'/%s' % stewards_route, oppia_root.OppiaRootPage)
     )
 
 # Redirect all routes handled using angular router to the oppia root page.
-for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
+for page in constants.constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
         if 'LIGHTWEIGHT' in page:
             URLS.append(

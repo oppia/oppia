@@ -30,8 +30,7 @@ import json
 import re
 import string
 
-from core import feconf, schema_utils, utils
-from core.constants import constants
+from core import constants, feconf, schema_utils, utils
 from core.domain import html_cleaner  # pylint: disable=invalid-import-from
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
@@ -1589,7 +1588,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         init_state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
         category: str = feconf.DEFAULT_EXPLORATION_CATEGORY,
         objective: str = feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> Exploration:
         """Returns a Exploration domain object with default values.
 
@@ -1852,7 +1851,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag
@@ -2010,7 +2009,7 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for param_change in self.param_changes:
             param_change.validate()
 
-            if param_change.name in constants.INVALID_PARAMETER_NAMES:
+            if param_change.name in constants.constants.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
@@ -2032,7 +2031,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
         for state_name, state in self.states.items():
             for param_change in state.param_changes:
                 param_change.validate()
-                if param_change.name in constants.INVALID_PARAMETER_NAMES:
+                if (
+                    param_change.name
+                    in constants.constants.INVALID_PARAMETER_NAMES
+                ):
                     raise utils.ValidationError(
                         'The parameter name \'%s\' is reserved. Please choose '
                         'a different name for the parameter being set in '
@@ -5088,7 +5090,10 @@ class Exploration(translation_domain.BaseTranslatableObject):
             if utils.get_url_scheme(url) == 'http':
                 url = url.replace('http', 'https')
 
-            if utils.get_url_scheme(url) not in constants.ACCEPTABLE_SCHEMES:
+            if (
+                utils.get_url_scheme(url)
+                not in constants.constants.ACCEPTABLE_SCHEMES
+            ):
                 tag.decompose()
                 continue
 
@@ -6425,7 +6430,7 @@ class ExplorationSummary:
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(constants.TAG_REGEX, tag):
+            if not re.match(constants.constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag
@@ -6588,7 +6593,7 @@ class ExplorationSummary:
         Returns:
             bool. Whether the exploration is private.
         """
-        return bool(self.status == constants.ACTIVITY_STATUS_PRIVATE)
+        return bool(self.status == constants.constants.ACTIVITY_STATUS_PRIVATE)
 
     def is_solely_owned_by_user(self, user_id: str) -> bool:
         """Checks whether the exploration is solely owned by the user.
@@ -6624,7 +6629,7 @@ class ExplorationSummary:
             contributor_id: str. ID of the contributor to be added.
         """
         # We don't want to record the contributions of system users.
-        if contributor_id not in constants.SYSTEM_USER_IDS:
+        if contributor_id not in constants.constants.SYSTEM_USER_IDS:
             self.contributors_summary[contributor_id] = (
                 self.contributors_summary.get(contributor_id, 0) + 1
             )

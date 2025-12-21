@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import collections
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.domain import (
     classroom_config_services,
     collection_domain,
@@ -1081,7 +1080,10 @@ def _get_filtered_completed_exp_summaries(
     for index, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary is None:
             nonexistent_completed_exp_ids.append(exploration_ids[index])
-        elif exploration_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            exploration_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_completed_exp_ids.append(exploration_ids[index])
         else:
             filtered_completed_exp_summaries.append(exploration_summary)
@@ -1345,7 +1347,10 @@ def _get_filtered_completed_collection_summaries(
     for index, collection_summary in enumerate(collection_summaries):
         if collection_summary is None:
             nonexistent_completed_collection_ids.append(collection_ids[index])
-        elif collection_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            collection_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_completed_collection_ids.append(collection_ids[index])
         else:
             completed_exploration_ids = (
@@ -1419,7 +1424,10 @@ def _get_filtered_incomplete_exp_summaries(
     for index, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary is None:
             nonexistent_incomplete_exp_ids.append(exploration_ids[index])
-        elif exploration_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            exploration_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_incomplete_exp_ids.append(exploration_ids[index])
         else:
             filtered_incomplete_exp_summaries.append(exploration_summary)
@@ -1562,7 +1570,10 @@ def _get_filtered_incomplete_collection_summaries(
     for index, collection_summary in enumerate(collection_summaries):
         if collection_summary is None:
             nonexistent_incomplete_collection_ids.append(collection_ids[index])
-        elif collection_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            collection_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_incomplete_collection_ids.append(collection_ids[index])
         else:
             filtered_incomplete_collection_summaries.append(collection_summary)
@@ -1653,7 +1664,10 @@ def _get_filtered_exp_playlist_summaries(
     for index, exploration_summary in enumerate(exploration_summaries):
         if exploration_summary is None:
             nonexistent_playlist_exp_ids.append(exploration_ids[index])
-        elif exploration_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            exploration_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_playlist_exp_ids.append(exploration_ids[index])
         else:
             filtered_exp_playlist_summaries.append(exploration_summary)
@@ -1685,7 +1699,10 @@ def _get_filtered_collection_playlist_summaries(
     for index, collection_summary in enumerate(collection_summaries):
         if collection_summary is None:
             nonexistent_playlist_collection_ids.append(collection_ids[index])
-        elif collection_summary.status != constants.ACTIVITY_STATUS_PUBLIC:
+        elif (
+            collection_summary.status
+            != constants.constants.ACTIVITY_STATUS_PUBLIC
+        ):
             nonexistent_playlist_collection_ids.append(collection_ids[index])
         else:
             filtered_collection_playlist_summaries.append(collection_summary)

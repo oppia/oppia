@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import base64
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     classroom_config_services,
@@ -238,7 +237,7 @@ class TopicAssignmentsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -303,11 +302,11 @@ class SkillsDashboardPageDataHandler(
             },
             'sort': {
                 'schema': {'type': 'basestring'},
-                'choices': constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS,
+                'choices': constants.constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS,
             },
             'status': {
                 'schema': {'type': 'basestring'},
-                'choices': constants.SKILL_STATUS_OPTIONS,
+                'choices': constants.constants.SKILL_STATUS_OPTIONS,
             },
         }
     }
@@ -392,7 +391,7 @@ class NewTopicHandler(
                     ],
                 }
             },
-            'url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+            'url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
             'description': {
                 'schema': {
                     'type': 'basestring',
@@ -418,7 +417,9 @@ class NewTopicHandler(
             'thumbnailBgColor': {
                 'schema': {
                     'type': 'basestring',
-                    'choices': constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'],
+                    'choices': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                        'topic'
+                    ],
                 }
             },
             'image': {'schema': {'type': 'basestring'}},
@@ -429,13 +430,13 @@ class NewTopicHandler(
                         {
                             'id': 'has_length_at_most',
                             'max_value': (
-                                constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+                                constants.constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
                             ),
                         },
                         {
                             'id': 'has_length_at_least',
                             'min_value': (
-                                constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+                                constants.constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
                             ),
                         },
                     ],
@@ -556,7 +557,7 @@ class NewSkillHandler(
                         'validators': [
                             {
                                 'id': 'is_regex_matched',
-                                'regex_pattern': constants.ENTITY_ID_REGEX,
+                                'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                             }
                         ],
                     },
@@ -678,7 +679,7 @@ class MergeSkillHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 }
@@ -689,7 +690,7 @@ class MergeSkillHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 }

@@ -23,8 +23,7 @@ import json
 import os
 from unittest import mock
 
-from core import feconf, schema_utils
-from core.constants import constants
+from core import constants, feconf, schema_utils
 from core.domain import exp_domain, exp_services
 from core.domain import platform_parameter_list as param_list
 from core.domain import (
@@ -999,7 +998,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1067,7 +1066,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     ).to_dict(),
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1160,7 +1159,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 
@@ -1308,7 +1307,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
                     },
                 }
             ],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
 

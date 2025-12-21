@@ -19,7 +19,7 @@ from __future__ import annotations
 import textwrap
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.domain import email_services, platform_parameter_list
 from core.platform import models
 from core.tests import test_utils
@@ -43,7 +43,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         )
 
         with send_email_exception, mock.patch.object(
-            constants, 'DEV_MODE', False
+            constants.constants, 'DEV_MODE', False
         ):
             email_services.send_mail(
                 self.system_email_address,
@@ -118,7 +118,7 @@ class EmailServicesTest(test_utils.EmailTestBase):
         )
 
         with send_email_exception, mock.patch.object(
-            constants, 'DEV_MODE', False
+            constants.constants, 'DEV_MODE', False
         ):
             email_services.send_bulk_mail(
                 self.system_email_address,

@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 import os
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import domain_objects_validator
 from core.domain import (
     blog_services,
@@ -605,14 +604,14 @@ class ValidarteTaskEntriesTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.mock_date = datetime.datetime(2023, 4, 17, 22, 0, 0, 123456)
         self.task_entry_dict = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.mock_date,
         ).to_dict()

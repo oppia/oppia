@@ -21,8 +21,12 @@ from __future__ import annotations
 import json
 from unittest import mock
 
-from core import android_validation_constants, feature_flag_list, feconf
-from core.constants import constants
+from core import (
+    android_validation_constants,
+    constants,
+    feature_flag_list,
+    feconf,
+)
 from core.controllers import acl_decorators, base, incoming_app_feedback_report
 from core.domain import (
     blog_services,
@@ -3517,7 +3521,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     ) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_ADMIN)
         self.login(self.user_email)
-        with mock.patch.object(constants, 'DEV_MODE', True):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': True}):
             with mock.patch.object(self, 'testapp', self.mock_testapp):
                 response = self.get_json('/mock/', expected_status_int=401)
         error_msg = (
@@ -3533,7 +3537,7 @@ class AccessContributorDashboardAdminPageTests(test_utils.GenericTestBase):
     def test_question_coordinator_can_access_new_cd_admin_page(self) -> None:
         self.add_user_role(self.username, feconf.ROLE_ID_QUESTION_COORDINATOR)
         self.login(self.user_email)
-        with mock.patch.object(constants, 'DEV_MODE', True):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': True}):
             with mock.patch.object(self, 'testapp', self.mock_testapp):
                 response = self.get_json('/mock/')
         self.assertEqual(response['success'], 1)
@@ -3911,7 +3915,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     CHANGE_DICT_2: Final = {
         'cmd': 'add_written_translation',
         'state_name': 'Introduction',
-        'language_code': constants.DEFAULT_LANGUAGE_CODE,
+        'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
         'content_id': 'content_0',
         'content_html': '',
         'translation_html': '',

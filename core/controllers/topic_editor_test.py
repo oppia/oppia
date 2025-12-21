@@ -20,8 +20,7 @@ import datetime
 import os
 from unittest import mock
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     platform_parameter_list,
     skill_services,
@@ -196,11 +195,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'status': constants.constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': None,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
@@ -217,11 +218,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'status': constants.constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -238,11 +241,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -302,9 +307,9 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             language_code='en',
             version=1,
             node_titles=[],
-            thumbnail_bg_color=constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][
-                0
-            ],
+            thumbnail_bg_color=constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'story'
+            ][0],
             thumbnail_filename='img.svg',
             url_fragment='url',
             story_model_created_on=datetime.datetime.today(),
@@ -438,7 +443,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertIn(
             'Schema validation for \'description\' failed: '
             'Validation failed: has_length_at_most '
-            f'({{\'max_value\': {constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
+            f'({{\'max_value\': {constants.constants.MAX_CHARS_IN_STORY_DESCRIPTION}}}) '
             f'for object {invalid_description}',
             json_response['error'],
         )
@@ -855,7 +860,7 @@ class TopicEditorTests(
     def test_editable_topic_handler_put_fails_with_long_commit_message(
         self,
     ) -> None:
-        commit_msg = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        commit_msg = 'a' * (constants.constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
         change_cmd = {
             'version': 2,
             'commit_message': commit_msg,
@@ -880,7 +885,7 @@ class TopicEditorTests(
         self.assertIn(
             'Schema validation for \'commit_message\' failed: '
             'Validation failed: has_length_at_most '
-            f'({{\'max_value\': {constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
+            f'({{\'max_value\': {constants.constants.MAX_COMMIT_MESSAGE_LENGTH}}}) '
             f'for object {commit_msg}',
             json_response['error'],
         )
@@ -1707,7 +1712,7 @@ class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

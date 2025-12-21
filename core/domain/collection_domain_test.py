@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import collection_domain, collection_services
 from core.tests import test_utils
 
@@ -1144,7 +1143,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',
-            'status': constants.ACTIVITY_STATUS_PRIVATE,
+            'status': constants.constants.ACTIVITY_STATUS_PRIVATE,
             'community_owned': True,
             'viewer_ids': ['viewer_id'],
             'version': 1,
@@ -1168,7 +1167,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             True,
             ['owner_id'],
             ['editor_id'],
@@ -1258,7 +1257,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             True,
             ['owner_id'],
             ['editor_id'],
@@ -1282,7 +1281,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
             ['owner_id'],
             ['editor_id'],
@@ -1310,7 +1309,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             True,
             ['other_id'],
             ['editor_id'],
@@ -1343,7 +1342,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'objective',
             'en',
             [],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             True,
             ['owner_id', 'other_id'],
             ['editor_id'],

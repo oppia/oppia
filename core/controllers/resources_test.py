@@ -19,8 +19,7 @@ from __future__ import annotations
 import os
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     exp_services,
     fs_services,
@@ -207,7 +206,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        with mock.patch.dict(constants, {'EMULATOR_MODE': True}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': True}):
             response = self.get_custom_response(
                 self._get_image_url('exploration', '0', filename), 'image/png'
             )
@@ -231,7 +230,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.logout()
 
-        with mock.patch.dict(constants, {'EMULATOR_MODE': True}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': True}):
             response = self.get_custom_response(
                 self._get_image_url('topic', topic_id, filename), 'image/png'
             )
@@ -585,7 +584,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         self.login(self.EDITOR_EMAIL)
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             self.get_json(
                 '/assetsdevhandler/exploration/0/assets/image/myfile.png',
                 expected_status_int=404,
@@ -1071,7 +1070,7 @@ class FaviconHandlerTest(test_utils.GenericTestBase):
     """Test for the FaviconHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             response = self.get_html_response(
                 '/favicon.ico', expected_status_int=302
             )
@@ -1085,7 +1084,7 @@ class RobotsTxtHandlerTest(test_utils.GenericTestBase):
     """Test for the RobotsTxtHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             response = self.get_html_response(
                 '/robots.txt', expected_status_int=302
             )
@@ -1099,7 +1098,7 @@ class CopyrightImagesHandlerTest(test_utils.GenericTestBase):
     """Test for the CopyrightImagesHandler."""
 
     def test_redirect_to_assetsstatic(self) -> None:
-        with mock.patch.dict(constants, {'EMULATOR_MODE': False}):
+        with mock.patch.dict(constants.constants, {'EMULATOR_MODE': False}):
             response = self.get_html_response(
                 '/assets/copyrighted-images/general/mascot.svg',
                 expected_status_int=302,

@@ -22,8 +22,7 @@ import datetime
 import json
 import logging
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 
 from google import auth
@@ -43,7 +42,7 @@ app_identity_services = models.Registry.import_app_identity_services()
 CLIENT = tasks_v2.CloudTasksClient(
     credentials=(
         auth.credentials.AnonymousCredentials()
-        if constants.EMULATOR_MODE
+        if constants.constants.EMULATOR_MODE
         else auth.default()[0]
     )
 )

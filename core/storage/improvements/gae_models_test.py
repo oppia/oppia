@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 from core.tests import test_utils
 
@@ -75,14 +75,14 @@ class ExplorationStatsTaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             'uid',
         )
         self.assertTrue(
@@ -105,14 +105,14 @@ class ExplorationStatsTaskEntryModelTests(test_utils.GenericTestBase):
     def test_apply_deletion_policy(self) -> None:
         model_class = improvements_models.ExplorationStatsTaskEntryModel
         model_class.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
             resolver_id='uid',
         )
         self.assertTrue(model_class.has_reference_to_user_id('uid'))
@@ -135,25 +135,25 @@ class ExplorationStatsTaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_export_data_with_task(self) -> None:
         task_id_1 = improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_1',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description_1',
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id='uid',
         )
         task_id_2 = improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_2',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'state name',
             'issue_description_2',
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id='uid',
         )
         self.assertEqual(
@@ -174,11 +174,11 @@ class ExplorationStatsTaskEntryModelTests(test_utils.GenericTestBase):
     def test_generate_new_task_id(self) -> None:
         self.assertEqual(
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
                 1,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 'tid',
             ),
             'exploration.eid.1.high_bounce_rate.state.tid',
@@ -186,82 +186,82 @@ class ExplorationStatsTaskEntryModelTests(test_utils.GenericTestBase):
 
     def test_can_create_task_with_unicode_identifiers(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid_\U0001f4c8',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'tid_\U0001f4c8',
         )
 
     def test_can_create_new_high_bounce_rate_task(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
         )
 
     def test_can_create_new_successive_incorrect_answers_task(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
         )
 
     def test_can_create_new_needs_guiding_responses_task(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
         )
 
     def test_can_create_new_ineffective_feedback_loop_task(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
         )
 
     def test_can_not_create_duplicate_tasks(self) -> None:
         improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             'eid',
             1,
-            constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             'Introduction',
             'issue_description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
         )
 
         with self.assertRaisesRegex(Exception, 'Task id .* already exists'):
             improvements_models.ExplorationStatsTaskEntryModel.create(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 'eid',
                 1,
-                constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 'Introduction',
                 'issue_description',
-                status=constants.TASK_STATUS_OPEN,
+                status=constants.constants.TASK_STATUS_OPEN,
             )

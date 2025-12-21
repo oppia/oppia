@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 
 from typing import Dict, Final, List, Optional
@@ -34,21 +33,21 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-TASK_ENTITY_TYPES: Final = (constants.TASK_ENTITY_TYPE_EXPLORATION,)
+TASK_ENTITY_TYPES: Final = (constants.constants.TASK_ENTITY_TYPE_EXPLORATION,)
 
 TASK_STATUS_CHOICES: Final = (
-    constants.TASK_STATUS_OPEN,
-    constants.TASK_STATUS_OBSOLETE,
-    constants.TASK_STATUS_RESOLVED,
+    constants.constants.TASK_STATUS_OPEN,
+    constants.constants.TASK_STATUS_OBSOLETE,
+    constants.constants.TASK_STATUS_RESOLVED,
 )
 
-TASK_TARGET_TYPES: Final = (constants.TASK_TARGET_TYPE_STATE,)
+TASK_TARGET_TYPES: Final = (constants.constants.TASK_TARGET_TYPE_STATE,)
 
 TASK_TYPES: Final = (
-    constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-    constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
-    constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
-    constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+    constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+    constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP,
+    constants.constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS,
+    constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
 )
 
 
@@ -277,7 +276,7 @@ class ExplorationStatsTaskEntryModel(base_models.BaseModel):
         target_type: str,
         target_id: str,
         issue_description: Optional[str] = None,
-        status: str = constants.TASK_STATUS_OBSOLETE,
+        status: str = constants.constants.TASK_STATUS_OBSOLETE,
         resolver_id: Optional[str] = None,
         resolved_on: Optional[datetime.datetime] = None,
     ) -> str:

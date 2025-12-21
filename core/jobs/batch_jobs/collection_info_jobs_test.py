@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import collection_info_jobs
 from core.jobs.types import job_run_result
@@ -66,7 +65,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.2,
         )
@@ -113,7 +112,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.2,
         )
@@ -125,7 +124,7 @@ class GetCollectionOwnersEmailsJobTests(job_test_utils.JobTestBase):
             editor_ids=[self.USER_ID_1],
             voice_artist_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.2,
         )

@@ -19,8 +19,7 @@ from __future__ import annotations
 import base64
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     collection_domain,
     collection_services,
@@ -238,7 +237,7 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
 
         self.login(self.OWNER_EMAIL)
-        long_message = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        long_message = 'a' * (constants.constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
         long_message_dict = self.json_dict.copy()
         long_message_dict['commit_message'] = long_message
 

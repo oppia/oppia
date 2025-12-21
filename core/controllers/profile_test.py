@@ -24,8 +24,7 @@ import re
 import zipfile
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     exp_domain,
     exp_services,
@@ -118,7 +117,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
                 {
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                    'default_dashboard': constants.constants.DASHBOARD_TYPE_CREATOR,
                     'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                     ),
@@ -498,7 +497,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 'updates': [
                     {
                         'update_type': 'default_dashboard',
-                        'data': constants.DASHBOARD_TYPE_CREATOR,
+                        'data': constants.constants.DASHBOARD_TYPE_CREATOR,
                     }
                 ]
             },
@@ -506,7 +505,8 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         )
         user_settings = user_services.get_user_settings(self.owner_id)
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR
+            user_settings.default_dashboard,
+            constants.constants.DASHBOARD_TYPE_CREATOR,
         )
         self.logout()
 
@@ -732,7 +732,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -754,7 +754,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
                 'can_receive_email_updates': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
         )
@@ -822,7 +822,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 {
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                    'default_dashboard': constants.constants.DASHBOARD_TYPE_CREATOR,
                     'can_receive_email_updates': (
                         feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                     ),
@@ -844,7 +844,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                     'username': self.EDITOR_USERNAME,
                     'agreed_to_terms': True,
                     'can_receive_email_updates': True,
-                    'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                    'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 },
                 csrf_token=csrf_token,
             )
@@ -862,7 +862,7 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
                 'can_receive_email_updates': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
         )
@@ -999,7 +999,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1063,7 +1063,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1086,7 +1086,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.EDITOR_USERNAME,
                 'agreed_to_terms': False,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1101,7 +1101,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1120,7 +1120,7 @@ class SignupTests(test_utils.GenericTestBase):
             feconf.SIGNUP_DATA_URL,
             {
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -1134,7 +1134,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': '',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -1151,7 +1151,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': '!a!',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
             expected_status_int=400,
@@ -1167,7 +1167,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': self.UNICODE_TEST_STRING,
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1186,7 +1186,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'username': 'abcde',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1207,7 +1207,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_CREATOR,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1223,7 +1223,8 @@ class SignupTests(test_utils.GenericTestBase):
             editor_user_id, strict=True
         )
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_CREATOR
+            user_settings.default_dashboard,
+            constants.constants.DASHBOARD_TYPE_CREATOR,
         )
 
         self.logout()
@@ -1240,7 +1241,7 @@ class SignupTests(test_utils.GenericTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.VIEWER_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1256,7 +1257,8 @@ class SignupTests(test_utils.GenericTestBase):
             viewer_user_id, strict=True
         )
         self.assertEqual(
-            user_settings.default_dashboard, constants.DASHBOARD_TYPE_LEARNER
+            user_settings.default_dashboard,
+            constants.constants.DASHBOARD_TYPE_LEARNER,
         )
 
         self.logout()

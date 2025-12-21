@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import re
 
-from core.constants import constants
+from core import constants
 from core.domain import (
     skill_services,
     study_guide_domain,
@@ -95,7 +95,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 'Naming Numbers',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             ),
@@ -104,7 +104,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 'Subtopic Name',
                 ['skill_id_2'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'other-subtopic-url',
             ),
@@ -416,9 +416,11 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 'parent_topic_id': self.TOPIC_ID_1,
                 'parent_topic_name': 'Place Values',
                 'thumbnail_filename': 'image.svg',
-                'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                     'subtopic'
-                ][0],
+                ][
+                    0
+                ],
                 'subtopic_mastery': None,
                 'parent_topic_url_fragment': 'abbrev',
                 'classroom_url_fragment': None,
@@ -511,7 +513,7 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
                 'Another Subtopic',
                 ['skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'another-subtopic-url',
             )

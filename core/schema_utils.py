@@ -31,8 +31,7 @@ import numbers
 import re
 import urllib
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import expression_parser, html_cleaner, user_domain
 from extensions.objects.models import objects
 
@@ -550,7 +549,7 @@ class _Validators:
         Returns:
             bool. Whether the given object is a valid URL fragment.
         """
-        return bool(re.match(constants.VALID_URL_FRAGMENT_REGEX, obj))
+        return bool(re.match(constants.constants.VALID_URL_FRAGMENT_REGEX, obj))
 
     @staticmethod
     def is_at_least(obj: float, min_value: int) -> bool:

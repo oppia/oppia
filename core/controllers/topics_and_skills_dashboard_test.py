@@ -19,8 +19,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     question_services,
     skill_domain,
@@ -797,15 +796,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['Explanation 1'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                 'explanations': ['Explanation 2'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[2],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[2],
                 'explanations': ['Explanation 3'],
             },
         ]
@@ -863,15 +862,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         )
         rubrics = [
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['Explanation 1'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                 'explanations': ['Explanation 2'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[2],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[2],
                 'explanations': ['Explanation 3'],
             },
         ]
@@ -930,15 +929,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         )
         rubrics = [
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['Explanation 1', explanation_html_2],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                 'explanations': ['Explanation 2'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[2],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[2],
                 'explanations': ['Explanation 3'],
             },
         ]
@@ -1025,15 +1024,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['Explanation 1'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                 'explanations': ['Explanation 2'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[2],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[2],
                 'explanations': ['Explanation 3'],
             },
         ]
@@ -1063,15 +1062,15 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         csrf_token = self.get_new_csrf_token()
         rubrics = [
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['Explanation 1'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[1],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[1],
                 'explanations': ['Explanation 2'],
             },
             {
-                'difficulty': constants.SKILL_DIFFICULTIES[2],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[2],
                 'explanations': ['Explanation 3'],
             },
         ]
@@ -1221,7 +1220,7 @@ class TopicIdToDiagnosticTestSkillIdsHandlerTests(
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

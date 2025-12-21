@@ -21,8 +21,7 @@ import logging
 import types
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     email_manager,
     exp_domain,
@@ -779,7 +778,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -827,7 +826,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                         'can_receive_email_updates': (
                             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                         ),
@@ -908,7 +907,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                         'can_receive_email_updates': (
                             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                         ),
@@ -967,7 +966,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
                     {
                         'agreed_to_terms': True,
                         'username': self.EDITOR_USERNAME,
-                        'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                        'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                         'can_receive_email_updates': (
                             feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                         ),
@@ -1056,7 +1055,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1106,7 +1105,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1124,7 +1123,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1163,7 +1162,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': 'BadUsername!!!',
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1182,7 +1181,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1268,7 +1267,7 @@ class SignupEmailTests(test_utils.EmailTestBase):
             {
                 'agreed_to_terms': True,
                 'username': self.EDITOR_USERNAME,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -3234,7 +3233,7 @@ class NotifyContributionDashboardReviewersEmailTests(test_utils.EmailTestBase):
                     'question_state_data': self._create_valid_question_data(
                         'default_state', content_id_generator
                     ).to_dict(),
-                    'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                    'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION
                     ),
@@ -5376,7 +5375,7 @@ class NotifyAdminsSuggestionsWaitingTooLongForReviewEmailTests(
                     'question_state_data': self._create_valid_question_data(
                         'default_state', content_id_generator
                     ).to_dict(),
-                    'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                    'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                     'question_state_data_schema_version': (
                         feconf.CURRENT_STATE_SCHEMA_VERSION
                     ),
@@ -6709,7 +6708,7 @@ class NotifyAdminsContributorDashboardReviewersNeededTests(
                 'question_state_data': self._create_valid_question_data(
                     'default_state', content_id_generator
                 ).to_dict(),
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION
                 ),
@@ -8342,7 +8341,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     ) -> None:
         email_manager.send_email_to_new_cd_user(
             self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
 
@@ -8362,7 +8361,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         ):
             email_manager.send_email_to_new_cd_user(
                 self.translation_reviewer_id,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             )
 
     @test_utils.set_platform_parameters(
@@ -8376,7 +8375,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         ):
             email_manager.send_email_to_removed_cd_user(
                 self.translation_reviewer_id,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             )
 
     def test_assign_translation_reviewer_email_for_invalid_category(
@@ -8391,9 +8390,9 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         self.assertEqual(
             sorted(email_manager.NEW_CD_USER_EMAIL_DATA.keys()),
             [
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             ],
         )
         for category_details in email_manager.NEW_CD_USER_EMAIL_DATA.values():
@@ -8442,7 +8441,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_new_cd_user(
             self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
 
@@ -8502,7 +8501,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_new_cd_user(
             self.question_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
             language_code='hi',
         )
 
@@ -8560,7 +8559,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_new_cd_user(
             self.question_submitter_id,
-            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
             language_code='hi',
         )
 
@@ -8595,7 +8594,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
     def test_email_is_not_sent_server_can_send_emails_is_false(self) -> None:
         email_manager.send_email_to_removed_cd_user(
             self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
 
@@ -8616,9 +8615,9 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         self.assertEqual(
             sorted(email_manager.REMOVED_CD_USER_EMAIL_DATA.keys()),
             [
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
-                constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             ],
         )
         for (
@@ -8664,7 +8663,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_removed_cd_user(
             self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
 
@@ -8723,7 +8722,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_removed_cd_user(
             self.question_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
             language_code='hi',
         )
 
@@ -8780,7 +8779,7 @@ class CDUserEmailTest(test_utils.EmailTestBase):
 
         email_manager.send_email_to_removed_cd_user(
             self.question_submitter_id,
-            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION,
             language_code='hi',
         )
 
@@ -9057,7 +9056,7 @@ class CurriculumAdminsChapterNotificationsReminderMailTests(
             '</ol>'
             'Regards,<br> Oppia Foundation'
         ) % (
-            str(constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
+            str(constants.constants.CHAPTER_PUBLICATION_NOTICE_PERIOD_IN_DAYS),
             DEV_OPPIA_SITE_URL,
             feconf.STORY_EDITOR_URL_PREFIX,
         )

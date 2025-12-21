@@ -25,8 +25,7 @@ import re
 import zipfile
 from unittest import mock
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     change_domain,
     exp_domain,
@@ -2014,7 +2013,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'test_exp_id',
             title='some title',
             category='Algebra',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
         )
         exploration.objective = 'An objective'
         content_id_generator = translation_domain.ContentIdGenerator(
@@ -9397,7 +9396,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             content_count=3,
             incomplete_translation_language_codes=[
                 language['id']
-                for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                for language in (constants.constants.SUPPORTED_AUDIO_LANGUAGES)
             ],
             language_codes_with_assigned_voice_artists=['en'],
         ).put()
@@ -9570,7 +9569,7 @@ class ExplorationTranslationCountTests(ExplorationServicesUnitTests):
             content_count=3,
             incomplete_translation_language_codes=[
                 language['id']
-                for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                for language in (constants.constants.SUPPORTED_AUDIO_LANGUAGES)
             ],
             language_codes_with_assigned_voice_artists=['en'],
         ).put()
@@ -12801,7 +12800,7 @@ class ComputeVoiceoversModelFromExplorationChangeTest(
             'test_exp_id',
             title='some title',
             category='Algebra',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
         )
         exploration.objective = 'An objective'
         content_id_generator = translation_domain.ContentIdGenerator(

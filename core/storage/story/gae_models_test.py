@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 from core.tests import test_utils
 
@@ -182,7 +181,7 @@ class StoryCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.story_id = 'b'

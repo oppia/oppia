@@ -21,8 +21,7 @@ from __future__ import annotations
 import copy
 import json
 
-from core import schema_utils
-from core.constants import constants
+from core import constants, schema_utils
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -1345,7 +1344,10 @@ class OskCharacters(BaseObject):
         Returns:
             dict. The object schema.
         """
-        return {'type': 'unicode', 'choices': constants.VALID_ALLOWED_VARIABLES}
+        return {
+            'type': 'unicode',
+            'choices': constants.constants.VALID_ALLOWED_VARIABLES,
+        }
 
 
 class AlgebraicIdentifier(BaseObject):
@@ -1366,7 +1368,7 @@ class AlgebraicIdentifier(BaseObject):
         """
         return {
             'type': 'unicode',
-            'choices': constants.VALID_ALGEBRAIC_IDENTIFIERS,
+            'choices': constants.constants.VALID_ALGEBRAIC_IDENTIFIERS,
         }
 
 

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     learner_goals_services,
     learner_progress_services,
@@ -57,7 +56,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -67,7 +66,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -77,7 +76,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -87,7 +86,7 @@ class LearnerGoalsTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )

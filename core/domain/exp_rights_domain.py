@@ -23,8 +23,7 @@ should therefore be independent of the specific storage models used.
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import rights_domain
 from core.platform import models  # pylint: disable=invalid-import-from
 
@@ -35,8 +34,8 @@ from typing import List, Optional
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
-ACTIVITY_STATUS_PRIVATE: str = constants.ACTIVITY_STATUS_PRIVATE
-ACTIVITY_STATUS_PUBLIC: str = constants.ACTIVITY_STATUS_PUBLIC
+ACTIVITY_STATUS_PRIVATE: str = constants.constants.ACTIVITY_STATUS_PRIVATE
+ACTIVITY_STATUS_PUBLIC: str = constants.constants.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = feconf.ROLE_OWNER
 ROLE_EDITOR = feconf.ROLE_EDITOR

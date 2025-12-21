@@ -20,8 +20,7 @@ import json
 import os
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     question_fetchers,
     question_services,
@@ -832,7 +831,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         ]
         payload = {
             'change_list': change_list,
-            'commit_message': ('a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)),
+            'commit_message': (
+                'a' * (constants.constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+            ),
             'version': 2,
         }
 

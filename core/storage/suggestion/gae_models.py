@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 import enum
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import (
@@ -707,7 +706,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
-        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+        if sort_key == constants.constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
@@ -899,7 +898,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 next_offset: int. The input offset + the number of results
                     returned by the current query.
         """
-        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+        if sort_key == constants.constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
@@ -1068,7 +1067,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             if len(skill_ids) == 0:
                 raise RuntimeError('skill_ids list can\'t be empty')
 
-        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+        if sort_key == constants.constants.SUGGESTIONS_SORT_KEY_DATE:
             # The first sort property must be the same as the property to which
             # an inequality filter is applied. Thus, the inequality filter on
             # author_id can not be used here.
@@ -1231,7 +1230,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             )
         )
 
-        if sort_key == constants.SUGGESTIONS_SORT_KEY_DATE:
+        if sort_key == constants.constants.SUGGESTIONS_SORT_KEY_DATE:
             suggestion_query = suggestion_query.order(-cls.created_on)
 
         results: Sequence[GeneralSuggestionModel] = suggestion_query.fetch(

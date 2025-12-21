@@ -20,8 +20,7 @@ import random
 import types
 from unittest import mock
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.domain import skill_services, state_domain, translation_domain
 from core.platform import models
 from core.tests import test_utils
@@ -569,7 +568,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
 
     def test_get_question_skill_links_by_skill_ids_many_skills(self) -> None:
-        # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
+        # Test the case when len(skill_ids) > constants.constants.MAX_SKILLS_PER_QUESTION.
         skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
@@ -1011,7 +1010,7 @@ class QuestionCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.question_id = 'b'

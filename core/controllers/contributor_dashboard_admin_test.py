@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 import json
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import topic_domain, topic_services, user_services
 from core.platform import models
 from core.tests import test_utils
@@ -296,7 +295,7 @@ class ContributionRightsHandlerTest(test_utils.GenericTestBase):
             'At \'http://localhost/contributionrightshandler/invalid\' these '
             'errors are happening:\nSchema validation for \'category\' failed: '
             'Received invalid which is not in the allowed range of '
-            'choices: %s' % constants.CD_USER_RIGHTS_CATEGORIES,
+            'choices: %s' % constants.constants.CD_USER_RIGHTS_CATEGORIES,
         )
 
     def test_remove_reviewer_with_invalid_username_raise_error(self) -> None:
@@ -626,7 +625,7 @@ class TranslationContributionStatsHandlerTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

@@ -21,8 +21,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     exp_domain,
     exp_services,
@@ -197,7 +196,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_PROPERTY_THUMBNAIL_BG_COLOR
                     ),
                     'old_value': None,
-                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][
+                    'new_value': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                        'story'
+                    ][
                         0
                     ],
                 }
@@ -223,7 +224,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.STORY_ID)
         fs.commit(
-            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+            '%s/image.svg' % (constants.constants.ASSET_TYPE_THUMBNAIL),
             raw_image,
             mimetype='image/svg+xml',
         )
@@ -241,7 +242,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.thumbnail_size_in_bytes, len(raw_image))
         self.assertEqual(
             story.thumbnail_bg_color,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
         )
         self.assertEqual(story.version, 3)
         self.assertEqual(story.meta_tag_content, 'new story meta tag content')
@@ -251,7 +252,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_titles, ['Title 1'])
         self.assertEqual(
             story_summary.thumbnail_bg_color,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['story'][0],
         )
         self.assertEqual(story_summary.thumbnail_filename, 'image.svg')
 
@@ -352,9 +353,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                         story_domain.STORY_NODE_PROPERTY_THUMBNAIL_BG_COLOR
                     ),
                     'old_value': None,
-                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                    'new_value': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                         'chapter'
-                    ][0],
+                    ][
+                        0
+                    ],
                 }
             ),
             story_domain.StoryChange(
@@ -363,7 +366,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     'node_id': self.NODE_ID_2,
                     'property_name': (story_domain.STORY_NODE_PROPERTY_STATUS),
                     'old_value': None,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                    'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                 }
             ),
             story_domain.StoryChange(
@@ -410,7 +413,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_STORY, self.STORY_ID)
         fs.commit(
-            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+            '%s/image.svg' % (constants.constants.ASSET_TYPE_THUMBNAIL),
             raw_image,
             mimetype='image/svg+xml',
         )
@@ -428,7 +431,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             story.story_contents.nodes[1].thumbnail_bg_color,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['chapter'][0],
         )
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids, [self.NODE_ID_1]
@@ -445,7 +448,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.version, 3)
         self.assertEqual(
             story.story_contents.nodes[1].status,
-            constants.STORY_NODE_STATUS_PUBLISHED,
+            constants.constants.STORY_NODE_STATUS_PUBLISHED,
         )
         self.assertEqual(
             story.story_contents.nodes[1].planned_publication_date,
@@ -510,7 +513,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     ),
                     'old_value': None,
                     'new_value': (
-                        constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0]
+                        constants.constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[
+                            0
+                        ]
                     ),
                 }
             ),
@@ -533,7 +538,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             story.story_contents.nodes[0].unpublishing_reason,
-            constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0],
+            constants.constants.ALLOWED_STORY_NODE_UNPUBLISHING_REASONS[0],
         )
 
     def test_prerequisite_skills_validation(self) -> None:
@@ -541,9 +546,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -562,9 +569,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -583,9 +592,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -624,9 +635,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_1: story_domain.StoryNodeDict = {
             'id': 'node_1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -645,9 +658,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_2: story_domain.StoryNodeDict = {
             'id': 'node_2',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -666,9 +681,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         node_3: story_domain.StoryNodeDict = {
             'id': 'node_3',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -2827,11 +2844,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'status': constants.constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
@@ -2848,11 +2867,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'status': constants.constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1672770600000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -2869,11 +2890,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690655400000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -3023,9 +3046,11 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_1: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_1,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 1',
             'description': 'Description 1',
@@ -3044,9 +3069,11 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_2: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_2,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
@@ -3065,9 +3092,11 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_3: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_3,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 3',
             'description': 'Description 3',
@@ -3086,9 +3115,11 @@ class StoryProgressUnitTests(test_utils.GenericTestBase):
         self.node_4: story_domain.StoryNodeDict = {
             'id': self.NODE_ID_4,
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 4',
             'description': 'Description 4',

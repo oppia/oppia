@@ -23,8 +23,7 @@ import re
 import types
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 from core.tests import test_utils
 
@@ -664,7 +663,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             commit_type='create',
             commit_message='New commit created.',
             version=1,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             community_owned=False,
         )
         model1.update_timestamps()
@@ -677,7 +676,8 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
         self.assertEqual(test_model.user_id, 'user')
         self.assertEqual(test_model.commit_type, 'create')
         self.assertEqual(
-            test_model.post_commit_status, constants.ACTIVITY_STATUS_PUBLIC
+            test_model.post_commit_status,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
         self.assertEqual(test_model.post_commit_community_owned, False)
         self.assertEqual(test_model.post_commit_is_private, False)
@@ -690,7 +690,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             commit_type='create',
             commit_message='New commit created.',
             version=1,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             community_owned=False,
         )
         model2 = TestCommitLogEntryModel.create(
@@ -700,7 +700,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             commit_type='edit',
             commit_message='New commit created.',
             version=2,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             community_owned=False,
         )
         model1.update_timestamps()

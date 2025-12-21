@@ -29,8 +29,7 @@ import copy
 import logging
 import os
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     activity_services,
     caching_services,
@@ -425,7 +424,8 @@ def get_collection_and_collection_rights_by_id(
     collection_rights = None
     if collection_and_rights[1][0] is not None:
         collection_rights = rights_manager.get_activity_rights_from_model(
-            collection_and_rights[1][0], constants.ACTIVITY_TYPE_COLLECTION
+            collection_and_rights[1][0],
+            constants.constants.ACTIVITY_TYPE_COLLECTION,
         )
 
     return (collection, collection_rights)
@@ -1178,7 +1178,7 @@ def delete_collections(
 
     # Remove the collection from the featured activity list, if necessary.
     activity_services.remove_featured_activities(
-        constants.ACTIVITY_TYPE_COLLECTION, collection_ids
+        constants.constants.ACTIVITY_TYPE_COLLECTION, collection_ids
     )
 
 
@@ -1418,7 +1418,7 @@ def compute_collection_contributors_summary(
     while True:
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
-        if committer_id not in constants.SYSTEM_USER_IDS:
+        if committer_id not in constants.constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:

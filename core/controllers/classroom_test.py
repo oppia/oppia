@@ -20,8 +20,7 @@ import json
 import os
 
 import main
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     classroom_config_domain,
     classroom_config_services,
@@ -80,7 +79,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         )
         self.public_topic_1.thumbnail_filename = 'Topic.svg'
         self.public_topic_1.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         )
         self.public_topic_1.subtopics = [
             topic_domain.Subtopic(
@@ -88,7 +87,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -107,7 +106,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         )
         self.public_topic_2.thumbnail_filename = 'Topic.svg'
         self.public_topic_2.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         )
         self.public_topic_2.subtopics = [
             topic_domain.Subtopic(
@@ -115,7 +114,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
                 'TitleTwo',
                 ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )
@@ -134,7 +133,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
         )
         self.public_topic_3.thumbnail_filename = 'Topic.svg'
         self.public_topic_3.thumbnail_bg_color = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         )
         self.public_topic_3.subtopics = [
             topic_domain.Subtopic(
@@ -142,7 +141,7 @@ class BaseClassroomControllerTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1', 'skill_id_2', 'skill_id_3'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-three',
             )

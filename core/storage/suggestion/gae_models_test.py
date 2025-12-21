@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 from core.tests import test_utils
 
@@ -903,7 +902,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1'],
             )
@@ -919,7 +918,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1'],
             )
@@ -936,7 +935,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1'],
             )
@@ -953,7 +952,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
                 exp_ids=['exp1'],
             )
@@ -1143,7 +1142,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
             )
         )
@@ -1158,7 +1157,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
             )
         )
@@ -1174,7 +1173,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
             )
         )
@@ -1190,7 +1189,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=None,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 language_codes=[self.translation_language_code],
             )
         )
@@ -1399,7 +1398,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=1,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids=None,
             )
         )
@@ -1414,7 +1413,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=2,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids=None,
             )
         )
@@ -1430,7 +1429,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids=None,
             )
         )
@@ -1446,7 +1445,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 limit=10,
                 offset=0,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                 skill_ids=['skill_1', 'skill_3'],
             )
         )
@@ -1464,7 +1463,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                     limit=10,
                     offset=0,
                     user_id=user_id,
-                    sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                    sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
                     skill_ids=[],
                 )
             )
@@ -1524,7 +1523,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 offset=0,
                 suggestion_type=feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
                 user_id=user_id,
-                sort_key=constants.SUGGESTIONS_SORT_KEY_DATE,
+                sort_key=constants.constants.SUGGESTIONS_SORT_KEY_DATE,
             )
         )
         # Ruling out the possibility of None for mypy type checking.
@@ -7098,7 +7097,9 @@ class SortChoicesUnitTest(test_utils.GenericTestBase):
         for enum_member in suggestion_models.SortChoices:
             enum_values.append(enum_member.value)
 
-        dict_values = list(constants.CD_ADMIN_STATS_SORT_OPTIONS.keys())
+        dict_values = list(
+            constants.constants.CD_ADMIN_STATS_SORT_OPTIONS.keys()
+        )
 
         enum_values.sort()
         dict_values.sort()

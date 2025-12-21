@@ -23,8 +23,7 @@ import heapq
 import logging
 import re
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     contribution_stats_services,
     email_manager,
@@ -294,12 +293,14 @@ def create_suggestion(
         question_dict = cast(
             question_domain.QuestionDict, change_cmd['question_dict']
         )
-        question_dict['language_code'] = constants.DEFAULT_LANGUAGE_CODE
+        question_dict['language_code'] = (
+            constants.constants.DEFAULT_LANGUAGE_CODE
+        )
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION
         )
         # The language code of the question, used for querying purposes.
-        add_question_language_code = constants.DEFAULT_LANGUAGE_CODE
+        add_question_language_code = constants.constants.DEFAULT_LANGUAGE_CODE
         suggestion = suggestion_registry.SuggestionAddQuestion(
             thread_id,
             target_id,
@@ -1060,7 +1061,7 @@ def auto_reject_translation_suggestions_for_content_ids(
     reject_suggestions(
         obsolete_suggestion_ids,
         feconf.SUGGESTION_BOT_USER_ID,
-        constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG,
+        constants.constants.OBSOLETE_TRANSLATION_SUGGESTION_REVIEW_MSG,
     )
 
 
@@ -4296,7 +4297,8 @@ def enqueue_contributor_ranking_notification_email_task(
     # contributor_user_id is alrerady validated in the controller layer.
     # TODO(#16062): Rank name should be valid to send notification emails.
     if language_code not in [
-        language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+        language['id']
+        for language in (constants.constants.SUPPORTED_AUDIO_LANGUAGES)
     ]:
         raise Exception('Not supported language code: %s' % language_code)
     if contribution_type not in [
@@ -4412,7 +4414,7 @@ def _generate_translation_contributor_certificate_data(
     language = next(
         filter(
             lambda lang: lang['id'] == language_code,
-            constants.SUPPORTED_AUDIO_LANGUAGES,
+            constants.constants.SUPPORTED_AUDIO_LANGUAGES,
         ),
         None,
     )

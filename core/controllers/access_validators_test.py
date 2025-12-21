@@ -19,8 +19,7 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
-from core import feature_flag_list, feconf
-from core.constants import constants
+from core import constants, feature_flag_list, feconf
 from core.domain import (
     caching_services,
     classroom_config_domain,
@@ -138,7 +137,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 'subtopic_name',
                 [self.skill_id1],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name-one',
             )
@@ -149,7 +148,7 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
                 'subtopic_name_2',
                 [self.skill_id2],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name-two',
             )
@@ -157,9 +156,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         self.topic.next_subtopic_id = 3
         self.topic.skill_ids_for_diagnostic_test = [self.skill_id1]
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         self.topic = topic_domain.Topic.create_default_topic(
@@ -170,9 +169,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
             'fragm',
         )
         self.topic.thumbnail_filename = 'Topic.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -318,7 +317,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_false_if_no_public_classrooms_are_present(
         self,
     ) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             self.get_json(
                 '%s/can_access_classrooms_page'
                 % (ACCESS_VALIDATION_HANDLER_PREFIX),
@@ -328,7 +327,7 @@ class ClassroomsPageAccessValidationHandlerTests(test_utils.GenericTestBase):
     def test_validation_returns_true_in_dev_mode_if_no_classroom_are_present(
         self,
     ) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', True):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': True}):
             self.get_html_response(
                 '%s/can_access_classrooms_page'
                 % ACCESS_VALIDATION_HANDLER_PREFIX
@@ -411,9 +410,9 @@ class TopicViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             'fragm',
         )
         topic.thumbnail_filename = 'Image.svg'
-        topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         topic.url_fragment = 'private'
         topic_services.save_new_topic(self.admin_id, topic)
 
@@ -1632,9 +1631,11 @@ class ReviewTestsPageAccessValidationTests(test_utils.GenericTestBase):
             'title': 'Title 1',
             'description': 'Description 1',
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],

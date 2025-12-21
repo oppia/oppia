@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     collection_domain,
@@ -119,7 +118,7 @@ class CreatorDashboardHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': (
-                        constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
+                        constants.constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
                     ),
                 }
             }
@@ -474,7 +473,7 @@ class UploadExplorationHandler(
         yaml_content = self.normalized_request['yaml_file']
 
         new_exploration_id = exp_fetchers.get_new_exploration_id()
-        if constants.ALLOW_YAML_FILE_UPLOAD:
+        if constants.constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, []
             )

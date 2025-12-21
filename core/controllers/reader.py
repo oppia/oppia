@@ -19,8 +19,7 @@ from __future__ import annotations
 import logging
 import random
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import (
     acl_decorators,
     base,
@@ -110,7 +109,7 @@ class ExplorationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -137,7 +136,7 @@ class ExplorationHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH,
+                            'max_value': constants.constants.MAX_PROGRESS_URL_ID_LENGTH,
                         }
                     ],
                 },
@@ -341,7 +340,7 @@ class EntityTranslationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -405,7 +404,7 @@ class PretestHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -413,7 +412,7 @@ class PretestHandler(
     }
     HANDLER_ARGS_SCHEMAS = {
         'GET': {
-            'story_url_fragment': constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
+            'story_url_fragment': constants.constants.SCHEMA_FOR_STORY_URL_FRAGMENTS,
         }
     }
 
@@ -473,7 +472,7 @@ class StorePlaythroughHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -543,7 +542,7 @@ class StatsEventsHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -616,7 +615,7 @@ class AnswerSubmittedEventHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -644,7 +643,7 @@ class AnswerSubmittedEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -788,7 +787,7 @@ class StateHitEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -877,7 +876,7 @@ class StateCompleteEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -970,7 +969,7 @@ class LeaveForRefresherExpEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -1033,7 +1032,7 @@ class ReaderFeedbackHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1063,7 +1062,7 @@ class ReaderFeedbackHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 },
@@ -1121,7 +1120,7 @@ class ExplorationStartEventHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1199,7 +1198,7 @@ class ExplorationActualStartEventHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1261,7 +1260,7 @@ class SolutionHitEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -1326,7 +1325,7 @@ class ExplorationCompleteEventHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -1339,7 +1338,7 @@ class ExplorationCompleteEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -1451,7 +1450,7 @@ class ExplorationMaybeLeaveHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -1462,7 +1461,7 @@ class ExplorationMaybeLeaveHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -1560,10 +1559,10 @@ class LearnerIncompleteActivityHandler(
             'schema': {
                 'type': 'basestring',
                 'choices': [
-                    constants.ACTIVITY_TYPE_EXPLORATION,
-                    constants.ACTIVITY_TYPE_COLLECTION,
-                    constants.ACTIVITY_TYPE_STORY,
-                    constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                    constants.constants.ACTIVITY_TYPE_EXPLORATION,
+                    constants.constants.ACTIVITY_TYPE_COLLECTION,
+                    constants.constants.ACTIVITY_TYPE_STORY,
+                    constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
                 ],
             }
         },
@@ -1573,7 +1572,7 @@ class LearnerIncompleteActivityHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1592,19 +1591,19 @@ class LearnerIncompleteActivityHandler(
             activity_id: str. The ID of the activity to be deleted.
         """
         assert self.user_id is not None
-        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
             learner_progress_services.remove_exp_from_incomplete_list(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
             learner_progress_services.remove_collection_from_incomplete_list(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_STORY:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_STORY:
             learner_progress_services.remove_story_from_incomplete_list(
                 self.user_id, activity_id
             )
-        elif activity_type == constants.ACTIVITY_TYPE_LEARN_TOPIC:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_LEARN_TOPIC:
             learner_progress_services.remove_topic_from_partially_learnt_list(
                 self.user_id, activity_id
             )
@@ -1636,7 +1635,7 @@ class RatingHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1719,7 +1718,7 @@ class RecommendationsHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1733,7 +1732,7 @@ class RecommendationsHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -1752,7 +1751,7 @@ class RecommendationsHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -1764,7 +1763,7 @@ class RecommendationsHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                         }
                     ],
                 },
@@ -1854,7 +1853,7 @@ class FlagExplorationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -1962,7 +1961,7 @@ class TransientCheckpointUrlPage(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_PROGRESS_URL_ID_LENGTH,
+                        'max_value': constants.constants.MAX_PROGRESS_URL_ID_LENGTH,
                     }
                 ],
             },
@@ -2019,7 +2018,7 @@ class SaveTransientCheckpointProgressHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -2040,7 +2039,7 @@ class SaveTransientCheckpointProgressHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -2142,7 +2141,7 @@ class LearnerAnswerDetailsSubmissionHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -2171,7 +2170,7 @@ class LearnerAnswerDetailsSubmissionHandler(
         by the learner.
         """
         assert self.normalized_payload is not None
-        if not constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
+        if not constants.constants.ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE:
             raise self.NotFoundException
 
         interaction_id = self.normalized_payload['interaction_id']
@@ -2244,7 +2243,7 @@ class CheckpointReachedEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 }
@@ -2304,7 +2303,7 @@ class ExplorationRestartEventHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_STATE_NAME_LENGTH,
+                            'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                         }
                     ],
                 },
@@ -2358,7 +2357,7 @@ class SyncLoggedOutLearnerProgressHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -2404,7 +2403,7 @@ class StateVersionHistoryHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -2415,7 +2414,7 @@ class StateVersionHistoryHandler(
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_STATE_NAME_LENGTH,
+                        'max_value': constants.constants.MAX_STATE_NAME_LENGTH,
                     }
                 ],
             }
@@ -2495,7 +2494,7 @@ class MetadataVersionHistoryHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }

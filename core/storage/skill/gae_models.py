@@ -16,7 +16,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple
@@ -224,7 +224,7 @@ class SkillModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         skill_commit_log_entry.skill_id = self.id
@@ -376,15 +376,21 @@ class SkillSummaryModel(base_models.BaseModel):
         )
         sort = -cls.skill_model_created_on
         if sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingCreatedOn']
+            constants.constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                'DecreasingCreatedOn'
+            ]
         ):
             sort = cls.skill_model_created_on
         elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['IncreasingUpdatedOn']
+            constants.constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                'IncreasingUpdatedOn'
+            ]
         ):
             sort = -cls.skill_model_last_updated
         elif sort_by == (
-            constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS['DecreasingUpdatedOn']
+            constants.constants.TOPIC_SKILL_DASHBOARD_SORT_OPTIONS[
+                'DecreasingUpdatedOn'
+            ]
         ):
             sort = cls.skill_model_last_updated
 

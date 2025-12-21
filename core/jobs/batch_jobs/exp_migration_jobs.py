@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import exp_domain, exp_fetchers, exp_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
@@ -165,7 +164,8 @@ class MigrateExplorationModels(beam.PTransform):  # type: ignore[misc]
             >> beam.Map(
                 lambda exp_rights: (
                     exp_rights.id,
-                    exp_rights.status == constants.ACTIVITY_STATUS_PUBLIC,
+                    exp_rights.status
+                    == constants.constants.ACTIVITY_STATUS_PUBLIC,
                 )
             )
         )

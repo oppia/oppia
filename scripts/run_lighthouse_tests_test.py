@@ -23,7 +23,7 @@ import subprocess
 import sys
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.tests import test_utils
 from scripts import build, common, run_lighthouse_tests, servers
 
@@ -768,7 +768,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
             build, 'main', side_effect=lambda args: None
         )
         swap_emulator_mode = mock.patch.dict(
-            constants, {'EMULATOR_MODE': False}
+            constants.constants, {'EMULATOR_MODE': False}
         )
 
         with (

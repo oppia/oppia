@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core.constants import constants
+from core import constants
 from core.domain import search_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_search_indexing_jobs
@@ -60,7 +60,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -104,7 +104,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
                 objective='objective',
                 language_code='lang',
                 community_owned=False,
-                status=constants.ACTIVITY_STATUS_PUBLIC,
+                status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             )
             exp_summary.update_timestamps()
             exp_summary.put()
@@ -160,7 +160,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -213,7 +213,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
         exp_summary.update_timestamps()
         exp_summary.put()
@@ -239,7 +239,7 @@ class IndexExplorationsInSearchJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
         exp_summary.update_timestamps()
         exp_summary.put()

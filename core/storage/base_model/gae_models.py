@@ -20,8 +20,7 @@ import datetime
 import enum
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import (
@@ -784,7 +783,7 @@ class BaseCommitLogEntryModel(BaseModel):
             post_commit_status=status,
             post_commit_community_owned=community_owned,
             post_commit_is_private=(
-                status == constants.ACTIVITY_STATUS_PRIVATE
+                status == constants.constants.ACTIVITY_STATUS_PRIVATE
             ),
         )
 

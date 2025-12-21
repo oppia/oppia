@@ -25,8 +25,7 @@ from __future__ import annotations
 import copy
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     caching_services,
     exp_fetchers,
@@ -638,7 +637,10 @@ def validate_explorations_for_story(
                 raise utils.ValidationError(error_string)
             validation_error_messages.append(error_string)
         else:
-            if exp_rights_dict[exp_id] != constants.ACTIVITY_STATUS_PUBLIC:
+            if (
+                exp_rights_dict[exp_id]
+                != constants.constants.ACTIVITY_STATUS_PUBLIC
+            ):
                 error_string = (
                     'Exploration with ID %s is not public. Please publish '
                     'explorations before adding them to a story.' % exp_id
@@ -649,7 +651,7 @@ def validate_explorations_for_story(
 
     if exps_dict:
         for exp_id, exp in exps_dict.items():
-            if exp.category not in constants.ALL_CATEGORIES:
+            if exp.category not in constants.constants.ALL_CATEGORIES:
                 error_string = (
                     'All explorations in a story should be of a '
                     'default category. The exploration with ID %s has'

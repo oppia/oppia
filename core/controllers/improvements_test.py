@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.controllers import improvements
 from core.domain import (
     exp_services,
@@ -58,7 +57,7 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
     def _new_obsolete_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
     ) -> improvements_domain.TaskEntry:
         """Constructs a new default obsolete task with the provided values.
@@ -73,14 +72,14 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new obsolete task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_OBSOLETE,
+            status=constants.constants.TASK_STATUS_OBSOLETE,
             resolver_id=None,
             resolved_on=None,
         )
@@ -88,7 +87,7 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
     def _new_open_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
     ) -> improvements_domain.TaskEntry:
         """Constructs a new default open task with the provided values.
@@ -103,14 +102,14 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new open task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
             resolver_id=None,
             resolved_on=None,
         )
@@ -118,7 +117,7 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
     def _new_resolved_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
         resolved_on: datetime.datetime = MOCK_DATE,
     ) -> improvements_domain.TaskEntry:
@@ -135,14 +134,14 @@ class ImprovementsTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new resolved task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id=self.owner_id,
             resolved_on=resolved_on,
         )
@@ -167,7 +166,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         """
         return '%s/%s/%s' % (
             feconf.IMPROVEMENTS_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id,
         )
 
@@ -218,7 +217,8 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_get_returns_resolved_tasks(self) -> None:
         task_entries = [
             self._new_resolved_task(
-                state_name=name, task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
+                state_name=name,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
             )
             for name in ['A', 'B', 'C']
         ]
@@ -283,10 +283,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'task_entries': [
                         {
                             'entity_version': self.exp.version,
-                            'task_type': constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                            'task_type': constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                             'target_id': feconf.DEFAULT_INIT_STATE_NAME,
                             'issue_description': 'issue description',
-                            'status': constants.TASK_STATUS_OPEN,
+                            'status': constants.constants.TASK_STATUS_OPEN,
                         }
                     ]
                 },
@@ -380,11 +380,11 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         task_id = (
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.exp.id,
                 self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 feconf.DEFAULT_INIT_STATE_NAME,
             )
         )
@@ -421,10 +421,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'task_entries': [
                         {
                             'entity_version': self.exp.version,
-                            'task_type': constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                            'task_type': constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                             'target_id': feconf.DEFAULT_INIT_STATE_NAME,
                             'issue_description': 'issue description',
-                            'status': constants.TASK_STATUS_OPEN,
+                            'status': constants.constants.TASK_STATUS_OPEN,
                         }
                     ]
                 },
@@ -433,11 +433,11 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         task_id = (
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.exp.id,
                 self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 feconf.DEFAULT_INIT_STATE_NAME,
             )
         )
@@ -447,15 +447,18 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
+            task_entry_model.entity_type,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         )
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
         self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
+            task_entry_model.task_type,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         )
         self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
+            task_entry_model.target_type,
+            constants.constants.TASK_TARGET_TYPE_STATE,
         )
         self.assertEqual(
             task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
@@ -463,7 +466,9 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
         self.assertEqual(
             task_entry_model.issue_description, 'issue description'
         )
-        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
+        self.assertEqual(
+            task_entry_model.status, constants.constants.TASK_STATUS_OPEN
+        )
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
@@ -475,10 +480,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'task_entries': [
                         {
                             'entity_version': self.exp.version,
-                            'task_type': constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                            'task_type': constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                             'target_id': feconf.DEFAULT_INIT_STATE_NAME,
                             'issue_description': 'issue description',
-                            'status': constants.TASK_STATUS_OBSOLETE,
+                            'status': constants.constants.TASK_STATUS_OBSOLETE,
                         }
                     ]
                 },
@@ -487,11 +492,11 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         task_id = (
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.exp.id,
                 self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 feconf.DEFAULT_INIT_STATE_NAME,
             )
         )
@@ -501,15 +506,18 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
+            task_entry_model.entity_type,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         )
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
         self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
+            task_entry_model.task_type,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         )
         self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
+            task_entry_model.target_type,
+            constants.constants.TASK_TARGET_TYPE_STATE,
         )
         self.assertEqual(
             task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
@@ -518,7 +526,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             task_entry_model.issue_description, 'issue description'
         )
         self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_OBSOLETE
+            task_entry_model.status, constants.constants.TASK_STATUS_OBSOLETE
         )
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
@@ -535,10 +543,10 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
                     'task_entries': [
                         {
                             'entity_version': self.exp.version,
-                            'task_type': constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                            'task_type': constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                             'target_id': feconf.DEFAULT_INIT_STATE_NAME,
                             'issue_description': 'issue description',
-                            'status': constants.TASK_STATUS_RESOLVED,
+                            'status': constants.constants.TASK_STATUS_RESOLVED,
                         }
                     ]
                 },
@@ -547,11 +555,11 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         task_id = (
             improvements_models.ExplorationStatsTaskEntryModel.generate_task_id(
-                constants.TASK_ENTITY_TYPE_EXPLORATION,
+                constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
                 self.exp.id,
                 self.exp.version,
-                constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-                constants.TASK_TARGET_TYPE_STATE,
+                constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                constants.constants.TASK_TARGET_TYPE_STATE,
                 feconf.DEFAULT_INIT_STATE_NAME,
             )
         )
@@ -561,15 +569,18 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
         self.assertEqual(task_entry_model.id, task_id)
         self.assertEqual(
-            task_entry_model.entity_type, constants.TASK_ENTITY_TYPE_EXPLORATION
+            task_entry_model.entity_type,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         )
         self.assertEqual(task_entry_model.entity_id, self.exp.id)
         self.assertEqual(task_entry_model.entity_version, self.exp.version)
         self.assertEqual(
-            task_entry_model.task_type, constants.TASK_TYPE_HIGH_BOUNCE_RATE
+            task_entry_model.task_type,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         )
         self.assertEqual(
-            task_entry_model.target_type, constants.TASK_TARGET_TYPE_STATE
+            task_entry_model.target_type,
+            constants.constants.TASK_TARGET_TYPE_STATE,
         )
         self.assertEqual(
             task_entry_model.target_id, feconf.DEFAULT_INIT_STATE_NAME
@@ -578,7 +589,7 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
             task_entry_model.issue_description, 'issue description'
         )
         self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_RESOLVED
+            task_entry_model.status, constants.constants.TASK_STATUS_RESOLVED
         )
         self.assertEqual(task_entry_model.resolver_id, self.owner_id)
         self.assertEqual(task_entry_model.resolved_on, self.MOCK_DATE)
@@ -586,14 +597,14 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
     def test_to_dict_with_invalid_resolver_id_raises_exception(self) -> None:
         invalid_resolver_id = 'non_existing_user_id'
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp.id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             invalid_resolver_id,
             self.MOCK_DATE,
         )
@@ -604,14 +615,14 @@ class ExplorationImprovementsHandlerTests(ImprovementsTestBase):
 
     def test_to_dict_with_non_existing_resolver_id(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp.id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             None,
             self.MOCK_DATE,
         )
@@ -666,7 +677,7 @@ class ExplorationImprovementsHistoryHandlerTests(ImprovementsTestBase):
         """
         url = '%s/%s/%s' % (
             feconf.IMPROVEMENTS_HISTORY_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id,
         )
         if cursor is not None:
@@ -804,7 +815,7 @@ class ExplorationImprovementsConfigHandlerTests(test_utils.GenericTestBase):
         """
         return '%s/%s/%s' % (
             feconf.IMPROVEMENTS_CONFIG_URL_PREFIX,
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID if exp_id is None else exp_id,
         )
 

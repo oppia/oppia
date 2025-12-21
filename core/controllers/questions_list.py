@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import question_services, skill_fetchers
 
@@ -67,11 +66,16 @@ class QuestionsListHandler(
 
         question_summaries, merged_question_skill_links = (
             question_services.get_displayable_question_skill_link_details(
-                constants.NUM_QUESTIONS_PER_PAGE + 1, skill_ids, offset
+                constants.constants.NUM_QUESTIONS_PER_PAGE + 1,
+                skill_ids,
+                offset,
             )
         )
 
-        if len(question_summaries) <= constants.NUM_QUESTIONS_PER_PAGE:
+        if (
+            len(question_summaries)
+            <= constants.constants.NUM_QUESTIONS_PER_PAGE
+        ):
             more = False
         else:
             more = True

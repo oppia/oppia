@@ -21,8 +21,7 @@ from __future__ import annotations
 import enum
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import feature_flag_domain
 from core.domain import feature_flag_registry as registry
 from core.tests import test_utils
@@ -130,7 +129,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def test_updating_dev_feature_in_test_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
-            with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
                 with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
                 ):
@@ -148,7 +147,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
 
     def test_updating_dev_feature_in_prod_env_raises_exception(self) -> None:
         with self.swap_name_to_description_feature_stage_dict:
-            with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
                 with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):
@@ -176,7 +175,7 @@ class FeatureFlagRegistryTests(test_utils.GenericTestBase):
             },
         )
         with swap_name_to_description_feature_stage_dict:
-            with mock.patch.object(constants, 'DEV_MODE', False):
+            with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
                 with mock.patch.object(
                     feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
                 ):

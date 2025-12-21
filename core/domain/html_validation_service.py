@@ -21,8 +21,7 @@ from __future__ import annotations
 import json
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import fs_services, rte_component_registry
 from extensions.objects.models import objects
 from extensions.rich_text_components import components
@@ -784,10 +783,12 @@ def get_invalid_svg_tags_and_attrs(
     invalid_elements = []
     invalid_attrs = []
     for element in soup.find_all():
-        if element.name.lower() in constants.SVG_ATTRS_ALLOWLIST:
+        if element.name.lower() in constants.constants.SVG_ATTRS_ALLOWLIST:
             for attr in element.attrs:
                 if attr.lower() not in (
-                    constants.SVG_ATTRS_ALLOWLIST[element.name.lower()]
+                    constants.constants.SVG_ATTRS_ALLOWLIST[
+                        element.name.lower()
+                    ]
                 ):
                     invalid_attrs.append('%s:%s' % (element.name, attr))
         else:

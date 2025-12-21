@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.domain import (
     activity_domain,
     activity_services,
@@ -583,7 +582,7 @@ def get_displayable_exp_summary_dicts(
             summary_dict: DisplayableExplorationSummaryDict = {
                 'id': exploration_summary.id,
                 'title': exploration_summary.title,
-                'activity_type': constants.ACTIVITY_TYPE_EXPLORATION,
+                'activity_type': constants.constants.ACTIVITY_TYPE_EXPLORATION,
                 'category': exploration_summary.category,
                 'created_on_msec': utils.get_time_in_millisecs(
                     exploration_summary.exploration_model_created_on
@@ -658,7 +657,7 @@ def _get_displayable_collection_summary_dicts(
                     'id': collection_summary.id,
                     'title': collection_summary.title,
                     'category': collection_summary.category,
-                    'activity_type': constants.ACTIVITY_TYPE_COLLECTION,
+                    'activity_type': constants.constants.ACTIVITY_TYPE_COLLECTION,
                     'objective': collection_summary.objective,
                     'language_code': collection_summary.language_code,
                     'tags': collection_summary.tags,
@@ -804,14 +803,14 @@ def check_activity_id_validity(
 
     activity_summaries_by_type = [
         {
-            'type': constants.ACTIVITY_TYPE_EXPLORATION,
+            'type': constants.constants.ACTIVITY_TYPE_EXPLORATION,
             'ids': exploration_ids,
             'summaries': exp_fetchers.get_exploration_summaries_matching_ids(
                 exploration_ids
             ),
         },
         {
-            'type': constants.ACTIVITY_TYPE_COLLECTION,
+            'type': constants.constants.ACTIVITY_TYPE_COLLECTION,
             'ids': collection_ids,
             'summaries': collection_services.get_collection_summaries_matching_ids(
                 collection_ids
@@ -828,7 +827,10 @@ def check_activity_id_validity(
     for activities_info in activity_summaries_by_type:
 
         # If the activity is an Exploration.
-        if activities_info['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
+        if (
+            activities_info['type']
+            == constants.constants.ACTIVITY_TYPE_EXPLORATION
+        ):
             for index, summary in enumerate(activities_info['summaries']):
                 # If there's no summary for the Exploration ID,
                 # it means it doesn't exist. ID string is added to
@@ -888,7 +890,7 @@ def get_featured_activity_summary_dicts(
             'tags': [],
             'thumbnail_icon_url': self.get_static_asset_url(
                 '/images/subjects/Lightbulb.svg'),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'id': 'eid2',
             'category': 'A category',
             'ratings': feconf.get_empty_ratings(),
@@ -910,11 +912,11 @@ def get_featured_activity_summary_dicts(
     )
 
     summary_dicts_by_id: Dict[str, Dict[str, DisplayableSummaryDictsType]] = {
-        constants.ACTIVITY_TYPE_EXPLORATION: {
+        constants.constants.ACTIVITY_TYPE_EXPLORATION: {
             summary_dict['id']: summary_dict
             for summary_dict in exp_summary_dicts
         },
-        constants.ACTIVITY_TYPE_COLLECTION: {
+        constants.constants.ACTIVITY_TYPE_COLLECTION: {
             summary_dict['id']: summary_dict
             for summary_dict in col_summary_dicts
         },

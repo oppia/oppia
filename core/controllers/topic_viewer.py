@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     classroom_config_services,
@@ -42,8 +41,8 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     URL_PATH_ARGS_SCHEMAS = {
-        'classroom_url_fragment': constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
-        'topic_url_fragment': constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
+        'classroom_url_fragment': constants.constants.SCHEMA_FOR_CLASSROOM_URL_FRAGMENTS,
+        'topic_url_fragment': constants.constants.SCHEMA_FOR_TOPIC_URL_FRAGMENTS,
     }
     HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
 
@@ -80,7 +79,7 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             filtered_nodes = [
                 node
                 for node in all_nodes
-                if node.status != constants.STORY_NODE_STATUS_DRAFT
+                if node.status != constants.constants.STORY_NODE_STATUS_DRAFT
             ]
             pending_nodes = story_fetchers.get_pending_and_all_nodes_in_story(
                 self.user_id, story_summary.id
@@ -186,7 +185,9 @@ class TopicPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     None
                     if (
                         classroom_name
-                        == str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+                        == str(
+                            constants.constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS
+                        )
                     )
                     else classroom_name
                 ),
@@ -206,7 +207,7 @@ class TopicNameHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_CHARS_IN_TOPIC_NAME,
+                        'max_value': constants.constants.MAX_CHARS_IN_TOPIC_NAME,
                     }
                 ],
             }

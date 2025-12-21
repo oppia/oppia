@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.platform import models
 
 from typing import Dict, Mapping
@@ -179,7 +179,7 @@ class SubtopicPageModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
@@ -359,7 +359,7 @@ class StudyGuideModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         study_guide_commit_log_entry.study_guide_id = self.id

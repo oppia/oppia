@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 from core.controllers import acl_decorators, base, domain_objects_validator
 from core.domain import (
     role_services,
@@ -82,7 +81,7 @@ class SkillRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -139,7 +138,7 @@ class EditableSkillDataHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }
@@ -253,11 +252,12 @@ class EditableSkillDataHandler(
         commit_message = self.normalized_payload.get('commit_message')
         if (
             commit_message is not None
-            and len(commit_message) > constants.MAX_COMMIT_MESSAGE_LENGTH
+            and len(commit_message)
+            > constants.constants.MAX_COMMIT_MESSAGE_LENGTH
         ):
             raise self.InvalidInputException(
                 'Commit messages must be at most %s characters long.'
-                % constants.MAX_COMMIT_MESSAGE_LENGTH
+                % constants.constants.MAX_COMMIT_MESSAGE_LENGTH
             )
 
         change_list = self.normalized_payload['change_dicts']
@@ -412,7 +412,7 @@ class DiagnosticTestSkillAssignmentHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.ENTITY_ID_REGEX,
+                        'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                     }
                 ],
             }

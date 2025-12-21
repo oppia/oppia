@@ -38,8 +38,7 @@ import unittest
 from unittest import mock
 
 import main
-from core import feature_flag_list, feconf, schema_utils, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, schema_utils, utils
 from core.controllers import base
 from core.domain import (
     auth_domain,
@@ -1506,7 +1505,7 @@ class TestBase(unittest.TestCase):
 
     def get_static_asset_filepath(self) -> str:
         """Returns filepath to the static files on disk ('' or 'build/')."""
-        return '' if constants.DEV_MODE else os.path.join('build')
+        return '' if constants.constants.DEV_MODE else os.path.join('build')
 
     def get_static_asset_url(self, asset_suffix: str) -> str:
         """Returns the relative path for the asset, appending it to the
@@ -2484,7 +2483,7 @@ version: 1
                                 'username': username,
                                 'agreed_to_terms': True,
                                 'default_dashboard': (
-                                    constants.DASHBOARD_TYPE_LEARNER
+                                    constants.constants.DASHBOARD_TYPE_LEARNER
                                 ),
                                 'can_receive_email_updates': (
                                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
@@ -3340,7 +3339,7 @@ version: 1
         title: str = 'A title',
         category: str = 'Algebra',
         objective: str = 'An objective',
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         end_state_name: Optional[str] = None,
         interaction_id: str = 'TextInput',
         content_html: str = '',
@@ -3423,7 +3422,7 @@ version: 1
         title: str = 'A title',
         category: str = 'A category',
         objective: str = 'An objective',
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         content_html: str = '',
     ) -> exp_domain.Exploration:
         """Saves a new strictly-validated exploration with a sequence of states.
@@ -3527,7 +3526,7 @@ version: 1
         title: str = 'A title',
         category: str = 'A category',
         objective: str = 'An objective',
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> collection_domain.Collection:
         """Saves a new default collection written by owner_id.
 
@@ -3559,7 +3558,7 @@ version: 1
         title: str = 'A title',
         category: str = 'A category',
         objective: str = 'An objective',
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         exploration_id: str = 'an_exploration_id',
         end_state_name: str = DEFAULT_END_STATE_NAME,
     ) -> collection_domain.Collection:
@@ -3723,8 +3722,8 @@ version: 1
                             story_domain.STORY_NODE_PROPERTY_STATUS
                         ),
                         'node_id': 'node_1',
-                        'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                        'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                        'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                     }
                 ),
             ],
@@ -3739,7 +3738,7 @@ version: 1
         title: str = 'Title',
         description: str = 'Description',
         notes: str = 'Notes',
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         url_fragment: str = 'title',
         meta_tag_content: str = 'story meta tag content',
     ) -> story_domain.Story:
@@ -3856,7 +3855,7 @@ version: 1
         url_fragment: str = 'topic',
         thumbnail_filename: Optional[str] = 'topic.svg',
         thumbnail_bg_color: Optional[str] = (
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
         ),
         thumbnail_size_in_bytes: Optional[int] = 21131,
         description: str = 'description',
@@ -3865,7 +3864,7 @@ version: 1
         uncategorized_skill_ids: Optional[List[str]] = None,
         subtopics: Optional[List[topic_domain.Subtopic]] = None,
         next_subtopic_id: int = 0,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         meta_tag_content: str = 'topic meta tag content',
         practice_tab_is_displayed: bool = False,
         page_title_fragment_for_web: str = 'topic page title',
@@ -3954,7 +3953,7 @@ version: 1
         linked_skill_ids: List[str],
         next_content_id_index: int,
         inapplicable_skill_misconception_ids: Optional[List[str]] = None,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> question_domain.Question:
         """Creates an Oppia Question and saves it.
 
@@ -3995,7 +3994,7 @@ version: 1
         owner_id: str,
         linked_skill_ids: List[str],
         inapplicable_skill_misconception_ids: Optional[List[str]] = None,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> None:
         """Saves a new default question with a default version 27 state data
         dict.
@@ -4042,7 +4041,7 @@ version: 1
         author_id: str,
         skill_id: str,
         suggestion_id: Optional[str] = None,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
     ) -> str:
         """Saves a new question suggestion with a default version 27 state data
         dict.
@@ -4104,7 +4103,7 @@ version: 1
         misconceptions: Optional[List[skill_domain.Misconception]] = None,
         rubrics: Optional[List[skill_domain.Rubric]] = None,
         skill_contents: Optional[skill_domain.SkillContents] = None,
-        language_code: str = constants.DEFAULT_LANGUAGE_CODE,
+        language_code: str = constants.constants.DEFAULT_LANGUAGE_CODE,
         prerequisite_skill_ids: Optional[List[str]] = None,
     ) -> skill_domain.Skill:
         """Creates an Oppia Skill and saves it.
@@ -4142,13 +4141,13 @@ version: 1
         else:
             skill.rubrics = [
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                    constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
                 ),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                    constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
                 ),
                 skill_domain.Rubric(
-                    constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                    constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
                 ),
             ]
         skill.language_code = language_code

@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.domain import (
     activity_domain,
     activity_services,
@@ -46,7 +46,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         given exploration id.
         """
         return activity_domain.ActivityReference(
-            constants.ACTIVITY_TYPE_EXPLORATION, exploration_id
+            constants.constants.ACTIVITY_TYPE_EXPLORATION, exploration_id
         )
 
     def _create_collection_reference(
@@ -56,7 +56,7 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         given collection id.
         """
         return activity_domain.ActivityReference(
-            constants.ACTIVITY_TYPE_COLLECTION, collection_id
+            constants.constants.ACTIVITY_TYPE_COLLECTION, collection_id
         )
 
     def _compare_lists(

@@ -23,8 +23,7 @@ import json
 import numbers
 import sys
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
@@ -2180,7 +2179,7 @@ class LearnerAnswerDetails:
             )
 
         if self.interaction_id in (
-            constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS
+            constants.constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS
         ):
             raise utils.ValidationError(
                 'The %s interaction does not support soliciting '

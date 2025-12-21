@@ -19,8 +19,7 @@ from __future__ import annotations
 import enum
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     feature_flag_domain,
     feature_flag_registry,
@@ -292,7 +291,9 @@ class FeatureFlagsHandlerTest(test_utils.GenericTestBase):
         self.login(self.RELEASE_COORDINATOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
 
-        prod_mode_patch = mock.patch.dict(constants, {'DEV_MODE': False})
+        prod_mode_patch = mock.patch.dict(
+            constants.constants, {'DEV_MODE': False}
+        )
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
             'The \'feature_flag_name\' must be provided when the action is '

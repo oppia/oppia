@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.domain import beam_job_domain
 from core.jobs import base_jobs, jobs_manager
 from core.jobs import registry as jobs_registry
@@ -59,7 +59,7 @@ def run_beam_job(
         else:
             raise ValueError('Must specify the job class or name to run')
 
-    run_synchronously = constants.EMULATOR_MODE
+    run_synchronously = constants.constants.EMULATOR_MODE
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
     return get_beam_job_run_from_model(run_model)

@@ -25,8 +25,7 @@ import os
 import zipfile
 from unittest import mock
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.controllers import creator_dashboard
 from core.domain import (
     exp_domain,
@@ -2587,7 +2586,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        long_commit_message = 'a' * (constants.MAX_COMMIT_MESSAGE_LENGTH + 1)
+        long_commit_message = 'a' * (
+            constants.constants.MAX_COMMIT_MESSAGE_LENGTH + 1
+        )
 
         csrf_token = self.get_new_csrf_token()
 
@@ -3957,7 +3958,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
     def test_get_learner_answer_details_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
+            constants.constants,
+            {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False},
         ):
             response = self.get_json(
                 '%s/%s/%s'
@@ -3969,7 +3971,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 expected_status_int=404,
             )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
@@ -4028,7 +4030,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer_details,
         )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference
@@ -4059,7 +4061,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
     def test_delete_learner_answer_info_of_exploration_states(self) -> None:
         self.login(self.OWNER_EMAIL)
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False}
+            constants.constants,
+            {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': False},
         ):
             self.delete_json(
                 '%s/%s/%s?state_name=%s&learner_answer_info_id=%s'
@@ -4073,7 +4076,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 expected_status_int=404,
             )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 self.entity_type, self.state_reference
@@ -4151,7 +4154,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer_details,
         )
         with mock.patch.dict(
-            constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
+            constants.constants, {'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE': True}
         ):
             learner_answer_details = stats_services.get_learner_answer_details(
                 feconf.ENTITY_TYPE_QUESTION, state_reference

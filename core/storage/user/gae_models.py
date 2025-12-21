@@ -22,8 +22,7 @@ import itertools
 import random
 import string
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import (
@@ -90,20 +89,24 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_language_codes = datastore_services.StringProperty(
         repeated=True,
         indexed=True,
-        choices=[lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES],
+        choices=[
+            lc['code'] for lc in constants.constants.SUPPORTED_CONTENT_LANGUAGES
+        ],
     )
     # System language preference (for I18N).
     preferred_site_language_code = datastore_services.StringProperty(
         default=None,
         choices=[
-            language['id'] for language in constants.SUPPORTED_SITE_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_SITE_LANGUAGES
         ],
     )
     # Audio language preference used for audio translations.
     preferred_audio_language_code = datastore_services.StringProperty(
         default=None,
         choices=[
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         ],
     )
     # Language preference when submitting text translations in the
@@ -135,20 +138,22 @@ class UserSettingsModel(base_models.BaseModel):
     )
     # The preferred dashboard of the user.
     default_dashboard = datastore_services.StringProperty(
-        default=constants.DASHBOARD_TYPE_LEARNER,
+        default=constants.constants.DASHBOARD_TYPE_LEARNER,
         indexed=True,
         choices=[
-            constants.DASHBOARD_TYPE_LEARNER,
-            constants.DASHBOARD_TYPE_CREATOR,
-            constants.DASHBOARD_TYPE_CONTRIBUTOR,
+            constants.constants.DASHBOARD_TYPE_LEARNER,
+            constants.constants.DASHBOARD_TYPE_CREATOR,
+            constants.constants.DASHBOARD_TYPE_CONTRIBUTOR,
         ],
     )
     # The preferred dashboard display preference.
     creator_dashboard_display_pref = datastore_services.StringProperty(
-        default=constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'],
+        default=constants.constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS[
+            'CARD'
+        ],
         indexed=True,
         choices=list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
+            constants.constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
         ),
     )
     # The time, in milliseconds, when the user first contributed to Oppia.

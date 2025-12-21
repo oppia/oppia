@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import change_domain, state_domain, translation_domain
 
 from typing import (
@@ -516,7 +515,7 @@ class StudyGuide:
             sections,
             feconf.CURRENT_STUDY_GUIDE_SECTIONS_SCHEMA_VERSION,
             content_id_generator.next_content_id_index,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
         )
 
@@ -718,7 +717,7 @@ class StudyGuide:
             )
         if not any(
             self.language_code == lc['code']
-            for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+            for lc in constants.constants.SUPPORTED_CONTENT_LANGUAGES
         ):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code

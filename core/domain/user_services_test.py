@@ -24,8 +24,7 @@ import os
 import re
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     auth_services,
     collection_services,
@@ -94,7 +93,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -104,7 +105,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias3',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -1347,7 +1350,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': 'display_alias3',
             'pin': '12345',
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -1720,7 +1725,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': display_alias_3,
             'pin': None,
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -1886,7 +1893,9 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             'schema_version': 1,
             'display_alias': display_alias_3,
             'pin': None,
-            'preferred_language_codes': [constants.DEFAULT_LANGUAGE_CODE],
+            'preferred_language_codes': [
+                constants.constants.DEFAULT_LANGUAGE_CODE
+            ],
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None,
             'preferred_translation_language_code': None,
@@ -4730,7 +4739,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be None'
         ):
             user_services.get_contributor_usernames(
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION,
                 language_code='hi',
             )
 
@@ -4741,7 +4750,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             Exception, 'The language_code cannot be None'
         ):
             user_services.get_contributor_usernames(
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION
             )
 
     def test_get_contributor_usernames_with_invalid_category_raises(
@@ -4758,7 +4767,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
         self.assertEqual(usernames, [])
@@ -4767,7 +4776,7 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             self.translator_id, 'hi'
         )
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
             language_code='hi',
         )
         self.assertEqual(usernames, [self.TRANSLATOR_USERNAME])
@@ -4776,13 +4785,13 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
         )
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_review_question(self.question_reviewer_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
+            constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_QUESTION
         )
         self.assertEqual(usernames, [self.QUESTION_REVIEWER_USERNAME])
 
@@ -4790,13 +4799,13 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+            constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
         )
         self.assertEqual(usernames, [])
 
         user_services.allow_user_to_submit_question(self.question_submitter_id)
         usernames = user_services.get_contributor_usernames(
-            constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
+            constants.constants.CD_USER_RIGHTS_CATEGORY_SUBMIT_QUESTION
         )
         self.assertEqual(usernames, [self.QUESTION_SUBMITTER_USERNAME])
 

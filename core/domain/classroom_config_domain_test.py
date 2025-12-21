@@ -24,8 +24,7 @@
 
 from __future__ import annotations
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.domain import classroom_config_domain
 from core.tests import test_utils
 
@@ -231,7 +230,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Classroom teaser_text should be at most %d characters, '
             'received %s.'
             % (
-                constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT,
+                constants.constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT,
                 self.classroom.teaser_text,
             )
         )
@@ -260,7 +259,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Classroom topic_list_intro should be at most %d characters, '
             'received %s.'
             % (
-                constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
+                constants.constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
                 self.classroom.topic_list_intro,
             )
         )
@@ -289,7 +288,7 @@ class ClassroomDomainTests(test_utils.GenericTestBase):
             'Classroom course_details should be at most %d '
             'characters, received %s.'
             % (
-                constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
+                constants.constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
                 self.classroom.course_details,
             )
         )

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.platform import models
 
 from typing import Dict, List, Mapping, Optional, Sequence, cast
@@ -249,9 +248,9 @@ class TopicModel(base_models.VersionedModel):
         # BaseModel to TopicRightsModel.
         topic_rights = cast(TopicRightsModel, additional_models['rights_model'])
         if topic_rights.topic_is_published:
-            status = constants.ACTIVITY_STATUS_PUBLIC
+            status = constants.constants.ACTIVITY_STATUS_PUBLIC
         else:
-            status = constants.ACTIVITY_STATUS_PRIVATE
+            status = constants.constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
             self.id,
@@ -595,9 +594,9 @@ class TopicRightsModel(base_models.VersionedModel):
         )
 
         if self.topic_is_published:
-            status = constants.ACTIVITY_STATUS_PUBLIC
+            status = constants.constants.ACTIVITY_STATUS_PUBLIC
         else:
-            status = constants.ACTIVITY_STATUS_PRIVATE
+            status = constants.constants.ACTIVITY_STATUS_PRIVATE
 
         topic_commit_log = TopicCommitLogEntryModel(
             id=('rights-%s-%s' % (self.id, self.version)),

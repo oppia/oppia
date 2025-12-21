@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feature_flag_list
-from core.constants import constants
+from core import constants, feature_flag_list
 from core.domain import (
     classroom_config_services,
     feature_flag_services,
@@ -306,7 +305,7 @@ def get_matching_learner_group_syllabus_to_add(
         story_domain.LearnerGroupSyllabusStorySummaryDict
     ] = []
 
-    if category != constants.DEFAULT_ADD_SYLLABUS_FILTER:
+    if category != constants.constants.DEFAULT_ADD_SYLLABUS_FILTER:
         for classroom in classrooms:
             if category and classroom.name == category:
                 matching_topic_ids.extend(classroom.get_topic_ids())
@@ -333,7 +332,7 @@ def get_matching_learner_group_syllabus_to_add(
     keyword = keyword.lower()
     for topic in matching_topics:
         if language_code not in (
-            constants.DEFAULT_ADD_SYLLABUS_FILTER,
+            constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             topic.language_code,
         ):
             continue
@@ -343,8 +342,8 @@ def get_matching_learner_group_syllabus_to_add(
             # 'Story', add all story ids of this topic to the filtered
             # story ids.
             if search_type in (
-                constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                constants.constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(
@@ -356,8 +355,8 @@ def get_matching_learner_group_syllabus_to_add(
             # 'Skill', add all subtopics of this topic to the filtered
             # subtopics.
             if search_type in (
-                constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                constants.constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
@@ -369,8 +368,8 @@ def get_matching_learner_group_syllabus_to_add(
             # 'Skill', add the subtopics which have the keyword in their
             # title to the filtered subtopics.
             if search_type in (
-                constants.LEARNER_GROUP_ADD_SKILL_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                constants.constants.LEARNER_GROUP_ADD_SKILL_FILTER,
+                constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
                 matching_subtopics_dicts.extend(
                     get_matching_subtopic_syllabus_item_dicts(
@@ -382,8 +381,8 @@ def get_matching_learner_group_syllabus_to_add(
             # 'Story', add all story ids of this topic to the possible
             # story ids.
             if search_type in (
-                constants.LEARNER_GROUP_ADD_STORY_FILTER,
-                constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                constants.constants.LEARNER_GROUP_ADD_STORY_FILTER,
+                constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             ):
                 matching_story_syllabus_item_dicts.extend(
                     get_matching_story_syllabus_item_dicts(

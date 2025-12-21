@@ -22,8 +22,7 @@ import logging
 import re
 import zipfile
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     email_manager,
@@ -129,7 +128,7 @@ class BulkEmailWebhookEndpoint(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.EMAIL_REGEX,
+                            'regex_pattern': constants.constants.EMAIL_REGEX,
                         }
                     ],
                 }
@@ -229,7 +228,7 @@ class MailingListSubscriptionHandler(
                     'validators': [
                         {
                             'id': 'is_regex_matched',
-                            'regex_pattern': constants.EMAIL_REGEX,
+                            'regex_pattern': constants.constants.EMAIL_REGEX,
                         }
                     ],
                 }
@@ -520,9 +519,9 @@ class SignupHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.DASHBOARD_TYPE_LEARNER,
-                        constants.DASHBOARD_TYPE_CREATOR,
-                        constants.DASHBOARD_TYPE_CONTRIBUTOR,
+                        constants.constants.DASHBOARD_TYPE_LEARNER,
+                        constants.constants.DASHBOARD_TYPE_CREATOR,
+                        constants.constants.DASHBOARD_TYPE_CONTRIBUTOR,
                     ],
                 }
             },
@@ -787,7 +786,7 @@ class SiteLanguageHandler(
                     'choices': list(
                         map(
                             LANGUAGE_ID_PROVIDER_FUNC,
-                            constants.SUPPORTED_SITE_LANGUAGES,
+                            constants.constants.SUPPORTED_SITE_LANGUAGES,
                         )
                     ),
                 }

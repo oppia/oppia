@@ -22,8 +22,7 @@ import operator
 import random
 import string
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.controllers import acl_decorators, base
 from core.controllers import domain_objects_validator as validation_method
 from core.domain import (
@@ -93,7 +92,7 @@ PLATFORM_PARAMS_TO_SHOW_IN_BLOG_ADMIN_PAGE = set(
 )
 
 supported_languages: List[str] = [
-    lang['id'] for lang in constants.SUPPORTED_AUDIO_LANGUAGES
+    lang['id'] for lang in constants.constants.SUPPORTED_AUDIO_LANGUAGES
 ]
 
 EDUCATION_BLOG_POST_TITLE = 'Education'
@@ -711,7 +710,7 @@ class AdminHandler(
         Raises:
             Exception. Cannot reload an exploration in production.
         """
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded exploration %s'
                 % (self.user_id, exploration_id)
@@ -818,7 +817,7 @@ class AdminHandler(
             question_id,
             state,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
             linked_skill_ids,
             [],
@@ -841,13 +840,13 @@ class AdminHandler(
         """
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
+                constants.constants.SKILL_DIFFICULTIES[0], ['Explanation 1']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
+                constants.constants.SKILL_DIFFICULTIES[1], ['Explanation 2']
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
+                constants.constants.SKILL_DIFFICULTIES[2], ['Explanation 3']
             ),
         ]
         skill = skill_domain.Skill.create_default_skill(
@@ -863,7 +862,7 @@ class AdminHandler(
             Exception. Cannot load new blog post in production mode.
         """
         assert self.user_id is not None
-        if not constants.DEV_MODE:
+        if not constants.constants.DEV_MODE:
             raise Exception('Cannot load new blog post in production mode.')
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
@@ -939,7 +938,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.'
@@ -1039,7 +1038,8 @@ class AdminHandler(
                 topic_1, 1, 'thumbnail.svg'
             )
             topic_1.update_subtopic_thumbnail_bg_color(
-                1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
+                1,
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
             )
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_2)
             topic_1.move_skill_id_to_subtopic(None, 1, skill_id_3)
@@ -1203,7 +1203,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.'
@@ -1222,7 +1222,7 @@ class AdminHandler(
                 )
                 question_services.add_question(self.user_id, question)
                 question_difficulty = list(
-                    constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values()
+                    constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values()
                 )
                 random_difficulty = random.choice(question_difficulty)
                 question_services.create_new_question_skill_link(
@@ -1242,7 +1242,7 @@ class AdminHandler(
             Exception. Cannot reload a collection in production.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s reloaded collection %s'
                 % (self.user_id, collection_id)
@@ -1269,7 +1269,7 @@ class AdminHandler(
             Exception. Environment is not DEVMODE.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations'
                 % (self.user_id, num_dummy_exps_to_generate)
@@ -1284,7 +1284,9 @@ class AdminHandler(
             exploration_ids_to_publish = []
             for i in range(num_dummy_exps_to_generate):
                 title = random.choice(possible_titles)
-                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
+                category = random.choice(
+                    constants.constants.SEARCH_DROPDOWN_CATEGORIES
+                )
                 new_exploration_id = exp_fetchers.get_new_exploration_id()
                 exploration = exp_domain.Exploration.create_default_exploration(
                     new_exploration_id,
@@ -1317,7 +1319,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.'
@@ -1413,7 +1415,10 @@ class AdminHandler(
                     topic, 1, 'thumbnail.svg'
                 )
                 topic.update_subtopic_thumbnail_bg_color(
-                    1, constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0]
+                    1,
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                 )
                 topic.move_skill_id_to_subtopic(None, 1, skill_id)
 
@@ -1611,7 +1616,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     'User does not have enough rights to generate data.'
@@ -1704,7 +1709,9 @@ class AdminHandler(
                     'Title',
                     [skill_id_1],
                     'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                     21131,
                     'dummy-subtopic-three',
                 )
@@ -1723,7 +1730,9 @@ class AdminHandler(
                     'Title',
                     [skill_id_2],
                     'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                     21131,
                     'dummy-subtopic-three',
                 )
@@ -1746,7 +1755,9 @@ class AdminHandler(
                     'Title',
                     [skill_id_3],
                     'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                     21131,
                     'dummy-subtopic-three',
                 )
@@ -1765,7 +1776,9 @@ class AdminHandler(
                     'Title',
                     [skill_id_4],
                     'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                     21131,
                     'dummy-subtopic-three',
                 )
@@ -1784,7 +1797,9 @@ class AdminHandler(
                     'Title',
                     [skill_id_5],
                     'image.svg',
-                    constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                    constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][
+                        0
+                    ],
                     21131,
                     'dummy-subtopic-three',
                 )
@@ -1964,7 +1979,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if (feconf.ROLE_ID_QUESTION_ADMIN not in self.user.roles) and (
                 not user_services.can_submit_question_suggestions(self.user_id)
             ):
@@ -2097,7 +2112,7 @@ class AdminHandler(
             Exception. Cannot load stories in production mode.
             Exception. User does not have enough rights to generate data.
         """
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     (
@@ -2142,7 +2157,7 @@ class AdminHandler(
             Exception. User does not have enough rights to generate data.
         """
         assert self.user_id is not None
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             if feconf.ROLE_ID_CURRICULUM_ADMIN not in self.user.roles:
                 raise Exception(
                     (
@@ -2152,7 +2167,9 @@ class AdminHandler(
                     % self.username
                 )
 
-            category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
+            category = random.choice(
+                constants.constants.SEARCH_DROPDOWN_CATEGORIES
+            )
             story = story_fetchers.get_story_by_id(story_id)
             exp_ids = story.story_contents.get_all_linked_exp_ids()
 
@@ -3046,7 +3063,7 @@ class UpdateUsernameHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_USERNAME_LENGTH,
+                            'max_value': constants.constants.MAX_USERNAME_LENGTH,
                         }
                     ],
                 }
@@ -3249,7 +3266,7 @@ class UpdateBlogPostHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_USERNAME_LENGTH,
+                            'max_value': constants.constants.MAX_USERNAME_LENGTH,
                         }
                     ],
                 }

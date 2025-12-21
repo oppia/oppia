@@ -22,8 +22,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     exp_services,
     feature_flag_services,
@@ -330,8 +329,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                     'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                     'node_id': story.story_contents.nodes[i].id,
-                    'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                    'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                    'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                    'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                 }
             )
             for i in range(len(chapter_exp_ids))
@@ -495,8 +494,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                             'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                             'node_id': story.story_contents.nodes[0].id,
-                            'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                            'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                            'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                            'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                         }
                     )
                 ],
@@ -541,8 +540,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                         'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                         'node_id': story.story_contents.nodes[0].id,
-                        'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                        'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                        'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                     }
                 )
             ],
@@ -565,8 +564,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                             'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                             'node_id': story.story_contents.nodes[0].id,
-                            'old_value': constants.STORY_NODE_STATUS_PUBLISHED,
-                            'new_value': constants.STORY_NODE_STATUS_DRAFT,
+                            'old_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
+                            'new_value': constants.constants.STORY_NODE_STATUS_DRAFT,
                         }
                     )
                 ],
@@ -610,8 +609,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                         'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                         'node_id': story.story_contents.nodes[0].id,
-                        'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                        'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                        'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                     }
                 )
             ],
@@ -677,8 +676,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
                         'property_name': story_domain.STORY_NODE_PROPERTY_STATUS,
                         'node_id': story.story_contents.nodes[0].id,
-                        'old_value': constants.STORY_NODE_STATUS_DRAFT,
-                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                        'old_value': constants.constants.STORY_NODE_STATUS_DRAFT,
+                        'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                     }
                 )
             ],
@@ -1181,7 +1180,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
-            '%s/image.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+            '%s/image.svg' % (constants.constants.ASSET_TYPE_THUMBNAIL),
             raw_image,
             mimetype='image/svg+xml',
         )
@@ -1211,9 +1210,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                     'property_name': 'thumbnail_bg_color',
                     'subtopic_id': 1,
                     'old_value': None,
-                    'new_value': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+                    'new_value': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                         'subtopic'
-                    ][0],
+                    ][
+                        0
+                    ],
                 }
             ),
         ]
@@ -1230,7 +1231,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.svg')
         self.assertEqual(
             topic.subtopics[0].thumbnail_bg_color,
-            constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         )
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self) -> None:
@@ -1451,7 +1452,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
-            '%s/thumbnail.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+            '%s/thumbnail.svg' % (constants.constants.ASSET_TYPE_THUMBNAIL),
             raw_image,
             mimetype='image/svg+xml',
         )
@@ -3607,7 +3608,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             raw_image = f.read()
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, self.TOPIC_ID)
         fs.commit(
-            '%s/img.svg' % (constants.ASSET_TYPE_THUMBNAIL),
+            '%s/img.svg' % (constants.constants.ASSET_TYPE_THUMBNAIL),
             raw_image,
             mimetype='image/svg+xml',
         )
@@ -4002,11 +4003,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_PUBLISHED,
+            'status': constants.constants.STORY_NODE_STATUS_PUBLISHED,
             'planned_publication_date_msecs': 1690800486000,
             'first_publication_date_msecs': 1672684200000,
             'last_modified_msecs': 1672684200000,
@@ -4023,11 +4026,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_DRAFT,
+            'status': constants.constants.STORY_NODE_STATUS_DRAFT,
             'planned_publication_date_msecs': 1659264486000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -4044,11 +4049,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1690800486000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,
@@ -4065,11 +4072,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'description': '',
             'prerequisite_skill_ids': [],
             'thumbnail_filename': 'image.svg',
-            'thumbnail_bg_color': constants.ALLOWED_THUMBNAIL_BG_COLORS[
+            'thumbnail_bg_color': constants.constants.ALLOWED_THUMBNAIL_BG_COLORS[
                 'chapter'
-            ][0],
+            ][
+                0
+            ],
             'thumbnail_size_in_bytes': 21131,
-            'status': constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
+            'status': constants.constants.STORY_NODE_STATUS_READY_TO_PUBLISH,
             'planned_publication_date_msecs': 1693478886000,
             'first_publication_date_msecs': None,
             'last_modified_msecs': 1672684200000,

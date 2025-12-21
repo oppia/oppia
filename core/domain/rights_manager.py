@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     activity_services,
     change_domain,
@@ -70,14 +69,14 @@ def get_activity_rights_from_model(
         activity_rights_model: ActivityRightsModel. Activity rights from the
             datastore.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
 
     Returns:
         ActivityRights. The rights object created from the model.
     """
     cloned_from_value = None
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         # Ruling out the possibility of CollectionRightsModel for mypy
         # type checking.
         assert isinstance(
@@ -144,8 +143,8 @@ def _save_activity_rights(
         activity_rights: ActivityRights. The rights object for the given
             activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         commit_message: str. Descriptive message for the commit.
         commit_cmds: list(dict). A list of commands describing what kind of
             commit was done.
@@ -154,17 +153,17 @@ def _save_activity_rights(
 
     # Ruling out the possibility of any other activity type.
     assert activity_type in (
-        constants.ACTIVITY_TYPE_COLLECTION,
-        constants.ACTIVITY_TYPE_EXPLORATION,
+        constants.constants.ACTIVITY_TYPE_COLLECTION,
+        constants.constants.ACTIVITY_TYPE_EXPLORATION,
     )
 
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _save_exploration_rights(
             committer_id, activity_rights, commit_message, commit_cmds
         )
         return
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
         model = collection_models.CollectionRightsModel.get(
             activity_rights.id, strict=True
         )
@@ -268,15 +267,15 @@ def _update_activity_summary(
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         assert isinstance(activity_rights, exp_rights_domain.ExplorationRights)
         _update_exploration_summary(activity_rights)
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
         _update_collection_summary(activity_rights)
 
 
@@ -393,8 +392,8 @@ def _get_activity_rights_where_user_is_owner(
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         user_id: str. The id of the user.
 
     Returns:
@@ -403,11 +402,11 @@ def _get_activity_rights_where_user_is_owner(
     """
     # Ruling out the possibility of any other activity type.
     assert activity_type in (
-        constants.ACTIVITY_TYPE_COLLECTION,
-        constants.ACTIVITY_TYPE_EXPLORATION,
+        constants.constants.ACTIVITY_TYPE_COLLECTION,
+        constants.constants.ACTIVITY_TYPE_EXPLORATION,
     )
 
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         activity_rights_models: Sequence[
             Union[
                 collection_models.CollectionRightsModel,
@@ -418,7 +417,7 @@ def _get_activity_rights_where_user_is_owner(
                 exp_models.ExplorationRightsModel.owner_ids == user_id
             )
         ).fetch()
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
         activity_rights_models = collection_models.CollectionRightsModel.query(
             datastore_services.any_of(
                 collection_models.CollectionRightsModel.owner_ids == user_id
@@ -469,7 +468,7 @@ def get_collection_rights_where_user_is_owner(
         the owner.
     """
     return _get_activity_rights_where_user_is_owner(
-        constants.ACTIVITY_TYPE_COLLECTION, user_id
+        constants.constants.ACTIVITY_TYPE_COLLECTION, user_id
     )
 
 
@@ -586,7 +585,7 @@ def get_collection_rights(
     if model is None:
         return None
     return get_activity_rights_from_model(
-        model, constants.ACTIVITY_TYPE_COLLECTION
+        model, constants.constants.ACTIVITY_TYPE_COLLECTION
     )
 
 
@@ -658,8 +657,8 @@ def _get_activity_rights(
 
     Args:
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         activity_id: str. ID of the activity.
         strict: bool. Whether to fail noisily if the activity_rights
             doesn't exist for the given activity_id.
@@ -671,9 +670,9 @@ def _get_activity_rights(
     Raises:
         Exception. The activity_type provided is unknown.
     """
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         activity_rights = get_exploration_rights(activity_id, strict=strict)
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
         # Here we use MyPy ignore because of an assignment type mismatch.
         # This will be removed once the CollectionRights domain object
         # is implemented.
@@ -1031,8 +1030,8 @@ def _assign_role(
             ROLE_VIEWER.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         allow_assigning_any_role: bool. Whether to assign a role to the user
             irrespective of whether they have any existing role in the activity.
             The default value is false.
@@ -1063,7 +1062,7 @@ def _assign_role(
 
     if (
         new_role == rights_domain.ROLE_VOICE_ARTIST
-        and activity_type == constants.ACTIVITY_TYPE_EXPLORATION
+        and activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION
     ):
         if activity_rights.is_published():
             user_can_assign_role = check_can_manage_voice_artist_in_activity(
@@ -1212,8 +1211,8 @@ def _deassign_role(
             the activity.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. UnauthorizedUserException: Could not deassign role.
@@ -1234,7 +1233,7 @@ def _deassign_role(
 
     if (
         activity_rights.is_voice_artist(removed_user_id)
-        and activity_type == constants.ACTIVITY_TYPE_EXPLORATION
+        and activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION
     ):
         user_can_deassign_role = check_can_manage_voice_artist_in_activity(
             committer, activity_rights
@@ -1309,8 +1308,8 @@ def _release_ownership_of_activity(
             is performing the action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have release rights.
@@ -1369,8 +1368,8 @@ def _change_activity_status(
         committer_id: str. ID of the user who is performing the update action.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
         new_status: str. The new status of the activity.
         commit_message: str. The human-written commit message for this change.
 
@@ -1383,9 +1382,9 @@ def _change_activity_status(
 
     old_status = activity_rights.status
     activity_rights.status = new_status
-    if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+    if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
         cmd_type = rights_domain.CMD_CHANGE_EXPLORATION_STATUS
-    elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
+    elif activity_type == constants.constants.ACTIVITY_TYPE_COLLECTION:
         cmd_type = rights_domain.CMD_CHANGE_COLLECTION_STATUS
     commit_cmds = [
         {'cmd': cmd_type, 'old_status': old_status, 'new_status': new_status}
@@ -1417,8 +1416,8 @@ def _publish_activity(
         committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to publish the
@@ -1455,8 +1454,8 @@ def _unpublish_activity(
         committer: UserActionsInfo. UserActionsInfo object for the committer.
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
-            constants.ACTIVITY_TYPE_EXPLORATION,
-            constants.ACTIVITY_TYPE_COLLECTION.
+            constants.constants.ACTIVITY_TYPE_EXPLORATION,
+            constants.constants.ACTIVITY_TYPE_COLLECTION.
 
     Raises:
         Exception. The committer does not have rights to unpublish the
@@ -1518,7 +1517,7 @@ def assign_role_for_exploration(
         assignee_id,
         new_role,
         exploration_id,
-        constants.ACTIVITY_TYPE_EXPLORATION,
+        constants.constants.ACTIVITY_TYPE_EXPLORATION,
         allow_assigning_any_role=True,
     )
     if new_role in [
@@ -1556,7 +1555,7 @@ def deassign_role_for_exploration(
         committer,
         removed_user_id,
         exploration_id,
-        constants.ACTIVITY_TYPE_EXPLORATION,
+        constants.constants.ACTIVITY_TYPE_EXPLORATION,
     )
 
 
@@ -1574,7 +1573,7 @@ def release_ownership_of_exploration(
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
-        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION
+        committer, exploration_id, constants.constants.ACTIVITY_TYPE_EXPLORATION
     )
 
 
@@ -1642,7 +1641,7 @@ def set_private_viewability_of_exploration(
     _save_activity_rights(
         committer_id,
         exploration_rights,
-        constants.ACTIVITY_TYPE_EXPLORATION,
+        constants.constants.ACTIVITY_TYPE_EXPLORATION,
         commit_message,
         commit_cmds,
     )
@@ -1666,7 +1665,7 @@ def publish_exploration(
             _publish_activity.
     """
     _publish_activity(
-        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION
+        committer, exploration_id, constants.constants.ACTIVITY_TYPE_EXPLORATION
     )
 
 
@@ -1684,7 +1683,7 @@ def unpublish_exploration(
             _unpublish_activity.
     """
     _unpublish_activity(
-        committer, exploration_id, constants.ACTIVITY_TYPE_EXPLORATION
+        committer, exploration_id, constants.constants.ACTIVITY_TYPE_EXPLORATION
     )
     taskqueue_services.defer(
         feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
@@ -1725,7 +1724,7 @@ def assign_role_for_collection(
         assignee_id,
         new_role,
         collection_id,
-        constants.ACTIVITY_TYPE_COLLECTION,
+        constants.constants.ACTIVITY_TYPE_COLLECTION,
     )
     if new_role in [rights_domain.ROLE_OWNER, rights_domain.ROLE_EDITOR]:
         subscription_services.subscribe_to_collection(
@@ -1758,7 +1757,7 @@ def deassign_role_for_collection(
         committer,
         removed_user_id,
         collection_id,
-        constants.ACTIVITY_TYPE_COLLECTION,
+        constants.constants.ACTIVITY_TYPE_COLLECTION,
     )
 
 
@@ -1776,7 +1775,7 @@ def release_ownership_of_collection(
             _release_ownership_of_activity.
     """
     _release_ownership_of_activity(
-        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION
+        committer, collection_id, constants.constants.ACTIVITY_TYPE_COLLECTION
     )
 
 
@@ -1797,7 +1796,7 @@ def publish_collection(
             _publish_activity.
     """
     _publish_activity(
-        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION
+        committer, collection_id, constants.constants.ACTIVITY_TYPE_COLLECTION
     )
 
 
@@ -1815,5 +1814,5 @@ def unpublish_collection(
             _unpublish_activity.
     """
     _unpublish_activity(
-        committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION
+        committer, collection_id, constants.constants.ACTIVITY_TYPE_COLLECTION
     )

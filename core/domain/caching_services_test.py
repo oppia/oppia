@@ -21,8 +21,7 @@ from __future__ import annotations
 import json
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     caching_domain,
     caching_services,
@@ -771,15 +770,15 @@ class CachingServicesUnitTests(test_utils.GenericTestBase):
 
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0],
+                constants.constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1],
+                constants.constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2],
+                constants.constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p> 😍'],
             ),
         ]

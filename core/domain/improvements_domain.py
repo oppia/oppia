@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 
 from typing import Optional, TypedDict
 
@@ -99,7 +98,7 @@ class TaskEntry:
             resolved_on: datetime. The datetime at which this task was resolved.
                 Only used when status is resolved, otherwise replaced with None.
         """
-        if status != constants.TASK_STATUS_RESOLVED:
+        if status != constants.constants.TASK_STATUS_RESOLVED:
             resolver_id = None
             resolved_on = None
         self.entity_type = entity_type

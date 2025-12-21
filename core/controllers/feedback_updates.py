@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     exp_fetchers,
@@ -132,7 +131,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.VALID_THREAD_ID_REGEX,
+                        'regex_pattern': constants.constants.VALID_THREAD_ID_REGEX,
                     }
                 ],
             }

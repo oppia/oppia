@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     collection_services,
@@ -132,21 +131,21 @@ class LibraryIndexHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """Handles GET requests."""
         # TODO(sll): Support index pages for other language codes.
         summary_dicts_by_category = summary_services.get_library_groups(
-            [constants.DEFAULT_LANGUAGE_CODE]
+            [constants.constants.DEFAULT_LANGUAGE_CODE]
         )
         top_rated_activity_summary_dicts = (
             summary_services.get_top_rated_exploration_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE],
+                [constants.constants.DEFAULT_LANGUAGE_CODE],
                 feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FOR_LIBRARY_PAGE,
             )
         )
         featured_activity_summary_dicts = (
             summary_services.get_featured_activity_summary_dicts(
-                [constants.DEFAULT_LANGUAGE_CODE]
+                [constants.constants.DEFAULT_LANGUAGE_CODE]
             )
         )
 
-        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
@@ -246,7 +245,7 @@ class LibraryGroupIndexHandler(
         elif group_name == feconf.LIBRARY_GROUP_TOP_RATED:
             top_rated_activity_summary_dicts = (
                 summary_services.get_top_rated_exploration_summary_dicts(
-                    [constants.DEFAULT_LANGUAGE_CODE],
+                    [constants.constants.DEFAULT_LANGUAGE_CODE],
                     feconf.NUMBER_OF_TOP_RATED_EXPLORATIONS_FULL_PAGE,
                 )
             )
@@ -254,7 +253,7 @@ class LibraryGroupIndexHandler(
                 activity_list = top_rated_activity_summary_dicts
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
 
-        preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
+        preferred_language_codes = [constants.constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes

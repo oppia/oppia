@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (  # pylint: disable=invalid-import-from
     change_domain,
     html_validation_service,
@@ -363,7 +362,7 @@ class SubtopicPage:
             topic_id,
             SubtopicPageContents.create_default_subtopic_page_contents(),
             feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
         )
 
@@ -568,7 +567,7 @@ class SubtopicPage:
             )
         if not any(
             self.language_code == lc['code']
-            for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+            for lc in constants.constants.SUPPORTED_CONTENT_LANGUAGES
         ):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code

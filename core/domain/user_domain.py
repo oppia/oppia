@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 
 from typing import Dict, List, Optional, TypedDict
 
@@ -116,9 +115,9 @@ class UserSettings:
         last_logged_in: Optional[datetime.datetime] = None,
         last_created_an_exploration: Optional[datetime.datetime] = None,
         last_edited_an_exploration: Optional[datetime.datetime] = None,
-        default_dashboard: str = constants.DASHBOARD_TYPE_LEARNER,
+        default_dashboard: str = constants.constants.DASHBOARD_TYPE_LEARNER,
         creator_dashboard_display_pref: str = (
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']
+            constants.constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']
         ),
         user_bio: str = '',
         subject_interests: Optional[List[str]] = None,
@@ -334,7 +333,7 @@ class UserSettings:
                 'received %s' % self.creator_dashboard_display_pref
             )
         if self.creator_dashboard_display_pref not in list(
-            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
+            constants.constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.values()
         ):
             raise utils.ValidationError(
                 '%s is not a valid value for the dashboard display '
@@ -509,10 +508,10 @@ class UserSettings:
         """
         if not username:
             raise utils.ValidationError('Empty username supplied.')
-        if len(username) > constants.MAX_USERNAME_LENGTH:
+        if len(username) > constants.constants.MAX_USERNAME_LENGTH:
             raise utils.ValidationError(
                 'A username can have at most %s characters.'
-                % constants.MAX_USERNAME_LENGTH
+                % constants.constants.MAX_USERNAME_LENGTH
             )
         if not re.match(feconf.ALPHANUMERIC_REGEX, username):
             raise utils.ValidationError(

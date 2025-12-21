@@ -25,7 +25,7 @@ import re
 import subprocess
 import sys
 
-from core.constants import constants
+from core import constants
 from scripts import build, common, servers
 
 from typing import Final, List, Optional
@@ -329,7 +329,7 @@ def main(args: Optional[List[str]] = None) -> None:
         stack.enter_context(servers.managed_redis_server())
         stack.enter_context(servers.managed_elasticsearch_dev_server())
 
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             stack.enter_context(servers.managed_firebase_auth_emulator())
             stack.enter_context(servers.managed_cloud_datastore_emulator())
 

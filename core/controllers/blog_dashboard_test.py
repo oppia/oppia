@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import os
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import blog_services
 from core.platform import models
 from core.tests import test_utils
@@ -311,7 +310,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
             '%s/%s'
             % (
                 feconf.BLOG_EDITOR_DATA_URL_PREFIX,
-                '123' * constants.BLOG_POST_ID_LENGTH,
+                '123' * constants.constants.BLOG_POST_ID_LENGTH,
             ),
             expected_status_int=400,
         )

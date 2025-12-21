@@ -25,8 +25,7 @@ import json
 import os
 import re
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import voiceover_services
 from core.platform import models
 
@@ -254,7 +253,7 @@ def convert_plaintext_to_ssml_content(
     )
 
     math_symbol_pronunciations = (
-        constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
+        constants.constants.LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS.get(
             language_code, {}
         )
     )

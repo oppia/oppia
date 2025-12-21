@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -456,7 +455,7 @@ class ExplorationVoiceoverSyncJobTestsBase(
             self.CURATED_EXPLORATION_ID_1,
             self.owner_id,
             title='title1',
-            category=constants.ALL_CATEGORIES[0],
+            category=constants.constants.ALL_CATEGORIES[0],
             end_state_name='End State',
         )
         self.publish_exploration(self.owner_id, exploration_1.id)
@@ -472,7 +471,7 @@ class ExplorationVoiceoverSyncJobTestsBase(
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -610,7 +609,7 @@ class ExplorationVoiceoverSyncJobTestsBase(
             self.CURATED_EXPLORATION_ID_2,
             self.owner_id,
             title='title2',
-            category=constants.ALL_CATEGORIES[0],
+            category=constants.constants.ALL_CATEGORIES[0],
             end_state_name='End State',
         )
         self.publish_exploration(self.owner_id, exploration_2.id)
@@ -626,7 +625,7 @@ class ExplorationVoiceoverSyncJobTestsBase(
                 'Title subtopic',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-sub',
             )

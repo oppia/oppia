@@ -23,8 +23,7 @@ import html
 import logging
 import re
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     blog_domain,
     html_cleaner,
@@ -687,7 +686,9 @@ def generate_summary_of_blog_post(content: str) -> str:
         flags=re.DOTALL,
     )
     raw_text = html_cleaner.strip_html_tags(raw_html)
-    max_chars_in_summary = constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
+    max_chars_in_summary = (
+        constants.constants.MAX_CHARS_IN_BLOG_POST_SUMMARY - 3
+    )
     if len(raw_text) > max_chars_in_summary:
         summary = html.unescape(raw_text)[:max_chars_in_summary] + '...'
         return summary.strip()

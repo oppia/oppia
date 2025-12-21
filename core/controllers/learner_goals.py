@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import learner_goals_services, learner_progress_services
 
@@ -43,7 +42,7 @@ class LearnerGoalsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         'activity_type': {
             'schema': {
                 'type': 'basestring',
-                'choices': [constants.ACTIVITY_TYPE_LEARN_TOPIC],
+                'choices': [constants.constants.ACTIVITY_TYPE_LEARN_TOPIC],
             }
         },
     }

@@ -22,8 +22,7 @@ import collections
 import itertools
 import operator
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import exp_domain, improvements_domain
 from core.platform import models
 
@@ -112,7 +111,7 @@ def fetch_exploration_tasks(
                 tasks.
     """
     composite_entity_id = improvements_models.ExplorationStatsTaskEntryModel.generate_composite_entity_id(
-        constants.TASK_ENTITY_TYPE_EXPLORATION,
+        constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
         exploration.id,
         exploration.version,
     )
@@ -124,9 +123,9 @@ def fetch_exploration_tasks(
     open_tasks: List[improvements_domain.TaskEntry] = []
     resolved_task_types_by_state_name = collections.defaultdict(list)
     for status_group, tasks in tasks_grouped_by_status:
-        if status_group == constants.TASK_STATUS_OPEN:
+        if status_group == constants.constants.TASK_STATUS_OPEN:
             open_tasks.extend(tasks)
-        elif status_group == constants.TASK_STATUS_RESOLVED:
+        elif status_group == constants.constants.TASK_STATUS_RESOLVED:
             for t in tasks:
                 resolved_task_types_by_state_name[t.target_id].append(
                     t.task_type
@@ -166,9 +165,10 @@ def fetch_exploration_task_history_page(
     )
     results, cursor, more = (
         model_class.query(
-            model_class.entity_type == constants.TASK_ENTITY_TYPE_EXPLORATION,
+            model_class.entity_type
+            == constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             model_class.entity_id == exploration.id,
-            model_class.status == constants.TASK_STATUS_RESOLVED,
+            model_class.status == constants.constants.TASK_STATUS_RESOLVED,
         )
         .order(-model_class.resolved_on)
         .fetch_page(

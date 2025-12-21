@@ -21,8 +21,7 @@ from __future__ import annotations
 import inspect
 from types import ModuleType  # pylint: disable=import-only-modules
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 
 from typing import List, Tuple, Type
 
@@ -344,7 +343,7 @@ class _Gae(Platform):
             module. The speech synthesis services module based on the current
             environment.
         """
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             from core.platform.speech_synthesis import (
                 dev_mode_speech_synthesis_services,
             )
@@ -370,7 +369,7 @@ class _Gae(Platform):
             Exception. The value of feconf.EMAIL_SERVICE_PROVIDER does not
                 correspond to a valid email_services module.
         """
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             from core.platform.email import dev_mode_email_services
 
             return dev_mode_email_services
@@ -400,7 +399,7 @@ class _Gae(Platform):
             Exception. The value of feconf.BULK_EMAIL_SERVICE_PROVIDER does not
                 correspond to a valid email_services module.
         """
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             from core.platform.bulk_email import dev_mode_bulk_email_services
 
             return dev_mode_bulk_email_services
@@ -436,7 +435,7 @@ class _Gae(Platform):
         Returns:
             module. The core.platform.taskqueue services module.
         """
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             from core.platform.taskqueue import dev_mode_taskqueue_services
 
             return dev_mode_taskqueue_services
@@ -463,7 +462,7 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             from core.platform.translate import dev_mode_translate_services
 
             return dev_mode_translate_services
@@ -479,7 +478,7 @@ class _Gae(Platform):
         Returns:
             module. The cloud_translate_services module.
         """
-        if constants.EMULATOR_MODE:
+        if constants.constants.EMULATOR_MODE:
             from core.platform.storage import dev_mode_storage_services
 
             return dev_mode_storage_services
@@ -495,7 +494,7 @@ class _Gae(Platform):
         Returns:
             module. The cloud_secrets_services module.
         """
-        if constants.DEV_MODE:
+        if constants.constants.DEV_MODE:
             from core.platform.secrets import dev_mode_secrets_services
 
             return dev_mode_secrets_services

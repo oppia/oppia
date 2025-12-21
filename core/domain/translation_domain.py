@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import enum
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (  # pylint: disable=invalid-import-from
     translatable_object_registry,
 )
@@ -1009,7 +1008,9 @@ class WrittenTranslations:
                 # translations can be in supported audio/voiceover languages.
                 allowed_language_codes = [
                     language['id']
-                    for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+                    for language in (
+                        constants.constants.SUPPORTED_AUDIO_LANGUAGES
+                    )
                 ]
                 if language_code not in allowed_language_codes:
                     raise utils.ValidationError(

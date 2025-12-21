@@ -30,8 +30,7 @@ import types
 from unittest import mock
 
 import main
-from core import feconf, handler_schema_constants, utils
-from core.constants import constants
+from core import constants, feconf, handler_schema_constants, utils
 from core.controllers import acl_decorators, base, payload_validator
 from core.domain import (
     auth_domain,
@@ -279,20 +278,16 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         )
 
     def test_root_redirect_rules_for_deleted_user_prod_mode(self) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             self.login(self.DELETED_USER_EMAIL)
-            response = self.get_html_response('/', expected_status_int=302)
-            self.assertIn(
-                'pending-account-deletion', response.headers['location']
-            )
+        response = self.get_html_response('/', expected_status_int=302)
+        self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_deleted_user_dev_mode(self) -> None:
-        with mock.patch.object(constants, 'DEV_MODE', True):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': True}):
             self.login(self.DELETED_USER_EMAIL)
-            response = self.get_html_response('/', expected_status_int=302)
-            self.assertIn(
-                'pending-account-deletion', response.headers['location']
-            )
+        response = self.get_html_response('/', expected_status_int=302)
+        self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_get_with_invalid_return_type_logs_correct_warning(self) -> None:
         # Modify the testapp to use the mock handler.
@@ -1047,7 +1042,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
 
         supported_language_filenames = [
             ('%s.json' % language_details['id'])
-            for language_details in constants.SUPPORTED_SITE_LANGUAGES
+            for language_details in constants.constants.SUPPORTED_SITE_LANGUAGES
         ]
 
         filenames = os.listdir(
@@ -1105,7 +1100,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         are also present in en.json.
         """
         en_key_list = self._extract_keys_from_json_file('en.json')
-        hacky_translation_keys = constants.HACKY_TRANSLATION_KEYS
+        hacky_translation_keys = constants.constants.HACKY_TRANSLATION_KEYS
         missing_hacky_translation_keys = list(
             set(hacky_translation_keys) - set(en_key_list)
         )
@@ -1511,7 +1506,7 @@ class SignUpTests(test_utils.GenericTestBase):
             {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token=csrf_token,
             expected_status_int=401,
@@ -1531,7 +1526,7 @@ class SignUpTests(test_utils.GenericTestBase):
             {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
                 'can_receive_email_updates': (
                     feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE
                 ),
@@ -1553,7 +1548,7 @@ class SignUpTests(test_utils.GenericTestBase):
             {
                 'username': 'abc',
                 'agreed_to_terms': True,
-                'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
+                'default_dashboard': constants.constants.DASHBOARD_TYPE_LEARNER,
             },
             csrf_token='invalid_token',
             expected_status_int=401,

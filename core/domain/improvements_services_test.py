@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import improvements_domain, improvements_services
 from core.platform import models
 from core.tests import test_utils
@@ -54,7 +53,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     def _new_obsolete_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
     ) -> improvements_domain.TaskEntry:
         """Constructs a new default obsolete task with the provided values.
@@ -69,14 +68,14 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new obsolete task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_OBSOLETE,
+            status=constants.constants.TASK_STATUS_OBSOLETE,
             resolver_id=None,
             resolved_on=None,
         )
@@ -84,7 +83,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     def _new_open_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
     ) -> improvements_domain.TaskEntry:
         """Constructs a new default open task with the provided values.
@@ -99,14 +98,14 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new open task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
             resolver_id=None,
             resolved_on=None,
         )
@@ -114,7 +113,7 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
     def _new_resolved_task(
         self,
         state_name: str = feconf.DEFAULT_INIT_STATE_NAME,
-        task_type: str = constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+        task_type: str = constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
         exploration_version: int = 1,
     ) -> improvements_domain.TaskEntry:
         """Constructs a new default resolved task with the provided values.
@@ -129,14 +128,14 @@ class ImprovementsServicesTestBase(test_utils.GenericTestBase):
             improvements_domain.TaskEntry. A new resolved task entry.
         """
         return improvements_domain.TaskEntry(
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.EXP_ID,
             entity_version=exploration_version,
             task_type=task_type,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=state_name,
             issue_description='issue description',
-            status=constants.TASK_STATUS_RESOLVED,
+            status=constants.constants.TASK_STATUS_RESOLVED,
             resolver_id=self.owner_id,
             resolved_on=self.MOCK_DATE,
         )
@@ -147,14 +146,14 @@ class GetTaskEntryFromModelTests(ImprovementsServicesTestBase):
 
     def test_returns_same_fields_as_model(self) -> None:
         task_id = improvements_models.ExplorationStatsTaskEntryModel.create(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.EXP_ID,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -214,33 +213,46 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
     def test_fetch_identifies_the_resolved_tasks_of_each_state(self) -> None:
         tasks = [
             self._new_resolved_task(
-                state_name='A', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            ),
-            self._new_resolved_task(
-                state_name='B', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
+                state_name='A',
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
             ),
             self._new_resolved_task(
                 state_name='B',
-                task_type=(constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            ),
+            self._new_resolved_task(
+                state_name='B',
+                task_type=(
+                    constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES
+                ),
             ),
             self._new_resolved_task(
                 state_name='C',
-                task_type=(constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
-            ),
-            self._new_resolved_task(
-                state_name='D', task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE
-            ),
-            self._new_resolved_task(
-                state_name='D',
-                task_type=(constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES),
+                task_type=(
+                    constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP
+                ),
             ),
             self._new_resolved_task(
                 state_name='D',
-                task_type=(constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP),
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
             ),
             self._new_resolved_task(
                 state_name='D',
-                task_type=(constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS),
+                task_type=(
+                    constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES
+                ),
+            ),
+            self._new_resolved_task(
+                state_name='D',
+                task_type=(
+                    constants.constants.TASK_TYPE_INEFFECTIVE_FEEDBACK_LOOP
+                ),
+            ),
+            self._new_resolved_task(
+                state_name='D',
+                task_type=(
+                    constants.constants.TASK_TYPE_SUCCESSIVE_INCORRECT_ANSWERS
+                ),
             ),
         ]
         improvements_services.put_tasks(tasks)
@@ -304,33 +316,33 @@ class FetchExplorationTasksTests(ImprovementsServicesTestBase):
             # Version 1 tasks.
             self._new_open_task(
                 state_name='A',
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                 exploration_version=1,
             ),
             self._new_open_task(
                 state_name='B',
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                 exploration_version=1,
             ),
             self._new_open_task(
                 state_name='C',
-                task_type=constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+                task_type=constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
                 exploration_version=1,
             ),
             # Version 2 tasks.
             self._new_open_task(
                 state_name='A',
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                 exploration_version=2,
             ),
             self._new_resolved_task(
                 state_name='B',
-                task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+                task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
                 exploration_version=2,
             ),
             self._new_resolved_task(
                 state_name='C',
-                task_type=constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
+                task_type=constants.constants.TASK_TYPE_NEEDS_GUIDING_RESPONSES,
                 exploration_version=2,
             ),
         ]
@@ -663,7 +675,7 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
             )
         )
         self.assertEqual(
-            task_entry_model.status, constants.TASK_STATUS_RESOLVED
+            task_entry_model.status, constants.constants.TASK_STATUS_RESOLVED
         )
         self.assertEqual(task_entry_model.resolver_id, self.owner_id)
         self.assertEqual(task_entry_model.resolved_on, self.MOCK_DATE)
@@ -683,7 +695,9 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
                 task_entry, task_entry_model
             )
         )
-        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
+        self.assertEqual(
+            task_entry_model.status, constants.constants.TASK_STATUS_OPEN
+        )
         self.assertIsNone(task_entry_model.resolver_id)
         self.assertIsNone(task_entry_model.resolved_on)
 
@@ -706,6 +720,8 @@ class ApplyChangesToModelTests(ImprovementsServicesTestBase):
                 task_entry, task_entry_model
             )
         )
-        self.assertEqual(task_entry_model.status, constants.TASK_STATUS_OPEN)
+        self.assertEqual(
+            task_entry_model.status, constants.constants.TASK_STATUS_OPEN
+        )
         self.assertIsNone(task_entry_model.resolved_on)
         self.assertIsNone(task_entry_model.resolved_on)

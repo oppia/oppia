@@ -32,8 +32,7 @@ import time
 import unicodedata
 import urllib.parse
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 
 import filetype
 import yaml
@@ -831,7 +830,7 @@ def require_valid_name(
             'Adjacent whitespace in %s should be collapsed.' % name_type
         )
 
-    for character in constants.INVALID_NAME_CHARS:
+    for character in constants.constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
                 r'Invalid character %s in %s: %s' % (character, name_type, name)
@@ -869,7 +868,7 @@ def require_valid_url_fragment(
             'received %s.' % (name_type, allowed_length, name)
         )
 
-    if not re.match(constants.VALID_URL_FRAGMENT_REGEX, name):
+    if not re.match(constants.constants.VALID_URL_FRAGMENT_REGEX, name):
         raise ValidationError(
             '%s field contains invalid characters. Only lowercase words'
             ' separated by hyphens are allowed. Received %s.'
@@ -965,10 +964,13 @@ def require_valid_meta_tag_content(meta_tag_content: str) -> None:
             'Expected meta tag content to be a string, received %s'
             % meta_tag_content
         )
-    if len(meta_tag_content) > constants.MAX_CHARS_IN_META_TAG_CONTENT:
+    if (
+        len(meta_tag_content)
+        > constants.constants.MAX_CHARS_IN_META_TAG_CONTENT
+    ):
         raise ValidationError(
             'Meta tag content should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_META_TAG_CONTENT
+            % constants.constants.MAX_CHARS_IN_META_TAG_CONTENT
         )
 
 
@@ -986,10 +988,10 @@ def require_valid_page_title_fragment_for_web(
         ValidationError. Page title fragment is too small.
     """
     max_chars_in_page_title_frag_for_web = (
-        constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        constants.constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
     )
     min_chars_in_page_title_frag_for_web = (
-        constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+        constants.constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
     )
 
     if not isinstance(page_title_fragment_for_web, str):
@@ -1000,12 +1002,12 @@ def require_valid_page_title_fragment_for_web(
     if len(page_title_fragment_for_web) > max_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be longer than %s characters.'
-            % constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+            % constants.constants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
         )
     if len(page_title_fragment_for_web) < min_chars_in_page_title_frag_for_web:
         raise ValidationError(
             'Page title fragment should not be shorter than %s characters.'
-            % constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
+            % constants.constants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB
         )
 
 
@@ -1037,9 +1039,9 @@ def get_hex_color_for_category(category: str) -> str:
         str. Color assigned to that category.
     """
     color: str = (
-        constants.CATEGORIES_TO_COLORS[category]
-        if category in constants.CATEGORIES_TO_COLORS
-        else constants.DEFAULT_COLOR
+        constants.constants.CATEGORIES_TO_COLORS[category]
+        if category in constants.constants.CATEGORIES_TO_COLORS
+        else constants.constants.DEFAULT_COLOR
     )
     return color
 
@@ -1056,8 +1058,8 @@ def get_thumbnail_icon_url_for_category(category: str) -> str:
     """
     icon_name = (
         category
-        if category in constants.CATEGORIES_TO_COLORS
-        else constants.DEFAULT_THUMBNAIL_ICON
+        if category in constants.constants.CATEGORIES_TO_COLORS
+        else constants.constants.DEFAULT_THUMBNAIL_ICON
     )
     # Remove all spaces from the string.
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
@@ -1072,7 +1074,9 @@ def is_supported_audio_language_code(language_code: str) -> bool:
     Returns:
         bool. Whether the language code is supported audio language code or not.
     """
-    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
+    language_codes = [
+        lc['id'] for lc in constants.constants.SUPPORTED_AUDIO_LANGUAGES
+    ]
     return language_code in language_codes
 
 
@@ -1086,7 +1090,7 @@ def is_valid_language_code(language_code: str) -> bool:
         bool. Whether the language code is valid or not.
     """
     language_codes = [
-        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES
+        lc['code'] for lc in constants.constants.SUPPORTED_CONTENT_LANGUAGES
     ]
     return language_code in language_codes
 
@@ -1104,7 +1108,7 @@ def get_supported_audio_language_description(language_code: str) -> str:
     Raises:
         Exception. If the given language code is unsupported.
     """
-    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
+    for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES:
         if language['id'] == language_code:
             description: str = language['description']
             return description
@@ -1219,11 +1223,11 @@ def get_asset_dir_prefix() -> str:
     It is used as a prefix in urls for images, css and script files.
 
     Returns:
-        str. Prefix '/build' if constants.DEV_MODE is false, otherwise
+        str. Prefix '/build' if constants.constants.DEV_MODE is false, otherwise
         null string.
     """
     asset_dir_prefix = ''
-    if not constants.DEV_MODE:
+    if not constants.constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix

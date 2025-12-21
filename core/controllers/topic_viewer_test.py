@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     classroom_config_services,
     platform_parameter_list,
@@ -79,16 +78,16 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
                 'subtopic_name',
                 [self.skill_id_2],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'subtopic-name',
             )
         )
         self.topic.next_subtopic_id = 2
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
                 self.story_id_1
@@ -370,9 +369,9 @@ class TopicPageDataHandlerTests(
         )
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one'
@@ -434,9 +433,9 @@ class TopicPageDataHandlerTests(
         )
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one'
@@ -505,9 +504,9 @@ class TopicPageDataHandlerTests(
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one'
@@ -569,9 +568,9 @@ class TopicPageDataHandlerTests(
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.practice_tab_is_displayed = False
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one'
@@ -635,9 +634,9 @@ class TopicPageDataHandlerTests(
         for index in range(number_of_skills):
             self.topic.uncategorized_skill_ids.append(skill_ids[index])
         self.topic.thumbnail_filename = 'Image.svg'
-        self.topic.thumbnail_bg_color = constants.ALLOWED_THUMBNAIL_BG_COLORS[
-            'topic'
-        ][0]
+        self.topic.thumbnail_bg_color = (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic'][0]
+        )
         self.topic.practice_tab_is_displayed = True
         subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title 1', 'url-frag-one'

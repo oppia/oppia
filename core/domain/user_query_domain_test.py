@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import user_query_domain
 from core.tests import test_utils
 
@@ -41,7 +40,7 @@ class UserQueryParamsAttributeTests(test_utils.GenericTestBase):
         )
         attribute_names = [
             predicate['backend_attr']
-            for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+            for predicate in constants.constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
         ]
 
         attribute_names_predefined.sort()

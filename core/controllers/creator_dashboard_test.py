@@ -20,8 +20,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import creator_dashboard
 from core.domain import (
     collection_services,
@@ -386,7 +385,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             collection.category, feconf.DEFAULT_COLLECTION_OBJECTIVE
         )
         self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
+            collection.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.logout()
 
@@ -624,7 +623,9 @@ class CreationButtonsTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_upload_exploration(self) -> None:
-        with mock.patch.dict(constants, {'ALLOW_YAML_FILE_UPLOAD': True}):
+        with mock.patch.dict(
+            constants.constants, {'ALLOW_YAML_FILE_UPLOAD': True}
+        ):
             self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
             self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
 

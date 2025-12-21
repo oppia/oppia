@@ -20,8 +20,7 @@ import datetime
 from unittest import mock
 
 import main
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     beam_job_services,
     email_manager,
@@ -838,7 +837,7 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
                 'question_state_data': self._create_valid_question_data(
                     'default_state', content_id_generator
                 ).to_dict(),
-                'language_code': constants.DEFAULT_LANGUAGE_CODE,
+                'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
                 'question_state_data_schema_version': (
                     feconf.CURRENT_STATE_SCHEMA_VERSION
                 ),

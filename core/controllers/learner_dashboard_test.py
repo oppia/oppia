@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     learner_progress_services,
     story_domain,
@@ -85,7 +84,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -95,7 +94,7 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -571,7 +570,7 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -581,7 +580,7 @@ class LearnerCompletedChaptersCountHandlerTests(test_utils.GenericTestBase):
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -711,7 +710,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -721,7 +720,7 @@ class LearnerDashboardCollectionsProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -838,7 +837,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )
@@ -848,7 +847,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         'Title 1',
         ['skill_id_1'],
         'image.svg',
-        constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+        constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
         21131,
         'dummy-subtopic-zero',
     )

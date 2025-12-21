@@ -22,8 +22,7 @@ import logging
 import unittest
 from unittest import mock
 
-from core import feature_flag_list, feconf
-from core.constants import constants
+from core import constants, feature_flag_list, feconf
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -111,7 +110,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
             )
             for i in range(5)
@@ -131,7 +130,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -1068,7 +1067,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 '%s' % i,
                 self.owner_id,
                 title='title %d' % i,
-                category=constants.ALL_CATEGORIES[i],
+                category=constants.constants.ALL_CATEGORIES[i],
                 end_state_name='End State',
             )
             for i in range(5)
@@ -1088,7 +1087,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -1215,20 +1214,25 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             'new_lang' in opportunity.incomplete_translation_language_codes
         )
 
-        mock_supported_languages = constants.SUPPORTED_AUDIO_LANGUAGES + [
-            {
-                'id': 'new_lang',
-                'description': 'New language',
-                'relatedLanguages': ['new_lang'],
-            }
-        ]
+        mock_supported_languages = (
+            constants.constants.SUPPORTED_AUDIO_LANGUAGES
+            + [
+                {
+                    'id': 'new_lang',
+                    'description': 'New language',
+                    'relatedLanguages': ['new_lang'],
+                }
+            ]
+        )
 
         self.assertEqual(len(observed_log_messages), 0)
 
         with mock.patch.object(
             logging, 'info', _mock_logging_function
         ), mock.patch.object(
-            constants, 'SUPPORTED_AUDIO_LANGUAGES', mock_supported_languages
+            constants.constants,
+            'SUPPORTED_AUDIO_LANGUAGES',
+            mock_supported_languages,
         ):
             opportunities = opportunity_services.get_exploration_opportunity_summaries_by_ids(
                 ['0']
@@ -1376,7 +1380,8 @@ class OpportunityUpdateOnAcceeptingSuggestionUnitTest(
     def setUp(self) -> None:
         super().setUp()
         supported_language_codes = set(
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES
+            language['id']
+            for language in constants.constants.SUPPORTED_AUDIO_LANGUAGES
         )
         self.new_incomplete_translation_language_codes = list(
             supported_language_codes - set(['en'])

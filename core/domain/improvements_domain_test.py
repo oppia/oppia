@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import improvements_domain
 from core.tests import test_utils
 
@@ -41,14 +40,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     def test_task_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -59,14 +58,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     def test_composite_entity_id_has_expected_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -76,14 +75,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
         # Data url for images/avatar/user_blue_72px.png.
         # Generated using utils.convert_png_to_data_url.
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -107,14 +106,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     def test_can_create_open_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_OPEN,
+            constants.constants.TASK_STATUS_OPEN,
             None,
             None,
         )
@@ -132,14 +131,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     def test_can_create_obsolete_task_with_corresponding_values(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_OBSOLETE,
+            constants.constants.TASK_STATUS_OBSOLETE,
             None,
             None,
         )
@@ -157,14 +156,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
 
     def test_can_create_resolved_task_with_corresponding_value(self) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_RESOLVED,
+            constants.constants.TASK_STATUS_RESOLVED,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -184,14 +183,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_OPEN,
+            constants.constants.TASK_STATUS_OPEN,
             self.owner_id,
             self.MOCK_DATE,
         )
@@ -211,14 +210,14 @@ class TaskEntryTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         task_entry = improvements_domain.TaskEntry(
-            constants.TASK_ENTITY_TYPE_EXPLORATION,
+            constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             self.exp_id,
             1,
-            constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            constants.TASK_TARGET_TYPE_STATE,
+            constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            constants.constants.TASK_TARGET_TYPE_STATE,
             feconf.DEFAULT_INIT_STATE_NAME,
             'issue description',
-            constants.TASK_STATUS_OBSOLETE,
+            constants.constants.TASK_STATUS_OBSOLETE,
             self.owner_id,
             self.MOCK_DATE,
         )

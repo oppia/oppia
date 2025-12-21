@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core.constants import constants
+from core import constants
 from core.domain import (
     collection_domain,
     collection_services,
@@ -205,7 +205,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'Title',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url',
             )
@@ -273,7 +273,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'Title 1',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-one',
             )
@@ -342,7 +342,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'Title 1',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-one',
             )
@@ -386,7 +386,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                 'Title 1',
                 ['skill_id_1'],
                 'image.svg',
-                constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
                 21131,
                 'dummy-subtopic-url-one',
             )
@@ -1531,7 +1531,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_3
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -1571,7 +1572,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -1592,7 +1594,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -1724,7 +1727,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -1770,7 +1774,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -1795,7 +1800,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert public_collection is not None
         self.assertEqual(
-            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_collection.status, constants.constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2033,7 +2038,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_3
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2078,7 +2084,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2101,7 +2108,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2320,7 +2328,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2366,7 +2375,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2391,7 +2401,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert public_collection is not None
         self.assertEqual(
-            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_collection.status, constants.constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2649,7 +2659,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_1
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2718,7 +2729,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2741,7 +2753,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             self.EXP_ID_0
         )
         self.assertEqual(
-            public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_exploration.status,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         )
 
         # Call get_exploration_progress to get filtered progress.
@@ -2782,7 +2795,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2821,7 +2835,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert private_collection is not None
         self.assertEqual(
-            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE
+            private_collection.status,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
         )
 
         # Call get_collection_progress to get filtered progress.
@@ -2846,7 +2861,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Ruling out the possibility of None for mypy type checking.
         assert public_collection is not None
         self.assertEqual(
-            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC
+            public_collection.status, constants.constants.ACTIVITY_STATUS_PUBLIC
         )
 
         # Call get_collection_progress to get filtered progress.

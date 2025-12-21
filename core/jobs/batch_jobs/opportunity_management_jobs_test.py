@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import opportunity_services, state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import opportunity_management_jobs
@@ -141,7 +140,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description=self.SKILL_1_DESCRIPTION,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -170,7 +169,7 @@ class GenerateSkillOpportunityModelJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_2_ID,
             description=self.SKILL_2_DESCRIPTION,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -531,7 +530,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 1)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'},
+            {l['id'] for l in constants.constants.SUPPORTED_AUDIO_LANGUAGES}
+            - {'cs'},
         )
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
@@ -633,7 +633,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'},
+            {l['id'] for l in constants.constants.SUPPORTED_AUDIO_LANGUAGES}
+            - {'en'},
         )
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
@@ -722,7 +723,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 1)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'cs'},
+            {l['id'] for l in constants.constants.SUPPORTED_AUDIO_LANGUAGES}
+            - {'cs'},
         )
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(
@@ -930,7 +932,8 @@ class GenerateExplorationOpportunitySummariesJobTests(
         self.assertEqual(opportunity_model.content_count, 2)
         self.assertItemsEqual(
             opportunity_model.incomplete_translation_language_codes,
-            {l['id'] for l in constants.SUPPORTED_AUDIO_LANGUAGES} - {'en'},
+            {l['id'] for l in constants.constants.SUPPORTED_AUDIO_LANGUAGES}
+            - {'en'},
         )
         self.assertEqual(opportunity_model.translation_counts, {})
         self.assertEqual(

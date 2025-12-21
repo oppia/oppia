@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core.constants import constants
+from core import constants
 from core.domain import email_manager, user_query_domain
 from core.platform import models
 
@@ -46,7 +46,7 @@ def _get_user_query_from_model(
         predicate['backend_attr']: getattr(
             user_query_model, predicate['backend_attr']
         )
-        for predicate in constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+        for predicate in constants.constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     }
     user_query_params = user_query_domain.UserQueryParams(**attributes)
 

@@ -55,8 +55,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     auth_domain,
     platform_parameter_list,
@@ -133,13 +132,13 @@ def establish_auth_session(
     )
 
     response.set_cookie(
-        constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
+        constants.constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
         value=fresh_cookie,
         max_age=feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         overwrite=True,
         # Toggles https vs http. The production server uses https, but the local
         # developement server uses http.
-        secure=(not constants.EMULATOR_MODE),
+        secure=(not constants.constants.EMULATOR_MODE),
         # Using the HttpOnly flag when generating a cookie helps mitigate the
         # risk of client side script accessing the protected cookie (if the
         # browser supports it).
@@ -154,7 +153,9 @@ def destroy_auth_session(response: webapp2.Response) -> None:
     Args:
         response: webapp2.Response. Response to clear the cookies from.
     """
-    response.delete_cookie(constants.FIREBASE_AUTH_SESSION_COOKIE_NAME)
+    response.delete_cookie(
+        constants.constants.FIREBASE_AUTH_SESSION_COOKIE_NAME
+    )
 
 
 def get_auth_claims_from_request(
@@ -544,7 +545,9 @@ def _get_session_cookie(request: webapp2.Request) -> Optional[str]:
         str|None. Value of the session cookie authorizing the signed in user, if
         present, otherwise None.
     """
-    return request.cookies.get(constants.FIREBASE_AUTH_SESSION_COOKIE_NAME)
+    return request.cookies.get(
+        constants.constants.FIREBASE_AUTH_SESSION_COOKIE_NAME
+    )
 
 
 def _get_id_token(request: webapp2.Request) -> Optional[str]:

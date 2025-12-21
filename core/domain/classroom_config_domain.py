@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import copy
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 
 from typing import Dict, List, TypedDict
 
@@ -176,10 +175,10 @@ class Classroom:
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
-        if len(name) > constants.MAX_CHARS_IN_CLASSROOM_NAME:
+        if len(name) > constants.constants.MAX_CHARS_IN_CLASSROOM_NAME:
             raise utils.ValidationError(
                 'Classroom name should be at most %d characters, received %s.'
-                % (constants.MAX_CHARS_IN_CLASSROOM_NAME, name)
+                % (constants.constants.MAX_CHARS_IN_CLASSROOM_NAME, name)
             )
 
     @classmethod
@@ -198,11 +197,17 @@ class Classroom:
         if teaser_text == '':
             raise utils.ValidationError('teaser_text field should not be empty')
 
-        if len(teaser_text) > constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT:
+        if (
+            len(teaser_text)
+            > constants.constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT
+        ):
             error_message = (
                 'Classroom teaser_text should be at most %d characters, '
                 'received %s.'
-                % (constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT, teaser_text)
+                % (
+                    constants.constants.MAX_CHARS_IN_CLASSROOM_TEASER_TEXT,
+                    teaser_text,
+                )
             )
             raise utils.ValidationError(error_message)
 
@@ -226,13 +231,13 @@ class Classroom:
 
         if (
             len(topic_list_intro)
-            > constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO
+            > constants.constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO
         ):
             error_message = (
                 'Classroom topic_list_intro should be at most %d '
                 'characters, received %s.'
                 % (
-                    constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
+                    constants.constants.MAX_CHARS_IN_CLASSROOM_TOPIC_LIST_INTRO,
                     topic_list_intro,
                 )
             )
@@ -258,13 +263,13 @@ class Classroom:
 
         if (
             len(course_details)
-            > constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS
+            > constants.constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS
         ):
             error_message = (
                 'Classroom course_details should be at most %d characters, '
                 'received %s.'
                 % (
-                    constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
+                    constants.constants.MAX_CHARS_IN_CLASSROOM_COURSE_DETAILS,
                     course_details,
                 )
             )
@@ -291,7 +296,7 @@ class Classroom:
         utils.require_valid_url_fragment(
             url_fragment,
             'Classroom URL Fragment',
-            constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_CLASSROOM_URL_FRAGMENT,
         )
 
     @classmethod
@@ -309,7 +314,9 @@ class Classroom:
                 f'{image_type}_bg_color field should not be empty'
             )
 
-        if bg_color not in (constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom']):
+        if bg_color not in (
+            constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['classroom']
+        ):
             raise utils.ValidationError(
                 f'Classroom {image_type} background color '
                 f'{bg_color} is not supported.'

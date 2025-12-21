@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     android_services,
@@ -82,7 +81,7 @@ class InitializeAndroidTestDataHandler(
                 published.
             InvalidInputException. The topic is already published.
         """
-        if not constants.DEV_MODE:
+        if not constants.constants.DEV_MODE:
             raise Exception('Cannot load new structures data in production.')
 
         topic_id = android_services.initialize_android_test_data()
@@ -158,17 +157,17 @@ class AndroidActivityHandler(
                 'schema': {
                     'type': 'basestring',
                     'choices': [
-                        constants.ACTIVITY_TYPE_EXPLORATION,
-                        constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
-                        constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
-                        constants.ACTIVITY_TYPE_STORY,
-                        constants.ACTIVITY_TYPE_SKILL,
-                        constants.ACTIVITY_TYPE_SUBTOPIC,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
-                        constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
-                        constants.ACTIVITY_TYPE_LEARN_TOPIC,
-                        constants.ACTIVITY_TYPE_CLASSROOM,
-                        constants.ACTIVITY_TYPE_QUESTIONS,
+                        constants.constants.ACTIVITY_TYPE_EXPLORATION,
+                        constants.constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS,
+                        constants.constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS,
+                        constants.constants.ACTIVITY_TYPE_STORY,
+                        constants.constants.ACTIVITY_TYPE_SKILL,
+                        constants.constants.ACTIVITY_TYPE_SUBTOPIC,
+                        constants.constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION,
+                        constants.constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE,
+                        constants.constants.ACTIVITY_TYPE_LEARN_TOPIC,
+                        constants.constants.ACTIVITY_TYPE_CLASSROOM,
+                        constants.constants.ACTIVITY_TYPE_QUESTIONS,
                     ],
                 },
             },
@@ -199,7 +198,7 @@ class AndroidActivityHandler(
         activities: List[ActivityDataResponseDict] = []
 
         if (
-            activity_type != constants.ACTIVITY_TYPE_QUESTIONS
+            activity_type != constants.constants.ACTIVITY_TYPE_QUESTIONS
             and offset is not None
         ):
             raise self.InvalidInputException(
@@ -215,7 +214,7 @@ class AndroidActivityHandler(
                 'Entries in activities_data should be unique'
             )
 
-        if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
+        if activity_type == constants.constants.ACTIVITY_TYPE_EXPLORATION:
             ids_and_versions = [
                 (activity_data['id'], activity_data.get('version'))
                 for activity_data in activities_data
@@ -243,7 +242,7 @@ class AndroidActivityHandler(
                     }
                 )
 
-        elif activity_type == constants.ACTIVITY_TYPE_SUBTOPIC:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_SUBTOPIC:
             # Subtopic pages require special handling because their IDs are
             # compound keys (topic_id-subtopic_id) that need to be split and
             # processed separately.
@@ -284,7 +283,7 @@ class AndroidActivityHandler(
                 ]
             )
 
-        elif activity_type == constants.ACTIVITY_TYPE_QUESTIONS:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_QUESTIONS:
             # Questions require special handling as they are fetched in bulk.
             # With a fixed limit of questions per request,
             # and an offset to paginate through the entire question set.
@@ -309,7 +308,7 @@ class AndroidActivityHandler(
             )
 
         elif activity_type == (
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
+            constants.constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE_MIGRATION
         ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
@@ -331,7 +330,7 @@ class AndroidActivityHandler(
                     }
                 )
         elif activity_type == (
-            constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
+            constants.constants.ACTIVITY_TYPE_SUBTOPIC_WITH_STUDY_GUIDE
         ):
             for activity_data in activities_data:
                 topic_id, study_guide_id = activity_data['id'].split('-')
@@ -352,7 +351,7 @@ class AndroidActivityHandler(
                         ),
                     }
                 )
-        elif activity_type == constants.ACTIVITY_TYPE_CLASSROOM:
+        elif activity_type == constants.constants.ACTIVITY_TYPE_CLASSROOM:
             for activity_data in activities_data:
                 if activity_data.get('version') is not None:
                     raise self.InvalidInputException(
@@ -374,7 +373,10 @@ class AndroidActivityHandler(
                     }
                 )
 
-        elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS:
+        elif (
+            activity_type
+            == constants.constants.ACTIVITY_TYPE_EXPLORATION_TRANSLATIONS
+        ):
             # Translations require both version and language code, and use a
             # different payload structure than other activities.
             entity_type = feconf.TranslatableEntityType(
@@ -427,7 +429,10 @@ class AndroidActivityHandler(
             self.render_json(activities)
             return
 
-        elif activity_type == constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS:
+        elif (
+            activity_type
+            == constants.constants.ACTIVITY_TYPE_EXPLORATION_VOICEOVERS
+        ):
             for activity_data in activities_data:
                 version = activity_data.get('version')
                 language_code = activity_data.get('language_code')
@@ -480,13 +485,13 @@ class AndroidActivityHandler(
                 ]
             ] = []
 
-            if activity_type == constants.ACTIVITY_TYPE_STORY:
+            if activity_type == constants.constants.ACTIVITY_TYPE_STORY:
                 fetched_entities = (
                     story_fetchers.get_multiple_stories_by_ids_and_version(
                         ids_and_versions
                     )
                 )
-            elif activity_type == constants.ACTIVITY_TYPE_SKILL:
+            elif activity_type == constants.constants.ACTIVITY_TYPE_SKILL:
                 fetched_entities = (
                     skill_fetchers.get_multiple_skills_by_ids_and_version(
                         ids_and_versions

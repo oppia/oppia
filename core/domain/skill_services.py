@@ -20,8 +20,7 @@ import collections
 import itertools
 import logging
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     caching_services,
     classroom_config_services,
@@ -296,10 +295,13 @@ def _filter_skills_by_status(
         matching the given status.
     """
 
-    if status is None or status == constants.SKILL_STATUS_OPTIONS['ALL']:
+    if (
+        status is None
+        or status == constants.constants.SKILL_STATUS_OPTIONS['ALL']
+    ):
         return augmented_skill_summaries
 
-    elif status == constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
+    elif status == constants.constants.SKILL_STATUS_OPTIONS['UNASSIGNED']:
         unassigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
             if not augmented_skill_summary.topic_names:
@@ -309,7 +311,7 @@ def _filter_skills_by_status(
 
         return unassigned_augmented_skill_summaries
 
-    elif status == constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
+    elif status == constants.constants.SKILL_STATUS_OPTIONS['ASSIGNED']:
         assigned_augmented_skill_summaries = []
         for augmented_skill_summary in augmented_skill_summaries:
             if augmented_skill_summary.topic_names:

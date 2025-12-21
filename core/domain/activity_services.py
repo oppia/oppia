@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import activity_domain
 from core.platform import models
 
@@ -156,9 +155,15 @@ def split_by_type(
     """
     exploration_ids, collection_ids = [], []
     for activity_reference in activity_references:
-        if activity_reference.type == constants.ACTIVITY_TYPE_EXPLORATION:
+        if (
+            activity_reference.type
+            == constants.constants.ACTIVITY_TYPE_EXPLORATION
+        ):
             exploration_ids.append(activity_reference.id)
-        elif activity_reference.type == constants.ACTIVITY_TYPE_COLLECTION:
+        elif (
+            activity_reference.type
+            == constants.constants.ACTIVITY_TYPE_COLLECTION
+        ):
             collection_ids.append(activity_reference.id)
         else:
             raise Exception(

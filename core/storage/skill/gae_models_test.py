@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core.constants import constants
+from core import constants
 from core.domain import skill_domain
 from core.platform import models
 from core.tests import test_utils
@@ -169,7 +169,7 @@ class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.skill_id = 'b'

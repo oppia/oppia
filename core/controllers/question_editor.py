@@ -21,8 +21,7 @@ from __future__ import annotations
 import json
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
@@ -38,7 +37,10 @@ from typing import Dict, List, TypedDict
 SCHEMA_FOR_QUESTION_ID = {
     'type': 'basestring',
     'validators': [
-        {'id': 'is_regex_matched', 'regex_pattern': constants.ENTITY_ID_REGEX}
+        {
+            'id': 'is_regex_matched',
+            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
+        }
     ],
 }
 
@@ -57,10 +59,11 @@ class QuestionCreationHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'skill_ids parameter isn\'t present in the payload'
             )
 
-        if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
+        if len(skill_ids) > constants.constants.MAX_SKILLS_PER_QUESTION:
             raise self.InvalidInputException(
                 'More than %d QuestionSkillLinks for one question '
-                'is not supported.' % constants.MAX_SKILLS_PER_QUESTION
+                'is not supported.'
+                % constants.constants.MAX_SKILLS_PER_QUESTION
             )
         try:
             for skill_id in skill_ids:
@@ -219,7 +222,7 @@ class QuestionSkillLinkHandler(
                                     'validators': [
                                         {
                                             'id': 'is_regex_matched',
-                                            'regex_pattern': constants.ENTITY_ID_REGEX,
+                                            'regex_pattern': constants.constants.ENTITY_ID_REGEX,
                                         }
                                     ],
                                 },
@@ -311,7 +314,7 @@ class EditableQuestionDataHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 }

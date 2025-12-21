@@ -20,8 +20,7 @@ import io
 import logging
 import urllib
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     fs_services,
@@ -127,7 +126,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             NotFoundException. The page cannot be found.
             Exception. File not found.
         """
-        if not constants.EMULATOR_MODE:
+        if not constants.constants.EMULATOR_MODE:
             raise self.NotFoundException
 
         try:

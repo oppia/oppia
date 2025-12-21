@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     learner_group_fetchers,
@@ -36,7 +35,7 @@ LEARNER_GROUP_SCHEMA = {
             'validators': [
                 {
                     'id': 'has_length_at_most',
-                    'max_value': constants.MAX_CHARS_IN_LEARNER_GROUP_TITLE,
+                    'max_value': constants.constants.MAX_CHARS_IN_LEARNER_GROUP_TITLE,
                 }
             ],
         }
@@ -54,7 +53,7 @@ LEARNER_GROUP_SCHEMA = {
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_USERNAME_LENGTH,
+                        'max_value': constants.constants.MAX_USERNAME_LENGTH,
                     }
                 ],
             },
@@ -69,7 +68,7 @@ LEARNER_GROUP_SCHEMA = {
                 'validators': [
                     {
                         'id': 'has_length_at_most',
-                        'max_value': constants.MAX_USERNAME_LENGTH,
+                        'max_value': constants.constants.MAX_USERNAME_LENGTH,
                     }
                 ],
             },
@@ -184,7 +183,7 @@ class LearnerGroupHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -297,7 +296,7 @@ class LearnerGroupLearnerProgressHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -395,7 +394,7 @@ class LearnerGroupLearnerSpecificProgressHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -460,7 +459,7 @@ class LearnerGroupSyllabusHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -538,19 +537,19 @@ class LearnerGroupSearchSyllabusHandler(
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                'default_value': constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             },
             'search_category': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                'default_value': constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             },
             'search_language_code': {
                 'schema': {
                     'type': 'basestring',
                 },
-                'default_value': constants.DEFAULT_ADD_SYLLABUS_FILTER,
+                'default_value': constants.constants.DEFAULT_ADD_SYLLABUS_FILTER,
             },
         }
     }
@@ -637,7 +636,7 @@ class ViewLearnerGroupInfoHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -777,7 +776,7 @@ class LearnerGroupLearnersInfoHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -854,7 +853,7 @@ class LearnerGroupLearnerInvitationHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -869,7 +868,7 @@ class LearnerGroupLearnerInvitationHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_USERNAME_LENGTH,
+                            'max_value': constants.constants.MAX_USERNAME_LENGTH,
                         }
                     ],
                 }
@@ -962,7 +961,7 @@ class ExitLearnerGroupHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }
@@ -977,7 +976,7 @@ class ExitLearnerGroupHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_USERNAME_LENGTH,
+                            'max_value': constants.constants.MAX_USERNAME_LENGTH,
                         }
                     ],
                 }
@@ -1181,7 +1180,7 @@ class LearnerGroupProgressSharingPermissionHandler(
                 'validators': [
                     {
                         'id': 'is_regex_matched',
-                        'regex_pattern': constants.LEARNER_GROUP_ID_REGEX,
+                        'regex_pattern': constants.constants.LEARNER_GROUP_ID_REGEX,
                     }
                 ],
             }

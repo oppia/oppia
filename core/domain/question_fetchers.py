@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import copy
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import question_domain, state_domain
 from core.platform import models
 
@@ -208,7 +207,8 @@ def migrate_state_schema(
 
 
 def get_all_questions(
-    offset: int = 0, question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+    offset: int = 0,
+    question_count: int = constants.constants.MAX_QUESTIONS_FETCHABLE,
 ) -> List[question_domain.Question]:
     """Returns all the questions.
 

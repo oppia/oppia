@@ -18,8 +18,7 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import (
     question_services,
     skill_services,
@@ -100,7 +99,9 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             )
 
         self.login(self.CURRICULUM_ADMIN_EMAIL)
-        with mock.patch.dict(constants, {'NUM_QUESTIONS_PER_PAGE': 2}):
+        with mock.patch.dict(
+            constants.constants, {'NUM_QUESTIONS_PER_PAGE': 2}
+        ):
             json_response = self.get_json(
                 '%s/%s,%s?offset=0'
                 % (

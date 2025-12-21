@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     app_feedback_report_services,
@@ -264,7 +263,7 @@ class CronMailReviewerNewSuggestionsHandler(
 
             # Collect reviewer IDs.
             reviewer_usernames = user_services.get_contributor_usernames(
-                constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
+                constants.constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
                 language_property,
             )
 

@@ -23,8 +23,7 @@ import os
 import re
 from unittest import mock
 
-from core import feature_flag_list
-from core.constants import constants
+from core import constants, feature_flag_list
 from core.domain import (
     auth_domain,
     feature_flag_services,
@@ -500,7 +499,7 @@ class TestUtilsTests(test_utils.GenericTestBase):
         self.assertEqual(asset_url, '/assets/images/subjects/Lightbulb.svg')
 
     def test_get_static_asset_filepath_with_prod_mode_on(self) -> None:
-        with mock.patch.dict(constants, {'DEV_MODE': False}):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             filepath = self.get_static_asset_filepath()
             self.assertEqual(filepath, 'build')
 

@@ -24,8 +24,7 @@ import functools
 import json
 import re
 
-from core import android_validation_constants, feconf, utils
-from core.constants import constants
+from core import android_validation_constants, constants, feconf, utils
 
 # The fs_services module is required in one of the migration
 # functions in Topic class. This import should be removed
@@ -808,7 +807,9 @@ class StoryReference:
             ValidationError. One or more attributes of the StoryReference are
                 invalid.
         """
-        if not bool(re.match(constants.ENTITY_ID_REGEX, self.story_id)):
+        if not bool(
+            re.match(constants.constants.ENTITY_ID_REGEX, self.story_id)
+        ):
             raise utils.ValidationError('Invalid story ID: %s' % self.story_id)
 
 
@@ -938,7 +939,7 @@ class Subtopic:
         """
         return (
             thumbnail_bg_color
-            in constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic']
+            in constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic']
         )
 
     def validate(self) -> None:
@@ -1345,7 +1346,7 @@ class Topic:
         utils.require_valid_url_fragment(
             url_fragment,
             'Topic URL Fragment',
-            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT,
         )
 
     @classmethod
@@ -1371,7 +1372,8 @@ class Topic:
             bool. Whether the thumbnail background color is valid or not.
         """
         return (
-            thumbnail_bg_color in constants.ALLOWED_THUMBNAIL_BG_COLORS['topic']
+            thumbnail_bg_color
+            in constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['topic']
         )
 
     def get_all_skill_ids(self) -> List[str]:
@@ -1775,7 +1777,7 @@ class Topic:
             [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             1,
-            constants.DEFAULT_LANGUAGE_CODE,
+            constants.constants.DEFAULT_LANGUAGE_CODE,
             0,
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
             '',
@@ -1802,7 +1804,7 @@ class Topic:
         """
         fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic_id)
         filepath = '%s/%s' % (
-            constants.ASSET_TYPE_THUMBNAIL,
+            constants.constants.ASSET_TYPE_THUMBNAIL,
             subtopic_dict['thumbnail_filename'],
         )
         subtopic_dict['thumbnail_size_in_bytes'] = (
@@ -1827,7 +1829,7 @@ class Topic:
         """
         subtopic_title = re.sub('[^a-z]+', '', subtopic_dict['title'])
         subtopic_dict['url_fragment'] = subtopic_title[
-            : constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
+            : constants.constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT
         ]
         return subtopic_dict
 
@@ -2216,7 +2218,7 @@ class Topic:
         utils.require_valid_url_fragment(
             new_url_fragment,
             'Subtopic Url Fragment',
-            constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT,
         )
         self.subtopics[subtopic_index].url_fragment = new_url_fragment
 
@@ -2514,7 +2516,7 @@ class TopicSummary:
         utils.require_valid_url_fragment(
             url_fragment,
             'Topic URL Fragment',
-            constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT,
+            constants.constants.MAX_CHARS_IN_TOPIC_URL_FRAGMENT,
         )
 
     def validate(self) -> None:

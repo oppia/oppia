@@ -21,8 +21,7 @@ from __future__ import annotations
 import copy
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     change_domain,
     exp_domain,
@@ -1057,10 +1056,13 @@ class SuggestionAddQuestion(BaseSuggestion):
             self.change_cmd.question_dict
         )
 
-        if self.language_code != constants.DEFAULT_LANGUAGE_CODE:
+        if self.language_code != constants.constants.DEFAULT_LANGUAGE_CODE:
             raise utils.ValidationError(
                 'Expected language_code to be %s, received %s'
-                % (constants.DEFAULT_LANGUAGE_CODE, self.language_code)
+                % (
+                    constants.constants.DEFAULT_LANGUAGE_CODE,
+                    self.language_code,
+                )
             )
 
         if self.language_code != question_dict['language_code']:
@@ -1076,7 +1078,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             )
 
         skill_difficulties = list(
-            constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values()
+            constants.constants.SKILL_DIFFICULTY_LABEL_TO_FLOAT.values()
         )
         if self._get_skill_difficulty() not in skill_difficulties:
             raise utils.ValidationError(

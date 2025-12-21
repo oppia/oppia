@@ -179,13 +179,3 @@ constants = Constants(
 release_constants = Constants(  # pylint:disable=invalid-name
     json.loads(get_package_file_contents('assets', 'release_constants.json'))
 )
-
-# Export the parsed constants as module-level attributes so that code and
-# tests which expect to patch or access constants as attributes on the
-# module (e.g. `mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', ...)`)
-# work correctly. We avoid exposing the entire dict itself and only copy
-# scalar values into the module namespace.
-for _k, _v in constants.items():
-    # Avoid clobbering existing module attributes.
-    if _k not in globals():
-        globals()[_k] = _v

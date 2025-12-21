@@ -16,8 +16,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_topics_with_hanging_stories_job
 from core.jobs.types import job_run_result
@@ -71,7 +70,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
             story_models.StoryModel,
             id=self.STORY_ID_1,
             title='Story Title 1',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             story_contents={
                 'nodes': [],
                 'initial_node_id': None,
@@ -89,7 +88,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
                 {'story_id': self.STORY_ID_1, 'story_is_published': True}
             ],
             canonical_name='topic-one-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-one-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
@@ -112,7 +111,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
                 }
             ],
             canonical_name='topic-one-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-one-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
@@ -139,7 +138,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
             name=self.TOPIC_NAME_1,
             canonical_story_references=[self.CORRUPTED_MALFORMED],
             canonical_name='topic-one-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-one-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
@@ -164,7 +163,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
             story_models.StoryModel,
             id=self.STORY_ID_1,
             title='Story Title 1',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             story_contents={
                 'nodes': [],
                 'initial_node_id': None,
@@ -178,7 +177,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
             story_models.StoryModel,
             id=self.STORY_ID_2,
             title='Story Title 2',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             story_contents={
                 'nodes': [],
                 'initial_node_id': None,
@@ -197,7 +196,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
                 {'story_id': self.STORY_ID_1, 'story_is_published': True}
             ],
             canonical_name='topic-one-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-one-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
@@ -216,7 +215,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
                 {'story_id': self.STORY_ID_2, 'story_is_published': True},
             ],
             canonical_name='topic-two-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-two-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,
@@ -243,7 +242,7 @@ class AuditTopicsWithHangingStoriesJobTests(job_test_utils.JobTestBase):
             name=self.TOPIC_NAME_1,
             canonical_story_references=[self.CORRUPTED_NON_STRING_ID],
             canonical_name='topic-one-canonical-name',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             next_subtopic_id=1,
             page_title_fragment_for_web='topic-one-web-fragment',
             story_reference_schema_version=feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION,

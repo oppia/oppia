@@ -22,8 +22,7 @@ import collections
 import itertools
 import logging
 
-from core import feature_flag_list, feconf, utils
-from core.constants import constants
+from core import constants, feature_flag_list, feconf, utils
 from core.domain import (
     caching_services,
     change_domain,
@@ -1291,7 +1290,7 @@ def publish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                             story_domain.STORY_NODE_PROPERTY_STATUS
                         ),
                         'old_value': node.status,
-                        'new_value': constants.STORY_NODE_STATUS_PUBLISHED,
+                        'new_value': constants.constants.STORY_NODE_STATUS_PUBLISHED,
                     }
                 )
             )
@@ -1367,7 +1366,7 @@ def unpublish_story(topic_id: str, story_id: str, committer_id: str) -> None:
                             story_domain.STORY_NODE_PROPERTY_STATUS
                         ),
                         'old_value': node.status,
-                        'new_value': constants.STORY_NODE_STATUS_DRAFT,
+                        'new_value': constants.constants.STORY_NODE_STATUS_DRAFT,
                     }
                 )
             )
@@ -2108,7 +2107,7 @@ def update_thumbnail_filename(
     """
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
-        constants.ASSET_TYPE_THUMBNAIL,
+        constants.constants.ASSET_TYPE_THUMBNAIL,
         new_thumbnail_filename,
     )
     if fs.isfile(filepath):
@@ -2141,7 +2140,7 @@ def update_subtopic_thumbnail_filename(
     """
     fs = fs_services.GcsFileSystem(feconf.ENTITY_TYPE_TOPIC, topic.id)
     filepath = '%s/%s' % (
-        constants.ASSET_TYPE_THUMBNAIL,
+        constants.constants.ASSET_TYPE_THUMBNAIL,
         new_thumbnail_filename,
     )
     if fs.isfile(filepath):
@@ -2384,7 +2383,10 @@ def get_chapter_counts_in_topic_summaries(
             total_chapters_count = len(nodes)
             published_chapters_count = 0
             for node in nodes:
-                if node.status == constants.STORY_NODE_STATUS_PUBLISHED:
+                if (
+                    node.status
+                    == constants.constants.STORY_NODE_STATUS_PUBLISHED
+                ):
                     published_chapters_count += 1
                 else:
                     if node.is_node_upcoming():

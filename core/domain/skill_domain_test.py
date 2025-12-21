@@ -18,8 +18,7 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import skill_domain, state_domain, translation_domain
 from core.tests import test_utils
 
@@ -54,13 +53,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         ]
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation 1</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']
+                constants.constants.SKILL_DIFFICULTIES[1],
+                ['<p>Explanation 2</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 3</p>']
+                constants.constants.SKILL_DIFFICULTIES[2],
+                ['<p>Explanation 3</p>'],
             ),
         ]
         self.skill = skill_domain.Skill(
@@ -372,7 +374,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.skill.skill_contents.explanation, new_explanation)
 
     def test_update_rubric(self) -> None:
-        difficulty = constants.SKILL_DIFFICULTIES[0]
+        difficulty = constants.constants.SKILL_DIFFICULTIES[0]
         explanations = ['explanation1']
         self.skill.update_rubric(difficulty, explanations)
         with self.assertRaisesRegex(
@@ -427,17 +429,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Another Explanation</p>']
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p>Another Explanation</p>'],
             ),
         ]
         self._assert_validation_error('Duplicate rubric found')
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0],
+                constants.constants.SKILL_DIFFICULTIES[0],
                 ['<p>%s</p>' % ('Explanation' * 30)],
             )
         ]
@@ -448,7 +452,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p> Explanation </p>'] * 15
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p> Explanation </p>'] * 15,
             )
         ]
         self._assert_validation_error(
@@ -457,7 +462,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
 
         self.skill.rubrics = [
-            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[1], [])
+            skill_domain.Rubric(constants.constants.SKILL_DIFFICULTIES[1], [])
         ]
         self._assert_validation_error(
             'Expected at least one explanation in medium level rubrics'
@@ -495,10 +500,12 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.validate()
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 1</p>']
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation 1</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 2</p>']
+                constants.constants.SKILL_DIFFICULTIES[1],
+                ['<p>Explanation 2</p>'],
             ),
         ]
         self._assert_validation_error(
@@ -508,13 +515,16 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_order_of_rubrics(self) -> None:
         self.skill.rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], ['<p>Explanation 1</p>']
+                constants.constants.SKILL_DIFFICULTIES[1],
+                ['<p>Explanation 1</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], ['<p>Explanation 2</p>']
+                constants.constants.SKILL_DIFFICULTIES[2],
+                ['<p>Explanation 2</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], ['<p>Explanation 3</p>']
+                constants.constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation 3</p>'],
             ),
         ]
         self._assert_validation_error(
@@ -702,15 +712,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test the create_default_skill function."""
         rubrics = [
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0],
+                constants.constants.SKILL_DIFFICULTIES[0],
                 ['<p>[NOTE: Creator should fill this in]</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1],
+                constants.constants.SKILL_DIFFICULTIES[1],
                 ['<p>[NOTE: Creator should fill this in]</p>'],
             ),
             skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2],
+                constants.constants.SKILL_DIFFICULTIES[2],
                 ['<p>[NOTE: Creator should fill this in]</p>'],
             ),
         ]
@@ -741,7 +751,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'skill_contents_schema_version': (
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             ),
-            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'language_code': constants.constants.DEFAULT_LANGUAGE_CODE,
             'next_misconception_id': 0,
             'version': 0,
             'superseding_skill_id': None,
@@ -781,7 +791,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         )
 
         rubric = skill_domain.Rubric(
-            constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']
+            constants.constants.SKILL_DIFFICULTIES[0], ['<p>Explanation</p>']
         )
         rubric_dict = rubric.to_dict()
         rubric_from_dict = skill_domain.Rubric.from_dict(rubric_dict)
@@ -1088,14 +1098,15 @@ class SkillChangeTests(test_utils.GenericTestBase):
         skill_change_object = skill_domain.SkillChange(
             {
                 'cmd': 'update_rubrics',
-                'difficulty': constants.SKILL_DIFFICULTIES[0],
+                'difficulty': constants.constants.SKILL_DIFFICULTIES[0],
                 'explanations': ['<p>Explanation</p>'],
             }
         )
 
         self.assertEqual(skill_change_object.cmd, 'update_rubrics')
         self.assertEqual(
-            skill_change_object.difficulty, constants.SKILL_DIFFICULTIES[0]
+            skill_change_object.difficulty,
+            constants.constants.SKILL_DIFFICULTIES[0],
         )
         self.assertEqual(
             skill_change_object.explanations, ['<p>Explanation</p>']

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import skill_inspection_jobs
 from core.jobs.types import job_run_result
@@ -54,7 +53,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description=self.SKILL_1_DESC,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -87,7 +86,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description=self.SKILL_1_DESC,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -114,7 +113,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_2_ID,
             description=self.SKILL_2_DESC,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -148,7 +147,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_2_ID,
             description=self.SKILL_2_DESC,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={
@@ -175,7 +174,7 @@ class CountHangingPrerequisiteSkillsJobTests(job_test_utils.JobTestBase):
             skill_models.SkillModel,
             id=self.SKILL_1_ID,
             description=self.SKILL_1_DESC,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            language_code=constants.constants.DEFAULT_LANGUAGE_CODE,
             misconceptions=[],
             rubrics=[],
             skill_contents={

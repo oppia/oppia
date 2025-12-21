@@ -20,8 +20,7 @@ handler arguments.
 
 from __future__ import annotations
 
-from core import utils
-from core.constants import constants
+from core import constants, utils
 from core.controllers import base
 from core.domain import (
     blog_domain,
@@ -203,7 +202,9 @@ def validate_change_dict_for_blog_post(
         blog_domain.BlogPost.require_valid_tags(change_dict['tags'], False)
         # Validates that the tags in the change dict are from the list of
         # default tags set by admin.
-        list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        list_of_default_tags = (
+            constants.constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
+        )
         assert list_of_default_tags is not None
         list_of_default_tags_value = list_of_default_tags
         if not all(
@@ -278,7 +279,7 @@ def validate_email_dashboard_data(
     Raises:
         Exception. The key in 'data' is not one of the allowed keys.
     """
-    predicates = constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
+    predicates = constants.constants.EMAIL_DASHBOARD_PREDICATE_DEFINITION
     possible_keys = [predicate['backend_attr'] for predicate in predicates]
 
     for key, value in data.items():

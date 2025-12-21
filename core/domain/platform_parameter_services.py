@@ -23,8 +23,7 @@ import json
 import logging
 import os
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
 
@@ -108,7 +107,7 @@ def get_server_mode() -> platform_parameter_domain.ServerMode:
     )
     return (
         platform_parameter_domain.ServerMode.DEV
-        if constants.DEV_MODE
+        if constants.constants.DEV_MODE
         else (
             platform_parameter_domain.ServerMode.PROD
             if feconf.ENV_IS_OPPIA_ORG_PRODUCTION_SERVER
@@ -123,10 +122,10 @@ def _get_branch_name() -> str:
     Returns:
         str. The branch name.
     """
-    # Here we use cast because constants.BRANCH_NAME is typed as Any in the
+    # Here we use cast because constants.constants.BRANCH_NAME is typed as Any in the
     # Constants class due to its dynamic nature, but we know it's always
     # a string from assets/constants.ts.
-    return cast(str, constants.BRANCH_NAME)
+    return cast(str, constants.constants.BRANCH_NAME)
 
 
 def _create_evaluation_context_for_server() -> (

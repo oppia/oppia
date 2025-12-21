@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import base64
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
     collection_domain,
@@ -82,7 +81,7 @@ class EditableCollectionDataHandler(
                     'validators': [
                         {
                             'id': 'has_length_at_most',
-                            'max_value': constants.MAX_COMMIT_MESSAGE_LENGTH,
+                            'max_value': constants.constants.MAX_COMMIT_MESSAGE_LENGTH,
                         }
                     ],
                 },

@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 
 from typing import Dict, List, TypedDict
 
@@ -217,7 +216,8 @@ class ExplorationOpportunitySummary:
             )
 
         allowed_language_codes = [
-            language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+            language['id']
+            for language in (constants.constants.SUPPORTED_AUDIO_LANGUAGES)
         ]
 
         if not set(self.language_codes_with_assigned_voice_artists).isdisjoint(
@@ -474,7 +474,8 @@ class TranslationOpportunity:
             )
 
         allowed_language_codes = [
-            language['id'] for language in (constants.SUPPORTED_AUDIO_LANGUAGES)
+            language['id']
+            for language in (constants.constants.SUPPORTED_AUDIO_LANGUAGES)
         ]
 
         for language_code in self.incomplete_translation_language_codes:

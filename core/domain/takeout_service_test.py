@@ -22,8 +22,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     exp_domain,
     exp_services,
@@ -665,7 +664,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -717,7 +716,7 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -1029,13 +1028,13 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
         improvements_models.ExplorationStatsTaskEntryModel(
             id=self.GENERIC_MODEL_ID,
             composite_entity_id=self.GENERIC_MODEL_ID,
-            entity_type=constants.TASK_ENTITY_TYPE_EXPLORATION,
+            entity_type=constants.constants.TASK_ENTITY_TYPE_EXPLORATION,
             entity_id=self.GENERIC_MODEL_ID,
             entity_version=1,
-            task_type=constants.TASK_TYPE_HIGH_BOUNCE_RATE,
-            target_type=constants.TASK_TARGET_TYPE_STATE,
+            task_type=constants.constants.TASK_TYPE_HIGH_BOUNCE_RATE,
+            target_type=constants.constants.TASK_TARGET_TYPE_STATE,
             target_id=self.GENERIC_MODEL_ID,
-            status=constants.TASK_STATUS_OPEN,
+            status=constants.constants.TASK_STATUS_OPEN,
             resolver_id=self.USER_ID_1,
         ).put()
 

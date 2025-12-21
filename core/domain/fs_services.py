@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import image_services, image_validation_services
 from core.platform import models
 
@@ -443,7 +442,7 @@ def get_static_asset_url(filepath: str) -> str:
     logging.info(
         'Logging OPPIA_SITE_URL_FOR_EMAILS for debugging: %s' % oppia_site_url
     )
-    if constants.EMULATOR_MODE:
+    if constants.constants.EMULATOR_MODE:
         # By using assetsstatic the app returns the requested
         # files in assets folder by that it bypasses
         # the handlers that call this method, thus preventing

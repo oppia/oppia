@@ -25,8 +25,7 @@ import json
 import logging
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import auth_domain, user_services
 from core.platform import models
 from core.platform.auth import firebase_auth_services
@@ -1044,9 +1043,9 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         if id_token:
             req.headers['Authorization'] = 'Bearer %s' % id_token
         if session_cookie:
-            req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
-                session_cookie
-            )
+            req.cookies[
+                constants.constants.FIREBASE_AUTH_SESSION_COOKIE_NAME
+            ] = session_cookie
         return req
 
     def create_response(
@@ -1064,7 +1063,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         res = webapp2.Response()
         if session_cookie:
             res.set_cookie(
-                constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
+                constants.constants.FIREBASE_AUTH_SESSION_COOKIE_NAME,
                 value=session_cookie,
             )
         return res

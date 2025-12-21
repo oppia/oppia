@@ -22,8 +22,7 @@ import copy
 import datetime
 
 import core.storage.base_model.gae_models as base_models
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
@@ -179,7 +178,7 @@ class CollectionModel(base_models.VersionedModel):
     objective = datastore_services.TextProperty(default='', indexed=False)
     # The language code of this collection.
     language_code = datastore_services.StringProperty(
-        default=constants.DEFAULT_LANGUAGE_CODE, indexed=True
+        default=constants.constants.DEFAULT_LANGUAGE_CODE, indexed=True
     )
     # Tags associated with this collection.
     tags = datastore_services.StringProperty(repeated=True, indexed=True)
@@ -508,11 +507,11 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # The publication status of this collection.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE,
+        default=constants.constants.ACTIVITY_STATUS_PRIVATE,
         indexed=True,
         choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         ],
     )
 
@@ -634,7 +633,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
         if model_dict['status'] == 'publicized':
-            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+            model_dict['status'] = constants.constants.ACTIVITY_STATUS_PUBLIC
 
         # The voice_artist_ids field was previously named translator_ids. We
         # need to move the values from translator_ids field to voice_artist_ids
@@ -769,7 +768,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == constants.ACTIVITY_STATUS_PRIVATE
+                    self.status == constants.constants.ACTIVITY_STATUS_PRIVATE
                 ),
             )
             return {
@@ -865,11 +864,11 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     # The publication status of this collection.
     status = datastore_services.StringProperty(
-        default=constants.ACTIVITY_STATUS_PRIVATE,
+        default=constants.constants.ACTIVITY_STATUS_PRIVATE,
         indexed=True,
         choices=[
-            constants.ACTIVITY_STATUS_PRIVATE,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
         ],
     )
 
@@ -991,7 +990,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         """
         return (
             cls.get_all()
-            .filter(cls.status == constants.ACTIVITY_STATUS_PRIVATE)
+            .filter(cls.status == constants.constants.ACTIVITY_STATUS_PRIVATE)
             .filter(
                 datastore_services.any_of(
                     cls.owner_ids == user_id,

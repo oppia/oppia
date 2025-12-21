@@ -19,8 +19,7 @@ from __future__ import annotations
 import math
 import random
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.platform import models
 
 from typing import Dict, List, Mapping, Sequence
@@ -248,7 +247,7 @@ class QuestionModel(base_models.VersionedModel):
             commit_type,
             commit_message,
             commit_cmds,
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         question_commit_log.question_id = self.id
@@ -320,7 +319,7 @@ class QuestionModel(base_models.VersionedModel):
     def get_all_questions(
         cls,
         offset: int,
-        question_count: int = constants.MAX_QUESTIONS_FETCHABLE,
+        question_count: int = constants.constants.MAX_QUESTIONS_FETCHABLE,
     ) -> Sequence[QuestionModel]:
         """Fetches the list of questions in batches.
 
@@ -331,7 +330,9 @@ class QuestionModel(base_models.VersionedModel):
         Returns:
             list(QuestionModel). The list of questions.
         """
-        question_count = min(question_count, constants.MAX_QUESTIONS_FETCHABLE)
+        question_count = min(
+            question_count, constants.constants.MAX_QUESTIONS_FETCHABLE
+        )
 
         return (
             cls.query()
@@ -462,7 +463,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             corresponding to given skill_ids.
         """
         question_skill_count = (
-            min(len(skill_ids), constants.MAX_SKILLS_PER_QUESTION)
+            min(len(skill_ids), constants.constants.MAX_SKILLS_PER_QUESTION)
             * question_count
         )
 

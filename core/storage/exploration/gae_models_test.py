@@ -23,8 +23,7 @@ import datetime
 import types
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import exp_domain, exp_services, rights_domain
 from core.platform import models
 from core.tests import test_utils
@@ -128,7 +127,7 @@ class ExplorationRightsSnapshotContentModelTests(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.1,
         ).save(
@@ -202,7 +201,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -217,7 +216,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -232,7 +231,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_2],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -247,7 +246,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_4],
             viewer_ids=[self.USER_ID_4],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.4,
         ).save(
@@ -297,7 +296,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=['voice_artist_id'],
             viewer_ids=['viewer_id'],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -393,7 +392,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=['voice_artist_id'],
             viewer_ids=['viewer_id'],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -443,7 +442,7 @@ class ExplorationRightsModelRevertUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_2],
             viewer_ids=[],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.4,
         )
@@ -600,7 +599,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.exploration_id = 'b'
@@ -625,7 +624,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
         public_commit = exp_models.ExplorationCommitLogEntryModel.create(
@@ -635,7 +634,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         private_commit.exploration_id = 'a'
@@ -684,7 +683,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
         commit2 = exp_models.ExplorationCommitLogEntryModel.create(
@@ -694,7 +693,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit1.exploration_id = 'a'
@@ -788,7 +787,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             community_owned=False,
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
@@ -810,7 +809,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             community_owned=False,
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
@@ -846,7 +845,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 
         # Test that private summaries should be ignored.
         good_rating_exploration_summary_model.status = (
-            constants.ACTIVITY_STATUS_PRIVATE
+            constants.constants.ACTIVITY_STATUS_PRIVATE
         )
         good_rating_exploration_summary_model.update_timestamps()
         good_rating_exploration_summary_model.put()
@@ -863,7 +862,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             community_owned=False,
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
@@ -884,7 +883,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             community_owned=False,
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
@@ -911,7 +910,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             community_owned=False,
             owner_ids=['a'],
             editor_ids=['editor_id'],
@@ -932,7 +931,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             objective='objective',
             language_code='language_code',
             tags=['tag'],
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             community_owned=False,
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],

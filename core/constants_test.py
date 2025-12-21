@@ -216,6 +216,8 @@ class ConstantsTests(test_utils.GenericTestBase):
         """Ensure that module-level constants can be patched using
         mock.patch.object without raising KeyError.
         """
-        # Patch the module-level attribute (not the Constants instance).
-        with mock.patch.object(constants, 'OPPORTUNITIES_PAGE_SIZE', 1):
-            self.assertEqual(constants.OPPORTUNITIES_PAGE_SIZE, 1)
+        # Patch the parsed constants mapping directly.
+        with mock.patch.dict(
+            constants.constants, {'OPPORTUNITIES_PAGE_SIZE': 1}
+        ):
+            self.assertEqual(constants.constants.OPPORTUNITIES_PAGE_SIZE, 1)

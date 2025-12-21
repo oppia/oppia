@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import datetime
 
-from core.constants import constants
+from core import constants
 from core.domain import recommendations_services
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_recommendation_computation_jobs
@@ -63,7 +63,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary.update_timestamps()
@@ -89,7 +89,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_1.update_timestamps()
@@ -102,7 +102,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_2.update_timestamps()
@@ -146,7 +146,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_1.update_timestamps()
@@ -159,7 +159,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PRIVATE,
+            status=constants.constants.ACTIVITY_STATUS_PRIVATE,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_2.update_timestamps()
@@ -193,7 +193,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang1',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_1.update_timestamps()
@@ -206,7 +206,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang2',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_2.update_timestamps()
@@ -238,7 +238,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang1',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_1.update_timestamps()
@@ -251,7 +251,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang1',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_2.update_timestamps()
@@ -264,7 +264,7 @@ class ComputeExplorationRecommendationsJobTests(job_test_utils.JobTestBase):
             objective='objective',
             language_code='lang1',
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             exploration_model_last_updated=datetime.datetime.utcnow(),
         )
         exp_summary_3.update_timestamps()

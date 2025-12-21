@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import classroom_config_domain
 from core.platform import models
 
@@ -183,7 +182,7 @@ def get_classroom_url_fragment_for_topic_id(topic_id: str) -> str:
     for classroom in classrooms:
         if topic_id in classroom.get_topic_ids():
             return classroom.url_fragment
-    return str(constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
+    return str(constants.constants.CLASSROOM_URL_FRAGMENT_FOR_UNATTACHED_TOPICS)
 
 
 def get_classroom_name_for_topic_id(topic_id: str) -> str:
@@ -199,7 +198,7 @@ def get_classroom_name_for_topic_id(topic_id: str) -> str:
     for classroom in classrooms:
         if topic_id in classroom.get_topic_ids():
             return classroom.name
-    return str(constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
+    return str(constants.constants.CLASSROOM_NAME_FOR_UNATTACHED_TOPICS)
 
 
 def get_new_classroom_id() -> str:

@@ -22,8 +22,7 @@ import copy
 import datetime
 from unittest import mock
 
-from core import feconf
-from core.constants import constants
+from core import constants, feconf
 from core.domain import collection_domain, collection_services, rights_domain
 from core.platform import models
 from core.tests import test_utils
@@ -115,7 +114,7 @@ class CollectionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.1,
         ).save(
@@ -189,7 +188,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.1,
         ).save(
@@ -204,7 +203,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_1],
             viewer_ids=[self.USER_ID_1],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.2,
         ).save(
@@ -219,7 +218,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_2],
             viewer_ids=[self.USER_ID_2],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.3,
         ).save(
@@ -234,7 +233,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_4],
             viewer_ids=[self.USER_ID_4],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.4,
         ).save(
@@ -284,7 +283,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=['voice_artist_ids'],
             viewer_ids=['viewer_ids'],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -379,7 +378,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=['voice_artist_ids'],
             viewer_ids=['viewer_ids'],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.0,
         ).save(
@@ -427,7 +426,7 @@ class CollectionRightsModelRevertUnitTest(test_utils.GenericTestBase):
             voice_artist_ids=[self.USER_ID_2],
             viewer_ids=[],
             community_owned=False,
-            status=constants.ACTIVITY_STATUS_PUBLIC,
+            status=constants.constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
             first_published_msec=0.4,
         )
@@ -573,7 +572,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         commit.collection_id = 'b'
@@ -598,7 +597,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -608,7 +607,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         private_commit.collection_id = 'a'
@@ -647,7 +646,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.constants.ACTIVITY_STATUS_PRIVATE,
             False,
         )
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -657,7 +656,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'msg',
             'create',
             [{}],
-            constants.ACTIVITY_STATUS_PUBLIC,
+            constants.constants.ACTIVITY_STATUS_PUBLIC,
             False,
         )
         # We need to manually set collection_id as it is a property of
@@ -762,7 +761,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 objective='objective',
                 language_code='language_code',
                 tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
                 owner_ids=['owner_ids'],
                 editor_ids=['editor_ids'],
@@ -786,7 +785,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 objective='objective',
                 language_code='language_code',
                 tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
                 owner_ids=['owner_ids'],
                 editor_ids=['editor_ids'],
@@ -816,7 +815,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 objective='objective',
                 language_code='language_code',
                 tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
                 owner_ids=['a'],
                 editor_ids=['editor_ids'],
@@ -840,7 +839,7 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
                 objective='objective',
                 language_code='language_code',
                 tags=['tags'],
-                status=constants.ACTIVITY_STATUS_PRIVATE,
+                status=constants.constants.ACTIVITY_STATUS_PRIVATE,
                 community_owned=False,
                 owner_ids=['owner_ids'],
                 editor_ids=['editor_ids'],

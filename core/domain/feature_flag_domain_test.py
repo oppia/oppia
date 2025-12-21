@@ -21,8 +21,7 @@ from __future__ import annotations
 import datetime
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import feature_flag_domain
 from core.tests import test_utils
 
@@ -195,7 +194,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             with mock.patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', False
             ):
@@ -212,7 +211,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             with mock.patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
             ):
@@ -229,7 +228,7 @@ class FeatureFlagConfigTests(test_utils.GenericTestBase):
         feature_flag_config = feature_flag_domain.FeatureFlagConfig(
             False, 0, [], datetime.datetime.utcnow()
         )
-        with mock.patch.object(constants, 'DEV_MODE', False):
+        with mock.patch.dict(constants.constants, {'DEV_MODE': False}):
             with mock.patch.object(
                 feconf, 'ENV_IS_OPPIA_ORG_PRODUCTION_SERVER', True
             ):

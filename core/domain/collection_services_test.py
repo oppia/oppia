@@ -23,8 +23,7 @@ import logging
 import os
 from unittest import mock
 
-from core import feconf, utils
-from core.constants import constants
+from core import constants, feconf, utils
 from core.domain import (
     collection_domain,
     collection_services,
@@ -174,7 +173,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.category, 'category')
         self.assertEqual(collection.objective, 'objective')
         self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
+            collection.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.assertEqual(collection.version, 1)
         self.assertEqual(
@@ -213,7 +212,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.category, 'category')
         self.assertEqual(collection.objective, 'objective')
         self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
+            collection.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.assertEqual(collection.version, 1)
         self.assertEqual(
@@ -295,7 +294,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.category, 'A category')
         self.assertEqual(collection.objective, 'An objective')
         self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
+            collection.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.assertEqual(
             collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION
@@ -310,7 +309,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(collection.category, 'Some new category')
         self.assertEqual(collection.objective, 'Some new objective')
         self.assertEqual(
-            collection.language_code, constants.DEFAULT_LANGUAGE_CODE
+            collection.language_code, constants.constants.DEFAULT_LANGUAGE_CODE
         )
         self.assertEqual(
             collection.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION
