@@ -261,7 +261,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts',
     'core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.spec.ts',
-    'core/templates/services/angular-services.index.ts',
     'core/templates/services/date-time-format.service.spec.ts',
     'core/templates/services/entity-voiceovers.services.spec.ts',
     'core/templates/services/exploration-features.service.spec.ts',
