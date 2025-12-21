@@ -1,62 +1,49 @@
 <div *ngIf="!mobileCardToBeShown && !isInNewLessonPlayer()" class="e2e-test-lesson-card">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
+    [activityType]="activityType" [activityId]="explorationId" [activityTitle]="explorationTitle"
+    [isContainerNarrow]="isContainerNarrow" [isAddToPlaylistIconShown]="true" class="e2e-test-lesson-playlist-icon">
   </oppia-learner-dashboard-icons>
 
   <mat-card (keydown.enter)="$event.stopPropagation(); explorationAnchor.click()"
-            [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
-            *ngIf="!isRefresherExploration"
-            tabindex="0"
-            [style.padding]="0"
-            class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card oppia-focus-indicator-blue"
-            (mouseenter)="setHoverState(true)"
-            (mouseleave)="setHoverState(false)"
-            [ngStyle]="{'margin': '5px'}">
-    <a #explorationAnchor
-       [href]="getExplorationLink()"
-       tabindex="-1"
-       target="{{ openInNewWindow ? '_blank' : '_self' }}">
+    [ngClass]="{'oppia-activity-summary-tile-mobile': isCollectionPreviewTile, 'oppia-activity-summary-tile': !isCollectionPreviewTile, 'small-width': !isWindowLarge, 'oppia-activity-playlist-tile': isPlaylistTile}"
+    *ngIf="!isRefresherExploration" tabindex="0" [style.padding]="0"
+    class="oppia-exploration-dashboard-card e2e-test-exploration-dashboard-card oppia-focus-indicator-blue"
+    (mouseenter)="setHoverState(true)" (mouseleave)="setHoverState(false)" [ngStyle]="{'margin': '5px'}">
+    <a #explorationAnchor [href]="getExplorationLink()" tabindex="-1"
+      target="{{ openInNewWindow ? '_blank' : '_self' }}">
       <div class="title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
         <img class="thumbnail-image" [src]="thumbnailIcon" [alt]="'category: ' + category + '.'">
         <span class="activity-title e2e-test-exp-summary-tile-title">
           <span *ngIf="isWindowLarge">
             <span *ngIf="!isHackyExpTitleTranslationDisplayed()"
-                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'"
-                  class="e2e-test-exploration-tile-title">
+              [attr.aria-label]="'exploration title:' + explorationTitle + '.'" class="e2e-test-exploration-tile-title">
               {{ explorationTitle | truncate:40 }}
             </span>
             <span *ngIf="isHackyExpTitleTranslationDisplayed()"
-                  [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
+              [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
               {{ expTitleTranslationKey | translate | truncate:40 }}
             </span>
           </span>
           <span *ngIf="!isWindowLarge">
             <span *ngIf="!isHackyExpTitleTranslationDisplayed()"
-                  [attr.aria-label]="'exploration title:' + explorationTitle + '.'">
+              [attr.aria-label]="'exploration title:' + explorationTitle + '.'">
               {{ explorationTitle | truncate:40 }}
             </span>
             <span *ngIf="isHackyExpTitleTranslationDisplayed()"
-                  [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
+              [attr.aria-label]="'exploration title:' + expTitleTranslationKey + '.'">
               {{ expTitleTranslationKey | translate | truncate:40 }}
             </span>
           </span>
         </span>
       </div>
       <div *ngIf="!isPlaylistTile" class="title-section-mask"></div>
-      <div class="summary-section"
-           section="{isWindowLarge?undefined:'right-section'}">
+      <div class="summary-section" section="{isWindowLarge?undefined:'right-section'}">
         <div *ngIf="isWindowLarge" class="objective e2e-test-exp-summary-tile-objective">
-          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()"
-                [attr.aria-label]="'objective:' + objective + '.'">
+          <span *ngIf="!isHackyExpObjectiveTranslationDisplayed()" [attr.aria-label]="'objective:' + objective + '.'">
             {{ objective | truncateAndCapitalize:95 }}
           </span>
           <span *ngIf="isHackyExpObjectiveTranslationDisplayed()"
-                [attr.aria-label]="'objective:' + expObjectiveTranslationKey + '.'">
+            [attr.aria-label]="'objective:' + expObjectiveTranslationKey + '.'">
             {{ expObjectiveTranslationKey | translate | truncateAndCapitalize:95 }}
           </span>
         </div>
@@ -67,24 +54,30 @@
         <ul *ngIf="!isCollectionPreviewTile" class="metrics layout-row">
           <li>
             <span class="e2e-test-exp-summary-tile-rating" [ngClass]="{'rating-disabled': !avgRating}">
-              <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate" placement="top" container="body">
-                <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
+              <span class="fas fa-star" [ngbTooltip]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate" placement="top"
+                container="body">
+                <span class="oppia-icon-accessibility-label"
+                  [innerHTML]="'I18N_LIBRARY_RATINGS_TOOLTIP' | translate"></span>
               </span>
               <span *ngIf="avgRating">
                 {{ avgRating | number:'1.1-1' }}
               </span>
-              <span *ngIf="!avgRating" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!avgRating" [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+                class="oppia-inactive-summary-tile-attribute">
               </span>
             </span>
           </li>
           <li>
-            <span class="far fa-eye" [ngbTooltip]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top" container="body">
-              <span class="oppia-icon-accessibility-label" [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
+            <span class="far fa-eye" [ngbTooltip]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate" placement="top"
+              container="body">
+              <span class="oppia-icon-accessibility-label"
+                [innerHTML]="'I18N_LIBRARY_VIEWS_TOOLTIP' | translate"></span>
             </span>
             <span *ngIf="numViews" class="e2e-test-exp-summary-tile-views">
               {{ numViews | summarizeNonnegativeNumber }}
             </span>
-            <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+            <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+              class="oppia-inactive-summary-tile-attribute">
             </span>
           </li>
           <li>
@@ -92,18 +85,20 @@
               <span class="oppia-icon-accessibility-label">Last Updated</span>
               {{ lastUpdatedDateTime }}
             </span>
-            <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+            <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+              class="oppia-inactive-summary-tile-attribute">
             </span>
           </li>
         </ul>
-        <button *ngIf="isCollectionPreviewTile" class="oppia-learner-confirm-button oppia-play-exploration-button mat-button  mat-default-theme e2e-test-play-exploration-button">
+        <button *ngIf="isCollectionPreviewTile"
+          class="oppia-learner-confirm-button oppia-play-exploration-button mat-button  mat-default-theme e2e-test-play-exploration-button">
           <span [innerHTML]="'I18N_PLAYER_PLAY_EXPLORATION' | translate"></span>
         </button>
       </div>
     </a>
   </mat-card>
   <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
-            *ngIf="isRefresherExploration" (click)="loadParentExploration()">
+    *ngIf="isRefresherExploration" (click)="loadParentExploration()">
     <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
     <i class="fas fa-arrow-right oppia-arrow-icon">
     </i>
@@ -112,12 +107,8 @@
 
 <div *ngIf="mobileCardToBeShown && !isInNewLessonPlayer()">
   <oppia-learner-dashboard-icons *ngIf="showLearnerDashboardIconsIfPossible && userIsLoggedIn"
-                                 [activityType]="activityType"
-                                 [activityId]="explorationId"
-                                 [activityTitle]="explorationTitle"
-                                 [isContainerNarrow]="isContainerNarrow"
-                                 [isAddToPlaylistIconShown]="!isOwnedByCurrentUser"
-                                 class="e2e-test-lesson-playlist-icon">
+    [activityType]="activityType" [activityId]="explorationId" [activityTitle]="explorationTitle"
+    [isContainerNarrow]="isContainerNarrow" [isAddToPlaylistIconShown]="true" class="e2e-test-lesson-playlist-icon">
   </oppia-learner-dashboard-icons>
   <mat-card class="mobile-activity-summary-card" *ngIf="!isRefresherExploration" [ngStyle]="{'margin': '5px'}">
     <a [href]="getExplorationLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
@@ -127,15 +118,17 @@
       <div class="mobile-activity-card-details">
         <h3 class="mobile-exploration-title e2e-test-exp-summary-tile-title">
           <span *ngIf="!isHackyExpTitleTranslationDisplayed()">{{ explorationTitle | truncate:40 }}</span>
-          <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40 }}</span>
+          <span *ngIf="isHackyExpTitleTranslationDisplayed()">{{ expTitleTranslationKey | translate | truncate:40
+            }}</span>
         </h3>
         <div class="mobile-activity-card-summary-section">
           <ul *ngIf="!isCollectionPreviewTile" class="mobile-activity-card-summary-elements">
             <li>
               <span *ngIf="numViews">{{ numViews | summarizeNonnegativeNumber }}</span>
-              <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!numViews" [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+                class="oppia-inactive-summary-tile-attribute">
               </span>
-              <span *ngIf="numViews == '1'"  class="views-text">view</span>
+              <span *ngIf="numViews == '1'" class="views-text">view</span>
               <span *ngIf="numViews != '1'" class="views-text">views</span>
             </li>
             <li>
@@ -148,7 +141,8 @@
                 <span class="oppia-icon-accessibility-label">Last Updated</span>
                 {{ relativeLastUpdatedDateTime }}
               </span>
-              <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate" class="oppia-inactive-summary-tile-attribute">
+              <span *ngIf="!lastUpdatedDateTime" [innerHTML]="'I18N_LIBRARY_N/A' | translate"
+                class="oppia-inactive-summary-tile-attribute">
               </span>
             </li>
           </ul>
@@ -157,7 +151,7 @@
     </a>
   </mat-card>
   <button mat-button class="oppia-learner-confirm-button oppia-return-to-parent-button e2e-test-return-to-parent-button"
-            *ngIf="isRefresherExploration" (click)="loadParentExploration()">
+    *ngIf="isRefresherExploration" (click)="loadParentExploration()">
     <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
     <i class="fas fa-arrow-right oppia-arrow-icon">
     </i>
@@ -167,6 +161,7 @@
 <a [href]="getExplorationLink()" *ngIf="isInNewLessonPlayer()">
   <button class="exploration-summary-btn" tabindex="0">
     <i class="fa-solid fa-arrow-right arrow-icon"></i>
-    <p>{{ explorationTitle }}<br><span><i class="fa-solid fa-star star-icon"></i>{{avgRating ? avgRating : 'N/A'}}</span></p>
+    <p>{{ explorationTitle }}<br><span><i class="fa-solid fa-star star-icon"></i>{{avgRating ? avgRating :
+        'N/A'}}</span></p>
   </button>
 </a>
