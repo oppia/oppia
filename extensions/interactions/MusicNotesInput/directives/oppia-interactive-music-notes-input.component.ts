@@ -28,6 +28,7 @@ import {
   OnDestroy,
   OnInit,
   Renderer2,
+  ViewChild,
 } from '@angular/core';
 import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
 import {
@@ -42,6 +43,7 @@ import {Subscription} from 'rxjs';
 import {AlertsService} from 'services/alerts.service';
 import {MusicNotesInputRulesService} from './music-notes-input-rules.service';
 import {MusicPhrasePlayerService} from './music-phrase-player.service';
+import {CdkDragDrop, CdkDragEnd} from '@angular/cdk/drag-drop';
 
 interface MusicNote {
   baseNoteMidiNumber: number;
@@ -59,6 +61,19 @@ interface NoteSequence {
 
 interface Sequence {
   value: ReadableMusicNote[];
+}
+
+interface Note {
+  id: string;
+  type: number;
+  position?: {x: number; y: number};
+}
+
+interface DraggedNoteData {
+  id?: string;
+  type?: string;
+  noteType?: number;
+  isPalette: boolean;
 }
 
 @Component({
@@ -104,6 +119,11 @@ export class MusicNotesInputComponent
     InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
 
   staffContainerElt: HTMLElement | null = null;
+
+  placedNotes: Note[] = [];
+
+  @ViewChild('staffArea') staffAreaRef!: ElementRef;
+  @ViewChild('validNoteArea') validNoteAreaRef!: ElementRef;
 
   constructor(
     private interactionAttributesExtractorService: InteractionAttributesExtractorService,
@@ -184,6 +204,7 @@ export class MusicNotesInputComponent
     });
   }
 
+
   // Remove a specific note with given noteId from noteSequence. If given
   // noteId is not in noteSequence, nothing will be removed.
   _removeNotesFromNoteSequenceWithId(noteId: string): void {
@@ -199,6 +220,20 @@ export class MusicNotesInputComponent
   // compareNoteStarts function.
   _sortNoteSequence(): void {
     this.noteSequence.sort(this.compareNoteStarts);
+  }
+
+  updateNoteSequenceFromPlacedNotes(): void {
+    this.noteSequence = this.placedNotes.map(note => ({
+      note: {
+        baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES.C4,
+        offset: 0,
+        noteId: note.id,
+        noteStart: {
+          num: 1,
+          den: 1,
+        },
+      },
+    }));
   }
 
   /**
@@ -242,12 +277,9 @@ export class MusicNotesInputComponent
       this.CONTAINER_HEIGHT / this.verticalGridKeys.length;
 
     this.clearNotesFromStaff();
-    this.initPalette();
 
     this.clearDroppableStaff();
     this.buildDroppableStaff();
-
-    this.repaintNotes();
   }
 
   // Initial notes are placed on the staff at the
@@ -313,6 +345,7 @@ export class MusicNotesInputComponent
     }
     return staffLinePositions as Object;
   }
+
 
   // Creates the notes and helper-clone notes for the noteChoices div.
   // TODO(#14340): Remove some usages of jQuery from the codebase.
@@ -382,10 +415,44 @@ export class MusicNotesInputComponent
             }
           },
         });
-      }
-      noteChoicesDiv.append(innerDiv);
+
+  onNoteDropped(event: CdkDragDrop<DraggedNoteData>): void {
+    if (!this.interactionIsActive) {
+      return;
     }
+
+    const data = event.item.data;
+
+    const draggedElement = event.item.element.nativeElement;
+    const draggedRect = draggedElement.getBoundingClientRect();
+    const staffRect = this.staffAreaRef.nativeElement.getBoundingClientRect();
+
+    const relativeX = draggedRect.left - staffRect.left;
+    if (data.isPalette) {
+      const newNote: Note = {
+        id: this.generateUniqueNoteId(),
+        type: data.noteType,
+        position: {
+          x: this.snapToGrid(relativeX),
+          y: 0,
+        },
+      };
+      this.placedNotes.push(newNote);
+    } else {
+      const note = this.placedNotes.find(n => n.id === data.id);
+      if (note) {
+        note.position = {
+          x: this.snapToGrid(relativeX),
+          y: 0,
+        };
+
+      }
+    }
+
+    this._sortNoteSequence();
+    this.updateNoteSequenceFromPlacedNotes();
   }
+
 
   // TODO(#14340): Remove some usages of jQuery from the codebase.
   repaintNotes(): void {
@@ -443,8 +510,48 @@ export class MusicNotesInputComponent
         });
       }
       noteChoicesDiv.append(innerDiv);
+=======
+  onPlacedNoteDragEnd(event: CdkDragEnd, note: Note): void {
+    const staffRect = this.staffAreaRef.nativeElement.getBoundingClientRect();
+    const draggedRect =
+      event.source.element.nativeElement.getBoundingClientRect();
+
+    const isOutside =
+      draggedRect.left < staffRect.left ||
+      draggedRect.right > staffRect.right ||
+      draggedRect.top < staffRect.top ||
+      draggedRect.bottom > staffRect.bottom;
+
+    if (isOutside) {
+      this._removeNotesFromNoteSequenceWithId(note.id);
+      this._sortNoteSequence();
+      this.updateNoteSequenceFromPlacedNotes();
+
     }
-    this.repaintLedgerLines();
+  }
+
+  // Remove a specific note with given noteId from noteSequence. If given
+  // noteId is not in noteSequence, nothing will be removed.
+
+  _removeNotesFromNoteSequenceWithId(noteId: string): void {
+    this.placedNotes = this.placedNotes.filter(note => note.id !== noteId);
+  }
+
+  snapToGrid(x: number): number {
+    return (
+      Math.round(x / this.HORIZONTAL_GRID_SPACING) *
+      this.HORIZONTAL_GRID_SPACING
+    );
+  }
+
+  getNoteClass(type: number): string {
+    return type === this.NOTE_TYPE_NATURAL
+      ? 'oppia-music-input-natural-note'
+      : '';
+  }
+
+  generateUniqueNoteId(): string {
+    return Math.random().toString(36).substring(2, 9);
   }
 
   buildDroppableStaff(): void {
@@ -682,6 +789,7 @@ export class MusicNotesInputComponent
   // Clear noteSequence values and remove all notes
   // and Ledger Lines from the staff.
   clearSequence(): void {
+    this.placedNotes = [];
     this.noteSequence = [];
     const notesOnStaff = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-on-staff'
@@ -726,11 +834,11 @@ export class MusicNotesInputComponent
     return leftOffset + noteStartAsFloat * this.HORIZONTAL_GRID_SPACING;
   }
 
-  isCloneOffStaff(helperClone: JQuery<HTMLElement>): boolean {
-    return !(
-      helperClone.position().top > this.staffTop &&
-      helperClone.position().top < this.staffBottom
-    );
+  isCloneOffStaff(helperClone: HTMLElement): boolean {
+    const rect = helperClone.getBoundingClientRect();
+    const top = rect.top;
+
+    return !(top > this.staffTop && top < this.staffBottom);
   }
 
   isLedgerLineNote(lineValue: string): boolean {
@@ -1002,4 +1110,16 @@ export class MusicNotesInputComponent
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
+
+  getDragData(note: Note): DraggedNoteData {
+    return {
+      id: note.id,
+      type: note.type.toString(),
+      noteType: note.type,
+      isPalette: false,
+    };
+  }
 }
+
+// Music interaction is not working well.
+// We will probably deprecate it, since it's rarely used.
