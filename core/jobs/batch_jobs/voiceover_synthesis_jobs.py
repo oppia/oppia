@@ -585,29 +585,3 @@ class VoiceoverSynthesisAuditJob(VoiceoverSynthesisJob):
     """Audit job for VoiceoverSynthesisJob."""
 
     DATASTORE_UPDATES_ALLOWED = False
-
-
-class VoiceoverConstantsAuditJob(base_jobs.JobBase):
-    """A one-off job to audit the autogeneratable language accent constants
-    used for voiceover synthesis.
-    """
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of language accent codes present in the
-        autogeneratable language accent constants.
-
-        Returns:
-            beam.PCollection[job_run_result.JobRunResult]. A PCollection
-            containing job run results with the language accent codes.
-        """
-        return (
-            self.pipeline
-            | 'Get language accent codes'
-            >> beam.Create(
-                sorted(
-                    constants.autogeneratable_language_accent_constants.keys()
-                )
-            )
-            | 'Format results'
-            >> beam.Map(job_run_result.JobRunResult.as_stdout)
-        )

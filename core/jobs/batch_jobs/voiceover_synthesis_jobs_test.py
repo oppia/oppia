@@ -598,26 +598,3 @@ class VoiceoverSynthesisAuditJobRunTests(VoiceoverSynthesisBaseClass):
             job_run_result.JobRunResult(stdout=expected_output_2, stderr=''),
         ]
         self.assert_job_output_is(expected_output)
-
-
-class VoiceoverConstantsAuditJobTests(VoiceoverSynthesisBaseClass):
-
-    JOB_CLASS: Type[voiceover_synthesis_jobs.VoiceoverConstantsAuditJob] = (
-        voiceover_synthesis_jobs.VoiceoverConstantsAuditJob
-    )
-
-    def test_should_audit_voiceover_constants_successfully(self) -> None:
-        autogeneratable_language_accent_codes = sorted(
-            constants.autogeneratable_language_accent_constants.keys()
-        )
-
-        expected_output = []
-
-        for language_accent_code in autogeneratable_language_accent_codes:
-            expected_output.append(
-                job_run_result.JobRunResult(
-                    stdout=f'{language_accent_code}', stderr=''
-                )
-            )
-
-        self.assert_job_output_is(expected_output)
