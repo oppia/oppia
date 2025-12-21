@@ -222,7 +222,9 @@ describe('Logged-In Learner', function () {
   });
 
   afterAll(async function () {
-    await UserFactory.closeBrowserForUser(loggedInUser);
+    if (loggedInUser) {
+      await UserFactory.closeBrowserForUser(loggedInUser);
+    }
     await UserFactory.closeAllBrowsers();
   });
 });
