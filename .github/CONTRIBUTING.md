@@ -4,7 +4,10 @@ There are lots of ways to help out and become an Oppia contributor, from joining
 
 To make it easier to get started, we've catalogued some of the different ways to help out. Please feel free to take a look through them, and see if any interest you:
 
-- [Coders](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia)
+- [Coders](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia)  
+  _New contributors are encouraged to begin with issues labeled **good first issue** or **Impact: Low**.  
+  Please comment on an issue before starting work to confirm alignment with maintainers and avoid duplicate effort._
+
 - [Instructional designers and storytellers](https://github.com/oppia/oppia/wiki/Teaching-with-Oppia)
 - [UX researchers](https://github.com/oppia/oppia/wiki/Conducting-research-with-students)
 - [Voice artists](https://github.com/oppia/oppia/wiki/Instructions-for-voice-artists)
