@@ -347,6 +347,11 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             'content_id_0' in self.entity_voiceovers_instance.voiceovers_mapping
         )
 
+        # Does not throw error if content_id is not present.
+        self.entity_voiceovers_instance.remove_voiceover(
+            'content_1', feconf.VoiceoverType.MANUAL
+        )
+
     def test_create_empty_entity_voiceovers(self) -> None:
         empty_entity_voiceovers = (
             voiceover_domain.EntityVoiceovers.create_empty(
@@ -373,9 +378,6 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         self.assertEqual(entity_voiceovers_object.language_accent_code, 'en-US')
         self.assertEqual(entity_voiceovers_object.voiceovers_mapping, {})
 
-        entity_voiceovers_object.add_new_content_id_without_voiceovers(
-            'content_1'
-        )
         entity_voiceovers_object.add_voiceover(
             'content_1',
             feconf.VoiceoverType.MANUAL,
