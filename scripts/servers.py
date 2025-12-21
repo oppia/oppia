@@ -109,11 +109,27 @@ def managed_process(
 
         try:
             if popen_proc.is_running():
-                # Children must be terminated before the parent, otherwise they
-                # may become zombie processes.
-                procs_still_alive = popen_proc.children(recursive=True) + [
-                    popen_proc
-                ]
+                # Try a gentle shutdown first by sending SIGINT so the process
+                # (and any Java/Netty server) can close sockets cleanly and
+                # perform any necessary cleanup. This helps avoid socket
+                # reset warnings caused by abrupt termination.
+                try:
+                    logging.info(
+                        'Sending SIGINT to %s...' % get_proc_info(popen_proc)
+                    )
+                    popen_proc.send_signal(signal.SIGINT)
+                    popen_proc.wait(timeout=5)
+                except (OSError, psutil.TimeoutExpired):
+                    # If SIGINT didn't stop it, proceed to terminate children
+                    # and the parent as before. Children must be terminated
+                    # before the parent, otherwise they may become zombies.
+                    procs_still_alive = popen_proc.children(recursive=True) + [
+                        popen_proc
+                    ]
+                else:
+                    # Process exited cleanly after SIGINT. No further action
+                    # required.
+                    procs_still_alive = []
 
             procs_to_kill = []
             for proc in procs_still_alive:
