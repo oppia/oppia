@@ -6,6 +6,7 @@ and platform integration. The Oppia project documentation and installation
 instructions are maintained on the project wiki — treat
 https://github.com/oppia/oppia/wiki as the source-of-truth for setup steps and
 environment choices.
+For local setup instructions (Windows/macOS/Linux), see: https://github.com/oppia/oppia/wiki/Installing-Oppia
 
 Key directories to inspect:
 
