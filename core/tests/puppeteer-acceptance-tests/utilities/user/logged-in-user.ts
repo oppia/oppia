@@ -667,8 +667,6 @@ export class LoggedInUser extends BaseUser {
 
     await this.waitForPageToFullyLoad();
     await this.expectElementToBeVisible(goalsSectionContainerSelector);
-    // Wait for network idle to ensure API data has loaded before checking for goal cards.
-    await this.waitForNetworkIdle();
   }
 
   /**
