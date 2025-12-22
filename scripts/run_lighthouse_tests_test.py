@@ -779,10 +779,12 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
-            fake_cwd = os.path.join(temp_dir, 'cwd')
-            os.mkdir(fake_cwd)
+            tmp_working_dir = os.path.join(temp_dir, 'cwd')
+            os.mkdir(tmp_working_dir)
 
-            expected_dir = os.path.join(fake_cwd, '..', 'lhci-puppeteer-video')
+            expected_dir = os.path.join(
+                tmp_working_dir, '..', 'lhci-puppeteer-video'
+            )
 
             self.assertFalse(os.path.exists(expected_dir))
 
@@ -803,7 +805,7 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                     return (b'topic:123\n', b'')
 
             with (
-                self.swap(os, 'getcwd', lambda: fake_cwd),
+                self.swap(os, 'getcwd', lambda: tmp_working_dir),
                 self.swap(subprocess, 'Popen', MockProcess),
                 self.swap(
                     run_lighthouse_tests,

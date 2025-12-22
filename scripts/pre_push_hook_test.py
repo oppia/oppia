@@ -795,9 +795,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
             mock_check_output.return_value = 'old-branch'
 
             with pre_push_hook.ChangedBranch('old-branch'):
-                pass
-
-            self.assertEqual(mock_check_output.call_count, 1)
+                self.assertEqual(mock_check_output.call_count, 1)
 
             mock_check_output.assert_called_once_with(
                 ['git', 'symbolic-ref', '-q', '--short', 'HEAD'],

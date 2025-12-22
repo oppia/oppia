@@ -678,9 +678,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             run_frontend_tests.main(args=[])
 
         printed_lines: list[str] = []
-        for line in self.print_arr:
-            if isinstance(line, bytes):
-                printed_lines.append(line.decode('utf-8'))
         printed_lines += [
             line for line in self.print_arr if isinstance(line, str)
         ]
@@ -689,6 +686,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'Executed tests. Trying to get the Angular injector..' in line
             for line in printed_lines
         )
+
+        assert not any('[web-server]:' in line for line in printed_lines)
 
     def test_angular_injector_message_not_printed(self) -> None:
         class MockFile:
