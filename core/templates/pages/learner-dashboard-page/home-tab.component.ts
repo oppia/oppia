@@ -1,23 +1,11 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview Component for home tab in the Learner Dashboard page.
- */
-
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectorRef,
+} from '@angular/core';
 import {AppConstants} from 'app.constants';
-import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -29,6 +17,7 @@ import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
 
 import './home-tab.component.css';
 
@@ -39,21 +28,19 @@ import './home-tab.component.css';
 })
 export class HomeTabComponent {
   @Output() setActiveSection: EventEmitter<string> = new EventEmitter();
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() incompleteExplorationsList!: LearnerExplorationSummary[];
-  @Input() incompleteCollectionsList!: CollectionSummary[];
-  @Input() currentGoals!: LearnerTopicSummary[];
-  @Input() goalTopics!: LearnerTopicSummary[];
-  @Input() partiallyLearntTopicsList!: LearnerTopicSummary[];
-  @Input() untrackedTopics!: Record<string, LearnerTopicSummary[]>;
+  @Input() incompleteExplorationsList: LearnerExplorationSummary[] = [];
+  @Input() incompleteCollectionsList: CollectionSummary[] = [];
+  @Input() currentGoals: LearnerTopicSummary[] = [];
+  @Input() goalTopics: LearnerTopicSummary[] = [];
+  @Input() partiallyLearntTopicsList: LearnerTopicSummary[] = [];
+  @Input() untrackedTopics: Record<string, LearnerTopicSummary[]> = {};
   @Input() username!: string;
   @Input() redesignFeatureFlag!: boolean;
-  @Input() totalLessonsInPlaylists!: (
+  @Input() totalLessonsInPlaylists: (
     | LearnerExplorationSummary
     | CollectionSummary
-  )[];
+  )[] = [];
+
   currentGoalsLength!: number;
   classroomUrlFragment!: string;
   goalTopicsLength!: number;
@@ -81,7 +68,9 @@ export class HomeTabComponent {
     private windowDimensionService: WindowDimensionsService,
     private urlInterpolationService: UrlInterpolationService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   isSerialChapterFeatureLearnerFlagEnabled(): boolean {
@@ -91,84 +80,132 @@ export class HomeTabComponent {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.width = this.widthConst * this.currentGoals.length;
-    var allGoals = [...this.currentGoals, ...this.partiallyLearntTopicsList];
-    this.currentGoalsLength = this.currentGoals.length;
-    this.goalTopicsLength = this.goalTopics.length;
-    this.currentGoalIds = new Set(this.currentGoals.map(g => g.id));
+    this.loadedLessonCards = 0;
 
-    if (allGoals.length !== 0) {
-      var allGoalIds = [];
-      for (var goal of allGoals) {
-        allGoalIds.push(goal.id);
-      }
-      var uniqueGoalIds = Array.from(new Set(allGoalIds));
-      for (var uniqueGoalId of uniqueGoalIds) {
-        var index = allGoalIds.indexOf(uniqueGoalId);
-        this.continueWhereYouLeftOffList.push(allGoals[index]);
-      }
-    }
+    const topicsPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardTopicsAndStoriesDataAsync();
+    const collectionsPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
+    const explorationsPromise =
+      this.learnerDashboardBackendApiService.fetchLearnerDashboardExplorationsDataAsync();
 
-    // TODO(#18384): Test cases - current lesson is last lesson.
-    for (const topic of this.partiallyLearntTopicsList) {
-      const storySummaries = topic.getCanonicalStorySummaryDicts();
+    Promise.all([topicsPromise, collectionsPromise, explorationsPromise]).then(
+      ([topicsData, collectionsData, explorationsData]) => {
+        try {
+          this.currentGoals = topicsData.topicsToLearnList;
+          this.goalTopics = topicsData.allTopicsList;
+          this.partiallyLearntTopicsList = topicsData.partiallyLearntTopicsList;
+          this.untrackedTopics = topicsData.untrackedTopics;
+          this.incompleteCollectionsList =
+            collectionsData.incompleteCollectionsList;
+          this.incompleteExplorationsList =
+            explorationsData.incompleteExplorationsList;
 
-      for (const story of storySummaries) {
-        let publishedNodesCount: number;
-        if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
-          const publishedNodes = story
-            .getAllNodes()
-            .filter(node => node.getPublishedStatus());
-          publishedNodesCount = publishedNodes.length;
-        } else {
-          publishedNodesCount = story.getAllNodes().length;
+          this.totalLessonsInPlaylists = [
+            ...this.incompleteExplorationsList,
+            ...this.incompleteCollectionsList,
+          ];
+
+          this.width = this.widthConst * (this.currentGoals?.length || 0);
+          var allGoals = [
+            ...(this.currentGoals || []),
+            ...(this.partiallyLearntTopicsList || []),
+          ];
+          this.currentGoalsLength = this.currentGoals?.length || 0;
+          this.goalTopicsLength = this.goalTopics?.length || 0;
+          this.currentGoalIds = new Set(this.currentGoals?.map(g => g.id));
+
+          if (allGoals.length !== 0) {
+            var allGoalIds = [];
+            for (var goal of allGoals) {
+              allGoalIds.push(goal.id);
+            }
+            var uniqueGoalIds = Array.from(new Set(allGoalIds));
+            for (var uniqueGoalId of uniqueGoalIds) {
+              var index = allGoalIds.indexOf(uniqueGoalId);
+              this.continueWhereYouLeftOffList.push(allGoals[index]);
+            }
+          }
+
+          if (this.partiallyLearntTopicsList) {
+            for (const topic of this.partiallyLearntTopicsList) {
+              const storySummaries = topic.getCanonicalStorySummaryDicts();
+              if (storySummaries) {
+                for (const story of storySummaries) {
+                  let publishedNodesCount: number = 0;
+                  if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+                    const publishedNodes = story
+                      .getAllNodes()
+                      .filter(n => n.getPublishedStatus());
+                    publishedNodesCount = publishedNodes.length;
+                  } else {
+                    publishedNodesCount = story.getAllNodes().length;
+                  }
+
+                  const completedNodes = story.getCompletedNodeTitles();
+                  const remainingPublished =
+                    publishedNodesCount - completedNodes.length - 1;
+
+                  if (
+                    remainingPublished > 0 &&
+                    remainingPublished < publishedNodesCount
+                  ) {
+                    this.storySummariesWithAvailableNodes.add(story.getId());
+                  }
+                  if (!this.hasMultipleUnfinishedPublished) {
+                    this.hasMultipleUnfinishedPublished =
+                      publishedNodesCount > 1 && remainingPublished > 0;
+                  }
+                }
+              }
+            }
+          }
+
+          this.totalLessonCards = 0;
+          if (this.getTotalInProgressLessons() > 0) {
+            this.totalLessonCards +=
+              (this.incompleteExplorationsList?.length || 0) +
+              (this.incompleteCollectionsList?.length || 0) +
+              (this.partiallyLearntTopicsList?.reduce(
+                (acc, topic) =>
+                  acc + (topic.getCanonicalStorySummaryDicts()?.length || 0),
+                0
+              ) || 0);
+
+            if (
+              this.hasMultipleUnfinishedPublished &&
+              this.storySummariesWithAvailableNodes.size > 0
+            ) {
+              this.totalLessonCards +=
+                this.storySummariesWithAvailableNodes.size;
+            }
+          }
+
+          if (
+            this.isNonemptyObject(this.untrackedTopics) &&
+            !this.isGoalLimitReached()
+          ) {
+            this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
+          }
+        } catch (e) {
+          console.error('Error processing dashboard data: ', e);
+        } finally {
+          setTimeout(() => {
+            this.allCardsLoaded = true;
+            this.changeDetectorRef.detectChanges();
+            this.loaderService.hideLoadingScreen();
+          }, 1000);
         }
-
-        const completedNodes = story.getCompletedNodeTitles();
-        const remainingPublished =
-          publishedNodesCount - completedNodes.length - 1;
-
-        if (
-          remainingPublished > 0 &&
-          remainingPublished < publishedNodesCount
-        ) {
-          this.storySummariesWithAvailableNodes.add(story.getId());
-        }
-        if (!this.hasMultipleUnfinishedPublished) {
-          this.hasMultipleUnfinishedPublished =
-            publishedNodesCount > 1 && remainingPublished > 0;
-        }
+      },
+      error => {
+        console.error('Error fetching dashboard data: ', error);
+        setTimeout(() => {
+          this.allCardsLoaded = true;
+          this.changeDetectorRef.detectChanges();
+          this.loaderService.hideLoadingScreen();
+        }, 1000);
       }
-    }
-
-    this.totalLessonCards = 0;
-
-    // Check if the Progress section is visible in HTML.
-    if (this.getTotalInProgressLessons() > 0) {
-      this.totalLessonCards +=
-        (this.incompleteExplorationsList?.length || 0) +
-        (this.incompleteCollectionsList?.length || 0) +
-        this.partiallyLearntTopicsList.reduce(
-          (acc, topic) => acc + topic.getCanonicalStorySummaryDicts().length,
-          0
-        );
-
-      // Check if Recommended section is visible in HTML.
-      if (
-        this.hasMultipleUnfinishedPublished &&
-        this.storySummariesWithAvailableNodes.size > 0
-      ) {
-        this.totalLessonCards += this.storySummariesWithAvailableNodes.size;
-      }
-    }
-
-    // Check if Playlist section is visible in HTML.
-    if (
-      this.isNonemptyObject(this.untrackedTopics) &&
-      !this.isGoalLimitReached()
-    ) {
-      this.totalLessonCards += this.totalLessonsInPlaylists?.length || 0;
-    }
+    );
 
     this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
     this.directiveSubscriptions.add(
@@ -176,34 +213,14 @@ export class HomeTabComponent {
         this.windowIsNarrow = this.windowDimensionService.isWindowNarrow();
       })
     );
-
-    if (this.totalLessonCards === 0) {
-      this.allCardsLoaded = true;
-      this.loadingMessage = '';
-      this.loaderService.hideLoadingScreen();
-    } else {
-      setTimeout(() => {
-        if (!this.allCardsLoaded) {
-          this.allCardsLoaded = true;
-          this.loadingMessage = '';
-          this.loaderService.hideLoadingScreen();
-        }
-      }, 10000);
-    }
   }
 
   onLessonLoaded(): void {
     this.loadedLessonCards++;
-    if (this.loadedLessonCards >= this.totalLessonCards) {
-      this.allCardsLoaded = true;
-      this.loadingMessage = '';
-      this.loaderService.hideLoadingScreen();
-    }
   }
 
   getTimeOfDay(): string {
     let time = new Date().getHours();
-
     if (time <= 12) {
       return 'I18N_LEARNER_DASHBOARD_MORNING_GREETING';
     } else if (time <= 18) {
@@ -236,19 +253,9 @@ export class HomeTabComponent {
   }
 
   getWidth(length: number): number {
-    /**
-     * If there are 3 or more topics for each untrackedTopic, the total
-     * width of the section will be 662px in mobile view to enable scrolling.
-     */
     if (length >= 3) {
       return 662;
     }
-    /**
-     * If there less than 3 topics for each untrackedTopic, the total
-     * width of the section will be calculated by multiplying the addition of
-     * number of topics and one classroom card with 164px in mobile view to
-     * enable scrolling.
-     */
     return (length + 1) * 164;
   }
 
@@ -279,19 +286,20 @@ export class HomeTabComponent {
   }
 
   getTotalInProgressLessons(): number {
-    const totalStories = this.partiallyLearntTopicsList.reduce((acc, curr) => {
-      let availableStories = 0;
-      for (let i = 0; i < curr.getCanonicalStorySummaryDicts().length; i++) {
-        let currentStory = curr.getCanonicalStorySummaryDicts()[i];
-        if (
-          currentStory.getAllNodes().length >
-          currentStory.getCompletedNodeTitles().length
-        ) {
-          availableStories++;
+    const totalStories =
+      this.partiallyLearntTopicsList?.reduce((acc, curr) => {
+        let availableStories = 0;
+        for (let i = 0; i < curr.getCanonicalStorySummaryDicts().length; i++) {
+          let currentStory = curr.getCanonicalStorySummaryDicts()[i];
+          if (
+            currentStory.getAllNodes().length >
+            currentStory.getCompletedNodeTitles().length
+          ) {
+            availableStories++;
+          }
         }
-      }
-      return acc + availableStories;
-    }, 0);
+        return acc + availableStories;
+      }, 0) || 0;
 
     return (
       totalStories +
