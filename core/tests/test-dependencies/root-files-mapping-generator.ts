@@ -79,7 +79,6 @@ const FILE_EXCLUSIONS_FOR_SEARCH = [
   'core/tests/services_sources',
   'core/tests/test-dependencies',
   'core/templates/tests',
-  'core/templates/services/angular-services.index.ts',
   'core/templates/utility/hashes.ts',
   'webpack.*.ts',
   'angular-template-style-url-replacer.webpack-loader.js',

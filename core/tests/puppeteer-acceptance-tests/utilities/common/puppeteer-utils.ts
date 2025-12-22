@@ -42,6 +42,8 @@ const actionStatusMessageSelector = '.e2e-test-status-message';
 const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
+const oskContainerSelector = '.e2e-test-osk-container';
+const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
 
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
@@ -821,7 +823,7 @@ export class BaseUser {
     // Stop the screen recorder with a timeout to prevent hanging.
     if (this.screenRecorder) {
       try {
-        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 30000;
+        const SCREEN_RECORDER_STOP_TIMEOUT_MS = 120000;
         await Promise.race([
           this.screenRecorder.stop(),
           new Promise((_, reject) =>
@@ -1997,6 +1999,57 @@ export class BaseUser {
     await this.expectElementToBeVisible(warningToastMessageSelector, false);
   }
 
+  /**
+   * Function to verify the number of elements matching a selector.
+   * @param {string} selector - The selector to match elements.
+   * @param {number} count - The expected number of elements.
+   */
+  async expectNumberOfElementsToBe(
+    selector: string,
+    count: number
+  ): Promise<void> {
+    const elements = await this.page.$$(selector);
+    expect(elements.length).toBe(count);
+  }
+
+  /**
+   * Finds child element in parent by matching text values.
+   * @param {puppeteer.Page | puppeteer.ElementHandle | undefined} parentElement - Element we're searching through.
+   * @param {Record<string, string>} selectors - Relevant selectors.
+   * @param {string} criteria - Title value to match.
+   */
+  async findChildElementInParent(
+    parentElement: puppeteer.Page | puppeteer.ElementHandle | undefined,
+    selectors: Record<string, string>,
+    criteria: string
+  ): Promise<puppeteer.ElementHandle | undefined> {
+    let targetElement;
+    let lastHeadingText: string | undefined;
+
+    const allElements = await parentElement?.$$(selectors.content);
+    for (const h of allElements || []) {
+      const targetHeadingElement = await h.$(selectors.heading);
+      const targetHeadingText = await targetHeadingElement?.evaluate(ele =>
+        ele.textContent?.trim()
+      );
+      lastHeadingText = targetHeadingText || undefined;
+      showMessage(`gettingText: ${targetHeadingElement} ${targetHeadingText}`);
+      if (targetHeadingText === criteria) {
+        targetElement = h;
+        break;
+      }
+    }
+
+    if (!targetElement) {
+      throw new Error(
+        `Element with selectors: ${JSON.stringify(
+          selectors
+        )} and criteria: ${criteria} is not found. Last heading seen: ${lastHeadingText}`
+      );
+    }
+    return targetElement;
+  }
+
   protected parseLocaleAbbreviatedDatetimeString(dateString: string): number {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -2071,6 +2124,23 @@ export class BaseUser {
 
     // If no pattern matches, throw an error.
     throw new Error(`Unable to parse date string: "${dateString}"`);
+  }
+
+  /**
+   * Checks if the on screen keyboard is visible.
+   */
+  async isOnScreenKeyboardVisible(): Promise<boolean> {
+    return await this.isElementVisible(oskContainerSelector);
+  }
+
+  /**
+   * Hides the on screen keyboard.
+   */
+  async hideOSK(): Promise<void> {
+    await this.expectElementToBeVisible(oskContainerSelector);
+    await this.expectElementToBeVisible(hideOSKButtonSelector);
+    await this.clickOnElementWithSelector(hideOSKButtonSelector);
+    await this.expectElementToBeVisible(hideOSKButtonSelector, false);
   }
 }
 
