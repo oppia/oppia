@@ -37,7 +37,7 @@ if MYPY:  # pragma: no cover
 
 
 class AuditInvalidFeedbackMessagesJob(base_jobs.JobBase):
-    """Audit job that reports feedback messages with missing author_id."""
+    """Audit job that reports all feedback messages with missing author_id in GeneralFeedbackMessageModel."""
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the audit job.
