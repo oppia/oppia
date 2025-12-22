@@ -118,16 +118,22 @@ describe('Logged-In Learner', function () {
     );
 
     await UserFactory.closeSuperAdminBrowser();
-
-    // Add the Place Values goal after user creation so tests can use it.
-    await loggedInUser.navigateToLearnerDashboard();
-    await loggedInUser.navigateToGoalsSection();
-    await loggedInUser.addGoalInRedesignedLearnerDashboard('Place Values');
   }, 6000000); // Setup taking longer than default timeout.
 
   it('should start and complete Chapter 1, then show updated progress (33%)', async function () {
     await loggedInUser.navigateToLearnerDashboard();
     await loggedInUser.navigateToGoalsSection();
+
+    await loggedInUser.clickOnAddGoalsButtonInRedesignedLearnerDashboard();
+
+    await loggedInUser.clickOnGoalCheckboxInRedesignedLearnerDashboard(
+      'Place Values',
+      true
+    );
+
+    await loggedInUser.submitGoalInRedesignedLearnerDashboard();
+
+    await loggedInUser.expectGoalCardToBeVisible('Place Values');
     await loggedInUser.clickOnGoalCard('Place Values');
 
     await loggedInUser.clickLessonCardButton('What are the Place Values');
@@ -222,9 +228,7 @@ describe('Logged-In Learner', function () {
   });
 
   afterAll(async function () {
-    if (loggedInUser) {
-      await UserFactory.closeBrowserForUser(loggedInUser);
-    }
+    await UserFactory.closeBrowserForUser(loggedInUser);
     await UserFactory.closeAllBrowsers();
   });
 });
