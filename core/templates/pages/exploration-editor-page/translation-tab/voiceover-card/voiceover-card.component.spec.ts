@@ -1004,30 +1004,6 @@ describe('Voiceover card component', () => {
     expect(component.automaticVoiceoverGenerationStatus).toEqual('SUCCEEDED');
   }));
 
-  it(
-    'should not make multiple calls to fetch entity voiceovers if ' +
-      'generation status is SUCCEEDED',
-    fakeAsync(() => {
-      spyOn(
-        voiceoverRegenerationTaskMappingService,
-        'getContentRegenerationStatus'
-      ).and.returnValue('SUCCEEDED');
-      spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.returnValue(
-        Promise.resolve()
-      );
-
-      entityVoiceoversService.isEntityVoiceoverFetchInProgress = true;
-
-      component.updateAutomaticVoiceoverWithRegenerationStatus();
-
-      tick();
-
-      expect(
-        entityVoiceoversService.fetchEntityVoiceovers
-      ).not.toHaveBeenCalled();
-    })
-  );
-
   it('should update automatic voiceover status when generation status is FAILED', fakeAsync(() => {
     spyOn(
       voiceoverRegenerationTaskMappingService,

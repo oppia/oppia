@@ -38,7 +38,6 @@ export class EntityVoiceoversService {
   public languageAccentCodeToEntityVoiceovers: LanguageAccentCodeToEntityVoiceovers =
     {};
   public entityVoiceoversLoaded: boolean = false;
-  public isEntityVoiceoverFetchInProgress: boolean = false;
   private _voiceoversLoadedEventEmitter = new EventEmitter<void>();
   public languageAccentCodeChangeEventEmitter = new EventEmitter<void>();
 
@@ -85,7 +84,6 @@ export class EntityVoiceoversService {
   async fetchEntityVoiceovers(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.entityVoiceoversLoaded = false;
-      this.isEntityVoiceoverFetchInProgress = true;
       this.voiceoverBackendApiService
         .fetchEntityVoiceoversByLanguageCodeAsync(
           this.entityType,
@@ -99,7 +97,6 @@ export class EntityVoiceoversService {
           this.entityVoiceoversLoaded = true;
           this.activeLanguageAccentCode = this.getLanguageAccentCodes()[0];
           this._voiceoversLoadedEventEmitter.emit();
-          this.isEntityVoiceoverFetchInProgress = false;
           resolve();
         });
     });
