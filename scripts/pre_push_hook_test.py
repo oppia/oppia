@@ -797,10 +797,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
             with pre_push_hook.ChangedBranch('old-branch'):
                 self.assertEqual(mock_check_output.call_count, 1)
 
+            self.assertEqual(mock_check_output.call_count, 1)
+
             mock_check_output.assert_called_once_with(
                 ['git', 'symbolic-ref', '-q', '--short', 'HEAD'],
                 encoding='utf-8',
             )
+
+            for call in mock_check_output.call_args_list:
+                self.assertNotIn('checkout', call.args[0])
 
     def test_main_skips_linter_when_files_to_lint_is_empty(self) -> None:
         parse_args_swap = self.swap(
