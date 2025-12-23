@@ -82,6 +82,7 @@ class FeatureNames(enum.Enum):
     ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
         'enable_background_voiceover_synthesis'
     )
+    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -108,6 +109,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -302,6 +304,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
+        (
+            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }
