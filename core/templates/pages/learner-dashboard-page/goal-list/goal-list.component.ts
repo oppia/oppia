@@ -21,9 +21,12 @@ import {AppConstants} from 'app.constants';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
 import {LearnerTopicSummary} from 'domain/topic/learner-topic-summary.model';
 import {StorySummary} from 'domain/story/story-summary.model';
 import {StoryNode} from 'domain/story/story-node.model';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+
 @Component({
   selector: 'oppia-goal-list',
   templateUrl: './goal-list.component.html',
@@ -38,7 +41,9 @@ export class GoalListComponent implements OnInit {
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private urlInterpolationService: UrlInterpolationService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService,
+    private chapterProgressLoaderService: ChapterProgressLoaderService
   ) {}
 
   ngOnInit(): void {
@@ -57,6 +62,21 @@ export class GoalListComponent implements OnInit {
     return (
       (story.getCompletedNodeTitles().length / story.getNodeTitles().length) *
       100
+    );
+  }
+
+  getChapterProgress(storyNode: StoryNode): number {
+    const explorationId = storyNode.getExplorationId();
+    if (!explorationId) {
+      return 0;
+    }
+    const lessonProgress =
+      this.chapterProgressLoaderService.getLessonProgress(explorationId);
+    if (lessonProgress) {
+      return lessonProgress;
+    }
+    return this.chapterProgressLoaderService.computeLessonProgress(
+      explorationId
     );
   }
 
@@ -131,6 +151,74 @@ export class GoalListComponent implements OnInit {
       earliestCompletedNode = earliestNode;
     }
     return earliestCompletedNode + 1;
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
+  getStartButtonClass(story: StorySummary, nodeIndex: number): string {
+    const node = story.getAllNodes()[nodeIndex];
+
+    if (
+      !node.getPublishedStatus() &&
+      this.isSerialChapterFeatureLearnerFlagEnabled()
+    ) {
+      return 'oppia-learner-dash-button--disabled';
+    }
+
+    if (!this.isExpanded(story.getId())) {
+      return 'oppia-learner-dash-button--default';
+    }
+
+    const currentPlayableNode =
+      this.allCurrentNodes[
+        this.goalTopic.getCanonicalStorySummaryDicts().indexOf(story)
+      ];
+
+    if (currentPlayableNode === nodeIndex) {
+      return 'oppia-learner-dash-button--default';
+    }
+
+    return 'oppia-learner-dash-button--inverse oppia-learner-dash-button--incomplete-goal';
+  }
+
+  getStartButtonHref(story: StorySummary, nodeIndex: number): string | null {
+    const node = story.getAllNodes()[nodeIndex];
+
+    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    if (!node.getPublishedStatus()) {
+      return null;
+    }
+
+    if (this.isExpanded(story.getId())) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    const currentPlayableNode =
+      this.allCurrentNodes[
+        this.goalTopic.getCanonicalStorySummaryDicts().indexOf(story)
+      ];
+
+    if (currentPlayableNode === nodeIndex) {
+      return this.getNodeLessonUrl(story, node);
+    }
+
+    return null;
+  }
+
+  getStartButtonLabel(story: StorySummary, nodeIndex: number): string {
+    const node = story.getAllNodes()[nodeIndex];
+    if (!this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START';
+    }
+    return node.getPublishedStatus()
+      ? 'I18N_LEARNER_DASHBOARD_CARD_BUTTON_START'
+      : 'I18N_LEARNER_STORY_TILE_COMING_SOON';
   }
 
   handleToggleState(updateState: boolean, storyId: string): void {

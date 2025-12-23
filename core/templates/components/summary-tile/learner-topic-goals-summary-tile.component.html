@@ -3,13 +3,16 @@
     <div class="classroom-name-container">
       <p class="classroom-name">{{ topicSummary.getClassroomName() }}</p>
     </div>
+    <div class="classroom-new-chapter" *ngIf="isNewChapterLabelVisible() && isSerialChapterFeatureLearnerFlagEnabled()">
+      <p class="classroom-status">New</p>
+    </div>
     <a class="oppia-story-link"
-       [href]="statusIsPublished ? getStoryNodeLink() : null"
-       [title]="!statusIsPublished ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : ''"
-       (click)="onStoryClick($event)"
-       (contextmenu)="onStoryClick($event)"
-       [attr.tabindex]="statusIsPublished ? 0 : -1"
-       target="{{ statusIsPublished && openInNewWindow ? '_blank' : '_self' }}">
+       [attr.href]="isSerialChapterFeatureLearnerFlagEnabled() ?  statusIsPublished ? getStoryNodeLink() : null : getStoryNodeLink()"
+       [title]="isSerialChapterFeatureLearnerFlagEnabled() && !statusIsPublished ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : ''"
+       (click)="isSerialChapterFeatureLearnerFlagEnabled() ? onStoryClick($event) : null"
+       (contextmenu)="isSerialChapterFeatureLearnerFlagEnabled() ? onStoryClick($event) : null"
+       [attr.tabindex]="!isSerialChapterFeatureLearnerFlagEnabled() || statusIsPublished ? 0 : -1"
+       target="!isSerialChapterFeatureLearnerFlagEnabled ? {{ openInNewWindow ? '_blank' : '_self' }} : {{ statusIsPublished && openInNewWindow ? '_blank' : '_self' }}">
       <div class="story-card">
         <div class="oppia-title-section" [ngStyle]="{'background-color': thumbnailBgColor}">
           <!-- We add an empty alt text so that the screen reader does not read the thumbnail image filename and ignores it as the thumbnail does not convey any significant information. -->
@@ -31,7 +34,10 @@
         </div>
       </div>
       <div class="continue-button" *ngIf="isCardHovered()">
-        <p class="continue-button-text">
+        <p *ngIf="!isSerialChapterFeatureLearnerFlagEnabled()" class="continue-button-text">
+            Continue
+        </p>
+        <p *ngIf="isSerialChapterFeatureLearnerFlagEnabled()" class="continue-button-text">
           {{ statusIsPublished ? ('I18N_LEARNER_STORY_TILE_CONTINUE' | translate) : ('I18N_LEARNER_STORY_TILE_COMING_SOON' | translate) }}
         </p>
       </div>
@@ -170,6 +176,20 @@
     display: block;
     float: left;
   }
+  .classroom-new-chapter {
+    align-items: center;
+    background: #00609c;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: row;
+    height: 24px;
+    justify-content: center;
+    left: 8px;
+    padding: 5px;
+    position: absolute;
+    top: 8px;
+    width: 42px;
+  }
   .classroom-name-container {
     align-items: center;
     background: #005240;
@@ -191,5 +211,13 @@
     font-style: normal;
     font-weight: 500;
     line-height: 14px;
+  }
+  .classroom-new-chapter .classroom-status {
+    color: #fff;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: 13px;
+    font-style: Bold;
+    font-weight: 700;
+    line-height: 100%;
   }
 </style>

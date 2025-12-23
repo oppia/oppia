@@ -24,6 +24,7 @@ import {Subscription} from 'rxjs';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 import {UrlService} from 'services/contextual/url.service';
 import {StoryEditorStateService} from '../services/story-editor-state.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 interface IconsArray {
   // Thumbnails for the story nodes are null if they are not yet uploaded.
@@ -49,7 +50,8 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
   constructor(
     private storyEditorStateService: StoryEditorStateService,
     private assetsBackendApiService: AssetsBackendApiService,
-    private urlService: UrlService
+    private urlService: UrlService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -61,6 +63,11 @@ export class StoryPreviewTabComponent implements OnInit, OnDestroy {
       this.nodes = this.storyContents.getNodes();
       this.pathIconParameters = this.generatePathIconParameters();
     }
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
   }
 
   generatePathIconParameters(): IconsArray[] {

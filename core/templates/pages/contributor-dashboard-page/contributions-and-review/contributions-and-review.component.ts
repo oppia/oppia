@@ -22,6 +22,7 @@ import {
   OnInit,
   ViewChild,
   HostListener,
+  Input,
 } from '@angular/core';
 import {NgbModalRef, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
@@ -55,7 +56,7 @@ import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MatSnackBar, MatSnackBarRef} from '@angular/material/snack-bar';
 import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {UndoSnackbarComponent} from 'components/custom-snackbar/undo-snackbar.component';
-
+import {WindowRef} from 'services/contextual/window-ref.service';
 export interface Suggestion {
   change_cmd: {
     skill_id: string;
@@ -129,6 +130,7 @@ const COMMIT_TIMEOUT_DURATION = 30000;
   templateUrl: './contributions-and-review.component.html',
 })
 export class ContributionsAndReview implements OnInit, OnDestroy {
+  @Input() activeTopicName: string;
   @ViewChild('opportunitiesList')
   opportunitiesListRef!: OpportunitiesListComponent;
 
@@ -158,6 +160,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   reviewableQuestionsSortKey: string;
   userCreatedTranslationsSortKey: string;
   reviewableTranslationsSortKey: string;
+  topicReady: boolean;
   commitTimeout?: NodeJS.Timeout;
   queuedSuggestionSummary = null;
   queuedSuggestion = null;
@@ -201,7 +204,8 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     private featureService: PlatformFeatureService,
     private htmlLengthService: HtmlLengthService,
     private htmlEscaperService: HtmlEscaperService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private windowRef: WindowRef
   ) {}
 
   getQuestionContributionsSummary(
@@ -627,6 +631,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
   }
 
   switchToTab(tabType: string, subType: string): void {
+    this.windowRef.nativeWindow.scrollTo(0, 0);
     this.activeTabType = tabType;
     this.dropdownShown = false;
     this.activeDropdownTabChoice = this.getActiveDropdownTabText(
@@ -797,6 +802,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
     this.contributions = {};
     this.userDetailsLoading = true;
     this.userIsLoggedIn = false;
+    this.topicReady = false;
     this.languageCode = this.translationLanguageService.getActiveLanguageCode();
     this.activeTabType = '';
     this.activeTabSubtype = '';
@@ -831,6 +837,15 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
         enabled: true,
       },
     ];
+
+    // Whenever the active topic changes, update the `topicReady` flag.
+    // `topicReady` is true if there is an active topic, false otherwise.
+    // This flag can be used to conditionally render parts of the UI or
+    // enable/disable features that depend on a selected topic.
+    this.translationTopicService.onActiveTopicChanged.subscribe(() => {
+      const topic = this.translationTopicService.getActiveTopicName();
+      this.topicReady = !!topic;
+    });
 
     // Reset active exploration when changing topics.
     this.directiveSubscriptions.add(

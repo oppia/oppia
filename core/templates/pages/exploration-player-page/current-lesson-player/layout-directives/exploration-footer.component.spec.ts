@@ -377,14 +377,14 @@ describe('ExplorationFooterComponent', () => {
 
       component.checkpointCount = 5;
 
-      playerPositionService.onLoadedMostRecentCheckpoint.emit();
+      playerPositionService.onLoadedMostRecentCheckpoint.next();
 
       expect(component.getCheckpointCount).toHaveBeenCalledTimes(1);
       expect(component.showProgressReminderModal).toHaveBeenCalled();
 
       component.checkpointCount = 0;
 
-      playerPositionService.onLoadedMostRecentCheckpoint.emit();
+      playerPositionService.onLoadedMostRecentCheckpoint.next();
 
       expect(component.getCheckpointCount).toHaveBeenCalledTimes(2);
     })

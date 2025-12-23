@@ -46,22 +46,8 @@ import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.s
 import {Interaction} from '../../../../domain/exploration/interaction.model';
 import {RecordedVoiceovers} from '../../../../domain/exploration/recorded-voiceovers.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
-import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {TranslateModule} from '@ngx-translate/core';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: false,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
-}
 
 describe('Supplemental card component', () => {
   let fixture: ComponentFixture<SupplementalCardComponent>;
@@ -99,10 +85,6 @@ describe('Supplemental card component', () => {
         {
           provide: ChangeDetectorRef,
           useClass: MockChangeDetectorRef,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
         CurrentInteractionService,
         PlayerPositionService,
