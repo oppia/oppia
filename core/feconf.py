@@ -80,8 +80,6 @@ def check_dev_mode_is_true() -> None:
 
 check_dev_mode_is_true()
 
-# TODO(#18260): Remove this when we permanently move to the Dockerized Setup.
-OPPIA_IS_DOCKERIZED = bool(os.environ.get('OPPIA_IS_DOCKERIZED', False))
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
@@ -492,12 +490,18 @@ VALID_MAILCHIMP_FIELD_KEYS = ['NAME']
 # Valid Mailchimp tags.
 VALID_MAILCHIMP_TAGS = ['Account', 'Android', 'Web']
 
+GAE_DEVELOPMENT_SERVER_PORT = 8181
+GAE_ADMIN_SERVER_PORT = 8000
+
 ES_HOST = os.environ.get('ES_HOST', 'localhost')
 ES_LOCALHOST_PORT = 9200
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct ElasticSearch
 # auth information during deployment.
 ES_CLOUD_ID = None
 ES_USERNAME = None
+
+ES_DISK_WATERMARK_LOW = 85
+ES_DISK_WATERMARK_HIGH = 95
 
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
@@ -978,6 +982,9 @@ QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 REGENERATE_TOPIC_SUMMARIES_URL = '/regenerate_topic_summaries_handler'
+GENERATE_STUDY_GUIDE_MODELS_URL = '/generate_study_guide_models_handler'
+DELETE_STUDY_GUIDE_MODELS_URL = '/delete_study_guide_models_handler'
+VERIFY_STUDY_GUIDE_MODELS_URL = '/verify_study_guide_models_handler'
 DELETE_ACCOUNT_URL = '/delete-account'
 DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
 EXPORT_ACCOUNT_HANDLER_URL = '/export-account-handler'
@@ -1366,8 +1373,7 @@ FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 # use alpha-numeric characters, hence the tighter restriction.
 FIREBASE_AUTH_ID_REGEX = '^[A-Za-z0-9]{1,128}$'
 
-# TODO(#18260): Change this when we permanently move to the Dockerized Setup.
-CLOUD_DATASTORE_EMULATOR_HOST = os.environ.get('DATASTORE_HOST', 'localhost')
+CLOUD_DATASTORE_EMULATOR_HOST = 'localhost'
 CLOUD_DATASTORE_EMULATOR_PORT = 8089
 
 FIREBASE_EMULATOR_CONFIG_PATH = '.firebase.json'

@@ -8,3 +8,7 @@ paths-ignore:
   # for SHA-1. We can migrate to a stronger cryptographic algorithm, replacing
   # all SHA-1, but that would require changes to the existing data we have.
   - core/utils.py
+  # This file is ignored because it is a test file that represents an invalid
+  # merge conflict (and thus is not a valid Python file). Including it in the
+  # list of files to be scanned causes CodeQL to run into a parsing error.
+  - scripts/linters/test_files/invalid_merge_conflict.py

@@ -82,6 +82,7 @@ class FeatureNames(enum.Enum):
     ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
         'enable_background_voiceover_synthesis'
     )
+    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -108,6 +109,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -121,7 +123,6 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
     FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
@@ -136,6 +137,7 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
     FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -273,7 +275,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
@@ -302,6 +304,12 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'The flag enables the asynchronous voiceover synthesis for the '
             'curated exploration contents.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
+        (
+            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }

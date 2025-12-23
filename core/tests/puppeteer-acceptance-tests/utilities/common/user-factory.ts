@@ -383,4 +383,15 @@ export class UserFactory {
     activeUsers.splice(index, 1);
     await user.closeBrowser();
   };
+
+  /**
+   * This function closes the browser for SuperAdm (Resolves issue of failing
+   * closing browser for superAdm)
+   */
+  static closeSuperAdminBrowser = async function (): Promise<void> {
+    if (superAdminInstance !== null) {
+      await superAdminInstance.closeBrowser();
+      showMessage('Super admin browser closed.');
+    }
+  };
 }
