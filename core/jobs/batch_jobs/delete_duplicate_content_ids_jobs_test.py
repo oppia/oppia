@@ -30,9 +30,9 @@ from core.jobs import job_test_utils
 from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
+
+
 from core.tests import test_utils
-
-
 from typing import Final
 
 MYPY = False
@@ -112,7 +112,7 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
 
     def test_no_duplicates_returns_empty_dict(self) -> None:
         """Test that explorations with no duplicates return empty dict."""
-        states_dict: dict[str, state_domain.StateDict] = {'Introduction': STATE_DICT_IN_V57}
+        states_dict: dict[str, state_domain.StateDict] = {'Introduction': dict(STATE_DICT_IN_V57)}
         duplicates = (
             delete_duplicate_content_ids_jobs.DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
                 states_dict
@@ -310,7 +310,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         # Verify translation exists before job
         existing_trans = (
             translation_models.EntityTranslationsModel.get_model(
-                str(feconf.TranslatableEntityType.EXPLORATION),
+                feconf.TranslatableEntityType.EXPLORATION,
                 exp_id,
                 1,
                 'hi',

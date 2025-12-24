@@ -1,8 +1,7 @@
 # coding: utf-8
-#
-# Copyright 2025 The Oppia Authors. All Rights Reserved.
-#
+    )
 # Licensed under the Apache License, Version 2.0 (the "License");
+(exp_models, translation_models, voiceover_models) = (
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -18,8 +17,8 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional, Set, Tuple
-
+from typing import Dict, List, Set, Tuple, Any
+import logging
 from core import feconf
 from core.domain import exp_domain, exp_fetchers, state_domain
 from core.jobs import base_jobs
@@ -47,9 +46,10 @@ if MYPY:  # pragma: no cover
             models.Names.TRANSLATION,
             models.Names.VOICEOVER,
         ]
+datastore_services = models.Registry.import_datastore_services()
+
     )
 )
-
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -82,56 +82,56 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         
         for state_name, state_dict in states_dict.items():
             content_ids: Set[str] = set()
-            
             # Add content ID from state content
-            content_ids.add(state_dict['content']['content_id'])
-            
+            cid = state_dict['content']['content_id']
+            if isinstance(cid, str):
+                content_ids.add(cid)
             # Add content IDs from interaction
             interaction = state_dict['interaction']
-            
             # Default outcome
             if interaction['default_outcome'] is not None:
-                content_ids.add(
-                    interaction['default_outcome']['feedback']['content_id']
-                )
-            
+                cid = interaction['default_outcome']['feedback']['content_id']
+                if isinstance(cid, str):
+                    content_ids.add(cid)
             # Answer groups
             for answer_group in interaction['answer_groups']:
-                content_ids.add(
-                    answer_group['outcome']['feedback']['content_id']
-                )
-                
+                cid = answer_group['outcome']['feedback']['content_id']
+                if isinstance(cid, str):
+                    content_ids.add(cid)
                 # Rule inputs with content IDs
                 for rule_spec in answer_group['rule_specs']:
                     for param_name, param_value in rule_spec['inputs'].items():
                         if isinstance(param_value, dict) and 'contentId' in param_value:
-                            content_ids.add(param_value['contentId'])
-            
+                            rcid = param_value['contentId']
+                            if isinstance(rcid, str):
+                                content_ids.add(rcid)
             # Solution
             if interaction['solution'] is not None:
-                content_ids.add(
-                    interaction['solution']['explanation']['content_id']
-                )
-            
+                cid = interaction['solution']['explanation']['content_id']
+                if isinstance(cid, str):
+                    content_ids.add(cid)
             # Hints
             for hint in interaction['hints']:
-                content_ids.add(hint['hint_content']['content_id'])
-            
+                cid = hint['hint_content']['content_id']
+                if isinstance(cid, str):
+                    content_ids.add(cid)
             # Customization args
             if interaction['customization_args']:
                 for ca_name, ca_spec in interaction['customization_args'].items():
-                    ca_value: object = ca_spec.get('value', {})
+                    ca_value: Any = ca_spec.get('value', {})
                     if isinstance(ca_value, dict) and ca_value.get('content_id') is not None:
-                        content_ids.add(ca_value.get('content_id'))
+                        cid = ca_value.get('content_id')
+                        if isinstance(cid, str):
+                            content_ids.add(cid)
                     elif isinstance(ca_value, dict) and ca_value.get('placeholder') is not None:
                         placeholder = ca_value.get('placeholder')
                         if isinstance(placeholder, dict) and placeholder.get('value') is not None:
                             val = placeholder.get('value')
                             if isinstance(val, dict) and val.get('content_id') is not None:
-                                content_ids.add(val.get('content_id'))
-            
+                                cid = val.get('content_id')
+                                if isinstance(cid, str):
+                                    content_ids.add(cid)
             state_to_content_ids[state_name] = list(content_ids)
-        
         return state_to_content_ids
 
     @staticmethod
