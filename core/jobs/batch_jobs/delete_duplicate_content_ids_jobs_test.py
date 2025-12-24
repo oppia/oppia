@@ -32,15 +32,12 @@ from core.jobs.types import job_run_result
 from core.platform import models
 from core.tests import test_utils
 
+
 from typing import Final
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        exp_models,
-        translation_models,
-        voiceover_models,
-    )
+    from mypy_imports import exp_models, translation_models, voiceover_models
 
 (exp_models, translation_models, voiceover_models) = (
     models.Registry.import_models(
