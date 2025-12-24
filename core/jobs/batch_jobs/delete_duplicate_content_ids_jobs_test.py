@@ -112,7 +112,7 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
 
     def test_no_duplicates_returns_empty_dict(self) -> None:
         """Test that explorations with no duplicates return empty dict."""
-        states_dict = {'Introduction': STATE_DICT_IN_V57}
+        states_dict: dict[str, state_domain.StateDict] = {'Introduction': STATE_DICT_IN_V57}
         duplicates = (
             delete_duplicate_content_ids_jobs.DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
                 states_dict
@@ -122,11 +122,11 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
 
     def test_finds_duplicates_across_states(self) -> None:
         """Test that duplicates are correctly identified across states."""
-        state1 = dict(STATE_DICT_IN_V57)
-        state2 = dict(STATE_DICT_IN_V57)
+        state1: state_domain.StateDict = dict(STATE_DICT_IN_V57)
+        state2: state_domain.StateDict = dict(STATE_DICT_IN_V57)
         
         # Both states use the same feedback_1 content_id (duplicate)
-        states_dict = {
+        states_dict: dict[str, state_domain.StateDict] = {
             'Introduction': state1,
             'End': state2,
         }
@@ -143,15 +143,15 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
 
     def test_unique_content_ids_not_duplicated(self) -> None:
         """Test that unique content IDs are not marked as duplicates."""
-        state1 = dict(STATE_DICT_IN_V57)
-        state2 = dict(STATE_DICT_IN_V57)
+        state1: state_domain.StateDict = dict(STATE_DICT_IN_V57)
+        state2: state_domain.StateDict = dict(STATE_DICT_IN_V57)
         
         # Change state2's feedback content_id to be unique
         state2['interaction']['answer_groups'][0]['outcome']['feedback'][
             'content_id'
         ] = 'feedback_2'
         
-        states_dict = {
+        states_dict: dict[str, state_domain.StateDict] = {
             'Introduction': state1,
             'End': state2,
         }
@@ -177,8 +177,8 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.AUTHOR_EMAIL, 'author')
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.signup(self.AUTHOR_EMAIL, 'author')  # type: ignore[attr-defined]
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[attr-defined]
 
     def test_exploration_without_duplicates_unmodified(self) -> None:
         """Test that explorations without duplicates are not changed."""
@@ -291,7 +291,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         # Create a translation for one of the duplicate content IDs
         translation_model = (
             translation_models.EntityTranslationsModel.create_new(
-                feconf.TranslatableEntityType.EXPLORATION,
+                str(feconf.TranslatableEntityType.EXPLORATION),
                 exp_id,
                 1,  # version
                 'hi',  # language code
@@ -310,7 +310,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         # Verify translation exists before job
         existing_trans = (
             translation_models.EntityTranslationsModel.get_model(
-                feconf.TranslatableEntityType.EXPLORATION,
+                str(feconf.TranslatableEntityType.EXPLORATION),
                 exp_id,
                 1,
                 'hi',

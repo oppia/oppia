@@ -120,15 +120,15 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             # Customization args
             if interaction['customization_args']:
                 for ca_name, ca_spec in interaction['customization_args'].items():
-                    ca_value = ca_spec.get('value', {})
-                    if isinstance(ca_value, dict) and 'content_id' in ca_value:
-                        content_ids.add(ca_value['content_id'])
-                    elif isinstance(ca_value, dict) and 'placeholder' in ca_value:
-                        placeholder = ca_value['placeholder']
-                        if isinstance(placeholder, dict) and 'value' in placeholder:
-                            val = placeholder['value']
-                            if isinstance(val, dict) and 'content_id' in val:
-                                content_ids.add(val['content_id'])
+                    ca_value: object = ca_spec.get('value', {})
+                    if isinstance(ca_value, dict) and ca_value.get('content_id') is not None:
+                        content_ids.add(ca_value.get('content_id'))
+                    elif isinstance(ca_value, dict) and ca_value.get('placeholder') is not None:
+                        placeholder = ca_value.get('placeholder')
+                        if isinstance(placeholder, dict) and placeholder.get('value') is not None:
+                            val = placeholder.get('value')
+                            if isinstance(val, dict) and val.get('content_id') is not None:
+                                content_ids.add(val.get('content_id'))
             
             state_to_content_ids[state_name] = list(content_ids)
         
@@ -217,7 +217,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             exploration.version = exp_model.version + 1
             
             # Extract the old->new mapping from state updates
-            old_to_new_mapping = {}
+            old_to_new_mapping: Dict[str, str] = {}
             for state_name in states_dict.keys():
                 old_state = exploration.states_dict.get(state_name)
                 if old_state:
