@@ -830,12 +830,10 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(
       () => {
-        // Accept and go to feedback tab
         this.routerService.navigateToFeedbackTab();
         this.isModalOpenable = true;
       },
       () => {
-        // Dismiss and stay on current tab
         this.isModalOpenable = true;
       }
     );
