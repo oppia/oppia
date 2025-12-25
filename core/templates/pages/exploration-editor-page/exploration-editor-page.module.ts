@@ -178,6 +178,7 @@ import {VersionHistoryService} from './services/version-history.service';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverPlayerService} from 'pages/exploration-player-page/services/voiceover-player.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 
 @NgModule({
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
@@ -231,6 +232,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     EditorNavigationComponent,
     TeachOppiaModalComponent,
     SettingsTabComponent,
+    FeedbackPromptModalComponent,
     UnresolvedAnswersOverviewComponent,
     PreviewTabComponent,
     HistoryTabComponent,
@@ -273,6 +275,7 @@ import {WindowDimensionsService} from 'services/contextual/window-dimensions.ser
     TransferExplorationOwnershipModalComponent,
     HelpModalComponent,
     PreviewSetParametersModalComponent,
+    FeedbackPromptModalComponent,
     CheckRevertExplorationModalComponent,
     RevertExplorationModalComponent,
     WelcomeTranslationModalComponent,

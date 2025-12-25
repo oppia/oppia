@@ -1,27 +1,29 @@
 <div class="modal-header">
-    <h3 class="modal-title">
-        Open Feedback Available
-    </h3>
+  <h3 class="modal-title">
+    Open Feedback Available
+  </h3>
 </div>
 
 <div class="modal-body oppia-long-text">
-    <p>
-        Your exploration has
-        <strong>{{ openThreadsCount }}</strong>
-        open feedback<span *ngIf="openThreadsCount !== 1">s</span>.
-    </p>
+  <p>
+    Your exploration has
+    <strong>{{ openThreadsCount }}</strong>
+    open feedback
+    <span *ngIf="openThreadsCount === 1"> thread</span>
+    <span *ngIf="openThreadsCount !== 1"> threads</span>.
+  </p>
 
-    <p>
-        Would you like to review the feedback now, or continue editing?
-    </p>
+  <p>
+    Would you like to review the feedback now, or continue editing?
+  </p>
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="cancel()">
-        Stay in editor
-    </button>
+  <button type="button" class="btn btn-secondary" (click)="cancel()">
+    Stay in editor
+  </button>
 
-    <button type="button" class="btn btn-primary" (click)="accept()">
-        Go to feedback
-    </button>
+  <button type="button" class="btn btn-success" (click)="accept()">
+    Go to feedback
+  </button>
 </div>
