@@ -449,7 +449,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
         this.explorationWarningsService.updateWarnings();
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
-        // this.maybeShowFeedbackPromptModal();
         this.explorationEditorPageHasInitialized = true;
       }
     );
@@ -831,12 +830,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(
       () => {
-        // Accept → go to feedback tab
+        // Accept and go to feedback tab
         this.routerService.navigateToFeedbackTab();
         this.isModalOpenable = true;
       },
       () => {
-        // Dismiss → stay on current tab
+        // Dismiss and stay on current tab
         this.isModalOpenable = true;
       }
     );
