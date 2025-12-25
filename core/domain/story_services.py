@@ -984,7 +984,9 @@ def delete_story_summary(story_id: str) -> None:
             be deleted.
     """
 
-    story_models.StorySummaryModel.get(story_id).delete()
+    story_summary_model = story_models.StorySummaryModel.get(story_id)
+    if story_summary_model is not None:
+        story_summary_model.delete()
 
 
 def compute_summary_of_story(
