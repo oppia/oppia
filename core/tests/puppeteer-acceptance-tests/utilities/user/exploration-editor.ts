@@ -1711,6 +1711,10 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
+
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1765,6 +1769,10 @@ export class ExplorationEditor extends BaseUser {
 
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2046,6 +2054,10 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
+
+    if (await this.isOnScreenKeyboardVisible()) {
+      await this.hideOSK();
+    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2756,21 +2768,29 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
+   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(): Promise<void> {
+  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        timeout: 5000,
+        // If we know the modal should appear, we can wait longer.
+        timeout: failIfMissing ? 20000 : 5000,
       });
       await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        hidden: true,
-      });
+      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      showMessage(`Welcome Modal not found, but test can be continued.
-        Error: ${(error as Error).message}`);
+      if (!failIfMissing) {
+        showMessage(
+          'Welcome Modal not found, but test can be continued.\n' +
+            `Error: ${error.message}`
+        );
+      } else {
+        throw new Error(
+          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
+        );
+      }
     }
   }
 
@@ -3737,7 +3757,7 @@ export class ExplorationEditor extends BaseUser {
         `Could not find clickable background for card: ${cardName}`
       );
     }
-    await nodeBackground.click();
+    await this.clickOnElement(nodeBackground);
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
