@@ -358,8 +358,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             )
             .then(response => {
               for (let language in response) {
-                // Initialize the entity translation objects with the last published translations
-                // in order to compare translation changes made.
+                // Initialize the entity translation objects with the last published translations in order to compare translation changes made
                 let languageTranslations =
                   response[language].translationMappingToBackendDict();
                 this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
@@ -382,22 +381,21 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
                   translations: languageTranslations,
                 });
               }
-              // Populate the entity translations with draft changes
-              // if they exist.
+              // Populate the entity translations with draft changes if they exist
               this.populateEntityTranslationsWithDraftChanges(
                 explorationData.draft_changes,
                 explorationData.version
               );
             });
         } else {
-          // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
+          // Simply populate draft changes for the translation tab in case the feature flag is not enabled
           this.populateEntityTranslationsWithDraftChanges(
             explorationData.draft_changes,
             explorationData.version
           );
         }
 
-        // Initialize changeList by draft changes if they exist.
+        // Initialize changeList by draft changes if they exist
         if (explorationData.draft_changes !== null) {
           this.changeListService.loadAutosavedChangeList(
             explorationData.draft_changes
@@ -441,14 +439,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           this.stateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
         }
 
-        // TODO(#13352): Initialize StateTopAnswersStatsService and register
-        // relevant callbacks.
+        // TODO(#13352): Initialize StateTopAnswersStatsService and register relevant callbacks
         await this.explorationImprovementsService.initAsync();
         await this.explorationImprovementsService.flushUpdatedTasksToBackend();
 
         this.explorationWarningsService.updateWarnings();
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
-        // this.maybeShowFeedbackPromptModal();
         this.explorationEditorPageHasInitialized = true;
       }
     );
@@ -754,7 +750,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      // eslint-disable-next-line max-len
+      // Eslint-disable-next-line max-len
       this.stateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(
         () => {
           this.showWelcomeExplorationModal();
@@ -794,9 +790,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.revertExplorationUrl = '/createhandler/revert/' + this.explorationId;
     this.areExplorationWarningsVisible = false;
 
-    // The initExplorationPage function is written separately since it
-    // is also called in directiveSubscriptions when some external events are
-    // triggered.
+    // The initExplorationPage function is written separately since it is also called in directiveSubscriptions when some external events are triggered
     this.improvementsTabIsEnabled = false;
 
     Promise.resolve(
