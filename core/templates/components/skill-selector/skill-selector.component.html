@@ -4,7 +4,7 @@
       <mat-card class="list-view-item e2e-test-skill-select-header">
         Search By Skill
         <input type="text" class="form-control e2e-test-skill-name-input" placeholder="Enter a skill name"
-          [(ngModel)]="skillFilterText" autofocus>
+          [(ngModel)]="skillFilterText" (ngModelChange)="onSkillSearchChange()" autofocus>
       </mat-card>
       <div class="skill-list-box">
         <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">

@@ -213,6 +213,9 @@ export class SkillSelectorComponent implements OnInit {
       return filteredSkills.includes(val.description);
     });
   }
+  onSkillSearchChange(): void {
+    // This method exists only to trigger Angular change detection
+  }
 
   clearAllFilters(): void {
     for (let i = 0; i < this.topicFilterList.length; i++) {
