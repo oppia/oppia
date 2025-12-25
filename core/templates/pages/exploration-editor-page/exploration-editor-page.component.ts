@@ -205,7 +205,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   /** ******************************************
-   * Methods affecting the graph visualization.
+   * Methods affecting the graph visualization
    ********************************************/
   toggleExplorationWarningVisibility(): void {
     this.areExplorationWarningsVisible = !this.areExplorationWarningsVisible;
@@ -678,7 +678,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         },
         () => {
-          // Note to developers:
+          // Note to developers
           // This callback is triggered when the Cancel button is clicked
           // No further action is needed
         }
@@ -780,7 +780,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     );
 
     /** ********************************************************
-     * Called on initial load of the exploration editor page.
+     * Called on initial load of the exploration editor page
      *********************************************************/
     this.loaderService.showLoadingScreen('Loading');
 
@@ -827,12 +827,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(
       () => {
-        // Accept → go to feedback tab
+        // Accept and go to feedback tab
         this.routerService.navigateToFeedbackTab();
         this.isModalOpenable = true;
       },
       () => {
-        // Dismiss → stay on current tab
+        // Dismiss and stay on current tab
         this.isModalOpenable = true;
       }
     );
