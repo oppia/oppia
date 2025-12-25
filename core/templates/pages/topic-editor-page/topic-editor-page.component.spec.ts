@@ -65,9 +65,9 @@ describe('Topic editor page', () => {
   let undoRedoService: UndoRedoService;
   let topicEditorStateService: TopicEditorStateService;
   let urlService: UrlService;
-  let topic;
-  let ngbModal;
-  let runSpy;
+  let topic: Topic;
+  let ngbModal: NgbModal;
+  let runSpy: jasmine.Spy;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({

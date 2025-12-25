@@ -834,7 +834,7 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(componentInstance as any, '_navigateToPreview');
 
     const mockModalRef = {
       componentInstance: {},
@@ -857,7 +857,7 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToPreview');
+    const navigateSpy = spyOn(componentInstance as any, '_navigateToPreview');
 
     const mockModalRef = {
       componentInstance: {},
@@ -880,7 +880,7 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(componentInstance as any, '_navigateToMainTab');
 
     const mockModalRef = {
       componentInstance: {},
@@ -903,7 +903,7 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance, '_navigateToMainTab');
+    const navigateSpy = spyOn(componentInstance as any, '_navigateToMainTab');
 
     const mockModalRef = {
       componentInstance: {},

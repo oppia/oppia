@@ -38,11 +38,11 @@ import {TopicEditorStateService} from './services/topic-editor-state.service';
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
-  topic: Topic;
-  validationIssues: string[];
-  prepublishValidationIssues: string[];
-  warningsAreShown: boolean;
-  topicRights: TopicRights;
+  topic!: Topic;
+  validationIssues!: string[];
+  prepublishValidationIssues!: string[];
+  warningsAreShown!: boolean;
+  topicRights!: TopicRights;
   cancelNavigationOnce = false;
 
   constructor(
@@ -66,7 +66,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getEntityType(): string {
-    return this.pageContextService.getEntityType();
+    return this.pageContextService.getEntityType() || '';
   }
 
   setDocumentTitle(): void {
@@ -183,6 +183,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
         return 'Topic Preview';
       }
     }
+    return 'Topic Editor';
   }
 
   _validateTopic(): void {
@@ -194,10 +195,12 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
       this.validationIssues.push('Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
-    let subtopicPrepublishValidationIssues = [].concat.apply(
-      [],
-      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
-    );
+    let subtopicPrepublishValidationIssues: string[] = [];
+    this.topic.getSubtopics().forEach(subtopic => {
+      subtopicPrepublishValidationIssues = subtopicPrepublishValidationIssues.concat(
+        subtopic.prepublishValidate()
+      );
+    });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );

@@ -43,22 +43,22 @@ import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.
 export class TopicEditorNavbarComponent
   implements OnInit, OnDestroy, AfterContentChecked
 {
-  validationIssues: string[];
-  topic: Topic;
-  prepublishValidationIssues: string[];
-  topicRights: TopicRights;
-  topicId: string;
-  topicName: string;
-  discardChangesButtonIsShown: boolean;
-  showTopicEditOptions: boolean;
-  topicSkillIds: string[];
-  showNavigationOptions: boolean;
-  warningsAreShown: boolean;
-  navigationChoices: string[];
-  activeTab: string;
-  changeListLength: number;
-  topicIsSaveable: boolean;
-  totalWarningsCount: number;
+  validationIssues!: string[];
+  topic!: Topic;
+  prepublishValidationIssues!: string[];
+  topicRights!: TopicRights;
+  topicId!: string;
+  topicName!: string;
+  discardChangesButtonIsShown!: boolean;
+  showTopicEditOptions!: boolean;
+  topicSkillIds!: string[];
+  showNavigationOptions!: boolean;
+  warningsAreShown!: boolean;
+  navigationChoices!: string[];
+  activeTab!: string;
+  changeListLength!: number;
+  topicIsSaveable!: boolean;
+  totalWarningsCount!: number;
 
   constructor(
     private topicEditorStateService: TopicEditorStateService,
@@ -81,6 +81,9 @@ export class TopicEditorNavbarComponent
   }
 
   _validateTopic(): void {
+    if (!this.topic) {
+      return;
+    }
     this.validationIssues = this.topic.validate();
     if (this.topicEditorStateService.getTopicWithNameExists()) {
       this.validationIssues.push('A topic with this name already exists.');
@@ -89,16 +92,21 @@ export class TopicEditorNavbarComponent
       this.validationIssues.push('Topic URL fragment already exists.');
     }
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
-    let subtopicPrepublishValidationIssues = [].concat.apply(
-      [],
-      this.topic.getSubtopics().map(subtopic => subtopic.prepublishValidate())
-    );
+    let subtopicPrepublishValidationIssues: string[] = [];
+    this.topic.getSubtopics().forEach(subtopic => {
+      subtopicPrepublishValidationIssues = subtopicPrepublishValidationIssues.concat(
+        subtopic.prepublishValidate()
+      );
+    });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues
     );
   }
 
   publishTopic(): void {
+    if (!this.topic || !this.topicRights) {
+      return;
+    }
     if (!this.topicRights.canPublishTopic()) {
       this.ngbModal
         .open(TopicEditorSendMailComponent, {
@@ -142,6 +150,9 @@ export class TopicEditorNavbarComponent
   }
 
   discardChanges(): void {
+    if (!this.topicId) {
+      return;
+    }
     this.undoRedoService.clearChanges();
     this.discardChangesButtonIsShown = false;
     this.topicEditorStateService.loadTopic(this.topicId);
@@ -152,6 +163,9 @@ export class TopicEditorNavbarComponent
   }
 
   isTopicSaveable(): boolean {
+    if (!this.topicRights) {
+      return false;
+    }
     return (
       this.getChangeListLength() > 0 &&
       this.getWarningsCount() === 0 &&
@@ -177,6 +191,9 @@ export class TopicEditorNavbarComponent
   }
 
   saveChanges(): void {
+    if (!this.topicRights) {
+      return;
+    }
     let isTopicPublished = this.topicRights.isPublished();
     const modelRef = this.ngbModal.open(TopicEditorSaveModalComponent, {
       backdrop: 'static',
@@ -197,6 +214,9 @@ export class TopicEditorNavbarComponent
   }
 
   unpublishTopic(): boolean {
+    if (!this.topicId || !this.topicRights) {
+      return false;
+    }
     const classroomName = this.topicEditorStateService.getClassroomName();
     if (classroomName) {
       const errorMessage =
@@ -215,6 +235,7 @@ export class TopicEditorNavbarComponent
         this.topicRights.markTopicAsUnpublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
       });
+    return true;
   }
 
   toggleNavigationOptions(): void {
@@ -253,6 +274,7 @@ export class TopicEditorNavbarComponent
     } else if (activeTab === 'topic_preview') {
       return 'Preview';
     }
+    return 'Editor';
   }
 
   openTopicViewer(): void {
@@ -292,9 +314,15 @@ export class TopicEditorNavbarComponent
         );
         return;
       }
+      if (!this.topic) {
+        return;
+      }
       const topicUrlFragment = this.topic.getUrlFragment();
       const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
+      if (!classroomUrlFragment) {
+        return;
+      }
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
           ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,

@@ -165,7 +165,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     let subtopic = Subtopic.createFromTitle(1, 'subtopic1');
     topic = Topic.create(
-      sampleTopicBackendObject.topicDict as TopicBackendDict,
+      sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
     topic._subtopics = [subtopic];
@@ -309,7 +309,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       getDescription: () => {
         return null;
       },
-    };
-    component.isSkillDeleted(skillSummary as ShortSkillSummary);
+    } as unknown as ShortSkillSummary;
+    component.isSkillDeleted(skillSummary);
   });
 });

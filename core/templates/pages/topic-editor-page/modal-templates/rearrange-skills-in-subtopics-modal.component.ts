@@ -42,14 +42,14 @@ export class RearrangeSkillsInSubtopicsModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, OnDestroy
 {
-  topic: Topic;
-  subtopics: Subtopic[];
-  uncategorizedSkillSummaries: ShortSkillSummary[];
-  skillSummaryToMove: ShortSkillSummary;
+  topic!: Topic;
+  subtopics!: Subtopic[];
+  uncategorizedSkillSummaries!: ShortSkillSummary[];
+  skillSummaryToMove!: ShortSkillSummary;
   oldSubtopicId: number | null = null;
-  errorMsg: string;
-  editableName: string;
-  selectedSubtopicId: number;
+  errorMsg!: string;
+  editableName!: string;
+  selectedSubtopicId!: number;
   maxCharsInSubtopicTitle: number = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
 
   SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
@@ -67,6 +67,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
 
   initEditor(): void {
     this.topic = this.topicEditorStateService.getTopic();
+    if (!this.topic) {
+      return;
+    }
     this.subtopics = this.topic.getSubtopics();
     this.uncategorizedSkillSummaries =
       this.topic.getUncategorizedSkillSummaries();
@@ -105,6 +108,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
     event: CdkDragDrop<ShortSkillSummary[]>,
     newSubtopicId: number | null
   ): void {
+    if (!this.topic || !this.skillSummaryToMove) {
+      return;
+    }
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -123,12 +129,18 @@ export class RearrangeSkillsInSubtopicsModalComponent
       }
 
       if (newSubtopicId === null) {
+        if (this.oldSubtopicId === null) {
+          return;
+        }
         this.topicUpdateService.removeSkillFromSubtopic(
           this.topic,
           this.oldSubtopicId,
           this.skillSummaryToMove
         );
       } else {
+        if (this.oldSubtopicId === null) {
+          return;
+        }
         this.topicUpdateService.moveSkillToSubtopic(
           this.topic,
           this.oldSubtopicId,
@@ -141,6 +153,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
   }
 
   updateSubtopicTitle(subtopicId: number): void {
+    if (!this.topic) {
+      return;
+    }
     if (
       !this.subtopicValidationService.checkValidSubtopicName(this.editableName)
     ) {
@@ -156,11 +171,13 @@ export class RearrangeSkillsInSubtopicsModalComponent
     this.editNameOfSubtopicWithId(null);
   }
 
-  editNameOfSubtopicWithId(subtopicId: number): void {
+  editNameOfSubtopicWithId(subtopicId: number | null): void {
     if (!subtopicId) {
       this.editableName = '';
+      this.selectedSubtopicId = 0;
+    } else {
+      this.selectedSubtopicId = subtopicId;
     }
-    this.selectedSubtopicId = subtopicId;
   }
 
   isSkillDeleted(skillSummary: ShortSkillSummary): boolean {

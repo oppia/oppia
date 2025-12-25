@@ -51,45 +51,45 @@ import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearr
   templateUrl: './topic-editor-tab.component.html',
 })
 export class TopicEditorTabComponent implements OnInit, OnDestroy {
-  skillCreationIsAllowed: boolean;
-  topic: Topic;
-  skillQuestionCountDict: object;
-  topicRights: TopicRights;
-  topicNameEditorIsShown: boolean;
-  topicDataHasLoaded: boolean;
-  editableName: string;
-  editableMetaTagContent: string;
-  editablePageTitleFragmentForWeb: string;
-  editablePracticeIsDisplayed: boolean;
-  initialTopicName: string;
-  initialTopicUrlFragment: string;
-  editableTopicUrlFragment: string;
-  editableDescription: string;
-  allowedBgColors;
-  topicNameExists: boolean;
-  topicUrlFragmentExists: boolean;
-  hostname: string;
-  availableSkillSummariesForDiagnosticTest: ShortSkillSummary[];
-  selectedSkillSummariesForDiagnosticTest: ShortSkillSummary[];
-  diagnosticTestSkillsDropdownIsShown: boolean;
-  topicPreviewCardIsShown: boolean;
-  SUBTOPIC_LIST: string;
-  SKILL_LIST: string;
-  STORY_LIST: string;
-  subtopicCardSelectedIndexes: {};
-  subtopicsListIsShown: boolean;
-  selectedSkillEditOptionsIndex: {};
-  editableDescriptionIsEmpty: boolean;
-  topicDescriptionChanged: boolean;
-  subtopics: Subtopic[];
-  subtopicQuestionCountDict: {};
-  uncategorizedSkillSummaries: ShortSkillSummary[];
-  editableThumbnailDataUrl: string;
-  canonicalStorySummaries: StorySummary[];
-  mainTopicCardIsShown: boolean;
-  storiesListIsShown: boolean;
-  uncategorizedEditOptionsIndex: number;
-  subtopicEditOptionsAreShown: number;
+  skillCreationIsAllowed!: boolean;
+  topic!: Topic;
+  skillQuestionCountDict!: Record<string, number>;
+  topicRights!: TopicRights;
+  topicNameEditorIsShown!: boolean;
+  topicDataHasLoaded!: boolean;
+  editableName!: string;
+  editableMetaTagContent!: string;
+  editablePageTitleFragmentForWeb!: string;
+  editablePracticeIsDisplayed!: boolean;
+  initialTopicName!: string;
+  initialTopicUrlFragment!: string;
+  editableTopicUrlFragment!: string;
+  editableDescription!: string;
+  allowedBgColors!: string[];
+  topicNameExists!: boolean;
+  topicUrlFragmentExists!: boolean;
+  hostname!: string;
+  availableSkillSummariesForDiagnosticTest!: ShortSkillSummary[];
+  selectedSkillSummariesForDiagnosticTest!: ShortSkillSummary[];
+  diagnosticTestSkillsDropdownIsShown!: boolean;
+  topicPreviewCardIsShown!: boolean;
+  SUBTOPIC_LIST!: string;
+  SKILL_LIST!: string;
+  STORY_LIST!: string;
+  subtopicCardSelectedIndexes!: Record<string | number, boolean>;
+  subtopicsListIsShown!: boolean;
+  selectedSkillEditOptionsIndex!: Record<string | number, Record<number, boolean> | {}>;
+  editableDescriptionIsEmpty!: boolean;
+  topicDescriptionChanged!: boolean;
+  subtopics!: Subtopic[];
+  subtopicQuestionCountDict!: Record<number, number>;
+  uncategorizedSkillSummaries!: ShortSkillSummary[];
+  editableThumbnailDataUrl!: string;
+  canonicalStorySummaries!: StorySummary[];
+  mainTopicCardIsShown!: boolean;
+  storiesListIsShown!: boolean;
+  uncategorizedEditOptionsIndex!: number | null;
+  subtopicEditOptionsAreShown!: number | null;
   skillOptionDialogueBox: boolean = true;
   maxCharsInTopicName!: number;
   MAX_CHARS_IN_TOPIC_URL_FRAGMENT!: number;
@@ -101,7 +101,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   classroomUrlFragment: string | null = null;
   classroomName: string | null = null;
   curriculumAdminUsernames: string[] = [];
-  generatedUrlPrefix: string;
+  generatedUrlPrefix!: string;
 
   constructor(
     private pageContextService: PageContextService,
@@ -125,6 +125,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
 
   drop(event: CdkDragDrop<Subtopic[]>): void {
+    if (!this.topic || !this.subtopics) {
+      return;
+    }
     moveItemInArray(this.subtopics, event.previousIndex, event.currentIndex);
 
     this.topicUpdateService.rearrangeSubtopic(
@@ -139,8 +142,11 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.skillCreationIsAllowed =
       this.topicEditorStateService.isSkillCreationAllowed();
     this.topic = this.topicEditorStateService.getTopic();
+    if (!this.topic) {
+      return;
+    }
     this.skillQuestionCountDict =
-      this.topicEditorStateService.getSkillQuestionCountDict();
+      this.topicEditorStateService.getSkillQuestionCountDict() as Record<string, number>;
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.topicNameEditorIsShown = false;
     if (this.topicEditorStateService.hasLoadedTopic()) {
@@ -156,7 +162,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.initialTopicUrlFragment = this.topic.getUrlFragment();
     this.editableTopicUrlFragment = this.topic.getUrlFragment();
     this.editableDescription = this.topic.getDescription();
-    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+    this.allowedBgColors = [...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic];
     this.topicNameExists = false;
     this.topicUrlFragmentExists = false;
     this.hostname = this.windowRef.nativeWindow.location.hostname;
@@ -181,16 +187,24 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     });
     this.uncategorizedSkillSummaries =
       this.topic.getUncategorizedSkillSummaries();
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+    if (!entityType || !entityId) {
+      return;
+    }
     this.editableThumbnailDataUrl =
       this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
         this.topic.getThumbnailFilename(),
-        this.pageContextService.getEntityType(),
-        this.pageContextService.getEntityId()
+        entityType,
+        entityId
       );
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}`;
   }
 
   getEligibleSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
+    if (!this.topic) {
+      return [];
+    }
     let availableSkillSummaries =
       this.topic.getAvailableSkillSummariesForDiagnosticTest();
 
@@ -203,7 +217,13 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addSkillForDiagnosticTest(): void {
+    if (!this.topic) {
+      return;
+    }
     let skillToAdd = this.skillForDiagnosticTestFormControl.value;
+    if (!skillToAdd) {
+      return;
+    }
     this.skillForDiagnosticTestFormControl.setValue(null);
     this.selectedSkillSummariesForDiagnosticTest.push(skillToAdd);
 
@@ -224,6 +244,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   removeSkillFromDiagnosticTest(skillToRemove: ShortSkillSummary): void {
+    if (!this.topic) {
+      return;
+    }
     let skillSummary = this.selectedSkillSummariesForDiagnosticTest.find(
       skill => skill.getId() === skillToRemove.getId()
     );
@@ -254,6 +277,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   // editor, it gets assigned to that topic, and to reflect that
   // change, we need to fetch the topic again from the backend.
   refreshTopic(): void {
+    if (!this.topic) {
+      return;
+    }
     this.topicEditorStateService.loadTopic(this.topic.getId());
   }
 
@@ -343,6 +369,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicName(newName: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newName === this.initialTopicName) {
       this.topicNameExists = false;
       return;
@@ -361,6 +390,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicUrlFragment(newTopicUrlFragment: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newTopicUrlFragment === this.initialTopicUrlFragment) {
       this.topicUrlFragmentExists = false;
       return;
@@ -397,6 +429,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicThumbnailFilename(newThumbnailFilename: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newThumbnailFilename === this.topic.getThumbnailFilename()) {
       return;
     }
@@ -407,6 +442,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicThumbnailBgColor(newThumbnailBgColor: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newThumbnailBgColor === this.topic.getThumbnailBgColor()) {
       return;
     }
@@ -417,12 +455,18 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateTopicDescription(newDescription: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newDescription !== this.topic.getDescription()) {
       this.topicUpdateService.setTopicDescription(this.topic, newDescription);
     }
   }
 
   updateTopicMetaTagContent(newMetaTagContent: string): void {
+    if (!this.topic) {
+      return;
+    }
     if (newMetaTagContent !== this.topic.getMetaTagContent()) {
       this.topicUpdateService.setMetaTagContent(this.topic, newMetaTagContent);
     }
@@ -431,6 +475,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   updateTopicPageTitleFragmentForWeb(
     newTopicPageTitleFragmentForWeb: string
   ): void {
+    if (!this.topic) {
+      return;
+    }
     let currentValue = this.topic.getPageTitleFragmentForWeb();
     if (newTopicPageTitleFragmentForWeb !== currentValue) {
       this.topicUpdateService.setPageTitleFragmentForWeb(
@@ -444,6 +491,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   // practice tab or 2) the creator is turning on the practice tab
   // and it has enough practice questions.
   updatePracticeTabIsDisplayed(newPracticeTabIsDisplayed: boolean): void {
+    if (!this.topic) {
+      return;
+    }
     if (
       !newPracticeTabIsDisplayed ||
       this.doesTopicHaveMinimumPracticeQuestions()
@@ -469,6 +519,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   deleteUncategorizedSkillFromTopic(skillSummary: ShortSkillSummary): void {
+    if (!this.topic) {
+      return;
+    }
     this.topicUpdateService.removeUncategorizedSkill(this.topic, skillSummary);
     this.removeSkillFromDiagnosticTest(skillSummary);
     this.initEditor();
@@ -478,6 +531,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     subtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
+    if (!this.topic) {
+      return;
+    }
     this.skillOptionDialogueBox = true;
     this.selectedSkillEditOptionsIndex = {};
     this.topicUpdateService.removeSkillFromSubtopic(
@@ -492,6 +548,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     subtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
+    if (!this.topic) {
+      return;
+    }
     this.skillOptionDialogueBox = true;
     this.selectedSkillEditOptionsIndex = {};
     this.topicUpdateService.removeSkillFromSubtopic(
@@ -507,6 +566,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   deleteSubtopic(subtopicId: number): void {
+    if (!this.topic) {
+      return;
+    }
     this.topicEditorStateService.deleteSubtopicPage(
       this.topic.getId(),
       subtopicId
@@ -536,6 +598,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   getPreviewFooter(): string {
+    if (!this.topic) {
+      return '0 Stories';
+    }
     var canonicalStoriesLength = this.topic.getCanonicalStoryIds().length;
     if (canonicalStoriesLength === 0 || canonicalStoriesLength > 1) {
       return canonicalStoriesLength + ' Stories';
@@ -543,7 +608,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     return '1 Story';
   }
 
-  togglePreviewListCards(listType: string = null): void {
+  togglePreviewListCards(listType: string | null = null): void {
     if (!this.windowDimensionsService.isWindowNarrow()) {
       return;
     }
@@ -570,6 +635,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     oldSubtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
+    if (!this.topic) {
+      return;
+    }
     this.skillOptionDialogueBox = true;
     const modalRef: NgbModalRef = this.ngbModal.open(
       ChangeSubtopicAssignmentModalComponent,
@@ -602,8 +670,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   showSkillEditOptions(
-    subtopicIndex: string | number = null,
-    skillIndex: number = null
+    subtopicIndex: string | number | null = null,
+    skillIndex: number | null = null
   ): void {
     if (subtopicIndex === null && skillIndex === null) {
       this.skillOptionDialogueBox = true;
@@ -614,6 +682,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
 
     if (Object.keys(this.selectedSkillEditOptionsIndex).length) {
       this.selectedSkillEditOptionsIndex = {};
+      return;
+    }
+    if (subtopicIndex === null || skillIndex === null) {
       return;
     }
     this.selectedSkillEditOptionsIndex[subtopicIndex] = {};
