@@ -184,9 +184,8 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
     sentenceRegex: RegExp
   ): Node[] | HTMLElement | Text[] | Node {
     const currentNodeName = node.nodeName;
-    // Preserve <br> nodes as-is so visual line breaks are retained.
     if (node.nodeName === 'BR') {
-      return [node]; // Preserve <br>
+      return [node];
     }
     if (node.nodeType === Node.TEXT_NODE) {
       const textContent = node.textContent || '';
@@ -250,11 +249,7 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
         let nextSentenceOffset = '';
 
         for (let childNode of updatedChildNodes) {
-          // If we encounter a <br>, keep it visually but don't treat it as
-          // Part of the sentence text; push it into the span list and
-          // Continue.
           if (childNode.nodeName === 'BR') {
-            // Visually keep the <br>, but do not treat it as text.
             spanNodeList.push(childNode);
             continue;
           }
@@ -288,7 +283,11 @@ export class RteOutputDisplayComponent implements OnInit, AfterViewInit {
           }
         }
 
-        // Clone only the element, not its children (important!).
+        // Clone only the element, not its children. Cloning children here
+        // would move or duplicate the original child nodes and could
+        // detach them from the source DOM. We clone the element shell and
+        // then clone/append child nodes explicitly into span wrappers to
+        // preserve the original DOM and avoid side-effects during traversal.
         let nodeTemp = node.cloneNode(false) as Node;
 
         for (let spanNode of spanNodeList) {
