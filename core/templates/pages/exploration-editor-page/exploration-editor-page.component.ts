@@ -358,7 +358,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             )
             .then(response => {
               for (let language in response) {
-                // Initialize the entity translation objects with the last published translations in order to compare translation changes made
+                // Initializes the entity translation objects with the last published translations
+                // In order to compare translation changes made
                 let languageTranslations =
                   response[language].translationMappingToBackendDict();
                 this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
@@ -388,7 +389,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
               );
             });
         } else {
-          // Simply populate draft changes for the translation tab in case the feature flag is not enabled
+          // Simply populate draft changes for the translation tab
+          // In case the feature flag is not enabled
           this.populateEntityTranslationsWithDraftChanges(
             explorationData.draft_changes,
             explorationData.version
@@ -407,7 +409,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           explorationData.draft_changes !== null &&
           explorationData.draft_changes.length > 0
         ) {
-          // Show modal displaying lost changes if the version of draft changes is invalid and draft_changes is not `null`
+          // Show modal displaying lost changes
+          // If the version of draft changes is invalid and draft_changes is not `null`
           this.autosaveInfoModalsService.showVersionMismatchModal(
             this.changeListService.getChangeList()
           );
