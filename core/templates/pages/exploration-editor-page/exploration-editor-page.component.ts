@@ -205,7 +205,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
   }
 
   /** ******************************************
-   * Methods affecting the graph visualization
+   * Methods affecting the graph visualization.
    ********************************************/
   toggleExplorationWarningVisibility(): void {
     this.areExplorationWarningsVisible = !this.areExplorationWarningsVisible;
@@ -215,8 +215,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     return explorationId ? '/explore/' + explorationId : '';
   }
 
-  // Initializes the exploration page using data from the backend
-  // Called on page load
+  // Initializes the exploration page using data from the backend.
+  // Called on page load.
   initExplorationPage(): Promise<void> {
     this.editabilityService.lockExploration(true);
     this.modifyTranslationsFeatureFlagIsEnabled =
@@ -358,8 +358,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             )
             .then(response => {
               for (let language in response) {
-                // Initializes the entity translation objects with the last published translations
-                // In order to compare translation changes made
+                // Initialize the entity translation objects with the last published translations
+                // in order to compare translation changes made.
                 let languageTranslations =
                   response[language].translationMappingToBackendDict();
                 this.entityTranslationsService.languageCodeToLastPublishedEntityTranslations[
@@ -382,22 +382,22 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
                   translations: languageTranslations,
                 });
               }
-              // Populate the entity translations with draft changes if they exist
+              // Populate the entity translations with draft changes
+              // if they exist.
               this.populateEntityTranslationsWithDraftChanges(
                 explorationData.draft_changes,
                 explorationData.version
               );
             });
         } else {
-          // Simply populate draft changes for the translation tab
-          // In case the feature flag is not enabled
+          // Simply populate draft changes for the translation tab in case the feature flag is not enabled.
           this.populateEntityTranslationsWithDraftChanges(
             explorationData.draft_changes,
             explorationData.version
           );
         }
 
-        // Initialize changeList by draft changes if they exist
+        // Initialize changeList by draft changes if they exist.
         if (explorationData.draft_changes !== null) {
           this.changeListService.loadAutosavedChangeList(
             explorationData.draft_changes
@@ -409,8 +409,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           explorationData.draft_changes !== null &&
           explorationData.draft_changes.length > 0
         ) {
-          // Show modal displaying lost changes
-          // If the version of draft changes is invalid and draft_changes is not `null`
+          // Show modal displaying lost changes if the version of draft
+          // changes is invalid, and draft_changes is not `null`.
           this.autosaveInfoModalsService.showVersionMismatchModal(
             this.changeListService.getChangeList()
           );
@@ -442,12 +442,14 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           this.stateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
         }
 
-        // TODO(#13352): Initialize StateTopAnswersStatsService and register relevant callbacks
+        // TODO(#13352): Initialize StateTopAnswersStatsService and register
+        // relevant callbacks.
         await this.explorationImprovementsService.initAsync();
         await this.explorationImprovementsService.flushUpdatedTasksToBackend();
 
         this.explorationWarningsService.updateWarnings();
         this.stateEditorRefreshService.onRefreshStateEditor.emit();
+        // this.maybeShowFeedbackPromptModal();
         this.explorationEditorPageHasInitialized = true;
       }
     );
@@ -470,7 +472,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         let changeDict = draftChanges[i];
 
         if (changeDict.cmd === 'edit_translation') {
-          // Create the entity translation objects first if they don't exist
+          // Create the entity translation objects first if they don't exist.
           if (
             !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
               changeDict.language_code
@@ -487,7 +489,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             });
           }
 
-          // Update the translations appropriately, via latest draft changes
+          // Update the translations appropriately, via latest draft changes.
           if (changeDict.translation.content_value) {
             this.entityTranslationsService.languageCodeToLatestEntityTranslations[
               changeDict.language_code
@@ -678,9 +680,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         },
         () => {
-          // Note to developers
-          // This callback is triggered when the Cancel button is clicked
-          // No further action is needed
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         }
       );
   }
@@ -753,7 +755,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     );
 
     this.directiveSubscriptions.add(
-      // Eslint-disable-next-line max-len
+      // eslint-disable-next-line max-len
       this.stateTutorialFirstTimeService.onEnterEditorForTheFirstTime.subscribe(
         () => {
           this.showWelcomeExplorationModal();
@@ -780,7 +782,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     );
 
     /** ********************************************************
-     * Called on initial load of the exploration editor page
+     * Called on initial load of the exploration editor page.
      *********************************************************/
     this.loaderService.showLoadingScreen('Loading');
 
@@ -793,7 +795,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.revertExplorationUrl = '/createhandler/revert/' + this.explorationId;
     this.areExplorationWarningsVisible = false;
 
-    // The initExplorationPage function is written separately since it is also called in directiveSubscriptions when some external events are triggered
+    // The initExplorationPage function is written separately since it
+    // is also called in directiveSubscriptions when some external events are
+    // triggered.
     this.improvementsTabIsEnabled = false;
 
     Promise.resolve(
@@ -827,12 +831,12 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
 
     modalRef.result.then(
       () => {
-        // Accept and go to feedback tab
+        // Accept → go to feedback tab
         this.routerService.navigateToFeedbackTab();
         this.isModalOpenable = true;
       },
       () => {
-        // Dismiss and stay on current tab
+        // Dismiss → stay on current tab
         this.isModalOpenable = true;
       }
     );
