@@ -888,7 +888,9 @@ export class BaseUser {
       try {
         process.off('SIGTERM', this.sigTermHandler);
       } catch (e) {
-        // Ignore if unable to remove.
+        showMessage(
+          `Unable to remove SIGTERM handler for ${this.username ?? 'unknown user'}: ${e}`
+        );
       }
       this.sigTermHandler = undefined;
     }
@@ -896,7 +898,9 @@ export class BaseUser {
       try {
         process.off('SIGINT', this.sigIntHandler);
       } catch (e) {
-        // Ignore if unable to remove.
+        showMessage(
+          `Unable to remove SIGINT handler for ${this.username ?? 'unknown user'}: ${e}`
+        );
       }
       this.sigIntHandler = undefined;
     }
