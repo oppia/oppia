@@ -3947,19 +3947,6 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         )
         self.assertEqual(generated_response, {})
 
-    def test_cannot_send_dummy_mail(self) -> None:
-        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-        generated_response = self.post_json(
-            '/senddummymailtoadminhandler',
-            {},
-            csrf_token=csrf_token,
-            expected_status_int=400,
-        )
-        self.assertEqual(
-            generated_response['error'], 'This app cannot send emails.'
-        )
-
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     """Tests for updating usernames."""

@@ -29,7 +29,7 @@ class ImageValidationServiceTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             self.raw_image = f.read()
