@@ -215,8 +215,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     return explorationId ? '/explore/' + explorationId : '';
   }
 
-  // Initializes the exploration page using data from the backend.
-  // Called on page load.
+  // Initializes the exploration page using data from the backend
+  // Called on page load
   initExplorationPage(): Promise<void> {
     this.editabilityService.lockExploration(true);
     this.modifyTranslationsFeatureFlagIsEnabled =
@@ -349,20 +349,6 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           );
         }
 
-        // if (
-        //   !this.routerService.isLocationSetToNonStateEditorTab() &&
-        //   !explorationData.states.hasOwnProperty(
-        //     this.routerService.getCurrentStateFromLocationPath()
-        //   )
-        // ) {
-        //   if (this.threadDataBackendApiService.getOpenThreadsCount() > 0) {
-        //     this.routerService.navigateToFeedbackTab();
-        //   }
-        // }
-        // if (!this.routerService.isLocationSetToNonStateEditorTab()) {
-        //   this.routerService.navigateToMainTab(null);
-        // }
-
         if (this.modifyTranslationsFeatureFlagIsEnabled) {
           this.entityBulkTranslationsBackendApiService
             .fetchEntityBulkTranslationsAsync(
@@ -423,8 +409,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           explorationData.draft_changes !== null &&
           explorationData.draft_changes.length > 0
         ) {
-          // Show modal displaying lost changes if the version of draft
-          // changes is invalid, and draft_changes is not `null`.
+          // Show modal displaying lost changes if the version of draft changes is invalid and draft_changes is not `null`
           this.autosaveInfoModalsService.showVersionMismatchModal(
             this.changeListService.getChangeList()
           );
@@ -486,7 +471,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         let changeDict = draftChanges[i];
 
         if (changeDict.cmd === 'edit_translation') {
-          // Create the entity translation objects first if they don't exist.
+          // Create the entity translation objects first if they don't exist
           if (
             !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
               changeDict.language_code
@@ -503,7 +488,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
             });
           }
 
-          // Update the translations appropriately, via latest draft changes.
+          // Update the translations appropriately, via latest draft changes
           if (changeDict.translation.content_value) {
             this.entityTranslationsService.languageCodeToLatestEntityTranslations[
               changeDict.language_code
@@ -695,8 +680,8 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
         },
         () => {
           // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
+          // This callback is triggered when the Cancel button is clicked
+          // No further action is needed
         }
       );
   }
