@@ -43,6 +43,15 @@ class WorkingJob(base_jobs.JobBase):
         )
 
 
+class VoiceoverSynthesisForTestingJob(base_jobs.JobBase):
+    """Simple job for voiceover synthesis to test resource limiting."""
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        return self.pipeline | beam.Create(
+            [job_run_result.JobRunResult(stdout='o', stderr='e')]
+        )
+
+
 class FailingJob(base_jobs.JobBase):
     """Simple job that always raises an exception."""
 
@@ -253,3 +262,33 @@ class CancelJobTests(test_utils.GenericTestBase):
 
         self.assertGreater(len(logs), 0)
         self.assertIn('uh-oh', logs[0])
+
+
+class LimitJobResourcesTests(test_utils.GenericTestBase):
+
+    def test_does_job_requires_limiting_workers_true(self) -> None:
+        job_name = 'VoiceoverSynthesisJob'
+        self.assertTrue(
+            jobs_manager.does_job_requires_limiting_workers(job_name)
+        )
+
+    def test_does_job_requires_limiting_workers_false(self) -> None:
+        job_name = 'SomeOtherJob'
+        self.assertFalse(
+            jobs_manager.does_job_requires_limiting_workers(job_name)
+        )
+
+    def test_working_voiceover_sync_job(self) -> None:
+        run = jobs_manager.run_job(
+            VoiceoverSynthesisForTestingJob, True, namespace=self.namespace
+        )
+
+        self.assertEqual(run.latest_job_state, 'DONE')
+
+        run_model = beam_job_models.BeamJobRunModel.get(run.id)
+        self.assertEqual(run, run_model)
+
+        self.assertEqual(
+            beam_job_services.get_beam_job_run_result(run.id).to_dict(),
+            {'stdout': 'o', 'stderr': 'e'},
+        )
