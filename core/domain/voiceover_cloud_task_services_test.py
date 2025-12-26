@@ -20,7 +20,14 @@ from __future__ import annotations
 
 from core import feconf
 from core.domain import cloud_task_domain, voiceover_cloud_task_services
+from core.platform import models
 from core.tests import test_utils
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import cloud_task_models
+
+(cloud_task_models,) = models.Registry.import_models([models.Names.CLOUD_TASK])
 
 
 class CloudTaskServicesTests(test_utils.GenericTestBase):
@@ -172,7 +179,11 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
                 'content_0': 'GENERATING',
                 'content_1': 'SUCCEEDED',
                 'content_2': 'GENERATING',
-            }
+                'content_4': 'SUCCEEDED',
+            },
+            'en-IN': {
+                'content_0': 'SUCCEEDED',
+            },
         }
         language_accent_to_content_status_map_2 = {
             'en-US': {
@@ -180,21 +191,28 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
                 'content_1': 'SUCCEEDED',
                 'content_2': 'SUCCEEDED',
                 'content_3': 'GENERATING',
-            }
+            },
+            'hi-IN': {
+                'content_0': 'SUCCEEDED',
+            },
         }
         voiceover_regeneration_task_mapping_1 = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id_1,
-                language_accent_to_content_status_map_1,
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel(
+                exploration_id=exploration_id,
+                cloud_task_run_id=task_run_id_1,
+                language_accent_to_content_status_map=(
+                    language_accent_to_content_status_map_1
+                ),
             )
         )
 
         voiceover_regeneration_task_mapping_2 = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                exploration_id,
-                task_run_id_2,
-                language_accent_to_content_status_map_2,
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel(
+                exploration_id=exploration_id,
+                cloud_task_run_id=task_run_id_2,
+                language_accent_to_content_status_map=(
+                    language_accent_to_content_status_map_2
+                ),
             )
         )
 
@@ -206,16 +224,30 @@ class CloudTaskServicesTests(test_utils.GenericTestBase):
         )
         language_accent_to_content_status_map = {
             'en-US': {
-                'content_0': 'FAILED',
+                'content_0': 'GENERATING',
                 'content_1': 'SUCCEEDED',
                 'content_2': 'GENERATING',
                 'content_3': 'GENERATING',
-            }
+                'content_4': 'SUCCEEDED',
+            },
+            'en-IN': {
+                'content_0': 'SUCCEEDED',
+            },
+            'hi-IN': {
+                'content_0': 'SUCCEEDED',
+            },
         }
 
         self.assertDictEqual(
             retrieved_language_accent_to_content_status_map,
             language_accent_to_content_status_map,
+        )
+
+        retrieved_language_accent_to_content_status_map = voiceover_cloud_task_services.resolve_multiple_cloud_task_runs_for_exploration(
+            []
+        )
+        self.assertDictEqual(
+            retrieved_language_accent_to_content_status_map, {}
         )
 
     def test_verify_if_given_function_belongs_to_voiceover_regeneration_tasks(

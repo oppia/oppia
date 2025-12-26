@@ -18,11 +18,15 @@
 
 from __future__ import annotations
 
+import collections
+import copy
+import datetime
+
 from core import feconf
 from core.domain import cloud_task_domain
 from core.platform import models
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -79,48 +83,49 @@ def get_existing_voiceover_regeneration_requests_in_task_queue(
         dict. A mapping of language accents to their content regeneration
         status.
     """
-
     # Getting all the existing voiceover regeneration requests for the given
     # exploration ID.
-    voiceover_regeneration_task_requests = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
+    voiceover_regeneration_task_request_models: List[
+        cloud_task_models.VoiceoverRegenerationTaskMappingModel
+    ] = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
         exploration_id
     )
 
-    # List of domain instances for the voiceover regeneration requests.
-    voiceover_regeneration_task_domain_objects: list[
-        cloud_task_domain.VoiceoverRegenerationTaskMapping
-    ] = []
-    voiceover_regeneration_tasks_to_delete = []
-
-    for task_mapping_model in voiceover_regeneration_task_requests:
-        voiceover_regeneration_task = (
-            cloud_task_domain.VoiceoverRegenerationTaskMapping(
-                task_mapping_model.exploration_id,
-                task_mapping_model.cloud_task_run_id,
-                task_mapping_model.language_accent_to_content_status_map,
-            )
-        )
-
-        voiceover_regeneration_task_domain_objects.append(
-            voiceover_regeneration_task
-        )
-
-        if voiceover_regeneration_task.are_all_voiceovers_generated():
-            voiceover_regeneration_tasks_to_delete.append(task_mapping_model)
+    # Here we use cast because we are narrowing down the type from
+    # Optional[datetime.datetime] to datetime.datetime for sorting purposes.
+    voiceover_regeneration_task_request_models.sort(
+        key=lambda model: cast(datetime.datetime, model.created_on)
+    )
 
     # If multiple voiceover-regeneration requests exist in the Cloud Task queue
     # for the same exploration ID, they should be merged into a single
     # dictionary containing the latest status data.
     language_accent_to_content_status_map = (
         resolve_multiple_cloud_task_runs_for_exploration(
-            voiceover_regeneration_task_domain_objects
+            voiceover_regeneration_task_request_models
         )
     )
+
+    voiceover_regeneration_task_models_to_delete = []
+
+    for (
+        voiceover_regeneration_task_model
+    ) in voiceover_regeneration_task_request_models:
+        voiceover_regeneration_task = cloud_task_domain.VoiceoverRegenerationTaskMapping(
+            voiceover_regeneration_task_model.exploration_id,
+            voiceover_regeneration_task_model.cloud_task_run_id,
+            voiceover_regeneration_task_model.language_accent_to_content_status_map,
+        )
+
+        if voiceover_regeneration_task.are_all_voiceovers_generated():
+            voiceover_regeneration_task_models_to_delete.append(
+                voiceover_regeneration_task_model
+            )
 
     # Deleting the voiceover regeneration task run mapping if all
     # voiceovers have been generated successfully.
     cloud_task_models.VoiceoverRegenerationTaskMappingModel.delete_multi(
-        voiceover_regeneration_tasks_to_delete
+        voiceover_regeneration_task_models_to_delete
     )
 
     return {
@@ -185,76 +190,137 @@ def update_voiceover_regeneration_task_run_mapping_for_content(
 
 
 def resolve_multiple_cloud_task_runs_for_exploration(
-    voiceover_regeneration_task_domain_objects: List[
-        cloud_task_domain.VoiceoverRegenerationTaskMapping
+    voiceover_regeneration_task_request_models: List[
+        cloud_task_models.VoiceoverRegenerationTaskMappingModel
     ],
 ) -> Dict[str, Dict[str, str]]:
     """Resolves multiple voiceover regeneration cloud task run requests for
     the same exploration by merging their content status.
 
     Args:
-        voiceover_regeneration_task_domain_objects: list(
-            VoiceoverRegenerationTaskMapping). A list of
-            VoiceoverRegenerationTaskMapping domain objects.
+        voiceover_regeneration_task_request_models: list(
+            VoiceoverRegenerationTaskMappingModel). A list of
+            VoiceoverRegenerationTaskMappingModel instances.
 
     Returns:
         dict. A mapping of language accents to their content regeneration
         status.
     """
-    # A reference mapping dictionary to hold the merged language accent to
-    # content status data.
-    reference_language_accent_to_content_status_map = {}
+    reference_language_accent_to_content_status_map: Dict[
+        str, Dict[str, str]
+    ] = collections.defaultdict(dict)
 
-    for (
-        voiceover_regeneration_task
-    ) in voiceover_regeneration_task_domain_objects:
+    number_of_models = len(voiceover_regeneration_task_request_models)
+
+    if number_of_models == 0:
+        return {}
+
+    if number_of_models == 1:
+        language_accent_to_content_status_map: Dict[str, Dict[str, str]] = (
+            voiceover_regeneration_task_request_models[
+                0
+            ].language_accent_to_content_status_map
+        )
+        return language_accent_to_content_status_map
+
+    # Number of models is more than 1.
+    for index in range(number_of_models - 1):
+        earlier_model = voiceover_regeneration_task_request_models[index]
+        later_model = voiceover_regeneration_task_request_models[index + 1]
+
+        earlier_language_accent_to_content_status_map = (
+            earlier_model.language_accent_to_content_status_map
+        )
+        earlier_language_accent_to_content_status_map_clone = copy.deepcopy(
+            earlier_language_accent_to_content_status_map
+        )
+        later_language_accent_to_content_status_map = (
+            later_model.language_accent_to_content_status_map
+        )
+
         for (
-            language_accent,
-            content_status_map,
-        ) in (
-            voiceover_regeneration_task.language_accent_to_content_status_map.items()
-        ):
-
+            language_accent
+        ) in earlier_language_accent_to_content_status_map_clone.keys():
             if (
                 language_accent
-                not in reference_language_accent_to_content_status_map
+                not in later_language_accent_to_content_status_map
             ):
                 reference_language_accent_to_content_status_map[
                     language_accent
-                ] = content_status_map
-            else:
-                reference_content_status_map = (
-                    reference_language_accent_to_content_status_map[
+                ] = earlier_language_accent_to_content_status_map_clone[
+                    language_accent
+                ]
+                continue
+
+            for (
+                content_id,
+                earlier_regeneration_status,
+            ) in earlier_language_accent_to_content_status_map_clone[
+                language_accent
+            ].items():
+
+                if (
+                    content_id
+                    not in later_language_accent_to_content_status_map[
                         language_accent
                     ]
+                ):
+                    reference_language_accent_to_content_status_map[
+                        language_accent
+                    ][content_id] = earlier_regeneration_status
+                    continue
+
+                # In case of conflict.
+                later_regeneration_status = (
+                    later_language_accent_to_content_status_map[
+                        language_accent
+                    ][content_id]
                 )
 
-                for (
-                    content_id,
-                    regeneration_status,
-                ) in content_status_map.items():
+                if earlier_regeneration_status == 'GENERATING':
+                    reference_language_accent_to_content_status_map[
+                        language_accent
+                    ][content_id] = earlier_regeneration_status
+                    continue
 
-                    if content_id not in reference_content_status_map:
-                        reference_content_status_map[content_id] = (
-                            regeneration_status
-                        )
-                        continue
+                reference_language_accent_to_content_status_map[
+                    language_accent
+                ][content_id] = later_regeneration_status
 
-                    if (
-                        reference_content_status_map[content_id] == 'FAILED'
-                        or regeneration_status == 'FAILED'
-                    ):
-                        reference_content_status_map[content_id] = 'FAILED'
-                    elif (
-                        reference_content_status_map[content_id] == 'GENERATING'
-                        or regeneration_status == 'GENERATING'
-                    ):
-                        reference_content_status_map[content_id] = 'GENERATING'
-                    elif (
-                        reference_content_status_map[content_id] == 'SUCCEEDED'
-                        and regeneration_status == 'SUCCEEDED'
-                    ):
-                        reference_content_status_map[content_id] = 'SUCCEEDED'
+                del earlier_language_accent_to_content_status_map[
+                    language_accent
+                ][content_id]
+
+    later_language_accent_to_content_status_map = (
+        voiceover_regeneration_task_request_models[
+            -1
+        ].language_accent_to_content_status_map
+    )
+    for language_accent in later_language_accent_to_content_status_map.keys():
+        if (
+            language_accent
+            not in reference_language_accent_to_content_status_map
+        ):
+            reference_language_accent_to_content_status_map[language_accent] = (
+                later_language_accent_to_content_status_map[language_accent]
+            )
+            continue
+
+        for (
+            content_id,
+            later_regeneration_status,
+        ) in later_language_accent_to_content_status_map[
+            language_accent
+        ].items():
+            if (
+                content_id
+                not in reference_language_accent_to_content_status_map[
+                    language_accent
+                ]
+            ):
+                reference_language_accent_to_content_status_map[
+                    language_accent
+                ][content_id] = later_regeneration_status
 
     return reference_language_accent_to_content_status_map
 
