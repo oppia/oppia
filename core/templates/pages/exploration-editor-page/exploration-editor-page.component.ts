@@ -826,7 +826,9 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
       windowClass: 'oppia-confirm-or-cancel-modal',
     });
 
-    modalRef.componentInstance.openThreadsCount = openThreadsCount;
+    if (modalRef.componentInstance) {
+      modalRef.componentInstance.openThreadsCount = openThreadsCount;
+    }
 
     modalRef.result.then(
       () => {

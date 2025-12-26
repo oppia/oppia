@@ -337,7 +337,9 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
-
+    component.feedbackPromptModalData = {
+      openThreadsCount: 0,
+    };
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
@@ -906,6 +908,9 @@ describe('Exploration editor page component', () => {
       ];
       mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
         true;
+      component.feedbackPromptModalData = {
+        openThreadsCount: 0,
+      };
       component.ngOnInit();
     });
 

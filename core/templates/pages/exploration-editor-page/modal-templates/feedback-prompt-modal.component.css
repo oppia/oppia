@@ -1,0 +1,9 @@
+.oppia-white-button {
+  background-color: white;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+.oppia-white-button:hover {
+  background-color: #f5f5f5;
+}
