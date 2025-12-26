@@ -32,6 +32,7 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {PageContextService} from 'services/page-context.service';
@@ -338,7 +339,6 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
-    spyOn(component, 'maybeShowFeedbackPromptModal').and.stub();
     const mockModalRef: Partial<NgbModalRef> = {
       componentInstance: {},
       result: Promise.resolve(),
@@ -1227,6 +1227,46 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
   });
+
+  it('should show feedback prompt modal when there are open feedback threads', fakeAsync(() => {
+    component.feedbackPromptModalData = {openThreadsCount: 3};
+    component.isModalOpenable = true;
+
+    (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+      false
+    );
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+
+    (ngbModal.open as jasmine.Spy).and.returnValue({
+      componentInstance: {openThreadsCount: 3},
+      result: Promise.resolve(),
+    } as NgbModalRef);
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+
+    flush();
+    discardPeriodicTasks();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+  }));
+
+  it('should not show feedback prompt modal when there are no open threads', fakeAsync(() => {
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
+    component.feedbackPromptModalData = {openThreadsCount: 0};
+    component.isModalOpenable = true;
+
+    (ngbModal.open as jasmine.Spy).calls.reset();
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+
+    flushMicrotasks();
+    flush();
+    discardPeriodicTasks();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  }));
 
   describe('voiceover tab', () => {
     it('should be shwon correctly', () => {
