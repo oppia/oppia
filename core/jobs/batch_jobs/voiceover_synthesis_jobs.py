@@ -73,6 +73,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
 
     def __init__(self, oppia_project_id: Optional[str] = None) -> None:
         super().__init__()
+        feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV = oppia_project_id
         self.oppia_project_id = oppia_project_id
 
     def process(

@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core import feconf
 import os
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
@@ -36,6 +37,12 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
+    # Since the Dataflow runtime cannot access environment variables in a Beam
+    # job, we must explicitly set and retrieve the project ID within the Beam
+    # environment.
+    if feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV is not None:
+        return feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV
+
     oppia_project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id')
     assert isinstance(oppia_project_id, str)
     if not oppia_project_id:
