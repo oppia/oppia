@@ -66,7 +66,6 @@ var ExplorationEditorPage = function () {
     '.e2e-test-exploration-category-dropdown'
   );
   var sharePublishModalElement = $('.e2e-test-share-publish-modal');
-  var toastMessage = $('.e2e-test-toast-message');
 
   /*
    * Non-Interactive elements
@@ -510,6 +509,15 @@ var ExplorationEditorPage = function () {
   // ---- INTERNET CONNECTION ----
 
   this.waitForOnlineAlert = async function () {
+    const toastContainer = $('.toast-success');
+
+    await waitFor.presenceOf(
+      toastContainer,
+      'Online success toast container taking too long to appear.'
+    );
+
+    const toastMessage = toastContainer.$('.e2e-test-toast-message');
+
     await waitFor.visibilityOf(
       toastMessage,
       'Online info toast message taking too long to appear.'
@@ -517,13 +525,18 @@ var ExplorationEditorPage = function () {
     expect(await action.getText('Toast Message', toastMessage)).toMatch(
       'Reconnected. Checking whether your changes are mergeable.'
     );
-    await waitFor.invisibilityOf(
-      toastMessage,
-      'Online info toast message taking too long to disappear.'
-    );
   };
 
   this.waitForOfflineAlert = async function () {
+    const toastContainer = $('.toast-info');
+
+    await waitFor.presenceOf(
+      toastContainer,
+      'Offline info toast container taking too long to appear.'
+    );
+
+    const toastMessage = toastContainer.$('.e2e-test-toast-message');
+
     await waitFor.visibilityOf(
       toastMessage,
       'Offline warning toast message taking too long to appear.'
@@ -531,10 +544,6 @@ var ExplorationEditorPage = function () {
     expect(await action.getText('Toast Message', toastMessage)).toMatch(
       'Looks like you are offline. You can continue working, and can save ' +
         'your changes once reconnected.'
-    );
-    await waitFor.invisibilityOf(
-      toastMessage,
-      'Offline warning toast message taking too long to disappear.'
     );
   };
 };
