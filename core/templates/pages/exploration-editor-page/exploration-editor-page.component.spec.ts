@@ -1249,7 +1249,7 @@ describe('Exploration editor page component', () => {
     flush();
     discardPeriodicTasks();
 
-    expect((component as any).maybeShowFeedbackPromptModal).toHaveBeenCalled();
+    expect(component.maybeShowFeedbackPromptModal).toHaveBeenCalled();
   }));
 
   it('should not show feedback prompt modal when there are no open threads', fakeAsync(() => {
