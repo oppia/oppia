@@ -134,7 +134,6 @@ describe('Exploration editor page component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
-  let mockModalRef: any;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
   let autosaveIsInProgress = new EventEmitter<boolean>();
@@ -339,10 +338,14 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
-    spyOn(component as any, 'maybeShowFeedbackPromptModal').and.stub();
-    mockModalRef = {componentInstance: {}, result: Promise.resolve()};
+    spyOn(component, 'maybeShowFeedbackPromptModal').and.stub();
+    const mockModalRef: Partial<NgbModalRef> = {
+      componentInstance: {},
+      result: Promise.resolve(),
+    };
+
     spyOn(TestBed.inject(NgbModal), 'open').and.returnValue(
-      mockModalRef as any
+      mockModalRef as NgbModalRef
     );
 
     component.feedbackPromptModalData = {openThreadsCount: 0};
