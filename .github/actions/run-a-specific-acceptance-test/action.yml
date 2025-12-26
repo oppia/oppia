@@ -79,7 +79,20 @@ runs:
         name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
         # Note: The path must be kept in sync with the one specified in
         # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
-        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/diff-snapshots
+    
+    - name: Upload test new screenshots
+      # We need to pass !cancelled() because if not, GitHub will implicitly use success(),
+      # which requires all previous jobs/steps to have succeeded. This is not what we want.
+      # Reference: https://docs.github.com/en/actions/reference/workflows-and-actions/expressions#status-check-functions
+      # Quote: "A default status check of success() is applied unless you *include* one of these functions."
+      if: ${{ !cancelled() && steps.run-acceptance-test.outcome == 'failure' && inputs.modified-suite-name-for-uploads != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: new-snapshots_${{ inputs.modified-suite-name-for-uploads }}
+        # Note: The path must be kept in sync with the one specified in
+        # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
+        path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/new-snapshots
 
     - name: Check for video recordings
       shell: bash
