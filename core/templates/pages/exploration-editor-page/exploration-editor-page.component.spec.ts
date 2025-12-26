@@ -83,6 +83,7 @@ class MockNgbModalRef {
 class MockNgbModal {
   open() {
     return {
+      componentInstance: {},
       result: Promise.resolve(),
     };
   }
@@ -133,6 +134,7 @@ describe('Exploration editor page component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
+  let mockModalRef: any;
   let refreshGraphEmitter = new EventEmitter<void>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
   let autosaveIsInProgress = new EventEmitter<boolean>();
@@ -337,9 +339,14 @@ describe('Exploration editor page component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEditorPageComponent);
     component = fixture.componentInstance;
-    component.feedbackPromptModalData = {
-      openThreadsCount: 0,
-    };
+    spyOn(component as any, 'maybeShowFeedbackPromptModal').and.stub();
+    mockModalRef = {componentInstance: {}, result: Promise.resolve()};
+    spyOn(TestBed.inject(NgbModal), 'open').and.returnValue(
+      mockModalRef as any
+    );
+
+    component.feedbackPromptModalData = {openThreadsCount: 0};
+
     cls = TestBed.inject(ChangeListService);
     as = TestBed.inject(AlertsService);
     ngbModal = TestBed.inject(NgbModal);
@@ -372,6 +379,10 @@ describe('Exploration editor page component', () => {
       EntityBulkTranslationsBackendApiService
     );
     pageContextService = TestBed.inject(PageContextService);
+
+    spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+    spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(Promise.resolve([]));
+    spyOn(pts, 'setDocumentTitle').and.callThrough();
 
     isLocationSetToNonStateEditorTabSpy = spyOn(
       rs,
@@ -415,12 +426,6 @@ describe('Exploration editor page component', () => {
 
   describe('when user permission is true and draft changes not valid', () => {
     beforeEach(() => {
-      ngbModal = TestBed.inject(NgbModal);
-      tds = TestBed.inject(ThreadDataBackendApiService);
-      rs = TestBed.inject(RouterService);
-      ews = TestBed.inject(ExplorationWarningsService);
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -440,10 +445,6 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
-        Promise.resolve([])
-      );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
         Promise.resolve({
           canEdit: true,
@@ -476,7 +477,9 @@ describe('Exploration editor page component', () => {
       spyOnProperty(stfts, 'onOpenTranslationTutorial').and.returnValue(
         mockOpenTranslationTutorialEmitter
       );
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
 
+      ets.init(explorationData.title);
       explorationData.is_version_of_draft_valid = false;
       explorationData.draft_changes = ['data1', 'data2'];
 
@@ -490,7 +493,7 @@ describe('Exploration editor page component', () => {
     it('should start editor tutorial when on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
       isLocationSetToNonStateEditorTabSpy.and.returnValue(false);
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(sers.onRefreshStateEditor, 'emit');
 
@@ -508,6 +511,13 @@ describe('Exploration editor page component', () => {
       discardPeriodicTasks();
     }));
 
+    it('should return the thread count', () => {
+      tds.countOfOpenFeedbackThreads = 2;
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
+      component.hasCriticalWarnings();
+      expect(component.getOpenThreadsCount()).toEqual(2);
+    });
+
     it('should skip to main content', () => {
       const mockElement = document.createElement('div');
       mockElement.classList.add('exploration-editor-content');
@@ -521,7 +531,7 @@ describe('Exploration editor page component', () => {
 
     it('should start editor tutorial when not on main page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startEditorTutorial').and.callThrough();
       spyOn(rs, 'navigateToMainTab');
       rs.navigateToSettingsTab();
@@ -536,7 +546,7 @@ describe('Exploration editor page component', () => {
 
     it('should start translation tutorial when on translation page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startTranslationTutorial').and.callThrough();
       rs.navigateToTranslationTab();
       mockRefreshTranslationTabEventEmitter.emit();
@@ -552,7 +562,7 @@ describe('Exploration editor page component', () => {
 
     it('should start translation tutorial when not on translation page', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       spyOn(component, 'startTranslationTutorial').and.callThrough();
       spyOn(rs, 'navigateToTranslationTab');
 
@@ -581,14 +591,14 @@ describe('Exploration editor page component', () => {
 
     it('should return the thread count', () => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       component.hasCriticalWarnings();
       expect(component.getOpenThreadsCount()).toEqual(2);
     });
 
     it('should navigate to main tab', fakeAsync(() => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
       isLocationSetToNonStateEditorTabSpy.and.returnValue(null);
       spyOn(rs, 'getCurrentStateFromLocationPath').and.returnValue(null);
       spyOn(rs, 'navigateToMainTab').and.callThrough();
@@ -604,7 +614,7 @@ describe('Exploration editor page component', () => {
 
     it('should navigate between tabs', () => {
       tds.countOfOpenFeedbackThreads = 2;
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(2);
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(2);
       let focusSpy = spyOn(component, 'setFocusOnActiveTab');
       spyOn(rs, 'navigateToMainTab').and.stub();
       component.selectMainTab();
@@ -677,7 +687,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
+      (ngbModal.open as jasmine.Spy).and.returnValue({
         result: Promise.resolve('editor'),
       } as NgbModalRef);
 
@@ -690,7 +700,7 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should show the user help modal for editor tutorial', fakeAsync(() => {
-      spyOn(ngbModal, 'open').and.returnValue({
+      (ngbModal.open as jasmine.Spy).and.returnValue({
         result: Promise.resolve('translation'),
       } as NgbModalRef);
 
@@ -705,7 +715,6 @@ describe('Exploration editor page component', () => {
 
   describe('Checking internet Connection', () => {
     beforeEach(() => {
-      ueps = TestBed.inject(UserExplorationPermissionsService);
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -723,11 +732,12 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(0);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(0);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
+
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
         Promise.resolve({
           canEdit: true,
@@ -783,8 +793,6 @@ describe('Exploration editor page component', () => {
     let lastPublishedTranslations: LanguageCodeToEntityTranslations;
 
     beforeEach(() => {
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-      tds = TestBed.inject(ThreadDataBackendApiService);
       registerAcceptTutorialModalEventSpy = spyOn(
         sas,
         'registerAcceptTutorialModalEvent'
@@ -807,9 +815,8 @@ describe('Exploration editor page component', () => {
       );
       spyOn(ews, 'updateWarnings');
       spyOn(gds, 'recompute');
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(1);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(1);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
@@ -911,6 +918,7 @@ describe('Exploration editor page component', () => {
       component.feedbackPromptModalData = {
         openThreadsCount: 0,
       };
+      ets.init(explorationData.title);
       component.ngOnInit();
     });
 
@@ -948,7 +956,6 @@ describe('Exploration editor page component', () => {
     }));
 
     it('should react when exploration property changes', () => {
-      ets.init('Exploration Title');
       mockExplorationPropertyChangedEventEmitter.emit();
 
       expect(pts.setDocumentTitle).toHaveBeenCalledWith(
@@ -1082,7 +1089,7 @@ describe('Exploration editor page component', () => {
         ' modal',
       fakeAsync(() => {
         spyOn(component, 'startEditorTutorial').and.callThrough();
-        spyOn(ngbModal, 'open').and.returnValue({
+        (ngbModal.open as jasmine.Spy).and.returnValue({
           componentInstance: new MockNgbModalRef(),
           result: Promise.resolve(explorationId),
         } as NgbModalRef);
@@ -1106,9 +1113,9 @@ describe('Exploration editor page component', () => {
       'should dismiss tutorial when dismissing welcome exploration' + ' modal',
       fakeAsync(() => {
         spyOn(component, 'startEditorTutorial').and.callThrough();
-        spyOn(ngbModal, 'open').and.returnValue({
+        (ngbModal.open as jasmine.Spy).and.returnValue({
           componentInstance: new MockNgbModalRef(),
-          result: Promise.reject(explorationId),
+          result: Promise.reject('dismiss'),
         } as NgbModalRef);
 
         component.showWelcomeExplorationModal();
@@ -1147,17 +1154,6 @@ describe('Exploration editor page component', () => {
 
   describe('Initializing improvements tab', () => {
     beforeEach(() => {
-      tds = TestBed.inject(ThreadDataBackendApiService);
-      ueps = TestBed.inject(UserExplorationPermissionsService);
-
-      registerAcceptTutorialModalEventSpy = spyOn(
-        sas,
-        'registerAcceptTutorialModalEvent'
-      );
-      registerDeclineTutorialModalEventSpy = spyOn(
-        sas,
-        'registerDeclineTutorialModalEvent'
-      );
       mockEnterEditorForTheFirstTime = new EventEmitter();
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
         Promise.resolve(null)
@@ -1169,9 +1165,8 @@ describe('Exploration editor page component', () => {
       spyOn(ers, 'isPublic').and.returnValue(true);
       spyOn(ews, 'updateWarnings').and.callThrough();
       spyOn(gds, 'recompute').and.callThrough();
-      spyOn(pts, 'setDocumentTitle').and.callThrough();
-      spyOn(tds, 'getOpenThreadsCount').and.returnValue(5);
-      spyOn(tds, 'getFeedbackThreadsAsync').and.returnValue(
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(5);
+      (tds.getFeedbackThreadsAsync as jasmine.Spy).and.returnValue(
         Promise.resolve([])
       );
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
@@ -1239,8 +1234,7 @@ describe('Exploration editor page component', () => {
 
       // Curated exploration must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(true);
-      let voiceoverTabIsEnabled = component.isVoiceoverTabEnabled();
-      expect(voiceoverTabIsEnabled).toBeTrue();
+      expect(component.isVoiceoverTabEnabled()).toBeTrue();
 
       // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
