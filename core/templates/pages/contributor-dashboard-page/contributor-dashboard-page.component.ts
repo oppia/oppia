@@ -37,9 +37,6 @@ import {UserService} from 'services/user.service';
   templateUrl: './contributor-dashboard-page.component.html',
 })
 export class ContributorDashboardPageComponent implements OnInit {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
   defaultHeaderVisible!: boolean;
   profilePicturePngDataUrl!: string;
   profilePictureWebpDataUrl!: string;
@@ -54,8 +51,6 @@ export class ContributorDashboardPageComponent implements OnInit {
   languageCode!: string;
   topicName!: string;
   activeTabName!: string;
-  // The following property is set to null when the
-  // user is not logged in.
   username: string | null = null;
 
   constructor(
@@ -72,9 +67,6 @@ export class ContributorDashboardPageComponent implements OnInit {
 
   onTabClick(activeTabName: string): void {
     this.activeTabName = activeTabName;
-
-    // The setTimeout is required to ensure that focus is applied only
-    // after all the functions in main thread have executed.
     if (this.activeTabName === 'translateTextTab') {
       setTimeout(() => {
         this.focusManagerService.setFocusWithoutScroll('selectLangDropDown');
@@ -89,10 +81,16 @@ export class ContributorDashboardPageComponent implements OnInit {
 
   onChangeLanguage(languageCode: string): void {
     this.languageCode = languageCode;
-    this.translationLanguageService.setActiveLanguageCode(this.languageCode);
+    this.translationLanguageService.setActiveLanguageCode(languageCode);
     this.localStorageService.updateLastSelectedTranslationLanguageCode(
-      this.languageCode
+      languageCode
     );
+  }
+
+  onChangeTopic(topicName: string): void {
+    this.topicName = topicName;
+    this.translationTopicService.setActiveTopicName(topicName);
+    this.localStorageService.updateLastSelectedTranslationTopicName(topicName);
   }
 
   showLanguageSelector(): boolean {
@@ -101,14 +99,6 @@ export class ContributorDashboardPageComponent implements OnInit {
         this.activeTabName as keyof ContributorDashboardTabsDetails
       ];
     return activeTabDetail.customizationOptions.includes('language');
-  }
-
-  onChangeTopic(topicName: string): void {
-    this.topicName = topicName;
-    this.translationTopicService.setActiveTopicName(this.topicName);
-    this.localStorageService.updateLastSelectedTranslationTopicName(
-      this.topicName
-    );
   }
 
   showTopicSelector(): boolean {
@@ -124,6 +114,7 @@ export class ContributorDashboardPageComponent implements OnInit {
       activeTabType === 'reviews' &&
       activeSuggestionType === 'add_question' &&
       this.activeTabName !== 'submitQuestionTab';
+
     const userIsReviewingTranslationSuggestions =
       activeTabType === 'reviews' &&
       activeSuggestionType === 'translate_content' &&
@@ -137,23 +128,15 @@ export class ContributorDashboardPageComponent implements OnInit {
   }
 
   getLanguageDescriptions(languageCodes: string[]): string[] {
-    const languageDescriptions: string[] = [];
-    languageCodes.forEach(languageCode => {
-      languageDescriptions.push(
-        this.languageUtilService.getAudioLanguageDescription(languageCode)
-      );
-    });
-    return languageDescriptions;
+    return languageCodes.map(code =>
+      this.languageUtilService.getAudioLanguageDescription(code)
+    );
   }
 
   ngOnInit(): void {
-    this.username = '';
     this.userInfoIsLoading = true;
     this.userIsLoggedIn = false;
     this.userIsReviewer = false;
-    this.userCanReviewTranslationSuggestionsInLanguages = [];
-    this.userCanReviewVoiceoverSuggestionsInLanguages = [];
-    this.userCanReviewQuestions = false;
     this.defaultHeaderVisible = true;
 
     const prevSelectedTopicName =
@@ -162,9 +145,10 @@ export class ContributorDashboardPageComponent implements OnInit {
     this.userService
       .getUserContributionRightsDataAsync()
       .then(userContributionRights => {
-        if (userContributionRights === null) {
+        if (!userContributionRights) {
           throw new Error('User contribution rights not found.');
         }
+
         this.userCanReviewTranslationSuggestionsInLanguages =
           this.getLanguageDescriptions(
             userContributionRights.can_review_translation_for_language_codes
@@ -179,9 +163,9 @@ export class ContributorDashboardPageComponent implements OnInit {
           userContributionRights.can_review_questions;
 
         this.userIsReviewer =
+          this.userCanReviewQuestions ||
           this.userCanReviewTranslationSuggestionsInLanguages.length > 0 ||
-          this.userCanReviewVoiceoverSuggestionsInLanguages.length > 0 ||
-          this.userCanReviewQuestions;
+          this.userCanReviewVoiceoverSuggestionsInLanguages.length > 0;
 
         this.tabsDetails.submitQuestionTab.enabled =
           userContributionRights.can_suggest_questions;
@@ -189,44 +173,43 @@ export class ContributorDashboardPageComponent implements OnInit {
 
     this.userService.getUserInfoAsync().then(userInfo => {
       this.userInfoIsLoading = false;
-      this.profilePictureWebpDataUrl =
-        this.urlInterpolationService.getStaticImageUrl(
-          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
-        );
       this.profilePicturePngDataUrl =
         this.urlInterpolationService.getStaticImageUrl(
           AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
         );
+      this.profilePictureWebpDataUrl =
+        this.urlInterpolationService.getStaticImageUrl(
+          AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
+        );
+
       if (userInfo.isLoggedIn()) {
         this.userIsLoggedIn = true;
         this.username = userInfo.getUsername();
-        if (this.username !== null) {
+        if (this.username) {
           [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
             this.userService.getProfileImageDataUrl(this.username);
         }
-      } else {
-        this.userIsLoggedIn = false;
-        this.username = '';
       }
     });
 
+    //  FIX: Always keep "All" option in topic dropdown
     this.contributionOpportunitiesService
       .getTranslatableTopicNamesAsync()
       .then(topicNames => {
-        // TODO(#15710): Set default active topic to 'All'.
-        if (topicNames.length <= 0) {
-          this.translationTopicService.setActiveTopicName(
-            ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME
-          );
-          return;
-        }
-        this.topicName = topicNames[0];
+        const allTopicName =
+          ContributorDashboardConstants.DEFAULT_OPPORTUNITY_TOPIC_NAME;
+
+        const topicNamesWithAll = [allTopicName, ...topicNames];
+
+        this.topicName = allTopicName;
+
         if (
           prevSelectedTopicName &&
-          topicNames.indexOf(prevSelectedTopicName) !== -1
+          topicNamesWithAll.includes(prevSelectedTopicName)
         ) {
           this.topicName = prevSelectedTopicName;
         }
+
         this.translationTopicService.setActiveTopicName(this.topicName);
       });
 
@@ -234,12 +217,14 @@ export class ContributorDashboardPageComponent implements OnInit {
 
     this.tabsDetails = {
       ...ContributorDashboardConstants.CONTRIBUTOR_DASHBOARD_TABS_DETAILS,
-      // TODO(#13015): Remove use of unknown as a type.
-    } as unknown as ContributorDashboardTabsDetails;
+    } as ContributorDashboardTabsDetails;
+
     this.OPPIA_AVATAR_IMAGE_URL =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-    this.languageCode = this.translationLanguageService.getActiveLanguageCode();
+
+    this.languageCode =
+      this.translationLanguageService.getActiveLanguageCode();
   }
 }
