@@ -43,6 +43,8 @@ export interface LearnerExplorationSummaryBackendDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
+  num_checkpoints: number;
+  visited_checkpoint_count: number;
 }
 
 export class LearnerExplorationSummary {
@@ -62,7 +64,9 @@ export class LearnerExplorationSummary {
     public lastUpdatedMsec: number,
     public createdOnMsec: number,
     public ratings: ExplorationRatings,
-    public humanReadableContributorsSummary: HumanReadableContributorsSummary
+    public humanReadableContributorsSummary: HumanReadableContributorsSummary,
+    public totalCheckpointCount: number,
+    public visitedCheckpointCount: number
   ) {}
 
   static createFromBackendDict(
@@ -84,7 +88,9 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.last_updated_msec,
       expSummaryBacknedDict.created_on_msec,
       expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary
+      expSummaryBacknedDict.human_readable_contributors_summary,
+      expSummaryBacknedDict.num_checkpoints,
+      expSummaryBacknedDict.visited_checkpoint_count
     );
   }
 }

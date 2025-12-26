@@ -19,6 +19,7 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    exp_fetchers,
     learner_progress_services,
     story_fetchers,
     subscription_services,
@@ -27,6 +28,7 @@ from core.domain import (
 )
 
 from typing import Dict, Optional, TypedDict
+from core.storage.user import gae_models as user_models
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -268,6 +270,99 @@ class LearnerDashboardExplorationsProgressHandler(
                 learner_progress.incomplete_exp_summaries
             )
         )
+
+        exp_ids = [d['id'] for d in incomplete_exp_summary_dicts]
+
+        user_id_exp_id_tuples = [(self.user_id, eid) for eid in exp_ids]
+        exp_user_models = user_models.ExplorationUserDataModel.get_multi(
+            user_id_exp_id_tuples
+        )
+
+        explorations_dict = exp_fetchers.get_multiple_explorations_by_id(
+            exp_ids
+        )
+
+        for index, exp_dict in enumerate(incomplete_exp_summary_dicts):
+            exp_id = exp_dict['id']
+            user_model = exp_user_models[index]
+            exploration = explorations_dict.get(exp_id)
+
+            total_checks = 0
+            visited_checks = 0
+
+            if exploration:
+                state_names = []
+                seen_states = set()
+                queue = [exploration.init_state_name]
+
+                while queue:
+                    curr_name = queue.pop(0)
+                    if curr_name in seen_states:
+                        continue
+
+                    seen_states.add(curr_name)
+                    state_names.append(curr_name)
+
+                    if curr_name in exploration.states:
+                        state_obj = exploration.states[curr_name]
+
+                        if state_obj.interaction.default_outcome:
+                            dest = state_obj.interaction.default_outcome.dest
+                            if dest not in seen_states and dest != curr_name:
+                                queue.append(dest)
+
+                        for group in state_obj.interaction.answer_groups:
+                            dest = group.outcome.dest
+                            if dest not in seen_states and dest != curr_name:
+                                queue.append(dest)
+
+                for s_name in exploration.states.keys():
+                    if s_name not in seen_states:
+                        state_names.append(s_name)
+
+                active_states = []
+                for s_name in state_names:
+                    if (
+                        exploration.states[s_name].interaction.id
+                        != 'EndExploration'
+                    ):
+                        active_states.append(s_name)
+
+                total_checks = len(active_states)
+                current_state = None
+
+                if (
+                    user_model
+                    and hasattr(
+                        user_model,
+                        'most_recently_reached_checkpoint_state_name',
+                    )
+                    and user_model.most_recently_reached_checkpoint_state_name
+                ):
+                    current_state = (
+                        user_model.most_recently_reached_checkpoint_state_name
+                    )
+
+                if (
+                    not current_state
+                    and user_model
+                    and user_model.furthest_reached_checkpoint_state_name
+                ):
+                    current_state = (
+                        user_model.furthest_reached_checkpoint_state_name
+                    )
+
+                visited_checks = 0
+                if current_state in active_states:
+                    visited_checks = active_states.index(current_state)
+                elif current_state in state_names:
+                    visited_checks = total_checks
+
+                if total_checks == 0:
+                    total_checks = 1
+
+            exp_dict['num_checkpoints'] = total_checks
+            exp_dict['visited_checkpoint_count'] = visited_checks
 
         exploration_playlist_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(

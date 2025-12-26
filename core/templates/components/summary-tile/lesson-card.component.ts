@@ -218,8 +218,15 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    // TODO(#18384): Get correct progress and state for button text.
-    this.progress = this.isCommunityLessonComplete ? 100 : 0;
+    if (explorationModel.totalCheckpointCount > 0) {
+      this.progress =
+        (explorationModel.visitedCheckpointCount /
+          explorationModel.totalCheckpointCount) *
+        100;
+    } else {
+      this.progress = this.isCommunityLessonComplete ? 100 : 0;
+    }
+
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
     this.lessonTopic = 'Community Lesson';
