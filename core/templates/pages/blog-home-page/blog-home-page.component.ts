@@ -172,6 +172,7 @@ export class BlogHomePageComponent implements OnInit {
       this.filterWasUsed = false;
       this.totalBlogPosts = 0;
       this.showBlogPostCardsLoadingScreen = false;
+      this.searchPageIsActive = false;
     }
     this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
       (data: BlogHomePageData) => {
@@ -208,9 +209,37 @@ export class BlogHomePageComponent implements OnInit {
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
-          this.blogPostSummaries = this.blogPostSummaries.concat(
-            data.blogPostSummaryDicts
-          );
+          // If we're jumping to a non-consecutive page, we need to ensure
+          // the array structure is correct. Pad with nulls up to the offset
+          // to maintain correct indices, then append the new data.
+          if (offset > this.blogPostSummaries.length) {
+            const extendedArray = [...this.blogPostSummaries];
+            // Pad the array to the required offset with nulls.
+            while (extendedArray.length < offset) {
+              extendedArray.push(null);
+            }
+            // Append the new page data.
+            extendedArray.push(...data.blogPostSummaryDicts);
+            this.blogPostSummaries = extendedArray;
+          } else {
+            // Check if we need to insert data at a specific offset (when array
+            // has been padded with nulls) or append (normal consecutive loading).
+            const currentLength = this.blogPostSummaries.length;
+            if (offset < currentLength) {
+              // Array has been padded, insert data at the correct offset.
+              const newArray = [...this.blogPostSummaries];
+              // Replace nulls at the offset position with actual data.
+              for (let i = 0; i < data.blogPostSummaryDicts.length; i++) {
+                newArray[offset + i] = data.blogPostSummaryDicts[i];
+              }
+              this.blogPostSummaries = newArray;
+            } else {
+              // Normal case: consecutive page loading, append to existing array.
+              this.blogPostSummaries = this.blogPostSummaries.concat(
+                data.blogPostSummaryDicts
+              );
+            }
+          }
           this.selectBlogPostSummariesToShow();
           this.calculateLastPostOnPageNum(
             this.page,
@@ -235,7 +264,9 @@ export class BlogHomePageComponent implements OnInit {
     if (this.blogPostSummaries.length < this.firstPostOnPageNum) {
       this.showBlogPostCardsLoadingScreen = true;
       if (!this.searchPageIsActive) {
-        this.loadMoreBlogPostSummaries(this.firstPostOnPageNum - 1);
+        // Calculate the offset needed for the current page (0-indexed).
+        const requiredOffset = this.firstPostOnPageNum - 1;
+        this.loadMoreBlogPostSummaries(requiredOffset);
       } else {
         this.blogPostSearchService.loadMoreData(
           data => {
@@ -278,9 +309,40 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   selectBlogPostSummariesToShow(): void {
-    this.blogPostSummariesToShow = this.blogPostSummaries.slice(
-      this.firstPostOnPageNum - 1,
-      this.lastPostOnPageNum
+    const startIndex = this.firstPostOnPageNum - 1;
+    const endIndex = this.lastPostOnPageNum;
+    const pageData = this.blogPostSummaries.slice(startIndex, endIndex);
+
+    // Check if we have null values, which indicate missing page data.
+    // If we do, we need to load the missing pages.
+    const hasNulls = pageData.some(
+      summary => summary === null || summary === undefined
+    );
+
+    if (hasNulls && !this.searchPageIsActive) {
+      // Find the first null index to determine which page needs to be loaded.
+      const firstNullIndex = pageData.findIndex(
+        summary => summary === null || summary === undefined
+      );
+      if (firstNullIndex !== -1) {
+        // Calculate the absolute index of the first missing item.
+        const missingItemIndex = startIndex + firstNullIndex;
+        // Calculate which page this item belongs to.
+        const missingPage =
+          Math.floor(
+            missingItemIndex / this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+          ) + 1;
+        // Load the missing page.
+        const missingPageOffset =
+          (missingPage - 1) * this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
+        this.loadMoreBlogPostSummaries(missingPageOffset);
+        return;
+      }
+    }
+
+    // Filter out null values and set the data to show.
+    this.blogPostSummariesToShow = pageData.filter(
+      summary => summary !== null && summary !== undefined
     );
   }
 
@@ -305,6 +367,7 @@ export class BlogHomePageComponent implements OnInit {
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
     if (this.searchQuery === '' && this.selectedTags.length === 0) {
+      this.searchPageIsActive = false;
       this.loadInitialBlogHomePageData();
       this.windowRef.nativeWindow.history.pushState({}, '', '/blog');
       return;
