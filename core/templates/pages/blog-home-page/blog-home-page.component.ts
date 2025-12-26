@@ -64,7 +64,7 @@ export class BlogHomePageComponent implements OnInit {
   listOfDefaultTags: string[] = [];
   selectedTags: string[] = [];
   showBlogPostCardsLoadingScreen: boolean = false;
-  blogPostSummaries: BlogPostSummary[] = [];
+  blogPostSummaries: (BlogPostSummary | null)[] = [];
   blogPostSummariesToShow: BlogPostSummary[] = [];
   searchedBlogPostSummaries: BlogPostSummary[] = [];
   page: number = 1;
@@ -180,7 +180,9 @@ export class BlogHomePageComponent implements OnInit {
           this.totalBlogPosts = data.numOfPublishedBlogPosts;
           this.noResultsFound = false;
           this.blogPostSummaries = data.blogPostSummaryDicts;
-          this.blogPostSummariesToShow = this.blogPostSummaries;
+          this.blogPostSummariesToShow = this.blogPostSummaries.filter(
+            summary => summary !== null && summary !== undefined
+          ) as BlogPostSummary[];
           this.calculateLastPostOnPageNum(
             this.page,
             this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
@@ -342,7 +344,8 @@ export class BlogHomePageComponent implements OnInit {
 
     // Filter out null values and set the data to show.
     this.blogPostSummariesToShow = pageData.filter(
-      summary => summary !== null && summary !== undefined
+      (summary): summary is BlogPostSummary =>
+        summary !== null && summary !== undefined
     );
   }
 
