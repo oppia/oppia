@@ -528,6 +528,12 @@ OPPIA_CONTENT_TAG_DELIMITER = '; '
 
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
 
+# The Google Cloud Dataflow environment cannot access the configured environment
+# variables, causing the Oppia project ID to always default to dev-project-id.
+# To resolve this, the project ID must be explicitly set within the Beam job so
+# that downstream services receive the correct value.
+OPPIA_PROJECT_ID_IN_DATAFLOW_ENV = None
+
 # This flag is used for distinguishing the prod/test environments for feature
 # gating.
 ENV_IS_OPPIA_ORG_PRODUCTION_SERVER = bool(
