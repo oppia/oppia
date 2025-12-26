@@ -32,7 +32,6 @@ import {StateEditorService} from 'components/state-editor/state-editor-propertie
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {UserExplorationPermissionsService} from 'pages/exploration-editor-page/services/user-exploration-permissions.service';
-import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 import {AlertsService} from 'services/alerts.service';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {PageContextService} from 'services/page-context.service';
@@ -1243,12 +1242,14 @@ describe('Exploration editor page component', () => {
     } as NgbModalRef);
 
     component.ngOnInit();
+    tick();
+
     esaves.onInitExplorationPage.emit();
 
     flush();
     discardPeriodicTasks();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect((component as any).maybeShowFeedbackPromptModal).toHaveBeenCalled();
   }));
 
   it('should not show feedback prompt modal when there are no open threads', fakeAsync(() => {
