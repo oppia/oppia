@@ -74,6 +74,7 @@ export class BlogHomePageComponent implements OnInit {
   searchOffset: number | null = 0;
   disableNextPageButton: boolean = false;
   filterWasUsed: boolean = false;
+  isLoadingBlogPosts: boolean = false;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -173,6 +174,7 @@ export class BlogHomePageComponent implements OnInit {
       this.totalBlogPosts = 0;
       this.showBlogPostCardsLoadingScreen = false;
       this.searchPageIsActive = false;
+      this.isLoadingBlogPosts = false;
     }
     this.blogHomePageBackendApiService.fetchBlogHomePageDataAsync('0').then(
       (data: BlogHomePageData) => {
@@ -189,28 +191,58 @@ export class BlogHomePageComponent implements OnInit {
           );
         } else {
           this.noResultsFound = true;
+          this.totalBlogPosts = 0;
         }
         this.listOfDefaultTags = data.listOfDefaultTags;
         this.loaderService.hideLoadingScreen();
       },
       errorResponse => {
+        this.isLoadingBlogPosts = false;
         if (
           AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
         ) {
           this.alertsService.addWarning(
             'Failed to get blog home page data.Error: ' +
-              `${errorResponse.error.error}`
+              `${errorResponse.error?.error || errorResponse.status}`
+          );
+        } else {
+          this.alertsService.addWarning(
+            'Unable to load blog home page. Please try again.'
           );
         }
+        this.loaderService.hideLoadingScreen();
       }
     );
   }
 
   loadMoreBlogPostSummaries(offset: number): void {
+    // Prevent concurrent loads.
+    if (this.isLoadingBlogPosts) {
+      return;
+    }
+
+    // Validate offset is non-negative.
+    if (offset < 0) {
+      this.alertsService.addWarning('Invalid page offset. Please try again.');
+      this.showBlogPostCardsLoadingScreen = false;
+      this.isLoadingBlogPosts = false;
+      return;
+    }
+
+    // Validate offset doesn't exceed total posts.
+    if (this.totalBlogPosts > 0 && offset >= this.totalBlogPosts) {
+      this.alertsService.addWarning('No more blog posts available.');
+      this.showBlogPostCardsLoadingScreen = false;
+      this.isLoadingBlogPosts = false;
+      return;
+    }
+
+    this.isLoadingBlogPosts = true;
     this.blogHomePageBackendApiService
       .fetchBlogHomePageDataAsync(String(offset))
       .then(
         (data: BlogHomePageData) => {
+          this.isLoadingBlogPosts = false;
           // If we're jumping to a non-consecutive page, we need to ensure
           // the array structure is correct. Pad with nulls up to the offset
           // to maintain correct indices, then append the new data.
@@ -229,10 +261,18 @@ export class BlogHomePageComponent implements OnInit {
             const currentLength = this.blogPostSummaries.length;
             if (offset < currentLength) {
               // Array has been padded, insert data at the correct offset.
+              // Only replace nulls, don't overwrite valid data.
               const newArray = [...this.blogPostSummaries];
               // Replace nulls at the offset position with actual data.
               for (let i = 0; i < data.blogPostSummaryDicts.length; i++) {
-                newArray[offset + i] = data.blogPostSummaryDicts[i];
+                const targetIndex = offset + i;
+                // Only replace if the position is null or undefined.
+                if (
+                  newArray[targetIndex] === null ||
+                  newArray[targetIndex] === undefined
+                ) {
+                  newArray[targetIndex] = data.blogPostSummaryDicts[i];
+                }
               }
               this.blogPostSummaries = newArray;
             } else {
@@ -250,34 +290,74 @@ export class BlogHomePageComponent implements OnInit {
           this.showBlogPostCardsLoadingScreen = false;
         },
         errorResponse => {
+          this.isLoadingBlogPosts = false;
+          this.showBlogPostCardsLoadingScreen = false;
           if (
             AppConstants.FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1
           ) {
             this.alertsService.addWarning(
-              'Failed to get blog home page data.Error:' +
-                ` ${errorResponse.error.error}`
+              'Failed to get blog home page data.Error: ' +
+                `${errorResponse.error?.error || errorResponse.status}`
+            );
+          } else {
+            // Handle non-fatal errors (like network issues).
+            this.alertsService.addWarning(
+              'Unable to load blog posts. Please try again.'
             );
           }
+          // Still try to show what we have.
+          this.selectBlogPostSummariesToShow();
         }
       );
   }
 
   loadPage(): void {
+    // Prevent loading if already loading.
+    if (this.isLoadingBlogPosts) {
+      return;
+    }
+
     if (this.blogPostSummaries.length < this.firstPostOnPageNum) {
       this.showBlogPostCardsLoadingScreen = true;
       if (!this.searchPageIsActive) {
         // Calculate the offset needed for the current page (0-indexed).
         const requiredOffset = this.firstPostOnPageNum - 1;
+        // Validate offset before loading.
+        if (requiredOffset < 0) {
+          this.alertsService.addWarning(
+            'Invalid page number. Please try again.'
+          );
+          this.showBlogPostCardsLoadingScreen = false;
+          return;
+        }
+        if (this.totalBlogPosts > 0 && requiredOffset >= this.totalBlogPosts) {
+          this.alertsService.addWarning('No more blog posts available.');
+          this.showBlogPostCardsLoadingScreen = false;
+          return;
+        }
         this.loadMoreBlogPostSummaries(requiredOffset);
       } else {
+        // For search pages, use the search service.
+        // Check if we have more data to load before calling loadMoreData.
+        if (this.searchOffset === null && this.blogPostSummaries.length > 0) {
+          // No more search results available.
+          this.alertsService.addWarning(
+            'No more search results found. End of search results.'
+          );
+          this.showBlogPostCardsLoadingScreen = false;
+          return;
+        }
         this.blogPostSearchService.loadMoreData(
           data => {
             this.loadSearchResultsPageData(data);
           },
-          _isCurrentlyFetchingResults => {
-            this.alertsService.addWarning(
-              'No more search resutls found. End of search results.'
-            );
+          isEndOfResults => {
+            this.showBlogPostCardsLoadingScreen = false;
+            if (isEndOfResults) {
+              this.alertsService.addWarning(
+                'No more search results found. End of search results.'
+              );
+            }
           }
         );
       }
@@ -287,30 +367,56 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   onPageChange(page = this.page): void {
+    // Prevent page changes while loading.
+    if (this.isLoadingBlogPosts) {
+      return;
+    }
+
+    // Validate page number.
+    if (page < 1) {
+      this.alertsService.addWarning('Invalid page number.');
+      return;
+    }
+
+    // Calculate max pages based on total posts.
+    const pageSize = !this.searchPageIsActive
+      ? this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
+      : this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH;
+    const maxPages =
+      this.totalBlogPosts > 0 ? Math.ceil(this.totalBlogPosts / pageSize) : 1;
+
+    if (page > maxPages && this.totalBlogPosts > 0) {
+      this.alertsService.addWarning('No more pages available.');
+      return;
+    }
+
+    this.page = page;
+
     if (!this.searchPageIsActive) {
-      this.calculateFirstPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-      );
-      this.calculateLastPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE
-      );
+      this.calculateFirstPostOnPageNum(page, pageSize);
+      this.calculateLastPostOnPageNum(page, pageSize);
       this.loadPage();
     } else {
-      this.calculateFirstPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
-      );
-      this.calculateLastPostOnPageNum(
-        page,
-        this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH
-      );
+      this.calculateFirstPostOnPageNum(page, pageSize);
+      this.calculateLastPostOnPageNum(page, pageSize);
       this.loadPage();
     }
   }
 
   selectBlogPostSummariesToShow(): void {
+    // Prevent recursive loading if already loading.
+    if (this.isLoadingBlogPosts) {
+      // Still try to show what we have, even if incomplete.
+      const startIndex = this.firstPostOnPageNum - 1;
+      const endIndex = this.lastPostOnPageNum;
+      const pageData = this.blogPostSummaries.slice(startIndex, endIndex);
+      this.blogPostSummariesToShow = pageData.filter(
+        (summary): summary is BlogPostSummary =>
+          summary !== null && summary !== undefined
+      );
+      return;
+    }
+
     const startIndex = this.firstPostOnPageNum - 1;
     const endIndex = this.lastPostOnPageNum;
     const pageData = this.blogPostSummaries.slice(startIndex, endIndex);
@@ -337,8 +443,14 @@ export class BlogHomePageComponent implements OnInit {
         // Load the missing page.
         const missingPageOffset =
           (missingPage - 1) * this.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE;
-        this.loadMoreBlogPostSummaries(missingPageOffset);
-        return;
+        // Validate offset before loading.
+        if (
+          missingPageOffset >= 0 &&
+          (this.totalBlogPosts === 0 || missingPageOffset < this.totalBlogPosts)
+        ) {
+          this.loadMoreBlogPostSummaries(missingPageOffset);
+          return;
+        }
       }
     }
 

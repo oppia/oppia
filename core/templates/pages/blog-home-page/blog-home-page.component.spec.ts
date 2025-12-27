@@ -164,6 +164,7 @@ describe('Blog home page component', () => {
       BlogPostSummary.createFromBackendDict(blogPostSummary);
     spyOn(loaderService, 'showLoadingScreen');
     spyOn(loaderService, 'hideLoadingScreen');
+    component.isLoadingBlogPosts = false;
   });
 
   it('should determine if small screen view is active', () => {
@@ -632,7 +633,7 @@ describe('Blog home page component', () => {
         component.loadPage();
 
         expect(alertsService.addWarning).toHaveBeenCalledWith(
-          'No more search resutls found. End of search results.'
+          'No more search results found. End of search results.'
         );
       }
     );
@@ -817,6 +818,7 @@ describe('Blog home page component', () => {
       ];
       component.ngOnInit();
       component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
+      component.isLoadingBlogPosts = false;
 
       expect(component.page).toBe(1);
       expect(component.firstPostOnPageNum).toBe(1);
@@ -836,6 +838,7 @@ describe('Blog home page component', () => {
         blogPostSummaryObject,
       ]);
       component.showBlogPostCardsLoadingScreen = false;
+      component.isLoadingBlogPosts = false;
 
       // Changing to page number 3.
       component.page = 3;
@@ -850,6 +853,7 @@ describe('Blog home page component', () => {
         blogPostSummaryObject,
       ]);
       component.showBlogPostCardsLoadingScreen = false;
+      component.isLoadingBlogPosts = false;
 
       // Changing back to page number 2.
       component.page = 2;
@@ -861,6 +865,42 @@ describe('Blog home page component', () => {
       expect(component.lastPostOnPageNum).toBe(4);
       expect(component.blogPostSummaries.length).toBe(5);
       expect(component.blogPostSummariesToShow.length).toBe(2);
+    });
+
+    it('should prevent page change when loading', () => {
+      component.isLoadingBlogPosts = true;
+      spyOn(component, 'loadPage');
+      spyOn(alertsService, 'addWarning');
+
+      component.onPageChange(2);
+
+      expect(component.loadPage).not.toHaveBeenCalled();
+    });
+
+    it('should reject invalid page numbers', () => {
+      spyOn(component, 'loadPage');
+      spyOn(alertsService, 'addWarning');
+
+      component.onPageChange(0);
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid page number.'
+      );
+      expect(component.loadPage).not.toHaveBeenCalled();
+    });
+
+    it('should reject page numbers beyond max pages', () => {
+      component.totalBlogPosts = 10;
+      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 5;
+      spyOn(component, 'loadPage');
+      spyOn(alertsService, 'addWarning');
+
+      component.onPageChange(3); // Max pages = ceil(10/5) = 2.
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more pages available.'
+      );
+      expect(component.loadPage).not.toHaveBeenCalled();
     });
 
     it('should use reject handler if fetching blog home page data fails', fakeAsync(() => {
@@ -915,6 +955,222 @@ describe('Blog home page component', () => {
           'Failed to get blog home page data.Error: Backend error'
         );
       })
+    );
+
+    it('should not show warning if error status is not in FATAL_ERROR_CODES', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogHomePageDataAsync'
+      ).and.returnValue(
+        Promise.reject({
+          error: {error: 'Backend error'},
+          status: 403,
+        })
+      );
+      component.totalBlogPosts = 10; // Set total to allow loading.
+
+      component.loadMoreBlogPostSummaries(1);
+
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).toHaveBeenCalledWith('1');
+
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Unable to load blog posts. Please try again.'
+      );
+      expect(component.isLoadingBlogPosts).toBeFalse();
+    }));
+
+    it('should prevent concurrent loads when isLoadingBlogPosts is true', () => {
+      component.isLoadingBlogPosts = true;
+      spyOn(blogHomePageBackendApiService, 'fetchBlogHomePageDataAsync');
+
+      component.loadMoreBlogPostSummaries(1);
+
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).not.toHaveBeenCalled();
+    });
+
+    it('should reject negative offsets', () => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(blogHomePageBackendApiService, 'fetchBlogHomePageDataAsync');
+
+      component.loadMoreBlogPostSummaries(-1);
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Invalid page offset. Please try again.'
+      );
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).not.toHaveBeenCalled();
+      expect(component.isLoadingBlogPosts).toBeFalse();
+    });
+
+    it('should reject offsets that exceed total posts', () => {
+      component.totalBlogPosts = 10;
+      spyOn(alertsService, 'addWarning');
+      spyOn(blogHomePageBackendApiService, 'fetchBlogHomePageDataAsync');
+
+      component.loadMoreBlogPostSummaries(10);
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more blog posts available.'
+      );
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).not.toHaveBeenCalled();
+      expect(component.isLoadingBlogPosts).toBeFalse();
+    });
+
+    it(
+      'should handle loading blog post summaries when offset is greater than' +
+        ' current array length',
+      fakeAsync(() => {
+        component.blogPostSummaries = [blogPostSummaryObject];
+        component.firstPostOnPageNum = 6; // Set to after the padded area to avoid triggering another load.
+        component.lastPostOnPageNum = 7;
+        component.searchPageIsActive = true; // Prevent selectBlogPostSummariesToShow from triggering another load.
+        blogHomePageDataObject.numOfPublishedBlogPosts = 5;
+        blogHomePageDataObject.blogPostSummaryDicts = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+        ];
+        spyOn(
+          blogHomePageBackendApiService,
+          'fetchBlogHomePageDataAsync'
+        ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+        // Spy on selectBlogPostSummariesToShow to prevent it from triggering loads.
+        spyOn(component, 'selectBlogPostSummariesToShow').and.callFake(
+          () => {}
+        );
+
+        // Load with offset 5, which is greater than current length (1).
+        component.loadMoreBlogPostSummaries(5);
+        tick();
+
+        expect(component.blogPostSummaries.length).toBe(7);
+        // First item should be the original summary.
+        expect(component.blogPostSummaries[0]).toEqual(blogPostSummaryObject);
+        // Items at indices 1-4 should be null (padded).
+        expect(component.blogPostSummaries[1]).toBeNull();
+        expect(component.blogPostSummaries[2]).toBeNull();
+        expect(component.blogPostSummaries[3]).toBeNull();
+        expect(component.blogPostSummaries[4]).toBeNull();
+        // Items at indices 5-6 should be the new summaries.
+        expect(component.blogPostSummaries[5]).toEqual(blogPostSummaryObject);
+        expect(component.blogPostSummaries[6]).toEqual(blogPostSummaryObject);
+      })
+    );
+
+    it(
+      'should handle loading blog post summaries when offset is less than' +
+        ' current array length (replacing nulls)',
+      fakeAsync(() => {
+        // Set up array with nulls at specific positions.
+        component.blogPostSummaries = [
+          blogPostSummaryObject,
+          null,
+          null,
+          blogPostSummaryObject,
+        ];
+        component.firstPostOnPageNum = 1;
+        component.lastPostOnPageNum = 1;
+        component.searchPageIsActive = true; // Prevent selectBlogPostSummariesToShow from triggering another load.
+        blogHomePageDataObject.numOfPublishedBlogPosts = 5;
+        blogHomePageDataObject.blogPostSummaryDicts = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+        ];
+        spyOn(
+          blogHomePageBackendApiService,
+          'fetchBlogHomePageDataAsync'
+        ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+        // Spy on selectBlogPostSummariesToShow to prevent it from triggering loads.
+        spyOn(component, 'selectBlogPostSummariesToShow').and.callFake(
+          () => {}
+        );
+
+        // Load at offset 1, which is less than current length (4).
+        component.loadMoreBlogPostSummaries(1);
+        tick();
+
+        expect(component.blogPostSummaries.length).toBe(4);
+        // First item should remain unchanged.
+        expect(component.blogPostSummaries[0]).toEqual(blogPostSummaryObject);
+        // Items at indices 1-2 should be replaced with new summaries.
+        expect(component.blogPostSummaries[1]).toEqual(blogPostSummaryObject);
+        expect(component.blogPostSummaries[2]).toEqual(blogPostSummaryObject);
+        // Last item should remain unchanged.
+        expect(component.blogPostSummaries[3]).toEqual(blogPostSummaryObject);
+      })
+    );
+
+    it(
+      'should load missing page when selectBlogPostSummariesToShow finds' +
+        ' nulls in page data',
+      fakeAsync(() => {
+        component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
+        component.totalBlogPosts = 5;
+        component.searchPageIsActive = false;
+        component.isLoadingBlogPosts = false;
+        // Set up array with nulls at positions that would be on page 2.
+        component.blogPostSummaries = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+          null,
+          null,
+        ];
+        component.firstPostOnPageNum = 3;
+        component.lastPostOnPageNum = 4;
+        blogHomePageDataObject.numOfPublishedBlogPosts = 5;
+        blogHomePageDataObject.blogPostSummaryDicts = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+        ];
+        spyOn(
+          blogHomePageBackendApiService,
+          'fetchBlogHomePageDataAsync'
+        ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+
+        component.selectBlogPostSummariesToShow();
+        tick();
+
+        // Should have called loadMoreBlogPostSummaries with offset 2 (page 2).
+        expect(
+          blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+        ).toHaveBeenCalledWith('2');
+        expect(component.blogPostSummaries.length).toBe(4);
+      })
+    );
+
+    it(
+      'should not trigger load when isLoadingBlogPosts is true in' +
+        ' selectBlogPostSummariesToShow',
+      () => {
+        component.isLoadingBlogPosts = true;
+        component.blogPostSummaries = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+          null,
+        ];
+        component.firstPostOnPageNum = 2;
+        component.lastPostOnPageNum = 3;
+        component.searchPageIsActive = false;
+        spyOn(component, 'loadMoreBlogPostSummaries');
+
+        component.selectBlogPostSummariesToShow();
+
+        expect(component.loadMoreBlogPostSummaries).not.toHaveBeenCalled();
+        // Should still show available data (index 1 is blogPostSummaryObject).
+        expect(component.blogPostSummariesToShow.length).toBe(1);
+        expect(component.blogPostSummariesToShow[0]).toEqual(
+          blogPostSummaryObject
+        );
+      }
     );
   });
 
