@@ -52,7 +52,7 @@ describe('FeedbackPromptModalComponent', () => {
   it('should close modal when proceeding to feedback tab', () => {
     spyOn(activeModal, 'close');
 
-    component.proceedToFeedbackTab();
+    component.accept();
 
     expect(activeModal.close).toHaveBeenCalled();
   });
@@ -60,7 +60,7 @@ describe('FeedbackPromptModalComponent', () => {
   it('should dismiss modal when dismissing', () => {
     spyOn(activeModal, 'dismiss');
 
-    component.dismissModal();
+    component.cancel();
 
     expect(activeModal.dismiss).toHaveBeenCalled();
   });
