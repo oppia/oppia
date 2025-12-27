@@ -1074,7 +1074,7 @@ export class BaseUser {
         errorMessage +=
           '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the difference between the old screenshot(s)' +
           ' and the new one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
-          ' folder name should be something like diff-snapshots_(suite-name)_desktop_original';
+          ' folder name should be something like diff-snapshots_(suite-name)_desktop_original. The diff screenshot(s) should end with "-diff".';
       }
       errorMessage +=
         '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference percentage across ' +
@@ -1082,7 +1082,7 @@ export class BaseUser {
         'run the tests in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to ' +
         'replace the old one(s).\r\nTo download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
         ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
-        ' The new screenshot(s) should not end with "-diff".';
+        ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
       throw new Error(errorMessage);
     }
   }
