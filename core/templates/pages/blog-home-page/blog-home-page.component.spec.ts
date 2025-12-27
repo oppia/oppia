@@ -1512,7 +1512,7 @@ describe('Blog home page component', () => {
     expect(component.lastPostOnPageNum).toBe(10);
 
     component.calculateLastPostOnPageNum(3, 5);
-    expect(component.lastPostOnPageNum).toBe(10); // Should not exceed totalBlogPosts
+    expect(component.lastPostOnPageNum).toBe(10); // It should not exceed totalBlogPosts.
   });
 
   it('should unsubscribe on destroy', () => {
