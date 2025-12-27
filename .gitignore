@@ -36,7 +36,6 @@ dist/*
 !.coveragerc
 coverage.xml
 .viminfo
-.vscode/*
 .nyc_output/*
 libpeerconnection.log
 readme_test_dir/*
@@ -80,4 +79,3 @@ debug.log
 
 # Puppeteer acceptance tests.
 jest-runtime-config.json
-.venv/
