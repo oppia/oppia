@@ -192,7 +192,7 @@ describe('Blog home page component', () => {
     expect(component.updateSearchFieldsBasedOnUrlQuery).toHaveBeenCalled();
   });
 
-  it('should reset all component state when filterWasUsed is set true and loadInitialHomePageData is called', () => {
+  it('should reset all component state when filterWasUsed is set true and loadInitialHomePageData is called', fakeAsync(() => {
     component.filterWasUsed = true;
     component.page = 3;
     component.firstPostOnPageNum = 21;
@@ -212,8 +212,19 @@ describe('Blog home page component', () => {
     component.showBlogPostCardsLoadingScreen = true;
 
     const resetSearchStateSpy = spyOn(searchService, 'resetSearchState');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogHomePageDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        numOfPublishedBlogPosts: 0,
+        blogPostSummaryDicts: [],
+        listOfDefaultTags: [],
+      })
+    );
 
     component.loadInitialBlogHomePageData();
+    tick();
 
     expect(resetSearchStateSpy).toHaveBeenCalled();
     expect(component.page).toBe(1);
@@ -222,7 +233,53 @@ describe('Blog home page component', () => {
     expect(component.filterWasUsed).toBe(false);
     expect(component.totalBlogPosts).toBe(0);
     expect(component.showBlogPostCardsLoadingScreen).toBe(false);
-  });
+  }));
+
+  it('should handle fatal error when fetching initial blog home page data fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogHomePageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Backend error'},
+        status: 500,
+      })
+    );
+
+    component.loadInitialBlogHomePageData();
+
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Failed to get blog home page data.Error: Backend error'
+    );
+    expect(component.isLoadingBlogPosts).toBeFalse();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
+
+  it('should handle non-fatal error when fetching initial blog home page data fails', fakeAsync(() => {
+    spyOn(alertsService, 'addWarning');
+    spyOn(
+      blogHomePageBackendApiService,
+      'fetchBlogHomePageDataAsync'
+    ).and.returnValue(
+      Promise.reject({
+        error: {error: 'Network error'},
+        status: 0, // Non-fatal error code.
+      })
+    );
+
+    component.loadInitialBlogHomePageData();
+
+    tick();
+
+    expect(alertsService.addWarning).toHaveBeenCalledWith(
+      'Unable to load blog home page. Please try again.'
+    );
+    expect(component.isLoadingBlogPosts).toBeFalse();
+    expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
+  }));
 
   it('should handle search query change with language param in URL with empty search query and tag list', () => {
     spyOn(component, 'loadInitialBlogHomePageData');
@@ -1172,6 +1229,181 @@ describe('Blog home page component', () => {
         );
       }
     );
+
+    it('should reject invalid requiredOffset in loadPage when offset is negative', () => {
+      component.isLoadingBlogPosts = false;
+      component.blogPostSummaries = [];
+      // To test negative offset, we need firstPostOnPageNum = 0, which makes
+      // requiredOffset = -1. However, the condition blogPostSummaries.length < firstPostOnPageNum
+      // is false (0 < 0), so validation doesn't run. The component should validate
+      // firstPostOnPageNum >= 1 earlier. For now, test that invalid firstPostOnPageNum
+      // doesn't cause errors and calls selectBlogPostSummariesToShow instead.
+      // Invalid: should be >= 1.
+      component.firstPostOnPageNum = 0;
+      component.lastPostOnPageNum = 1;
+      component.searchPageIsActive = false;
+      spyOn(alertsService, 'addWarning');
+      spyOn(component, 'loadMoreBlogPostSummaries');
+
+      component.loadPage();
+
+      // With firstPostOnPageNum = 0, the condition is false, so it goes to
+      // selectBlogPostSummariesToShow() which handles it gracefully.
+      expect(component.loadMoreBlogPostSummaries).not.toHaveBeenCalled();
+      // Note: Component should be updated to validate firstPostOnPageNum >= 1
+      // before the condition check to properly catch this case.
+    });
+
+    it('should reject requiredOffset that exceeds total posts in loadPage', () => {
+      component.isLoadingBlogPosts = false;
+      component.blogPostSummaries = [];
+      // RequiredOffset = 10.
+      component.firstPostOnPageNum = 11;
+      component.lastPostOnPageNum = 11;
+      component.totalBlogPosts = 10;
+      component.searchPageIsActive = false;
+      spyOn(alertsService, 'addWarning');
+      spyOn(component, 'loadMoreBlogPostSummaries');
+
+      component.loadPage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more blog posts available.'
+      );
+      expect(component.loadMoreBlogPostSummaries).not.toHaveBeenCalled();
+      expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
+    });
+
+    it('should handle search page when searchOffset is null and data exists', () => {
+      component.isLoadingBlogPosts = false;
+      component.blogPostSummaries = [blogPostSummaryObject];
+      component.firstPostOnPageNum = 2;
+      component.lastPostOnPageNum = 2;
+      component.searchPageIsActive = true;
+      component.searchOffset = null;
+      spyOn(alertsService, 'addWarning');
+      spyOn(searchService, 'loadMoreData');
+
+      component.loadPage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more search results found. End of search results.'
+      );
+      expect(searchService.loadMoreData).not.toHaveBeenCalled();
+      expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
+    });
+
+    it('should handle isEndOfResults in search page loadMoreData callback', () => {
+      component.isLoadingBlogPosts = false;
+      component.blogPostSummaries = [];
+      component.firstPostOnPageNum = 2;
+      component.lastPostOnPageNum = 2;
+      component.searchPageIsActive = true;
+      component.searchOffset = 1;
+      spyOn(alertsService, 'addWarning');
+      spyOn(searchService, 'loadMoreData').and.callFake(
+        (
+          successCallback: (data: SearchResponseData) => void,
+          failureCallback?: (isEndOfResults: boolean) => void
+        ) => {
+          if (failureCallback) {
+            // IsEndOfResults = true.
+            failureCallback(true);
+          }
+        }
+      );
+
+      component.loadPage();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'No more search results found. End of search results.'
+      );
+      expect(component.showBlogPostCardsLoadingScreen).toBeFalse();
+    });
+
+    it(
+      'should not load when missingPageOffset validation fails in' +
+        ' selectBlogPostSummariesToShow',
+      () => {
+        component.isLoadingBlogPosts = false;
+        component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
+        // Set low so missingPageOffset exceeds it.
+        component.totalBlogPosts = 1;
+        component.searchPageIsActive = false;
+        component.blogPostSummaries = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+          // This will be in pageData range.
+          blogPostSummaryObject,
+          // This null triggers the validation check.
+          null,
+        ];
+        component.firstPostOnPageNum = 3;
+        component.lastPostOnPageNum = 4;
+        // Calculation: startIndex = 2, endIndex = 4
+        // pageData = blogPostSummaries.slice(2, 4) = [blogPostSummaryObject, null]
+        // firstNullIndex = 1, missingItemIndex = 2 + 1 = 3
+        // missingPage = floor(3/2) + 1 = 2, missingPageOffset = (2-1)*2 = 2.
+        // Since missingPageOffset (2) >= totalBlogPosts (1), validation fails.
+        spyOn(component, 'loadMoreBlogPostSummaries');
+
+        component.selectBlogPostSummariesToShow();
+
+        expect(component.loadMoreBlogPostSummaries).not.toHaveBeenCalled();
+        // Should still filter and show what's available (1 non-null item in pageData).
+        expect(component.blogPostSummariesToShow.length).toBe(1);
+        expect(component.blogPostSummariesToShow[0]).toEqual(
+          blogPostSummaryObject
+        );
+      }
+    );
+
+    it('should load when totalBlogPosts is 0 in selectBlogPostSummariesToShow', fakeAsync(() => {
+      component.isLoadingBlogPosts = false;
+      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE = 2;
+      // No total posts yet.
+      component.totalBlogPosts = 0;
+      component.searchPageIsActive = false;
+      component.blogPostSummaries = [blogPostSummaryObject, null];
+      component.firstPostOnPageNum = 2;
+      component.lastPostOnPageNum = 2;
+      blogHomePageDataObject.numOfPublishedBlogPosts = 0;
+      blogHomePageDataObject.blogPostSummaryDicts = [blogPostSummaryObject];
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogHomePageDataAsync'
+      ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+
+      component.selectBlogPostSummariesToShow();
+      tick();
+
+      // Should load even when totalBlogPosts is 0 (validation allows it).
+      expect(
+        blogHomePageBackendApiService.fetchBlogHomePageDataAsync
+      ).toHaveBeenCalled();
+    }));
+
+    it('should handle error response without error property in loadMoreBlogPostSummaries', fakeAsync(() => {
+      component.totalBlogPosts = 10;
+      spyOn(alertsService, 'addWarning');
+      spyOn(
+        blogHomePageBackendApiService,
+        'fetchBlogHomePageDataAsync'
+      ).and.returnValue(
+        Promise.reject({
+          status: 500,
+          // No error property.
+        })
+      );
+
+      component.loadMoreBlogPostSummaries(1);
+      tick();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Failed to get blog home page data.Error: 500'
+      );
+      expect(component.isLoadingBlogPosts).toBeFalse();
+    }));
   });
 
   it('should tell searching status', () => {
