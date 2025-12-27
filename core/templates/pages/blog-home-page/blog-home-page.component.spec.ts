@@ -960,6 +960,23 @@ describe('Blog home page component', () => {
       expect(component.loadPage).not.toHaveBeenCalled();
     });
 
+    it('should handle page change when searchPageIsActive is true', () => {
+      component.searchPageIsActive = true;
+      component.totalBlogPosts = 10;
+      component.MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE_SEARCH = 5;
+      component.isLoadingBlogPosts = false;
+      spyOn(component, 'loadPage');
+      spyOn(component, 'calculateFirstPostOnPageNum');
+      spyOn(component, 'calculateLastPostOnPageNum');
+
+      component.onPageChange(2);
+
+      expect(component.page).toBe(2);
+      expect(component.calculateFirstPostOnPageNum).toHaveBeenCalledWith(2, 5);
+      expect(component.calculateLastPostOnPageNum).toHaveBeenCalledWith(2, 5);
+      expect(component.loadPage).toHaveBeenCalled();
+    });
+
     it('should use reject handler if fetching blog home page data fails', fakeAsync(() => {
       spyOn(alertsService, 'addWarning');
       spyOn(
@@ -1161,6 +1178,60 @@ describe('Blog home page component', () => {
         // Items at indices 1-2 should be replaced with new summaries.
         expect(component.blogPostSummaries[1]).toEqual(blogPostSummaryObject);
         expect(component.blogPostSummaries[2]).toEqual(blogPostSummaryObject);
+        // Last item should remain unchanged.
+        expect(component.blogPostSummaries[3]).toEqual(blogPostSummaryObject);
+      })
+    );
+
+    it(
+      'should not overwrite valid data when loading at offset less than' +
+        ' current array length',
+      fakeAsync(() => {
+        // Set up array with valid data at the target positions.
+        const existingSummary = {
+          _id: 'existing',
+          _authorUsername: 'author',
+          _displayedAuthorName: 'Author',
+          _title: 'Existing Title',
+          _summary: 'Existing summary.',
+          _tags: ['tag1'],
+          _thumbnailFilename: 'thumb.svg',
+          _urlFragment: 'existing-post',
+        } as BlogPostSummary;
+        component.blogPostSummaries = [
+          blogPostSummaryObject,
+          existingSummary,
+          existingSummary,
+          blogPostSummaryObject,
+        ];
+        component.firstPostOnPageNum = 1;
+        component.lastPostOnPageNum = 1;
+        component.searchPageIsActive = true; // Prevent selectBlogPostSummariesToShow from triggering another load.
+        blogHomePageDataObject.numOfPublishedBlogPosts = 5;
+        blogHomePageDataObject.blogPostSummaryDicts = [
+          blogPostSummaryObject,
+          blogPostSummaryObject,
+        ];
+        spyOn(
+          blogHomePageBackendApiService,
+          'fetchBlogHomePageDataAsync'
+        ).and.returnValue(Promise.resolve(blogHomePageDataObject));
+        // Spy on selectBlogPostSummariesToShow to prevent it from triggering loads.
+        spyOn(component, 'selectBlogPostSummariesToShow').and.callFake(
+          () => {}
+        );
+
+        // Load at offset 1, which is less than current length (4).
+        // The positions at indices 1-2 already have valid data, so they should not be overwritten.
+        component.loadMoreBlogPostSummaries(1);
+        tick();
+
+        expect(component.blogPostSummaries.length).toBe(4);
+        // First item should remain unchanged.
+        expect(component.blogPostSummaries[0]).toEqual(blogPostSummaryObject);
+        // Items at indices 1-2 should remain as existingSummary (not overwritten).
+        expect(component.blogPostSummaries[1]).toEqual(existingSummary);
+        expect(component.blogPostSummaries[2]).toEqual(existingSummary);
         // Last item should remain unchanged.
         expect(component.blogPostSummaries[3]).toEqual(blogPostSummaryObject);
       })
@@ -1418,5 +1489,35 @@ describe('Blog home page component', () => {
     ).and.returnValue('image_url');
 
     expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
+  });
+
+  it('should calculate first post on page number correctly', () => {
+    component.calculateFirstPostOnPageNum(1, 5);
+    expect(component.firstPostOnPageNum).toBe(1);
+
+    component.calculateFirstPostOnPageNum(2, 5);
+    expect(component.firstPostOnPageNum).toBe(6);
+
+    component.calculateFirstPostOnPageNum(3, 10);
+    expect(component.firstPostOnPageNum).toBe(21);
+  });
+
+  it('should calculate last post on page number correctly', () => {
+    component.totalBlogPosts = 10;
+
+    component.calculateLastPostOnPageNum(1, 5);
+    expect(component.lastPostOnPageNum).toBe(5);
+
+    component.calculateLastPostOnPageNum(2, 5);
+    expect(component.lastPostOnPageNum).toBe(10);
+
+    component.calculateLastPostOnPageNum(3, 5);
+    expect(component.lastPostOnPageNum).toBe(10); // Should not exceed totalBlogPosts
+  });
+
+  it('should unsubscribe on destroy', () => {
+    spyOn(component.directiveSubscriptions, 'unsubscribe');
+    component.ngOnDestroy();
+    expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
   });
 });
