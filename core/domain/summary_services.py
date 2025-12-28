@@ -84,6 +84,8 @@ class DisplayableExplorationSummaryDict(TypedDict):
     thumbnail_icon_url: str
     thumbnail_bg_color: str
     num_views: int
+    num_checkpoints: int
+    visited_checkpoint_count: int
 
 
 class PlaythroughDict(TypedDict):

@@ -43,6 +43,8 @@ describe('Exploration summary model', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
 
     let expSummaryObject =
@@ -70,5 +72,7 @@ describe('Exploration summary model', () => {
     expect(expSummaryObject.activityType).toEqual('exploration');
     expect(expSummaryObject.category).toEqual('Algebra');
     expect(expSummaryObject.title).toEqual('Test Title');
+    expect(expSummaryObject.numCheckpoints).toEqual(0);
+    expect(expSummaryObject.visitedCheckpointCount).toEqual(0);
   });
 });

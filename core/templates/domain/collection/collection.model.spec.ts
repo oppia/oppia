@@ -67,6 +67,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     return _sampleCollection.addCollectionNode(
@@ -121,6 +123,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     var collection = Collection.create({
@@ -173,6 +177,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     var collectionNode = CollectionNode.create(collectionNodeBackendObject);
@@ -215,6 +221,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     var collectionNode = CollectionNode.create(collectionNodeBackendObject);
@@ -255,6 +263,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     var collectionNodeBackendObject2 = {
@@ -282,6 +292,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     var collectionNode1 = CollectionNode.create(collectionNodeBackendObject1);
@@ -328,6 +340,8 @@ describe('Collection model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     _sampleCollection.addCollectionNode(
@@ -457,6 +471,8 @@ describe('Collection model', () => {
           activity_type: 'exploration',
           category: 'Algebra',
           title: 'Test Title',
+          num_checkpoints: 0,
+          visited_checkpoint_count: 0,
         },
       })
     );
@@ -489,10 +505,10 @@ describe('Collection model', () => {
       expect(_sampleCollection.explorationIdToNodeIndexMap[expId1]).toEqual(1);
 
       // Return false if invalid index is provided.
-      expect(_sampleCollection.swapCollectionNodes(0, 6)).toBeFalse();
-      expect(_sampleCollection.swapCollectionNodes(5, 1)).toBeFalse();
-      expect(_sampleCollection.swapCollectionNodes(-1, 1)).toBeFalse();
-      expect(_sampleCollection.swapCollectionNodes(0, -1)).toBeFalse();
+      expect(_sampleCollection.swapCollectionNodes(0, 6)).toBe(false);
+      expect(_sampleCollection.swapCollectionNodes(5, 1)).toBe(false);
+      expect(_sampleCollection.swapCollectionNodes(-1, 1)).toBe(false);
+      expect(_sampleCollection.swapCollectionNodes(0, -1)).toBe(false);
 
       // Do the swapping if valid indices are provided.
       _sampleCollection.swapCollectionNodes(0, 1);

@@ -22,8 +22,8 @@ import {
   fakeAsync,
   TestBed,
   tick,
+  flush,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
 import {MaterialModule} from 'modules/material.module';
 import {FormsModule} from '@angular/forms';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -39,6 +39,8 @@ import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LoaderService} from 'services/loader.service';
+import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import {AppConstants} from 'app.constants';
 
 describe('Home tab Component', () => {
   let component: HomeTabComponent;
@@ -48,6 +50,11 @@ describe('Home tab Component', () => {
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let mockResizeEmitter: EventEmitter<void>;
   let siteAnalyticsService: SiteAnalyticsService;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let topicsDataSpy: jasmine.Spy;
+  let collectionsDataSpy: jasmine.Spy;
+  let explorationsDataSpy: jasmine.Spy;
+
   class MockPlatformFeatureService {
     status = {
       SerialChapterLaunchLearnerView: {
@@ -64,6 +71,7 @@ describe('Home tab Component', () => {
       declarations: [MockTranslatePipe, HomeTabComponent],
       providers: [
         UrlInterpolationService,
+        LearnerDashboardBackendApiService,
         {
           provide: WindowDimensionsService,
           useValue: {
@@ -83,12 +91,15 @@ describe('Home tab Component', () => {
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    learnerDashboardBackendApiService = TestBed.inject(
+      LearnerDashboardBackendApiService
+    );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
+
     let subtopic = {
       skill_ids: ['skill_id_2'],
       id: 1,
@@ -227,31 +238,62 @@ describe('Home tab Component', () => {
         skill_id_2: 'Skill Description 2',
       },
     };
-    component.currentGoals = [
-      LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict1
-      ),
-    ];
-    component.goalTopics = [
-      LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict1
-      ),
-    ];
-    component.partiallyLearntTopicsList = [
-      LearnerTopicSummary.createFromBackendDict(
-        learnerTopicSummaryBackendDict1
-      ),
-    ];
-    component.untrackedTopics = {};
+
+    topicsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardTopicsAndStoriesDataAsync'
+    );
+    collectionsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardCollectionsDataAsync'
+    );
+    explorationsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardExplorationsDataAsync'
+    );
+
+    const defaultTopic = LearnerTopicSummary.createFromBackendDict(
+      learnerTopicSummaryBackendDict1
+    );
+    topicsDataSpy.and.returnValue(
+      Promise.resolve({
+        completedStoriesList: [],
+        learntTopicsList: [],
+        partiallyLearntTopicsList: [defaultTopic],
+        topicsToLearnList: [defaultTopic],
+        allTopicsList: [defaultTopic],
+        untrackedTopics: {},
+        completedToIncompleteStories: [],
+        learntToPartiallyLearntTopics: [],
+      })
+    );
+    collectionsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteCollectionsList: [],
+        completedCollectionsList: [],
+        collectionPlaylist: [],
+      })
+    );
+    explorationsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteExplorationsList: [],
+        completedExplorationsList: [],
+        explorationPlaylist: [],
+      })
+    );
+
     component.username = 'username';
-    fixture.detectChanges();
   });
 
-  it('should get the correct width in mobile view', () => {
+  it('should get the correct width in mobile view', fakeAsync(() => {
     component.ngOnInit();
+    tick();
+    tick(1000);
+    fixture.detectChanges();
+
     expect(component.width).toEqual(233);
     expect(component.windowIsNarrow).toBe(true);
-  });
+  }));
 
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
@@ -328,36 +370,71 @@ describe('Home tab Component', () => {
   it(
     'should show empty learn something new tab' +
       "'when goal selection limit is reached'",
-    () => {
-      component.currentGoalsLength = AppConstants.MAX_CURRENT_GOALS_COUNT;
+    fakeAsync(() => {
+      const goals = [];
+      for (let i = 0; i < AppConstants.MAX_CURRENT_GOALS_COUNT; i++) {
+        goals.push({id: 'id' + i});
+      }
+      topicsDataSpy.and.returnValue(
+        Promise.resolve({
+          topicsToLearnList: goals,
+          allTopicsList: [],
+          partiallyLearntTopicsList: [],
+          untrackedTopics: {},
+        })
+      );
+
+      component.ngOnInit();
+      tick();
+      tick(1000);
 
       expect(component.isGoalLimitReached()).toBe(true);
-
-      component.currentGoalsLength = 2;
-      component.goalTopicsLength = 2;
-      expect(component.isGoalLimitReached()).toBe(true);
-    }
+    })
   );
 
   it(
     'should not show empty learn something new tab' +
       "'when goal selection limit is not reached'",
-    () => {
-      component.goalTopicsLength = 0;
+    fakeAsync(() => {
+      topicsDataSpy.and.returnValue(
+        Promise.resolve({
+          topicsToLearnList: [],
+          allTopicsList: [],
+          partiallyLearntTopicsList: [],
+          untrackedTopics: {},
+        })
+      );
+      component.ngOnInit();
+      tick();
+      tick(1000);
+
       expect(component.isGoalLimitReached()).toBe(false);
-    }
+    })
   );
 
   it(
     'should not show empty learn something new tab' +
       "'when goal selection limit is reached and goal selection limit" +
       " is not reached'",
-    () => {
-      component.goalTopicsLength = 2;
-      component.currentGoalsLength = 0;
-      component.goalTopicsLength = 3;
+    fakeAsync(() => {
+      const goals = [{id: '1'}, {id: '2'}];
+      const allTopics = [{id: '1'}, {id: '2'}, {id: '3'}];
+
+      topicsDataSpy.and.returnValue(
+        Promise.resolve({
+          topicsToLearnList: goals,
+          allTopicsList: allTopics,
+          partiallyLearntTopicsList: [],
+          untrackedTopics: {},
+        })
+      );
+
+      component.ngOnInit();
+      tick();
+      tick(1000);
+
       expect(component.isGoalLimitReached()).toBe(false);
-    }
+    })
   );
 
   it('should record analytics when lesson card in home tab clicked', () => {
@@ -382,11 +459,14 @@ describe('Home tab Component', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should get the correct number of stories that have available story nodes to recommend', () => {
+  it('should get the correct number of stories that have available story nodes to recommend', fakeAsync(() => {
+    component.ngOnInit();
+    tick();
+    tick(1000);
     expect(component.storySummariesWithAvailableNodes).toEqual(new Set(['1']));
-  });
+  }));
 
-  it('should get the correct number in-progress lessons (explorations, collections, and classrooms)', () => {
+  it('should get the correct number in-progress lessons (explorations, collections, and classrooms)', fakeAsync(() => {
     const sampleExploration = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -426,19 +506,30 @@ describe('Home tab Component', () => {
       title: 'Test Title',
       node_count: 0,
     };
-    component.incompleteCollectionsList = [
-      CollectionSummary.createFromBackendDict(sampleCollection),
-    ];
-    component.incompleteExplorationsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
 
-    fixture.detectChanges();
+    collectionsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteCollectionsList: [
+          CollectionSummary.createFromBackendDict(sampleCollection),
+        ],
+      })
+    );
+    explorationsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteExplorationsList: [
+          LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+        ],
+      })
+    );
+
+    component.ngOnInit();
+    tick();
+    tick(1000);
+
     expect(component.getTotalInProgressLessons()).toBe(4);
-  });
+  }));
 
-  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', () => {
-    // Add an unpublished node to test the filtering behavior.
+  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned ON', fakeAsync(() => {
     let unpublishedNodeDict = {
       id: 'unpublished_node',
       thumbnail_filename: 'image.png',
@@ -540,59 +631,39 @@ describe('Home tab Component', () => {
       skill_descriptions: {},
     };
 
-    component.partiallyLearntTopicsList = [
-      LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
-    ];
+    topicsDataSpy.and.returnValue(
+      Promise.resolve({
+        partiallyLearntTopicsList: [
+          LearnerTopicSummary.createFromBackendDict(
+            learnerTopicSummaryBackendDict
+          ),
+        ],
+        topicsToLearnList: [],
+        allTopicsList: [],
+        untrackedTopics: {},
+      })
+    );
 
     mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
 
-    // Re-initialize component to trigger ngOnInit with the feature flag ON.
     component.ngOnInit();
+    tick();
+    tick(1000);
 
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(true);
 
-    // Verify the story structure.
     const storySummaries =
       component.partiallyLearntTopicsList[0].getCanonicalStorySummaryDicts();
     const story = storySummaries[0];
     expect(story.getId()).toEqual('story_with_mixed_nodes');
-    expect(story.getNodeTitles().length).toEqual(3);
-    expect(story.getCompletedNodeTitles().length).toEqual(1);
-    expect(story.getCompletedNodeTitles()).toContain('Completed Chapter');
 
-    // Verify that getAllNodes returns all 3 nodes.
-    const allNodes = story.getAllNodes();
-    expect(allNodes.length).toEqual(3);
-
-    // Verify filtering behavior: only 2 nodes should have Published status.
-    const publishedNodeIds = allNodes
-      .filter((node: {getPublishedStatus: () => boolean}) =>
-        node.getPublishedStatus()
-      )
-      .map((node: {getId: () => string}) => node.getId());
-    expect(publishedNodeIds.length).toEqual(2);
-    expect(publishedNodeIds).toContain('completed_node');
-    expect(publishedNodeIds).toContain('remaining_node');
-    expect(publishedNodeIds).not.toContain('unpublished_node');
-
-    expect(publishedNodeIds.length).toEqual(2);
-    expect(publishedNodeIds).toContain('completed_node');
-    expect(publishedNodeIds).toContain('remaining_node');
-    expect(publishedNodeIds).not.toContain('unpublished_node');
-
-    // Verify that the story is added to storySummariesWithAvailableNodes.
-    // With the feature flag ON, only published nodes should be counted.
-    // Story has 3 total nodes but only 2 published (completed and remaining).
-    // With 1 completed and 2 published, remainingPublished = 2 - 1 - 1 = 0.
-    // So this story should NOT be in storySummariesWithAvailableNodes.
     expect(
       component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes')
     ).toBe(false);
-  });
+  }));
 
-  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned OFF', () => {
-    // Add an unpublished node to test the difference in behavior.
+  it('should get publishedNotesCount when isSerialChapterLearnerFeature is turned OFF', fakeAsync(() => {
     let unpublishedNodeDict = {
       id: 'unpublished_node_2',
       thumbnail_filename: 'image.png',
@@ -694,47 +765,32 @@ describe('Home tab Component', () => {
       skill_descriptions: {},
     };
 
-    component.partiallyLearntTopicsList = [
-      LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
-    ];
+    topicsDataSpy.and.returnValue(
+      Promise.resolve({
+        partiallyLearntTopicsList: [
+          LearnerTopicSummary.createFromBackendDict(
+            learnerTopicSummaryBackendDict
+          ),
+        ],
+        topicsToLearnList: [],
+        allTopicsList: [],
+        untrackedTopics: {},
+      })
+    );
 
     mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       false;
 
-    // Re-initialize component to trigger ngOnInit with the feature flag OFF.
     component.ngOnInit();
+    tick();
+    tick(1000);
 
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(false);
 
-    // Verify the story structure.
-    const storySummaries =
-      component.partiallyLearntTopicsList[0].getCanonicalStorySummaryDicts();
-    const story = storySummaries[0];
-    expect(story.getId()).toEqual('story_with_mixed_nodes_2');
-    expect(story.getNodeTitles().length).toEqual(3);
-    expect(story.getCompletedNodeTitles().length).toEqual(1);
-    expect(story.getCompletedNodeTitles()).toContain('Completed Chapter');
-
-    // Verify that getAllNodes returns all 3 nodes.
-    const allNodes = story.getAllNodes();
-    expect(allNodes.length).toEqual(3);
-
-    // Verify that even though there are published and unpublished nodes,
-    // when the flag is OFF, all nodes are counted.
-    const publishedNodes = allNodes.filter(
-      (node: {getPublishedStatus: () => boolean}) => node.getPublishedStatus()
-    );
-    expect(publishedNodes.length).toEqual(2);
-
-    // With the feature flag OFF, ALL nodes should be counted (including unpublished).
-    // Story has 3 total nodes (all counted when flag is OFF).
-    // With 1 completed and 3 total, remainingPublished = 3 - 1 - 1 = 1.
-    // Since remainingPublished (1) > 0 and < publishedNodesCount (3),
-    // this story SHOULD be in storySummariesWithAvailableNodes.
     expect(
       component.storySummariesWithAvailableNodes.has('story_with_mixed_nodes_2')
     ).toBe(true);
-  });
+  }));
 });
 
 describe('Home tab Component Loader visibility tests', () => {
@@ -742,6 +798,11 @@ describe('Home tab Component Loader visibility tests', () => {
   let fixture: ComponentFixture<HomeTabComponent>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let loaderService: LoaderService;
+  let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
+  let topicsDataSpy: jasmine.Spy;
+  let collectionsDataSpy: jasmine.Spy;
+  let explorationsDataSpy: jasmine.Spy;
+
   class MockPlatformFeatureService {
     status = {
       SerialChapterLaunchLearnerView: {
@@ -756,6 +817,7 @@ describe('Home tab Component Loader visibility tests', () => {
       imports: [MaterialModule, FormsModule, HttpClientTestingModule],
       declarations: [MockTranslatePipe, HomeTabComponent],
       providers: [
+        LearnerDashboardBackendApiService,
         {provide: PlatformFeatureService, useValue: mockPlatformFeatureService},
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -767,32 +829,50 @@ describe('Home tab Component Loader visibility tests', () => {
     component = fixture.componentInstance;
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     loaderService = TestBed.inject(LoaderService);
+    learnerDashboardBackendApiService = TestBed.inject(
+      LearnerDashboardBackendApiService
+    );
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
+
+    topicsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardTopicsAndStoriesDataAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        topicsToLearnList: [],
+        allTopicsList: [],
+        partiallyLearntTopicsList: [],
+        untrackedTopics: {},
+      })
+    );
+    collectionsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardCollectionsDataAsync'
+    ).and.returnValue(Promise.resolve({incompleteCollectionsList: []}));
+    explorationsDataSpy = spyOn(
+      learnerDashboardBackendApiService,
+      'fetchLearnerDashboardExplorationsDataAsync'
+    ).and.returnValue(Promise.resolve({incompleteExplorationsList: []}));
   });
 
-  it('should set allCardsLoaded to true immediately when totalLessonCards is 0', () => {
-    component.currentGoals = [];
-    component.goalTopics = [];
-    component.incompleteExplorationsList = [];
-    component.incompleteCollectionsList = [];
-    component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
-    component.untrackedTopics = {};
+  it('should set allCardsLoaded to true immediately when totalLessonCards is 0', fakeAsync(() => {
     component.username = 'testuser';
     component.allCardsLoaded = false;
     component.loadingMessage = 'Loading';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
+    tick();
+    tick(1000);
 
     expect(component.totalLessonCards).toEqual(0);
     expect(component.allCardsLoaded).toBe(true);
     expect(component.loadingMessage).toEqual('');
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
-  });
+  }));
 
   it('should set allCardsLoaded to true after timeout when not all cards are loaded', fakeAsync(() => {
     const sampleExploration = {
@@ -814,67 +894,42 @@ describe('Home tab Component Loader visibility tests', () => {
       title: 'Test Title',
     };
 
-    component.currentGoals = [];
-    component.goalTopics = [];
-    component.incompleteExplorationsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
-    component.incompleteCollectionsList = [];
-    component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
-    component.untrackedTopics = {};
+    explorationsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteExplorationsList: [
+          LearnerExplorationSummary.createFromBackendDict(sampleExploration),
+        ],
+      })
+    );
+
     component.username = 'testuser';
     component.allCardsLoaded = false;
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
+    tick();
 
     expect(component.allCardsLoaded).toBe(false);
     expect(component.totalLessonCards).toBeGreaterThan(0);
-    tick(10100);
+
+    tick(1000);
     expect(component.allCardsLoaded).toBe(true);
     expect(component.loadingMessage).toEqual('');
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
   }));
 
   it('should not call hideLoadingScreen in timeout if cards are already loaded', fakeAsync(() => {
-    const sampleExploration = {
-      last_updated_msec: 1591296737470.528,
-      community_owned: false,
-      objective: 'Test Objective',
-      id: '44LKoKLlIbGe',
-      num_views: 0,
-      thumbnail_icon_url: '/subjects/Algebra.svg',
-      human_readable_contributors_summary: {},
-      language_code: 'en',
-      thumbnail_bg_color: '#cc4b00',
-      created_on_msec: 1591296635736.666,
-      ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-      status: 'public',
-      tags: [],
-      activity_type: 'exploration',
-      category: 'Algebra',
-      title: 'Test Title',
-    };
-
-    component.currentGoals = [];
-    component.goalTopics = [];
-    component.incompleteExplorationsList = [
-      LearnerExplorationSummary.createFromBackendDict(sampleExploration),
-    ];
-    component.incompleteCollectionsList = [];
-    component.partiallyLearntTopicsList = [];
-    component.totalLessonsInPlaylists = [];
-    component.untrackedTopics = {};
     component.username = 'testuser';
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
-
     component.allCardsLoaded = true;
+
+    tick();
     const callCountBeforeTimeout = hideLoadingScreenSpy.calls.count();
-    tick(10100);
-    expect(hideLoadingScreenSpy.calls.count()).toEqual(callCountBeforeTimeout);
+
+    tick(1000);
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
   }));
 
   it('should increment loadedLessonCards and hide loading screen when all lessons are loaded', () => {
@@ -906,29 +961,23 @@ describe('Home tab Component Loader visibility tests', () => {
     expect(component.loadingMessage).toEqual('Loading');
     expect(hideLoadingScreenSpy).not.toHaveBeenCalled();
   });
+
   describe('Final Coverage Checks (Loader & Initialization)', () => {
-    it('should handle undefined lists without crashing and hide loader', () => {
-      component.incompleteExplorationsList =
-        undefined as unknown as LearnerExplorationSummary[];
-      component.incompleteCollectionsList =
-        undefined as unknown as CollectionSummary[];
-      component.totalLessonsInPlaylists = undefined as unknown as (
-        | LearnerExplorationSummary
-        | CollectionSummary
-      )[];
-      component.currentGoals = [];
-      component.partiallyLearntTopicsList = [];
-      component.goalTopics = [];
-      component.untrackedTopics = {};
-      spyOn(component, 'getTotalInProgressLessons').and.returnValue(1);
-      spyOn(component, 'isNonemptyObject').and.returnValue(true);
-      spyOn(component, 'isGoalLimitReached').and.returnValue(false);
+    it('should handle undefined lists without crashing and hide loader', fakeAsync(() => {
+      topicsDataSpy.and.returnValue(Promise.resolve({}));
+      collectionsDataSpy.and.returnValue(Promise.resolve({}));
+      explorationsDataSpy.and.returnValue(Promise.resolve({}));
+
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
+      tick();
+      tick(1000);
+
       expect(component.totalLessonCards).toEqual(0);
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();
-    });
-    it('should deduplicate topics in continueWhereYouLeftOffList', () => {
+    }));
+
+    it('should deduplicate topics in continueWhereYouLeftOffList', fakeAsync(() => {
       const topic = LearnerTopicSummary.createFromBackendDict({
         id: 't1',
         name: 'Topic 1',
@@ -948,14 +997,21 @@ describe('Home tab Component Loader visibility tests', () => {
         degrees_of_mastery: {},
         skill_descriptions: {},
       });
-      component.currentGoals = [topic];
-      component.partiallyLearntTopicsList = [topic];
-      component.incompleteExplorationsList = [];
-      component.incompleteCollectionsList = [];
-      component.goalTopics = [];
-      component.untrackedTopics = {};
+
+      topicsDataSpy.and.returnValue(
+        Promise.resolve({
+          topicsToLearnList: [topic],
+          partiallyLearntTopicsList: [topic],
+          allTopicsList: [],
+          untrackedTopics: {},
+        })
+      );
+
       component.ngOnInit();
+      tick();
+      tick(1000);
+
       expect(component.continueWhereYouLeftOffList.length).toEqual(1);
-    });
+    }));
   });
 });

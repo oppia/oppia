@@ -28,7 +28,6 @@ from core.domain import (
 )
 
 from typing import Dict, Optional, TypedDict
-from core.storage.user import gae_models as user_models
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -255,8 +254,9 @@ class LearnerDashboardExplorationsProgressHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
+        user_id = self.user_id
         (learner_progress, number_of_nonexistent_explorations) = (
-            learner_progress_services.get_exploration_progress(self.user_id)
+            learner_progress_services.get_exploration_progress(user_id)
         )
 
         completed_exp_summary_dicts = (
@@ -273,9 +273,8 @@ class LearnerDashboardExplorationsProgressHandler(
 
         exp_ids = [d['id'] for d in incomplete_exp_summary_dicts]
 
-        user_id_exp_id_tuples = [(self.user_id, eid) for eid in exp_ids]
-        exp_user_models = user_models.ExplorationUserDataModel.get_multi(
-            user_id_exp_id_tuples
+        exp_user_models = learner_progress_services.get_exploration_user_data(
+            user_id, exp_ids
         )
 
         explorations_dict = exp_fetchers.get_multiple_explorations_by_id(
@@ -371,7 +370,7 @@ class LearnerDashboardExplorationsProgressHandler(
         )
 
         creators_subscribed_to = (
-            subscription_services.get_all_creators_subscribed_to(self.user_id)
+            subscription_services.get_all_creators_subscribed_to(user_id)
         )
         creators_settings = user_services.get_users_settings(
             creators_subscribed_to, strict=True
@@ -436,3 +435,4 @@ class LearnerDashboardIdsHandler(
             }
         )
         self.render_json(self.values)
+        

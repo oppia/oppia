@@ -48,6 +48,8 @@ describe('Collection node model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'exp title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       };
     let collectionNodeBackendObject: CollectionNodeBackendDict = {
       exploration_id: 'exp_id0',
@@ -97,6 +99,8 @@ describe('Collection node model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'exp title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       };
     let collectionNodeBackendObject: CollectionNodeBackendDict = {
       exploration_id: 'exp_id0',
@@ -135,6 +139,8 @@ describe('Collection node model', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'exp title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       };
     let collectionNodeBackendObject: CollectionNodeBackendDict = {
       exploration_id: 'exp_id0',
@@ -149,7 +155,7 @@ describe('Collection node model', () => {
 
     expect(summaryObject).toBeNull();
     expect(collectionNode.getExplorationTitle()).toBeNull();
-    expect(collectionNode.isExplorationPrivate()).toBeFalse();
+    expect(collectionNode.isExplorationPrivate()).toBe(false);
 
     collectionNode.setExplorationSummaryObject(explorationSummaryBackendObject);
     summaryObject = collectionNode.getExplorationSummaryObject();
@@ -174,7 +180,7 @@ describe('Collection node model', () => {
 
     expect(summaryObject).toBeNull();
     expect(collectionNode.getExplorationTitle()).toBeNull();
-    expect(collectionNode.isExplorationPrivate()).toBeFalse();
+    expect(collectionNode.isExplorationPrivate()).toBe(false);
 
     collectionNode.setExplorationSummaryObject(explorationSummaryBackendObject);
     summaryObject = collectionNode.getExplorationSummaryObject();

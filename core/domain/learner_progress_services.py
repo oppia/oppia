@@ -41,6 +41,8 @@ from core.domain import (
     topic_services,
     user_domain,
 )
+from core.storage.user import gae_models as user_models
+
 from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, TypedDict
@@ -2530,6 +2532,21 @@ def get_collection_progress(
 
     return (learner_progress_in_collection, number_of_nonexistent_collections)
 
+
+def get_exploration_user_data(user_id, exp_ids):
+    """Fetches the exploration user data models for a list of explorations.
+
+    Args:
+        user_id: str. The id of the user.
+        exp_ids: list(str). The ids of the explorations.
+
+    Returns:
+        list(ExplorationUserDataModel|None). The list of exploration user
+        data models.
+    """
+    user_id_exp_id_tuples = [(user_id, exp_id) for exp_id in exp_ids]
+    return user_models.ExplorationUserDataModel.get_multi(
+        user_id_exp_id_tuples)
 
 def get_exploration_progress(
     user_id: str,

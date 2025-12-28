@@ -100,6 +100,50 @@ class LearnerDashboardTopicsAndStoriesProgressHandlerTests(
         'dummy-subtopic-zero',
     )
 
+    def test_story_progress_includes_checkpoint_counts(self) -> None:
+        self.login(self.VIEWER_EMAIL)
+        self.save_new_topic(
+            self.TOPIC_ID_1, self.owner_id, name=self.TOPIC_NAME_1,
+            url_fragment='topic-one', description='A new topic',
+            subtopics=[self.subtopic_0], next_subtopic_id=1)
+        self.save_new_story(self.STORY_ID_1, self.owner_id, self.TOPIC_ID_1)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1)
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1)
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': 'node_1',
+                'title': 'Node 1',
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID,
+                'node_id': 'node_1',
+                'old_value': None,
+                'new_value': self.EXP_ID_1
+            })
+        ]
+        story_services.update_story(
+            self.owner_id, self.STORY_ID_1, change_list, 'Added node')
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+        learner_progress_services.record_topic_started(
+            self.viewer_id, self.TOPIC_ID_1)
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_TOPIC_AND_STORY_DATA_URL)
+        topic_data = response['partially_learnt_topics_list'][0]
+        story_data = topic_data['canonical_story_summary_dicts'][0]
+        
+        self.assertIn('num_checkpoints', story_data)
+        self.assertIn('visited_checkpoint_count', story_data)
+        
+        self.logout()
+
     def setUp(self) -> None:
         super().setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
