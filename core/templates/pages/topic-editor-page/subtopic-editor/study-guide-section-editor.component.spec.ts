@@ -25,20 +25,11 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {TopicEditorStateService} from '../services/topic-editor-state.service';
 import {StudyGuideSectionEditorComponent} from './study-guide-section-editor.component';
 import {HtmlLengthService} from 'services/html-length.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockHtmlLengthService {
   computeHtmlLength(html: string, calculationType: string): number {
     return html.length;
   }
-}
-
-class MockPlatformFeatureService {
-  status = {
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
-  };
 }
 
 describe('Study Guide Section editor component', () => {
