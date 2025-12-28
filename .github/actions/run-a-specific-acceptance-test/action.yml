@@ -77,6 +77,8 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: diff-snapshots_${{ inputs.modified-suite-name-for-uploads }}
+        # Note: The path must be kept in sync with the one specified in
+        # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
         path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/diff-snapshots
     
     - name: Upload test new screenshots
@@ -88,6 +90,8 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: new-snapshots_${{ inputs.modified-suite-name-for-uploads }}
+        # Note: The path must be kept in sync with the one specified in
+        # core/tests/puppeteer-acceptance-tests/utilities/common/puppeteer-utils.ts
         path: /home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/${{ inputs.test-suite }}/prod-${{ inputs.viewport-type }}-screenshots/new-snapshots
 
     - name: Check for video recordings
