@@ -85,6 +85,16 @@ describe('Create new skill modal', () => {
     expect(componentInstance.conceptCardExplanationEditorIsShown).toBeTrue();
   });
 
+  it('should get html schema', () => {
+    const result = componentInstance.getHtmlSchema();
+    expect(result).toEqual({
+      type: 'html',
+      ui_config: {
+        rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
+      },
+    });
+  });
+
   it('should set error message if needed', () => {
     spyOn(validatorsService, 'hasValidDescription').and.returnValue(false);
     componentInstance.skillDescriptionExists = false;
