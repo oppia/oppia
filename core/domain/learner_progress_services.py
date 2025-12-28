@@ -41,9 +41,9 @@ from core.domain import (
     topic_services,
     user_domain,
 )
+from core.platform import models
 from core.storage.user import gae_models as user_models
 
-from core.platform import models
 
 from typing import Dict, List, Optional, Tuple, TypedDict
 
