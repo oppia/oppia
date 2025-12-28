@@ -33,7 +33,7 @@ from core.storage.beam_job import gae_models as beam_job_models
 import apache_beam as beam
 from apache_beam import runners
 from google.cloud import dataflow
-from typing import Iterator, Optional, Type
+from typing import Dict, Iterator, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -125,7 +125,7 @@ def run_job(
     """
     job_name = job_class.__name__
 
-    additional_options = {}
+    additional_options: Dict[str, int | str] = {}
     if does_job_requires_limiting_workers(job_name):
         # We want to limit the number of workers for Beam jobs related to voiceover
         # synthesis, as these jobs depend on Azure for voiceover regeneration, and
@@ -140,6 +140,7 @@ def run_job(
         pipeline = beam.Pipeline(
             runner=runners.DirectRunner() if sync else runners.DataflowRunner(),
             options=job_options.JobOptions(
+                flags=None,
                 namespace=namespace,
                 oppia_project_id=app_identity_services.get_application_id(),
                 **additional_options,

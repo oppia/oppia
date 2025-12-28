@@ -22,6 +22,7 @@ speech-service/index-text-to-speech.
 from __future__ import annotations
 
 import re
+import time
 
 from core import constants, feconf
 from core.domain import voiceover_services
@@ -403,21 +404,62 @@ def regenerate_speech_from_text(
         plaintext, language_accent_code
     )
 
-    speech_synthesis_result = speech_synthesizer.speak_ssml_async(
-        ssml_text_for_speech_synthesis
-    ).get()
+    delay_before_retrying_in_sec = 1
 
-    binary_audio_data = speech_synthesis_result.audio_data
+    for _ in range(get_number_of_retry_attempts_for_voiceover_synthesis()):
+        # Adding a delay before retrying the speech synthesis.
+        time.sleep(delay_before_retrying_in_sec)
+        speech_synthesis_result = speech_synthesizer.speak_ssml_async(
+            ssml_text_for_speech_synthesis
+        ).get()
 
-    error_details = None
-    if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
-        cancellation_details = speech_synthesis_result.cancellation_details
+        binary_audio_data = speech_synthesis_result.audio_data
 
-        if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            error_details = cancellation_details.error_details
+        error_details = None
+        error_code = None
+
+        if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = speech_synthesis_result.cancellation_details
+
+            if (
+                cancellation_details.reason
+                == speechsdk.CancellationReason.Error
+            ):
+                error_details = cancellation_details.error_details
+                error_code = str(cancellation_details.error_code)
+
+            # Exponential backoff for retrying speech synthesis in case of too
+            # many requests, connection # failure, or service timeout errors.
+            if error_code in [
+                'CancellationErrorCode.TooManyRequests',
+                'CancellationErrorCode.ConnectionFailure',
+                'CancellationErrorCode.ServiceTimeout',
+            ]:
+                delay_before_retrying_in_sec *= 2
+            else:
+                break
+
+        if error_details is None:
+            break
 
     return (
         binary_audio_data,
         word_boundary_collection_instance.audio_offset_list,
         error_details,
     )
+
+
+def get_number_of_retry_attempts_for_voiceover_synthesis() -> int:
+    """Returns the max retry attempts for voiceover synthesis.
+    The limit is lower in GAE/Gunicorn environments to prevent worker timeouts.
+
+    Returns:
+        int. The max number of retry attempts for voiceover synthesis.
+    """
+    if feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV is None:
+        # Gunicorn workers have a 60s timeout. Capping at 4 retries ensures
+        # the cumulative backoff (15s) stays well within the request limit.
+        return 4
+
+    # Dataflow environments handle long-running processes, allowing more retries.
+    return 10
