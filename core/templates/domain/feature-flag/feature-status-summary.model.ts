@@ -42,7 +42,6 @@ export enum FeatureNames {
   ShowVoiceoverTabForNonCuratedExplorations = 'show_voiceover_tab_for_non_curated_explorations',
   ShowRestructuredStudyGuides = 'show_restructured_study_guides',
   EnableTranslationOppsWithNewOppModels = 'enable_translation_opps_with_new_opp_models',
-  EnableWorkedExamplesRteComponent = 'enable_worked_examples_rte_component',
   ShowRegeneratedVoiceoversToLearners = 'show_regenerated_voiceovers_to_learners',
   EnableBackgroundVoiceoverSynthesis = 'enable_background_voiceover_synthesis',
   EnableReadyForReviewTest = 'enable_ready_for_review_test',

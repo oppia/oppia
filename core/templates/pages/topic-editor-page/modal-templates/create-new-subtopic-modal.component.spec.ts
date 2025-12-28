@@ -104,9 +104,6 @@ class MockPlatformFeatureService {
     ShowRestructuredStudyGuides: {
       isEnabled: false,
     },
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
   };
 }
 
@@ -130,13 +127,6 @@ describe('create new subtopic modal', function () {
     type: 'html',
     ui_config: {
       rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
-      rows: 100,
-    },
-  };
-  let AllComponentsSchema = {
-    type: 'html',
-    ui_config: {
-      rte_component_config_id: 'ALL_COMPONENTS',
       rows: 100,
     },
   };
@@ -267,19 +257,12 @@ describe('create new subtopic modal', function () {
     expect(component.sectionContentHtml).toBe('section content');
   });
 
-  it('should return ALL_COMPONENTS schema when EnableWorkedExamplesRteComponent is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-    let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-    expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
-  });
-
   it(
     'should show Schema editor when user clicks' +
       'on "Give a description or explanation of the subtopic." button',
     () => {
       let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
-      expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
+      expect(SUBTOPIC_PAGE_SCHEMA).toEqual(DefaultSubtopicPageSchema);
 
       component.showSchemaEditor();
       expect(component.schemaEditorIsShown).toBe(true);
@@ -384,20 +367,6 @@ describe('create new subtopic modal', function () {
 
     platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
     expect(component.isShowRestructuredStudyGuidesFeatureEnabled()).toBe(false);
-  });
-
-  it('should check if worked examples RTE component feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      true
-    );
-
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
-    );
   });
 
   it('should not create subtopic when "Cancel" button clicked', fakeAsync(() => {

@@ -37,10 +37,6 @@ describe('Blog Editor and curriculum admin', function () {
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-    // Enable the feature flag.
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
-    );
     blogPostEditor = await UserFactory.createNewUser(
       'blogPostEditor',
       'blog_post_editor@example.com',

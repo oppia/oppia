@@ -21,32 +21,16 @@ import {ChangeDetectorRef, NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ReviewMaterialEditorComponent} from './review-material-editor.component';
-import {PlatformFeatureService} from 'services/platform-feature.service';
-
-class MockPlatformFeatureService {
-  status = {
-    EnableWorkedExamplesRteComponent: {
-      isEnabled: false,
-    },
-  };
-}
 
 describe('Review Material Editor Component', () => {
   let component: ReviewMaterialEditorComponent;
   let fixture: ComponentFixture<ReviewMaterialEditorComponent>;
-  let platformFeatureService: PlatformFeatureService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ReviewMaterialEditorComponent],
-      providers: [
-        ChangeDetectorRef,
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
-        },
-      ],
+      providers: [ChangeDetectorRef],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -54,7 +38,6 @@ describe('Review Material Editor Component', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ReviewMaterialEditorComponent);
     component = fixture.componentInstance;
-    platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     component.bindableDict = {
       displayedConceptCardExplanation: 'Explanation',
@@ -134,17 +117,6 @@ describe('Review Material Editor Component', () => {
     expect(component.getSchema()).toEqual(component.HTML_SCHEMA);
   });
 
-  it('should get schema with ALL_COMPONENTS when feature is disabled', () => {
-    const schema = component.getSchema();
-
-    expect(schema).toEqual({
-      type: 'html',
-      ui_config: {
-        rte_component_config_id: 'ALL_COMPONENTS',
-      },
-    });
-  });
-
   it('should update editableExplanation', () => {
     component.editableExplanation = 'Old Explanation';
 
@@ -162,10 +134,7 @@ describe('Review Material Editor Component', () => {
     expect(component.editableExplanation).toEqual('Same Explanation');
   });
 
-  it('should get schema with SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS when feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
-
+  it('should get correct schema', () => {
     const schema = component.getSchema();
 
     expect(schema).toEqual({
@@ -174,12 +143,6 @@ describe('Review Material Editor Component', () => {
         rte_component_config_id: 'SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS',
       },
     });
-  });
-
-  it('should return correct value for isEnableWorkedexamplesRteComponentFeatureEnabled', () => {
-    expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
-      false
-    );
   });
 
   it('should save explanation memento when opening editor', () => {

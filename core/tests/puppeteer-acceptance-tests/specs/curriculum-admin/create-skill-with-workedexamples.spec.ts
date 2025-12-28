@@ -43,11 +43,6 @@ describe('Curriculum Admin', function () {
       [ROLES.RELEASE_COORDINATOR]
     );
 
-    // Enable the feature flag.
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
-    );
-
     await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
     // Setup taking longer than 300000 ms.
   }, 480000);

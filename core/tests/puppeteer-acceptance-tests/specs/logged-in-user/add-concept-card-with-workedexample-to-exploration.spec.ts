@@ -44,9 +44,6 @@ describe('Logged-in User', function () {
       'release_coordinator@example.com',
       [ROLES.RELEASE_COORDINATOR]
     );
-    await releaseCoordinator.enableFeatureFlag(
-      'enable_worked_examples_rte_component'
-    );
 
     await curriculumAdmin.createTopicWithSkill(
       'Addition and Subtraction',
