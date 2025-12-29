@@ -24,6 +24,7 @@ import {
   VoiceoverBackendApiService,
   LanguageAccentToContentStatusMap,
 } from 'domain/voiceover/voiceover-backend-api.service';
+import {VoiceoverLanguageManagementService} from './voiceover-language-management-service';
 
 @Injectable({
   providedIn: 'root',
@@ -43,7 +44,10 @@ export class VoiceoverRegenerationTaskMappingService {
   public pollingSub: Subscription | null = null;
   private _newRegenerationRequestEventEmitter = new EventEmitter<void>();
 
-  constructor(private voiceoverBackendApiService: VoiceoverBackendApiService) {}
+  constructor(
+    private voiceoverBackendApiService: VoiceoverBackendApiService,
+    private voiceoverLanguageManagementService: VoiceoverLanguageManagementService
+  ) {}
 
   init(explorationID: string): void {
     this.explorationID = explorationID;

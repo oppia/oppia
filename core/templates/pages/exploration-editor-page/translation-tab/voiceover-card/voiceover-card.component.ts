@@ -65,6 +65,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   voiceoversAreLoaded: boolean = false;
   currentVoiceoverLoadedType!: string | undefined;
+  voiceoverAdminConfigIsLoading: boolean = false;
 
   isVoiceoverSupportedForSelectedLanguage: boolean = false;
   isVoiceoverAutogenerationSupportedForSelectedAccent: boolean = false;
@@ -138,6 +139,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.languageAccentCode =
       this.localStorageService.getLastSelectedLanguageAccentCode() as string;
     this.languageAccentCodeIsSelected = this.languageAccentCode !== 'undefined';
+    this.voiceoverAdminConfigIsLoading = true;
 
     this.voiceoverRegenerationTaskMappingService.init(
       this.pageContextService.getExplorationId()
@@ -150,6 +152,10 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     this.directiveSubscriptions.add(
       this.translationLanguageService.onActiveLanguageChanged.subscribe(() => {
         this.updateLanguageCode();
+        this.voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes =
+          this.voiceoverLanguageManagementService.getAutogeneratableLanguageAccents(
+            this.languageCode
+          );
       })
     );
 
@@ -167,9 +173,6 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
           let newLanguageAccentCode =
             this.localStorageService.getLastSelectedLanguageAccentCode() as string;
           this.updateLanguageAccentCode(newLanguageAccentCode);
-          this.voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes.push(
-            newLanguageAccentCode
-          );
         }
       )
     );
@@ -202,14 +205,13 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
             ?.automatedVoiceoversAudioOffsetsMsecs || {}
         );
         this.automaticVoiceoverHighlightService.getSentencesToHighlightForTimeRanges();
-        this.voiceoverRegenerationTaskMappingService.currentLanguageAccentCodes =
-          this.entityVoiceoversService.getLanguageAccentCodes();
       })
     );
 
     this.adminBackendApiService
       .getAdminConfigForAutomaticVoiceoversAsync()
       .then(isVoiceoverAutogenerationEnabledByAdmins => {
+        this.voiceoverAdminConfigIsLoading = false;
         this.isVoiceoverAutogenerationEnabledByAdmins =
           isVoiceoverAutogenerationEnabledByAdmins;
       });
@@ -345,6 +347,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       this.automaticVoiceoverGenerationStatus = voiceoverGenerationStatus;
       this.entityVoiceoversService.fetchEntityVoiceovers().then(() => {
         this.updateStatusGraph();
+        this.changeDetectorRef.detectChanges();
       });
     } else if (voiceoverGenerationStatus === 'FAILED') {
       this.automaticVoiceover = undefined;
@@ -354,7 +357,7 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
     } else if (voiceoverGenerationStatus === undefined) {
       this.automaticVoiceoverGenerationStatus = '';
     }
-    this.graphDataService.recompute();
+    this.changeDetectorRef.detectChanges();
   }
 
   updateActiveContent(): void {
