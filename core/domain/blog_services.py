@@ -1019,13 +1019,18 @@ def create_blog_author_details_model(user_id: str) -> None:
 
     Args:
         user_id: str. The user ID of the blog author.
+
+    Raises:
+        Exception. Unable to fetch user details for the given user ID.
     """
     user_settings = user_services.get_user_settings(user_id, strict=True)
-    # Adding an if statement for mypy type checks to pass.
-    if user_settings.username:
-        blog_models.BlogAuthorDetailsModel.create(
-            user_id, user_settings.username, user_settings.user_bio
-        )
+
+    if user_settings is None or user_settings.username is None:
+        raise Exception('Unable to fetch user details for the given user')
+
+    blog_models.BlogAuthorDetailsModel.create(
+        user_id, user_settings.username, user_settings.user_bio
+    )
 
 
 def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
@@ -1069,6 +1074,9 @@ def update_blog_author_details(
         user_id: str. The user id of the blog author.
         displayed_author_name: str. The publicly viewable name of the author.
         author_bio: str. The bio of the blog author.
+
+    Raises:
+        Exception. Unable to fetch blog author details for the given user ID.
     """
     blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
         user_id
@@ -1077,9 +1085,10 @@ def update_blog_author_details(
         displayed_author_name
     )
 
-    # Adding an if statement for mypy type checks to pass.
-    if blog_author_model:
-        blog_author_model.displayed_author_name = displayed_author_name
-        blog_author_model.author_bio = author_bio
-        blog_author_model.update_timestamps()
-        blog_author_model.put()
+    if blog_author_model is None:
+        raise Exception('Unable to fetch author details for the given user.')
+
+    blog_author_model.displayed_author_name = displayed_author_name
+    blog_author_model.author_bio = author_bio
+    blog_author_model.update_timestamps()
+    blog_author_model.put()
