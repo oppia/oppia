@@ -303,7 +303,7 @@ def compute_voiceover_related_change(
 
             for entity_voiceovers in all_entity_voiceovers:
                 # If the language code is English, it indicates that the
-                # English content was modified, so all associated manual
+                # English content was modified, so all associated
                 # voiceovers must be marked as needing update.
                 if (
                     language_code != constants.DEFAULT_LANGUAGE_CODE
@@ -330,8 +330,8 @@ def compute_voiceover_related_change(
 
             for entity_voiceovers in all_entity_voiceovers:
                 # If the language code is English, it indicates that the
-                # English content was modified, so all associated manual
-                # voiceovers must be marked as needing update.
+                # English content was modified, so all associated
+                # voiceovers must be removed.
                 if (
                     language_code != constants.DEFAULT_LANGUAGE_CODE
                     and entity_voiceovers.language_accent_code

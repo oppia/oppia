@@ -347,7 +347,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
             'content_id_0' in self.entity_voiceovers_instance.voiceovers_mapping
         )
 
-        # Does not throw error if content_id is not present.
+        # This does not throw an error if the content_id is not present.
         self.entity_voiceovers_instance.remove_voiceover(
             'content_1', feconf.VoiceoverType.MANUAL
         )
@@ -498,7 +498,7 @@ class EntityVoiceoversUnitTests(test_utils.GenericTestBase):
         assert voiceover is not None
         self.assertTrue(voiceover.needs_update)
 
-        # Does not throw error if content_id is not present.
+        # This does not throw an error if the content_id is not present.
         entity_voiceovers_object.mark_voiceovers_as_needing_update(
             'content_1', feconf.VoiceoverType.MANUAL
         )
