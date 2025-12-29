@@ -21,6 +21,7 @@ import logging
 import operator
 import random
 import string
+import time
 
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
@@ -161,6 +162,8 @@ ARABIC_BLOG_POST_CONTENT = """
     <li>Edits were done by all of the marketing team! (Thanks to the best teammates)</li>
     </ul>
 """
+MAX_DUMMY_EXPLORATIONS = 500
+BATCH_SIZE = 25
 
 SAMPLE_EXPLORATION_DICT = exp_domain.ExplorationDict(
     {
@@ -1267,8 +1270,18 @@ class AdminHandler(
 
         Raises:
             Exception. Environment is not DEVMODE.
+            Exception. Cannot generate more than MAX_DUMMY_EXPLORATIONS at once.
         """
         assert self.user_id is not None
+
+        # Add max limit validation.
+        if num_dummy_exps_to_generate > MAX_DUMMY_EXPLORATIONS:
+            raise Exception(
+                f'Cannot generate more than {MAX_DUMMY_EXPLORATIONS} dummy '
+                f'explorations at once. Requested: {num_dummy_exps_to_generate}. '
+                f'Please try generating explorations in smaller batches.'
+            )
+
         if constants.DEV_MODE:
             logging.info(
                 '[ADMIN] %s generated %s number of dummy explorations'
@@ -1281,26 +1294,102 @@ class AdminHandler(
                 'Elvish, language of "Lord of the Rings',
                 'The Science of Superheroes',
             ]
+
             exploration_ids_to_publish = []
-            for i in range(num_dummy_exps_to_generate):
-                title = random.choice(possible_titles)
-                category = random.choice(constants.SEARCH_DROPDOWN_CATEGORIES)
-                new_exploration_id = exp_fetchers.get_new_exploration_id()
-                exploration = exp_domain.Exploration.create_default_exploration(
-                    new_exploration_id,
-                    title=title,
-                    category=category,
-                    objective='Dummy Objective',
+            created_count = 0
+            failed_count = 0
+            published_count = 0
+
+            # Process in batches to prevent Redis connection pool exhaustion.
+            for batch_start in range(0, num_dummy_exps_to_generate, BATCH_SIZE):
+                batch_end = min(
+                    batch_start + BATCH_SIZE, num_dummy_exps_to_generate
                 )
-                exp_services.save_new_exploration(self.user_id, exploration)
-                if i <= num_dummy_exps_to_publish - 1:
-                    exploration_ids_to_publish.append(new_exploration_id)
-                    rights_manager.publish_exploration(
-                        self.user, new_exploration_id
+                logging.info(
+                    '[ADMIN] Processing batch %d-%d of %d dummy explorations'
+                    % (batch_start + 1, batch_end, num_dummy_exps_to_generate)
+                )
+
+                # Create explorations for this batch.
+                for i in range(batch_start, batch_end):
+                    try:
+                        title = random.choice(possible_titles)
+                        category = random.choice(
+                            constants.SEARCH_DROPDOWN_CATEGORIES
+                        )
+                        new_exploration_id = (
+                            exp_fetchers.get_new_exploration_id()
+                        )
+                        exploration = (
+                            exp_domain.Exploration.create_default_exploration(
+                                new_exploration_id,
+                                title=title,
+                                category=category,
+                                objective='Dummy Objective',
+                            )
+                        )
+                        exp_services.save_new_exploration(
+                            self.user_id, exploration
+                        )
+                        created_count += 1
+
+                        # Publish if we haven't reached the publish limit.
+                        if published_count < num_dummy_exps_to_publish:
+                            try:
+                                rights_manager.publish_exploration(
+                                    self.user, new_exploration_id
+                                )
+                                exploration_ids_to_publish.append(
+                                    new_exploration_id
+                                )
+                                published_count += 1
+                            except Exception:
+                                logging.exception(
+                                    '[ADMIN] Failed to publish exploration %s'
+                                    % new_exploration_id
+                                )
+
+                    except Exception:
+                        failed_count += 1
+                        logging.exception(
+                            '[ADMIN] Failed to create exploration at index %d'
+                            % i
+                        )
+                        continue
+
+                # Small delay between batches to prevent overwhelming Redis.
+                if batch_end < num_dummy_exps_to_generate:
+                    # 50ms delay.
+                    time.sleep(0.05)
+
+            # Index published explorations.
+            if exploration_ids_to_publish:
+                try:
+                    exp_services.index_explorations_given_ids(
+                        exploration_ids_to_publish
                     )
-            exp_services.index_explorations_given_ids(
-                exploration_ids_to_publish
+                    logging.info(
+                        '[ADMIN] Successfully indexed %d published explorations'
+                        % len(exploration_ids_to_publish)
+                    )
+                except Exception:
+                    logging.exception('[ADMIN] Failed to index explorations')
+
+            # Final summary.
+            logging.info(
+                '[ADMIN] Exploration generation complete. '
+                'Created: %d/%d, Published: %d/%d, Failed: %d'
+                % (
+                    created_count,
+                    num_dummy_exps_to_generate,
+                    published_count,
+                    num_dummy_exps_to_publish,
+                    failed_count,
+                )
             )
+            # Raise exception if no explorations were created.
+            if created_count == 0:
+                raise Exception('Dummy explorations not generated.')
         else:
             raise Exception('Cannot generate dummy explorations in production.')
 
