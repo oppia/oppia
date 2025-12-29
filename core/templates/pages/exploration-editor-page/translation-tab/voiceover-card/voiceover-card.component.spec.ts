@@ -171,6 +171,10 @@ describe('Voiceover card component', () => {
       translationLanguageService,
       'onActiveLanguageChanged'
     ).and.returnValue(questionSummariesInitializedEmitter);
+    spyOn(
+      voiceoverLanguageManagementService,
+      'getAutogeneratableLanguageAccents'
+    );
 
     spyOn(audioPlayerService, 'isTrackLoaded').and.returnValue(true);
     spyOn(audioPlayerService, 'isPlaying').and.returnValue(true);
