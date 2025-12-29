@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.constants import constants
 from core.domain import (
     learner_goals_services,
@@ -628,7 +628,66 @@ class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
         self.assertIsNone(json_response['next_node_id'])
         self.assertFalse(json_response['ready_for_review_test'])
 
-    def test_post_returns_ready_for_review_when_acquired_skills_exist(
+    def test_post_returns_ready_for_review_false_when_acquired_skills_exist_and_enable_ready_for_review_test_is_disabled(
+        self,
+    ) -> None:
+        csrf_token = self.get_new_csrf_token()
+        self.save_new_skill(
+            'skill_1', self.admin_id, description='Skill Description'
+        )
+        content_id_generator = translation_domain.ContentIdGenerator()
+        self.save_new_question(
+            'question_1',
+            self.admin_id,
+            self._create_valid_question_data('ABC', content_id_generator),
+            ['skill_1'],
+            content_id_generator.next_content_id_index,
+        )
+        question_services.create_new_question_skill_link(
+            self.admin_id, 'question_1', 'skill_1', 0.3
+        )
+        old_value: List[str] = []
+        changelist = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS
+                    ),
+                    'node_id': self.NODE_ID_1,
+                    'old_value': old_value,
+                    'new_value': ['skill_1'],
+                }
+            )
+        ]
+        story_services.update_story(
+            self.admin_id, self.STORY_ID, changelist, 'Added acquired skill.'
+        )
+
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_2
+        )
+        story_services.record_completed_node_in_story_context(
+            self.viewer_id, self.STORY_ID, self.NODE_ID_1
+        )
+        json_response = self.post_json(
+            '%s/staging/topic/%s/%s'
+            % (
+                feconf.STORY_PROGRESS_URL_PREFIX,
+                self.STORY_URL_FRAGMENT,
+                self.NODE_ID_3,
+            ),
+            {},
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(len(json_response['summaries']), 0)
+        self.assertIsNone(json_response['next_node_id'])
+        self.assertFalse(json_response['ready_for_review_test'])
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST]
+    )
+    def test_post_returns_ready_for_review_when_acquired_skills_exist_and_enable_ready_for_review_test_is_enabled(
         self,
     ) -> None:
         csrf_token = self.get_new_csrf_token()
