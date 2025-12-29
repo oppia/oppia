@@ -40,7 +40,6 @@ import yaml
 from PIL import Image
 from typing import (
     Any,
-    BinaryIO,
     Callable,
     Dict,
     Iterable,
@@ -49,11 +48,9 @@ from typing import (
     Literal,
     Mapping,
     Optional,
-    TextIO,
     Tuple,
     TypeVar,
     Union,
-    cast,
     overload,
 )
 
@@ -65,9 +62,6 @@ SECONDS_IN_HOUR = 60 * 60
 SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
-
-TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
-BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
 
 
 class SingletonMeta(type):
@@ -140,57 +134,6 @@ class ExplorationConversionError(Exception):
     """
 
     pass
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: TextModeTypes,
-    encoding: str = 'utf-8',
-    newline: Union[str, None] = None,
-) -> TextIO: ...
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: BinaryModeTypes,
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> BinaryIO: ...
-
-
-def open_file(
-    filename: str,
-    mode: Union[TextModeTypes, BinaryModeTypes],
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> Union[BinaryIO, TextIO]:
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: Literal. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        IO[Any]. The file object.
-
-    Raises:
-        FileNotFoundError. The file cannot be found.
-    """
-    # Here we use cast because we are narrowing down the type from IO[Any]
-    # to Union[BinaryIO, TextIO].
-    file = cast(
-        Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline),
-    )
-    return file
-
-
-@overload
-def get_file_contents(filepath: str) -> str: ...
 
 
 @overload

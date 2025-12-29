@@ -30,13 +30,11 @@
         </mat-progress-bar>
 
         <span class="voiceover-timer">
-          {{manualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
+          {{roundedManualVoiceoverCurrentDuration | formatTime}} / {{manualVoiceoverTotalDuration | formatTime}}
         </span>
 
         <div class="voiceover-action-buttons">
           <button (click)="toggleAudioNeedsUpdate()"
-                  mat-icon-button
-                  mat-button
                   class="e2e-test-audio-status-update-button"
                   [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
             <mat-icon matTooltip="Audio needs update"
@@ -51,8 +49,6 @@
           </button>
 
           <button (click)="deleteManualVoiceover()"
-                  mat-icon-button
-                  mat-button
                   class="delete-manual-voiceover-icon e2e-test-delete-voiceover-button">
             <mat-icon matTooltip="Delete voiceover">delete</mat-icon>
           </button>
@@ -87,12 +83,10 @@
                             class="voiceover-progress">
           </mat-progress-bar>
           <span class="voiceover-timer">
-            {{automaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
+            {{roundedAutomaticVoiceoverCurrentDuration | formatTime}} / {{automaticVoiceoverTotalDuration | formatTime}}
           </span>
           <div class="voiceover-action-buttons">
             <button (click)="generateVoiceover()"
-                    mat-icon-button
-                    mat-button
                     [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers"
                     class="regenerate-voiceover-button">
               <mat-icon matTooltip="Regenerate voiceover" *ngIf="!isAutomaticVoiceoverGenerating">
@@ -161,11 +155,19 @@
   }
   .needs-update-button-icon {
     background-color: #e9b330;
+    border: none;
+    border-radius: 20px;
     color: #fff;
+    height: 40px;
+    width: 40px;
   }
   .does-not-needs-update-button-icon {
     background-color: #009688;
+    border: none;
+    border-radius: 20px;
     color: #fff;
+    height: 40px;
+    width: 40px;
   }
   .language-accent-selector {
     width: 350px;
@@ -223,11 +225,19 @@
   }
   .delete-manual-voiceover-icon {
     background-color: #d14836;
+    border: none;
+    border-radius: 20px;
     color: #fff;
+    height: 40px;
+    width: 40px;
   }
   .regenerate-voiceover-button {
     background-color: #009688;
+    border: none;
+    border-radius: 20px;
     color: #fff;
+    height: 40px;
+    width: 40px;
   }
   .regenerate-voiceover-button:disabled {
     background-color: #a1c5c3;
