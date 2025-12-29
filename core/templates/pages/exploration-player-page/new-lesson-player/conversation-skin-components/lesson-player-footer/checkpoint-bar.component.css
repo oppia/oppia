@@ -28,6 +28,7 @@
 }
 
 .completed-checkpoint-node {
+  align-items: center;
   background-color: #00645c;
   border-radius: 50%;
   cursor: pointer;
@@ -36,7 +37,6 @@
   justify-content: center;
   width: 25px;
   z-index: 0;
-  align-items: center;
 }
 
 .in-progress-checkpoint-node {
