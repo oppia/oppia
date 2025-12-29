@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import time
 
-from core import constants, feconf
+from core import feconf
 from core.domain import (
     exp_fetchers,
     opportunity_services,

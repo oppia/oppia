@@ -18,8 +18,9 @@
 
 from __future__ import annotations
 
-from core import feconf
 import os
+
+from core import feconf
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
