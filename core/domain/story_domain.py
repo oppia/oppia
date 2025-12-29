@@ -1946,9 +1946,11 @@ class Story:
     ) -> StoryContentsDict:
         """Converts v5 Story Contents schema to the modern v6 schema.
         v6 schema fixes story node's destination_node_ids and relinks disconnected nodes.
+
         Args:
             story_contents_dict: dict. A dict used to initialize a Story
                 Contents domain object.
+
         Returns:
             dict. The converted story_contents_dict.
         """
