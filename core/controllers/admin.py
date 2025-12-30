@@ -868,11 +868,15 @@ class AdminHandler(
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
         fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
-        with open('./assets/images/general/learner1.png', 'rb') as thumbnail:
+        with open(
+            './assets/images/general/learner1.png', 'rb', encoding=None
+        ) as thumbnail:
             fs.commit(
                 'thumbnail/blog_thumbnail.png', thumbnail.read(), 'image/png'
             )
-        with open('./assets/images/subjects/Art.svg', 'rb') as image:
+        with open(
+            './assets/images/subjects/Art.svg', 'rb', encoding=None
+        ) as image:
             fs.commit(
                 'image/blog_post_image_height_326_width_490.svg',
                 image.read(),
@@ -1911,7 +1915,9 @@ class AdminHandler(
             )
 
             banner_image = b''
-            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+            with open(
+                'core/tests/data/classroom-banner.png', 'rb', encoding=None
+            ) as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
                 'banner.png',
@@ -3004,16 +3010,8 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        server_can_send_emails = (
-            parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if server_can_send_emails:
-            email_manager.send_dummy_mail_to_admin(username)
-            self.render_json({})
-        else:
-            raise self.InvalidInputException('This app cannot send emails.')
+        email_manager.send_dummy_mail_to_admin(username)
+        self.render_json({})
 
 
 class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
