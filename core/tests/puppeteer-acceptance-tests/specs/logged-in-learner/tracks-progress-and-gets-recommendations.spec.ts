@@ -90,7 +90,11 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
 
       // Add skill to diagnostic test and publish topic.
-      await curriculumAdmin.addSkillToDiagnosticTest('Negative Numbers');
+      // Navigate to topic editor first before adding skill to diagnostic test.
+      await curriculumAdmin.addSkillToDiagnosticTest(
+        'Negative Numbers',
+        'Algebra I'
+      );
 
       // Create classroom and add topic to it.
       await curriculumAdmin.createAndPublishClassroom(
