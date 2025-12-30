@@ -56,6 +56,8 @@ describe('Read only story node model', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
       completed: true,
       thumbnail_bg_color: '#a33f40',
@@ -96,6 +98,8 @@ describe('Read only story node model', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
     expect(_sampleStoryNode.getOutline()).toEqual('Outline');

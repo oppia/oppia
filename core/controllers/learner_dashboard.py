@@ -307,12 +307,20 @@ class LearnerDashboardExplorationsProgressHandler(
 
                         if state_obj.interaction.default_outcome:
                             dest = state_obj.interaction.default_outcome.dest
-                            if dest not in seen_states and dest != curr_name:
+                            if (
+                                dest is not None
+                                and dest not in seen_states
+                                and dest != curr_name
+                            ):
                                 queue.append(dest)
 
                         for group in state_obj.interaction.answer_groups:
                             dest = group.outcome.dest
-                            if dest not in seen_states and dest != curr_name:
+                            if (
+                                dest is not None
+                                and dest not in seen_states
+                                and dest != curr_name
+                            ):
                                 queue.append(dest)
 
                 for s_name in exploration.states.keys():
@@ -435,4 +443,3 @@ class LearnerDashboardIdsHandler(
             }
         )
         self.render_json(self.values)
-        

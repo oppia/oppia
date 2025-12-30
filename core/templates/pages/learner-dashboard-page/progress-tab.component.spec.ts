@@ -75,6 +75,8 @@ const sampleExploration = {
   activity_type: 'exploration',
   category: 'Algebra',
   title: 'Test Title',
+  num_checkpoints: 0,
+  visited_checkpoint_count: 0,
 };
 
 describe('Progress Tab Component', () => {
@@ -357,7 +359,7 @@ describe('Progress Tab Component', () => {
 
     component.ngOnInit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
     expect(component.noCommunityLessonActivity).toEqual(true);
     expect(component.noPlaylistActivity).toEqual(true);
     expect(component.totalIncompleteLessonsList).toEqual([]);
@@ -375,11 +377,11 @@ describe('Progress Tab Component', () => {
   it('should check whether window is narrow on resizing the screen', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
     expect(component.displayLessonsInPlaylist).toEqual([]);
-    expect(component.windowIsNarrow).toBeTrue();
+    expect(component.windowIsNarrow).toBe(true);
 
     mockResizeEmitter.emit();
 
-    expect(component.windowIsNarrow).toBeFalse();
+    expect(component.windowIsNarrow).toBe(false);
     expect(component.displayLessonsInPlaylist).toEqual([]);
   });
 
@@ -440,6 +442,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let incompleteSummary =
       LearnerExplorationSummary.createFromBackendDict(incomplete);
@@ -470,6 +474,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Art',
       title: 'Test Title 1',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let completedSummary =
       LearnerExplorationSummary.createFromBackendDict(completed);
@@ -520,6 +526,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     const exp2 = {
@@ -545,6 +553,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary2 = LearnerExplorationSummary.createFromBackendDict(exp2);
     const exp3 = {
@@ -570,6 +580,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary3 = LearnerExplorationSummary.createFromBackendDict(exp3);
     const exp4 = {
@@ -595,6 +607,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary4 = LearnerExplorationSummary.createFromBackendDict(exp4);
 
@@ -692,6 +706,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let explorationSummary =
       LearnerExplorationSummary.createFromBackendDict(exploration);
@@ -727,6 +743,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     const exp2 = {
@@ -752,6 +770,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary2 = LearnerExplorationSummary.createFromBackendDict(exp2);
     const exp3 = {
@@ -777,6 +797,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary3 = LearnerExplorationSummary.createFromBackendDict(exp3);
     const exp4 = {
@@ -802,6 +824,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary4 = LearnerExplorationSummary.createFromBackendDict(exp4);
     component.displayInCommunityLessons = [
@@ -866,6 +890,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     component.explorationPlaylist = [summary1];
@@ -958,6 +984,8 @@ describe('Progress Tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let summary1 = LearnerExplorationSummary.createFromBackendDict(exp1);
     component.incompleteExplorationsList = [summary1];
@@ -1023,21 +1051,21 @@ describe('Progress Tab Component', () => {
 
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeTrue();
+    expect(component.isLearnerStateEmpty()).toBe(true);
   });
 
   it('should return false when there are in-progress lessons', () => {
     component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed lessons', () => {
     component.totalCompletedLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed and in-progress lessons', () => {
@@ -1045,7 +1073,7 @@ describe('Progress Tab Component', () => {
     component.totalIncompleteLessonsList = [explorationSummary];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are in-progress skills', () => {
@@ -1053,7 +1081,7 @@ describe('Progress Tab Component', () => {
     component.totalIncompleteLessonsList = [];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it('should return false when there are completed skills', () => {
@@ -1062,7 +1090,7 @@ describe('Progress Tab Component', () => {
     component.partiallyLearntTopicsList = [];
     fixture.detectChanges();
 
-    expect(component.isLearnerStateEmpty()).toBeFalse();
+    expect(component.isLearnerStateEmpty()).toBe(false);
   });
 
   it("should correctly set a topic and its subtopics' masteries on ngOnInit", () => {

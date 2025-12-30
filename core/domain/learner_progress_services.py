@@ -2533,7 +2533,9 @@ def get_collection_progress(
     return (learner_progress_in_collection, number_of_nonexistent_collections)
 
 
-def get_exploration_user_data(user_id, exp_ids):
+def get_exploration_user_data(
+    user_id: str, exp_ids: List[str]
+) -> List[Optional[user_models.ExplorationUserDataModel]]:
     """Fetches the exploration user data models for a list of explorations.
 
     Args:
@@ -2545,8 +2547,8 @@ def get_exploration_user_data(user_id, exp_ids):
         data models.
     """
     user_id_exp_id_tuples = [(user_id, exp_id) for exp_id in exp_ids]
-    return user_models.ExplorationUserDataModel.get_multi(
-        user_id_exp_id_tuples)
+    return user_models.ExplorationUserDataModel.get_multi(user_id_exp_id_tuples)
+
 
 def get_exploration_progress(
     user_id: str,

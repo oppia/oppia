@@ -107,6 +107,8 @@ describe('Guest collection progress service', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: expTitle,
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
     return CollectionNode.create(collectionNodeBackendObject);

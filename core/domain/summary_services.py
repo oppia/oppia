@@ -611,6 +611,8 @@ def get_displayable_exp_summary_dicts(
                     exploration_summary.category
                 ),
                 'num_views': view_counts[ind],
+                'num_checkpoints': 0,
+                'visited_checkpoint_count': 0,
             }
 
             displayable_exp_summaries.append(summary_dict)

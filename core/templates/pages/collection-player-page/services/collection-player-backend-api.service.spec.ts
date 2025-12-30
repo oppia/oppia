@@ -99,6 +99,8 @@ describe('Collection Player Backend Api Service', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     };
 

@@ -84,6 +84,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     ],
     is_already_subscribed: false,
@@ -112,6 +114,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
     ],
     subject_interests: [],
@@ -353,6 +357,8 @@ describe('Profile page', () => {
           activity_type: 'exploration',
           category: 'Algebra',
           title: 'Test Title',
+          num_checkpoints: 0,
+          visited_checkpoint_count: 0,
         },
       ],
       is_already_subscribed: false,
@@ -409,6 +415,8 @@ describe('Profile page', () => {
           activity_type: 'exploration',
           category: 'Algebra',
           title: 'Test Title',
+          num_checkpoints: 0,
+          visited_checkpoint_count: 0,
         })
       );
     }
@@ -448,6 +456,8 @@ describe('Profile page', () => {
           activity_type: 'exploration',
           category: 'Algebra',
           title: 'Test Title',
+          num_checkpoints: 0,
+          visited_checkpoint_count: 0,
         })
       );
     }
@@ -476,6 +486,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
 
@@ -503,6 +515,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
 
@@ -530,6 +544,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
 
@@ -557,6 +573,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
 
@@ -584,6 +602,8 @@ describe('Profile page', () => {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       })
     );
 

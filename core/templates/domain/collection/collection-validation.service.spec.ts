@@ -91,6 +91,8 @@ describe('Collection validation service', function () {
         activity_type: 'exploration',
         category: 'Algebra',
         title: 'Test Title',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       });
     }
     return _sampleCollection.addCollectionNode(collectionNode);

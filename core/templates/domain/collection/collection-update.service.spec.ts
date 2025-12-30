@@ -68,6 +68,8 @@ describe('Collection update service', () => {
       thumbnail_bg_color: '#cc4b00',
       thumbnail_icon_url: '/subjects/Algebra.svg',
       title: 'a title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
     let sampleCollectionBackendObject: CollectionBackendDict = {
       id: 'collection_id',

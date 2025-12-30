@@ -128,6 +128,8 @@ describe('Story viewer backend API service', () => {
           activity_type: 'exploration',
           category: 'Algebra',
           title: 'Test Title',
+          num_checkpoints: 0,
+          visited_checkpoint_count: 0,
         },
       ],
       next_node_id: 'node_2',

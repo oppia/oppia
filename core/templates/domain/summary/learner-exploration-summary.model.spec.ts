@@ -72,7 +72,7 @@ describe('Exploration summary model', () => {
     expect(expSummaryObject.activityType).toEqual('exploration');
     expect(expSummaryObject.category).toEqual('Algebra');
     expect(expSummaryObject.title).toEqual('Test Title');
-    expect(expSummaryObject.numCheckpoints).toEqual(0);
+    expect(expSummaryObject.totalCheckpointCount).toEqual(0);
     expect(expSummaryObject.visitedCheckpointCount).toEqual(0);
   });
 });

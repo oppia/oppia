@@ -161,6 +161,8 @@ describe('Story Viewer Page component', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
       completed: true,
       thumbnail_bg_color: '#927117',
@@ -199,6 +201,8 @@ describe('Story Viewer Page component', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
       completed: false,
       thumbnail_bg_color: '#927117',
@@ -278,7 +282,7 @@ describe('Story Viewer Page component', () => {
 
     component.ngOnInit();
 
-    expect(component.showChapters()).toBeFalse();
+    expect(component.showChapters()).toBe(false);
   });
 
   it('should throw error if story url fragment is not present', () => {
@@ -377,7 +381,7 @@ describe('Story Viewer Page component', () => {
       'node_2'
     );
 
-    expect(component.showChapters()).toBeTrue();
+    expect(component.showChapters()).toBe(true);
   });
 
   it('should sign in correctly', fakeAsync(() => {
@@ -531,6 +535,8 @@ describe('Story Viewer Page component', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
       completed: true,
       thumbnail_bg_color: '#927117',
@@ -569,6 +575,8 @@ describe('Story Viewer Page component', () => {
         tags: [],
         activity_type: 'exploration',
         category: 'Algebra',
+        num_checkpoints: 0,
+        visited_checkpoint_count: 0,
       },
       completed: false,
       thumbnail_bg_color: '#927117',

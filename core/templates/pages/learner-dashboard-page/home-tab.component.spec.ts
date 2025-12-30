@@ -490,6 +490,8 @@ describe('Home tab Component', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
 
     const sampleCollection = {
@@ -892,6 +894,8 @@ describe('Home tab Component Loader visibility tests', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
     };
 
     explorationsDataSpy.and.returnValue(
