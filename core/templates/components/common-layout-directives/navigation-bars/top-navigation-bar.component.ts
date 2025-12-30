@@ -103,6 +103,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
   userIsLoggedIn: boolean = false;
+  authStatusResolved: boolean = false;
   currentUrl!: string;
   userMenuIsShown: boolean = false;
   inClassroomPage: boolean = false;
@@ -275,6 +276,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isBlogAdmin = userInfo.isBlogAdmin();
       this.isBlogPostEditor = userInfo.isBlogPostEditor();
       this.userIsLoggedIn = userInfo.isLoggedIn();
+      this.authStatusResolved = true;
       let usernameFromUserInfo = userInfo.getUsername();
       if (this.userIsLoggedIn) {
         let feedbackUpdatesDataPromise =
