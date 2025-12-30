@@ -346,6 +346,27 @@ describe('Admin dev mode activities tab', () => {
       }
     );
 
+    it('should not generate dummy exploration if more than 500 explorations are requested', () => {
+      let adminBackendSpy = spyOn(
+        adminBackendApiService,
+        'generateDummyExplorationsAsync'
+      );
+
+      component.numDummyExpsToGenerate = 501;
+      component.numDummyExpsToPublish = 500;
+
+      spyOn(component.setStatusMessage, 'emit');
+
+      component.generateDummyExplorations();
+
+      expect(component.setStatusMessage.emit).toHaveBeenCalledWith(
+        'Cannot generate more than 500 dummy explorations at once. ' +
+          'Requested: 501. ' +
+          'Please try generating explorations in smaller batches.'
+      );
+      expect(adminBackendSpy).not.toHaveBeenCalled();
+    });
+
     it('should generate dummy explorations', async(() => {
       component.numDummyExpsToPublish = 1;
       component.numDummyExpsToGenerate = 2;
