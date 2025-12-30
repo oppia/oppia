@@ -17,7 +17,7 @@
  */
 
 import {Component, Input, ViewChild} from '@angular/core';
-import {NgForm} from '@angular/forms';
+import {AbstractControl, NgForm} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import cloneDeep from 'lodash/cloneDeep';
@@ -31,6 +31,7 @@ import {ServicesConstants} from 'services/services.constants';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {Subscription} from 'rxjs';
 import {HtmlLengthService} from 'services/html-length.service';
+import {CustomizationArgSpec} from 'components/ck-editor-helpers/ck-editor-4-widgets.initializer';
 
 const CALCULATION_TYPE_CHARACTER = 'character';
 
@@ -108,16 +109,16 @@ export type RteComponentId = {
   templateUrl: './rte-helper-modal.component.html',
 })
 export class RteHelperModalComponent {
-  @Input() componentId: RteComponentId;
-  @Input() customizationArgSpecs: CustomizationArgsSpecsType;
-  @Input() attrsCustomizationArgsDict: CustomizationArgsForRteType;
-  @Input() componentIsNewlyCreated: boolean;
+  @Input() componentId!: RteComponentId;
+  @Input() customizationArgSpecs!: CustomizationArgsSpecsType;
+  @Input() attrsCustomizationArgsDict!: CustomizationArgsForRteType;
+  @Input() componentIsNewlyCreated!: boolean;
   modalIsLoading: boolean = true;
-  errorMessage: string;
+  errorMessage!: string;
   tmpCustomizationArgs: CustomizationArgsNameAndValueArray = [];
   @ViewChild('schemaForm') schemaForm!: NgForm;
-  public customizationArgsForm: FormGroup;
-  customizationArgsFormSubscription: Subscription;
+  public customizationArgsForm!: FormGroup;
+  customizationArgsFormSubscription!: Subscription;
   COMPONENT_ID_COLLAPSIBLE = 'collapsible';
   COMPONENT_ID_COLLAPSIBLE_HEADING = 'collapsible_heading';
   COMPONENT_ID_COLLAPSIBLE_CONTENT = 'collapsible_content';
@@ -210,12 +211,14 @@ export class RteHelperModalComponent {
       }
     }
 
-    const formGroupControls = {};
-    this.customizationArgSpecs.forEach((_, index) => {
-      formGroupControls[index] = this.fb.control(
-        this.tmpCustomizationArgs[index].value
-      );
-    });
+    let formGroupControls: Record<string, AbstractControl> = {};
+    this.customizationArgSpecs.forEach(
+      (_spec: CustomizationArgSpec, index: number): void => {
+        formGroupControls[index.toString()] = this.fb.control(
+          this.tmpCustomizationArgs[index].value
+        );
+      }
+    );
 
     this.customizationArgsForm = this.fb.group(formGroupControls);
 
@@ -243,7 +246,7 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: number | string | boolean): void {
+  onCustomizationArgsFormChange(value: Record<string, any>): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
       let rawLatex: string = value[0].raw_latex;
@@ -452,7 +455,11 @@ export class RteHelperModalComponent {
    * @returns The character limit for the component
    */
   getCharacterLimit(componentId: string): number {
-    return this.CHARACTER_LIMITS[componentId] || this.CHARACTER_LIMITS.default;
+    const limits = this.CHARACTER_LIMITS;
+    if (componentId in limits) {
+      return limits[componentId as keyof typeof limits];
+    }
+    return limits.default;
   }
 
   isErrorMessageNonempty(): boolean {
@@ -472,8 +479,8 @@ export class RteHelperModalComponent {
 
   save(): void {
     for (let index in this.customizationArgsForm.value) {
-      this.tmpCustomizationArgs[index].value =
-        this.customizationArgsForm.value[index];
+      const i = Number(index);
+      this.tmpCustomizationArgs[i].value = this.customizationArgsForm.value[i];
     }
     this.externalRteSaveService.onExternalRteSave.emit();
 
@@ -521,7 +528,11 @@ export class RteHelperModalComponent {
         const HUNDRED_KB_IN_BYTES = 100 * 1024;
         maxAllowedFileSize = HUNDRED_KB_IN_BYTES;
       }
-      if (resampledFile.size > maxAllowedFileSize) {
+      if (
+        !resampledFile ||
+        !maxAllowedFileSize ||
+        resampledFile.size > maxAllowedFileSize
+      ) {
         this.alertsService.addInfoMessage(
           `The SVG file generated exceeds ${maxAllowedFileSize / 1024}` +
             ' KB. Please split the expression into smaller ones.' +
@@ -536,6 +547,13 @@ export class RteHelperModalComponent {
         this.pageContextService.getImageSaveDestination() ===
         AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       ) {
+        if (!svgFile) {
+          this.alertsService.addWarning(
+            'SVG file could not be generated. Please try again.'
+          );
+          this.ngbActiveModal.dismiss('cancel');
+          return;
+        }
         this.imageLocalStorageService.saveImage(svgFileName, svgFile);
         const mathContentDict = {
           raw_latex: tmpCustomizationArgs[0].value.raw_latex,
@@ -546,11 +564,19 @@ export class RteHelperModalComponent {
         this.ngbActiveModal.close(customizationArgsDict);
         return;
       }
+      const entityType = this.pageContextService.getEntityType();
+      if (!entityType) {
+        this.alertsService.addWarning(
+          'Entity type is missing. Please reload and try again.'
+        );
+        this.ngbActiveModal.dismiss('cancel');
+        return;
+      }
       this.assetsBackendApiService
         .saveMathExpressionImage(
           resampledFile,
           svgFileName,
-          this.pageContextService.getEntityType(),
+          entityType,
           this.pageContextService.getEntityId()
         )
         .then(

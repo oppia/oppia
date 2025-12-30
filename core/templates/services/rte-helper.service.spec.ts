@@ -19,6 +19,7 @@
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RteHelperService} from './rte-helper.service';
 import {TestBed, fakeAsync, tick} from '@angular/core/testing';
+import {CustomizationArgsForRteType} from './rte-helper-modal.component';
 
 describe('Rte Helper Service', () => {
   let rteHelperService: RteHelperService;
@@ -391,7 +392,7 @@ describe('Rte Helper Service', () => {
       false,
       'video',
       [],
-      {},
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -413,7 +414,7 @@ describe('Rte Helper Service', () => {
       false,
       'video',
       [],
-      {},
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );
@@ -436,7 +437,7 @@ describe('Rte Helper Service', () => {
       false,
       'video',
       [],
-      {},
+      {} as CustomizationArgsForRteType,
       submitCallBackSpy,
       dismissCallBackSpy
     );

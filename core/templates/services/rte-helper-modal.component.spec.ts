@@ -23,17 +23,21 @@ import {
   fakeAsync,
   flush,
 } from '@angular/core/testing';
-import {AppConstants} from 'app.constants';
-import {RteHelperModalComponent} from './rte-helper-modal.component';
+import {AppConstants} from '../app.constants';
+import {
+  CustomizationArgsForRteType,
+  CustomizationArgsSpecsType,
+  RteHelperModalComponent,
+} from './rte-helper-modal.component';
 import {ExternalRteSaveService} from './external-rte-save.service';
 import {AlertsService} from './alerts.service';
 import {PageContextService} from './page-context.service';
 import {ImageLocalStorageService} from './image-local-storage.service';
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {ImageUploadHelperService} from './image-upload-helper.service';
-import {SharedFormsModule} from 'components/forms/shared-forms.module';
+import {SharedFormsModule} from '../components/forms/shared-forms.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {DirectivesModule} from 'directives/directives.module';
+import {DirectivesModule} from '../directives/directives.module';
 import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
@@ -118,8 +122,9 @@ describe('RteHelperModalComponent', () => {
       component.componentId = 'video';
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should load modal correctly', fakeAsync(() => {
@@ -142,9 +147,9 @@ describe('RteHelperModalComponent', () => {
       spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
       component.ngOnInit();
       flush();
-      component.onCustomizationArgsFormChange(
-        component.attrsCustomizationArgsDict.heading
-      );
+      component.onCustomizationArgsFormChange({
+        heading: component.attrsCustomizationArgsDict.heading,
+      });
       expect(component.isErrorMessageNonempty()).toBe(false);
       component.save();
       flush();
@@ -178,8 +183,9 @@ describe('RteHelperModalComponent', () => {
       component = fixture.componentInstance;
       component.attrsCustomizationArgsDict = {
         heading: 'This value is not default.',
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as unknown as CustomizationArgsSpecsType;
     });
 
     it('should disable save button', fakeAsync(() => {
@@ -208,8 +214,9 @@ describe('RteHelperModalComponent', () => {
           raw_latex: '',
           svg_filename: '',
         },
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should load modal correctly', fakeAsync(() => {
@@ -461,8 +468,9 @@ describe('RteHelperModalComponent', () => {
       component.attrsCustomizationArgsDict = {
         url: 'google.com',
         text: 'google.com',
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should load modal correctly', fakeAsync(() => {
@@ -584,8 +592,9 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 10,
           autoplay: false,
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as unknown as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
     it('should disable save button and display error message', fakeAsync(() => {
       component.ngOnInit();
@@ -626,8 +635,9 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should call onCustomizationArgsFormChange when customizationArgsForm value changes', fakeAsync(() => {
@@ -673,8 +683,9 @@ describe('RteHelperModalComponent', () => {
         alt: '',
         caption: '',
         filepath: '',
-      };
-      component.customizationArgSpecs = customizationArgSpecs;
+      } as CustomizationArgsForRteType;
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should delete the RTE component', fakeAsync(() => {
@@ -704,8 +715,9 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: 'oppia',
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should disable save button and display error message', fakeAsync(() => {
@@ -744,8 +756,9 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: ' ',
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should make the text equal to url when text is empty', fakeAsync(() => {
@@ -822,8 +835,9 @@ describe('RteHelperModalComponent', () => {
           start: 0,
           end: 0,
           autoplay: false,
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as unknown as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should disable save button and display error message', fakeAsync(() => {
@@ -876,8 +890,9 @@ describe('RteHelperModalComponent', () => {
               content: 'Content for Tab 2',
             },
           ],
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as unknown as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as unknown as CustomizationArgsSpecsType;
     });
 
     it('should disable save button and display error message', fakeAsync(() => {
@@ -956,8 +971,9 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'Collapsible 1',
           content: 'Hello',
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should display error message when heading length exceeds limit', fakeAsync(() => {
@@ -1006,8 +1022,9 @@ describe('RteHelperModalComponent', () => {
         (component.attrsCustomizationArgsDict = {
           heading: 'sample question',
           content: 'sample answer',
-        });
-      component.customizationArgSpecs = customizationArgSpecs;
+        } as CustomizationArgsForRteType);
+      component.customizationArgSpecs =
+        customizationArgSpecs as CustomizationArgsSpecsType;
     });
 
     it('should display error message when question length exceeds limit', fakeAsync(() => {

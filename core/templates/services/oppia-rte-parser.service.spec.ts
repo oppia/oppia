@@ -23,12 +23,18 @@ import {
   OppiaRteParserService,
   TextNode,
 } from './oppia-rte-parser.service';
+interface RteDomNode {
+  tag?: string;
+  value?: string;
+  attrs?: Record<string, string>;
+  children?: RteDomNode[];
+}
 
 describe('RTE parser service', () => {
   let rteParserService: OppiaRteParserService;
 
-  const compareRteNodeToObject = (node: OppiaRteNode, dom) => {
-    const dfs = (n: OppiaRteNode | TextNode, d) => {
+  const compareRteNodeToObject = (node: OppiaRteNode, dom: RteDomNode) => {
+    const dfs = (n: OppiaRteNode | TextNode, d: RteDomNode) => {
       if ('value' in n) {
         if (!d.value) {
           return false;
@@ -61,11 +67,12 @@ describe('RTE parser service', () => {
         }
       }
 
-      if (n.children.length !== d.children.length) {
+      if (!d.children || n.children.length !== d.children.length) {
         return false;
       }
-      for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
-        if (!dfs(n.children[childIndex], d.children[childIndex])) {
+
+      for (let i = 0; i < n.children.length; i++) {
+        if (!dfs(n.children[i], d.children[i])) {
           return false;
         }
       }
@@ -111,7 +118,7 @@ describe('RTE parser service', () => {
               },
             },
           ],
-        },
+        } as RteDomNode,
       },
     ];
     testCases.forEach(testCase => {
@@ -130,7 +137,7 @@ describe('RTE parser service', () => {
       }
 
       get tagName() {
-        return undefined;
+        return undefined as unknown as string;
       }
     }
     customElements.define('dummy-element', DummyHtmlElement);

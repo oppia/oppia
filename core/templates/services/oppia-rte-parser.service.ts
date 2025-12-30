@@ -18,14 +18,14 @@
 
 import {TemplatePortal} from '@angular/cdk/portal';
 import {Injectable} from '@angular/core';
-import {NoninteractiveCollapsible} from 'rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import {NoninteractiveImage} from 'rich_text_components/Image/directives/oppia-noninteractive-image.component';
-import {NoninteractiveLink} from 'rich_text_components/Link/directives/oppia-noninteractive-link.component';
-import {NoninteractiveMath} from 'rich_text_components/Math/directives/oppia-noninteractive-math.component';
-import {NoninteractiveSkillreview} from 'rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import {NoninteractiveTabs} from 'rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-import {NoninteractiveVideo} from 'rich_text_components/Video/directives/oppia-noninteractive-video.component';
-import {NoninteractiveWorkedexample} from 'rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
+import {NoninteractiveCollapsible} from 'extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import {NoninteractiveImage} from 'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import {NoninteractiveLink} from 'extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import {NoninteractiveMath} from 'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import {NoninteractiveSkillreview} from 'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import {NoninteractiveTabs} from 'extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import {NoninteractiveVideo} from 'extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import {NoninteractiveWorkedexample} from 'extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const selectorToComponentClassMap = {
   'oppia-noninteractive-collapsible': NoninteractiveCollapsible,
@@ -47,7 +47,7 @@ export class OppiaRteNode {
   children: (OppiaRteNode | TextNode)[] = [];
   parent: OppiaRteNode | null = null;
   nodeType: '' | 'component';
-  portal: TemplatePortal;
+  portal!: TemplatePortal;
   constructor(
     public readonly selector: string,
     public attrs: Record<string, string> = {}
@@ -55,7 +55,11 @@ export class OppiaRteNode {
     let t: '' | 'component' = '';
     if (this.selector.startsWith('oppia-noninteractive-')) {
       t = 'component';
-      if (selectorToComponentClassMap[this.selector] === undefined) {
+      if (
+        selectorToComponentClassMap[
+          this.selector as keyof typeof selectorToComponentClassMap
+        ] === undefined
+      ) {
         throw new Error('Unexpected tag encountered: ' + selector);
       }
     }
@@ -93,8 +97,9 @@ export class OppiaRteParserService {
 
       // Create attributes Object from NamedNodeMap.
       for (let i = 0; i < node.attributes.length; i++) {
-        attrs[this._convertKebabCaseToCamelCase(node.attributes[i].nodeName)] =
-          node.attributes[i].nodeValue;
+        const attr = node.attributes[i];
+        attrs[this._convertKebabCaseToCamelCase(attr.nodeName)] =
+          attr.nodeValue ?? '';
       }
 
       // Check if it an RTE component.
@@ -105,7 +110,7 @@ export class OppiaRteParserService {
       // Check if it is a text node.
       if (Object.keys(node.children).length === 0) {
         const childNode = new OppiaRteNode(tagName, attrs);
-        childNode.children.push(new TextNode(node.textContent));
+        childNode.children.push(new TextNode(node.textContent ?? ''));
         return childNode;
       }
 
@@ -113,7 +118,10 @@ export class OppiaRteParserService {
       const childNode = new OppiaRteNode(tagName, attrs);
       for (let child = 0; child < max; child++) {
         if (node.childNodes[child].nodeType === 3) {
-          const text = node.childNodes[child].nodeValue.replace(/[\t\n]/g, '');
+          const text = (node.childNodes[child].nodeValue ?? '').replace(
+            /[\t\n]/g,
+            ''
+          );
           childNode.children.push(new TextNode(text));
           continue;
         }
