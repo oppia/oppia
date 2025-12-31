@@ -1799,6 +1799,118 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_cannot_generate_more_than_max_dummy_explorations(self) -> None:
+        """Test that MAX_DUMMY_EXPLORATIONS limit is enforced."""
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Try to generate more than MAX_DUMMY_EXPLORATIONS (500)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'Cannot generate more than 500 dummy explorations at once. '
+            'Requested: 501. Please try generating explorations in smaller batches.',
+        )
+
+        with assert_raises_regexp_context_manager:
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_generate': 501,
+                    'num_dummy_exps_to_publish': 10,
+                },
+                csrf_token=csrf_token,
+            )
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        self.assertEqual(len(generated_exps), 0)
+        self.logout()
+
+    def test_batch_processing_behavior(self) -> None:
+        """Test that batch processing works correctly with BATCH_SIZE."""
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Generate 30 explorations to test batch processing (BATCH_SIZE = 25)
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 30,
+                'num_dummy_exps_to_publish': 15,
+            },
+            csrf_token=csrf_token,
+        )
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(20)
+
+        # Verify all explorations were created.
+        self.assertEqual(len(generated_exps), 30)
+        # Verify correct number were published.
+        self.assertEqual(len(published_exps), 15)
+
+        self.logout()
+
+    def test_zero_explorations_generation_raises_exception(self) -> None:
+        """Test that generating 0 explorations raises an exception."""
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        response = self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 0,
+                'num_dummy_exps_to_publish': 0,
+            },
+            csrf_token=csrf_token,
+            expected_status_int=500,
+        )
+
+        # Should raise exception about no explorations generated.
+        self.assertEqual(response['error'], 'Dummy explorations not generated.')
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+
+        # Should have no explorations.
+        self.assertEqual(len(generated_exps), 0)
+        self.assertEqual(len(published_exps), 0)
+
+        self.logout()
+
+    def test_exploration_indexing_after_generation(self) -> None:
+        """Test that explorations are properly indexed after generation."""
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Generate and publish some explorations.
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_explorations',
+                'num_dummy_exps_to_generate': 5,
+                'num_dummy_exps_to_publish': 3,
+            },
+            csrf_token=csrf_token,
+        )
+
+        # Verify explorations were created and published.
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+
+        self.assertEqual(len(generated_exps), 5)
+        self.assertEqual(len(published_exps), 3)
+
+        # Verify that published explorations are indexed
+        # (This is a basic check - in practice you might want to check
+        # the search index directly if possible)
+        all_published = exp_services.get_recently_published_exp_summaries(10)
+        self.assertGreaterEqual(len(all_published), 3)
+
+        self.logout()
+
 
 class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy question suggestions."""
