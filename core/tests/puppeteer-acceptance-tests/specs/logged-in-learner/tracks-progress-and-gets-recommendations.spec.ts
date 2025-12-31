@@ -80,21 +80,40 @@ describe('Logged-In Learner', function () {
         );
 
       // Create topic, subtopic, and skill.
-      await curriculumAdmin.createAndPublishTopic(
-        'Algebra I',
+      await curriculumAdmin.createTopic('Algebra I', 'algebra-i');
+      await curriculumAdmin.createSubtopicForTopic(
         'Negative Numbers',
-        'Negative Numbers'
+        'negative-numbers',
+        'Algebra I'
+      );
+      await curriculumAdmin.createSkillForTopic(
+        'Negative Numbers',
+        'Algebra I',
+        false
       );
 
-      // Add questions to the skill.
+      // Add 3 questions to the skill.
       await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
 
-      // Add skill to diagnostic test and publish topic.
+      // Assign skill to subtopic.
+      await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
+        'Negative Numbers',
+        'Negative Numbers',
+        'Algebra I'
+      );
+
+      // Save topic draft to ensure changes are persisted before adding skill to diagnostic test.
+      await curriculumAdmin.saveTopicDraft('Algebra I');
+
+      // Add skill to diagnostic test.
       // Navigate to topic editor first before adding skill to diagnostic test.
       await curriculumAdmin.addSkillToDiagnosticTest(
         'Negative Numbers',
         'Algebra I'
       );
+
+      // Publish topic.
+      await curriculumAdmin.publishDraftTopic('Algebra I');
 
       // Create classroom and add topic to it.
       await curriculumAdmin.createAndPublishClassroom(
