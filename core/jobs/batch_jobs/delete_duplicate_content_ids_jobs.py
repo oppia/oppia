@@ -83,13 +83,13 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 content_ids.add(cid)
             interaction = state_dict['interaction']
             if interaction['default_outcome'] is not None:
-                cid = interaction['default_outcome']['feedback']['content_id']
-                if isinstance(cid, str):
-                    content_ids.add(cid)
+                cid2 = interaction['default_outcome']['feedback']['content_id']
+                if isinstance(cid2, str):
+                    content_ids.add(cid2)
             for answer_group in interaction['answer_groups']:
-                cid = answer_group['outcome']['feedback']['content_id']
-                if isinstance(cid, str):
-                    content_ids.add(cid)
+                cid3 = answer_group['outcome']['feedback']['content_id']
+                if isinstance(cid3, str):
+                    content_ids.add(cid3)
                 for rule_spec in answer_group['rule_specs']:
                     for _, param_value in rule_spec['inputs'].items():
                         if isinstance(param_value, dict) and 'contentId' in param_value:
@@ -97,28 +97,28 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                             if isinstance(rcid, str):
                                 content_ids.add(rcid)
             if interaction['solution'] is not None:
-                cid = interaction['solution']['explanation']['content_id']
-                if isinstance(cid, str):
-                    content_ids.add(cid)
+                cid4 = interaction['solution']['explanation']['content_id']
+                if isinstance(cid4, str):
+                    content_ids.add(cid4)
             for hint in interaction['hints']:
-                cid = hint['hint_content']['content_id']
-                if isinstance(cid, str):
-                    content_ids.add(cid)
+                cid5 = hint['hint_content']['content_id']
+                if isinstance(cid5, str):
+                    content_ids.add(cid5)
             if interaction['customization_args']:
                 for _, ca_spec in interaction['customization_args'].items():
                     ca_value: Any = ca_spec.get('value', {})
                     if isinstance(ca_value, dict) and ca_value.get('content_id') is not None:
-                        cid = ca_value.get('content_id')
-                        if isinstance(cid, str):
-                            content_ids.add(cid)
+                        cid6 = ca_value.get('content_id')
+                        if isinstance(cid6, str):
+                            content_ids.add(cid6)
                     elif isinstance(ca_value, dict) and ca_value.get('placeholder') is not None:
                         placeholder = ca_value.get('placeholder')
                         if isinstance(placeholder, dict) and placeholder.get('value') is not None:
                             val = placeholder.get('value')
                             if isinstance(val, dict) and val.get('content_id') is not None:
-                                cid = val.get('content_id')
-                                if isinstance(cid, str):
-                                    content_ids.add(cid)
+                                cid7 = val.get('content_id')
+                                if isinstance(cid7, str):
+                                    content_ids.add(cid7)
             state_to_content_ids[state_name] = list(content_ids)
         return state_to_content_ids
 
@@ -162,7 +162,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         Tuple[str, str]
     ]:
         """Processes an exploration to fix duplicate content IDs.
-        
+
         Args:
             exp_model: ExplorationModel. The exploration model to process.
 
@@ -175,8 +175,14 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_from_model(exp_model)
 
+            states_dict = getattr(exploration, 'states_dict', None)
+            if states_dict is None:
+                states_dict = getattr(exploration, 'states', None)
+            if states_dict is None:
+                return result.Err((exp_model.id, "Exploration has no states_dict or states attribute"))
+
             duplicates = DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
-                exploration.states_dict
+                states_dict
             )
 
             if not duplicates:
@@ -188,20 +194,23 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 list(duplicates.keys())
             )
 
-            states_dict, next_content_id_index = (
+            updated_states_dict, next_content_id_index = (
                 state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
-                    exploration.states_dict
+                    states_dict
                 )
             )
 
-            exploration.states_dict = states_dict
-            exploration.update_next_content_id_index(next_content_id_index)
+            if hasattr(exploration, 'states_dict'):
+                exploration.states_dict = updated_states_dict
+            elif hasattr(exploration, 'states'):
+                exploration.states = updated_states_dict
 
+            exploration.update_next_content_id_index(next_content_id_index)
             exploration.version = exp_model.version + 1
 
             old_to_new_mapping: Dict[str, str] = {}
-            for state_name in states_dict.keys():
-                old_state = exploration.states_dict.get(state_name)
+            for state_name in updated_states_dict.keys():
+                old_state = updated_states_dict.get(state_name)
                 if old_state:
                     pass
 
@@ -239,7 +248,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             old_translations = (
                 translation_models.EntityTranslationsModel.get_all_for_entity(
-                    feconf.TranslatableEntityType.EXPLORATION,
+                    str(feconf.TranslatableEntityType.EXPLORATION),
                     exp_id,
                     old_version,
                 )
@@ -248,7 +257,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             new_translations = []
             for trans_model in old_translations:
                 new_trans = translation_models.EntityTranslationsModel.create_new(
-                    feconf.TranslatableEntityType.EXPLORATION,
+                    str(feconf.TranslatableEntityType.EXPLORATION),
                     exp_id,
                     new_version,
                     trans_model.language_code,
@@ -310,8 +319,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             succeeded
             | 'Convert to models'
             >> beam.Map(
-                lambda item: exp_domain.Exploration.convert_to_model(item[1])
-                if item[2] else None
+                lambda item: item[1].to_model() if hasattr(item[1], 'to_model') else None
             )
             | 'Filter nones' >> beam.Filter(lambda m: m is not None)
         )
