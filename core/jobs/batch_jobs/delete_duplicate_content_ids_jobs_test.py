@@ -21,18 +21,15 @@ from __future__ import annotations
 from core import feconf
 from core.domain import (
     exp_domain,
-    exp_fetchers,
     exp_services,
     state_domain,
-    translation_domain,
 )
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
-
-
 from core.tests import test_utils
+
 from typing import Final
 
 MYPY = False
@@ -179,22 +176,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         """Test that explorations without duplicates are not changed."""
         exp_id = 'exp_without_duplicates'
 
-        exp_dict = {
-            'category': 'Test',
-            'author_notes': '',
-            'language_code': 'en',
-            'tags': [],
-            'blurb': '',
-            'title': 'Test Exploration',
-            'objective': 'To test',
-            'param_specs': {},
-            'param_changes': [],
-            'version': 1,
-            'auto_tts_enabled': False,
-            'states': {
-                feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V57,
-            },
-        }
+
 
         exploration = exp_domain.Exploration.create_default_exploration(
             exp_id, title='Test Exploration'

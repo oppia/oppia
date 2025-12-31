@@ -17,8 +17,12 @@
 
 from __future__ import annotations
 
-from typing import Dict, List, Set, Tuple, Any
+from typing import Any, Dict, List, Set, Tuple
+
 import logging
+
+import apache_beam as beam
+
 from core import feconf
 from core.domain import exp_domain, exp_fetchers, state_domain
 from core.jobs import base_jobs
@@ -26,8 +30,6 @@ from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
 from core.jobs.types import job_run_result
 from core.platform import models
-
-import apache_beam as beam
 import result
 
 MYPY = False
@@ -89,7 +91,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 if isinstance(cid, str):
                     content_ids.add(cid)
                 for rule_spec in answer_group['rule_specs']:
-                    for param_name, param_value in rule_spec['inputs'].items():
+                    for _, param_value in rule_spec['inputs'].items():
                         if isinstance(param_value, dict) and 'contentId' in param_value:
                             rcid = param_value['contentId']
                             if isinstance(rcid, str):
@@ -103,7 +105,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 if isinstance(cid, str):
                     content_ids.add(cid)
             if interaction['customization_args']:
-                for ca_name, ca_spec in interaction['customization_args'].items():
+                for _, ca_spec in interaction['customization_args'].items():
                     ca_value: Any = ca_spec.get('value', {})
                     if isinstance(ca_value, dict) and ca_value.get('content_id') is not None:
                         cid = ca_value.get('content_id')
@@ -154,7 +156,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
 
     @staticmethod
     def _process_exploration(
-        exp_model: exp_models.ExplorationModel,
+        exp_model: 'exp_models.ExplorationModel',
     ) -> result.Result[
         Tuple[str, exp_domain.Exploration, Dict[str, str]], 
         Tuple[str, str]
@@ -173,13 +175,11 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_from_model(exp_model)
 
-            # Find duplicate content IDs
             duplicates = DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
                 exploration.states_dict
             )
 
             if not duplicates:
-                # No duplicates found
                 return result.Ok((exploration.id, exploration, {}))
 
             logging.info(
@@ -188,27 +188,21 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 list(duplicates.keys())
             )
 
-            # Regenerate states with unique content IDs
             states_dict, next_content_id_index = (
                 state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
                     exploration.states_dict
                 )
             )
 
-            # Update exploration
             exploration.states_dict = states_dict
             exploration.update_next_content_id_index(next_content_id_index)
 
-            # Increment version to track migration
             exploration.version = exp_model.version + 1
 
-            # Extract the old->new mapping from state updates
             old_to_new_mapping: Dict[str, str] = {}
             for state_name in states_dict.keys():
                 old_state = exploration.states_dict.get(state_name)
                 if old_state:
-                    # The mapping was embedded in the state update process
-                    # We need to track it from the content IDs
                     pass
 
             return result.Ok((exploration.id, exploration, old_to_new_mapping))
@@ -226,7 +220,8 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         new_version: int,
     ) -> Tuple[List[translation_models.EntityTranslationsModel],
                List[voiceover_models.EntityVoiceoversModel]]:
-        """Migrates translations and voiceovers to new version.
+        """
+        Migrates translations and voiceovers to new version.
 
         For explorations with duplicate content IDs that were fixed, we need to
         clone all EntityTranslationsModels and EntityVoiceoversModels from the
@@ -239,10 +234,9 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             new_version: int. The new exploration version.
 
         Returns:
-            Tuple of (translation_models, voiceover_models) to be persisted.
+            tuple. (translation_models, voiceover_models) to be persisted.
         """
         with datastore_services.get_ndb_context():
-            # Get all translations for old version
             old_translations = (
                 translation_models.EntityTranslationsModel.get_all_for_entity(
                     feconf.TranslatableEntityType.EXPLORATION,
@@ -251,7 +245,6 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 )
             )
 
-            # Clone translations to new version
             new_translations = []
             for trans_model in old_translations:
                 new_trans = translation_models.EntityTranslationsModel.create_new(
@@ -264,7 +257,6 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 new_trans.update_timestamps()
                 new_translations.append(new_trans)
 
-            # Get all voiceovers for old version
             old_voiceovers = (
                 voiceover_models.EntityVoiceoversModel.get_entity_voiceovers_for_given_exploration(
                     exp_id,
@@ -273,7 +265,6 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 )
             )
 
-            # Clone voiceovers to new version
             new_voiceovers = []
             for vo_model in old_voiceovers:
                 new_vo = voiceover_models.EntityVoiceoversModel.create_new(
@@ -290,7 +281,8 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         return new_translations, new_voiceovers
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of job run results.
+        """
+        Returns a PCollection of job run results.
 
         Returns:
             PCollection. A PCollection of results indicating which explorations
@@ -308,31 +300,28 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             >> beam.Map(self._process_exploration)
         )
 
-        # Separate successes and errors
         succeeded = (
             processed_explorations
             | 'Filter successes' >> beam.Filter(lambda r: r.is_ok())
             | 'Extract ok results' >> beam.Map(lambda r: r.unwrap())
         )
 
-        # Extract exploration models and translations/voiceovers to persist
         exp_models_to_put = (
             succeeded
             | 'Convert to models'
             >> beam.Map(
                 lambda item: exp_domain.Exploration.convert_to_model(item[1])
-                if item[2] else None  # Only convert if there were duplicates
+                if item[2] else None
             )
             | 'Filter nones' >> beam.Filter(lambda m: m is not None)
         )
-        
+
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_exp_put_results = (
                 exp_models_to_put
                 | 'Put exploration models' >> ndb_io.PutModels()
             )
 
-        # Generate results
         job_results = (
             processed_explorations
             | 'Generate results'
@@ -343,8 +332,8 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
 
         return job_results
 
-
 class AuditDeleteDuplicateContentIdsJob(DeleteDuplicateContentIdsJob):
-    """Audit version of DeleteDuplicateContentIdsJob that doesn't modify data."""
-
+    """
+    Audit version of DeleteDuplicateContentIdsJob that doesn't modify data.
+    """
     DATASTORE_UPDATES_ALLOWED = False
