@@ -1,7 +1,8 @@
 # coding: utf-8
-    )
+#
+# Copyright 2025 The Oppia Authors. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License");
-(exp_models, translation_models, voiceover_models) = (
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -13,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs that delete duplicate content IDs in explorations."""
+"""Jobs for identifying and fixing duplicate content IDs in explorations."""
 
 from __future__ import annotations
 
@@ -39,17 +40,12 @@ if MYPY:  # pragma: no cover
         voiceover_models,
     )
 
-(exp_models, translation_models, voiceover_models) = (
-    models.Registry.import_models(
-        [
-            models.Names.EXPLORATION,
-            models.Names.TRANSLATION,
-            models.Names.VOICEOVER,
-        ]
-datastore_services = models.Registry.import_datastore_services()
 
-    )
-)
+(exp_models, translation_models, voiceover_models) = models.Registry.import_models([
+    models.Names.EXPLORATION,
+    models.Names.TRANSLATION,
+    models.Names.VOICEOVER,
+])
 datastore_services = models.Registry.import_datastore_services()
 
 

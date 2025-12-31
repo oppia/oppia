@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for delete_duplicate_content_ids_jobs."""
+"""Tests for fix_duplicate_content_ids_jobs."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ from core.tests import test_utils
 from typing import Final
 
 MYPY = False
-if MYPY:  # pragma: no cover
+if MYPY:
     from mypy_imports import exp_models, translation_models, voiceover_models
 
 (exp_models, translation_models, voiceover_models) = (
@@ -124,20 +124,18 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
         """Test that duplicates are correctly identified across states."""
         state1: state_domain.StateDict = dict(STATE_DICT_IN_V57)
         state2: state_domain.StateDict = dict(STATE_DICT_IN_V57)
-        
-        # Both states use the same feedback_1 content_id (duplicate)
+
         states_dict: dict[str, state_domain.StateDict] = {
             'Introduction': state1,
             'End': state2,
         }
-        
+
         duplicates = (
             delete_duplicate_content_ids_jobs.DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
                 states_dict
             )
         )
-        
-        # feedback_1 should be in duplicates since it appears in both states
+
         self.assertIn('feedback_1', duplicates)
         self.assertEqual(set(duplicates['feedback_1']), {'Introduction', 'End'})
 
@@ -145,25 +143,22 @@ class FindDuplicateContentIdsTests(job_test_utils.JobTestBase):
         """Test that unique content IDs are not marked as duplicates."""
         state1: state_domain.StateDict = dict(STATE_DICT_IN_V57)
         state2: state_domain.StateDict = dict(STATE_DICT_IN_V57)
-        
-        # Change state2's feedback content_id to be unique
+
         state2['interaction']['answer_groups'][0]['outcome']['feedback'][
             'content_id'
         ] = 'feedback_2'
-        
+
         states_dict: dict[str, state_domain.StateDict] = {
             'Introduction': state1,
             'End': state2,
         }
-        
+
         duplicates = (
             delete_duplicate_content_ids_jobs.DeleteDuplicateContentIdsJob._find_duplicate_content_ids(
                 states_dict
             )
         )
-        
-        # Only default_outcome should appear in both states
-        # feedback_1 should not be a duplicate
+
         self.assertNotIn('feedback_1', duplicates)
 
 
@@ -171,21 +166,19 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
     """Tests for DeleteDuplicateContentIdsJob."""
 
     JOB_CLASS = delete_duplicate_content_ids_jobs.DeleteDuplicateContentIdsJob
-    
+
     AUTHOR_EMAIL: Final = 'author@example.com'
     AUTHOR_ID: Final = 'author_id'
 
     def setUp(self) -> None:
         super().setUp()
-        self.signup(self.AUTHOR_EMAIL, 'author')  # type: ignore[attr-defined]
-        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)  # type: ignore[attr-defined]
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
 
     def test_exploration_without_duplicates_unmodified(self) -> None:
         """Test that explorations without duplicates are not changed."""
-        # Create exploration with unique content IDs
         exp_id = 'exp_without_duplicates'
-        
-        # Build a proper exploration dict
+
         exp_dict = {
             'category': 'Test',
             'author_notes': '',
@@ -202,28 +195,26 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
                 feconf.DEFAULT_INIT_STATE_NAME: STATE_DICT_IN_V57,
             },
         }
-        
+
         exploration = exp_domain.Exploration.create_default_exploration(
             exp_id, title='Test Exploration'
         )
         exp_services.save_new_exploration(self.author_id, exploration)
-        
+
         self.assert_job_output_is_empty()
 
     def test_exploration_with_duplicates_is_fixed(self) -> None:
         """Test that explorations with duplicate content IDs are detected."""
         exp_id = 'exp_with_duplicates'
-        
-        # Create two identical states with duplicate content IDs
+
         state1 = dict(STATE_DICT_IN_V57)
         state2 = dict(STATE_DICT_IN_V57)
-        
-        # Both states share feedback_1 content_id (this is the duplicate)
+
         states_dict = {
             feconf.DEFAULT_INIT_STATE_NAME: state1,
             'End': state2,
         }
-        
+
         exploration_model = self.create_model(
             exp_models.ExplorationModel,
             id=exp_id,
@@ -244,8 +235,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         )
         exploration_model.update_timestamps()
         exploration_model.put()
-        
-        # Run the job
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
@@ -257,16 +247,15 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
     def test_translations_preserved_after_fix(self) -> None:
         """Test that translations are preserved when content IDs are regenerated."""
         exp_id = 'exp_with_translations'
-        
-        # Create exploration with duplicate content IDs
+
         state1 = dict(STATE_DICT_IN_V57)
         state2 = dict(STATE_DICT_IN_V57)
-        
+
         states_dict = {
             feconf.DEFAULT_INIT_STATE_NAME: state1,
             'End': state2,
         }
-        
+
         exploration_model = self.create_model(
             exp_models.ExplorationModel,
             id=exp_id,
@@ -287,14 +276,13 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         )
         exploration_model.update_timestamps()
         exploration_model.put()
-        
-        # Create a translation for one of the duplicate content IDs
+
         translation_model = (
             translation_models.EntityTranslationsModel.create_new(
                 str(feconf.TranslatableEntityType.EXPLORATION),
                 exp_id,
-                1,  # version
-                'hi',  # language code
+                1,
+                'hi',
                 {
                     'feedback_1': {
                         'content_value': 'Translated feedback',
@@ -306,8 +294,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         )
         translation_model.update_timestamps()
         translation_model.put()
-        
-        # Verify translation exists before job
+
         existing_trans = (
             translation_models.EntityTranslationsModel.get_model(
                 feconf.TranslatableEntityType.EXPLORATION,
@@ -322,16 +309,15 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
     def test_voiceovers_preserved_after_fix(self) -> None:
         """Test that voiceovers are preserved when content IDs are regenerated."""
         exp_id = 'exp_with_voiceovers'
-        
-        # Create exploration with duplicate content IDs
+
         state1 = dict(STATE_DICT_IN_V57)
         state2 = dict(STATE_DICT_IN_V57)
-        
+
         states_dict = {
             feconf.DEFAULT_INIT_STATE_NAME: state1,
             'End': state2,
         }
-        
+
         exploration_model = self.create_model(
             exp_models.ExplorationModel,
             id=exp_id,
@@ -352,12 +338,11 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         )
         exploration_model.update_timestamps()
         exploration_model.put()
-        
-        # Create a voiceover for one of the duplicate content IDs
+
         voiceover_model = voiceover_models.EntityVoiceoversModel.create_new(
             feconf.ENTITY_TYPE_EXPLORATION,
             exp_id,
-            1,  # version
+            1,
             'en-US',
             {
                 'feedback_1': {
@@ -382,8 +367,7 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
         )
         voiceover_model.update_timestamps()
         voiceover_model.put()
-        
-        # Verify voiceover exists before job
+
         existing_vo = voiceover_models.EntityVoiceoversModel.get_model(
             feconf.ENTITY_TYPE_EXPLORATION,
             exp_id,
@@ -397,13 +381,12 @@ class DeleteDuplicateContentIdsJobTest(job_test_utils.JobTestBase):
     def test_job_handles_explorations_without_duplicates(self) -> None:
         """Test that the job gracefully handles explorations with no duplicates."""
         exp_id = 'exp_clean'
-        
+
         exploration = exp_domain.Exploration.create_default_exploration(
             exp_id, title='Clean Exploration'
         )
         exp_services.save_new_exploration(self.author_id, exploration)
-        
-        # Job should complete without errors even if there are no duplicates
+
         self.assert_job_output_is_empty()
 
 
@@ -419,16 +402,15 @@ class AuditDeleteDuplicateContentIdsJobTest(
     def test_audit_job_does_not_modify_datastore(self) -> None:
         """Test that the audit job doesn't persist changes."""
         exp_id = 'exp_audit_test'
-        
-        # Create exploration with duplicates
+
         state1 = dict(STATE_DICT_IN_V57)
         state2 = dict(STATE_DICT_IN_V57)
-        
+
         states_dict = {
             feconf.DEFAULT_INIT_STATE_NAME: state1,
             'End': state2,
         }
-        
+
         exploration_model = self.create_model(
             exp_models.ExplorationModel,
             id=exp_id,
@@ -449,10 +431,9 @@ class AuditDeleteDuplicateContentIdsJobTest(
         )
         exploration_model.update_timestamps()
         exploration_model.put()
-        
+
         original_version = exploration_model.version
-        
-        # Run audit job (which should NOT modify data)
+
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stderr(
@@ -460,7 +441,6 @@ class AuditDeleteDuplicateContentIdsJobTest(
                 )
             ]
         )
-        
-        # Verify exploration was not modified
+
         updated_model = exp_models.ExplorationModel.get(exp_id)
         self.assertEqual(updated_model.version, original_version)
