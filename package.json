@@ -16,7 +16,7 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
-    "*.py": "black"
+    "*.py": "ruff format"
   },
   "homepage": "https://github.com/oppia/oppia#readme",
   "devDependencies": {
