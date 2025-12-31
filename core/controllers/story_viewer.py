@@ -18,10 +18,11 @@ from __future__ import annotations
 
 import logging
 
-from core import feconf, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
+    feature_flag_services,
     learner_progress_services,
     question_services,
     skill_fetchers,
@@ -335,8 +336,14 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
             == 0
         )
-        if questions_available and (
-            learner_at_review_point_in_story or learner_completed_story
+
+        # Gated Review Test redirection.
+        if feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
+            self.user_id,
+        ) and (
+            questions_available
+            and (learner_at_review_point_in_story or learner_completed_story)
         ):
             ready_for_review_test = True
 
