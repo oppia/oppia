@@ -166,13 +166,6 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
             )
-            if not isinstance(
-                suggestion, suggestion_registry.SuggestionEditStateContent
-            ):
-                raise Exception(
-                    'No edit state content suggestion found for the given '
-                    'thread_id: %s' % thread_id
-                )
             exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = exploration.states[
                 suggestion.change_cmd.state_name
