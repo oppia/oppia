@@ -22,7 +22,7 @@ import datetime
 import uuid
 
 from core import feconf
-from core.domain import taskqueue_services
+from core.domain import cloud_task_domain, taskqueue_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -93,13 +93,11 @@ class TaskqueueDomainServicesUnitTests(test_utils.TestBase):
             **correct_kwargs,
         )
 
-        cloud_task_run_model: cloud_task_models.CloudTaskRunModel = (
-            cloud_task_models.CloudTaskRunModel.get_all().fetch()
+        cloud_task_run: cloud_task_domain.CloudTaskRun = (
+            taskqueue_services.get_all_cloud_task_runs()
         )[0]
-        assert cloud_task_run_model is not None
-        self.assertEqual(
-            cloud_task_run_model.function_id, correct_fn_identifier
-        )
+        assert cloud_task_run is not None
+        self.assertEqual(cloud_task_run.function_id, correct_fn_identifier)
 
     def test_enqueue_task_makes_the_correct_request(self) -> None:
         correct_payload = {'user_id': '1'}
