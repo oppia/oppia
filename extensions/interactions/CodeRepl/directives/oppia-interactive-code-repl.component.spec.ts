@@ -113,7 +113,7 @@ describe('InteractiveCodeReplComponent', () => {
 
     mockNewCardAvailableEmitter.emit();
 
-    expect(component.interactionIsActive).toBeFalse();
+    expect(component.interactionIsActive).toBe(false);
   });
 
   it('should initialize when code editor interaction is added', () => {
@@ -129,7 +129,7 @@ describe('InteractiveCodeReplComponent', () => {
     expect(component.preCode).toBe('# precode\n');
     expect(component.postCode).toBe('# postcode');
     expect(component.interactionIsActive).toBe(true);
-    expect(component.hasLoaded).toBeFalse();
+    expect(component.hasLoaded).toBe(false);
     expect(component.output).toBe('');
     expect(component.code).toBe(
       '# precode\n# Type your code here.\n# postcode'
@@ -158,7 +158,7 @@ describe('InteractiveCodeReplComponent', () => {
 
       // This displays the last answer only when the interaction is not active
       // anymore. Therefore, we test to see if the pre-condition is false.
-      expect(component.interactionIsActive).toBeFalse();
+      expect(component.interactionIsActive).toBe(false);
       expect(component.code).toBe(
         "# Type your code here.\nprint('hello');\n# postcode"
       );
@@ -309,7 +309,7 @@ describe('InteractiveCodeReplComponent', () => {
     component.ngAfterViewInit();
     tick();
 
-    expect(component.hasLoaded).toBeTrue();
+    expect(component.hasLoaded).toBe(true);
     expect(detectChangesSpy).toHaveBeenCalled();
   }));
 });
