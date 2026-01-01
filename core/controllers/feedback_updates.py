@@ -158,12 +158,13 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         suggestion = suggestion_services.get_suggestion_by_id(
             thread_id, strict=False
         )
-        if suggestion is None:
-            suggestion = None
+        
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
-        if suggestion:
+        suggestion_summary = None
+
+        if suggestion and suggestion.change_cmd is not None:
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
             )
@@ -171,20 +172,21 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             current_content_html = exploration.states[
                 suggestion.change_cmd.state_name
             ].content.html
-        suggestion_summary: SuggestionSummaryDict = {
-            'suggestion_html': (
-                suggestion.change_cmd.new_value  # type: ignore[assignment]
-            )['html'],
-            'current_content_html': current_content_html,
-            'description': suggestion_thread.subject,
-            'author_username': suggestion_author_setting.username,
-            'created_on_msecs': utils.get_time_in_millisecs(
-                messages[0].created_on
-            ),
-        }
-        message_summary_list.append(suggestion_summary)
-        messages.pop(0)
-        authors_settings.pop(0)
+
+            suggestion_summary = {
+                'suggestion_html': suggestion.change_cmd.new_value['html'],
+                'current_content_html': current_content_html,
+                'description': suggestion_thread.subject,
+                'author_username': suggestion_author_setting.username,
+                'created_on_msecs': utils.get_time_in_millisecs(
+                    messages[0].created_on
+                ),
+            }
+
+        if suggestion:
+            message_summary_list.append(suggestion_summary)
+            messages.pop(0)
+            authors_settings.pop(0)
         for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
