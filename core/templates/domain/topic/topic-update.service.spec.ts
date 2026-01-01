@@ -1246,7 +1246,7 @@ describe('Topic update service', function () {
           2,
           _secondSkillSummary
         );
-      }).toThrowError("Cannot read properties of null (reading 'addSkill')");
+      }).toThrowError("Subtopic with id 2 doesn't exist");
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );
@@ -1311,6 +1311,17 @@ describe('Topic update service', function () {
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );
+
+  it('should throw error when removing skill from non-existent subtopic', () => {
+    expect(() => {
+      topicUpdateService.removeSkillFromSubtopic(
+        _sampleTopic,
+        999,
+        _secondSkillSummary
+      );
+    }).toThrowError("Subtopic with id 999 doesn't exist");
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
 
   it('should add and delete a study guide section', () => {
     var newSampleSectionDict = {

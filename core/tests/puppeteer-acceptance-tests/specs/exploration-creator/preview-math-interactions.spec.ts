@@ -50,7 +50,7 @@ describe('Exploration Editor', function () {
 
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    await explorationEditor.dismissWelcomeModal(true);
   });
 
   it('should be able to preview "Fraction Input" interaction', async function () {
@@ -129,9 +129,6 @@ describe('Exploration Editor', function () {
     await explorationEditor.addHintToState(
       'Create a star topology using all 4 nodes.'
     );
-
-    // Move node.
-    // await explorationEditor.expectGraphNodeCanBeMoved();
 
     // Move node.
     await explorationEditor.navigateToPreviewTab();

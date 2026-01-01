@@ -23,7 +23,7 @@ import json
 import logging
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import platform_parameter_domain, platform_parameter_list
 from core.domain import platform_parameter_registry as registry
@@ -126,7 +126,7 @@ def _create_evaluation_context_for_server() -> (
         EvaluationContext. The context for evaluation.
     """
     current_app_version = json.load(
-        utils.open_file(PACKAGE_JSON_FILE_PATH, 'r')
+        open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8')
     )['version']
     # We want to make sure that the branch is the release branch.
     if not constants.BRANCH_NAME == '' and 'release' in constants.BRANCH_NAME:

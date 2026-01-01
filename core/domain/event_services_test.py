@@ -30,6 +30,7 @@ from core.domain import (
     exp_fetchers,
     feedback_services,
     stats_services,
+    taskqueue_services,
     user_services,
 )
 from core.platform import models
@@ -459,6 +460,28 @@ class StatsEventsHandlerUnitTests(test_utils.GenericTestBase):
         assert model is not None
         self.assertEqual(model.exp_id, exp_id)
         self.assertEqual(model.exp_version, exploration.version)
+
+    def test_stats_events_not_latest_version_does_not_defer_task(self) -> None:
+        """Checks that stats event is not deferred when not latest version."""
+        exp_id = 'eid1'
+        self.save_new_valid_exploration(exp_id, self.OWNER_EMAIL)
+        exploration = exp_fetchers.get_exploration_by_id(exp_id)
+
+        defer_calls = []
+
+        def _mock_defer(fn_identifier: str, queue_name: str) -> None:
+            defer_calls.append((queue_name, fn_identifier))
+
+        defer_swap = self.swap(taskqueue_services, 'defer', _mock_defer)
+
+        with defer_swap:
+            event_services.StatsEventsHandler.record(
+                exp_id,
+                exploration.version - 1,
+                {'state_stats_mapping': {'Introduction': {}}},
+            )
+
+        self.assertEqual(defer_calls, [])
 
 
 class AnswerSubmissionEventHandlerTests(test_utils.GenericTestBase):
