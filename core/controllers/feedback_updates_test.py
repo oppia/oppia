@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import datetime
-
 from core import feconf, utils
 from core.domain import (
     exp_domain,
@@ -25,7 +23,6 @@ from core.domain import (
     exp_services,
     feedback_services,
     state_domain,
-    suggestion_registry,
     suggestion_services,
 )
 from core.platform import models
@@ -272,7 +269,6 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
         messages_summary = response_dict['message_summary_list'][0]
 
         self.assertEqual(messages_summary['author_username'], None)
-
 
     def test_get_suggestions_after_updating_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
