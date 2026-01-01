@@ -23,6 +23,7 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
+import {ElementHandle} from 'puppeteer';
 import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
 
 const ROLES = testConstants.Roles;
@@ -59,7 +60,7 @@ describe('Blog Post Writer', function () {
     // We search for all elements with the text and click the one that is visible.
     // This is necessary because there might be duplicate elements for mobile/desktop layouts,
     // and waitForXPath might pick the hidden one and timeout.
-    await blogPostWriter.page.waitForFunction(
+    const createButton = (await blogPostWriter.page.waitForFunction(
       async (text: string) => {
         const elements = document.evaluate(
           `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
@@ -72,15 +73,15 @@ describe('Blog Post Writer', function () {
           const element = elements.snapshotItem(i) as HTMLElement;
           if (element.offsetParent !== null) {
             // Simple visibility check.
-            element.click();
-            return true;
+            return element;
           }
         }
-        return false;
+        return null;
       },
       {},
       LABELS.CREATE_NEW_BLOG_POST_BTN
-    );
+    )) as unknown as ElementHandle<Element>;
+    await createButton.click();
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
     // Upload GIF format thumbnail image.
@@ -195,8 +196,8 @@ describe('Blog Post Writer', function () {
 
   it('should be able to publish a new blog post', async function () {
     // Create a new blog post.
-    // Create a new blog post.
-    await blogPostWriter.page.waitForFunction(
+
+    const createButton = (await blogPostWriter.page.waitForFunction(
       async (text: string) => {
         const elements = document.evaluate(
           `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
@@ -209,15 +210,15 @@ describe('Blog Post Writer', function () {
           const element = elements.snapshotItem(i) as HTMLElement;
           if (element.offsetParent !== null) {
             // Simple visibility check.
-            element.click();
-            return true;
+            return element;
           }
         }
-        return false;
+        return null;
       },
       {},
       LABELS.CREATE_NEW_BLOG_POST_BTN
-    );
+    )) as unknown as ElementHandle<Element>;
+    await createButton.click();
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
     await blogPostWriter.saveBlogBodyChanges();
