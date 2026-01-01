@@ -175,7 +175,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             with datastore_services.get_ndb_context():
                 exploration = exp_fetchers.get_exploration_from_model(exp_model)
 
-            states_dict = getattr(exploration, 'states_dict', None)
+            states_dict: Dict[str, state_domain.StateDict] = getattr(exploration, 'states_dict', None)
             if states_dict is None:
                 states_dict = getattr(exploration, 'states', None)
             if states_dict is None:
@@ -194,6 +194,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
                 list(duplicates.keys())
             )
 
+            updated_states_dict: Dict[str, state_domain.StateDict]
             updated_states_dict, next_content_id_index = (
                 state_domain.State.update_old_content_id_to_new_content_id_in_v54_states(
                     states_dict
@@ -201,18 +202,14 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             )
 
             if hasattr(exploration, 'states_dict'):
-                exploration.states_dict = updated_states_dict
+                exploration.states_dict = updated_states_dict  # type: ignore
             elif hasattr(exploration, 'states'):
-                exploration.states = updated_states_dict
+                exploration.states = updated_states_dict  # type: ignore
 
             exploration.update_next_content_id_index(next_content_id_index)
             exploration.version = exp_model.version + 1
 
             old_to_new_mapping: Dict[str, str] = {}
-            for state_name in updated_states_dict.keys():
-                old_state = updated_states_dict.get(state_name)
-                if old_state:
-                    pass
 
             return result.Ok((exploration.id, exploration, old_to_new_mapping))
 
@@ -248,7 +245,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
         with datastore_services.get_ndb_context():
             old_translations = (
                 translation_models.EntityTranslationsModel.get_all_for_entity(
-                    str(feconf.TranslatableEntityType.EXPLORATION),
+                    feconf.TranslatableEntityType.EXPLORATION,
                     exp_id,
                     old_version,
                 )
@@ -257,7 +254,7 @@ class DeleteDuplicateContentIdsJob(base_jobs.JobBase):
             new_translations = []
             for trans_model in old_translations:
                 new_trans = translation_models.EntityTranslationsModel.create_new(
-                    str(feconf.TranslatableEntityType.EXPLORATION),
+                    feconf.TranslatableEntityType.EXPLORATION,
                     exp_id,
                     new_version,
                     trans_model.language_code,
