@@ -18,25 +18,21 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import state_domain
+from core.domain import exp_domain, exp_fetchers, state_domain
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, List, Set, Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import datastore_services
-    from mypy_imports import exp_models
+    from mypy_imports import datastore_services, exp_models
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
-
 
 class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     """Job that identifies explorations with duplicate content IDs."""

@@ -18,10 +18,12 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain
-from core.domain import exp_fetchers
-from core.domain import exp_services
-from core.domain import translation_domain
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    translation_domain,
+)
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
