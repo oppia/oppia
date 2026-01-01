@@ -94,12 +94,13 @@
 </mat-card>
 
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
-  <h3>Lesson-level voiceover regeneration status</h3>
+  <h3>Automatic voiceover updates</h3>
 
   <p class="info-text">
-      The voiceover regeneration records shown here are those triggered via the
-      deferred queue (performed asynchronously), not the ones initiated as one-off
-      individual voiceover regenerations through the exploration translation tab.
+      To ensure that all curated content has matching audio, these updates run
+      automatically when the content of an exploration in a published topic is
+      updated. Note: Does not include manual requests triggered via the
+      exploration editor page.
   </p>
 
   <div>
@@ -133,7 +134,7 @@
     </p>
   </div>
 
-  <div *ngIf="cloudTaskRunList.length > 0" class="datepicker-table-container">
+  <div *ngIf="cloudTaskRunList.length > 0">
     <table mat-table [dataSource]="cloudTaskRunList" class="voice-artist-table">
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef> State </th>
@@ -149,7 +150,7 @@
 
       <ng-container matColumnDef="functionID">
         <th mat-header-cell *matHeaderCellDef> Function ID </th>
-        <td mat-cell *matCellDef="let element"> {{element.functionId}} </td>
+        <td mat-cell *matCellDef="let element" class="task-run-data"> {{getFunctionIdText(element.functionId)}} </td>
       </ng-container>
 
       <ng-container matColumnDef="numberOfRetries">
@@ -159,12 +160,12 @@
 
       <ng-container matColumnDef="startedOn">
         <th mat-header-cell *matHeaderCellDef> Started on </th>
-        <td mat-cell *matCellDef="let element"> {{element.createdOn}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.createdOn | date:'medium'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="lastUpdated">
         <th mat-header-cell *matHeaderCellDef> Last updated </th>
-        <td mat-cell *matCellDef="let element"> {{element.lastUpdated}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.lastUpdated | date:'medium'}} </td>
       </ng-container>
 
       <ng-container matColumnDef="details">
@@ -181,16 +182,15 @@
 </mat-card>
 
 <style>
+  .task-run-data {
+    white-space: pre-wrap;
+  }
   .error-icon {
     color: red;
   }
   .refresh-data-info-container {
     margin: 20px;
     text-align: right;
-  }
-  .datepicker-table-container {
-    max-height: 250px;
-    overflow: auto;
   }
   .datepicker-container {
     display: flex;

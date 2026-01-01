@@ -1017,7 +1017,7 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
 
-def regenerate_voiceovers_for_updated_exploration(
+def regenerate_voiceovers_on_exploration_update(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
@@ -1102,7 +1102,7 @@ def regenerate_voiceovers_for_updated_exploration(
     )
 
 
-def regenerate_voiceovers_on_exploration_curation(
+def regenerate_voiceovers_on_exploration_added_to_topic(
     exploration_id: str,
     date_time: str,
     author_id: str,

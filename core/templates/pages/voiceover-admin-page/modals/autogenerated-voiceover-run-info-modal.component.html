@@ -3,7 +3,7 @@
 </div>
 <div class="modal-body">
   <div class="data-container">
-    <div class="date-type-title">
+    <div class="data-type-title">
       <span>Cloud task name:</span>
     </div>
     <div class="messages-container">
@@ -12,16 +12,16 @@
   </div>
 
   <div class="data-container">
-    <div class="date-type-title">
+    <div class="data-type-title">
       <span>Function ID:</span>
     </div>
     <div class="messages-container">
-      {{cloudTaskRun.functionId}}
+      {{getFunctionIdText(cloudTaskRun.functionId)}}
     </div>
   </div>
 
   <div class="data-container">
-    <div class="date-type-title">
+    <div class="data-type-title">
       <span>Current state:</span>
     </div>
     <div class="messages-container">
@@ -30,40 +30,42 @@
   </div>
 
   <div class="data-container">
-    <div class="date-type-title">
+    <div class="data-type-title">
       <span>Created on:</span>
     </div>
     <div class="messages-container">
-      {{cloudTaskRun.createdOn}}
+      {{cloudTaskRun.createdOn | date:'medium'}}
     </div>
   </div>
 
   <div class="data-container">
-    <div class="date-type-title">
+    <div class="data-type-title">
       <span>Last updated:</span>
     </div>
     <div class="messages-container">
-      {{cloudTaskRun.lastUpdated}}
+      {{cloudTaskRun.lastUpdated | date:'medium'}}
     </div>
   </div>
 
-  <div class="data-container">
-    <div class="date-type-title">
+  <div>
+    <div class="data-type-title">
       <span>Error messages:</span>
     </div>
-    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="messages-container">
+    <div *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length === 0" class="error-messages-container">
       <i>No error messages.</i>
     </div>
     <div class="content-container" *ngIf="cloudTaskRun.exceptionMessagesForFailedRuns.length > 0">
       <mat-tab-group>
         <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
           <div class="error-messages-container">
+            <span class="error-text">
+              {{error}}
+            </span>
+          </div>
+          <div>
             <button class="btn btn-secondary copy-to-clipboard-button" (click)="copyErrorToClipboard(error)">
               <mat-icon>content_copy</mat-icon>
             </button>
-            <span>
-              {{error}}
-            </span>
           </div>
         </mat-tab>
       </mat-tab-group>
@@ -75,19 +77,22 @@
 </div>
 
 <style>
-  .date-type-title {
+  .data-type-title {
     font-weight: bold;
     width: 50%;
   }
   .data-container {
+    align-items: center;
     display: flex;
   }
   .content-container {
     width: 100%;
   }
   .messages-container {
+    overflow: auto;
     padding: 1%;
-    width: 100%;
+    white-space: pre-wrap;
+    width: 190%;
   }
   .error-messages-container {
     background-color: rgba(0, 0, 0, 0.06);
@@ -99,5 +104,11 @@
     background-color: inherit;
     border: 0;
     cursor: pointer;
+    float: right;
+    margin-right: 10px;
+  }
+  .error-text {
+    font-family: monospace;
+    white-space: pre-wrap;
   }
 </style>

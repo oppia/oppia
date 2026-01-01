@@ -187,12 +187,14 @@ class AutomaticVoiceoverRegenerationRecordHandler(
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
-        cloud_task_run_objects = (
+        cloud_task_run_objects = sorted(
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 start_date_obj,
                 end_date_obj,
-            )
+            ),
+            key=lambda task_run: task_run.last_updated,
+            reverse=True,
         )
 
         self.values.update(

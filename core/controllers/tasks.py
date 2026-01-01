@@ -270,10 +270,10 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             wipeout_service.remove_user_from_activities_with_associated_rights_models
         ),
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE']: (
-            voiceover_services.regenerate_voiceovers_for_updated_exploration
+            voiceover_services.regenerate_voiceovers_on_exploration_update
         ),
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
-            voiceover_services.regenerate_voiceovers_on_exploration_curation
+            voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
         ),
     }
 

@@ -339,4 +339,14 @@ export class VoiceoverAdminPageComponent implements OnInit {
     );
     modalRef.componentInstance.cloudTaskRun = cloudTaskRun;
   }
+
+  getFunctionIdText(functionId: string): string {
+    if (functionId === 'regenerate_voiceovers_on_exploration_update') {
+      return 'regenerate_voiceovers_on_exploration_update \n ("Exploration content updated")';
+    } else if (
+      functionId === 'regenerate_voiceovers_on_exploration_added_to_topic'
+    ) {
+      return 'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to published topic")';
+    }
+  }
 }
