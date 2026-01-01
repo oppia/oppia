@@ -159,6 +159,14 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         suggestion = suggestion_services.get_suggestion_by_id(
             thread_id, strict=False
         )
+        if suggestion is None:
+            suggestion = None
+        elif isinstance(
+            suggestion,
+            suggestion_registry.SuggestionEditStateContent
+        ) and suggestion.is_deprecated:
+            suggestion = None
+
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
