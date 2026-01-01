@@ -4377,31 +4377,52 @@ export class LoggedOutUser extends BaseUser {
     studyGuideSections: string[][]
   ): Promise<void> {
     try {
-      const isTitlePresent = await this.isTextPresentOnPage(studyGuideTitle);
-
-      if (!isTitlePresent) {
+      try {
+        await this.page.waitForFunction(
+          (text: string) => {
+            const bodyText = document.body.innerText;
+            return bodyText.includes(text);
+          },
+          {},
+          studyGuideTitle
+        );
+      } catch (e) {
         throw new Error(
-          'Expected study guide title to be present, but it was not found.'
+          `Expected study guide title "${studyGuideTitle}" to be present, but it was not found.`
         );
       }
 
       for (var i = 0; i < studyGuideSections.length; i++) {
         for (var j = 0; j < 2; j++) {
-          const isHeadingPresent = await this.isTextPresentOnPage(
-            studyGuideSections[i][j]
-          );
-          if (!isHeadingPresent) {
+          const sectionHeading = studyGuideSections[i][j];
+          try {
+            await this.page.waitForFunction(
+              (text: string) => {
+                const bodyText = document.body.innerText;
+                return bodyText.includes(text);
+              },
+              {},
+              sectionHeading
+            );
+          } catch (e) {
             throw new Error(
-              `Expected study guide section ${i + 1} heading to be present on the page, but it was not found`
+              `Expected study guide section ${i + 1} heading "${sectionHeading}" to be present on the page, but it was not found`
             );
           }
           j++;
-          const isContentPresent = await this.isTextPresentOnPage(
-            studyGuideSections[i][j]
-          );
-          if (!isContentPresent) {
+          const sectionContent = studyGuideSections[i][j];
+          try {
+            await this.page.waitForFunction(
+              (text: string) => {
+                const bodyText = document.body.innerText;
+                return bodyText.includes(text);
+              },
+              {},
+              sectionContent
+            );
+          } catch (e) {
             throw new Error(
-              `Expected study guide section ${i + 1} content to be present on the page, but it was not found`
+              `Expected study guide section ${i + 1} content "${sectionContent}" to be present on the page, but it was not found`
             );
           }
         }
