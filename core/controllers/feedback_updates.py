@@ -172,7 +172,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 suggestion.change_cmd.state_name
             ].content.html
             suggestion_summary: SuggestionSummaryDict = {
-                'suggestion_html': suggestion.change_cmd.new_value.get('html'),
+                'suggestion_html': suggestion.change_cmd.new_value['html'],
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
