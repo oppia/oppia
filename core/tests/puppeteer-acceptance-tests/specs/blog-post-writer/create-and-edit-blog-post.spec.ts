@@ -71,7 +71,7 @@ describe('Blog Post Writer', function () {
         for (let i = 0; i < elements.snapshotLength; i++) {
           const element = elements.snapshotItem(i) as HTMLElement;
           if (element.offsetParent !== null) {
-            // Simple visibility check
+            // Simple visibility check.
             element.click();
             return true;
           }
@@ -208,7 +208,7 @@ describe('Blog Post Writer', function () {
         for (let i = 0; i < elements.snapshotLength; i++) {
           const element = elements.snapshotItem(i) as HTMLElement;
           if (element.offsetParent !== null) {
-            // Simple visibility check
+            // Simple visibility check.
             element.click();
             return true;
           }
