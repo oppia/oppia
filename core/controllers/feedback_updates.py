@@ -23,7 +23,6 @@ from core.domain import (
     exp_fetchers,
     feedback_services,
     subscription_services,
-    suggestion_registry,
     suggestion_services,
     user_services,
 )
@@ -161,7 +160,6 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
         if suggestion is None:
             suggestion = None
-        
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
