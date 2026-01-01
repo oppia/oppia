@@ -171,19 +171,20 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             current_content_html = exploration.states[
                 suggestion.change_cmd.state_name
             ].content.html
-            suggestion_summary: SuggestionSummaryDict = {
-                'suggestion_html': suggestion.change_cmd.new_value['html'],
-                'current_content_html': current_content_html,
-                'description': suggestion_thread.subject,
-                'author_username': suggestion_author_setting.username,
-                'created_on_msecs': utils.get_time_in_millisecs(
-                    messages[0].created_on
-                ),
-            }
-            message_summary_list.append(suggestion_summary)
-            messages.pop(0)
-            authors_settings.pop(0)
-
+        suggestion_summary: SuggestionSummaryDict = {
+            'suggestion_html': (
+                suggestion.change_cmd.new_value  # type: ignore[assignment]
+            )['html'],
+            'current_content_html': current_content_html,
+            'description': suggestion_thread.subject,
+            'author_username': suggestion_author_setting.username,
+            'created_on_msecs': utils.get_time_in_millisecs(
+                messages[0].created_on
+            ),
+        }
+        message_summary_list.append(suggestion_summary)
+        messages.pop(0)
+        authors_settings.pop(0)
         for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
