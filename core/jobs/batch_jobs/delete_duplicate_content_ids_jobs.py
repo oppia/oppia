@@ -25,7 +25,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Set, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -33,6 +33,7 @@ if MYPY:  # pragma: no cover
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
+
 
 class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
     """Job that identifies explorations with duplicate content IDs."""
