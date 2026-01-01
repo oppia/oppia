@@ -133,6 +133,8 @@ export class HomeTabComponent {
           this.goalTopicsLength = this.goalTopics?.length || 0;
           this.currentGoalIds = new Set(this.currentGoals?.map(g => g.id));
 
+          this.continueWhereYouLeftOffList = [];
+
           if (allGoals.length !== 0) {
             var allGoalIds = [];
             for (var goal of allGoals) {
@@ -247,8 +249,8 @@ export class HomeTabComponent {
     return 'I18N_LEARNER_DASHBOARD_EVENING_GREETING';
   }
 
-  isNonemptyObject(object: Object): boolean {
-    return Object.keys(object).length !== 0;
+  isNonemptyObject(object: Object | undefined | null): boolean {
+    return !!object && Object.keys(object).length !== 0;
   }
 
   getClassroomLink(classroomUrlFragment: string): string {
