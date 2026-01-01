@@ -161,12 +161,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
         if suggestion is None:
             suggestion = None
-        elif isinstance(
-            suggestion,
-            suggestion_registry.SuggestionEditStateContent
-        ) and suggestion.is_deprecated:
-            suggestion = None
-
+        
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
@@ -179,7 +174,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 suggestion.change_cmd.state_name
             ].content.html
             suggestion_summary: SuggestionSummaryDict = {
-                'suggestion_html': suggestion.change_cmd.new_value['html'],
+                'suggestion_html': suggestion.change_cmd.new_value.get('html'),
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
