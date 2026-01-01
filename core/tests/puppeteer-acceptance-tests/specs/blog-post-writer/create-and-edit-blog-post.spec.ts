@@ -56,9 +56,14 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectFirstBlogPostButtonToBeVisible(true);
 
     // Click on "Create new blog post" button.
-    await blogPostWriter.clickOnElementWithText(
-      LABELS.CREATE_NEW_BLOG_POST_BTN
+    const createBlogPostBtn = await blogPostWriter.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${LABELS.CREATE_NEW_BLOG_POST_BTN}"))]`,
+      {visible: true}
     );
+    if (!createBlogPostBtn) {
+      throw new Error('Create blog post button not found');
+    }
+    await createBlogPostBtn.click();
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
     // Upload GIF format thumbnail image.
@@ -173,9 +178,14 @@ describe('Blog Post Writer', function () {
 
   it('should be able to publish a new blog post', async function () {
     // Create a new blog post.
-    await blogPostWriter.clickOnElementWithText(
-      LABELS.CREATE_NEW_BLOG_POST_BTN
+    const createBlogPostBtn = await blogPostWriter.page.waitForXPath(
+      `//*[contains(normalize-space(text()), normalize-space("${LABELS.CREATE_NEW_BLOG_POST_BTN}"))]`,
+      {visible: true}
     );
+    if (!createBlogPostBtn) {
+      throw new Error('Create blog post button not found');
+    }
+    await createBlogPostBtn.click();
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
     await blogPostWriter.saveBlogBodyChanges();
