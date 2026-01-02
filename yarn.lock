@@ -9921,7 +9921,7 @@ gtoken@^5.0.4:
 
 "guppy-dev@git+https://github.com/oppia/guppy#f509e":
   version "2.0.0-rc.1"
-  resolved "git+ssh://git@github.com/oppia/guppy.git"
+  resolved "git+https://github.com/oppia/guppy#f509e155dc66f6310737c328cbfbc35b85194be2"
   integrity sha512-QuFa9kRVxRoqKKLpLdK9Fn7Xna8mR8LO/GJMVwBFBFBrMr62wGV+3OBQpE9RdKQb8rcoUN5p+61iwp34yGSLKA==
 
 hammerjs@^2.0.8:
@@ -10254,7 +10254,7 @@ html-webpack-plugin@^4.0.3:
 
 "htmllint-cli@git+https://github.com/oppia/htmllint-cli#01a8b74":
   version "0.0.7"
-  resolved "git+ssh://git@github.com/oppia/htmllint-cli.git"
+  resolved "git+https://github.com/oppia/htmllint-cli#01a8b74ae7aaedeadba3d1d4d93a29807f6a52da"
   integrity sha512-VTAbQ8Ug550VJMcQt/pqsaruT8rISQtsHCbDAfUbPqH5Fg7vglzSnMPoZL2nL5diy8h/C5IOIRG+mcjl1mF50Q==
   dependencies:
     bluebird "^3.5.5"
@@ -13610,7 +13610,7 @@ micromatch@^4.0.0, micromatch@^4.0.4, micromatch@^4.0.5:
 
 "midi@git+https://github.com/oppia/miDI.js#c26eb":
   version "0.3.0"
-  resolved "git+ssh://git@github.com/oppia/miDI.js.git"
+  resolved "git+https://github.com/oppia/miDI.js#c26ebb9baaf0abc060c8a13254dad283c6ee7304"
   integrity sha512-8hYZKhabLKvq2HHm928qtIqoTaSmpU1ivpdRBJAnyRFYminxF4NRqpsuomwOP0ynK8oMP4nCIqhV3eZQotLnZA==
 
 miller-rabin@^4.0.0:
@@ -17971,8 +17971,9 @@ sisteransi@^1.0.5:
   resolved "https://registry.npmjs.org/sisteransi/-/sisteransi-1.0.5.tgz"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
 
-"skulpt-dist@file:third_party/skulpt-dist":
-  resolved "file:third_party/skulpt-dist"
+"skulpt-dist@git+https://github.com/skulpt/skulpt-dist#7b61d":
+  version "0.0.0"
+  resolved "git+https://github.com/skulpt/skulpt-dist#7b61d9bca2b8f18d4691c27de8262b281bb0e8a7"
 
 slash@^3.0.0:
   version "3.0.0"
