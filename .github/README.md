@@ -26,9 +26,10 @@ Please refer to the [Installing Oppia page](https://github.com/oppia/oppia/wiki/
 
 ## Contributing
 
-The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.
+The Oppia project is built by the community for the community. We welcome contributions from everyone, especially new contributors.  
+If you are new to open source, this is a great place to start — we provide beginner-friendly issues and clear documentation to help you get started.
 
-You can help with Oppia's development in many ways, including art, coding, design and documentation.
+You can help with Oppia's development in many ways, including art, coding, design, and documentation.
 
 - **Developers**: please see [this wiki page](https://github.com/oppia/oppia/wiki/Contributing-code-to-Oppia#setting-things-up) for instructions on how to set things up and commit changes.
 - **All other contributors**: please see our [general contributor guidelines](https://github.com/oppia/oppia/wiki).
@@ -52,7 +53,12 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
 
 ## Social Media
 
-[<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] [<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] [<img height="30" src = "https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] [<img height="30" src = "https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] [<img height="30" src = "https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] [<img height="30" src = "https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
+[<img height="30" src="https://img.shields.io/badge/twitter-1DA1F2.svg?&style=for-the-badge&logo=twitter&logoColor=white" />][twitter] 
+[<img height="30" src="https://img.shields.io/badge/linkedin-0077B5.svg?&style=for-the-badge&logo=linkedin&logoColor=white" />][LinkedIn] 
+[<img height="30" src="https://img.shields.io/badge/facebook-1877F2.svg?&style=for-the-badge&logo=facebook&logoColor=white">][Facebook] 
+[<img height="30" src="https://img.shields.io/badge/medium-12100E.svg?&style=for-the-badge&logo=medium&logoColor=white">][medium] 
+[<img height="30" src="https://img.shields.io/badge/oppia.org%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][oppia-org-youtube] 
+[<img height="30" src="https://img.shields.io/badge/oppia%20dev%20youtube-FF0000.svg?&style=for-the-badge&logo=youtube&logoColor=white">][dev-youtube]
 
 [twitter]: https://twitter.com/oppiaorg
 [linkedIn]: https://www.linkedin.com/company/oppia-org/
