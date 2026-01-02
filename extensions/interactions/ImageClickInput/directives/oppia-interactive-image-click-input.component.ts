@@ -174,30 +174,26 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
           this.filepath
         );
 
-        if (base64Url === null) {
-          return;
-        }
-
-        const mimeType = base64Url.split(';')[0];
-        if (mimeType === AppConstants.SVG_MIME_TYPE) {
-          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            base64Url
-          ) as string;
-        } else {
-          this.imageUrl = base64Url;
+        if (base64Url !== null) {
+          const mimeType = base64Url.split(';')[0];
+          if (mimeType === AppConstants.SVG_MIME_TYPE) {
+            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+              base64Url
+            ) as string;
+          } else {
+            this.imageUrl = base64Url;
+          }
         }
       } else {
         const entityType = this.pageContextService.getEntityType();
         const entityId = this.pageContextService.getEntityId();
-        if (entityType === undefined || entityId === undefined) {
-          return;
+        if (entityType !== undefined && entityId !== undefined) {
+          this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
+            entityType,
+            entityId,
+            encodeURIComponent(this.filepath)
+          );
         }
-
-        this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
-          entityType,
-          entityId,
-          encodeURIComponent(this.filepath)
-        );
       }
     }
 

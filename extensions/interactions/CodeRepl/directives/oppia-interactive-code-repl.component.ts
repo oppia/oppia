@@ -175,12 +175,11 @@ export class InteractiveCodeReplComponent
   ngAfterViewInit(): void {
     const runAfterTimeout = () => {
       const codeMirror = this.codeMirrorComponent.codeMirror;
-      if (!codeMirror) {
-        return;
+      if (codeMirror) {
+        this.initMarkers(codeMirror);
+        this.hasLoaded = true;
+        this.changeDetectionRef.detectChanges();
       }
-      this.initMarkers(codeMirror);
-      this.hasLoaded = true;
-      this.changeDetectionRef.detectChanges();
     };
     setTimeout(() => {
       runAfterTimeout();
