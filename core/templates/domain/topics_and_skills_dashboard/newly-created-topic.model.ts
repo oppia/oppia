@@ -56,13 +56,13 @@ export class NewlyCreatedTopic {
       AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
     return Boolean(
       this.name &&
-        this.description &&
-        this.urlFragment &&
-        validUrlFragmentRegex.test(this.urlFragment) &&
-        this.urlFragment.length <= urlFragmentCharLimit &&
-        this.pageTitleFragment &&
-        this.pageTitleFragment.length >= titleFragMinLimit &&
-        this.pageTitleFragment.length <= titleFragMaxLimit
+      this.description &&
+      this.urlFragment &&
+      validUrlFragmentRegex.test(this.urlFragment) &&
+      this.urlFragment.length <= urlFragmentCharLimit &&
+      this.pageTitleFragment &&
+      this.pageTitleFragment.length >= titleFragMinLimit &&
+      this.pageTitleFragment.length <= titleFragMaxLimit
     );
   }
 

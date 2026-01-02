@@ -45,9 +45,9 @@ export class NewlyCreatedStory {
     );
     return Boolean(
       this.title &&
-        this.description &&
-        this.urlFragment &&
-        VALID_URL_FRAGMENT_REGEX.test(this.urlFragment)
+      this.description &&
+      this.urlFragment &&
+      VALID_URL_FRAGMENT_REGEX.test(this.urlFragment)
     );
   }
 }

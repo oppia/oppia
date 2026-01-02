@@ -156,11 +156,8 @@ export class NewChapterTitleModalComponent implements OnInit {
   isValid(): boolean {
     return Boolean(
       this.title &&
-        this.validatorsService.isValidExplorationId(
-          this.explorationId,
-          false
-        ) &&
-        this.editableThumbnailFilename
+      this.validatorsService.isValidExplorationId(this.explorationId, false) &&
+      this.editableThumbnailFilename
     );
   }
 

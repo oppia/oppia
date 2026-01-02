@@ -26,9 +26,7 @@ import './oppia-visualization-enumerated-frequency-table.directive.css';
   templateUrl:
     './oppia-visualization-enumerated-frequency-table.directive.html',
 })
-export class OppiaVisualizationEnumeratedFrequencyTableComponent
-  implements OnInit
-{
+export class OppiaVisualizationEnumeratedFrequencyTableComponent implements OnInit {
   // These properties below are initialized using Angular lifecycle hooks
   // where we need to do non-null assertion. For more information see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1

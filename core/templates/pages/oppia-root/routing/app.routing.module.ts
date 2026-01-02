@@ -58,9 +58,9 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_EDITOR.ROUTE,
     loadChildren: () =>
-      import(
-        'pages/exploration-editor-page/exploration-editor-page.module'
-      ).then(m => m.ExplorationEditorPageModule),
+      import('pages/exploration-editor-page/exploration-editor-page.module').then(
+        m => m.ExplorationEditorPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -75,9 +75,9 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CONTRIBUTOR_DASHBOARD
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/contributor-dashboard-page/contributor-dashboard-page.module'
-      ).then(m => m.ContributorDashboardPageModule),
+      import('pages/contributor-dashboard-page/contributor-dashboard-page.module').then(
+        m => m.ContributorDashboardPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.MODERATOR.ROUTE,
@@ -137,9 +137,9 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.DIAGNOSTIC_TEST_PLAYER
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/diagnostic-test-player-page/diagnostic-test-player-page.module'
-      ).then(m => m.DiagnosticTestPlayerPageModule),
+      import('pages/diagnostic-test-player-page/diagnostic-test-player-page.module').then(
+        m => m.DiagnosticTestPlayerPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.CLASSROOM.ROUTE,
@@ -186,27 +186,27 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_EDITOR
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/learner-group-pages/edit-group/edit-learner-group-page.module'
-      ).then(m => m.EditLearnerGroupPageModule),
+      import('pages/learner-group-pages/edit-group/edit-learner-group-page.module').then(
+        m => m.EditLearnerGroupPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.FACILITATOR_DASHBOARD
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/facilitator-dashboard-page/facilitator-dashboard-page.module'
-      ).then(m => m.FacilitatorDashboardPageModule),
+      import('pages/facilitator-dashboard-page/facilitator-dashboard-page.module').then(
+        m => m.FacilitatorDashboardPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LEARNER_GROUP_CREATOR
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/learner-group-pages/create-group/create-learner-group-page.module'
-      ).then(m => m.CreateLearnerGroupPageModule),
+      import('pages/learner-group-pages/create-group/create-learner-group-page.module').then(
+        m => m.CreateLearnerGroupPageModule
+      ),
     canActivate: [IsLoggedInGuard],
   },
   {
@@ -227,24 +227,24 @@ const routes: Route[] = [
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER.ROUTE,
     loadChildren: () =>
-      import(
-        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
-      ).then(m => m.ExplorationPlayerPageModule),
+      import('pages/exploration-player-page/current-lesson-player/exploration-player-page.module').then(
+        m => m.ExplorationPlayerPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.EXPLORATION_PLAYER_EMBED
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/exploration-player-page/current-lesson-player/exploration-player-page.module'
-      ).then(m => m.ExplorationPlayerPageModule),
+      import('pages/exploration-player-page/current-lesson-player/exploration-player-page.module').then(
+        m => m.ExplorationPlayerPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LESSON_PLAYER_EMBED.ROUTE,
     loadChildren: () =>
-      import(
-        'pages/exploration-player-page/new-lesson-player/lesson-player-page.module'
-      ).then(m => m.NewLessonPlayerPageModule),
+      import('pages/exploration-player-page/new-lesson-player/lesson-player-page.module').then(
+        m => m.NewLessonPlayerPageModule
+      ),
     canActivate: [LessonPlayerPageAuthGuard],
   },
   {
@@ -309,9 +309,9 @@ const routes: Route[] = [
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.RELEASE_COORDINATOR_PAGE
       .ROUTE,
     loadChildren: () =>
-      import(
-        'pages/release-coordinator-page/release-coordinator-page.module'
-      ).then(m => m.ReleaseCoordinatorPageModule),
+      import('pages/release-coordinator-page/release-coordinator-page.module').then(
+        m => m.ReleaseCoordinatorPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.LIBRARY_INDEX.ROUTE,
@@ -451,9 +451,9 @@ const routes: Route[] = [
       .ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
-      import(
-        'pages/learner-group-pages/view-group/view-learner-group-page.module'
-      ).then(m => m.ViewLearnerGroupPageModule),
+      import('pages/learner-group-pages/view-group/view-learner-group-page.module').then(
+        m => m.ViewLearnerGroupPageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_HOMEPAGE.ROUTE,
@@ -477,9 +477,9 @@ const routes: Route[] = [
       .ROUTE,
     pathMatch: 'full',
     loadChildren: () =>
-      import(
-        'pages/blog-author-profile-page/blog-author-profile-page.module'
-      ).then(m => m.BlogAuthorProfilePageModule),
+      import('pages/blog-author-profile-page/blog-author-profile-page.module').then(
+        m => m.BlogAuthorProfilePageModule
+      ),
   },
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.BLOG_POST_PAGE.ROUTE,
@@ -551,9 +551,9 @@ for (let key in AppConstants.AVAILABLE_LANDING_PAGES) {
     routes.push({
       path: key + '/' + AppConstants.AVAILABLE_LANDING_PAGES[key][i],
       loadChildren: () =>
-        import(
-          'pages/landing-pages/topic-landing-page/topic-landing-page.module'
-        ).then(m => m.TopicLandingPageModule),
+        import('pages/landing-pages/topic-landing-page/topic-landing-page.module').then(
+          m => m.TopicLandingPageModule
+        ),
     });
   }
 }
@@ -563,9 +563,9 @@ routes.push(
   {
     path: AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR_IFRAMED.ROUTE,
     loadChildren: () =>
-      import(
-        'pages/error-pages/error-iframed-page/error-iframed-page.module'
-      ).then(m => m.ErrorIframedPageModule),
+      import('pages/error-pages/error-iframed-page/error-iframed-page.module').then(
+        m => m.ErrorIframedPageModule
+      ),
   },
   // Route to register all the custom error pages on oppia.
   {

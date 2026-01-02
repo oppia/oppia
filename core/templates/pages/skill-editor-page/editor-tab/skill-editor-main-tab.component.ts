@@ -108,7 +108,7 @@ export class SkillEditorMainTabComponent
   isTopicDropdownEnabled(): boolean {
     this.topicDropdownEnabled = Boolean(
       this.assignedSkillTopicData &&
-        Object.keys(this.assignedSkillTopicData).length
+      Object.keys(this.assignedSkillTopicData).length
     );
     return this.topicDropdownEnabled;
   }

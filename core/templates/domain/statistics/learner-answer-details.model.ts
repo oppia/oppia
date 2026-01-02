@@ -68,11 +68,11 @@ export class LearnerAnswerDetails {
     return this.learnerAnswerInfoData;
   }
 
-getLastUpdatedTime(): number {
-  const createdOnValues = this.learnerAnswerInfoData
-    .map(info => info.getCreatedOn())
-    .filter((value): value is number => value !== null);
+  getLastUpdatedTime(): number {
+    const createdOnValues = this.learnerAnswerInfoData
+      .map(info => info.getCreatedOn())
+      .filter((value): value is number => value !== null);
 
-  return createdOnValues.length > 0 ? Math.max(...createdOnValues) : 0;
-}
+    return createdOnValues.length > 0 ? Math.max(...createdOnValues) : 0;
+  }
 }

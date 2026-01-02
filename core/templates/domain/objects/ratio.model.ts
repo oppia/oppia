@@ -48,7 +48,8 @@ export class Ratio {
     var INVALID_RATIO_REGEX = /\d+[\.\/]{1,}\d*/g;
     if (INVALID_RATIO_REGEX.test(rawInput)) {
       throw new Error(
-        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS.NON_INTEGER_ELEMENTS
+        ObjectsDomainConstants.RATIO_PARSING_ERROR_I18N_KEYS
+          .NON_INTEGER_ELEMENTS
       );
     }
     // Checking for badly formatted ratio e.g. :2:3:4 or 2:3:4:.

@@ -27,16 +27,15 @@ import {StudyGuide} from './study-guide.model';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {StudyGuideSection} from './study-guide-sections.model';
 
-describe('Topic update service', ()=> {
+describe('Topic update service', () => {
   let topicUpdateService: TopicUpdateService;
-let undoRedoService!: UndoRedoService;
-let _sampleTopic!: Topic;
-let _firstSkillSummary!: ShortSkillSummary;
-let _secondSkillSummary!: ShortSkillSummary;
-let _thirdSkillSummary!: ShortSkillSummary;
-let _sampleSubtopicPage!: SubtopicPage;
-let _sampleStudyGuide!: StudyGuide;
-
+  let undoRedoService!: UndoRedoService;
+  let _sampleTopic!: Topic;
+  let _firstSkillSummary!: ShortSkillSummary;
+  let _secondSkillSummary!: ShortSkillSummary;
+  let _thirdSkillSummary!: ShortSkillSummary;
+  let _sampleSubtopicPage!: SubtopicPage;
+  let _sampleStudyGuide!: StudyGuide;
 
   let sampleTopicBackendObject = {
     topicDict: {
@@ -126,7 +125,6 @@ let _sampleStudyGuide!: StudyGuide;
   beforeEach(() => {
     topicUpdateService = TestBed.inject(TopicUpdateService);
     undoRedoService = TestBed.inject(UndoRedoService);
-
 
     _firstSkillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     _secondSkillSummary = ShortSkillSummary.create('skill_2', 'Description 2');
@@ -825,32 +823,32 @@ let _sampleStudyGuide!: StudyGuide;
       sampleTopicBackendObject.topicDict as unknown as TopicBackendDict,
       sampleTopicBackendObject.skillIdToDescriptionDict
     );
-let skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
-expect(skills.length).toEqual(3);
-expect(skills[0].getId()).toEqual('skill_id_1');
-expect(skills[1].getId()).toEqual('skill_id_2');
-expect(skills[2].getId()).toEqual('skill_id_3');
+    let skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
+    expect(skills.length).toEqual(3);
+    expect(skills[0].getId()).toEqual('skill_id_1');
+    expect(skills[1].getId()).toEqual('skill_id_2');
+    expect(skills[2].getId()).toEqual('skill_id_3');
 
-topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
-skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
-expect(skills[0].getId()).toEqual('skill_id_2');
-expect(skills[1].getId()).toEqual('skill_id_1');
-expect(skills[2].getId()).toEqual('skill_id_3');
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 1, 0);
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_2');
+    expect(skills[1].getId()).toEqual('skill_id_1');
+    expect(skills[2].getId()).toEqual('skill_id_3');
 
-topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
-skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
-expect(skills[0].getId()).toEqual('skill_id_2');
-expect(skills[1].getId()).toEqual('skill_id_3');
-expect(skills[2].getId()).toEqual('skill_id_1');
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 1);
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_2');
+    expect(skills[1].getId()).toEqual('skill_id_3');
+    expect(skills[2].getId()).toEqual('skill_id_1');
 
-topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
-skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
-expect(skills[0].getId()).toEqual('skill_id_1');
-expect(skills[1].getId()).toEqual('skill_id_2');
-expect(skills[2].getId()).toEqual('skill_id_3');
+    topicUpdateService.rearrangeSkillInSubtopic(_sampleTopic, 1, 2, 0);
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
+    expect(skills[0].getId()).toEqual('skill_id_1');
+    expect(skills[1].getId()).toEqual('skill_id_2');
+    expect(skills[2].getId()).toEqual('skill_id_3');
 
-undoRedoService.undoChange(_sampleTopic);
-skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
+    undoRedoService.undoChange(_sampleTopic);
+    skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     expect(skills[0].getId()).toEqual('skill_id_2');
     expect(skills[1].getId()).toEqual('skill_id_3');
     expect(skills[2].getId()).toEqual('skill_id_1');
@@ -1314,110 +1312,109 @@ skills = _sampleTopic.getSubtopicById(1)!.getSkillSummaries();
     }
   );
 
-it('should add and delete a study guide section', () => {
-  const newSampleSectionDict = {
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'new heading',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: 'new content',
-    },
-  };
-  const newSampleSection =
-    StudyGuideSection.createFromBackendDict(newSampleSectionDict);
+  it('should add and delete a study guide section', () => {
+    const newSampleSectionDict = {
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'new heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'new content',
+      },
+    };
+    const newSampleSection =
+      StudyGuideSection.createFromBackendDict(newSampleSectionDict);
 
-  let oldSections = _sampleStudyGuide.getSections();
-  expect(oldSections[0].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'heading 1',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: '<p>content 1</p>',
-    },
+    let oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
+
+    topicUpdateService.addSection(_sampleStudyGuide, newSampleSection, 1);
+
+    oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
+    expect(oldSections.length).toEqual(2);
+    expect(oldSections[1].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'new heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'new content',
+      },
+    });
+
+    topicUpdateService.deleteSection(_sampleStudyGuide, 1, 1);
+
+    oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
+    expect(oldSections.length).toEqual(1);
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
   });
+  it('should update a study guide section and undo the changes', () => {
+    let oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
 
-  topicUpdateService.addSection(_sampleStudyGuide, newSampleSection, 1);
+    topicUpdateService.updateSection(
+      _sampleStudyGuide,
+      0,
+      'updated heading',
+      'updated content',
+      1
+    );
 
-  oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
-  expect(oldSections.length).toEqual(2);
-  expect(oldSections[1].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'new heading',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: 'new content',
-    },
+    oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'updated heading',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: 'updated content',
+      },
+    });
+
+    undoRedoService.undoChange(_sampleStudyGuide);
+
+    oldSections = _sampleStudyGuide.getSections();
+    expect(oldSections[0].toBackendDict()).toEqual({
+      heading: {
+        content_id: 'section_heading_0',
+        unicode_str: 'heading 1',
+      },
+      content: {
+        content_id: 'section_content_1',
+        html: '<p>content 1</p>',
+      },
+    });
   });
-
-  topicUpdateService.deleteSection(_sampleStudyGuide, 1, 1);
-
-  oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
-  expect(oldSections.length).toEqual(1);
-  expect(oldSections[0].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'heading 1',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: '<p>content 1</p>',
-    },
-  });
-});
-it('should update a study guide section and undo the changes', () => {
-  let oldSections = _sampleStudyGuide.getSections();
-  expect(oldSections[0].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'heading 1',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: '<p>content 1</p>',
-    },
-  });
-
-  topicUpdateService.updateSection(
-    _sampleStudyGuide,
-    0,
-    'updated heading',
-    'updated content',
-    1
-  );
-
-  oldSections = _sampleStudyGuide.getSections(); // ✅ reassignment
-  expect(oldSections[0].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'updated heading',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: 'updated content',
-    },
-  });
-
-  undoRedoService.undoChange(_sampleStudyGuide);
-
-  oldSections = _sampleStudyGuide.getSections();
-  expect(oldSections[0].toBackendDict()).toEqual({
-    heading: {
-      content_id: 'section_heading_0',
-      unicode_str: 'heading 1',
-    },
-    content: {
-      content_id: 'section_content_1',
-      html: '<p>content 1</p>',
-    },
-  });
-});
-
 
   it("should set/unset changes to a subtopic page's page content", () => {
     var newSampleSubtitledHtmlDict = {

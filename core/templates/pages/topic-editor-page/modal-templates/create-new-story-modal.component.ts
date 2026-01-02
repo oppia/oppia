@@ -92,8 +92,8 @@ export class CreateNewStoryModalComponent extends ConfirmOrCancelModal {
   isValid(): boolean {
     return Boolean(
       this.story.isValid() &&
-        this.imageLocalStorageService.getStoredImagesData().length > 0 &&
-        !this.storyUrlFragmentExists
+      this.imageLocalStorageService.getStoredImagesData().length > 0 &&
+      !this.storyUrlFragmentExists
     );
   }
 }

@@ -21,14 +21,12 @@ import {
   Change,
   DomainObject,
 } from 'domain/editor/undo_redo/change.model';
-import { QuestionUndoRedoService } from
-  'domain/editor/undo_redo/question-undo-redo.service';
-import { QuestionDomainConstants } from
-  'domain/question/question-domain.constants';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import { Injectable } from '@angular/core';
-import { StateBackendDict } from 'domain/state/state.model';
-import { Question } from './question.model';
+import {Injectable} from '@angular/core';
+import {StateBackendDict} from 'domain/state/state.model';
+import {Question} from './question.model';
 
 interface ApplyParams {
   property_name: string;
@@ -41,9 +39,7 @@ interface ApplyParams {
   providedIn: 'root',
 })
 export class QuestionUpdateService {
-  constructor(
-    private questionUndoRedoService: QuestionUndoRedoService
-  ) {}
+  constructor(private questionUndoRedoService: QuestionUndoRedoService) {}
 
   _applyChange(
     question: Question,
@@ -128,8 +124,9 @@ export class QuestionUpdateService {
       oldLanguageCode,
       (changeDict: BackendChangeObject, domainObject: DomainObject) => {
         const questionObj = domainObject as Question;
-        const languageCode =
-          this._getNewPropertyValueFromChangeDict(changeDict) as string;
+        const languageCode = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string;
         questionObj.setLanguageCode(languageCode);
       },
       (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
@@ -143,20 +140,18 @@ export class QuestionUpdateService {
     question: Question,
     newInapplicableSkillMisconceptionIds: string[]
   ): void {
-    const oldIds = cloneDeep(
-      question.getInapplicableSkillMisconceptionIds()
-    );
+    const oldIds = cloneDeep(question.getInapplicableSkillMisconceptionIds());
 
     this._applyPropertyChange(
       question,
-      QuestionDomainConstants
-        .QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+      QuestionDomainConstants.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newInapplicableSkillMisconceptionIds,
       oldIds,
       (changeDict: BackendChangeObject, domainObject: DomainObject) => {
         const questionObj = domainObject as Question;
-        const ids =
-          this._getNewPropertyValueFromChangeDict(changeDict) as string[];
+        const ids = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as string[];
         questionObj.setInapplicableSkillMisconceptionIds(ids);
       },
       (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
@@ -166,10 +161,7 @@ export class QuestionUpdateService {
     );
   }
 
-  setQuestionNextContentIdIndex(
-    question: Question,
-    newValue: number
-  ): void {
+  setQuestionNextContentIdIndex(question: Question, newValue: number): void {
     const oldValue = question.getNextContentIdIndex();
 
     this._applyPropertyChange(
@@ -179,8 +171,9 @@ export class QuestionUpdateService {
       oldValue,
       (changeDict: BackendChangeObject, domainObject: DomainObject) => {
         const questionObj = domainObject as Question;
-        const value =
-          this._getNewPropertyValueFromChangeDict(changeDict) as number;
+        const value = this._getNewPropertyValueFromChangeDict(
+          changeDict
+        ) as number;
         questionObj.setNextContentIdIndex(value);
       },
       (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
@@ -190,10 +183,7 @@ export class QuestionUpdateService {
     );
   }
 
-  setQuestionStateData(
-    question: Question,
-    updateFunction: () => void
-  ): void {
+  setQuestionStateData(question: Question, updateFunction: () => void): void {
     const oldStateData = cloneDeep(question.getStateData());
 
     updateFunction();

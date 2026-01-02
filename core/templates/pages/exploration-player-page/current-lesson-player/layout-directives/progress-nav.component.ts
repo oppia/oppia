@@ -237,8 +237,8 @@ export class ProgressNavComponent {
 
     return Boolean(
       this.interactionIsInline &&
-        this.displayedCard.isCompleted() &&
-        this.displayedCard.getLastOppiaResponse()
+      this.displayedCard.isCompleted() &&
+      this.displayedCard.getLastOppiaResponse()
     );
   }
 

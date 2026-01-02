@@ -392,8 +392,8 @@ export class QuestionsListComponent implements OnInit, OnDestroy {
     if (!this.questionIsBeingUpdated) {
       return Boolean(
         questionIdValid &&
-          this.newQuestionSkillDifficulties &&
-          this.newQuestionSkillDifficulties.length
+        this.newQuestionSkillDifficulties &&
+        this.newQuestionSkillDifficulties.length
       );
     }
     return questionIdValid;

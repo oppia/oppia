@@ -23,17 +23,13 @@ import {
 } from '@angular/common/http/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 
-import {EditableExplorationBackendApiService} from
-  'domain/exploration/editable-exploration-backend-api.service';
-import {ReadOnlyExplorationBackendApiService} from
-  'domain/exploration/read-only-exploration-backend-api.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService:
-    EditableExplorationBackendApiService;
-  let readOnlyExplorationBackendApiService:
-    ReadOnlyExplorationBackendApiService;
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 

@@ -904,8 +904,7 @@ describe('Exploration editor page component', () => {
           language_code: 'fr',
         },
       ];
-      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
-        true;
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled = true;
       component.ngOnInit();
     });
 
@@ -1048,8 +1047,7 @@ describe('Exploration editor page component', () => {
           },
         },
       });
-      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled =
-        false;
+      mockPlatformFeatureService.status.ExplorationEditorCanModifyTranslations.isEnabled = false;
 
       expect(
         entityTranslationsService.languageCodeToLastPublishedEntityTranslations
@@ -1239,14 +1237,12 @@ describe('Exploration editor page component', () => {
 
       // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
-      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
-        false;
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled = false;
       expect(component.isVoiceoverTabEnabled()).toBeFalse();
 
       // Non curated exploration, when feature flag is enabled, must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
-      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
-        true;
+      mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled = true;
       expect(component.isVoiceoverTabEnabled()).toBeTrue();
     });
   });

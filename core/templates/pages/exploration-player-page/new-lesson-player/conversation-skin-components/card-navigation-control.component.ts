@@ -226,8 +226,8 @@ export class CardNavigationControlComponent {
 
     return Boolean(
       this.interactionIsInline &&
-        this.displayedCard.isCompleted() &&
-        this.displayedCard.getLastOppiaResponse()
+      this.displayedCard.isCompleted() &&
+      this.displayedCard.getLastOppiaResponse()
     );
   }
 

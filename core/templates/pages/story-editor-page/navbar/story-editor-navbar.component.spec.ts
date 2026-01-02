@@ -200,8 +200,7 @@ describe('Story editor navbar component', () => {
   it('should get status of Serial Chapter Launch Feature flag', () => {
     expect(component.isSerialChapterFeatureFlagEnabled()).toBeFalse();
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
-      true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
     expect(component.isSerialChapterFeatureFlagEnabled()).toBeTrue();
   });
 

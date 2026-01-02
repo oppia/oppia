@@ -203,10 +203,10 @@ export class ExplorationMetadataModalComponent
   isSavingAllowed(): boolean {
     return Boolean(
       this.explorationTitleService.displayed &&
-        this.explorationObjectiveService.displayed &&
-        this.explorationObjectiveService.displayed.length >= 15 &&
-        this.explorationCategoryService.displayed &&
-        this.explorationLanguageCodeService.displayed
+      this.explorationObjectiveService.displayed &&
+      this.explorationObjectiveService.displayed.length >= 15 &&
+      this.explorationCategoryService.displayed &&
+      this.explorationLanguageCodeService.displayed
     );
   }
 

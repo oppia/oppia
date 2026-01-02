@@ -166,12 +166,12 @@ export class StateEditorComponent implements OnInit, OnDestroy {
     this.interactionIdIsSet = Boolean(newInteractionId);
     this.currentInteractionCanHaveSolution = Boolean(
       this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
-          .can_have_solution
+      INTERACTION_SPECS[newInteractionId as InteractionSpecsKey]
+        .can_have_solution
     );
     this.currentStateIsTerminal = Boolean(
       this.interactionIdIsSet &&
-        INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
+      INTERACTION_SPECS[newInteractionId as InteractionSpecsKey].is_terminal
     );
   }
 

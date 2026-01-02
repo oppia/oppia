@@ -614,23 +614,19 @@ describe('Audio Bar Component', () => {
     spyOn(pageContextService, 'isInExplorationPlayerPage').and.returnValue(
       true
     );
-    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled =
-      true;
+    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled = true;
 
     expect(component.isAutoVoiceoversEnabled()).toEqual(true);
 
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValue(
       true
     );
-    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled =
-      false;
-    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled =
-      true;
+    mockPlatformFeatureService.status.ShowRegeneratedVoiceoversToLearners.isEnabled = false;
+    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled = true;
 
     expect(component.isAutoVoiceoversEnabled()).toEqual(true);
 
-    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled =
-      false;
+    mockPlatformFeatureService.status.AutomaticVoiceoverRegenerationFromExp.isEnabled = false;
 
     expect(component.isAutoVoiceoversEnabled()).toEqual(false);
   });

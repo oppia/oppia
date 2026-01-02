@@ -164,14 +164,12 @@ describe('Add Study Guide Section Modal Component', () => {
   });
 
   it('should check worked examples feature flag', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       true
     );
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       false
     );

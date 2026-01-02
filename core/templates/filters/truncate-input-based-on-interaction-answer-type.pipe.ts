@@ -26,9 +26,7 @@ type InteractionId = keyof typeof INTERACTION_SPECS;
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
 })
-export class TruncateInputBasedOnInteractionAnswerTypePipe
-  implements PipeTransform
-{
+export class TruncateInputBasedOnInteractionAnswerTypePipe implements PipeTransform {
   constructor(private truncatePipe: TruncatePipe) {}
 
   transform(
@@ -45,10 +43,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
 
     let actualInputToTruncate = '';
 
-    if (
-      answerType === 'NormalizedString' ||
-      answerType === 'CodeEvaluation'
-    ) {
+    if (answerType === 'NormalizedString' || answerType === 'CodeEvaluation') {
       if (
         typeof input === 'object' &&
         input !== null &&

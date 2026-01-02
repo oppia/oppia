@@ -20,7 +20,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
@@ -45,8 +45,7 @@ interface QuestionBackendDict {
 
 describe('Editable question backend API service', () => {
   let httpTestingController: HttpTestingController;
-  let editableQuestionBackendApiService:
-    EditableQuestionBackendApiService;
+  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
 
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
@@ -65,8 +64,8 @@ describe('Editable question backend API service', () => {
               unicode_str: '',
             },
           },
-          rows: { value: 1 },
-          catchMisspellings: { value: false },
+          rows: {value: 1},
+          catchMisspellings: {value: false},
         },
         default_outcome: null,
         hints: [],
@@ -99,13 +98,11 @@ describe('Editable question backend API service', () => {
   it('should fetch a question successfully', fakeAsync(() => {
     let result!: Question;
 
-editableQuestionBackendApiService
-  .fetchQuestionAsync('question_id')
-  .then((data: FetchQuestionResponse) => {
-    result = data.questionObject;
-  });
-
-
+    editableQuestionBackendApiService
+      .fetchQuestionAsync('question_id')
+      .then((data: FetchQuestionResponse) => {
+        result = data.questionObject;
+      });
 
     const req = httpTestingController.expectOne(
       '/question_editor_handler/data/question_id'
@@ -168,7 +165,7 @@ editableQuestionBackendApiService
     );
     expect(req.request.method).toBe('PUT');
 
-    req.flush({ status: 200 });
+    req.flush({status: 200});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();

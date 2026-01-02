@@ -20,12 +20,11 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
-import { EditableTopicBackendApiService } from
-  'domain/topic/editable-topic-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { TopicBackendDict } from 'domain/topic/topic-object.model';
+import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {TopicBackendDict} from 'domain/topic/topic-object.model';
 
 /* ---------------------- Backend response interfaces ---------------------- */
 
@@ -68,10 +67,10 @@ describe('Editable topic backend API service', () => {
       skill_ids_for_diagnostic_test: [],
       next_subtopic_id: 1,
       canonical_story_references: [
-        { story_id: 'story_1', story_is_published: true },
+        {story_id: 'story_1', story_is_published: true},
       ],
       additional_story_references: [
-        { story_id: 'story_2', story_is_published: true },
+        {story_id: 'story_2', story_is_published: true},
       ],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [],
@@ -80,7 +79,7 @@ describe('Editable topic backend API service', () => {
       page_title_fragment_for_web: 'topic page',
     },
     canonical_story_summary_dicts: [
-      { id: '0', title: 'Title', node_count: 1, story_is_published: false },
+      {id: '0', title: 'Title', node_count: 1, story_is_published: false},
     ],
     grouped_skill_summary_dicts: {},
     skill_id_to_description_dict: {
@@ -97,8 +96,8 @@ describe('Editable topic backend API service', () => {
       id: 'topicId-1',
       topicId: 'topicId',
       page_contents: {
-        subtitled_html: { html: '<p>Data</p>', content_id: 'content' },
-        recorded_voiceovers: { voiceovers_mapping: { content: {} } },
+        subtitled_html: {html: '<p>Data</p>', content_id: 'content'},
+        recorded_voiceovers: {voiceovers_mapping: {content: {}}},
       },
       language_code: 'en',
     },
@@ -134,92 +133,80 @@ describe('Editable topic backend API service', () => {
     );
     csrfService = TestBed.get(CsrfTokenService);
 
-    spyOn(csrfService, 'getTokenAsync')
-      .and.resolveTo('sample-csrf-token');
+    spyOn(csrfService, 'getTokenAsync').and.resolveTo('sample-csrf-token');
   });
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing topic from the backend',
-    fakeAsync(() => {
-      const successHandler = jasmine.createSpy('success');
-      const failHandler = jasmine.createSpy('fail');
+  it('should successfully fetch an existing topic from the backend', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const failHandler = jasmine.createSpy('fail');
 
-      editableTopicBackendApiService
-        .fetchTopicAsync('0')
-        .then(successHandler, failHandler);
+    editableTopicBackendApiService
+      .fetchTopicAsync('0')
+      .then(successHandler, failHandler);
 
-      const req = httpTestingController.expectOne(
-        '/topic_editor_handler/data/0'
-      );
-      expect(req.request.method).toBe('GET');
-      req.flush(sampleDataResults);
+    const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+    expect(req.request.method).toBe('GET');
+    req.flush(sampleDataResults);
 
-      flushMicrotasks();
+    flushMicrotasks();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    })
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
 
-  it('should update a topic after fetching it from the backend',
-    fakeAsync(() => {
-      let topic!: TopicBackendDict;
+  it('should update a topic after fetching it from the backend', fakeAsync(() => {
+    let topic!: TopicBackendDict;
 
-      editableTopicBackendApiService.fetchTopicAsync('0')
-.then((data: { topicDict: TopicBackendDict }) => {
-  topic = data.topicDict;
-});
-
-
-      const getReq = httpTestingController.expectOne(
-        '/topic_editor_handler/data/0'
-      );
-      getReq.flush(sampleDataResults);
-      flushMicrotasks();
-
-      topic.name = 'New Name';
-      topic.version = 2;
-
-      const successHandler = jasmine.createSpy('success');
-
-      editableTopicBackendApiService
-        .updateTopicAsync(topic.id, topic.version, 'Updated', [])
-        .then(successHandler);
-
-      const putReq = httpTestingController.expectOne(
-        '/topic_editor_handler/data/0'
-      );
-      expect(putReq.request.method).toBe('PUT');
-
-      putReq.flush({
-        topic_dict: topic,
-        skill_id_to_description_dict:
-          sampleDataResults.skill_id_to_description_dict,
-        skill_id_to_rubrics_dict:
-          sampleDataResults.skill_id_to_rubrics_dict,
+    editableTopicBackendApiService
+      .fetchTopicAsync('0')
+      .then((data: {topicDict: TopicBackendDict}) => {
+        topic = data.topicDict;
       });
 
-      flushMicrotasks();
-      expect(successHandler).toHaveBeenCalled();
-    })
-  );
+    const getReq = httpTestingController.expectOne(
+      '/topic_editor_handler/data/0'
+    );
+    getReq.flush(sampleDataResults);
+    flushMicrotasks();
+
+    topic.name = 'New Name';
+    topic.version = 2;
+
+    const successHandler = jasmine.createSpy('success');
+
+    editableTopicBackendApiService
+      .updateTopicAsync(topic.id, topic.version, 'Updated', [])
+      .then(successHandler);
+
+    const putReq = httpTestingController.expectOne(
+      '/topic_editor_handler/data/0'
+    );
+    expect(putReq.request.method).toBe('PUT');
+
+    putReq.flush({
+      topic_dict: topic,
+      skill_id_to_description_dict:
+        sampleDataResults.skill_id_to_description_dict,
+      skill_id_to_rubrics_dict: sampleDataResults.skill_id_to_rubrics_dict,
+    });
+
+    flushMicrotasks();
+    expect(successHandler).toHaveBeenCalled();
+  }));
 
   it('should sucessfully delete a topic', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
 
-    editableTopicBackendApiService
-      .deleteTopicAsync('0')
-      .then(successHandler);
+    editableTopicBackendApiService.deleteTopicAsync('0').then(successHandler);
 
-    const req = httpTestingController.expectOne(
-      '/topic_editor_handler/data/0'
-    );
+    const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
     expect(req.request.method).toBe('DELETE');
 
-    req.flush({ status: 200 });
+    req.flush({status: 200});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith(200);

@@ -17,14 +17,14 @@
  * backend.
  */
 
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
 
-import { QuestionBackendDict, Question } from 'domain/question/question.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
-import { SkillBackendDict } from 'domain/skill/skill.model';
-import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
+import {SkillBackendDict} from 'domain/skill/skill.model';
+import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -106,7 +106,7 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            successCallback({ questionId: response.question_id });
+            successCallback({questionId: response.question_id});
           },
           errorResponse => {
             errorCallback(errorResponse.error?.error);
@@ -121,11 +121,10 @@ export class EditableQuestionBackendApiService {
     errorCallback: (reason?: string) => void
   ): Promise<void> {
     return new Promise(() => {
-      const questionDataUrl =
-        this.urlInterpolationService.interpolateUrl(
-          QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-          { question_id: questionId }
-        );
+      const questionDataUrl = this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: questionId}
+      );
 
       this.http
         .get<FetchQuestionBackendResponse>(questionDataUrl)
@@ -135,9 +134,7 @@ export class EditableQuestionBackendApiService {
             const questionObject = Question.createFromBackendDict(
               response.question_dict
             );
-            const skillDicts = cloneDeep(
-              response.associated_skill_dicts ?? []
-            );
+            const skillDicts = cloneDeep(response.associated_skill_dicts ?? []);
 
             successCallback({
               questionObject,
@@ -163,7 +160,7 @@ export class EditableQuestionBackendApiService {
       const editableQuestionDataUrl =
         this.urlInterpolationService.interpolateUrl(
           QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-          { question_id: questionId }
+          {question_id: questionId}
         );
 
       const putData = {
@@ -200,7 +197,7 @@ export class EditableQuestionBackendApiService {
       const editQuestionSkillLinkUrl =
         this.urlInterpolationService.interpolateUrl(
           QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
-          { question_id: questionId }
+          {question_id: questionId}
         );
 
       this.http
@@ -238,9 +235,7 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  async fetchQuestionAsync(
-    questionId: string
-  ): Promise<FetchQuestionResponse> {
+  async fetchQuestionAsync(questionId: string): Promise<FetchQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionAsync(questionId, resolve, reject);
     });

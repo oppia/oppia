@@ -316,7 +316,8 @@ export class GoalsTabComponent implements OnInit {
     const allTopicSummarys: {[id: string]: LearnerTopicSummary} =
       this.editGoals.reduce(
         (obj: {[id: string]: LearnerTopicSummary}, item) => (
-          (obj[item.id] = item), obj
+          (obj[item.id] = item),
+          obj
         ),
         {} as {[id: string]: LearnerTopicSummary}
       );
