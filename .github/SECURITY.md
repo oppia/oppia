@@ -44,6 +44,7 @@ The tech lead will designate one VRT member as the VRT lead responsible for driv
   For example, suppose we improperly sanitized user-provided data at the models layer such that user-provided code could be executed, but validation checks at the controller layer prevented an attacker from actually exploiting the vulnerability. This would be a security vulnerability because we do not intend for the models layer to allow user-provided code to execute, but it would be low-severity because the controllers layer would prevent exploitation.
 
 - **High-severity vulnerability**: The report identifies an exploitable security vulnerability that, if exploited, could result in any of the following:
+
   - (Confidentiality) Unauthorized access to any sensitive data that shouldn't be made public. Here, "sensitive data" generally refers to both private user data, as well as information that could be used to gain access to private user data; if in doubt, consult the data owners.
   - (Integrity) Unauthorized edits to any data.
   - (Availability) Degraded system performance of the platform for users.
