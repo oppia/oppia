@@ -108,11 +108,11 @@ export class UserEmailPreferencesService {
       .saveChangeToBackendAsync(requestParams)
       .then((response: EmailPreferencesData) => {
         let data = response;
-        (this.alertsService.clearWarnings(),
+        this.alertsService.clearWarnings(),
           this.init(
             data.email_preferences.mute_feedback_notifications,
             data.email_preferences.mute_suggestion_notifications
-          ));
+          );
       });
   }
 }

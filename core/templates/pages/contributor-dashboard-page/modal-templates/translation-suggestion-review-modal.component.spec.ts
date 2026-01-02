@@ -431,7 +431,8 @@ describe('Translation Suggestion Review Modal Component', function () {
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
-      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled = true;
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        true;
     });
 
     it('should call user service at initialization.', function () {
@@ -784,7 +785,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
-      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled = true;
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        true;
       component.ngOnInit();
     });
   });
@@ -881,7 +883,8 @@ describe('Translation Suggestion Review Modal Component', function () {
         suggestionIdToContribution
       );
       component.editedContent = editedContent;
-      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled = false;
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        false;
     });
 
     it('should call user service at initialization.', function () {
@@ -1478,7 +1481,8 @@ describe('Translation Suggestion Review Modal Component', function () {
       component.suggestionIdToContribution = cloneDeep(
         suggestionIdToContribution
       );
-      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled = false;
+      mockPlatformFeatureService.status.CdAllowUndoingTranslationReview.isEnabled =
+        false;
       component.ngOnInit();
     });
 
