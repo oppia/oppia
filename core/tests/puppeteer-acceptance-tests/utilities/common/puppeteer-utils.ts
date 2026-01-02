@@ -629,7 +629,7 @@ export class BaseUser {
         (await matOptionElement.evaluate(el => el.textContent?.trim())) ===
         value
       ) {
-        await matOptionElement.click();
+        await this.clickOnElement(matOptionElement);
         break;
       }
     }
