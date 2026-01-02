@@ -478,8 +478,15 @@ export class BlogPostEditor extends BaseUser {
         (selector: string) => {
           const elements = document.querySelectorAll(selector);
           for (const element of elements) {
-            if ((element as HTMLElement).offsetParent !== null) {
-              return element;
+            const rect = element.getBoundingClientRect();
+            // We check for width and height to ensure the element is actually rendered and taking up space.
+            // We also check checkVisibility() if available (modern browsers) as a fallback/confirmation,
+            // but rect > 0 is usually sufficient for "rendered and not display:none".
+            if (rect.width > 0 && rect.height > 0) {
+              const style = window.getComputedStyle(element);
+              if (style.visibility !== 'hidden' && style.opacity !== '0') {
+                return element;
+              }
             }
           }
           return null;
