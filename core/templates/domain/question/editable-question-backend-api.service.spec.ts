@@ -20,14 +20,14 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
   FetchQuestionResponse,
 } from 'domain/question/editable-question-backend-api.service';
 
-import {Question} from 'domain/question/question.model';
+import { Question } from 'domain/question/question.model';
 
 /**
  * Local backend dict shape.
@@ -51,8 +51,10 @@ describe('Editable question backend API service', () => {
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
     question_state_data: {
+      param_changes: [],
       content: {
         html: '<p>Question</p>',
+        audio_translations: {},
       },
       interaction: {
         id: 'TextInput',
@@ -65,10 +67,11 @@ describe('Editable question backend API service', () => {
               unicode_str: '',
             },
           },
-          rows: {value: 1},
-          catchMisspellings: {value: false},
+          rows: { value: 1 },
+          catchMisspellings: { value: false },
         },
         default_outcome: null,
+        param_changes: [],
         hints: [],
         solution: null,
       },

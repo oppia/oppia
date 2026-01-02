@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableExplorationBackendApiService
+ * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
@@ -23,19 +23,14 @@ import {
 } from '@angular/common/http/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
-import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
+import {EditableExplorationBackendApiService} from
+  'domain/exploration/editable-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from
+  'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
-
-interface ExplorationBackendDict {
-  exploration_id: string;
-  init_state_name: string;
-  language_code: string;
-  states: Record<string, unknown>;
-  username: string;
-  user_email: string;
-  version: number;
-}
+import {
+  ExplorationBackendDict
+} from 'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
@@ -116,7 +111,7 @@ describe('EditableExplorationBackendApiService', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
-    expect(req.request.method).toEqual('GET');
+    expect(req.request.method).toBe('GET');
     req.flush(sampleDataResults);
 
     flushMicrotasks();
@@ -134,13 +129,15 @@ describe('EditableExplorationBackendApiService', () => {
       .then(successHandler, failHandler);
 
     const req = httpTestingController.expectOne('/createhandler/data/1');
-    const errorResponse = new HttpErrorResponse({
-      error: 'Error loading exploration 1',
-      status: 500,
-      statusText: 'Internal Server Error',
-    });
+    req.error(
+      new ErrorEvent('Error'),
+      new HttpErrorResponse({
+        error: 'Error loading exploration 1',
+        status: 500,
+        statusText: 'Internal Server Error',
+      })
+    );
 
-    req.error(new ErrorEvent('Error'), errorResponse);
     flushMicrotasks();
 
     expect(successHandler).not.toHaveBeenCalled();
@@ -148,22 +145,17 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should update exploration after fetch', fakeAsync(() => {
-    let exploration: ExplorationBackendDict | null = null;
+    let exploration!: ExplorationBackendDict;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
       .then(data => {
-        exploration = data as ExplorationBackendDict;
+        exploration = data;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     req.flush(sampleDataResults);
     flushMicrotasks();
-
-    if (!exploration) {
-      fail('Expected exploration to be defined');
-      return;
-    }
 
     exploration.version = 2;
 
@@ -177,36 +169,33 @@ describe('EditableExplorationBackendApiService', () => {
       .then(() => {});
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
-    expect(updateReq.request.method).toEqual('PUT');
+    expect(updateReq.request.method).toBe('PUT');
     updateReq.flush(exploration);
+
     flushMicrotasks();
   }));
 
   it('should delete exploration', fakeAsync(() => {
-    let exploration: ExplorationBackendDict | null = null;
+    let exploration!: ExplorationBackendDict;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
       .then(data => {
-        exploration = data as ExplorationBackendDict;
+        exploration = data;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     req.flush(sampleDataResults);
     flushMicrotasks();
 
-    if (!exploration) {
-      fail('Expected exploration to be defined');
-      return;
-    }
-
     editableExplorationBackendApiService
       .deleteExplorationAsync(exploration.exploration_id)
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
-    expect(deleteReq.request.method).toEqual('DELETE');
+    expect(deleteReq.request.method).toBe('DELETE');
     deleteReq.flush({});
+
     flushMicrotasks();
   }));
 });
