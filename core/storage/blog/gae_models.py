@@ -228,9 +228,9 @@ class BlogPostModel(base_models.BaseModel):
             cls.get_all().filter(cls.author_id == user_id).fetch()
         )
         for blog_post_model in blog_post_models:
-            published_on = (  
-            utils.get_time_in_millisecs(blog_post_model.published_on)  
-            if blog_post_model.published_on is not None else None)  
+            published_on = (
+            utils.get_time_in_millisecs(blog_post_model.published_on)
+            if blog_post_model.published_on is not None else None)
             user_data[blog_post_model.id] = {
                 'title': blog_post_model.title,
                 'content': blog_post_model.content,
