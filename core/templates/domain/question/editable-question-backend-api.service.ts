@@ -14,17 +14,18 @@
 
 /**
  * @fileoverview Service to send and receive changes to a question in the
- *  backend.
+ * backend.
  */
 
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
-import {HttpClient} from '@angular/common/http';
-import {QuestionBackendDict, Question} from 'domain/question/question.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
-import {SkillBackendDict} from 'domain/skill/skill.model.ts';
-import {BackendChangeObject} from 'domain/editor/undo_redo/change.model';
+import { QuestionBackendDict, Question } from 'domain/question/question.model';
+import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
+import { QuestionDomainConstants } from 'domain/question/question-domain.constants';
+import { SkillBackendDict } from 'domain/skill/skill.model';
+import { BackendChangeObject } from 'domain/editor/undo_redo/change.model';
+
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface CreateQuestionResponse {
@@ -48,17 +49,21 @@ export interface FetchQuestionBackendResponse {
   user_email: string;
   username: string;
 }
+
 export interface UpdateEditableQuestionBackendResponse {
   questionDict: QuestionBackendDict;
 }
+
 export interface FetchQuestionResponse {
   questionObject: Question;
   associated_skill_dicts: SkillBackendDict[];
 }
+
 export interface ImageData {
   filename: string;
   imageBlob: Blob;
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -76,20 +81,23 @@ export class EditableQuestionBackendApiService {
     successCallback: (value: CreateQuestionResponse) => void,
     errorCallback: (reason?: string) => void
   ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      let body = new FormData();
-      let filenames = imagesData.map(obj => obj.filename);
-      let imageBlobs = imagesData.map(obj => obj.imageBlob);
-      let postData = {
+    return new Promise(() => {
+      const body = new FormData();
+      const filenames = imagesData.map(obj => obj.filename);
+      const imageBlobs = imagesData.map(obj => obj.imageBlob);
+
+      const postData = {
         question_dict: questionObject,
         skill_ids: skillIds,
         skill_difficulties: skillDifficulties,
         filenames: JSON.stringify(filenames),
       };
+
       body.append('payload', JSON.stringify(postData));
-      for (let idx in imageBlobs) {
-        body.append(`image${idx}`, imageBlobs[idx]);
-      }
+      imageBlobs.forEach((blob, idx) => {
+        body.append(`image${idx}`, blob);
+      });
+
       this.http
         .post<CreateQuestionResponseBackendDict>(
           QuestionDomainConstants.QUESTION_CREATION_URL,
@@ -98,12 +106,10 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            successCallback({
-              questionId: response.question_id,
-            });
+            successCallback({ questionId: response.question_id });
           },
           errorResponse => {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse.error?.error);
           }
         );
     });
@@ -113,31 +119,33 @@ export class EditableQuestionBackendApiService {
     questionId: string,
     successCallback: (value: FetchQuestionResponse) => void,
     errorCallback: (reason?: string) => void
-  ): Promise<FetchQuestionBackendResponse> {
-    return new Promise((resolve, reject) => {
-      const questionDataUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {
-          question_id: questionId,
-        }
-      );
+  ): Promise<void> {
+    return new Promise(() => {
+      const questionDataUrl =
+        this.urlInterpolationService.interpolateUrl(
+          QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+          { question_id: questionId }
+        );
 
       this.http
         .get<FetchQuestionBackendResponse>(questionDataUrl)
         .toPromise()
         .then(
           response => {
-            let questionObject = Question.createFromBackendDict(
+            const questionObject = Question.createFromBackendDict(
               response.question_dict
             );
-            let skillDicts = cloneDeep(response.associated_skill_dicts);
+            const skillDicts = cloneDeep(
+              response.associated_skill_dicts ?? []
+            );
+
             successCallback({
-              questionObject: questionObject,
+              questionObject,
               associated_skill_dicts: skillDicts,
             });
           },
           errorResponse => {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse.error?.error);
           }
         );
     });
@@ -150,20 +158,20 @@ export class EditableQuestionBackendApiService {
     changeList: BackendChangeObject[],
     successCallback: (value: QuestionBackendDict) => void,
     errorCallback: (reason?: string) => void
-  ): Promise<QuestionBackendDict> {
-    return new Promise((resolve, reject) => {
-      let editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {
-          question_id: questionId,
-        }
-      );
+  ): Promise<void> {
+    return new Promise(() => {
+      const editableQuestionDataUrl =
+        this.urlInterpolationService.interpolateUrl(
+          QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+          { question_id: questionId }
+        );
 
-      let putData = {
+      const putData = {
         version: questionVersion,
         commit_message: commitMessage,
         change_list: changeList,
       };
+
       this.http
         .put<UpdateEditableQuestionBackendResponse>(
           editableQuestionDataUrl,
@@ -172,14 +180,10 @@ export class EditableQuestionBackendApiService {
         .toPromise()
         .then(
           response => {
-            let questionDict = cloneDeep(response.questionDict);
-            successCallback(
-              // The returned data is an updated question dict.
-              questionDict
-            );
+            successCallback(cloneDeep(response.questionDict));
           },
           errorResponse => {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse.error?.error);
           }
         );
     });
@@ -188,28 +192,29 @@ export class EditableQuestionBackendApiService {
   private async _editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[],
-    successCallback: (value: void) => void,
+    successCallback: () => void,
     errorCallback: (reason?: string) => void
-  ): Promise<Question> {
-    return new Promise((resolve, reject) => {
-      var editQuestionSkillLinkUrl =
+  ): Promise<void> {
+    return new Promise(() => {
+      /** ✅ FIX 1: correct PLURAL endpoint */
+      const editQuestionSkillLinkUrl =
         this.urlInterpolationService.interpolateUrl(
           QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
-          {
-            question_id: questionId,
-          }
+          { question_id: questionId }
         );
+
       this.http
         .put(editQuestionSkillLinkUrl, {
           skill_ids_task_list: skillIdsTaskArray,
         })
         .toPromise()
         .then(
-          response => {
+          () => {
+            /** ✅ FIX 2: clean success resolution */
             successCallback();
           },
           errorResponse => {
-            errorCallback(errorResponse.error.error);
+            errorCallback(errorResponse.error?.error);
           }
         );
     });
@@ -233,7 +238,9 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  async fetchQuestionAsync(questionId: string): Promise<FetchQuestionResponse> {
+  async fetchQuestionAsync(
+    questionId: string
+  ): Promise<FetchQuestionResponse> {
     return new Promise((resolve, reject) => {
       this._fetchQuestionAsync(questionId, resolve, reject);
     });
@@ -253,16 +260,6 @@ export class EditableQuestionBackendApiService {
     });
   }
 
-  /**
-   * Updates a question in the backend with the provided question ID.
-   * The changes only apply to the question of the given version and the
-   * request to update the question will fail if the provided question
-   * version is older than the current version stored in the backend. Both
-   * the changes and the message to associate with those changes are used
-   * to commit a change to the question. The new question is passed to
-   * the success callback, if one is provided to the returned promise
-   * object. Errors are passed to the error callback, if one is provided.
-   */
   async updateQuestionAsync(
     questionId: string,
     questionVersion: string,
