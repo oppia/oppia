@@ -21,12 +21,14 @@ import {
   Change,
   DomainObject,
 } from 'domain/editor/undo_redo/change.model';
-import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
+import { QuestionUndoRedoService } from
+  'domain/editor/undo_redo/question-undo-redo.service';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
-import {Injectable} from '@angular/core';
-import {StateBackendDict} from 'domain/state/state.model';
-import {Question} from './question.model';
+import { Injectable } from '@angular/core';
+import { StateBackendDict } from 'domain/state/state.model';
+import { Question } from './question.model';
 
 interface ApplyParams {
   property_name: string;
@@ -39,28 +41,29 @@ interface ApplyParams {
   providedIn: 'root',
 })
 export class QuestionUpdateService {
-  constructor(private questionUndoRedoService: QuestionUndoRedoService) {}
+  constructor(
+    private questionUndoRedoService: QuestionUndoRedoService
+  ) {}
 
   _applyChange(
     question: Question,
     command: string,
     params: ApplyParams | BackendChangeObject,
-    apply: Function,
-    reverse: Function
+    apply: (
+      backendChangeObject: BackendChangeObject,
+      domainObject: DomainObject
+    ) => void,
+    reverse: (
+      backendChangeObject: BackendChangeObject,
+      domainObject: DomainObject
+    ) => void
   ): void {
-    let changeDict = cloneDeep(params);
-    changeDict.cmd = command;
-    let changeObj = new Change(
-      changeDict as BackendChangeObject,
-      apply as (
-        backendChangeObject: BackendChangeObject,
-        domainObject: DomainObject
-      ) => void,
-      reverse as (
-        backendChangeObject: BackendChangeObject,
-        domainObject: DomainObject
-      ) => void
+    const changeDict: BackendChangeObject = cloneDeep(
+      params as BackendChangeObject
     );
+    changeDict.cmd = command as BackendChangeObject['cmd'];
+
+    const changeObj = new Change(changeDict, apply, reverse);
     this.questionUndoRedoService.applyChange(changeObj, question);
   }
 
@@ -69,8 +72,14 @@ export class QuestionUpdateService {
     propertyName: string,
     newValue: StateBackendDict | string | string[] | number,
     oldValue: StateBackendDict | string | string[] | number,
-    apply: Function,
-    reverse: Function
+    apply: (
+      backendChangeObject: BackendChangeObject,
+      domainObject: DomainObject
+    ) => void,
+    reverse: (
+      backendChangeObject: BackendChangeObject,
+      domainObject: DomainObject
+    ) => void
   ): void {
     this._applyChange(
       question,
@@ -89,13 +98,16 @@ export class QuestionUpdateService {
   _getParameterFromChangeDict(
     changeDict: BackendChangeObject,
     paramName: string
-  ): string | string[] {
-    return changeDict[paramName];
+  ): string | string[] | number {
+    return (changeDict as unknown as Record<string, unknown>)[paramName] as
+      | string
+      | string[]
+      | number;
   }
 
   _getNewPropertyValueFromChangeDict(
     changeDict: BackendChangeObject
-  ): string | string[] {
+  ): string | string[] | number {
     return this._getParameterFromChangeDict(changeDict, 'new_value');
   }
 
@@ -103,26 +115,26 @@ export class QuestionUpdateService {
     setA: Set<string>,
     setB: Set<string>
   ): string[] {
-    let diffList = Array.from(setA).filter(element => {
-      return !setB.has(element);
-    });
-    return diffList;
+    return Array.from(setA).filter(element => !setB.has(element));
   }
 
   setQuestionLanguageCode(question: Question, newLanguageCode: string): void {
-    let oldLanguageCode = cloneDeep(question.getLanguageCode());
+    const oldLanguageCode = cloneDeep(question.getLanguageCode());
+
     this._applyPropertyChange(
       question,
       QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE,
       newLanguageCode,
       oldLanguageCode,
-      (changeDict: BackendChangeObject, question: Question) => {
+      (changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
         const languageCode =
-          this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setLanguageCode(languageCode as string);
+          this._getNewPropertyValueFromChangeDict(changeDict) as string;
+        questionObj.setLanguageCode(languageCode);
       },
-      (changeDict: BackendChangeObject, question: Question) => {
-        question.setLanguageCode(oldLanguageCode);
+      (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        questionObj.setLanguageCode(oldLanguageCode);
       }
     );
   }
@@ -131,73 +143,73 @@ export class QuestionUpdateService {
     question: Question,
     newInapplicableSkillMisconceptionIds: string[]
   ): void {
-    let oldInapplicableSkillMisconceptionIds = cloneDeep(
+    const oldIds = cloneDeep(
       question.getInapplicableSkillMisconceptionIds()
     );
+
     this._applyPropertyChange(
       question,
-      QuestionDomainConstants.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+      QuestionDomainConstants
+        .QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newInapplicableSkillMisconceptionIds,
-      oldInapplicableSkillMisconceptionIds,
-      (changeDict: BackendChangeObject, question: Question) => {
-        const inapplicableSkillMisconceptionIds =
-          this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setInapplicableSkillMisconceptionIds(
-          inapplicableSkillMisconceptionIds as string[]
-        );
+      oldIds,
+      (changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        const ids =
+          this._getNewPropertyValueFromChangeDict(changeDict) as string[];
+        questionObj.setInapplicableSkillMisconceptionIds(ids);
       },
-      (changeDict: BackendChangeObject, question: Question) => {
-        question.setInapplicableSkillMisconceptionIds(
-          oldInapplicableSkillMisconceptionIds
-        );
+      (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        questionObj.setInapplicableSkillMisconceptionIds(oldIds);
       }
     );
   }
 
-  setQuestionNextContentIdIndex(question: Question, newValue: number): void {
-    var oldValue = question.getNextContentIdIndex();
+  setQuestionNextContentIdIndex(
+    question: Question,
+    newValue: number
+  ): void {
+    const oldValue = question.getNextContentIdIndex();
+
     this._applyPropertyChange(
       question,
       QuestionDomainConstants.QUESTION_PROPERTY_NEXT_CONTENT_ID_INDEX,
       newValue,
       oldValue,
-      (changeDict, question) => {
-        var newValue = this._getNewPropertyValueFromChangeDict(changeDict);
-        question.setNextContentIdIndex(newValue);
+      (changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        const value =
+          this._getNewPropertyValueFromChangeDict(changeDict) as number;
+        questionObj.setNextContentIdIndex(value);
       },
-      (changeDict, question) => {
-        question.setNextContentIdIndex(changeDict.old_value);
+      (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        questionObj.setNextContentIdIndex(oldValue);
       }
     );
   }
 
-  setQuestionStateData(question: Question, updateFunction: Function): void {
-    let oldStateData = cloneDeep(question.getStateData());
-    // We update the question here before making the change,
-    // so that we can obtain the new state to save to the backend via
-    // the change list.
-    //
-    // We diverge slightly from the other models of update services because
-    // a separate service (StateEditorService) is being used to update
-    // the question, and we can't retrieve the new state data without
-    // simultaneously updating it.
-    //
-    // The updating of the question in the client can't be deferred to
-    // when the change in the change list is applied, because we would
-    // have to defer the extraction of the new state data, which we need
-    // for creating the change to send to the backend.
+  setQuestionStateData(
+    question: Question,
+    updateFunction: () => void
+  ): void {
+    const oldStateData = cloneDeep(question.getStateData());
+
     updateFunction();
-    let newStateData = question.getStateData();
+    const newStateData = question.getStateData();
+
     this._applyPropertyChange(
       question,
       QuestionDomainConstants.QUESTION_PROPERTY_QUESTION_STATE_DATA,
       newStateData.toBackendDict(),
       oldStateData.toBackendDict(),
-      (changeDict: BackendChangeObject, question: Question) => {
-        // Unused (see comment above).
+      (_changeDict: BackendChangeObject, _domainObject: DomainObject) => {
+        // Intentionally unused.
       },
-      (changeDict: BackendChangeObject, question: Question) => {
-        question.setStateData(oldStateData);
+      (_changeDict: BackendChangeObject, domainObject: DomainObject) => {
+        const questionObj = domainObject as Question;
+        questionObj.setStateData(oldStateData);
       }
     );
   }

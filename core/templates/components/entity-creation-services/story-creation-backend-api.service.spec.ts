@@ -60,7 +60,7 @@ describe('Story Creation Backend Api Service', () => {
   }));
 
   beforeEach(async(() => {
-    let sampleTopicBackendObject = {
+    const sampleTopicBackendObject = {
       topicDict: {
         id: 'sample_topic_id',
         name: 'Topic name',

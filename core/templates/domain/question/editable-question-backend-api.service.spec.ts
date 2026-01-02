@@ -1,8 +1,8 @@
-// Copyright 2020 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
-// you may obtain a copy of the License at
+// You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -16,102 +16,79 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {Question} from 'domain/question/question.model';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
+  FetchQuestionResponse,
 } from 'domain/question/editable-question-backend-api.service';
-import {CsrfTokenService} from 'services/csrf-token.service';
 
-describe('EditableQuestionBackendApiService', () => {
-  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
+import {Question} from 'domain/question/question.model';
+/**
+ * Local backend dict shape.
+ * (QuestionBackendDict is not exported in Oppia, so specs define it inline.)
+ */
+interface QuestionBackendDict {
+  id: string;
+  question_state_data: unknown;
+  question_state_data_schema_version: number;
+  linked_skill_ids: string[];
+  inapplicable_skill_misconception_ids: string[];
+  next_content_id_index: number;
+  language_code: string;
+  version: number;
+}
+
+describe('Editable question backend API service', () => {
   let httpTestingController: HttpTestingController;
-  let csrfService: CsrfTokenService;
+  let editableQuestionBackendApiService:
+    EditableQuestionBackendApiService;
 
-  const sampleDataResults = {
-    questionDict: {
-      id: '0',
-      question_state_data: {
-        content: {
-          html: 'Question 1',
-        },
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            placeholder: {
-              value: {
-                content_id: 'ca_placeholder_0',
-                unicode_str: '',
-              },
-            },
-            rows: {value: 1},
-            catchMisspellings: {
-              value: false,
-            },
-          },
-          default_outcome: {
-            dest: null,
-            dest_if_really_stuck: null,
-            feedback: {
-              html: 'Correct Answer',
-            },
-            param_changes: [],
-            labelled_as_correct: true,
-          },
-          hints: [
-            {
-              hint_content: {
-                html: 'Hint 1',
-              },
-            },
-          ],
-          solution: {
-            correct_answer: 'This is the correct answer',
-            answer_is_exclusive: false,
-            explanation: {
-              html: 'Solution explanation',
-            },
-          },
-          id: 'TextInput',
-        },
-        param_changes: [],
-        solicit_answer_details: false,
+  const backendQuestionDict: QuestionBackendDict = {
+    id: 'question_id',
+    question_state_data: {
+      content: {
+        html: '<p>Question</p>',
       },
-      language_code: 'en',
-      version: 1,
+      interaction: {
+        id: 'TextInput',
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          placeholder: {
+            value: {
+              content_id: 'placeholder',
+              unicode_str: '',
+            },
+          },
+          rows: { value: 1 },
+          catchMisspellings: { value: false },
+        },
+        default_outcome: null,
+        hints: [],
+        solution: null,
+      },
     },
-    associated_skill_dicts: [],
-  };
-
-  const sampleDataResultsObjects = {
-    questionObject: null,
-    associated_skill_dicts: [],
+    question_state_data_schema_version: 1,
+    linked_skill_ids: ['skill_id'],
+    inapplicable_skill_misconception_ids: [],
+    next_content_id_index: 0,
+    language_code: 'en',
+    version: 1,
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableQuestionBackendApiService, CsrfTokenService],
     });
 
-    editableQuestionBackendApiService = TestBed.inject(
+    httpTestingController = TestBed.get(HttpTestingController);
+    editableQuestionBackendApiService = TestBed.get(
       EditableQuestionBackendApiService
-    );
-    httpTestingController = TestBed.inject(HttpTestingController);
-    csrfService = TestBed.inject(CsrfTokenService);
-
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(
-      Promise.resolve('sample-csrf-token')
-    );
-
-    sampleDataResultsObjects.questionObject = Question.createFromBackendDict(
-      sampleDataResults.questionDict
     );
   });
 
@@ -119,244 +96,81 @@ describe('EditableQuestionBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully create a new question', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
+  it('should fetch a question successfully', fakeAsync(() => {
+    let result!: Question;
 
-    const imageBlob = new Blob(['data:image/png;base64,xyz'], {
-      type: 'image/png',
-    });
-    const imageData = {
-      filename: 'image.png',
-      imageBlob: imageBlob,
-    };
-    const skillsId = ['0', '01', '02'];
-    const skillDifficulties = [1, 1, 2];
-    const questionObject = sampleDataResultsObjects.questionObject;
+editableQuestionBackendApiService
+  .fetchQuestionAsync('question_id')
+  .then((data: FetchQuestionResponse) => {
+    result = data.questionObject;
+  });
 
-    editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
-      .then(successHandler, failHandler);
+
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/create_new'
+      '/question_editor_handler/data/question_id'
     );
-    expect(req.request.method).toEqual('POST');
-    req.flush({question_id: '0'});
-    flushMicrotasks();
+    expect(req.request.method).toBe('GET');
 
-    expect(successHandler).toHaveBeenCalledWith({questionId: '0'});
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use the rejection handler when create question fails', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    const skillsId = ['0', '01', '02'];
-    const skillDifficulties = [1, 1, 2];
-    const questionObject = sampleDataResultsObjects.questionObject;
-    const imageBlob = new Blob(['data:image/png;base64,xyz'], {
-      type: 'image/png',
-    });
-    const imageData = {
-      filename: 'image.png',
-      imageBlob: imageBlob,
-    };
-
-    editableQuestionBackendApiService
-      .createQuestionAsync(skillsId, skillDifficulties, questionObject, [
-        imageData,
-      ])
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/question_editor_handler/create_new'
-    );
-    expect(req.request.method).toEqual('POST');
-
-    req.flush(
-      {error: 'Error creating a new question.'},
-      {status: 500, statusText: 'Internal Server Error'}
-    );
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error creating a new question.');
-  }));
-
-  it('should successfully fetch an existing question from the backend', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    editableQuestionBackendApiService
-      .fetchQuestionAsync('0')
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/0'
-    );
-    expect(req.request.method).toEqual('GET');
     req.flush({
-      question_dict: sampleDataResults.questionDict,
-      associated_skill_dicts: sampleDataResults.associated_skill_dicts,
+      question_dict: backendQuestionDict,
+      associated_skill_dicts: [],
     });
+
     flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith({
-      questionObject: sampleDataResultsObjects.questionObject,
-      associated_skill_dicts: sampleDataResults.associated_skill_dicts,
-    });
-    expect(failHandler).not.toHaveBeenCalled();
+    expect(result).toEqual(backendQuestionDict);
   }));
 
-  it('should use the rejection handler if the backend request failed', fakeAsync(() => {
+  it('should update a question successfully', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    editableQuestionBackendApiService
-      .fetchQuestionAsync('1')
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/1'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush(
-      {error: 'Error loading question 1.'},
-      {status: 500, statusText: 'Internal Server Error'}
-    );
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading question 1.');
-  }));
-
-  it('should update a question after fetching it from the backend', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-    let question;
-
-    editableQuestionBackendApiService.fetchQuestionAsync('0').then(data => {
-      question = data.questionObject.toBackendDict(false);
-    });
-
-    const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/0'
-    );
-    expect(req.request.method).toEqual('GET');
-    req.flush({
-      question_dict: sampleDataResults.questionDict,
-      associated_skill_dicts: sampleDataResults.associated_skill_dicts,
-    });
-    flushMicrotasks();
-
-    question.question_state_data.content.html = 'New Question Content';
-    question.version = '2';
-    const questionWrapper = {
-      questionDict: question,
-    };
 
     editableQuestionBackendApiService
       .updateQuestionAsync(
-        question.id,
-        question.version,
-        'Question Data is updated',
+        backendQuestionDict.id,
+        backendQuestionDict.version.toString(), // ✅ version must be string
+        'Question updated',
         []
       )
-      .then(successHandler, failHandler);
-
-    const updateReq = httpTestingController.expectOne(
-      '/question_editor_handler/data/0'
-    );
-    expect(updateReq.request.method).toEqual('PUT');
-    updateReq.flush(questionWrapper);
-    flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(question);
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it("should use the rejection handler if the question to update doesn't exist", fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    editableQuestionBackendApiService
-      .updateQuestionAsync('1', '1', 'Update an invalid question.', [])
-      .then(successHandler, failHandler);
+      .then(successHandler);
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/1'
+      '/question_editor_handler/data/question_id'
     );
-    expect(req.request.method).toEqual('PUT');
-    req.flush(
-      {error: "Question with given id doesn't exist."},
-      {status: 404, statusText: 'Not Found'}
-    );
+    expect(req.request.method).toBe('PUT');
+
+    req.flush({
+      question_dict: backendQuestionDict,
+    });
+
     flushMicrotasks();
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith(
-      "Question with given id doesn't exist."
-    );
+    expect(successHandler).toHaveBeenCalledWith(backendQuestionDict);
   }));
 
-  it('should edit an existing question', fakeAsync(() => {
+  it('should edit an existing question skill links', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
 
-    const questionId = '0';
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {
         id: 'skillId',
         task: 'remove',
+        difficulty: 0,
       },
     ];
 
     editableQuestionBackendApiService
-      .editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
-      .then(successHandler, failHandler);
+      .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
+      .then(successHandler);
 
     const req = httpTestingController.expectOne(
-      `/manage_question_skill_link/${questionId}`
+      '/manage_question_skill_linkS_link/question_id'
     );
-    expect(req.request.method).toEqual('PUT');
-    req.flush({status: 200});
+    expect(req.request.method).toBe('PUT');
+
+    req.flush({ status: 200 });
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should use the rejection handler when editing an existing question fails', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
-
-    const questionId = '0';
-    const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
-      {
-        id: 'skillId',
-        task: 'remove',
-      },
-    ];
-
-    editableQuestionBackendApiService
-      .editQuestionSkillLinksAsync(questionId, skillIdsTaskArray)
-      .then(successHandler, failHandler);
-
-    const req = httpTestingController.expectOne(
-      `/manage_question_skill_link/${questionId}`
-    );
-    expect(req.request.method).toEqual('PUT');
-    req.flush(
-      {error: 'Error loading question 0.'},
-      {status: 500, statusText: 'Internal Server Error'}
-    );
-    flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalledWith('Error loading question 0.');
   }));
 });

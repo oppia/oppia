@@ -21,6 +21,8 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
+type InteractionId = keyof typeof INTERACTION_SPECS;
+
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
 })
@@ -34,31 +36,31 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: string,
     length: number
   ): string {
-    let answerType = INTERACTION_SPECS[interactionId].answer_type;
-    let actualInputToTruncate = '';
-    let inputUpdate;
-
-    // TODO(#15858): Update InteractionAnswer type and remove if block
-    // code in truncate-input-based-on-interaction-answer-type.pipe.ts file.
-
-    // As input variable can be of 19 types and
-    // there properties are also different
-    // we need to fix all InteractionAnswer properties.
-    // we can do this in later stage.
-    // For now i am using the if block logic to do the task.
-    // by doing so we don't need to change this in whole codebase.
-    if (typeof input !== 'object') {
-      inputUpdate = {
-        code: input,
-      };
-    } else {
-      inputUpdate = input;
+    if (!(interactionId in INTERACTION_SPECS)) {
+      throw new Error('Unknown interaction answer type');
     }
 
-    if (answerType === 'NormalizedString') {
-      actualInputToTruncate = inputUpdate.code;
-    } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = inputUpdate.code;
+    const answerType =
+      INTERACTION_SPECS[interactionId as InteractionId].answer_type;
+
+    let actualInputToTruncate = '';
+
+    if (
+      answerType === 'NormalizedString' ||
+      answerType === 'CodeEvaluation'
+    ) {
+      if (
+        typeof input === 'object' &&
+        input !== null &&
+        'code' in input &&
+        typeof (input as {code: string}).code === 'string'
+      ) {
+        actualInputToTruncate = (input as {code: string}).code;
+      } else if (typeof input === 'string') {
+        actualInputToTruncate = input;
+      } else {
+        throw new Error('Invalid input type for truncation');
+      }
     } else {
       throw new Error('Unknown interaction answer type');
     }
