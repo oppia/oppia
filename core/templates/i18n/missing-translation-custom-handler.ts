@@ -24,7 +24,9 @@ import {AppConstants} from 'app.constants';
 
 type DefaultTranslationsKey = keyof typeof AppConstants.DEFAULT_TRANSLATIONS;
 
-export class MissingTranslationCustomHandler implements MissingTranslationHandler {
+export class MissingTranslationCustomHandler
+  implements MissingTranslationHandler
+{
   handle(params: MissingTranslationHandlerParams): string {
     if (params.key in AppConstants.DEFAULT_TRANSLATIONS) {
       return AppConstants.DEFAULT_TRANSLATIONS[

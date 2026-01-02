@@ -1234,7 +1234,8 @@ describe('Translation Modal Component', () => {
           returnValue: '',
         } as BeforeUnloadEvent;
 
-        interface ComponentWithPrivateMembers extends TranslationModalComponent {
+        interface ComponentWithPrivateMembers
+          extends TranslationModalComponent {
           beforeUnloadHandler: (e: BeforeUnloadEvent) => string | undefined;
         }
 
