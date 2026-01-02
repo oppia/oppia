@@ -205,8 +205,8 @@ export class PlayerHeaderComponent {
 
     return Boolean(
       this.topicUrlFragment &&
-      this.classroomUrlFragment &&
-      this.storyUrlFragment
+        this.classroomUrlFragment &&
+        this.storyUrlFragment
     );
   }
 
