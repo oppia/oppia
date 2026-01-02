@@ -51,10 +51,10 @@ export class InteractiveCodeReplComponent
     code: string;
     output: string;
   } | null;
-  @Input() languageWithValue!: {value: string};
-  @Input() placeholderWithValue!: {value: string};
-  @Input() preCodeWithValue!: {value: string};
-  @Input() postCodeWithValue!: {value: string};
+  @Input() languageWithValue!: string;
+  @Input() placeholderWithValue!: string;
+  @Input() preCodeWithValue!: string;
+  @Input() postCodeWithValue!: string;
   @ViewChild(CodemirrorComponent) codeMirrorComponent!: CodemirrorComponent;
   componentSubscriptions = new Subscription();
   hasLoaded: boolean = true;
@@ -104,10 +104,10 @@ export class InteractiveCodeReplComponent
       this.interactionAttributesExtractorService.getValuesFromAttributes(
         'CodeRepl',
         {
-          languageWithValue: this.languageWithValue.value,
-          placeholderWithValue: this.placeholderWithValue.value,
-          preCodeWithValue: this.preCodeWithValue.value,
-          postCodeWithValue: this.postCodeWithValue.value,
+          languageWithValue: this.languageWithValue,
+          placeholderWithValue: this.placeholderWithValue,
+          preCodeWithValue: this.preCodeWithValue,
+          postCodeWithValue: this.postCodeWithValue,
         }
       ) as CodeReplCustomizationArgs;
 

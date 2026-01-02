@@ -31,6 +31,7 @@ import 'third-party-imports/skulpt.import';
 import {CodemirrorComponent} from '@ctrl/ngx-codemirror';
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
+import {CodeReplCustomizationArgs} from 'interactions/customization-args-defs';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('InteractiveCodeReplComponent', () => {
@@ -46,11 +47,11 @@ describe('InteractiveCodeReplComponent', () => {
       attributes: Record<string, string>
     ) {
       return {
-        language: attributes.languageWithValue,
-        placeholder: attributes.placeholderWithValue,
-        preCode: attributes.preCodeWithValue,
-        postCode: attributes.postCodeWithValue,
-      };
+        language: {value: attributes.languageWithValue},
+        placeholder: {value: attributes.placeholderWithValue},
+        preCode: {value: attributes.preCodeWithValue},
+        postCode: {value: attributes.postCodeWithValue},
+      } as CodeReplCustomizationArgs;
     }
   }
 
@@ -97,10 +98,10 @@ describe('InteractiveCodeReplComponent', () => {
     fixture = TestBed.createComponent(InteractiveCodeReplComponent);
     component = fixture.componentInstance;
     component.lastAnswer = null;
-    component.languageWithValue = {value: 'python'};
-    component.placeholderWithValue = {value: '# Type your code here.'};
-    component.preCodeWithValue = {value: '# precode'};
-    component.postCodeWithValue = {value: '# postcode'};
+    component.languageWithValue = 'python';
+    component.placeholderWithValue = '# Type your code here.';
+    component.preCodeWithValue = '# precode';
+    component.postCodeWithValue = '# postcode';
   });
 
   it('should set interaction as inactive when a new card is displayed', () => {
@@ -170,7 +171,7 @@ describe('InteractiveCodeReplComponent', () => {
   );
 
   it('should not display precode when user does not enter any characters', () => {
-    component.preCodeWithValue = {value: ' '};
+    component.preCodeWithValue = ' ';
 
     expect(component.preCode).toBeUndefined();
 
@@ -216,33 +217,37 @@ describe('InteractiveCodeReplComponent', () => {
     }).toThrowError('module test not found');
   });
 
-  it('should customize editor with editor options when the exploration player loads', () => {
-    let cm = {
-      replaceSelection: (spaces: string) => {
-        expect(spaces).toBe('  ');
-        expect(spaces.length).toBe(2);
-      },
-      getDoc: () => {
-        return {
-          setCursor: (pos: number) => {
-            expect(pos).toBe(2);
-          },
-          getCursor: (loc: string) => {
-            if (loc === 'head') {
-              return 2;
-            }
-          },
-        };
-      },
-      getOption: (opt: string) => {
-        if (opt === 'indentUnit') {
-          return 2;
-        }
-      },
-    } as unknown as CodeMirror.Editor;
+  it(
+    'should customize editor with editor options when the exploration player' +
+      ' loads',
+    () => {
+      let cm = {
+        replaceSelection: (spaces: string) => {
+          expect(spaces).toBe('  ');
+          expect(spaces.length).toBe(2);
+        },
+        getDoc: () => {
+          return {
+            setCursor: (pos: number) => {
+              expect(pos).toBe(2);
+            },
+            getCursor: (loc: string) => {
+              if (loc === 'head') {
+                return 2;
+              }
+            },
+          };
+        },
+        getOption: (opt: string) => {
+          if (opt === 'indentUnit') {
+            return 2;
+          }
+        },
+      } as unknown as CodeMirror.Editor;
 
-    component.editorOptions.extraKeys.Tab(cm);
-  });
+      component.editorOptions.extraKeys.Tab(cm);
+    }
+  );
 
   it('should run code and submit code when user submits code', fakeAsync(() => {
     spyOn(Sk, 'importMainWithBody').and.returnValue({});
