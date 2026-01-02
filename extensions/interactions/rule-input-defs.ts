@@ -219,7 +219,8 @@ export interface SetInputRuleInputs {
   x: TranslatableSetOfUnicodeString;
 }
 
-export interface TranslatableSetOfNormalizedString extends BaseTranslatableObject {
+export interface TranslatableSetOfNormalizedString
+  extends BaseTranslatableObject {
   normalizedStrSet: string[];
 }
 

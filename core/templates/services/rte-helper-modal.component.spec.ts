@@ -255,7 +255,8 @@ describe('RteHelperModalComponent', () => {
         component.customizationArgsForm.value
       );
       expect(component.isErrorMessageNonempty()).toBe(true);
-      component.customizationArgsForm.value[0].mathExpressionSvgIsBeingProcessed = false;
+      component.customizationArgsForm.value[0].mathExpressionSvgIsBeingProcessed =
+        false;
       component.onCustomizationArgsFormChange(
         component.customizationArgsForm.value
       );
@@ -577,13 +578,13 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'video'),
+      (component.componentId = 'video'),
         (component.attrsCustomizationArgsDict = {
           video_id: 'Ntcw0H0hwPU',
           start: 0,
           end: 10,
           autoplay: false,
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
     it('should disable save button and display error message', fakeAsync(() => {
@@ -699,11 +700,11 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'link'),
+      (component.componentId = 'link'),
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: 'oppia',
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -739,11 +740,11 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'link'),
+      (component.componentId = 'link'),
         (component.attrsCustomizationArgsDict = {
           url: 'oppia.org',
           text: ' ',
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -815,13 +816,13 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'video'),
+      (component.componentId = 'video'),
         (component.attrsCustomizationArgsDict = {
           video_id: 'Ntcw0H0hwPU',
           start: 0,
           end: 0,
           autoplay: false,
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -863,7 +864,7 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'tabs'),
+      (component.componentId = 'tabs'),
         (component.attrsCustomizationArgsDict = {
           tabs_contents: [
             {
@@ -875,7 +876,7 @@ describe('RteHelperModalComponent', () => {
               content: 'Content for Tab 2',
             },
           ],
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -913,11 +914,11 @@ describe('RteHelperModalComponent', () => {
       flush();
       component.customizationArgsForm.value[0][0].title =
         'asdfasdfasdfasdfasdfasdfasfdasfasdfasdfasdfasdfaszxcvzxcvzxcvzxdfgdsfgsdfgsdfgvbxcvbcvzxcvsdfsdafzxcvzxcvzxcvzxcvzxcvsdzfasdafzxcvzxcvzxcvdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfcom';
-      ((component.customizationArgsForm.value[0][1].content =
+      (component.customizationArgsForm.value[0][1].content =
         'Lorem ipsum dolor sit amet'),
         component.onCustomizationArgsFormChange(
           component.customizationArgsForm.value
-        ));
+        );
       expect(component.isErrorMessageNonempty()).toBe(true);
       flush();
     }));
@@ -951,11 +952,11 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'collapsible'),
+      (component.componentId = 'collapsible'),
         (component.attrsCustomizationArgsDict = {
           heading: 'Collapsible 1',
           content: 'Hello',
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
@@ -1001,11 +1002,11 @@ describe('RteHelperModalComponent', () => {
     beforeEach(() => {
       fixture = TestBed.createComponent(RteHelperModalComponent);
       component = fixture.componentInstance;
-      ((component.componentId = 'workedexample'),
+      (component.componentId = 'workedexample'),
         (component.attrsCustomizationArgsDict = {
           heading: 'sample question',
           content: 'sample answer',
-        }));
+        });
       component.customizationArgSpecs = customizationArgSpecs;
     });
 
