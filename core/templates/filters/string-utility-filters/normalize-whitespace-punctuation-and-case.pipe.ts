@@ -26,7 +26,9 @@ import {Injectable, Pipe, PipeTransform} from '@angular/core';
   providedIn: 'root',
 })
 @Pipe({name: 'normalizeWhitespacePunctuationAndCase'})
-export class NormalizeWhitespacePunctuationAndCasePipe implements PipeTransform {
+export class NormalizeWhitespacePunctuationAndCasePipe
+  implements PipeTransform
+{
   transform(input: string): string {
     let isAlphanumeric = function (character: string): boolean {
       return (
