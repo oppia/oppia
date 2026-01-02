@@ -27,13 +27,23 @@ import {EditableExplorationBackendApiService} from 'domain/exploration/editable-
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 
+interface ExplorationBackendDict {
+  exploration_id: string;
+  init_state_name: string;
+  language_code: string;
+  states: Record<string, unknown>;
+  username: string;
+  user_email: string;
+  version: number;
+}
+
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let _readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
-  let sampleDataResults: Record<string, unknown>;
+  let sampleDataResults: ExplorationBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -138,26 +148,30 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should update exploration after fetch', fakeAsync(() => {
-    let exploration: Record<string, unknown>;
+    let exploration: ExplorationBackendDict | null = null;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
-      .then((data: unknown) => {
-        exploration = data as Record<string, unknown>;
+      .then(data => {
+        exploration = data as ExplorationBackendDict;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     req.flush(sampleDataResults);
     flushMicrotasks();
 
-    (exploration as {title: string}).title = 'New Title';
-    (exploration as {version: string}).version = '2';
+    if (!exploration) {
+      fail('Expected exploration to be defined');
+      return;
+    }
+
+    exploration.version = 2;
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
-        (exploration as {exploration_id: string}).exploration_id,
-        (exploration as {version: string}).version,
-        (exploration as {title: string}).title,
+        exploration.exploration_id,
+        exploration.version,
+        'Updated exploration',
         []
       )
       .then(() => {});
@@ -169,22 +183,25 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should delete exploration', fakeAsync(() => {
-    let exploration: Record<string, unknown>;
+    let exploration: ExplorationBackendDict | null = null;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
-      .then((data: unknown) => {
-        exploration = data as Record<string, unknown>;
+      .then(data => {
+        exploration = data as ExplorationBackendDict;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     req.flush(sampleDataResults);
     flushMicrotasks();
 
+    if (!exploration) {
+      fail('Expected exploration to be defined');
+      return;
+    }
+
     editableExplorationBackendApiService
-      .deleteExplorationAsync(
-        (exploration as {exploration_id: string}).exploration_id
-      )
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
