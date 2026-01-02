@@ -73,7 +73,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   isValid(): boolean {
     return Boolean(
       this.newlyCreatedTopic.isValid() &&
-      this.imageLocalStorageService.getStoredImagesData().length > 0
+        this.imageLocalStorageService.getStoredImagesData().length > 0
     );
   }
 

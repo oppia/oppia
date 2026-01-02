@@ -86,7 +86,7 @@ describe('Skill editor main tab component', () => {
       skillEditorRoutingService,
       'navigateToQuestionsTab'
     ).and.callThrough();
-    (component.createQuestion(), expect(routingSpy).toHaveBeenCalled());
+    component.createQuestion(), expect(routingSpy).toHaveBeenCalled();
     let createQuestionEventSpyon = spyOn(
       skillEditorRoutingService,
       'creatingNewQuestion'
@@ -113,7 +113,7 @@ describe('Skill editor main tab component', () => {
         } as NgbModalRef;
       });
 
-      (component.createQuestion(), expect(modalSpy).toHaveBeenCalled());
+      component.createQuestion(), expect(modalSpy).toHaveBeenCalled();
     }
   );
 
@@ -129,7 +129,7 @@ describe('Skill editor main tab component', () => {
         } as NgbModalRef;
       });
 
-      (component.createQuestion(), expect(modalSpy).toHaveBeenCalled());
+      component.createQuestion(), expect(modalSpy).toHaveBeenCalled();
     }
   );
 

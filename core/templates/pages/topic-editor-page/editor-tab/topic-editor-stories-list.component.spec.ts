@@ -115,10 +115,12 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
     expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(false);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
     expect(component.isSerialChapterLaunchFeatureEnabled()).toEqual(true);
   });
 
@@ -136,7 +138,8 @@ describe('topicEditorStoriesList', () => {
   });
 
   it('should initialise component when list of stories is displayed', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
     component.ngOnInit();
     expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
       'title',
@@ -144,7 +147,8 @@ describe('topicEditorStoriesList', () => {
       'publication_status',
     ]);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
     component.ngOnInit();
     expect(component.STORY_TABLE_COLUMN_HEADINGS).toEqual([
       'title',

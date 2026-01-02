@@ -152,7 +152,8 @@ describe('Create New Chapter Modal Component', () => {
       'setStoryNodeThumbnailFilename'
     );
     let storyUpdateSpyStatus = spyOn(storyUpdateService, 'setStoryNodeStatus');
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
 
     component.addStoryNodeWithData();
 

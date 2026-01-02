@@ -544,7 +544,8 @@ describe('Home tab Component', () => {
       LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
     ];
 
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
 
     // Re-initialize component to trigger ngOnInit with the feature flag ON.
     component.ngOnInit();
@@ -697,7 +698,8 @@ describe('Home tab Component', () => {
       LearnerTopicSummary.createFromBackendDict(learnerTopicSummaryBackendDict),
     ];
 
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled = false;
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      false;
 
     // Re-initialize component to trigger ngOnInit with the feature flag OFF.
     component.ngOnInit();

@@ -105,7 +105,8 @@ describe('Create new skill modal', () => {
   });
 
   it('should get html schema when feature is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
     const result = componentInstance.getHtmlSchema();
     expect(result).toEqual({
       type: 'html',
@@ -116,12 +117,14 @@ describe('Create new skill modal', () => {
   });
 
   it('should check if EnableWorkedexamplesRteComponent feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
     expect(
       componentInstance.isEnableWorkedexamplesRteComponentFeatureEnabled()
     ).toBeTrue();
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
     expect(
       componentInstance.isEnableWorkedexamplesRteComponentFeatureEnabled()
     ).toBeFalse();

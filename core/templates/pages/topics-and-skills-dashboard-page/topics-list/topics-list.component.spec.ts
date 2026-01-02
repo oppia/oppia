@@ -149,19 +149,22 @@ describe('Topics List Component', () => {
   });
 
   it('should get status of Serial Chapter Launch Feature flag', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
     expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).toEqual(
       false
     );
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
     expect(componentInstance.isSerialChapterLaunchFeatureEnabled()).toEqual(
       true
     );
   });
 
   it('should get correct headings list based on feature flag', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      true;
     componentInstance.ngOnInit();
 
     expect(componentInstance.TOPIC_HEADINGS.length).toBe(8);
@@ -176,7 +179,8 @@ describe('Topics List Component', () => {
       'topic_status',
     ]);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled = false;
+    mockPlatformFeatureService.status.SerialChapterLaunchCurriculumAdminView.isEnabled =
+      false;
     componentInstance.ngOnInit();
 
     expect(componentInstance.TOPIC_HEADINGS.length).toBe(6);

@@ -237,7 +237,8 @@ describe('Study Guide Section editor component', () => {
   });
 
   it('should get content schema with ALL_COMPONENTS when feature is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
 
     const schema = component.getContentSchema();
 
@@ -251,12 +252,14 @@ describe('Study Guide Section editor component', () => {
   });
 
   it('should check if EnableWorkedExamplesRteComponent feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       true
     );
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       false
     );

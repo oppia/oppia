@@ -151,7 +151,8 @@ describe('Story Preview tab', () => {
   it('should get status of Serial Chapter Launch Learner Feature flag', () => {
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(false);
 
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled = true;
+    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+      true;
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toEqual(true);
   });
 
