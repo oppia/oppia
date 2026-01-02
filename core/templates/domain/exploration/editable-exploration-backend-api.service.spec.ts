@@ -25,8 +25,6 @@ import {HttpErrorResponse} from '@angular/common/http';
 
 import {EditableExplorationBackendApiService} from
   'domain/exploration/editable-exploration-backend-api.service';
-import {ReadOnlyExplorationBackendApiService} from
-  'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {
   ExplorationBackendDict
@@ -34,7 +32,6 @@ import {
 
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
-  let _readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -45,16 +42,12 @@ describe('EditableExplorationBackendApiService', () => {
       imports: [HttpClientTestingModule],
       providers: [
         EditableExplorationBackendApiService,
-        ReadOnlyExplorationBackendApiService,
         CsrfTokenService,
       ],
     });
 
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
-    );
-    _readOnlyExplorationBackendApiService = TestBed.inject(
-      ReadOnlyExplorationBackendApiService
     );
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -72,7 +65,6 @@ describe('EditableExplorationBackendApiService', () => {
           param_changes: [],
           content: {
             html: '',
-            audio_translations: {},
           },
           unresolved_answers: {},
           interaction: {
@@ -152,15 +144,13 @@ describe('EditableExplorationBackendApiService', () => {
         exploration = data;
       });
 
-    const req = httpTestingController.expectOne('/createhandler/data/0');
-    req.flush(sampleDataResults);
+    const fetchReq = httpTestingController.expectOne('/createhandler/data/0');
+    fetchReq.flush(sampleDataResults);
     flushMicrotasks();
-
-    exploration.version = 2;
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
-        exploration.id,
+        exploration.exploration_id,
         exploration.version,
         'Updated exploration',
         []
@@ -183,12 +173,12 @@ describe('EditableExplorationBackendApiService', () => {
         exploration = data;
       });
 
-    const req = httpTestingController.expectOne('/createhandler/data/0');
-    req.flush(sampleDataResults);
+    const fetchReq = httpTestingController.expectOne('/createhandler/data/0');
+    fetchReq.flush(sampleDataResults);
     flushMicrotasks();
 
     editableExplorationBackendApiService
-      .deleteExplorationAsync(exploration.id)
+      .deleteExplorationAsync(exploration.exploration_id)
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
