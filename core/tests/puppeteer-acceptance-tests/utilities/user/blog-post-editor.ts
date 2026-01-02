@@ -112,6 +112,9 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateUserBioInRegisterModal(bio: string): Promise<void> {
     await this.expectElementToBeVisible(blogAuthorBioField);
+    await this.page.evaluate((selector: string) => {
+      document.querySelector(selector)?.scrollIntoView({block: 'center'});
+    }, blogAuthorBioField);
     await this.clearAllTextFrom(blogAuthorBioField);
     await this.typeInInputField(blogAuthorBioField, bio);
     await this.expectElementValueToBe(blogAuthorBioField, bio);
@@ -124,6 +127,9 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameInputSelector);
+    await this.page.evaluate((selector: string) => {
+      document.querySelector(selector)?.scrollIntoView({block: 'center'});
+    }, usernameInputSelector);
     await this.clearAllTextFrom(usernameInputSelector);
     await this.typeInInputField(usernameInputSelector, username);
     await this.expectElementValueToBe(usernameInputSelector, username);
@@ -463,6 +469,12 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(imagePath);
+      await this.page.evaluate((selector: string) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          element.scrollIntoView({block: 'center'});
+        }
+      }, addThumbnailImageButton);
       await this.clickOnElementWithSelector(addThumbnailImageButton);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
