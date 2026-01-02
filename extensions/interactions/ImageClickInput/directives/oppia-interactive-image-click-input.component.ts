@@ -224,12 +224,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   loadImage(): void {
     this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
       (objectUrl: string | SafeResourceUrl | null) => {
-        if (objectUrl === null) {
-          return;
+        if (objectUrl !== null) {
+          this.isTryAgainShown = false;
+          this.isLoadingIndicatorShown = false;
+          this.imageUrl = objectUrl as string;
         }
-        this.isTryAgainShown = false;
-        this.isLoadingIndicatorShown = false;
-        this.imageUrl = objectUrl as string;
       },
       () => {
         this.isTryAgainShown = true;
@@ -294,29 +293,22 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
     );
-
-    if (images.length === 0 || this.lastAnswer === null) {
-      return {left: 0, top: 0};
-    }
-
     const image: HTMLImageElement = images[0];
-    if (image.parentElement === null) {
-      return {left: 0, top: 0};
+    if (this.lastAnswer && image.parentElement) {
+      const left =
+        this.lastAnswer.clickPosition[0] * image.width +
+        image.getBoundingClientRect().left -
+        image.parentElement.getBoundingClientRect().left -
+        5;
+
+      const top =
+        this.lastAnswer.clickPosition[1] * image.height +
+        image.getBoundingClientRect().top -
+        image.parentElement.getBoundingClientRect().top -
+        5;
+      return {left, top};
     }
-
-    const left =
-      this.lastAnswer.clickPosition[0] * image.width +
-      image.getBoundingClientRect().left -
-      image.parentElement.getBoundingClientRect().left -
-      5;
-
-    const top =
-      this.lastAnswer.clickPosition[1] * image.height +
-      image.getBoundingClientRect().top -
-      image.parentElement.getBoundingClientRect().top -
-      5;
-
-    return {left, top};
+    return {left: 0, top: 0};
   }
 
   updateDotPosition(event: MouseEvent | KeyboardEvent): void {

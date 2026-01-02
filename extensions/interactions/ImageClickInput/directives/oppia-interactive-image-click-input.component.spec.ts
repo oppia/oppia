@@ -454,6 +454,49 @@ describe('InteractiveImageClickInput', () => {
     expect(component.getDotLocation()).toEqual({left: 95, top: 295});
   });
 
+  it('should return (0, 0) from getDotLocation when lastAnswer is null', () => {
+    component.lastAnswer = null;
+
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('oppia-image-click-img');
+
+    Object.defineProperty(component, 'el', {
+      value: {
+        nativeElement: {
+          querySelectorAll: () => [imageElement],
+        },
+      },
+    });
+
+    const result = component.getDotLocation();
+
+    expect(result).toEqual({left: 0, top: 0});
+  });
+
+  it('should return (0, 0) from getDotLocation when image parentElement is null', () => {
+    component.lastAnswer = {
+      clickPosition: [0.5, 0.5],
+      clickedRegions: [],
+    };
+
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('oppia-image-click-img');
+
+    expect(imageElement.parentElement).toBeNull();
+
+    Object.defineProperty(component, 'el', {
+      value: {
+        nativeElement: {
+          querySelectorAll: () => [imageElement],
+        },
+      },
+    });
+
+    const result = component.getDotLocation();
+
+    expect(result).toEqual({left: 0, top: 0});
+  });
+
   it('should check if mouse is over region when mouse moves', () => {
     spyOn(Element.prototype, 'querySelectorAll').and.callFake(
       jasmine.createSpy('querySelectorAll').and.returnValue([
