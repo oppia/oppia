@@ -84,7 +84,6 @@ describe('EditableExplorationBackendApiService', () => {
               dest_if_really_stuck: null,
               feedback: {
                 html: '',
-                audio_translations: {},
               },
             },
             confirmed_unclassified_answers: [],
@@ -161,7 +160,7 @@ describe('EditableExplorationBackendApiService', () => {
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
-        exploration.exploration_id,
+        exploration.id,
         exploration.version,
         'Updated exploration',
         []
@@ -189,7 +188,7 @@ describe('EditableExplorationBackendApiService', () => {
     flushMicrotasks();
 
     editableExplorationBackendApiService
-      .deleteExplorationAsync(exploration.exploration_id)
+      .deleteExplorationAsync(exploration.id)
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
