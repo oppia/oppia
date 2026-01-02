@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for the questions editor tab.
+ * @fileoverview Component for the questions editor tab
  */
 
 import {
@@ -51,14 +51,13 @@ import {GenerateContentIdService} from 'services/generate-content-id.service';
 })
 export class QuestionEditorComponent implements OnInit, OnDestroy {
   @Output() questionChange = new EventEmitter<void>();
-  // These properties below are initialized using Angular lifecycle hooks
-  // where we need to do non-null assertion. For more information see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
+
   @Input() userCanEditQuestion!: boolean;
   @Input() misconceptionsBySkill!: MisconceptionSkillMap;
   @Input() question!: Question;
   @Input() questionId!: string;
   @Input() questionStateData!: State;
+
   interactionIsShown!: boolean;
   oppiaBlackImgUrl!: string;
   stateEditorIsInitialized!: boolean;
@@ -118,7 +117,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     this._updateQuestion(() => {
       this.stateEditorService.setInteractionSolution(cloneDeep(displayedValue));
     });
-
     this.changeDetectionRef.detectChanges();
   }
 
@@ -146,7 +144,8 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     return 'Save Question';
   }
 
-  _updateQuestion(updateFunction: Function): void {
+  /** ✅ FIXED STRICT TYPE HERE */
+  _updateQuestion(updateFunction: () => void): void {
     this.questionChange.emit();
     this.questionUpdateService.setQuestionStateData(
       this.question,
@@ -155,8 +154,6 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
   }
 
   saveStateContent(displayedValue: SubtitledHtml): void {
-    // Show the interaction when the text content is saved, even if no
-    // content is entered.
     this._updateQuestion(() => {
       const stateData = this.question.getStateData();
       stateData.content = cloneDeep(displayedValue);
@@ -176,7 +173,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
 
     this.generateContentIdService.init(
       () => {
-        let indexToUse = this.nextContentIdIndexDisplayedValue;
+        const indexToUse = this.nextContentIdIndexDisplayedValue;
         this.nextContentIdIndexDisplayedValue += 1;
         return indexToUse;
       },
@@ -190,15 +187,14 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     if (outcome) {
       outcome.setDestination(null);
     }
-    if (stateData) {
-      this.stateEditorService.onStateEditorInitialized.emit(stateData);
 
-      if (stateData.content.html || stateData.interaction.id) {
-        this.interactionIsShown = true;
-      }
+    this.stateEditorService.onStateEditorInitialized.emit(stateData);
 
-      this.loaderService.hideLoadingScreen();
+    if (stateData.content.html || stateData.interaction.id) {
+      this.interactionIsShown = true;
     }
+
+    this.loaderService.hideLoadingScreen();
     this.stateEditorIsInitialized = true;
   }
 
@@ -224,10 +220,12 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     } else {
       this.editabilityService.markNotEditable();
     }
+
     this.stateEditorService.setActiveStateName('question');
     this.stateEditorService.setMisconceptionsBySkill(
       this.misconceptionsBySkill
     );
+
     this.oppiaBlackImgUrl =
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'

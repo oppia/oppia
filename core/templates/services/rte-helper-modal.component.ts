@@ -79,8 +79,7 @@ type CustomizationArgsNameAndValueArray = {
   [K in keyof ComponentSpecsType]: {
     // Extract the 'name' property from the customization_arg_specs array.
     name: ComponentSpecsType[K]['customization_arg_specs'][number]['name'];
-    value: // conditional type. // Check if the 'name' property is equal to 'math_content' using a
-    ComponentSpecsType[K]['customization_arg_specs'][number]['name'] extends 'math_content'
+    value: ComponentSpecsType[K]['customization_arg_specs'][number]['name'] extends 'math_content' // conditional type. // Check if the 'name' property is equal to 'math_content' using a
       ? ConvertStringLiteralsToString<
           ComponentSpecsType[K]['customization_arg_specs'][number]['default_value']
         > & {

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableExplorationBackendApiService.
+ * @fileoverview Unit tests for EditableExplorationBackendApiService
  */
 
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
@@ -29,11 +29,11 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 
 describe('EditableExplorationBackendApiService', () => {
   let editableExplorationBackendApiService: EditableExplorationBackendApiService;
-  let readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
+  let _readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
-  let sampleDataResults: any;
+  let sampleDataResults: Record<string, unknown>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -48,7 +48,7 @@ describe('EditableExplorationBackendApiService', () => {
     editableExplorationBackendApiService = TestBed.inject(
       EditableExplorationBackendApiService
     );
-    readOnlyExplorationBackendApiService = TestBed.inject(
+    _readOnlyExplorationBackendApiService = TestBed.inject(
       ReadOnlyExplorationBackendApiService
     );
     csrfService = TestBed.inject(CsrfTokenService);
@@ -125,7 +125,7 @@ describe('EditableExplorationBackendApiService', () => {
 
     const req = httpTestingController.expectOne('/createhandler/data/1');
     const errorResponse = new HttpErrorResponse({
-      error: 'Error loading exploration 1.',
+      error: 'Error loading exploration 1',
       status: 500,
       statusText: 'Internal Server Error',
     });
@@ -138,26 +138,26 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should update exploration after fetch', fakeAsync(() => {
-    let exploration: any;
+    let exploration: Record<string, unknown>;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
-      .then((data: any) => {
-        exploration = data;
+      .then((data: unknown) => {
+        exploration = data as Record<string, unknown>;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     req.flush(sampleDataResults);
     flushMicrotasks();
 
-    exploration.title = 'New Title';
-    exploration.version = '2';
+    (exploration as {title: string}).title = 'New Title';
+    (exploration as {version: string}).version = '2';
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
-        exploration.exploration_id,
-        exploration.version,
-        exploration.title,
+        (exploration as {exploration_id: string}).exploration_id,
+        (exploration as {version: string}).version,
+        (exploration as {title: string}).title,
         []
       )
       .then(() => {});
@@ -169,12 +169,12 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should delete exploration', fakeAsync(() => {
-    let exploration: any;
+    let exploration: Record<string, unknown>;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
-      .then((data: any) => {
-        exploration = data;
+      .then((data: unknown) => {
+        exploration = data as Record<string, unknown>;
       });
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
@@ -182,7 +182,9 @@ describe('EditableExplorationBackendApiService', () => {
     flushMicrotasks();
 
     editableExplorationBackendApiService
-      .deleteExplorationAsync(exploration.exploration_id)
+      .deleteExplorationAsync(
+        (exploration as {exploration_id: string}).exploration_id
+      )
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
