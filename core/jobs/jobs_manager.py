@@ -132,8 +132,8 @@ def run_job(
         # increasing parallelism may lead to rate-limiting issues.
         logging.info('Limiting the number of workers for job: %s' % job_name)
         additional_options = {
-            'max_num_workers': 5,
-            'autoscaling_algorithm': 'NONE',
+            'max_num_workers': 15,
+            'autoscaling_algorithm': 'THROUGHPUT_BASED',
         }
 
     if pipeline is None:

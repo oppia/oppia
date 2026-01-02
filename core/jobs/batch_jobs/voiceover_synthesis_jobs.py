@@ -73,8 +73,16 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
 
     def __init__(self, oppia_project_id: Optional[str] = None) -> None:
         super().__init__()
+        logging.info(
+            'Voiceover synthesis log: Initializing GenerateVoiceoversFn.'
+        )
         feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV = oppia_project_id
         self.oppia_project_id = oppia_project_id
+        logging.info(
+            'Voiceover synthesis log: Saved oppia_project_id to feconf: %s, %s',
+            oppia_project_id,
+            feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV,
+        )
 
     def process(
         self,
@@ -112,7 +120,10 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         """
         entity_id = combined_models[0]
 
-        logging.info('Generating voiceovers for exploration ID: %s', entity_id)
+        logging.info(
+            'Voiceover synthesis log: Generating voiceovers for exploration ID: %s',
+            entity_id,
+        )
         # Here we use cast because we are narrowing down the type of
         # exploration field in combined_models to Exploration model.
         exploration_model = cast(
@@ -143,7 +154,7 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         )
 
         logging.info(
-            'Completed generating voiceovers for exploration ID: %s',
+            'Voiceover synthesis log: Completed generating voiceovers for exploration ID: %s',
             entity_id,
         )
 
@@ -233,7 +244,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 exploration_model, False
             )
             logging.info(
-                'Converted exploration model to exploration domain object.'
+                'Voiceover synthesis log: Converted exploration model to exploration domain object.'
             )
 
             # Converting EntityTranslationsModels to domain objects.
@@ -244,7 +255,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     )
                 )
             logging.info(
-                'Converted entity translation models to '
+                'Voiceover synthesis log: Converted entity translation models to '
                 'entity translation domain objects.'
             )
 
@@ -258,7 +269,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     )
                 )
             logging.info(
-                'Converted entity voiceover models to '
+                'Voiceover synthesis log: Converted entity voiceover models to '
                 'entity voiceover domain objects.'
             )
 
@@ -355,7 +366,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     % entity_voiceovers_id
                 )
                 logging.info(
-                    'Generating voiceovers for Entityvoiceover with ID: %s.',
+                    'Voiceover synthesis log: Generating voiceovers for Entityvoiceover with ID: %s.',
                     entity_voiceovers_id,
                 )
 
@@ -403,7 +414,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             % content_id
                         )
                         logging.info(
-                            'Generated voiceover for content_id: %s.',
+                            'Voiceover synthesis log: Generated voiceover for content_id: %s.',
                             content_id,
                         )
                     except Exception as error:
@@ -432,7 +443,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                     )
                 )
                 logging.info(
-                    'Completed voiceover generation for entity ID: %s.'
+                    'Voiceover synthesis log: Completed voiceover generation for entity ID: %s.'
                     % entity_voiceovers_id
                 )
 
