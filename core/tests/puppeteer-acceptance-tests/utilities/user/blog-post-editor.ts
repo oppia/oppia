@@ -17,6 +17,7 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
+import {ElementHandle} from 'puppeteer';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {RTEEditor} from '../common/rte-editor';
@@ -469,13 +470,35 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(imagePath);
-      await this.page.evaluate((selector: string) => {
-        const element = document.querySelector(selector);
-        if (element) {
-          element.scrollIntoView({block: 'center'});
-        }
-      }, addThumbnailImageButton);
-      await this.clickOnElementWithSelector(addThumbnailImageButton);
+      // We search for all elements with the matching selector and click the one
+      // that is visible. This is necessary because there might be duplicate
+      // elements for mobile/desktop layouts, and waitForSelector might pick
+      // the hidden one and timeout/fail to click.
+      const buttonJSHandle = await this.page.waitForFunction(
+        (selector: string) => {
+          const elements = document.querySelectorAll(selector);
+          for (const element of elements) {
+            if ((element as HTMLElement).offsetParent !== null) {
+              return element;
+            }
+          }
+          return null;
+        },
+        {},
+        addThumbnailImageButton
+      );
+
+      const buttonElement =
+        buttonJSHandle.asElement() as ElementHandle<Element>;
+      if (!buttonElement) {
+        throw new Error('Visible Add Thumbnail button not found');
+      }
+
+      await this.page.evaluate((element: Element) => {
+        element.scrollIntoView({block: 'center'});
+      }, buttonElement);
+
+      await this.clickOnElement(buttonElement);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
