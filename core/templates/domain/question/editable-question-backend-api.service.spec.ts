@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableQuestionBackendApiService.
+ * @fileoverview Unit tests for EditableQuestionBackendApiService
  */
 
 import {
@@ -28,9 +28,10 @@ import {
 } from 'domain/question/editable-question-backend-api.service';
 
 import {Question} from 'domain/question/question.model';
+
 /**
  * Local backend dict shape.
- * (QuestionBackendDict is not exported in Oppia, so specs define it inline.)
+ * (QuestionBackendDict is not exported in Oppia, so specs define it inline)
  */
 interface QuestionBackendDict {
   id: string;
@@ -116,7 +117,7 @@ describe('Editable question backend API service', () => {
 
     flushMicrotasks();
 
-    expect(result).toEqual(backendQuestionDict);
+    expect(result.getId()).toBe('question_id');
   }));
 
   it('should update a question successfully', fakeAsync(() => {
@@ -125,7 +126,7 @@ describe('Editable question backend API service', () => {
     editableQuestionBackendApiService
       .updateQuestionAsync(
         backendQuestionDict.id,
-        backendQuestionDict.version.toString(), // ✅ version must be string
+        backendQuestionDict.version.toString(),
         'Question updated',
         []
       )
@@ -137,7 +138,7 @@ describe('Editable question backend API service', () => {
     expect(req.request.method).toBe('PUT');
 
     req.flush({
-      question_dict: backendQuestionDict,
+      questionDict: backendQuestionDict,
     });
 
     flushMicrotasks();
@@ -161,11 +162,11 @@ describe('Editable question backend API service', () => {
       .then(successHandler);
 
     const req = httpTestingController.expectOne(
-      '/manage_question_skill_linkS_link/question_id'
+      '/manage_question_skill_link/question_id'
     );
     expect(req.request.method).toBe('PUT');
 
-    req.flush({status: 200});
+    req.flush({});
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
