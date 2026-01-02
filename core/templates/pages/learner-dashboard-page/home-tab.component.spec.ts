@@ -55,6 +55,7 @@ describe('Home tab Component', () => {
   let topicsDataSpy: jasmine.Spy;
   let collectionsDataSpy: jasmine.Spy;
   let explorationsDataSpy: jasmine.Spy;
+  let loaderService: LoaderService;
 
   class MockPlatformFeatureService {
     status = {
@@ -93,6 +94,7 @@ describe('Home tab Component', () => {
     windowDimensionsService = TestBed.inject(WindowDimensionsService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    loaderService = TestBed.inject(LoaderService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService
     );
@@ -361,6 +363,12 @@ describe('Home tab Component', () => {
 
       result = component.isNonemptyObject({description: 'description'});
       expect(result).toBe(true);
+
+      result = component.isNonemptyObject(undefined);
+      expect(result).toBe(false);
+
+      result = component.isNonemptyObject(null);
+      expect(result).toBe(false);
     }
   );
 
@@ -390,7 +398,6 @@ describe('Home tab Component', () => {
       topicsDataSpy.and.returnValue(
         Promise.resolve({
           topicsToLearnList: goals,
-          // FIX: Pass goals here too so the component sees the limit is reached
           allTopicsList: goals,
           partiallyLearntTopicsList: [],
           untrackedTopics: {},
@@ -555,6 +562,44 @@ describe('Home tab Component', () => {
     flush(); // Resolve Timeout
 
     expect(component.getTotalInProgressLessons()).toBe(4);
+    discardPeriodicTasks();
+  }));
+
+  it('should handle error gracefully when fetching dashboard data fails', fakeAsync(() => {
+    // Force the backend API to fail
+    topicsDataSpy.and.returnValue(Promise.reject('Backend error'));
+
+    // Spy on console.error to check if it's called
+    spyOn(console, 'error');
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+
+    tick(); // Process the Promise rejection
+    tick(1000); // Process the setTimeout in the error block
+
+    // Verify the error was logged and the loader was still hidden
+    expect(console.error).toHaveBeenCalled();
+    expect(component.allCardsLoaded).toBe(true);
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
+
+    // Clean up
+    discardPeriodicTasks();
+  }));
+
+  it('should handle errors thrown inside the success block of dashboard data fetch', fakeAsync(() => {
+    // Return null to cause a crash when accessing properties
+    topicsDataSpy.and.returnValue(Promise.resolve(null));
+    spyOn(console, 'error');
+    const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
+
+    component.ngOnInit();
+    tick(); // Promise resolve
+    tick(1000); // setTimeout
+
+    expect(console.error).toHaveBeenCalled();
+    expect(component.allCardsLoaded).toBe(true);
+    expect(hideLoadingScreenSpy).toHaveBeenCalled();
     discardPeriodicTasks();
   }));
 
@@ -824,6 +869,87 @@ describe('Home tab Component', () => {
     ).toBe(true);
     discardPeriodicTasks();
   }));
+
+  it('should include lessons in playlist in total lesson card count when untracked topics exist and goal limit is not reached', fakeAsync(() => {
+    const untrackedTopicBackendDict = {
+      id: 'untracked_topic_id',
+      name: 'Untracked Topic',
+      language_code: 'en',
+      description: 'description',
+      version: 1,
+      story_titles: ['Story 1'],
+      total_published_node_count: 1,
+      thumbnail_filename: 'image.svg',
+      thumbnail_bg_color: '#C6DCDA',
+      classroom_name: 'math',
+      classroom_url_fragment: 'math',
+      practice_tab_is_displayed: false,
+      canonical_story_summary_dict: [],
+      url_fragment: 'untracked-topic',
+      subtopics: [],
+      degrees_of_mastery: {},
+      skill_descriptions: {},
+    };
+
+    const explorationDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: 'exp1',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      num_checkpoints: 0,
+      visited_checkpoint_count: 0,
+    };
+
+    topicsDataSpy.and.returnValue(
+      Promise.resolve({
+        topicsToLearnList: [],
+        allTopicsList: [],
+        partiallyLearntTopicsList: [],
+        untrackedTopics: {
+          math: [
+            LearnerTopicSummary.createFromBackendDict(
+              untrackedTopicBackendDict
+            ),
+          ],
+        },
+        completedStoriesList: [],
+        learntTopicsList: [],
+        completedToIncompleteStories: [],
+        learntToPartiallyLearntTopics: [],
+      })
+    );
+
+    explorationsDataSpy.and.returnValue(
+      Promise.resolve({
+        incompleteExplorationsList: [
+          LearnerExplorationSummary.createFromBackendDict(explorationDict),
+        ],
+        completedExplorationsList: [],
+        explorationPlaylist: [],
+      })
+    );
+
+    component.ngOnInit();
+    tick(); // Resolve Promise
+    fixture.detectChanges();
+    flush(); // Resolve Timeout
+
+    expect(component.totalLessonCards).toEqual(2);
+
+    discardPeriodicTasks();
+  }));
 });
 
 describe('Home tab Component Loader visibility tests', () => {
@@ -1050,7 +1176,6 @@ describe('Home tab Component Loader visibility tests', () => {
       tick();
       fixture.detectChanges();
       flush();
-
       expect(component.continueWhereYouLeftOffList.length).toEqual(1);
       discardPeriodicTasks();
     }));

@@ -30,6 +30,7 @@ import {LessonCardComponent} from './lesson-card.component';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {PlatformFeatureService} from '../../services/platform-feature.service';
 import {ChapterProgressLoaderService} from 'services/chapter-progress-loader.service';
+import {ChapterLabelVisibilityService} from 'services/chapter-label-visibility.service';
 
 import {CollectionSummary} from 'domain/collection/collection-summary.model';
 import {LearnerExplorationSummary} from 'domain/summary/learner-exploration-summary.model';
@@ -39,6 +40,7 @@ describe('LessonCardComponent', () => {
   let component: LessonCardComponent;
   let fixture: ComponentFixture<LessonCardComponent>;
   let chapterProgressLoaderService: jasmine.SpyObj<ChapterProgressLoaderService>;
+  let chapterLabelVisibilityService: jasmine.SpyObj<ChapterLabelVisibilityService>;
 
   const sampleCollection = {
     last_updated_msec: 1591296737470.528,
@@ -219,7 +221,7 @@ describe('LessonCardComponent', () => {
     all_node_dicts: [sampleNode, sampleNode2],
     topic_name: 'Topic',
     classroom_url_fragment: 'math',
-    topic_url_fragment: undefined,
+    topic_url_fragment: 'topic',
   };
 
   const multipleIncompleteNodesTopic = {
@@ -289,6 +291,11 @@ describe('LessonCardComponent', () => {
       ]
     );
 
+    const chapterLabelVisibilityServiceSpy = jasmine.createSpyObj(
+      'ChapterLabelVisibilityService',
+      ['isNewChapterLabelVisible']
+    );
+
     TestBed.configureTestingModule({
       imports: [FormsModule, HttpClientTestingModule],
       declarations: [LessonCardComponent, MockTranslatePipe],
@@ -302,12 +309,19 @@ describe('LessonCardComponent', () => {
           provide: ChapterProgressLoaderService,
           useValue: chapterProgressLoaderServiceSpy,
         },
+        {
+          provide: ChapterLabelVisibilityService,
+          useValue: chapterLabelVisibilityServiceSpy,
+        },
       ],
     }).compileComponents();
 
     chapterProgressLoaderService = TestBed.inject(
       ChapterProgressLoaderService
     ) as jasmine.SpyObj<ChapterProgressLoaderService>;
+    chapterLabelVisibilityService = TestBed.inject(
+      ChapterLabelVisibilityService
+    ) as jasmine.SpyObj<ChapterLabelVisibilityService>;
   }));
 
   beforeEach(() => {
@@ -383,6 +397,23 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 
+  it('should calculate progress correctly when exploration has checkpoints', fakeAsync(() => {
+    const explorationWithCheckpoints = {
+      ...sampleExploration,
+      num_checkpoints: 10,
+      visited_checkpoint_count: 5,
+    };
+
+    component.story = LearnerExplorationSummary.createFromBackendDict(
+      explorationWithCheckpoints
+    );
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(50);
+  }));
+
   it('should set story to complete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(100);
 
@@ -446,7 +477,11 @@ describe('LessonCardComponent', () => {
   }));
 
   it('should set story to StorySummary and not throw error for undefined topic_url_fragment', fakeAsync(() => {
-    component.story = StorySummary.createFromBackendDict(undefinedTopic);
+    // Create a story with a spy to force undefined topic_url_fragment
+    const story = StorySummary.createFromBackendDict(sampleTopic);
+    spyOn(story, 'getTopicUrlFragment').and.returnValue(undefined);
+
+    component.story = story;
     fixture.detectChanges();
     tick();
 
@@ -660,5 +695,26 @@ describe('LessonCardComponent', () => {
 
     expect(component.title).toBe('Chapter 2: Title 2');
     expect(component.progress).toBe(50);
+  }));
+
+  it('should check if new chapter label is visible', fakeAsync(() => {
+    chapterLabelVisibilityService.isNewChapterLabelVisible.and.returnValue(
+      true
+    );
+    component.story = StorySummary.createFromBackendDict(sampleTopic);
+    component.topic = sampleTopic.topic_name;
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.isNewChapterLabelVisible()).toBe(true);
+  }));
+
+  it('should not show new chapter label if story is not a StorySummary', fakeAsync(() => {
+    component.story = CollectionSummary.createFromBackendDict(sampleCollection);
+    fixture.detectChanges();
+    tick();
+
+    expect(component.isNewChapterLabelVisible()).toBe(false);
   }));
 });
