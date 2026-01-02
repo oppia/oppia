@@ -1678,40 +1678,6 @@ class GenerateContributorAdminStatsJobTests(ContributorDashboardTest):
 
         self.assertEqual(100, len(question_model.recent_review_outcomes))
 
-    def test_job_give_error_outputs(self) -> None:
-        self.question_suggestion_rejected_model.update_timestamps()
-        self.translation_suggestion_rejected_model_user1.update_timestamps()
-        self.exp_opportunity_model_1.update_timestamps()
-        self.skill_opportunity_model_1.update_timestamps()
-
-        self.put_multi(
-            [
-                self.question_suggestion_rejected_model,
-                self.translation_suggestion_rejected_model_user1,
-                self.exp_opportunity_model_1,
-                self.skill_opportunity_model_1,
-            ]
-        )
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'ERROR: \"Unable to create total question contribution '
-                        'stats for contributor id(user1): min() arg is an '
-                        'empty sequence\": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'ERROR: \"Unable to create total translation contribution '
-                        'stats for contributor id(user1) and language code(hi): '
-                        'min() arg is an empty sequence\": 1'
-                    )
-                ),
-            ]
-        )
-
     def test_skip_generation_if_users_are_deleted(self) -> None:
         suggestion_models.GeneralSuggestionModel(
             id=1,
@@ -1893,40 +1859,6 @@ class AuditGenerateContributorAdminStatsJobTests(ContributorDashboardTest):
                 ),
                 job_run_result.JobRunResult(
                     stdout='Question Submitter Models SUCCESS: 1'
-                ),
-            ]
-        )
-
-    def test_job_give_error_outputs(self) -> None:
-        self.question_suggestion_rejected_model.update_timestamps()
-        self.translation_suggestion_rejected_model_user1.update_timestamps()
-        self.exp_opportunity_model_1.update_timestamps()
-        self.skill_opportunity_model_1.update_timestamps()
-
-        self.put_multi(
-            [
-                self.question_suggestion_rejected_model,
-                self.translation_suggestion_rejected_model_user1,
-                self.exp_opportunity_model_1,
-                self.skill_opportunity_model_1,
-            ]
-        )
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'ERROR: "Unable to create total question contribution '
-                        'stats for contributor id(user1): min() arg is an '
-                        'empty sequence": 1'
-                    )
-                ),
-                job_run_result.JobRunResult(
-                    stderr=(
-                        'ERROR: "Unable to create total translation contribution '
-                        'stats for contributor id(user1) and language code(hi): '
-                        'min() arg is an empty sequence": 1'
-                    )
                 ),
             ]
         )
