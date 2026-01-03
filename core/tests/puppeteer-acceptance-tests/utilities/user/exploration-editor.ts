@@ -3125,30 +3125,16 @@ export class ExplorationEditor extends BaseUser {
    */
   async expectTitleToBe(expectedTitle: string): Promise<void> {
     await this.page.waitForSelector(explorationTitleSelector);
-    try {
-      await this.page.waitForFunction(
-        (selector: string, expected: string) => {
-          const element = document.querySelector(selector) as HTMLInputElement;
-          return element && element.value === expected;
-        },
-        {},
-        explorationTitleSelector,
-        expectedTitle
-      );
+    const titleInput = await this.page.$(explorationTitleSelector);
+    const currentTitle = await this.page.evaluate(
+      input => input.value,
+      titleInput
+    );
+
+    if (expectedTitle === currentTitle) {
       showMessage('Title matches the expected title.');
-    } catch (e) {
-      const titleInput = await this.page.$(explorationTitleSelector);
-      /* istanbul ignore next */
-      if (!titleInput) {
-        throw new Error('Title input element not found.');
-      }
-      const currentTitle = await this.page.evaluate(
-        input => input.value,
-        titleInput
-      );
-      throw new Error(
-        `Expected title to be "${expectedTitle}", but it was "${currentTitle}".`
-      );
+    } else {
+      throw new Error('Failed to update changes.');
     }
   }
 

@@ -3499,14 +3499,9 @@ export class LoggedInUser extends BaseUser {
       const submitButton = await this.page.$('.e2e-test-submit-answer-button');
 
       if (submitButton) {
-        const isSubmitVisible = await submitButton.evaluate(el => {
-          const rect = (el as HTMLElement).getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const style = window.getComputedStyle(el as HTMLElement);
-            return style.visibility !== 'hidden' && style.opacity !== '0';
-          }
-          return false;
-        });
+        const isSubmitVisible = await submitButton.evaluate(
+          el => (el as HTMLElement).offsetParent !== null
+        );
 
         if (isSubmitVisible) {
           // Try to input a simple answer if there's an input field.
@@ -3527,14 +3522,9 @@ export class LoggedInUser extends BaseUser {
       );
 
       if (continueButton) {
-        const isContinueVisible = await continueButton.evaluate(el => {
-          const rect = (el as HTMLElement).getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const style = window.getComputedStyle(el as HTMLElement);
-            return style.visibility !== 'hidden' && style.opacity !== '0';
-          }
-          return false;
-        });
+        const isContinueVisible = await continueButton.evaluate(
+          el => (el as HTMLElement).offsetParent !== null
+        );
 
         if (isContinueVisible) {
           await continueButton.click();

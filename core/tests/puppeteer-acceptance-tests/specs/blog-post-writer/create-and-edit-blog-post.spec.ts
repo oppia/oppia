@@ -23,7 +23,6 @@ import {UserFactory} from '../../utilities/common/user-factory';
 import {BlogPostEditor} from '../../utilities/user/blog-post-editor';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
-import {ElementHandle} from 'puppeteer';
 import testConstants, {FILEPATHS} from '../../utilities/common/test-constants';
 
 const ROLES = testConstants.Roles;
@@ -57,34 +56,9 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.expectFirstBlogPostButtonToBeVisible(true);
 
     // Click on "Create new blog post" button.
-    // We search for all elements with the text and click the one that is visible.
-    // This is necessary because there might be duplicate elements for mobile/desktop layouts,
-    // and waitForXPath might pick the hidden one and timeout.
-    const createButton = (await blogPostWriter.page.waitForFunction(
-      async (text: string) => {
-        const elements = document.evaluate(
-          `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-          document,
-          null,
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
-        );
-        for (let i = 0; i < elements.snapshotLength; i++) {
-          const element = elements.snapshotItem(i) as HTMLElement;
-          const rect = element.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const style = window.getComputedStyle(element);
-            if (style.visibility !== 'hidden' && style.opacity !== '0') {
-              return element;
-            }
-          }
-        }
-        return null;
-      },
-      {},
+    await blogPostWriter.clickOnElementWithText(
       LABELS.CREATE_NEW_BLOG_POST_BTN
-    )) as unknown as ElementHandle<Element>;
-    await createButton.click();
+    );
     await blogPostWriter.expectToBeOnBlogEditorPage();
 
     // Upload GIF format thumbnail image.
@@ -199,32 +173,9 @@ describe('Blog Post Writer', function () {
 
   it('should be able to publish a new blog post', async function () {
     // Create a new blog post.
-
-    const createButton = (await blogPostWriter.page.waitForFunction(
-      async (text: string) => {
-        const elements = document.evaluate(
-          `//*[contains(normalize-space(text()), normalize-space("${text}"))]`,
-          document,
-          null,
-          XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-          null
-        );
-        for (let i = 0; i < elements.snapshotLength; i++) {
-          const element = elements.snapshotItem(i) as HTMLElement;
-          const rect = element.getBoundingClientRect();
-          if (rect.width > 0 && rect.height > 0) {
-            const style = window.getComputedStyle(element);
-            if (style.visibility !== 'hidden' && style.opacity !== '0') {
-              return element;
-            }
-          }
-        }
-        return null;
-      },
-      {},
+    await blogPostWriter.clickOnElementWithText(
       LABELS.CREATE_NEW_BLOG_POST_BTN
-    )) as unknown as ElementHandle<Element>;
-    await createButton.click();
+    );
     await blogPostWriter.updateBlogPostTitle('Test Blog Post Title');
     await blogPostWriter.updateBodyTextTo('Test Blog Post Body');
     await blogPostWriter.saveBlogBodyChanges();

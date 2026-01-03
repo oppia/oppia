@@ -17,7 +17,6 @@
  */
 
 import {BaseUser} from '../common/puppeteer-utils';
-import {ElementHandle} from 'puppeteer';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
 import {RTEEditor} from '../common/rte-editor';
@@ -113,9 +112,6 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateUserBioInRegisterModal(bio: string): Promise<void> {
     await this.expectElementToBeVisible(blogAuthorBioField);
-    await this.page.evaluate((selector: string) => {
-      document.querySelector(selector)?.scrollIntoView({block: 'center'});
-    }, blogAuthorBioField);
     await this.clearAllTextFrom(blogAuthorBioField);
     await this.typeInInputField(blogAuthorBioField, bio);
     await this.expectElementValueToBe(blogAuthorBioField, bio);
@@ -128,9 +124,6 @@ export class BlogPostEditor extends BaseUser {
    */
   async updateUsernameInRegisterModal(username: string): Promise<void> {
     await this.expectElementToBeVisible(usernameInputSelector);
-    await this.page.evaluate((selector: string) => {
-      document.querySelector(selector)?.scrollIntoView({block: 'center'});
-    }, usernameInputSelector);
     await this.clearAllTextFrom(usernameInputSelector);
     await this.typeInInputField(usernameInputSelector, username);
     await this.expectElementValueToBe(usernameInputSelector, username);
@@ -320,11 +313,9 @@ export class BlogPostEditor extends BaseUser {
           'Expected pasted text to be present, but it was not found.'
         );
       }
-    } catch (error: unknown) {
+    } catch (error) {
       const newError = new Error(`Failed to verify pasted content: ${error}`);
-      if (error instanceof Error) {
-        newError.stack = error.stack;
-      }
+      newError.stack = error.stack;
       throw newError;
     }
   }
@@ -472,48 +463,7 @@ export class BlogPostEditor extends BaseUser {
   ): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.uploadFile(imagePath);
-      // We search for all elements with the matching selector and click the one
-      // that is visible. This is necessary because there might be duplicate
-      // elements for mobile/desktop layouts, and waitForSelector might pick
-      // the hidden one and timeout/fail to click.
-      const buttonJSHandle = await this.page.waitForFunction(
-        (selector: string) => {
-          const elements = document.querySelectorAll(selector);
-          for (const element of elements) {
-            const rect = element.getBoundingClientRect();
-            // We check for width and height to ensure the element is actually rendered and taking up space.
-            // We also check checkVisibility() if available (modern browsers) as a fallback/confirmation,
-            // but rect > 0 is usually sufficient for "rendered and not display:none".
-            if (rect.width > 0 && rect.height > 0) {
-              const style = window.getComputedStyle(element);
-              if (style.visibility !== 'hidden' && style.opacity !== '0') {
-                return element;
-              }
-            }
-          }
-          return null;
-        },
-        {},
-        addThumbnailImageButton
-      );
-
-      const buttonElement =
-        buttonJSHandle.asElement() as ElementHandle<Element>;
-      if (!buttonElement) {
-        throw new Error('Visible Add Thumbnail button not found');
-      }
-
-      await this.page.evaluate((element: Element) => {
-        element.scrollIntoView({block: 'center'});
-      }, buttonElement);
-
-      // We use a direct JS click here because Puppeteer's standard click checks (via clickOnElement)
-      // can fail if the element is partially obscured (e.g., by the footer) or if there are
-      // issues with calculating the clickable point on mobile. Since we have already verified
-      // the element's existence and visibility via getBoundingClientRect above, this is safe.
-      await this.page.evaluate((element: HTMLElement) => {
-        element.click();
-      }, buttonElement);
+      await this.clickOnElementWithSelector(addThumbnailImageButton);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
