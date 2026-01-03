@@ -377,6 +377,18 @@ URLS = [
         admin.RegenerateTopicSummariesHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.GENERATE_STUDY_GUIDE_MODELS_URL,
+        admin.GenerateStudyGuideModelsHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.DELETE_STUDY_GUIDE_MODELS_URL,
+        admin.DeleteStudyGuideModelsHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.VERIFY_STUDY_GUIDE_MODELS_URL,
+        admin.VerifyStudyGuideModelsHandler,
+    ),
+    get_redirect_route(
         r'/contributionrightshandler/<category>',
         contributor_dashboard_admin.ContributionRightsHandler,
     ),
@@ -590,15 +602,6 @@ URLS = [
     get_redirect_route(
         r'%s' % feconf.VOICEOVER_LANGUAGE_CODES_MAPPING_HANDLER_URL,
         voiceover.VoiceoverLanguageCodesMappingHandler,
-    ),
-    get_redirect_route(
-        r'%s' % feconf.VOICE_ARTIST_METADATA_HANDLER,
-        voiceover.VoiceArtistMetadataHandler,
-    ),
-    get_redirect_route(
-        r'%s/<voice_artist_id>/<language_code>'
-        % feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-        voiceover.GetSampleVoiceoversForGivenVoiceArtistHandler,
     ),
     get_redirect_route(
         r'/entity_voiceovers_bulk_handler/<entity_type>/<entity_id>/'
@@ -1364,6 +1367,13 @@ URLS = [
         '/learner_groups_feature_status_handler',
         learner_group.LearnerGroupsFeatureStatusHandler,
     ),
+    get_redirect_route(
+        r'/android_platform_parameters',
+        android.AndroidPlatformParametersHandler,
+    ),
+    get_redirect_route(
+        r'/android_feature_flags', android.AndroidFeatureFlagsHandler
+    ),
     get_redirect_route('/android_data', android.AndroidActivityHandler),
     get_redirect_route(
         '/automatic_voiceover_regeneration_record',
@@ -1597,7 +1607,7 @@ class NdbWsgiMiddleware:
         self, environ: Dict[str, str], start_response: webapp2.Response
     ) -> webapp2.Response:
         global_cache = datastore_services.RedisCache(
-            cache_services.CLOUD_NDB_REDIS_CLIENT
+            cache_services.get_cloud_ndb_redis_client()
         )
         with datastore_services.get_ndb_context(global_cache=global_cache):
             return self.wsgi_app(environ, start_response)
@@ -1605,4 +1615,8 @@ class NdbWsgiMiddleware:
 
 app_without_context = webapp2.WSGIApplication(URLS, debug=feconf.DEBUG)
 app = NdbWsgiMiddleware(app_without_context)
-firebase_auth_services.establish_firebase_connection()
+
+# Only establish Firebase connection when not running backend tests. This allows
+# test discovery and collection without requiring Google Cloud credentials.
+if 'pytest' not in __import__('sys').modules:
+    firebase_auth_services.establish_firebase_connection()

@@ -36,7 +36,7 @@
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
     <div class="oppia-base-container e2e-test-base-container"
-         [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+         [ngClass]="{'oppia-sidebar-menu-open e2e-test-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
          (swipeleft)="closeSidebarOnSwipe()">
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">
@@ -52,7 +52,7 @@
                                           [subheaderText]="getSubheaderText()">
                 </oppia-top-navigation-bar>
                 <div class="collapse d-lg-inline-flex navbar-collapse oppia-navbar-collapse ng-cloak navbar-options-display">
-                  <div [ngClass]="{'mr-auto': !isLanguageRTL(), 'ml-auto': isLanguageRTL()}">
+                  <div [ngClass]="{'me-auto': !isLanguageRTL(), 'ms-auto': isLanguageRTL()}">
                     <ng-content select="navbar-breadcrumb"></ng-content>
                   </div>
                   <ng-content select="nav-options"></ng-content>

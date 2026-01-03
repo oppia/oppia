@@ -434,7 +434,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         # Test successful update of thumbnail_filename when the thumbnail
         # is found in the filesystem.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -664,7 +664,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.story.update_thumbnail_filename('img.svg')
 
         # Save the dummy image to the filesystem to be used as thumbnail.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,

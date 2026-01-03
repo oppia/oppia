@@ -51,7 +51,7 @@
                      (focus)="toggleExplorationInputButtons()">
               <div class="save-button-container" *ngIf="explorationInputButtonsAreShown">
                 <span *ngIf="!isStoryPublished()" (click)="updateExplorationId(null)" class="fas fa-trash-alt list-summary"></span>
-                <button class="btn btn-default" (click)="toggleExplorationInputButtons()">Cancel</button>
+                <button class="btn btn-secondary" (click)="toggleExplorationInputButtons()">Cancel</button>
                 <button type="submit"
                         class="e2e-test-exploration-id-save-button btn btn-success btn-sm"
                         (click)="updateExplorationId(explorationId)"
@@ -91,13 +91,13 @@
         </div>
         <div *ngIf="mainChapterCardIsShown">
           <div *ngIf="!chapterPreviewCardIsShown">
-            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+            <button class="btn btn-secondary show-chapter-preview-button" (click)="togglePreview()">
               Preview Chapter Card
               <i class="fa fa-angle-down"></i>
             </button>
           </div>
           <div *ngIf="chapterPreviewCardIsShown">
-            <button class="btn btn-default show-chapter-preview-button" (click)="togglePreview()">
+            <button class="btn btn-secondary show-chapter-preview-button" (click)="togglePreview()">
               Collapse Chapter Card
               <i class="fa fa-angle-up"></i>
             </button>
@@ -128,16 +128,16 @@
           </div>
           <div class="chapter-card-inputs oppia-mobile-collapsible-card-content" *ngIf="chapterOutlineIsShown">
             Outline Finalized
-            <i *ngIf="!outlineIsFinalized" (click)="finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
+            <i *ngIf="!outlineIsFinalized" [class.disabled-icon]="!editableOutline || editableOutline.trim().length === 0" (click)="canFinalize() && finalizeOutline()" class="far fa-square md-18 e2e-test-finalize-outline" aria-label="Finalize outline"></i>
             <i *ngIf="outlineIsFinalized" (click)="unfinalizeOutline()" class="fas fa-check-square md-18" aria-label="Unfinalize outline"></i>
-            <div tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
+            <div class="e2e-test-chapter-outline-editor-container" tabindex="-1" (blur)="toggleChapterOutlineButtons()" (click)="toggleChapterOutlineButtons()">
               <schema-based-editor id="storyNodeOutline"
                                    [schema]="OUTLINE_SCHEMA"
                                    [localValue]="editableOutline"
                                    (localValueChange)="updateLocalEditableOutline($event)">
               </schema-based-editor>
               <div class="save-button-container" *ngIf="chapterOutlineButtonsAreShown">
-                <button class="btn btn-default">Cancel</button>
+                <button class="btn btn-secondary">Cancel</button>
                 <button type="button"
                         class="btn btn-success save-button e2e-test-node-outline-save-button"
                         [disabled]="!isOutlineModified(editableOutline)"
@@ -362,6 +362,11 @@
             <i class="fa fa-check todo-completed" *ngIf="plannedPublicationDate"></i>
             <span class="checklist-item-name">Planned Publication Date</span>
           </div>
+          <div class="todo-item-container">
+            <i class="fa fa-exclamation-triangle" *ngIf="!acquiredSkillIds || acquiredSkillIds.length === 0"></i>
+            <i class="fa fa-check todo-completed" *ngIf="acquiredSkillIds && acquiredSkillIds.length > 0"></i>
+            <span class="checklist-item-name">Acquired Skill</span>
+          </div>
         </div>
       </mat-card>
     </div>
@@ -452,6 +457,11 @@
     font-weight: bold;
     margin-top: 12px;
     text-align: left;
+  }
+  .disabled-icon {
+    cursor: not-allowed;
+    opacity: 0.4;
+    pointer-events: none;
   }
   .skill-header {
     border-bottom: 2px solid #000;

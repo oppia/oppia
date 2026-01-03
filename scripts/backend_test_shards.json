@@ -49,11 +49,11 @@
         "extensions.value_generators.models.generators_test",
         "core.controllers.admin_test",
         "core.controllers.android_test",
+        "core.controllers.android_platform_handlers_test",
         "core.jobs.batch_jobs.translation_migration_jobs_test",
         "core.controllers.release_coordinator_test",
         "core.platform.secrets.dev_mode_secrets_services_test",
         "scripts.generate_root_files_mapping_test",
-        "core.jobs.batch_jobs.delete_voiceover_models_data_job_test",
         "core.jobs.batch_jobs.dummy_jobs_test",
         "core.storage.cloud_task.gae_models_test",
         "core.domain.cloud_task_domain_test",
@@ -409,6 +409,7 @@
         "core.domain.voiceover_regeneration_services_test",
         "core.platform.speech_synthesis.azure_speech_synthesis_services_test",
         "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test",
-        "core.jobs.batch_jobs.populate_study_guide_models_jobs_test"
+        "core.jobs.batch_jobs.audit_topics_with_hanging_stories_job_test",
+        "conftest_test"
     ]
 }
