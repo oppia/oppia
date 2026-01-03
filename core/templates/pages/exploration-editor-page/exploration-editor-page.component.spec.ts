@@ -1231,23 +1231,14 @@ describe('Exploration editor page component', () => {
   });
 
   it('should show feedback prompt modal when there are open feedback threads', fakeAsync(() => {
-    // Reset previous calls to the global spy
     ngbModal.open.calls.reset();
-
-    // Set up conditions so modal should open
     (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
       false
     );
     (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
-
-    // Make sure the component thinks modals are allowed
     component.isModalOpenable = true;
-
-    // Run ngOnInit (sets up subscriptions)
     component.ngOnInit();
     tick();
-
-    // Directly trigger the private method that decides whether to show the modal
     (component as any).maybeShowFeedbackPromptModal();
 
     flush();
@@ -1287,17 +1278,12 @@ describe('Exploration editor page component', () => {
         'isExplorationLinkedToStory'
       );
 
-      // Curated exploration must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(true);
       expect(component.isVoiceoverTabEnabled()).toBeTrue();
-
-      // Non curated exploration, when feature flag is disabled, must not show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         false;
       expect(component.isVoiceoverTabEnabled()).toBeFalse();
-
-      // Non curated exploration, when feature flag is enabled, must show voiceover tab.
       isExplorationLinkedToStorySpy.and.returnValue(false);
       mockPlatformFeatureService.status.ShowVoiceoverTabForNonCuratedExplorations.isEnabled =
         true;
