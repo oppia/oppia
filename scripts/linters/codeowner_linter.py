@@ -65,6 +65,7 @@ CODEOWNER_IMPORTANT_PATHS: Final = [
     '/core/domain/user*.py',
     '/LICENSE',
     '/NOTICE',
+    '/README.md',
     '/core/templates/pages/terms-page/terms-page.component.html',
     '/core/templates/pages/privacy-page/privacy-page.component.html',
     '/core/templates/pages/license-page/license-page.component.html',
