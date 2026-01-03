@@ -18,8 +18,7 @@
 
 from __future__ import annotations
 
-from typing import MutableMapping, cast
-
+from typing import Any, Dict, cast
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -159,8 +158,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state.content.content_id = duplicate_id
         feedback = state_domain.SubtitledHtml(duplicate_id, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None, None)
-        answer_group = state_domain.AnswerGroup(outcome, [], [], None)
+            'Introduction', None, False, feedback, [], None, None)
+        answer_group = state_domain.AnswerGroup([], outcome, [], None)
         state.interaction.answer_groups.append(answer_group)
 
         exploration.next_content_id_index = (
@@ -218,9 +217,9 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state.content.content_id = duplicate_id
         state.interaction.solution = state_domain.Solution(
             'TextInput',
+            True,
             'answer',
             state_domain.SubtitledHtml(duplicate_id, '<p>explanation</p>'),
-            True,
             None
         )
 
@@ -259,8 +258,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state3.content.content_id = dup_id_2
         feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None, None)
-        answer_group = state_domain.AnswerGroup(outcome, [], [], None)
+            'Introduction', None, False, feedback, [], None, None)
+        answer_group = state_domain.AnswerGroup([], outcome, [], None)
         state1.interaction.answer_groups.append(answer_group)
 
         exploration.next_content_id_index = (
@@ -294,7 +293,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         state.content.content_id = duplicate_id
         placeholder_ca = state.interaction.customization_args.get('placeholder')
-        if placeholder_ca and hasattr(placeholder_ca.value, 'content_id'):
+        if placeholder_ca and isinstance(
+                placeholder_ca.value, state_domain.SubtitledUnicode):
             placeholder_ca.value.content_id = duplicate_id
 
         state2.content.content_id = duplicate_id
@@ -333,7 +333,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        # run job once via assert_job_output_is
+        # Run job once via assert_job_output_is
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 f'Fixed exploration exp_verify (version 1) - regenerated '
@@ -381,7 +381,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Answer group feedback uses dup_id_2.
         feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None, None)
+            'Introduction', None, False, feedback, [], None, None)
         state1.interaction.answer_groups.append(
             state_domain.AnswerGroup(outcome, [], [], None))
 
@@ -393,34 +393,32 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Solution uses dup_id_2.
         state1.interaction.solution = state_domain.Solution(
             'TextInput',
+            True,
             'answer',
             state_domain.SubtitledHtml(dup_id_2, '<p>expl</p>'),
-            True,
             None
         )
 
         state1.interaction.default_outcome = state_domain.Outcome(
             'Introduction',
+            None,
+            False,
             state_domain.SubtitledHtml(dup_id_2, '<p>default</p>'),
-            False, [], None, None, None)
+            [], None, None)
 
-        # Customization args with list+dict to hit recursion.
         placeholder_ca = state1.interaction.customization_args.get('placeholder')
-        if placeholder_ca and hasattr(placeholder_ca.value, 'content_id'):
+        if placeholder_ca and isinstance(
+                placeholder_ca.value, state_domain.SubtitledUnicode):
             placeholder_ca.value.content_id = dup_id_1
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
-        exp_services.save_new_exploration('owner_id', exploration)
 
         result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
             exploration)
         self.assertIsNotNone(result)
-        result_dict = cast(
-            dict[str, object],
-            result
-        )
-        self.assertGreaterEqual(len(cast(list, result_dict['fixed_content_ids'])), 3)
+        # Here use cast because the helper returns Optional[Dict[str, Any]].
+        result_dict = cast(Dict[str, Any], result)
+        # Here use cast because fixed_content_ids is a list of strings.
+        self.assertGreaterEqual(len(cast(list[str], result_dict['fixed_content_ids'])), 3)
+        # Here use cast because fixed_model is stored as an ExplorationModel in the dict.
         fixed_model = cast(exp_models.ExplorationModel, result_dict['fixed_model'])
         self.assertNotEqual(
             fixed_model.states['State2']['content']['content_id'],
