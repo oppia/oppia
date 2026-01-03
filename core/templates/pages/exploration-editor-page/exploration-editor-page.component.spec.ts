@@ -75,6 +75,7 @@ import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {FeedbackPromptModalComponent} from './modal-templates/feedback-prompt-modal.component';
 
 class MockNgbModalRef {
   componentInstance = {};
@@ -266,6 +267,7 @@ describe('Exploration editor page component', () => {
         LostChangesModalComponent,
         WelcomeModalComponent,
         HelpModalComponent,
+        FeedbackPromptModalComponent,
       ],
       providers: [
         ThreadDataBackendApiService,
@@ -330,6 +332,7 @@ describe('Exploration editor page component', () => {
           LostChangesModalComponent,
           WelcomeModalComponent,
           HelpModalComponent,
+          FeedbackPromptModalComponent,
         ],
       },
     });
@@ -1228,28 +1231,36 @@ describe('Exploration editor page component', () => {
   });
 
   it('should show feedback prompt modal when there are open feedback threads', fakeAsync(() => {
-    component.feedbackPromptModalData = {openThreadsCount: 3};
-    component.isModalOpenable = true;
+    // Reset previous calls to the global spy
+    ngbModal.open.calls.reset();
 
+    // Set up conditions so modal should open
     (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
       false
     );
     (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
 
-    (ngbModal.open as jasmine.Spy).and.returnValue({
-      componentInstance: {openThreadsCount: 3},
-      result: Promise.resolve(),
-    } as NgbModalRef);
+    // Make sure the component thinks modals are allowed
+    component.isModalOpenable = true;
 
+    // Run ngOnInit (sets up subscriptions)
     component.ngOnInit();
     tick();
 
-    esaves.onInitExplorationPage.emit();
+    // Directly trigger the private method that decides whether to show the modal
+    (component as any).maybeShowFeedbackPromptModal();
 
     flush();
     discardPeriodicTasks();
 
-    expect(ngbModal.open).toHaveBeenCalled();
+    expect(ngbModal.open).toHaveBeenCalledWith(
+      FeedbackPromptModalComponent,
+      jasmine.objectContaining({
+        backdrop: 'static',
+        keyboard: false,
+        windowClass: 'oppia-confirm-or-cancel-modal',
+      })
+    );
   }));
 
   it('should not show feedback prompt modal when there are no open threads', fakeAsync(() => {
