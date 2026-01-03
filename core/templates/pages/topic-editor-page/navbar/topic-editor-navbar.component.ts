@@ -139,14 +139,12 @@ export class TopicEditorNavbarComponent
         }
         this.topicRights.markTopicAsPublished();
         this.topicEditorStateService.setTopicRights(this.topicRights);
-      })
-      .then(() => {
         let successToast = 'Topic published.';
+        this.alertsService.addSuccessMessage(successToast, 1000);
         if (redirectToDashboard) {
           this.windowRef.nativeWindow.location.href =
             '/topics-and-skills-dashboard';
         }
-        this.alertsService.addSuccessMessage(successToast, 1000);
       });
   }
 
@@ -226,10 +224,11 @@ export class TopicEditorNavbarComponent
       this.alertsService.addWarning(errorMessage);
       return false;
     }
-    this.showTopicEditOptions = false;
     if (!this.topicRights.canPublishTopic()) {
+      this.showTopicEditOptions = false;
       return false;
     }
+    this.showTopicEditOptions = false;
     this.topicRightsBackendApiService
       .unpublishTopicAsync(this.topicId)
       .then(() => {
