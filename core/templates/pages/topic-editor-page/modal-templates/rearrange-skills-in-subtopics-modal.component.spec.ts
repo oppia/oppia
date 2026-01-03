@@ -203,6 +203,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       0
     );
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
     component.onMoveSkillEnd(dragDropEvent, null);
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
@@ -220,6 +221,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {},
     } as unknown as CdkDragDrop<ShortSkillSummary[]>;
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
     component.onMoveSkillEnd(event, 1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
@@ -237,7 +241,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       item: {},
     } as unknown as CdkDragDrop<ShortSkillSummary[]>;
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-    component.oldSubtopicId = 1;
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
     component.onMoveSkillEnd(event, null);
     expect(removeSkillSpy).toHaveBeenCalled();
   });
@@ -256,12 +262,14 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     } as unknown as CdkDragDrop<ShortSkillSummary[]>;
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
     component.oldSubtopicId = null;
     component.onMoveSkillEnd(event, null);
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
 
   it('should not call TopicUpdateService if subtopic name validation fails', () => {
+    component.ngOnInit();
     component.editableName = 'subtopic1';
     let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
     component.updateSubtopicTitle(1);
@@ -269,6 +277,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call TopicUpdateService to update subtopic title', () => {
+    component.ngOnInit();
+    component.editableName = 'new unique title';
     let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
     component.updateSubtopicTitle(1);
     expect(subtopicTitleSpy).toHaveBeenCalled();

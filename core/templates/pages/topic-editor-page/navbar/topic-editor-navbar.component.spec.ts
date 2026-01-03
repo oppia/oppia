@@ -701,6 +701,7 @@ describe('Topic Editor Navbar', () => {
   });
 
   it("should unpublish topic when user clicks the 'Unpublish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
@@ -727,6 +728,7 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should not unpublish topic if topic has not been published', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: false,
       can_publish_topic: false,
@@ -743,6 +745,7 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it('should not unpublish topic if topic is assigned to a classroom', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     componentInstance.topicRights = TopicRights.createFromBackendDict({
       published: true,
       can_publish_topic: true,
@@ -776,6 +779,7 @@ describe('Topic Editor Navbar', () => {
   }));
 
   it("should publish topic when user clicks the 'publish' button", fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
       Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
     );
@@ -803,6 +807,7 @@ describe('Topic Editor Navbar', () => {
     "should send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
