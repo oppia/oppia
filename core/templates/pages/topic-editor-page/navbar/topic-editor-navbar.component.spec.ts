@@ -839,12 +839,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance as any, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -862,12 +865,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance as any, '_navigateToPreview');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToPreview' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -885,12 +891,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance as any, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.resolve(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
@@ -908,12 +917,15 @@ describe('Topic Editor Navbar', () => {
     );
     spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(true);
     spyOn(questionUndoRedoService, 'clearChanges');
-    const navigateSpy = spyOn(componentInstance as any, '_navigateToMainTab');
+    const navigateSpy = spyOn(
+      componentInstance as TopicEditorNavbarComponent,
+      '_navigateToMainTab' as keyof TopicEditorNavbarComponent
+    );
 
     const mockModalRef = {
       componentInstance: {},
       result: Promise.reject(),
-    };
+    } as NgbModalRef;
 
     spyOn(ngbModal, 'open').and.returnValue(mockModalRef);
 
