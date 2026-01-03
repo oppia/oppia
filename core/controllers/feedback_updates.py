@@ -176,6 +176,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             new_value = suggestion.change_cmd.new_value
             if isinstance(new_value, dict):
+                # Here use cast because <provide a clear justification here>.
                 new_value_dict = cast(Dict[str, Any], new_value)
                 suggestion_html = str(new_value_dict.get('html', ''))
             else:
