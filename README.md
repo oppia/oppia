@@ -15,4 +15,8 @@ If you are new to the project, please start here:
 - Coding Style Guide:  
   https://github.com/oppia/oppia/wiki/Coding-style-guide
 
+
 These pages contain the correct and up-to-date onboarding instructions.
+
+<!-- ci-rerun -->
+
