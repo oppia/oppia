@@ -162,9 +162,9 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
-        
+
         suggestion_summary: Optional[SuggestionSummaryDict] = None
-        
+
         if suggestion and suggestion.change_cmd is not None:
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
