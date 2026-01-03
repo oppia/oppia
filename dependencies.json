@@ -27,17 +27,6 @@
         "js": ["dist/umd/popper.js"]
       }
     },
-    "bootstrap": {
-      "version": "5.3.3",
-      "downloadFormat": "zip",
-      "url": "https://github.com/twbs/bootstrap/releases/download/v5.3.3/bootstrap-5.3.3-dist.zip",
-      "rootDir": "bootstrap-5.3.3-dist",
-      "targetDirPrefix": "bootstrap-",
-      "bundle": {
-        "css": ["css/bootstrap.css"],
-        "js": ["js/bootstrap.js"]
-      }
-    },
     "mathJax": {
       "version": "2.7.5",
       "downloadFormat": "zip",

@@ -648,6 +648,19 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     dependency_filepaths = get_dependencies_filepaths()
 
+    # Add Bootstrap CSS from node_modules to replace dependencies.json source.
+    bootstrap_css_dir = os.path.join(
+        'node_modules', 'bootstrap', 'dist', 'css'
+    )
+    bootstrap_css_file = os.path.join(bootstrap_css_dir, 'bootstrap.css')
+    if not os.path.exists(bootstrap_css_file):
+        raise Exception(
+            'Bootstrap CSS not found at %s. '
+            'Make sure node_modules/bootstrap is installed.'
+            % bootstrap_css_file
+        )
+    dependency_filepaths['css'].append(bootstrap_css_file)
+
     # Add FontAwesome CSS from node_modules.
     fontawesome_css_dir = os.path.join(
         'node_modules', '@fortawesome', 'fontawesome-free', 'css'
