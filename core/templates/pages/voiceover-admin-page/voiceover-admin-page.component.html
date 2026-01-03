@@ -97,13 +97,17 @@
   <h3>Automatic voiceover updates</h3>
 
   <p class="info-text">
-    To ensure that all curated content has matching audio, these updates run
-    automatically when the content of an exploration in a published topic is
-    updated.
-    <i>
-      Note: Does not include manual requests triggered via the
-      exploration editor page ok.
-    </i>
+    <div>
+      To ensure that all curated content has matching audio, these updates run
+      automatically when the content of an exploration in a published topic is
+      updated.
+    </div>
+    <div>
+      <i>
+        Note: Does not include manual requests triggered via the
+        exploration editor page.
+      </i>
+    </div>
   </p>
 
   <div>
@@ -152,7 +156,7 @@
       </ng-container>
 
       <ng-container matColumnDef="functionID">
-        <th mat-header-cell *matHeaderCellDef> Function ID </th>
+        <th mat-header-cell *matHeaderCellDef> Event </th>
         <td mat-cell *matCellDef="let element" class="task-run-data"> {{getFunctionIdText(element.functionId)}} </td>
       </ng-container>
 

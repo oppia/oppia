@@ -58,9 +58,7 @@
       <mat-tab-group>
         <mat-tab *ngFor="let error of cloudTaskRun.exceptionMessagesForFailedRuns; index as index" label="Error {{index + 1}}">
           <div class="error-messages-container">
-            <span class="error-text">
-              {{error}}
-            </span>
+            {{error}}
           </div>
           <div>
             <button class="btn btn-secondary copy-to-clipboard-button" (click)="copyErrorToClipboard(error)">
@@ -96,9 +94,11 @@
   }
   .error-messages-container {
     background-color: rgba(0, 0, 0, 0.06);
+    font-family: monospace;
     height: 250px;
     overflow: scroll;
-    padding: 5%;
+    padding: 2%;
+    white-space: pre-wrap;
   }
   .copy-to-clipboard-button {
     background-color: inherit;
@@ -106,9 +106,5 @@
     cursor: pointer;
     float: right;
     margin-right: 10px;
-  }
-  .error-text {
-    font-family: monospace;
-    white-space: pre-wrap;
   }
 </style>
