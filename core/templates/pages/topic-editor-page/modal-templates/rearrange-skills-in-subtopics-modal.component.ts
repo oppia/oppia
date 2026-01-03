@@ -138,9 +138,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
           this.skillSummaryToMove
         );
       } else {
-        if (this.oldSubtopicId === null) {
-          return;
-        }
         this.topicUpdateService.moveSkillToSubtopic(
           this.topic,
           this.oldSubtopicId,
@@ -172,9 +169,9 @@ export class RearrangeSkillsInSubtopicsModalComponent
   }
 
   editNameOfSubtopicWithId(subtopicId: number | null): void {
-    if (!subtopicId) {
+    if (subtopicId === null || subtopicId === 0) {
       this.editableName = '';
-      this.selectedSubtopicId = -1;
+      this.selectedSubtopicId = 0;
     } else {
       this.selectedSubtopicId = subtopicId;
     }
