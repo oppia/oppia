@@ -648,6 +648,14 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     dependency_filepaths = get_dependencies_filepaths()
 
+    # Add FontAwesome CSS from node_modules.
+    fontawesome_css_dir = os.path.join(
+        'node_modules', '@fortawesome', 'fontawesome-free', 'css'
+    )
+    fontawesome_css_file = os.path.join(fontawesome_css_dir, 'all.min.css')
+    if os.path.exists(fontawesome_css_file):
+        dependency_filepaths['css'].append(fontawesome_css_file)
+
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
     with open(
         third_party_css_filepath, 'w+', encoding='utf-8'
@@ -660,6 +668,22 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
             dependency_filepaths['fonts'], webfonts_dir
         )
     )
+
+    # Copy FontAwesome webfonts from node_modules.
+    fontawesome_webfonts_dir = os.path.join(
+        'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts'
+    )
+    if os.path.exists(fontawesome_webfonts_dir):
+        fontawesome_font_files = []
+        for font_file in os.listdir(fontawesome_webfonts_dir):
+            font_file_path = os.path.join(fontawesome_webfonts_dir, font_file)
+            if os.path.isfile(font_file_path):
+                fontawesome_font_files.append(font_file_path)
+        _execute_tasks(
+            _generate_copy_tasks_for_fonts(
+                fontawesome_font_files, webfonts_dir
+            )
+        )
 
 
 def build_using_ng() -> None:
