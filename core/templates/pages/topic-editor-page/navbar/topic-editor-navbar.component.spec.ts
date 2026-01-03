@@ -447,6 +447,7 @@ describe('Topic Editor Navbar', () => {
       " clicks the 'publish' button and then cancels",
     fakeAsync(() => {
       componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
@@ -782,6 +783,7 @@ describe('Topic Editor Navbar', () => {
 
   it("should publish topic when user clicks the 'publish' button", fakeAsync(() => {
     componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
       Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
     );
@@ -810,6 +812,7 @@ describe('Topic Editor Navbar', () => {
       " clicks the 'publish' button",
     fakeAsync(() => {
       componentInstance.topicId = 'topic_1';
+      componentInstance.topic = topic;
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
