@@ -27,7 +27,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Dict, List, Optional, TypedDict, Union
+from typing import Any, Dict, List, Optional, TypedDict, Union, cast
 
 
 class MessageSummaryDict(TypedDict):
@@ -158,12 +158,13 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         suggestion = suggestion_services.get_suggestion_by_id(
             thread_id, strict=False
         )
-        
+
         suggestion_thread = feedback_services.get_thread(thread_id)
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
-        suggestion_summary = None
-
+        
+        suggestion_summary: Optional[SuggestionSummaryDict] = None
+        
         if suggestion and suggestion.change_cmd is not None:
             suggestion_author_setting = user_services.get_user_settings(
                 author_ids[0], strict=True
@@ -173,8 +174,15 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 suggestion.change_cmd.state_name
             ].content.html
 
+            new_value = suggestion.change_cmd.new_value
+            if isinstance(new_value, dict):
+                new_value_dict = cast(Dict[str, Any], new_value)
+                suggestion_html = str(new_value_dict.get('html', ''))
+            else:
+                suggestion_html = ''
+
             suggestion_summary = {
-                'suggestion_html': suggestion.change_cmd.new_value['html'],
+                'suggestion_html': suggestion_html,
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
                 'author_username': suggestion_author_setting.username,
@@ -183,7 +191,7 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 ),
             }
 
-        if suggestion:
+        if suggestion_summary is not None:
             message_summary_list.append(suggestion_summary)
             messages.pop(0)
             authors_settings.pop(0)
