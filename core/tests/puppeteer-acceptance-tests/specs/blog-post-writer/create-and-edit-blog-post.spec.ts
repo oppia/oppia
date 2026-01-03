@@ -71,9 +71,12 @@ describe('Blog Post Writer', function () {
         );
         for (let i = 0; i < elements.snapshotLength; i++) {
           const element = elements.snapshotItem(i) as HTMLElement;
-          if (element.offsetParent !== null) {
-            // Simple visibility check.
-            return element;
+          const rect = element.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            const style = window.getComputedStyle(element);
+            if (style.visibility !== 'hidden' && style.opacity !== '0') {
+              return element;
+            }
           }
         }
         return null;
@@ -208,9 +211,12 @@ describe('Blog Post Writer', function () {
         );
         for (let i = 0; i < elements.snapshotLength; i++) {
           const element = elements.snapshotItem(i) as HTMLElement;
-          if (element.offsetParent !== null) {
-            // Simple visibility check.
-            return element;
+          const rect = element.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) {
+            const style = window.getComputedStyle(element);
+            if (style.visibility !== 'hidden' && style.opacity !== '0') {
+              return element;
+            }
           }
         }
         return null;

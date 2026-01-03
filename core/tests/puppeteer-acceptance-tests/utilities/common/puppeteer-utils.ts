@@ -1098,12 +1098,14 @@ export class BaseUser {
       });
     } catch (error) {
       if (__dirname.startsWith('/home/runner')) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         throw new Error(
-          error.message +
+          errorMessage +
             '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
         );
       } else {
-        throw new Error(error.message);
+        throw new Error(error instanceof Error ? error.message : String(error));
       }
     }
   }
@@ -1128,8 +1130,10 @@ export class BaseUser {
   ): Promise<void> {
     try {
       await page.waitForNetworkIdle(options);
-    } catch (error) {
-      if (error.message.includes('Timeout')) {
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes('Timeout')) {
         showMessage(
           'Network did not become idle within the specified timeout, but we can continue.'
         );
@@ -1382,7 +1386,7 @@ export class BaseUser {
       );
 
       showMessage(`Text content of "${selector}" is "${text}".`);
-    } catch (error) {
+    } catch (error: unknown) {
       const actualTextContent = await this.page.evaluate(
         (selector: string, context: HTMLElement | null) => {
           const element = context
@@ -1396,12 +1400,14 @@ export class BaseUser {
         selector,
         context
       );
-      error.message =
-        `Text content of "${selector}" does not match the expected text.\n` +
-        `Expected: "${text}"\n` +
-        `Actual: "${actualTextContent}"\n` +
-        'Original Error:\n' +
-        error.message;
+      if (error instanceof Error) {
+        error.message =
+          `Text content of "${selector}" does not match the expected text.\n` +
+          `Expected: "${text}"\n` +
+          `Actual: "${actualTextContent}"\n` +
+          'Original Error:\n' +
+          error.message;
+      }
       throw error;
     }
   }
@@ -1452,14 +1458,16 @@ export class BaseUser {
         selector,
         text
       );
-    } catch (error) {
+    } catch (error: unknown) {
       const actualText = await this.page.evaluate((selector: string) => {
         const element = document.querySelector(selector);
         return element?.textContent?.trim();
       }, selector);
-      error.message =
-        `Element ${selector} does not contain "${text}". It contains "${actualText}".\n` +
-        error.message;
+      if (error instanceof Error) {
+        error.message =
+          `Element ${selector} does not contain "${text}". It contains "${actualText}".\n` +
+          error.message;
+      }
       throw error;
     }
   }
@@ -1507,11 +1515,15 @@ export class BaseUser {
         selector,
         value
       );
-    } catch (error) {
+    } catch (error: unknown) {
+      let stackTrace = '';
+      if (error instanceof Error) {
+        stackTrace = error.stack || '';
+      }
       throw new Error(
         `Element ${selector} does not have the expected value "${value}". ` +
           `Found "${await selector.evaluate(el => (el as HTMLInputElement).value)}".\n` +
-          `Original Error: ${error.stack}`
+          `Original Error: ${stackTrace}`
       );
     }
   }
@@ -1686,9 +1698,11 @@ export class BaseUser {
 
       // Verify the value of the select is updated.
       await this.expectTextContentToBe(selector, value);
-    } catch (error) {
+    } catch (error: unknown) {
       const newError = new Error(`Failed to update mat-option: ${error}`);
-      newError.stack = error.stack;
+      if (error instanceof Error) {
+        newError.stack = error.stack;
+      }
       throw newError;
     }
   }

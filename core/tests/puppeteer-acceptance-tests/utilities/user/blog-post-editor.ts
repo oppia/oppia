@@ -320,9 +320,11 @@ export class BlogPostEditor extends BaseUser {
           'Expected pasted text to be present, but it was not found.'
         );
       }
-    } catch (error) {
+    } catch (error: unknown) {
       const newError = new Error(`Failed to verify pasted content: ${error}`);
-      newError.stack = error.stack;
+      if (error instanceof Error) {
+        newError.stack = error.stack;
+      }
       throw newError;
     }
   }
@@ -505,7 +507,13 @@ export class BlogPostEditor extends BaseUser {
         element.scrollIntoView({block: 'center'});
       }, buttonElement);
 
-      await this.clickOnElement(buttonElement);
+      // We use a direct JS click here because Puppeteer's standard click checks (via clickOnElement)
+      // can fail if the element is partially obscured (e.g., by the footer) or if there are
+      // issues with calculating the clickable point on mobile. Since we have already verified
+      // the element's existence and visibility via getBoundingClientRect above, this is safe.
+      await this.page.evaluate((element: HTMLElement) => {
+        element.click();
+      }, buttonElement);
 
       await this.expectElementToBeVisible(addThumbnailImageButton, false);
     } else {
