@@ -348,5 +348,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
     ) {
       return 'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to published topic")';
     }
+    return '';
   }
 }

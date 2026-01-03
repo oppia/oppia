@@ -407,5 +407,7 @@ describe('Voiceover Admin Page component ', () => {
     const expectedText2 =
       'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to published topic")';
     expect(component.getFunctionIdText(functionId2)).toBe(expectedText2);
+
+    expect(component.getFunctionIdText('unknown_function_id')).toBe('');
   });
 });

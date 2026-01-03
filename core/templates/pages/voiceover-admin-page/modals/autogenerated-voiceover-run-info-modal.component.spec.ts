@@ -80,5 +80,7 @@ describe('Voiceover regeneration information modal', () => {
     expect(componentInstance.getFunctionIdText(functionId2)).toBe(
       expectedText2
     );
+
+    expect(componentInstance.getFunctionIdText('unknown_function_id')).toBe('');
   });
 });
