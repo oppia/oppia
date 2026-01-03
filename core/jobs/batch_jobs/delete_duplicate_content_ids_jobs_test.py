@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from typing import MutableMapping, cast
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -157,8 +159,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state.content.content_id = duplicate_id
         feedback = state_domain.SubtitledHtml(duplicate_id, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None)
-        answer_group = state_domain.AnswerGroup([], outcome, [], None)
+            'Introduction', feedback, False, [], None, None, None)
+        answer_group = state_domain.AnswerGroup(outcome, [], [], None)
         state.interaction.answer_groups.append(answer_group)
 
         exploration.next_content_id_index = (
@@ -218,7 +220,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             'TextInput',
             'answer',
             state_domain.SubtitledHtml(duplicate_id, '<p>explanation</p>'),
-            True
+            True,
+            None
         )
 
         exploration.next_content_id_index = (
@@ -256,8 +259,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state3.content.content_id = dup_id_2
         feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None)
-        answer_group = state_domain.AnswerGroup([], outcome, [], None)
+            'Introduction', feedback, False, [], None, None, None)
+        answer_group = state_domain.AnswerGroup(outcome, [], [], None)
         state1.interaction.answer_groups.append(answer_group)
 
         exploration.next_content_id_index = (
@@ -271,6 +274,40 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
                 f'content IDs: [\'{dup_id_1} -> content_4 in State2\', '
                 f'\'{dup_id_2} -> content_5 in State3\', '
                 f'\'{dup_id_2} -> content_6 in Introduction\']'
+            )
+        ])
+
+    def test_fix_job_with_duplicates_in_customization_args(self) -> None:
+        """Test fixing duplicates in customization args."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id5', title='Test Exploration', category='Test')
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index)
+
+        exploration.add_states(['State2'])
+        state = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        duplicate_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT)
+
+        state.content.content_id = duplicate_id
+        placeholder_ca = state.interaction.customization_args.get('placeholder')
+        if placeholder_ca and hasattr(placeholder_ca.value, 'content_id'):
+            placeholder_ca.value.content_id = duplicate_id
+
+        state2.content.content_id = duplicate_id
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index)
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is([
+            job_run_result.JobRunResult.as_stdout(
+                f'Fixed exploration exp_id5 (version 1) - regenerated content '
+                f'IDs: [\'{duplicate_id} -> content_3 in State2\']'
             )
         ])
 
@@ -296,13 +333,13 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         exp_services.save_new_exploration('owner_id', exploration)
 
+        # run job once via assert_job_output_is
         self.assert_job_output_is([
             job_run_result.JobRunResult.as_stdout(
                 f'Fixed exploration exp_verify (version 1) - regenerated '
                 f'content IDs: [\'{dup_id} -> content_3 in State2\']'
             )
         ])
-
         updated_model = exp_models.ExplorationModel.get('exp_verify')
         self.assertEqual(updated_model.version, 2)
         self.assertNotEqual(
@@ -344,9 +381,9 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Answer group feedback uses dup_id_2.
         feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', feedback, False, [], None, None)
+            'Introduction', feedback, False, [], None, None, None)
         state1.interaction.answer_groups.append(
-            state_domain.AnswerGroup([], outcome, [], None))
+            state_domain.AnswerGroup(outcome, [], [], None))
 
         # Hint uses dup_id_2.
         state1.interaction.hints.append(
@@ -358,19 +395,19 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             'TextInput',
             'answer',
             state_domain.SubtitledHtml(dup_id_2, '<p>expl</p>'),
-            True
+            True,
+            None
         )
 
-        # Default outcome uses dup_id_2.
         state1.interaction.default_outcome = state_domain.Outcome(
             'Introduction',
             state_domain.SubtitledHtml(dup_id_2, '<p>default</p>'),
-            False, [], None, None)
+            False, [], None, None, None)
 
         # Customization args with list+dict to hit recursion.
         placeholder_ca = state1.interaction.customization_args.get('placeholder')
-        if placeholder_ca:
-            placeholder_ca.value = [{'content_id': dup_id_1}]
+        if placeholder_ca and hasattr(placeholder_ca.value, 'content_id'):
+            placeholder_ca.value.content_id = dup_id_1
 
         exploration.next_content_id_index = (
             content_id_generator.next_content_id_index)
@@ -379,8 +416,12 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
             exploration)
         self.assertIsNotNone(result)
-        self.assertGreaterEqual(len(result['fixed_content_ids']), 3)
-        fixed_model = result['fixed_model']
+        result_dict = cast(
+            dict[str, object],
+            result
+        )
+        self.assertGreaterEqual(len(cast(list, result_dict['fixed_content_ids'])), 3)
+        fixed_model = cast(exp_models.ExplorationModel, result_dict['fixed_model'])
         self.assertNotEqual(
             fixed_model.states['State2']['content']['content_id'],
             fixed_model.states['Introduction']['content']['content_id'])
