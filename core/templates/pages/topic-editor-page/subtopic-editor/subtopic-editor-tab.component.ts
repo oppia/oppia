@@ -150,7 +150,10 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
           });
       }
       this.skillQuestionCountDict =
-        this.topicEditorStateService.getSkillQuestionCountDict() as Record<string, number>;
+        this.topicEditorStateService.getSkillQuestionCountDict() as Record<
+          string,
+          number
+        >;
       this.editableTitle = this.subtopic.getTitle();
       const thumbnailFilename = this.subtopic.getThumbnailFilename();
       const thumbnailBgColor = this.subtopic.getThumbnailBgColor();
@@ -164,7 +167,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       } else {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
       }
-      this.allowedBgColors = [...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic];
+      this.allowedBgColors = [
+        ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic,
+      ];
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
         this.sections = sections;

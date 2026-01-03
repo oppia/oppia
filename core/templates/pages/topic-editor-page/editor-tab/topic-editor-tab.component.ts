@@ -78,7 +78,10 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   STORY_LIST!: string;
   subtopicCardSelectedIndexes!: Record<string | number, boolean>;
   subtopicsListIsShown!: boolean;
-  selectedSkillEditOptionsIndex!: Record<string | number, Record<number, boolean> | {}>;
+  selectedSkillEditOptionsIndex!: Record<
+    string | number,
+    Record<number, boolean> | {}
+  >;
   editableDescriptionIsEmpty!: boolean;
   topicDescriptionChanged!: boolean;
   subtopics!: Subtopic[];
@@ -146,7 +149,10 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       return;
     }
     this.skillQuestionCountDict =
-      this.topicEditorStateService.getSkillQuestionCountDict() as Record<string, number>;
+      this.topicEditorStateService.getSkillQuestionCountDict() as Record<
+        string,
+        number
+      >;
     this.topicRights = this.topicEditorStateService.getTopicRights();
     this.topicNameEditorIsShown = false;
     if (this.topicEditorStateService.hasLoadedTopic()) {
@@ -687,7 +693,6 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     if (subtopicIndex === null || skillIndex === null) {
       return;
     }
-    this.selectedSkillEditOptionsIndex[subtopicIndex] = {};
     this.selectedSkillEditOptionsIndex[subtopicIndex] = {
       [skillIndex]: true,
     };

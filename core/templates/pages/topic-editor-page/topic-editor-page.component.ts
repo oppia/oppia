@@ -197,9 +197,10 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
     let prepublishTopicValidationIssues = this.topic.prepublishValidate();
     let subtopicPrepublishValidationIssues: string[] = [];
     this.topic.getSubtopics().forEach(subtopic => {
-      subtopicPrepublishValidationIssues = subtopicPrepublishValidationIssues.concat(
-        subtopic.prepublishValidate()
-      );
+      subtopicPrepublishValidationIssues =
+        subtopicPrepublishValidationIssues.concat(
+          subtopic.prepublishValidate()
+        );
     });
     this.prepublishValidationIssues = prepublishTopicValidationIssues.concat(
       subtopicPrepublishValidationIssues

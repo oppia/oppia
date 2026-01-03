@@ -76,7 +76,11 @@ class MockPageContextService {
 }
 
 class MockImageUploadHelperService {
-  getTrustedResourceUrlForThumbnailFilename(filename: string, entityType: string, entityId: string): string {
+  getTrustedResourceUrlForThumbnailFilename(
+    filename: string,
+    entityType: string,
+    entityId: string
+  ): string {
     return entityType + '/' + entityId + '/' + filename;
   }
 }
@@ -334,7 +338,10 @@ describe('Topic editor tab directive', () => {
     expect(component.skillOptionDialogueBox).toBe(true);
 
     component.showSkillEditOptions(0, 1);
-    const selectedIndex = component.selectedSkillEditOptionsIndex[0] as Record<number, boolean>;
+    const selectedIndex = component.selectedSkillEditOptionsIndex[0] as Record<
+      number,
+      boolean
+    >;
     expect(selectedIndex[1]).toEqual(true);
     expect(component.skillOptionDialogueBox).toBe(false);
 
@@ -344,24 +351,28 @@ describe('Topic editor tab directive', () => {
 
   it('should get the classroom URL fragment', () => {
     expect(component.classroomUrlFragment).toBeNull();
-    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue('classroom-frag');
+    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      'classroom-frag'
+    );
     component.ngOnInit();
     expect(component.classroomUrlFragment).toEqual('classroom-frag');
   });
 
   it('should get the classroom name', () => {
     expect(component.classroomName).toBeNull();
-    spyOn(topicEditorStateService, 'getClassroomName').and.returnValue('classroom-name');
+    spyOn(topicEditorStateService, 'getClassroomName').and.returnValue(
+      'classroom-name'
+    );
     component.ngOnInit();
     expect(component.classroomName).toEqual('classroom-name');
   });
 
   it('should get the curriculum admin usernames', () => {
     expect(component.curriculumAdminUsernames).toEqual([]);
-    spyOn(topicEditorStateService, 'getCurriculumAdminUsernames').and.returnValue([
-      'admin1',
-      'admin2',
-    ]);
+    spyOn(
+      topicEditorStateService,
+      'getCurriculumAdminUsernames'
+    ).and.returnValue(['admin1', 'admin2']);
     component.ngOnInit();
     expect(component.curriculumAdminUsernames).toEqual(['admin1', 'admin2']);
   });
