@@ -176,7 +176,11 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             new_value = suggestion.change_cmd.new_value
             if isinstance(new_value, dict):
-                # Here use cast because <provide a clear justification here>.
+                # Here we use type Any because suggestion.change_cmd.new_value is defined
+                # as a Union[str, dict] and the dict structure is dynamic depending on
+                # the suggestion type, so more specific typing is not possible here.
+                # Here we use cast because we have already verified at runtime that
+                # new_value is a dict, but mypy cannot infer this automatically.
                 new_value_dict = cast(Dict[str, Any], new_value)
                 suggestion_html = str(new_value_dict.get('html', ''))
             else:
