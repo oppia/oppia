@@ -1239,7 +1239,7 @@ describe('Exploration editor page component', () => {
     component.isModalOpenable = true;
     component.ngOnInit();
     tick();
-    (component as any).maybeShowFeedbackPromptModal();
+    component.maybeShowFeedbackPromptModal();
 
     flush();
     discardPeriodicTasks();
