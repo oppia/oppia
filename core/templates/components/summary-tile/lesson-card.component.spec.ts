@@ -208,22 +208,6 @@ describe('LessonCardComponent', () => {
     topic_url_fragment: 'topic',
   };
 
-  const undefinedTopic = {
-    id: '0',
-    title: 'Story Title',
-    description: 'Story Description',
-    node_titles: ['Title 1', 'Title 2'],
-    thumbnail_filename: 'image.svg',
-    thumbnail_bg_color: '#F8BF74',
-    story_is_published: true,
-    completed_node_titles: [],
-    url_fragment: 'story-title',
-    all_node_dicts: [sampleNode, sampleNode2],
-    topic_name: 'Topic',
-    classroom_url_fragment: 'math',
-    topic_url_fragment: 'topic',
-  };
-
   const multipleIncompleteNodesTopic = {
     id: '0',
     title: 'Story Title',
@@ -477,7 +461,7 @@ describe('LessonCardComponent', () => {
   }));
 
   it('should set story to StorySummary and not throw error for undefined topic_url_fragment', fakeAsync(() => {
-    // Create a story with a spy to force undefined topic_url_fragment
+    // Create a story with a spy to force undefined topic_url_fragment.
     const story = StorySummary.createFromBackendDict(sampleTopic);
     spyOn(story, 'getTopicUrlFragment').and.returnValue(undefined);
 

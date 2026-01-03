@@ -290,9 +290,9 @@ describe('Home tab Component', () => {
 
   it('should get the correct width in mobile view', fakeAsync(() => {
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.width).toEqual(233);
     expect(component.windowIsNarrow).toBe(true);
@@ -303,9 +303,9 @@ describe('Home tab Component', () => {
     spyOn(windowDimensionsService, 'isWindowNarrow').and.returnValue(false);
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.windowIsNarrow).toBe(false);
 
@@ -405,12 +405,12 @@ describe('Home tab Component', () => {
       );
 
       component.ngOnInit();
-      tick(); // Resolve Promise
+      tick();
       fixture.detectChanges();
 
       expect(component.isGoalLimitReached()).toBe(true);
 
-      flush(); // Clean up timeout
+      flush();
       discardPeriodicTasks();
     })
   );
@@ -428,12 +428,12 @@ describe('Home tab Component', () => {
         })
       );
       component.ngOnInit();
-      tick(); // Resolve Promise
+      tick();
       fixture.detectChanges();
 
       expect(component.isGoalLimitReached()).toBe(false);
 
-      flush(); // Clean up timeout
+      flush();
       discardPeriodicTasks();
     })
   );
@@ -456,12 +456,12 @@ describe('Home tab Component', () => {
       );
 
       component.ngOnInit();
-      tick(); // Resolve Promise
+      tick();
       fixture.detectChanges();
 
       expect(component.isGoalLimitReached()).toBe(false);
 
-      flush(); // Clean up timeout
+      flush();
       discardPeriodicTasks();
     })
   );
@@ -490,9 +490,9 @@ describe('Home tab Component', () => {
 
   it('should get the correct number of stories that have available story nodes to recommend', fakeAsync(() => {
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.storySummariesWithAvailableNodes).toEqual(new Set(['1']));
     discardPeriodicTasks();
@@ -557,45 +557,40 @@ describe('Home tab Component', () => {
     );
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.getTotalInProgressLessons()).toBe(4);
     discardPeriodicTasks();
   }));
 
   it('should handle error gracefully when fetching dashboard data fails', fakeAsync(() => {
-    // Force the backend API to fail
     topicsDataSpy.and.returnValue(Promise.reject('Backend error'));
 
-    // Spy on console.error to check if it's called
     spyOn(console, 'error');
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
 
-    tick(); // Process the Promise rejection
-    tick(1000); // Process the setTimeout in the error block
+    tick();
+    tick(1000);
 
-    // Verify the error was logged and the loader was still hidden
     expect(console.error).toHaveBeenCalled();
     expect(component.allCardsLoaded).toBe(true);
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
 
-    // Clean up
     discardPeriodicTasks();
   }));
 
   it('should handle errors thrown inside the success block of dashboard data fetch', fakeAsync(() => {
-    // Return null to cause a crash when accessing properties
     topicsDataSpy.and.returnValue(Promise.resolve(null));
     spyOn(console, 'error');
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
-    tick(); // Promise resolve
-    tick(1000); // setTimeout
+    tick();
+    tick(1000);
 
     expect(console.error).toHaveBeenCalled();
     expect(component.allCardsLoaded).toBe(true);
@@ -722,9 +717,9 @@ describe('Home tab Component', () => {
       true;
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(true);
 
@@ -858,9 +853,9 @@ describe('Home tab Component', () => {
       false;
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(false);
 
@@ -942,9 +937,9 @@ describe('Home tab Component', () => {
     );
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.totalLessonCards).toEqual(2);
 
@@ -1024,9 +1019,9 @@ describe('Home tab Component Loader visibility tests', () => {
     const hideLoadingScreenSpy = spyOn(loaderService, 'hideLoadingScreen');
 
     component.ngOnInit();
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.totalLessonCards).toEqual(0);
     expect(component.allCardsLoaded).toBe(true);
@@ -1070,14 +1065,13 @@ describe('Home tab Component Loader visibility tests', () => {
 
     component.ngOnInit();
 
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
 
-    // Check state before timer completion
     expect(component.allCardsLoaded).toBe(false);
     expect(component.totalLessonCards).toBeGreaterThan(0);
 
-    flush(); // Resolve Timeout
+    flush();
 
     expect(component.allCardsLoaded).toBe(true);
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
@@ -1091,9 +1085,9 @@ describe('Home tab Component Loader visibility tests', () => {
     component.ngOnInit();
     component.allCardsLoaded = true;
 
-    tick(); // Resolve Promise
+    tick();
     fixture.detectChanges();
-    flush(); // Resolve Timeout
+    flush();
 
     expect(hideLoadingScreenSpy).toHaveBeenCalled();
     discardPeriodicTasks();
@@ -1133,9 +1127,9 @@ describe('Home tab Component Loader visibility tests', () => {
 
       spyOn(loaderService, 'hideLoadingScreen');
       component.ngOnInit();
-      tick(); // Resolve Promise
+      tick();
       fixture.detectChanges();
-      flush(); // Resolve Timeout
+      flush();
 
       expect(component.totalLessonCards).toEqual(0);
       expect(loaderService.hideLoadingScreen).toHaveBeenCalled();

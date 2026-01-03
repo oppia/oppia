@@ -44,7 +44,6 @@ from core.domain import (
 from core.platform import models
 from core.storage.user import gae_models as user_models
 
-
 from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
