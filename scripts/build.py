@@ -653,8 +653,13 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
         'node_modules', '@fortawesome', 'fontawesome-free', 'css'
     )
     fontawesome_css_file = os.path.join(fontawesome_css_dir, 'all.min.css')
-    if os.path.exists(fontawesome_css_file):
-        dependency_filepaths['css'].append(fontawesome_css_file)
+    if not os.path.exists(fontawesome_css_file):
+        raise Exception(
+            'FontAwesome CSS not found at %s. '
+            'Make sure node_modules/@fortawesome/fontawesome-free is installed.'
+            % fontawesome_css_file
+        )
+    dependency_filepaths['css'].append(fontawesome_css_file)
 
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
     with open(
@@ -673,17 +678,20 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     fontawesome_webfonts_dir = os.path.join(
         'node_modules', '@fortawesome', 'fontawesome-free', 'webfonts'
     )
-    if os.path.exists(fontawesome_webfonts_dir):
-        fontawesome_font_files = []
-        for font_file in os.listdir(fontawesome_webfonts_dir):
-            font_file_path = os.path.join(fontawesome_webfonts_dir, font_file)
-            if os.path.isfile(font_file_path):
-                fontawesome_font_files.append(font_file_path)
-        _execute_tasks(
-            _generate_copy_tasks_for_fonts(
-                fontawesome_font_files, webfonts_dir
-            )
+    if not os.path.exists(fontawesome_webfonts_dir):
+        raise Exception(
+            'FontAwesome webfonts directory not found at %s. '
+            'Make sure node_modules/@fortawesome/fontawesome-free is installed.'
+            % fontawesome_webfonts_dir
         )
+    fontawesome_font_files = []
+    for font_file in os.listdir(fontawesome_webfonts_dir):
+        font_file_path = os.path.join(fontawesome_webfonts_dir, font_file)
+        if os.path.isfile(font_file_path):
+            fontawesome_font_files.append(font_file_path)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(fontawesome_font_files, webfonts_dir)
+    )
 
 
 def build_using_ng() -> None:
