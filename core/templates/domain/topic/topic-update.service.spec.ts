@@ -986,6 +986,30 @@ describe('Topic update service', function () {
     }
   );
 
+  it(
+    'should not create a backend change dict for moving a skill id to a' +
+      'subtopic when an error is encountered',
+    () => {
+      expect(() => {
+        topicUpdateService.moveSkillToSubtopic(
+          _sampleTopic,
+          null,
+          1,
+          _secondSkillSummary
+        );
+      }).toThrowError('Given skillId is not an uncategorized skill.');
+      expect(() => {
+        topicUpdateService.moveSkillToSubtopic(
+          _sampleTopic,
+          1,
+          2,
+          _secondSkillSummary
+        );
+      }).toThrowError("Subtopic with id 2 doesn't exist");
+      expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+    }
+  );
+
   it('should move/undo move a skill id to a subtopic', () => {
     expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
       _firstSkillSummary,
@@ -1246,7 +1270,7 @@ describe('Topic update service', function () {
           2,
           _secondSkillSummary
         );
-      }).toThrowError("Cannot read properties of null (reading 'addSkill')");
+      }).toThrowError("Subtopic with id 2 doesn't exist");
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );

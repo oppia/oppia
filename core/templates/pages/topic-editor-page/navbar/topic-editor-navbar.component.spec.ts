@@ -446,10 +446,12 @@ describe('Topic Editor Navbar', () => {
     "should not send email when user who doesn't have publishing rights" +
       " clicks the 'publish' button and then cancels",
     fakeAsync(() => {
+      componentInstance.topicId = 'topic_1';
       spyOn(topicRightsBackendApiService, 'sendMailAsync').and.returnValue(
         Promise.resolve()
       );
       spyOn(ngbModal, 'open').and.returnValue({
+        componentInstance: {},
         result: Promise.reject(),
       } as NgbModalRef);
       spyOn(alertsService, 'addSuccessMessage');

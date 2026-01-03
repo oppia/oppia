@@ -223,7 +223,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
-    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillStart(2, skillSummary);
     component.onMoveSkillEnd(event, 1);
     expect(moveSkillSpy).toHaveBeenCalled();
   });
