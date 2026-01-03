@@ -654,10 +654,6 @@ export class TopicUpdateService {
     if (!newSubtopicId) {
       throw new Error('New subtopic cannot be null');
     }
-    let oldSubtopic: Subtopic | null = null;
-    if (oldSubtopicId) {
-      oldSubtopic = topic.getSubtopicById(oldSubtopicId);
-    }
     let newSubtopic = topic.getSubtopicById(newSubtopicId);
     if (!newSubtopic) {
       throw new Error(`Subtopic with id ${newSubtopicId} doesn't exist`);
@@ -745,7 +741,6 @@ export class TopicUpdateService {
     subtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
     this._applyChange(
       topic,
       TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
