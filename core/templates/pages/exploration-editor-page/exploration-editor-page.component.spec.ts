@@ -72,6 +72,7 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {ExplorationPermissionsBackendApiService} from 'domain/exploration/exploration-permissions-backend-api.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
+import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
 import {EntityBulkTranslationsBackendApiService} from './services/entity-bulk-translations-backend-api.service';
 import {LanguageCodeToEntityTranslations} from '../../services/entity-translations.services';
 import {PlatformFeatureService} from 'services/platform-feature.service';
@@ -667,10 +668,10 @@ describe('Exploration editor page component', () => {
 
       expect(focusSpy).toHaveBeenCalledWith('tmpMessageText');
 
-      component.activeThread = 'false';
+      component.activeThread = null as unknown as string;
       component.setFocusOnActiveTab('feedback');
 
-      expect(focusSpy).toHaveBeenCalled();
+      expect(focusSpy).toHaveBeenCalledWith('newThreadButton');
     });
 
     it('should generate the aria label correctly', () => {
@@ -1230,6 +1231,273 @@ describe('Exploration editor page component', () => {
     }));
   });
 
+  describe('editability marking based on permissions', () => {
+    let editabilityService: EditabilityService;
+    let ueps: UserExplorationPermissionsService;
+    let esaves: ExplorationSaveService;
+    let explorationDataService: ExplorationDataService;
+    let efbas: ExplorationFeaturesBackendApiService;
+    let tds: ThreadDataBackendApiService;
+    let userService: UserService;
+
+    beforeEach(() => {
+      editabilityService = TestBed.inject(EditabilityService);
+      ueps = TestBed.inject(UserExplorationPermissionsService);
+      esaves = TestBed.inject(ExplorationSaveService);
+      explorationDataService = TestBed.inject(ExplorationDataService);
+      efbas = TestBed.inject(ExplorationFeaturesBackendApiService);
+      tds = TestBed.inject(ThreadDataBackendApiService);
+      userService = TestBed.inject(UserService);
+
+      (tds.getFeedbackThreadsAsync as jasmine.Spy)?.calls.reset();
+    });
+
+    it('should mark editable and translatable when user can edit', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: true, canVoiceover: false} as any)
+      );
+
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false} as any)
+      );
+
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        } as any)
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      flush();
+
+      esaves.onInitExplorationPage.emit();
+
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).toHaveBeenCalled();
+      expect(markTranslatableSpy).toHaveBeenCalled();
+    }));
+
+    it('should mark translatable but not editable when user can voiceover but not edit', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: false, canVoiceover: true} as any)
+      );
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false} as any)
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        } as any)
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).not.toHaveBeenCalled();
+      expect(markTranslatableSpy).toHaveBeenCalled();
+    }));
+
+    it('should mark neither editable nor translatable when user has no permissions', fakeAsync(() => {
+      spyOn(ueps, 'getPermissionsAsync').and.returnValue(
+        Promise.resolve({canEdit: false, canVoiceover: false} as any)
+      );
+      spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
+        cb();
+        return Promise.resolve(explorationData);
+      });
+      spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+        Promise.resolve({explorationIsCurated: false} as any)
+      );
+      spyOn(userService, 'getUserInfoAsync').and.returnValue(
+        Promise.resolve({
+          isCurriculumAdmin: () => false,
+          isModerator: () => false,
+        } as any)
+      );
+
+      const markEditableSpy = spyOn(editabilityService, 'markEditable');
+      const markTranslatableSpy = spyOn(editabilityService, 'markTranslatable');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      flush();
+      tick(200);
+      flush();
+      tick(200);
+      flushMicrotasks();
+      discardPeriodicTasks();
+
+      expect(markEditableSpy).not.toHaveBeenCalled();
+      expect(markTranslatableSpy).not.toHaveBeenCalled();
+    }));
+  });
+
+  it('should handle null draft changes correctly', fakeAsync(() => {
+    const data = {...explorationData};
+    data.draft_changes = null as any;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(data);
+    });
+
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false} as any)
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      } as any)
+    );
+
+    const entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
+    spyOn(entityVoiceoversService as any, 'init').and.callFake(() => {});
+    spyOn(entityVoiceoversService as any, 'fetchEntityVoiceovers').and.callFake(
+      () => {}
+    );
+
+    // Mock Bulk Translations service just in case feature flag is true
+    spyOn(
+      entityBulkTranslationsBackendApiService,
+      'fetchEntityBulkTranslationsAsync'
+    ).and.returnValue(Promise.resolve({}) as any);
+    const platformFeatureService = TestBed.inject(PlatformFeatureService);
+    (
+      platformFeatureService as any
+    ).status.ExplorationEditorCanModifyTranslations = {isEnabled: false};
+
+    spyOn(cls, 'loadAutosavedChangeList');
+    spyOn(
+      component,
+      'populateEntityTranslationsWithDraftChanges'
+    ).and.callThrough();
+
+    component.ngOnInit();
+    // Explicitly emit to ensure initExplorationPage runs
+    esaves.onInitExplorationPage.emit();
+    tick();
+    flush();
+    flushMicrotasks();
+
+    expect(cls.loadAutosavedChangeList).not.toHaveBeenCalled();
+    expect(
+      component.populateEntityTranslationsWithDraftChanges
+    ).toHaveBeenCalled();
+
+    discardPeriodicTasks();
+  }));
+
+  it('should reset isModalOpenable when feedback prompt modal is dismissed', fakeAsync(() => {
+    (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+    component.isModalOpenable = true;
+    const mockModalRef = {
+      componentInstance: {},
+      result: Promise.reject(),
+    };
+    (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
+
+    (component as any).maybeShowFeedbackPromptModal();
+
+    expect(ngbModal.open).toHaveBeenCalled();
+    expect(component.isModalOpenable).toBeFalse();
+
+    flush();
+
+    expect(component.isModalOpenable).toBeTrue();
+  }));
+
+  it('should handle exploration linked to story correctly', fakeAsync(() => {
+    const linkedData = {...explorationData};
+    (linkedData as any).exploration_is_linked_to_story = true;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(linkedData);
+    });
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false} as any)
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      } as any)
+    );
+    spyOn(pageContextService, 'setExplorationIsLinkedToStory');
+
+    component.ngOnInit();
+    tick();
+    flush();
+
+    expect(component.explorationIsLinkedToStory).toBeTrue();
+    expect(pageContextService.setExplorationIsLinkedToStory).toHaveBeenCalled();
+    discardPeriodicTasks();
+  }));
+
+  it('should unlock exploration if edits are allowed', fakeAsync(() => {
+    const allowedData = {...explorationData};
+    allowedData.edits_allowed = true;
+
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback();
+      return Promise.resolve(allowedData);
+    });
+
+    spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
+      Promise.resolve({explorationIsCurated: false} as any)
+    );
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve({
+        isCurriculumAdmin: () => false,
+        isModerator: () => false,
+      } as any)
+    );
+
+    const lockSpy = spyOn(component.editabilityService, 'lockExploration');
+
+    component.ngOnInit();
+    tick();
+    flush();
+
+    expect(lockSpy).toHaveBeenCalledWith(true);
+    expect(lockSpy).toHaveBeenCalledWith(false);
+    discardPeriodicTasks();
+  }));
+
   it('should show feedback prompt modal when there are open feedback threads', fakeAsync(() => {
     ngbModal.open.calls.reset();
     (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
@@ -1272,7 +1540,7 @@ describe('Exploration editor page component', () => {
   }));
 
   describe('voiceover tab', () => {
-    it('should be shwon correctly', () => {
+    it('should be shown correctly', () => {
       let isExplorationLinkedToStorySpy = spyOn(
         pageContextService,
         'isExplorationLinkedToStory'
@@ -1289,5 +1557,172 @@ describe('Exploration editor page component', () => {
         true;
       expect(component.isVoiceoverTabEnabled()).toBeTrue();
     });
+
+    it('should navigate to feedback tab when feedback prompt modal is confirmed', fakeAsync(() => {
+      (tds.getOpenThreadsCount as jasmine.Spy).and.returnValue(3);
+      (ngbModal.open as jasmine.Spy).calls.reset();
+
+      spyOn(rs, 'navigateToFeedbackTab');
+
+      component.isModalOpenable = true;
+
+      const mockModalRef = {
+        componentInstance: {
+          openThreadsCount: 0,
+        },
+        result: Promise.resolve(),
+      };
+      (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef as any);
+
+      (component as any).maybeShowFeedbackPromptModal();
+      flush();
+
+      expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
+      expect(component.isModalOpenable).toBeTrue();
+    }));
+
+    it('should not show lost changes modal if another modal is already open', fakeAsync(() => {
+      (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+        true
+      );
+      (
+        autosaveInfoModalsService.showLostChangesModal as jasmine.Spy
+      ).calls.reset();
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      tick();
+      flush();
+
+      expect(
+        autosaveInfoModalsService.showLostChangesModal
+      ).not.toHaveBeenCalled();
+
+      discardPeriodicTasks();
+    }));
+
+    it('should not mark translation tutorial as not seen if tutorial should not be shown on load', fakeAsync(() => {
+      const data = {...explorationData};
+      data.show_state_translation_tutorial_on_load = false;
+      const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+      spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(
+        callback => {
+          callback();
+          return Promise.resolve(data);
+        }
+      );
+
+      spyOn(stfts, 'markTranslationTutorialNotSeenBefore');
+
+      component.ngOnInit();
+      esaves.onInitExplorationPage.emit();
+      tick();
+      flush();
+
+      expect(stfts.markTranslationTutorialNotSeenBefore).not.toHaveBeenCalled();
+
+      discardPeriodicTasks();
+    }));
   });
+
+  it('should handle cancel in user help modal', fakeAsync(() => {
+    (ngbModal.open as jasmine.Spy).and.returnValue({
+      result: Promise.reject(),
+    } as NgbModalRef);
+
+    component.showUserHelpModal();
+    tick();
+
+    flush();
+  }));
+
+  it('should show lost changes modal when initialized with lost changes', fakeAsync(() => {
+    const lostChanges = [{cmd: 'some_change', state_name: 'Introduction'}];
+    const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
+
+    spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
+      callback(explorationId, lostChanges);
+      return Promise.resolve(explorationData);
+    });
+    (autosaveInfoModalsService.isModalOpen as jasmine.Spy).and.returnValue(
+      false
+    );
+    (
+      autosaveInfoModalsService.showLostChangesModal as jasmine.Spy
+    ).calls.reset();
+
+    component.ngOnInit();
+    esaves.onInitExplorationPage.emit();
+    tick();
+    flush();
+
+    expect(autosaveInfoModalsService.showLostChangesModal).toHaveBeenCalledWith(
+      lostChanges,
+      explorationId
+    );
+    discardPeriodicTasks();
+  }));
+
+  it('should not show welcome exploration modal if isModalOpenable is false', () => {
+    component.isModalOpenable = false;
+    (ngbModal.open as jasmine.Spy).calls.reset();
+
+    component.showWelcomeExplorationModal();
+
+    expect(ngbModal.open).not.toHaveBeenCalled();
+  });
+
+  it('should not navigate to main tab when internet disconnects if already on main tab', () => {
+    spyOn(rs, 'getActiveTabName').and.returnValue('main');
+    spyOn(rs, 'navigateToMainTab');
+
+    mockConnectionServiceEmitter.emit(false);
+
+    expect(rs.navigateToMainTab).not.toHaveBeenCalled();
+  });
+
+  it('should update existing entity translation with draft changes', fakeAsync(() => {
+    (
+      component as any
+    ).entityTranslationsService.languageCodeToLatestEntityTranslations = {
+      fr: EntityTranslation.createFromBackendDict({
+        entity_id: explorationId,
+        entity_type: 'exploration',
+        entity_version: 1,
+        language_code: 'fr',
+        translations: {},
+      }),
+    };
+
+    const draftChanges = [
+      {
+        cmd: 'edit_translation',
+        language_code: 'fr',
+        content_id: 'content_updated',
+        translation: {
+          content_value: '<p>Updated Content</p>',
+          content_format: 'html',
+          needs_update: false,
+        },
+      },
+    ];
+
+    component.populateEntityTranslationsWithDraftChanges(
+      draftChanges as any,
+      1
+    );
+
+    const translation = (
+      component as any
+    ).entityTranslationsService.languageCodeToLatestEntityTranslations.fr.getWrittenTranslation(
+      'content_updated'
+    );
+    expect(translation).toBeDefined();
+    const content = (translation as any).getHtml
+      ? translation.getHtml()
+      : (translation as any).toBackendDict
+        ? (translation as any).toBackendDict().content_value
+        : (translation as any).content_value;
+    expect(content).toBe('<p>Updated Content</p>');
+  }));
 });
