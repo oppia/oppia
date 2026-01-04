@@ -29,7 +29,6 @@ import sys
 import tempfile
 import threading
 
-from core import utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
@@ -113,7 +112,7 @@ class BuildTests(test_utils.GenericTestBase):
         for js_filepath in dependency_filepaths['js']:
             if counter == js_file_count:
                 break
-            with utils.open_file(js_filepath, 'r') as js_file:
+            with open(js_filepath, 'r', encoding='utf-8') as js_file:
                 # Assert that each line is copied over to file_stream object.
                 for line in js_file:
                     self.assertIn(line, third_party_js_stream.getvalue())
@@ -286,7 +285,9 @@ class BuildTests(test_utils.GenericTestBase):
         minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
-        with utils.open_file(base_html_source_path, 'r') as source_base_file:
+        with open(
+            base_html_source_path, 'r', encoding='utf-8'
+        ) as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegex(
                 source_base_file_content,
@@ -296,7 +297,9 @@ class BuildTests(test_utils.GenericTestBase):
             )
 
         # Build base.html file.
-        with utils.open_file(base_html_source_path, 'r') as source_base_file:
+        with open(
+            base_html_source_path, 'r', encoding='utf-8'
+        ) as source_base_file:
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
@@ -514,14 +517,14 @@ class BuildTests(test_utils.GenericTestBase):
             with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
+                with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                     self.assertEqual(
                         hashes_file.read(), '{"/path/file.js": "123456"}\n'
                     )
 
                 hashes = {'file.js': '123456', 'file.min.js': '654321'}
                 build.save_hashes_to_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
+                with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                     self.assertEqual(
                         ast.literal_eval(hashes_file.read()),
                         {'/file.min.js': '654321', '/file.js': '123456'},
@@ -699,8 +702,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', temp_file_name)
-        with utils.open_file(
-            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w'
+        with open(
+            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w', encoding='utf-8'
         ) as tmp:
             tmp.write('Some content.')
 
@@ -835,7 +838,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+        with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
@@ -844,14 +847,14 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
                 build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(
@@ -884,7 +887,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+        with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
             tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
@@ -893,7 +896,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
@@ -905,7 +908,7 @@ class BuildTests(test_utils.GenericTestBase):
                 ):
                     build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(content, 'Initial content in mock_app.yaml')
@@ -921,7 +924,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'some_file.txt')
-        with utils.open_file('some_file.txt', 'w') as tmp:
+        with open('some_file.txt', 'w', encoding='utf-8') as tmp:
             tmp.write('Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
@@ -1380,7 +1383,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
+                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
             )
         )
         self.exit_stack.enter_context(
@@ -1442,7 +1445,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
+                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
             )
         )
         self.exit_stack.enter_context(
