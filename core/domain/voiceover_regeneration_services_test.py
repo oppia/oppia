@@ -107,7 +107,9 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         expected_parsed_text = ''
         self.assertEqual(parsed_text, expected_parsed_text)
 
-    def test_worked_example_tag_has_empty_voiceover_string(self) -> None:
+    def test_should_able_to_convert_oppia_workedexample_tag_to_p_tag(
+        self,
+    ) -> None:
         content_html = (
             '<oppia-noninteractive-workedexample question-with-value="&amp;'
             'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
@@ -117,7 +119,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-workedexample>'
         )
         parsed_text = voiceover_regeneration_services.parse_html(content_html)
-        expected_parsed_text = ''
+        expected_parsed_text = 'Example:\n\n<pre><p>lorem ipsum</p></pre>\n\nSolution:\n\nlorem ipsum'
         self.assertEqual(parsed_text, expected_parsed_text)
 
     def test_collapsible_tag_has_empty_voiceover_string(self) -> None:
@@ -233,7 +235,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         mimetype = 'audio/mpeg'
 
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
         fs.commit(
@@ -286,7 +288,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
         mimetype = 'audio/mpeg'
 
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
 
         fs.commit(
@@ -349,7 +351,7 @@ class AutomaticVoiceoverRegenerationTests(test_utils.GenericTestBase):
             voiceover_filename_for_binary,
         )
         mimetype = 'audio/mpeg'
-        with open(voiceover_path, 'rb') as file:
+        with open(voiceover_path, 'rb', encoding=None) as file:
             binary_audio_data = file.read()
         fs.commit(
             '%s/%s' % ('audio', filename), binary_audio_data, mimetype=mimetype

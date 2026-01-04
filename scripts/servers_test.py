@@ -16,6 +16,7 @@
 
 from __future__ import annotations
 
+import builtins
 import collections
 import contextlib
 import io
@@ -36,6 +37,26 @@ from scripts import common, scripts_test_utils, servers
 
 import psutil
 from typing import Callable, Iterator, List, Optional, Sequence, Tuple
+
+
+class MockCompiler:
+    def wait(self) -> None:  # pylint: disable=missing-docstring
+        pass
+
+
+class MockCompilerContextManager:
+    def __init__(self) -> None:
+        pass
+
+    def __enter__(self) -> MockCompiler:
+        return MockCompiler()
+
+    def __exit__(self, *unused_args: str) -> None:
+        pass
+
+
+def mock_context_manager() -> MockCompilerContextManager:
+    return MockCompilerContextManager()
 
 
 class ManagedProcessTests(test_utils.TestBase):
@@ -408,7 +429,9 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_firebase_emulator(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         self.exit_stack.enter_context(
-            self.swap_to_always_return(common, 'wait_for_port_to_be_in_use')
+            self.swap_to_always_return(
+                common, 'wait_for_firebase_emulator_to_be_ready'
+            )
         )
 
         self.exit_stack.enter_context(servers.managed_firebase_auth_emulator())
@@ -530,7 +553,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q' % common.ES_PATH,
+            f'{common.ES_PATH}/bin/elasticsearch -q -E xpack.security.enabled=false -E cluster.routing.allocation.disk.threshold_enabled=false',
         )
         self.assertEqual(
             popen_calls[0].kwargs,
@@ -1224,7 +1247,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_acceptance_test_server_with_explicit_args(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         test_file_path = (
-            'blog-admin/assign-roles-to-users-and-change-tag-properties'
+            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
 
         self.exit_stack.enter_context(
@@ -1256,7 +1279,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_acceptance_test_server_headless(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         suite_name = (
-            'blog-admin/assign-roles-to-users-and-change-tag-properties'
+            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
 
         self.exit_stack.enter_context(
@@ -1278,7 +1301,7 @@ class ManagedProcessTests(test_utils.TestBase):
     def test_managed_acceptance_test_server_mobile(self) -> None:
         popen_calls = self.exit_stack.enter_context(self.swap_popen())
         suite_name = (
-            'blog-admin/assign-roles-to-users-and-change-tag-properties'
+            'blog-admin/assign-and-remove-blog-editor-and-blog-admin-roles'
         )
 
         self.exit_stack.enter_context(
@@ -1300,6 +1323,15 @@ class ManagedProcessTests(test_utils.TestBase):
 
 
 class GetChromedriverVersionTests(test_utils.TestBase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.print_arr: list[str] = []
+
+        def mock_print(msg: str) -> None:
+            self.print_arr.append(msg)
+
+        self.print_swap = self.swap(builtins, 'print', mock_print)
 
     def test_chrome_before_115_queries_api(self) -> None:
         def mock_check_output(_: List[str]) -> bytes:
@@ -1343,3 +1375,78 @@ class GetChromedriverVersionTests(test_utils.TestBase):
                 servers.get_chromedriver_version(),
                 '115.0.3626.123',
             )
+
+    def test_run_ng_compilation_successfully(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: True, expected_kwargs=[]
+        )
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir:
+            servers.run_ng_compilation()
+
+        self.assertNotIn(
+            'Failed to complete ng build compilation, exiting...',
+            self.print_arr,
+        )
+
+    def test_run_ng_compilation_failed(self) -> None:
+        swap_isdir = self.swap_with_checks(
+            os.path, 'isdir', lambda _: False, expected_kwargs=[]
+        )
+        swap_ng_build = self.swap_with_checks(
+            servers, 'managed_ng_build', mock_context_manager, expected_args=[]
+        )
+        swap_sys_exit = self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            servers.run_ng_compilation()
+
+        self.assertIn(
+            'Failed to complete ng build compilation, exiting...',
+            self.print_arr,
+        )
+
+    def test_subprocess_error_results_in_failed_ng_build(self) -> None:
+        class MockFailedCompiler:
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                raise subprocess.CalledProcessError(
+                    returncode=1, cmd='', output='Subprocess execution failed.'
+                )
+
+        class MockFailedCompilerContextManager:
+            def __init__(self) -> None:
+                pass
+
+            def __enter__(self) -> MockFailedCompiler:
+                return MockFailedCompiler()
+
+            def __exit__(self, *unused_args: str) -> None:
+                pass
+
+        def mock_failed_context_manager() -> MockFailedCompilerContextManager:
+            return MockFailedCompilerContextManager()
+
+        swap_ng_build = self.swap_with_checks(
+            servers,
+            'managed_ng_build',
+            mock_failed_context_manager,
+            expected_args=[],
+        )
+        swap_isdir = self.swap_with_checks(
+            os.path,
+            'isdir',
+            lambda _: False,
+            expected_args=[
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',),
+                ('dist/oppia-angular',),
+            ],
+        )
+        swap_sys_exit = self.swap_with_checks(
+            sys, 'exit', lambda _: None, expected_args=[(1,), (1,), (1,)]
+        )
+        with self.print_swap, swap_ng_build, swap_isdir, swap_sys_exit:
+            servers.run_ng_compilation()

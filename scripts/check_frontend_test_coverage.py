@@ -23,8 +23,6 @@ import os
 import re
 import sys
 
-from core import utils
-
 from typing import List, Optional
 
 _PARSER = argparse.ArgumentParser(
@@ -51,7 +49,7 @@ EXCLUDED_DIRECTORIES = [
 # manually.
 # Please keep the list in alphabetical order.
 # NOTE TO DEVELOPERS: do not add any new files to this list without asking
-# @nithusha21 first.
+# @hardikgoyal2003 first.
 NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/components/ck-editor-helpers/ck-editor-4-rte.component.ts',
     'core/templates/components/ck-editor-helpers/'
@@ -64,10 +62,12 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/domain/question/question.model.ts',
     'core/templates/expressions/expression-interpolation.service.ts',
     'core/templates/google-analytics.initializer.ts',
+    'core/templates/pages/blog-post-page/blog-post-page.component.ts',
     'core/templates/pages/exploration-editor-page/services/'
     'exploration-states.service.ts',
     'core/templates/pages/exploration-player-page/services/'
     'learner-answer-info.service.ts',
+    'core/templates/services/suggestion-modal.service.ts',
     'extensions/interactions/MusicNotesInput/directives/'
     'oppia-interactive-music-notes-input.component.ts',
     'extensions/interactions/PencilCodeEditor/directives/'
@@ -138,7 +138,7 @@ def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = utils.open_file(LCOV_FILE_PATH, 'r')
+    f = open(LCOV_FILE_PATH, 'r', encoding='utf-8')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 

@@ -14,7 +14,7 @@
         <path d="M15 11.5C15.8284 11.5 16.5 10.8284 16.5 10C16.5 9.17157 15.8284 8.5 15 8.5C14.1716 8.5 13.5 9.17157 13.5 10C13.5 10.8284 14.1716 11.5 15 11.5Z" fill="white"/>
       </svg>
     </button>
-    <button class="lesson-player-close-modal-button" [ngClass]="{'question-player-exit-btn': explorationContext !== explorationContextConstants.EXPLORATION_PAGE}" *ngIf="!pageIsIframed" (click)="closePlayer()" aria-label="Close player">
+    <button class="lesson-player-close-modal-button" [ngClass]="{'question-player-exit-btn': explorationContext !== explorationContextConstants.EXPLORATION_PAGE}" *ngIf="!pageIsIframed" (click)="closePlayer()" aria-label="Close player" matTooltip="Close player" matTooltipPosition="above">
       <i class="fa-solid fa-xmark"></i>
     </button>
   </div>

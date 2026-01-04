@@ -57,7 +57,6 @@
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
-/core/templates/services/angular-services.index.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.spec.ts @oppia/lace-frontend-reviewers
 /core/templates/services/page-head.service*.ts @oppia/lace-frontend-reviewers
@@ -174,6 +173,13 @@
 
 
 # Dev workflow team.
+/.vscode/launch.json @oppia/dev-workflow-reviewers
+/.vscode/settings.json @oppia/dev-workflow-reviewers
+/conftest.py @oppia/dev-workflow-reviewers
+/conftest_test.py @oppia/dev-workflow-reviewers
+/pytest.ini @oppia/dev-workflow-reviewers
+/AGENTS.md @oppia/dev-workflow-reviewers
+/.coderabbit.yaml @oppia/dev-workflow-reviewers
 /.eslintignore @oppia/dev-workflow-reviewers
 /.eslintrc @oppia/dev-workflow-reviewers
 /.htmllintrc @oppia/dev-workflow-reviewers
@@ -186,10 +192,6 @@
 /.pylintrc @oppia/dev-workflow-reviewers
 /.stylelintrc @oppia/dev-workflow-reviewers
 /.yarnrc @oppia/dev-workflow-reviewers
-/app_dev_docker.yaml @oppia/dev-workflow-reviewers
-/docker-compose.yml @oppia/dev-workflow-reviewers
-/docker/ @oppia/dev-workflow-reviewers
-/Makefile @oppia/dev-workflow-reviewers
 /tox.ini @oppia/dev-workflow-reviewers
 /pyproject.toml @oppia/dev-workflow-reviewers
 /scripts/*.py @oppia/dev-workflow-reviewers
@@ -305,6 +307,8 @@
 
 # Global frontend services
 /core/templates/services/alerts.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/chapter-progress-loader.service*.ts @oppia/lace-frontend-reviewers 
+/core/templates/services/chapter-label-visibility.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/date-time-format.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/extension-tag-assembler.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/html-escaper.service*.ts @oppia/lace-frontend-reviewers
@@ -347,7 +351,7 @@
 /core/templates/services/guppy-initialization.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/math-interactions.service.ts @oppia/lace-frontend-reviewers
 /extensions/domain*.py @oppia/lace-frontend-reviewers
-/extensions/interactions/ @oppia/lace-backend-reviewers
+/extensions/interactions/ @oppia/lace-frontend-reviewers
 /extensions/objects/ @oppia/lace-backend-reviewers
 /extensions/objects/templates/filepath-editor.component*.ts @oppia/lace-frontend-reviewers
 /extensions/objects/templates/filepath-editor.component.html @oppia/lace-frontend-reviewers
@@ -526,9 +530,7 @@
 /core/templates/services/interaction-rules-registry.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/services/interaction-specs.service*.ts @oppia/lace-frontend-reviewers
 /redis.conf @oppia/dev-workflow-reviewers
-/redis_docker.conf @oppia/dev-workflow-reviewers
 /.firebase.json @oppia/dev-workflow-reviewers
-/.firebase_docker.json @oppia/dev-workflow-reviewers
 
 
 # Miscellaneous.
@@ -691,9 +693,7 @@
 
 # Frontend unit tests
 /core/templates/**/*.spec.ts @oppia/lace-frontend-reviewers
-/core/templates/**/*Spec.ts @oppia/lace-frontend-reviewers
 /extensions/**/*.spec.ts @oppia/lace-frontend-reviewers
-/extensions/**/*Spec.ts @oppia/lace-frontend-reviewers
 
 # Draft version upgrade.
 /core/domain/draft_upgrade_services*.py @oppia/lace-backend-reviewers

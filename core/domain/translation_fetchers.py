@@ -174,7 +174,7 @@ def get_entity_translation(
 
 
 def get_multiple_entity_translations(
-    entity_references: List[translation_models.EntityTranslationReferenceDict]
+    entity_references: List[translation_models.EntityTranslationReferenceDict],
 ) -> List[Optional[translation_domain.EntityTranslation]]:
     """Gets multiple entity translations by their references.
 
@@ -189,10 +189,14 @@ def get_multiple_entity_translations(
     """
     entity_translation_models = (
         translation_models.EntityTranslationsModel.get_model_multi(
-            entity_references)
+            entity_references
+        )
     )
     return [
-        _get_entity_translation_from_model(entity_translation_model)
-        if entity_translation_model is not None else None
+        (
+            _get_entity_translation_from_model(entity_translation_model)
+            if entity_translation_model is not None
+            else None
+        )
         for entity_translation_model in entity_translation_models
     ]

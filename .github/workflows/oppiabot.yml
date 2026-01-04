@@ -33,7 +33,6 @@ jobs:
         uses: oppia/oppiabot@master
         with:
           repo-token: ${{secrets.GITHUB_TOKEN}}
-        env:
-          SHEETS_TOKEN: ${{ secrets.SHEETS_TOKEN }}
-          SHEETS_CRED: ${{ secrets.SHEETS_CRED }}
-          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          sheets-cred: ${{ secrets.SHEETS_CRED }}
+          sheets-token: ${{ secrets.SHEETS_TOKEN }}
+          cla-sheet-id: ${{ secrets.SPREADSHEET_ID }}

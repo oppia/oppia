@@ -149,13 +149,12 @@ class EntityTranslationsModel(base_models.BaseModel):
 
     @classmethod
     def get_model_multi(
-            cls,
-            entity_translation_references: List[EntityTranslationReferenceDict]
+        cls, entity_translation_references: List[EntityTranslationReferenceDict]
     ) -> List[Optional[EntityTranslationsModel]]:
         """Gets multiple EntityTranslationsModels by their references.
 
         Args:
-            entity_translation_references: List[EntityTranslationReferenceDict]. 
+            entity_translation_references: List[EntityTranslationReferenceDict].
                 List of dictionaries containing entity translation references.
 
         Returns:
@@ -167,7 +166,8 @@ class EntityTranslationsModel(base_models.BaseModel):
                 reference['entity_type'],
                 reference['entity_id'],
                 reference['entity_version'],
-                reference['language_code'])
+                reference['language_code'],
+            )
             for reference in entity_translation_references
         ]
         return cls.get_multi(model_ids)

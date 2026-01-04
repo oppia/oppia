@@ -42,14 +42,19 @@ class CloudTransactionServicesTests(test_utils.GenericTestBase):
             ) -> MockTransaction:
                 return MockTransaction()
 
-        swap_client = self.swap(
-            cloud_transaction_services, 'CLIENT', MockClient()
+        mock_client = MockClient()
+
+        def mock_get_client() -> MockClient:
+            return mock_client
+
+        swap_get_client = self.swap(
+            cloud_transaction_services, 'get_client', mock_get_client
         )
 
         def add(x: int, y: int) -> int:
             return x + y
 
-        with swap_client:
+        with swap_get_client:
             wrapper_fn = cloud_transaction_services.run_in_transaction_wrapper(
                 add
             )

@@ -1,26 +1,5 @@
 {
   "frontendDependencies": {
-    "angular": {
-      "version": "1.8.2",
-      "downloadFormat": "files",
-      "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2",
-      "targetDirPrefix": "angularjs-",
-      "files": [
-        "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
-        "angular-animate.min.js", "angular-animate.min.js.map", "angular-resource.js",
-        "angular-resource.min.js", "angular-resource.min.js.map", "angular-route.js",
-        "angular-route.min.js", "angular-route.min.js.map", "angular-sanitize.js",
-        "angular-sanitize.min.js", "angular-sanitize.min.js.map", "angular-aria.js",
-        "angular-aria.min.js", "angular-aria.min.js.map", "angular-touch.js",
-        "angular-touch.min.js", "angular-touch.min.js.map"
-      ],
-      "bundle": {
-        "js": [
-          "angular-animate.js", "angular-sanitize.js",
-          "angular-touch.js", "angular-aria.js"
-        ]
-      }
-    },
     "lamejs": {
       "version": "1.2.0",
       "downloadFormat": "zip",
@@ -49,25 +28,14 @@
       }
     },
     "bootstrap": {
-      "version": "4.3.1",
+      "version": "5.3.3",
       "downloadFormat": "zip",
-      "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
-      "rootDir": "bootstrap-4.3.1-dist",
+      "url": "https://github.com/twbs/bootstrap/releases/download/v5.3.3/bootstrap-5.3.3-dist.zip",
+      "rootDir": "bootstrap-5.3.3-dist",
       "targetDirPrefix": "bootstrap-",
       "bundle": {
         "css": ["css/bootstrap.css"],
         "js": ["js/bootstrap.js"]
-      }
-    },
-    "bowerMaterial": {
-      "version": "1.1.19",
-      "downloadFormat": "zip",
-      "url": "https://github.com/angular/bower-material/archive/v1.1.19.zip",
-      "rootDirPrefix": "bower-material-",
-      "targetDirPrefix": "bower-material-",
-      "files": ["angular-material.css", "angular-material.js"],
-      "bundle": {
-        "js": ["angular-material.js"]
       }
     },
     "fontAwesome": {
@@ -86,53 +54,12 @@
         "fontsPath": "webfonts"
       }
     },
-    "angular-simple-logger": {
-      "version": "0.1.7",
-      "downloadFormat": "files",
-      "url": "https://raw.githubusercontent.com/nmccready/angular-simple-logger/0.1.7/dist",
-      "rootDirPrefix": "angular-simple-logger-",
-      "targetDirPrefix": "angular-simple-logger-",
-      "files": ["angular-simple-logger.min.js"]
-    },
-    "jquery": {
-      "version": "3.5.1",
-      "downloadFormat": "files",
-      "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1",
-      "rootDirPrefix": "jquery-",
-      "targetDirPrefix": "jquery-",
-      "files": ["jquery.js", "jquery.min.js"]
-    },
-    "jqueryUI": {
-      "version": "1.12.1",
-      "downloadFormat": "files",
-      "url": "https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1",
-      "rootDirPrefix": "jqueryui-",
-      "targetDirPrefix": "jqueryui-",
-      "files": ["jquery-ui.min.js"]
-    },
-    "jqueryUITouchPunch": {
-      "version": "0.3.1",
-      "downloadFormat": "zip",
-      "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
-      "rootDirPrefix": "jquery-ui-touch-punch-improved-",
-      "targetDirPrefix": "jquery-ui-touch-punch-"
-    },
     "mathJax": {
       "version": "2.7.5",
       "downloadFormat": "zip",
       "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
       "rootDirPrefix": "MathJax-",
       "targetDirPrefix": "MathJax-"
-    },
-    "select2": {
-      "version": "4.0.3",
-      "downloadFormat": "zip",
-      "url": "https://github.com/select2/select2/archive/4.0.3.zip",
-      "rootDirPrefix": "select2-",
-      "targetDirPrefix": "select2-",
-      "bundle": {
-        "css": ["dist/css/select2.css"]
-      }
     },
     "ckeditor": {
       "version": "4.12.1",

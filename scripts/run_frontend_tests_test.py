@@ -68,10 +68,14 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                 self.run_counter += 1
                 return b''
 
+            def read(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
+
         class MockTask:
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile()
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -83,6 +87,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile(flakes=1)
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -94,6 +99,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 0
                 self.stdout = MockFile(flakes=10)
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -105,6 +111,7 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             def __init__(self) -> None:
                 self.returncode = 1
                 self.stdout = MockFile()
+                self.stderr = MockFile()
 
             def poll(self) -> int:  # pylint: disable=missing-docstring
                 return 1
@@ -179,42 +186,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             check_frontend_test_coverage, 'main', mock_check_frontend_coverage
         )
 
-    def test_run_dtslint_type_tests_passed(self) -> None:
-        with self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.run_dtslint_type_tests()
-        cmd = [
-            './node_modules/dtslint/bin/index.js',
-            run_frontend_tests.DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-            '--localTs',
-            run_frontend_tests.TYPESCRIPT_DIR_RELATIVE_PATH,
-        ]
-        self.assertIn(cmd, self.cmd_token_list)
-        self.assertIn('Running dtslint type tests.', self.print_arr)
-        self.assertNotIn(
-            'The dtslint (type tests) failed.', self.sys_exit_message
-        )
-
-    def test_run_dtslint_type_tests_failed(self) -> None:
-        with self.swap_failed_Popen, self.print_swap:
-            with self.swap_sys_exit:
-                run_frontend_tests.run_dtslint_type_tests()
-        cmd = [
-            './node_modules/dtslint/bin/index.js',
-            run_frontend_tests.DTSLINT_TYPE_TESTS_DIR_RELATIVE_PATH,
-            '--localTs',
-            run_frontend_tests.TYPESCRIPT_DIR_RELATIVE_PATH,
-        ]
-        self.assertIn(cmd, self.cmd_token_list)
-        self.assertIn('Running dtslint type tests.', self.print_arr)
-        self.assertIn('The dtslint (type tests) failed.', self.sys_exit_message)
-
-    def test_no_tests_are_run_when_dtslint_flag_passed(self) -> None:
-        with self.swap_success_Popen, self.print_swap:
-            run_frontend_tests.main(args=['--dtslint_only'])
-        self.assertIn('Running dtslint type tests.', self.print_arr)
-        self.assertIn('Done!', self.print_arr)
-        self.assertEqual(len(self.cmd_token_list), 1)
-
     def test_frontend_tests_with_specs_to_run(self) -> None:
         original_os_path_exists = os.path.exists
 
@@ -224,8 +195,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             if path == 'about-page.component.spec.ts':
                 return True
             if path == 'test-module.spec.js':
-                return True
-            if path == 'ExplorationObjectFactorySpec.ts':
                 return True
             return original_os_path_exists(path)
 
@@ -240,11 +209,9 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             '--specs_to_run='
                             'home-page.component.spec.ts,'
                             'about-page.component.ts,'
-                            'test-module.js,'
-                            'ExplorationObjectFactory.ts',
+                            'test-module.js',
                         ]
                     )
-
         cmd = [
             common.NODE_BIN_PATH,
             '--max-old-space-size=4096',
@@ -252,7 +219,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'start',
             os.path.join('core', 'tests', 'karma.conf.ts'),
             '--specs_to_run='
-            'ExplorationObjectFactorySpec.ts,'
             'about-page.component.spec.ts,'
             'home-page.component.spec.ts,'
             'test-module.spec.js',
@@ -264,7 +230,6 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             [
                 [
                     '--files_to_check='
-                    'ExplorationObjectFactorySpec.ts,'
                     'about-page.component.spec.ts,'
                     'home-page.component.spec.ts,'
                     'test-module.spec.js'

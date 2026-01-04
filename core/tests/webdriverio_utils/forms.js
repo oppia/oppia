@@ -362,9 +362,6 @@ var AutocompleteDropdownEditor = function (elem) {
     setValue: async function (text) {
       await action.click('Container Element', elem.$(containerLocator));
       await action.waitForAutosave();
-      // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
-      // field when it is 'activated', i.e. when the dropdown is clicked.
 
       await action.setValue(
         'Dropdown Element Search',
@@ -602,13 +599,21 @@ var RichTextChecker = async function (arrayOfElems, arrayOfTexts, fullText) {
   // specially.
   var justPassedRteComponent = false;
 
+  var removeHtmlComments = function (input) {
+    let previous;
+    do {
+      previous = input;
+      input = input.replace(/<!--[^>]*-->/g, '');
+    } while (input !== previous);
+
+    return input;
+  };
+
   var _readFormattedText = async function (text, tagName) {
     expect(await arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
     // Remove comments introduced by angular for bindings using replace.
     expect(
-      (await arrayOfElems[arrayPointer].getHTML(false))
-        .replace(/<!--[^>]*-->/g, '')
-        .trim()
+      removeHtmlComments(await arrayOfElems[arrayPointer].getHTML(false)).trim()
     ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
@@ -729,13 +734,12 @@ var CodeMirrorChecker = function (elem, codeMirrorPaneToScroll) {
       // This is used to match and scroll the text in codemirror to a point
       // scrollTo pixels from the top of the text or the bottom of the text
       // if scrollTo is too large.
-      await browser.execute(
-        "$('.CodeMirror-vscrollbar')." +
-          codeMirrorPaneToScroll +
-          '().scrollTop(' +
-          String(scrollTo) +
-          ');'
-      );
+      await browser.execute(scrollTo => {
+        var el = document.querySelector('.CodeMirror-vscrollbar');
+        if (el) {
+          el.scrollTop = scrollTo;
+        }
+      }, scrollTo);
       var lineHeight = await elem
         .$(codeMirrorLineNumberLocator)
         .getAttribute('clientHeight');
