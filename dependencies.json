@@ -1,32 +1,5 @@
 {
   "frontendDependencies": {
-    "lamejs": {
-      "version": "1.2.0",
-      "downloadFormat": "zip",
-      "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
-      "rootDirPrefix": "lamejs-",
-      "targetDirPrefix": "lamejs-"
-    },
-    "messageFormat": {
-      "version": "2.0.5",
-      "downloadFormat": "zip",
-      "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
-      "targetDirPrefix": "messageformat-",
-      "rootDirPrefix": "messageformat-",
-      "bundle": {
-        "js": ["messageformat.js"]
-      }
-    },
-    "popperJs": {
-      "version": "1.15.0",
-      "downloadFormat": "zip",
-      "url": "https://github.com/floating-ui/floating-ui/archive/v1.15.0.zip",
-      "rootDirPrefix": "floating-ui-",
-      "targetDirPrefix": "popperJs-",
-      "bundle": {
-        "js": ["dist/umd/popper.js"]
-      }
-    },
     "mathJax": {
       "version": "2.7.5",
       "downloadFormat": "zip",
