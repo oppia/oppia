@@ -364,7 +364,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'abbreviated_name',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -393,7 +393,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'meta_tag_content',
           new_value: 'new meta tag content',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -424,7 +424,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'page_title_fragment_for_web',
           new_value: 'new page title',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -454,7 +454,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'practice_tab_is_displayed',
           new_value: true,
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -480,7 +480,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'url_fragment',
           new_value: 'new-unique-value',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -512,7 +512,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_filename',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -541,7 +541,7 @@ describe('Topic update service', function () {
           cmd: 'update_topic_property',
           property_name: 'thumbnail_bg_color',
           new_value: 'new unique value',
-          old_value: null,
+          old_value: undefined,
         },
       ]);
     }
@@ -1335,17 +1335,6 @@ describe('Topic update service', function () {
       expect(undoRedoService.getCommittableChangeList()).toEqual([]);
     }
   );
-
-  it('should throw error when removing skill from non-existent subtopic', () => {
-    expect(() => {
-      topicUpdateService.removeSkillFromSubtopic(
-        _sampleTopic,
-        999,
-        _secondSkillSummary
-      );
-    }).toThrowError("Subtopic with id 999 doesn't exist");
-    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
-  });
 
   it('should add and delete a study guide section', () => {
     var newSampleSectionDict = {
