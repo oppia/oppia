@@ -35,7 +35,7 @@ module.exports = merge(common, {
   stats: {
     warningsFilter: [
       /export '.*' was not found in/,
-      /export .* was not found in/
-    ]
-  }
+      /export .* was not found in/,
+    ],
+  },
 });
