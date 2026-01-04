@@ -87,7 +87,7 @@ describe('Topic update service', function () {
       practice_tab_is_displayed: false,
       meta_tag_content: '',
       page_title_fragment_for_web: '',
-    },
+    } as any as TopicBackendDict,
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
@@ -877,7 +877,7 @@ describe('Topic update service', function () {
         thumbnail_filename: null,
         thumbnail_bg_color: null,
         url_fragment: 'title-two'
-      },
+      } as any,
       {
         id: 3,
         title: 'Title3',
@@ -885,9 +885,9 @@ describe('Topic update service', function () {
         thumbnail_filename: null,
         thumbnail_bg_color: null,
         url_fragment: 'title-three'
-      },
+      } as any,
     ];
-    sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict as any);
+    sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
 
     _sampleTopic = Topic.create(
       sampleTopicBackendObject.topicDict as TopicBackendDict,
@@ -930,7 +930,7 @@ describe('Topic update service', function () {
         thumbnail_filename: null,
         thumbnail_bg_color: null,
         url_fragment: ''
-      },
+      } as any,
     ];
   });
 
