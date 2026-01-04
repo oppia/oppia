@@ -1388,7 +1388,6 @@ describe('Exploration editor page component', () => {
       () => {}
     );
 
-    // Mock Bulk Translations service just in case feature flag is true
     spyOn(
       entityBulkTranslationsBackendApiService,
       'fetchEntityBulkTranslationsAsync'
@@ -1405,7 +1404,6 @@ describe('Exploration editor page component', () => {
     ).and.callThrough();
 
     component.ngOnInit();
-    // Explicitly emit to ensure initExplorationPage runs
     esaves.onInitExplorationPage.emit();
     tick();
     flush();
