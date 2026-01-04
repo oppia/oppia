@@ -87,9 +87,6 @@ type StudyGuideUpdateReverse = (
   domainObject: DomainObject
 ) => void;
 
-type EntityUpdateApply<T> = (topicChange: TopicChange, entity: T) => void;
-type EntityUpdateReverse<T> = (topicChange: TopicChange, entity: T) => void;
-
 @Injectable({
   providedIn: 'root',
 })
