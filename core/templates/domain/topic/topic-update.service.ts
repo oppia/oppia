@@ -881,7 +881,7 @@ export class TopicUpdateService {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let oldThumbnailFilename =
-      cloneDeep(subtopic.getThumbnailFilename()) || undefined;
+      cloneDeep(subtopic.getThumbnailFilename()) ?? null;
     this._applySubtopicPropertyChange(
       topic,
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -923,7 +923,7 @@ export class TopicUpdateService {
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
-    let oldUrlFragment = cloneDeep(subtopic.getUrlFragment()) || undefined;
+    let oldUrlFragment = cloneDeep(subtopic.getUrlFragment()) ?? null;
     this._applySubtopicPropertyChange(
       topic,
       TopicDomainConstants.SUBTOPIC_PROPERTY_URL_FRAGMENT,
@@ -965,8 +965,7 @@ export class TopicUpdateService {
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
-    let oldThumbnailBgColor =
-      cloneDeep(subtopic.getThumbnailBgColor()) || undefined;
+    let oldThumbnailBgColor = cloneDeep(subtopic.getThumbnailBgColor()) ?? null;
     this._applySubtopicPropertyChange(
       topic,
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_BG_COLOR,
