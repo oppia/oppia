@@ -16,17 +16,17 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {HttpErrorResponse} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
-import {EditableExplorationBackendApiService} from
+import { EditableExplorationBackendApiService } from
   'domain/exploration/editable-exploration-backend-api.service';
-import {CsrfTokenService} from 'services/csrf-token.service';
-import {ExplorationBackendDict} from
+import { CsrfTokenService } from 'services/csrf-token.service';
+import { ExplorationBackendDict } from
   'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
@@ -63,7 +63,9 @@ describe('EditableExplorationBackendApiService', () => {
       init_state_name: 'Introduction',
       param_changes: [],
       param_specs: {
-        param_specs: {},
+        x: {
+          obj_type: 'UnicodeString',
+        },
       },
       states: {
         Introduction: {
@@ -72,8 +74,8 @@ describe('EditableExplorationBackendApiService', () => {
             html: '',
             content_id: 'content',
           },
-          unresolved_answers: {},
           interaction: {
+            id: null,
             customization_args: {},
             answer_groups: [],
             default_outcome: {
@@ -85,19 +87,20 @@ describe('EditableExplorationBackendApiService', () => {
                 content_id: 'feedback',
               },
               labelled_as_correct: false,
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null,
             },
             confirmed_unclassified_answers: [],
-            id: null,
             hints: [],
             solution: null,
           },
-          recorded_voiceovers: {
-            voiceovers_mapping: {},
-          },
-          written_translations: {
-            translations_mapping: {},
-          },
+          classifier_model_id: null,
+          solicit_answer_details: false,
+          card_is_checkpoint: false,
+          linked_skill_id: null,
+          inapplicable_skill_misconception_ids: [],
         },
+
       },
       title: 'Sample exploration',
       language_code: 'en',
@@ -112,6 +115,11 @@ describe('EditableExplorationBackendApiService', () => {
         blurb: '',
         author_notes: '',
         edits_allowed: true,
+        states_schema_version: 0,
+        init_state_name: 'Introduction',
+        param_specs: {},
+        param_changes: [],
+        auto_tts_enabled: false,
       },
       version: 1,
     };
@@ -179,11 +187,11 @@ describe('EditableExplorationBackendApiService', () => {
     editableExplorationBackendApiService
       .updateExplorationAsync(
         '0',
-        exploration.version as number,
+        exploration.version!,
         'Updated exploration',
         []
       )
-      .then(() => {});
+      .then(() => { });
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toBe('PUT');
@@ -195,7 +203,7 @@ describe('EditableExplorationBackendApiService', () => {
   it('should delete exploration', fakeAsync(() => {
     editableExplorationBackendApiService
       .deleteExplorationAsync('0')
-      .then(() => {});
+      .then(() => { });
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(deleteReq.request.method).toBe('DELETE');
