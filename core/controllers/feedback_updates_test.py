@@ -270,6 +270,12 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(messages_summary['author_username'], None)
 
+    # NOTE:
+    # Previously, an exception was raised when an unsupported or deprecated
+    # suggestion type was encountered. This behavior has intentionally changed:
+    # such suggestions are now skipped instead of raising, so the feedback thread
+    # endpoint does not fail due to legacy data.
+
     def test_get_suggestions_after_updating_suggestion_summary(self) -> None:
         self.login(self.EDITOR_EMAIL)
 

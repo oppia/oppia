@@ -196,10 +196,15 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 ),
             }
 
-        if suggestion_summary is not None:
-            message_summary_list.append(suggestion_summary)
-            messages.pop(0)
-            authors_settings.pop(0)
+            # NOTE:
+            # Deprecated or legacy suggestion models may still exist in production data.
+            # We intentionally skip unsupported suggestions instead of raising an
+            # exception so that valid feedback threads can still be returned.
+
+            if suggestion_summary is not None:
+                message_summary_list.append(suggestion_summary)
+                messages.pop(0)
+                authors_settings.pop(0)
         for m, author_settings in zip(messages, authors_settings):
 
             if author_settings is None:
