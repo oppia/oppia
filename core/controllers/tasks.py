@@ -328,6 +328,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 cloud_task_run_domain_instance
             )
         except Exception as e:
+            assert cloud_task_run_domain_instance is not None
             # The maximum number of retries is enforced only for voiceover
             # regeneration tasks, as these depend on a cloud service. Retrying
             # indefinitely without investigating failures could result in

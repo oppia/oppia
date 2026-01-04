@@ -96,19 +96,19 @@
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
   <h3>Automatic voiceover updates</h3>
 
-  <p class="info-text">
-    <div>
+  <div class="info-text">
+    <p>
       To ensure that all curated content has matching audio, these updates run
       automatically when the content of an exploration in a published topic is
       updated.
-    </div>
-    <div>
+    </p>
+    <span>
       <i>
         Note: Does not include manual requests triggered via the
         exploration editor page.
       </i>
-    </div>
-  </p>
+    </span>
+  </div>
 
   <div>
     <div class="datepicker-container date-selector-inner-container">
@@ -135,9 +135,15 @@
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length">
+  <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
     <p class="info-text">
       <i>No records found for the selected date range.</i>
+    </p>
+  </div>
+
+  <div *ngIf="cloudTaskRunList.length === 100">
+    <p class="info-text">
+      <strong>Note: </strong>Displaying the most recent 100 voiceover regeneration records. Please choose a narrower date range to view more specific results.
     </p>
   </div>
 

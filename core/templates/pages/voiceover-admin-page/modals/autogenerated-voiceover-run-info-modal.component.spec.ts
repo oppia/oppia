@@ -76,7 +76,7 @@ describe('Voiceover regeneration information modal', () => {
 
     const functionId2 = 'regenerate_voiceovers_on_exploration_added_to_topic';
     const expectedText2 =
-      'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to published topic")';
+      'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to topic")';
     expect(componentInstance.getFunctionIdText(functionId2)).toBe(
       expectedText2
     );

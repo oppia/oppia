@@ -403,7 +403,7 @@ describe('Voiceover Admin Page component ', () => {
     expect(component.getFunctionIdText(functionId1)).toBe(expectedText1);
 
     const functionId2 = 'regenerate_voiceovers_on_exploration_added_to_topic';
-    const expectedText2 = 'Exploration added to published topic';
+    const expectedText2 = 'Exploration added to topic';
     expect(component.getFunctionIdText(functionId2)).toBe(expectedText2);
 
     expect(component.getFunctionIdText('unknown_function_id')).toBe('');

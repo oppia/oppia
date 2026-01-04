@@ -348,7 +348,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     } else if (
       functionId === 'regenerate_voiceovers_on_exploration_added_to_topic'
     ) {
-      return 'Exploration added to published topic';
+      return 'Exploration added to topic';
     }
     return '';
   }
