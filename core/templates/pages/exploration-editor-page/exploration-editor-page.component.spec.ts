@@ -1254,7 +1254,7 @@ describe('Exploration editor page component', () => {
 
     it('should mark editable and translatable when user can edit', fakeAsync(() => {
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
-        Promise.resolve({canEdit: true, canVoiceover: false} as any)
+        Promise.resolve({canEdit: true, canVoiceover: false})
       );
 
       spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
@@ -1263,14 +1263,14 @@ describe('Exploration editor page component', () => {
       });
 
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-        Promise.resolve({explorationIsCurated: false} as any)
+        Promise.resolve({explorationIsCurated: false})
       );
 
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({
           isCurriculumAdmin: () => false,
           isModerator: () => false,
-        } as any)
+        })
       );
 
       const markEditableSpy = spyOn(editabilityService, 'markEditable');
@@ -1295,20 +1295,20 @@ describe('Exploration editor page component', () => {
 
     it('should mark translatable but not editable when user can voiceover but not edit', fakeAsync(() => {
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
-        Promise.resolve({canEdit: false, canVoiceover: true} as any)
+        Promise.resolve({canEdit: false, canVoiceover: true})
       );
       spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
         cb();
         return Promise.resolve(explorationData);
       });
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-        Promise.resolve({explorationIsCurated: false} as any)
+        Promise.resolve({explorationIsCurated: false})
       );
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({
           isCurriculumAdmin: () => false,
           isModerator: () => false,
-        } as any)
+        })
       );
 
       const markEditableSpy = spyOn(editabilityService, 'markEditable');
@@ -1329,20 +1329,20 @@ describe('Exploration editor page component', () => {
 
     it('should mark neither editable nor translatable when user has no permissions', fakeAsync(() => {
       spyOn(ueps, 'getPermissionsAsync').and.returnValue(
-        Promise.resolve({canEdit: false, canVoiceover: false} as any)
+        Promise.resolve({canEdit: false, canVoiceover: false})
       );
       spyOn(explorationDataService, 'getDataAsync').and.callFake(cb => {
         cb();
         return Promise.resolve(explorationData);
       });
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-        Promise.resolve({explorationIsCurated: false} as any)
+        Promise.resolve({explorationIsCurated: false})
       );
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve({
           isCurriculumAdmin: () => false,
           isModerator: () => false,
-        } as any)
+        })
       );
 
       const markEditableSpy = spyOn(editabilityService, 'markEditable');
@@ -1364,7 +1364,7 @@ describe('Exploration editor page component', () => {
 
   it('should handle null draft changes correctly', fakeAsync(() => {
     const data = {...explorationData};
-    data.draft_changes = null as any;
+    data.draft_changes = null;
 
     const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
     spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
@@ -1373,18 +1373,18 @@ describe('Exploration editor page component', () => {
     });
 
     spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-      Promise.resolve({explorationIsCurated: false} as any)
+      Promise.resolve({explorationIsCurated: false})
     );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
         isCurriculumAdmin: () => false,
         isModerator: () => false,
-      } as any)
+      })
     );
 
     const entityVoiceoversService = TestBed.inject(EntityVoiceoversService);
-    spyOn(entityVoiceoversService as any, 'init').and.callFake(() => {});
-    spyOn(entityVoiceoversService as any, 'fetchEntityVoiceovers').and.callFake(
+    spyOn(entityVoiceoversService, 'init').and.callFake(() => {});
+    spyOn(entityVoiceoversService, 'fetchEntityVoiceovers').and.callFake(
       () => {}
     );
 
@@ -1392,11 +1392,11 @@ describe('Exploration editor page component', () => {
     spyOn(
       entityBulkTranslationsBackendApiService,
       'fetchEntityBulkTranslationsAsync'
-    ).and.returnValue(Promise.resolve({}) as any);
+    ).and.returnValue(Promise.resolve({}));
     const platformFeatureService = TestBed.inject(PlatformFeatureService);
-    (
-      platformFeatureService as any
-    ).status.ExplorationEditorCanModifyTranslations = {isEnabled: false};
+    platformFeatureService.status.ExplorationEditorCanModifyTranslations = {
+      isEnabled: false,
+    };
 
     spyOn(cls, 'loadAutosavedChangeList');
     spyOn(
@@ -1428,7 +1428,7 @@ describe('Exploration editor page component', () => {
     };
     (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
 
-    (component as any).maybeShowFeedbackPromptModal();
+    component.maybeShowFeedbackPromptModal();
 
     expect(ngbModal.open).toHaveBeenCalled();
     expect(component.isModalOpenable).toBeFalse();
@@ -1440,7 +1440,7 @@ describe('Exploration editor page component', () => {
 
   it('should handle exploration linked to story correctly', fakeAsync(() => {
     const linkedData = {...explorationData};
-    (linkedData as any).exploration_is_linked_to_story = true;
+    linkedData.exploration_is_linked_to_story = true;
 
     const explorationDataServiceSpy = TestBed.inject(ExplorationDataService);
     spyOn(explorationDataServiceSpy, 'getDataAsync').and.callFake(callback => {
@@ -1448,13 +1448,13 @@ describe('Exploration editor page component', () => {
       return Promise.resolve(linkedData);
     });
     spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-      Promise.resolve({explorationIsCurated: false} as any)
+      Promise.resolve({explorationIsCurated: false})
     );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
         isCurriculumAdmin: () => false,
         isModerator: () => false,
-      } as any)
+      })
     );
     spyOn(pageContextService, 'setExplorationIsLinkedToStory');
 
@@ -1478,13 +1478,13 @@ describe('Exploration editor page component', () => {
     });
 
     spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
-      Promise.resolve({explorationIsCurated: false} as any)
+      Promise.resolve({explorationIsCurated: false})
     );
     spyOn(userService, 'getUserInfoAsync').and.returnValue(
       Promise.resolve({
         isCurriculumAdmin: () => false,
         isModerator: () => false,
-      } as any)
+      })
     );
 
     const lockSpy = spyOn(component.editabilityService, 'lockExploration');
@@ -1572,9 +1572,9 @@ describe('Exploration editor page component', () => {
         },
         result: Promise.resolve(),
       };
-      (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef as any);
+      (ngbModal.open as jasmine.Spy).and.returnValue(mockModalRef);
 
-      (component as any).maybeShowFeedbackPromptModal();
+      component.maybeShowFeedbackPromptModal();
       flush();
 
       expect(rs.navigateToFeedbackTab).toHaveBeenCalled();
@@ -1682,17 +1682,16 @@ describe('Exploration editor page component', () => {
   });
 
   it('should update existing entity translation with draft changes', fakeAsync(() => {
-    (
-      component as any
-    ).entityTranslationsService.languageCodeToLatestEntityTranslations = {
-      fr: EntityTranslation.createFromBackendDict({
-        entity_id: explorationId,
-        entity_type: 'exploration',
-        entity_version: 1,
-        language_code: 'fr',
-        translations: {},
-      }),
-    };
+    component.entityTranslationsService.languageCodeToLatestEntityTranslations =
+      {
+        fr: EntityTranslation.createFromBackendDict({
+          entity_id: explorationId,
+          entity_type: 'exploration',
+          entity_version: 1,
+          language_code: 'fr',
+          translations: {},
+        }),
+      };
 
     const draftChanges = [
       {
@@ -1707,22 +1706,18 @@ describe('Exploration editor page component', () => {
       },
     ];
 
-    component.populateEntityTranslationsWithDraftChanges(
-      draftChanges as any,
-      1
-    );
+    component.populateEntityTranslationsWithDraftChanges(draftChanges, 1);
 
-    const translation = (
-      component as any
-    ).entityTranslationsService.languageCodeToLatestEntityTranslations.fr.getWrittenTranslation(
-      'content_updated'
-    );
+    const translation =
+      component.entityTranslationsService.languageCodeToLatestEntityTranslations.fr.getWrittenTranslation(
+        'content_updated'
+      );
     expect(translation).toBeDefined();
-    const content = (translation as any).getHtml
+    const content = translation.getHtml
       ? translation.getHtml()
-      : (translation as any).toBackendDict
-        ? (translation as any).toBackendDict().content_value
-        : (translation as any).content_value;
+      : translation.toBackendDict
+        ? translation.toBackendDict().content_value
+        : translation.content_value;
     expect(content).toBe('<p>Updated Content</p>');
   }));
 });
