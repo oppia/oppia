@@ -58,6 +58,7 @@ type TopicPropertyValue =
   | boolean
   | number
   | null
+  | undefined
   | SubtitledHtmlBackendDict
   | RecordedVoiceOverBackendDict
   | StudyGuideSectionBackendDict[];
