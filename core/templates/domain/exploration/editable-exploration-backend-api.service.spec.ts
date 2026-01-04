@@ -26,12 +26,12 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {EditableExplorationBackendApiService} from
   'domain/exploration/editable-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
-import {
-  ExplorationBackendDict
-} from 'domain/exploration/exploration.model';
+import {ExplorationBackendDict} from
+  'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -57,14 +57,20 @@ describe('EditableExplorationBackendApiService', () => {
     );
 
     sampleDataResults = {
-      exploration_id: '0',
+      auto_tts_enabled: false,
+      draft_changes: [],
+      is_version_of_draft_valid: true,
       init_state_name: 'Introduction',
-      language_code: 'en',
+      param_changes: [],
+      param_specs: {
+        param_specs: {},
+      },
       states: {
         Introduction: {
           param_changes: [],
           content: {
             html: '',
+            content_id: 'content',
           },
           unresolved_answers: {},
           interaction: {
@@ -76,15 +82,37 @@ describe('EditableExplorationBackendApiService', () => {
               dest_if_really_stuck: null,
               feedback: {
                 html: '',
+                content_id: 'feedback',
               },
+              labelled_as_correct: false,
             },
             confirmed_unclassified_answers: [],
             id: null,
+            hints: [],
+            solution: null,
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {},
+          },
+          written_translations: {
+            translations_mapping: {},
           },
         },
       },
-      username: 'test',
-      user_email: 'test@example.com',
+      title: 'Sample exploration',
+      language_code: 'en',
+      draft_change_list_id: 0,
+      next_content_id_index: 1,
+      exploration_metadata: {
+        title: 'Sample exploration',
+        category: 'Sample',
+        objective: 'Objective',
+        language_code: 'en',
+        tags: [],
+        blurb: '',
+        author_notes: '',
+        edits_allowed: true,
+      },
       version: 1,
     };
   });
@@ -140,7 +168,7 @@ describe('EditableExplorationBackendApiService', () => {
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
-      .then(data => {
+      .then((data: ExplorationBackendDict) => {
         exploration = data;
       });
 
@@ -150,8 +178,8 @@ describe('EditableExplorationBackendApiService', () => {
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
-        exploration.exploration_id,
-        exploration.version,
+        '0',
+        exploration.version as number,
         'Updated exploration',
         []
       )
@@ -159,26 +187,14 @@ describe('EditableExplorationBackendApiService', () => {
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toBe('PUT');
-    updateReq.flush(exploration);
+    updateReq.flush(sampleDataResults);
 
     flushMicrotasks();
   }));
 
   it('should delete exploration', fakeAsync(() => {
-    let exploration!: ExplorationBackendDict;
-
     editableExplorationBackendApiService
-      .fetchExplorationAsync('0')
-      .then(data => {
-        exploration = data;
-      });
-
-    const fetchReq = httpTestingController.expectOne('/createhandler/data/0');
-    fetchReq.flush(sampleDataResults);
-    flushMicrotasks();
-
-    editableExplorationBackendApiService
-      .deleteExplorationAsync(exploration.exploration_id)
+      .deleteExplorationAsync('0')
       .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');

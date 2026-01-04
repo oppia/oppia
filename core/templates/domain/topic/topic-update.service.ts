@@ -109,8 +109,8 @@ export class TopicUpdateService {
       domainObject: DomainObject
     ) => void
   ) {
-    let changeDict = cloneDeep(params);
-    changeDict.cmd = command;
+    let changeDict = cloneDeep(params) as Partial<TopicChange>;
+    changeDict.cmd = command as TopicChange['cmd'];
     let changeObj = new Change(
       changeDict as Partial<TopicChange> as TopicChange,
       apply as (
@@ -127,9 +127,9 @@ export class TopicUpdateService {
 
   private _getParameterFromChangeDict(
     changeDict: TopicChange,
-    paramName: string
+    paramName: keyof TopicChange
   ): TopicPropertyValue {
-    return changeDict[paramName as keyof TopicChange] as TopicPropertyValue;
+    return changeDict[paramName] as TopicPropertyValue;
   }
 
   // Applies a topic property change, specifically. See _applyChange()
@@ -148,7 +148,7 @@ export class TopicUpdateService {
       {
         property_name: propertyName,
         new_value: cloneDeep(newValue),
-        old_value: cloneDeep(oldValue) || null,
+        old_value: cloneDeep(oldValue),
       },
       apply as (
         backendChangeObject: TopicChange,
@@ -262,7 +262,7 @@ export class TopicUpdateService {
    * undo/redo service.
    */
   setTopicName(topic: Topic, name: string): void {
-    let oldName = cloneDeep(topic.getName());
+    const oldName = cloneDeep(topic.getName());
     this._applyTopicPropertyChange(
       topic,
       TopicDomainConstants.TOPIC_PROPERTY_NAME,
@@ -389,7 +389,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Apply ----
         const topic = domainObject as Topic;
-        var pageTitleFragmentForWeb = this._getNewPropertyValueFromChangeDict(
+        const pageTitleFragmentForWeb = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
         topic.setPageTitleFragmentForWeb(pageTitleFragmentForWeb);
@@ -434,7 +434,7 @@ export class TopicUpdateService {
    * undo/redo service.
    */
   setTopicThumbnailFilename(topic: Topic, thumbnailFilename: string): void {
-    let oldThumbnailFilename = cloneDeep(topic.getThumbnailFilename());
+    const oldThumbnailFilename = cloneDeep(topic.getThumbnailFilename());
     this._applyTopicPropertyChange(
       topic,
       TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -497,7 +497,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Apply ----
         const topic = domainObject as Topic;
-        var description = this._getNewPropertyValueFromChangeDict(
+        const description = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
         topic.setDescription(description);
@@ -542,7 +542,7 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   addSubtopic(topic: Topic, title: string, urlFragment: string): void {
-    let nextSubtopicId = topic.getNextSubtopicId();
+    const nextSubtopicId = topic.getNextSubtopicId();
     this._applyChange(
       topic,
       TopicDomainConstants.CMD_ADD_SUBTOPIC,
@@ -582,12 +582,12 @@ export class TopicUpdateService {
    * @param {number} subtopicId - The id of the subtopic to delete.
    */
   deleteSubtopic(topic: Topic, subtopicId: number): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
     let newlyCreated = false;
-    let changeList = this.undoRedoService.getCommittableChangeList();
+    const changeList = this.undoRedoService.getCommittableChangeList();
     for (let i = 0; i < changeList.length; i++) {
       let _changeList = changeList[i] as TopicChange;
       if (
@@ -603,7 +603,7 @@ export class TopicUpdateService {
       let indicesToDelete: number[] = [];
       // Loop over the current changelist and handle all the cases where
       // a skill moved into the subtopic or moved out of it.
-      for (var i = 0; i < currentChangeList.length; i++) {
+      for (let i = 0; i < currentChangeList.length; i++) {
         let changeDict = currentChangeList[
           i
         ].getBackendChangeObject() as TopicChange;
@@ -735,10 +735,10 @@ export class TopicUpdateService {
     newSubtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
-    if (!newSubtopicId) {
+    if (newSubtopicId === null) {
       throw new Error('New subtopic cannot be null');
     }
-    let newSubtopic = topic.getSubtopicById(newSubtopicId);
+    const newSubtopic = topic.getSubtopicById(newSubtopicId);
     if (!newSubtopic) {
       throw new Error(`Subtopic with id ${newSubtopicId} doesn't exist`);
     }
@@ -753,12 +753,13 @@ export class TopicUpdateService {
       ((changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Apply ----
         const topic = domainObject as Topic;
-        if (!oldSubtopicId) {
+        if (oldSubtopicId === null) {
           topic.removeUncategorizedSkill(skillSummary.getId());
-        } else {
+        }
+        else {
           const oldSubtopic = topic.getSubtopicById(oldSubtopicId);
           if (oldSubtopic) {
-            oldSubtopic.removeSkill(skillSummary.getId());
+          oldSubtopic.removeSkill(skillSummary.getId());
           }
         }
         const newSubtopicForApply = topic.getSubtopicById(newSubtopicId);
@@ -808,7 +809,7 @@ export class TopicUpdateService {
     subtopicId: number,
     skillSummary: ShortSkillSummary
   ): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn't exist`);
     }
@@ -863,11 +864,11 @@ export class TopicUpdateService {
     subtopicId: number,
     thumbnailFilename: string
   ): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
-    let oldThumbnailFilename = cloneDeep(subtopic.getThumbnailFilename());
+    const oldThumbnailFilename = cloneDeep(subtopic.getThumbnailFilename());
     this._applySubtopicPropertyChange(
       topic,
       TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -880,7 +881,7 @@ export class TopicUpdateService {
         let thumbnailFilename = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailFilename(thumbnailFilename);
         }
@@ -888,7 +889,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailFilename(oldThumbnailFilename);
         }
@@ -905,7 +906,7 @@ export class TopicUpdateService {
     subtopicId: number,
     urlFragment: string
   ): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
@@ -922,7 +923,7 @@ export class TopicUpdateService {
         let newUrlFragment = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setUrlFragment(newUrlFragment);
         }
@@ -930,7 +931,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setUrlFragment(oldUrlFragment);
         }
@@ -947,7 +948,7 @@ export class TopicUpdateService {
     subtopicId: number,
     thumbnailBgColor: string
   ): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
@@ -964,7 +965,7 @@ export class TopicUpdateService {
         let thumbnailBgColor = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailBgColor(thumbnailBgColor);
         }
@@ -972,7 +973,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailBgColor(oldThumbnailBgColor);
         }
@@ -985,7 +986,7 @@ export class TopicUpdateService {
    * the undo/redo service.
    */
   setSubtopicTitle(topic: Topic, subtopicId: number, title: string): void {
-    let subtopic = topic.getSubtopicById(subtopicId);
+    const subtopic = topic.getSubtopicById(subtopicId);
     if (!subtopic) {
       throw new Error(`Subtopic with id ${subtopicId} doesn\'t exist`);
     }
@@ -1002,7 +1003,7 @@ export class TopicUpdateService {
         let title = this._getNewPropertyValueFromChangeDict(
           changeDict
         ) as string;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setTitle(title);
         }
@@ -1010,7 +1011,7 @@ export class TopicUpdateService {
       (changeDict: TopicChange, domainObject: DomainObject) => {
         // ---- Undo ----
         const topic = domainObject as Topic;
-        let subtopic = topic.getSubtopicById(subtopicId);
+        const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setTitle(oldTitle);
         }
@@ -1023,7 +1024,7 @@ export class TopicUpdateService {
     subtopicId: number,
     newSubtitledHtml: SubtitledHtml
   ): void {
-    let oldSubtitledHtml = cloneDeep(
+    const oldSubtitledHtml = cloneDeep(
       subtopicPage.getPageContents().getSubtitledHtml()
     );
     this._applySubtopicPagePropertyChange(
@@ -1351,15 +1352,15 @@ export class TopicUpdateService {
     topic: Topic,
     newSkillSummariesForDiagnosticTest: ShortSkillSummary[]
   ): void {
-    let oldSkillSummariesForDiagnosticTest = cloneDeep(
+    const oldSkillSummariesForDiagnosticTest = cloneDeep(
       topic.getSkillSummariesForDiagnosticTest()
     );
-    let oldSkillIdsForDiagnosticTest = oldSkillSummariesForDiagnosticTest.map(
+    const oldSkillIdsForDiagnosticTest = oldSkillSummariesForDiagnosticTest.map(
       (skillSummary: ShortSkillSummary) => {
         return skillSummary.getId();
       }
     );
-    let newSkillIdsForDiagnosticTest = newSkillSummariesForDiagnosticTest.map(
+    const newSkillIdsForDiagnosticTest = newSkillSummariesForDiagnosticTest.map(
       (skillSummary: ShortSkillSummary) => {
         return skillSummary.getId();
       }

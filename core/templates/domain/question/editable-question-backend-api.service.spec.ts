@@ -20,18 +20,18 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+
 import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
   FetchQuestionResponse,
 } from 'domain/question/editable-question-backend-api.service';
-
-import { Question } from 'domain/question/question.model';
+import {Question} from 'domain/question/question.model';
 
 /**
  * Local backend dict shape.
- * (QuestionBackendDict is not exported in Oppia, so specs define it inline)
+ * (QuestionBackendDict is not exported in Oppia)
  */
 interface QuestionBackendDict {
   id: string;
@@ -44,7 +44,7 @@ interface QuestionBackendDict {
   version: number;
 }
 
-describe('Editable question backend API service', () => {
+describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let editableQuestionBackendApiService: EditableQuestionBackendApiService;
 
@@ -54,7 +54,7 @@ describe('Editable question backend API service', () => {
       param_changes: [],
       content: {
         html: '<p>Question</p>',
-        audio_translations: {},
+        content_id: 'content',
       },
       interaction: {
         id: 'TextInput',
@@ -67,8 +67,8 @@ describe('Editable question backend API service', () => {
               unicode_str: '',
             },
           },
-          rows: { value: 1 },
-          catchMisspellings: { value: false },
+          rows: {value: 1},
+          catchMisspellings: {value: false},
         },
         default_outcome: null,
         param_changes: [],
@@ -87,10 +87,11 @@ describe('Editable question backend API service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [EditableQuestionBackendApiService],
     });
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    editableQuestionBackendApiService = TestBed.get(
+    httpTestingController = TestBed.inject(HttpTestingController);
+    editableQuestionBackendApiService = TestBed.inject(
       EditableQuestionBackendApiService
     );
   });
@@ -129,7 +130,7 @@ describe('Editable question backend API service', () => {
     editableQuestionBackendApiService
       .updateQuestionAsync(
         backendQuestionDict.id,
-        backendQuestionDict.version.toString(),
+        backendQuestionDict.version,
         'Question updated',
         []
       )
@@ -141,7 +142,7 @@ describe('Editable question backend API service', () => {
     expect(req.request.method).toBe('PUT');
 
     req.flush({
-      questionDict: backendQuestionDict,
+      question_dict: backendQuestionDict,
     });
 
     flushMicrotasks();

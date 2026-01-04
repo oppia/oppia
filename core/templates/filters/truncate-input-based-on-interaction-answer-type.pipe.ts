@@ -21,6 +21,10 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
+type CodeAnswer = {
+  code: string;
+};
+
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
 })
@@ -34,31 +38,33 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: string,
     length: number
   ): string {
-    let answerType = INTERACTION_SPECS[interactionId].answer_type;
-    let actualInputToTruncate = '';
-    let inputUpdate;
+    const interactionSpec =
+      INTERACTION_SPECS[
+        interactionId as keyof typeof INTERACTION_SPECS
+      ];
 
-    // TODO(#15858): Update InteractionAnswer type and remove if block
-    // code in truncate-input-based-on-interaction-answer-type.pipe.ts file.
-
-    // As input variable can be of 19 types and
-    // there properties are also different
-    // we need to fix all InteractionAnswer properties.
-    // we can do this in later stage.
-    // For now i am using the if block logic to do the task.
-    // by doing so we don't need to change this in whole codebase.
-    if (typeof input !== 'object') {
-      inputUpdate = {
-        code: input,
-      };
-    } else {
-      inputUpdate = input;
+    if (!interactionSpec) {
+      throw new Error(`Unknown interaction id: ${interactionId}`);
     }
 
-    if (answerType === 'NormalizedString') {
-      actualInputToTruncate = inputUpdate.code;
-    } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = inputUpdate.code;
+    const answerType = interactionSpec.answer_type;
+    let actualInputToTruncate = '';
+
+    if (
+      answerType === 'NormalizedString' ||
+      answerType === 'CodeEvaluation'
+    ) {
+      if (
+        typeof input === 'object' &&
+        input !== null &&
+        'code' in input
+      ) {
+        actualInputToTruncate = (input as CodeAnswer).code;
+      } else if (typeof input === 'string') {
+        actualInputToTruncate = input;
+      } else {
+        throw new Error('Invalid input for code-based interaction');
+      }
     } else {
       throw new Error('Unknown interaction answer type');
     }

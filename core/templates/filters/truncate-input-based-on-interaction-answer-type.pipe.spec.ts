@@ -14,12 +14,13 @@
 
 /**
  * @fileoverview Unit Test for TruncateInputBasedOnInteractionAnswerType
- *  Pipe for Oppia.
+ * Pipe for Oppia.
  */
 
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from './truncate-input-based-on-interaction-answer-type.pipe';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   let pipe: TruncateInputBasedOnInteractionAnswerTypePipe;
@@ -31,19 +32,23 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   });
 
   it('should correctly truncate input data', () => {
-    let data = {
+    const codeReplAnswer: InteractionAnswer = {
       code: 'Hey oppia  users!',
-      output: null,
-      evaluation: null,
-      error: 'error',
+      output: '',
+      evaluation: '',
+      error: '',
     };
 
     expect(pipe.transform('Hey oppia  users!', 'TextInput', 8)).toBe(
       'Hey o...'
     );
-    expect(pipe.transform(data, 'CodeRepl', 8)).toBe('Hey o...');
+
+    expect(pipe.transform(codeReplAnswer, 'CodeRepl', 8)).toBe(
+      'Hey o...'
+    );
+
     expect(() => {
-      pipe.transform(data, 'ImageClickInput', 8);
+      pipe.transform(codeReplAnswer, 'ImageClickInput', 8);
     }).toThrowError('Unknown interaction answer type');
   });
 });
