@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import builtins
+import glob
 import io
 import multiprocessing
 import os
@@ -93,7 +94,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
         readlines_swap = self.swap(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        glob_swap = self.swap(other_files_linter.glob, 'glob', mock_glob)
+        glob_swap = self.swap(glob, 'glob', mock_glob)
         with readlines_swap, glob_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
