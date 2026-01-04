@@ -104,9 +104,9 @@ export class Exploration extends BaseTranslatableObject {
 
   // ---- Instance methods ----
   isStateTerminal(stateName: string): boolean {
-    let interactionId = this.getInteractionId(stateName);
+    const interactionId = this.getInteractionId(stateName);
     return (
-      Boolean(interactionId) &&
+      interactionId !== null &&
       INTERACTION_SPECS[interactionId as InteractionSpecsKey].is_terminal
     );
   }
@@ -120,17 +120,19 @@ export class Exploration extends BaseTranslatableObject {
       );
     }
 
-    const customizationArgs = this.getInteractionCustomizationArgs(
-      stateName
-    ) as EndExplorationCustomizationArgs;
-    return customizationArgs && customizationArgs.recommendedExplorationIds
+    const customizationArgs =
+      this.getInteractionCustomizationArgs(stateName) as
+        | EndExplorationCustomizationArgs
+        | null;
+
+    return customizationArgs?.recommendedExplorationIds
       ? customizationArgs.recommendedExplorationIds.value
       : null;
   }
 
   // Interaction is null for invalid state name.
   getInteraction(stateName: string): Interaction | null {
-    let state = this.states.getState(stateName);
+    const state = this.states.getState(stateName);
     if (!state) {
       this.logger.error('Invalid state name: ' + stateName);
       return null;
@@ -140,32 +142,26 @@ export class Exploration extends BaseTranslatableObject {
 
   // Interaction ID is null for invalid state name.
   getInteractionId(stateName: string): string | null {
-    let interaction = this.getInteraction(stateName);
-    if (interaction === null) {
-      return null;
-    }
-    return interaction.id;
+    const interaction = this.getInteraction(stateName);
+    return interaction ? interaction.id : null;
   }
 
   // Interaction customization args are null for invalid state name.
   getInteractionCustomizationArgs(
     stateName: string
   ): InteractionCustomizationArgs | null {
-    let interaction = this.getInteraction(stateName);
-    if (interaction === null) {
-      return null;
-    }
-    return interaction.customizationArgs;
+    const interaction = this.getInteraction(stateName);
+    return interaction ? interaction.customizationArgs : null;
   }
 
   isInteractionInline(stateName: string): boolean {
-    let interactionId = this.getInteractionId(stateName);
+    const interactionId = this.getInteractionId(stateName);
 
     // Note that we treat a null interaction as an inline one, so that the
     // error message associated with it is displayed in the most compact way
     // possible in the learner view.
     return (
-      !interactionId ||
+      interactionId === null ||
       INTERACTION_SPECS[interactionId as InteractionSpecsKey].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE
     );
@@ -231,8 +227,10 @@ export class Exploration extends BaseTranslatableObject {
         explorationBackendResponse.exploration.next_content_id_index,
       exploration_metadata: explorationBackendResponse.exploration_metadata,
       is_version_of_draft_valid: false,
-      draft_change_list_id: explorationBackendResponse.draft_change_list_id,
+      draft_change_list_id:
+        explorationBackendResponse.draft_change_list_id,
     };
+
     return Exploration.createFromBackendDict(
       explorationBackendDict,
       logger,
