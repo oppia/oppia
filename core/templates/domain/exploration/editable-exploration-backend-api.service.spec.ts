@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableExplorationBackendApiService.
+ * @fileoverview Unit tests for EditableExplorationBackendApiService
  */
 
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
@@ -23,12 +23,15 @@ import {
 } from '@angular/common/http/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 
-import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {EditableExplorationBackendApiService} from
+  'domain/exploration/editable-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
-import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
+import {ExplorationBackendDict} from
+  'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let editableExplorationBackendApiService:
+    EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -37,7 +40,10 @@ describe('EditableExplorationBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableExplorationBackendApiService, CsrfTokenService],
+      providers: [
+        EditableExplorationBackendApiService,
+        CsrfTokenService,
+      ],
     });
 
     editableExplorationBackendApiService = TestBed.inject(
@@ -165,7 +171,7 @@ describe('EditableExplorationBackendApiService', () => {
   }));
 
   it('should update exploration after fetch', fakeAsync(() => {
-    let exploration!: ExplorationBackendDict;
+    let exploration: ExplorationBackendDict | undefined;
 
     editableExplorationBackendApiService
       .fetchExplorationAsync('0')
@@ -177,10 +183,15 @@ describe('EditableExplorationBackendApiService', () => {
     fetchReq.flush(sampleDataResults);
     flushMicrotasks();
 
+    if (exploration === undefined) {
+      fail('Expected exploration to be defined after fetch');
+      return;
+    }
+
     editableExplorationBackendApiService
       .updateExplorationAsync(
         '0',
-        exploration.version!,
+        exploration.version,
         'Updated exploration',
         []
       )

@@ -30,7 +30,7 @@ import {
 import {Question} from 'domain/question/question.model';
 
 /**
- * Local backend dict shape.
+ * Local backend dict shape
  * (QuestionBackendDict is not exported in Oppia)
  */
 interface QuestionBackendDict {
@@ -101,7 +101,7 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result!: Question;
+    let result: Question | undefined;
 
     editableQuestionBackendApiService
       .fetchQuestionAsync('question_id')
@@ -121,6 +121,11 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
+    if (result === undefined) {
+      fail('Expected result to be defined');
+      return;
+    }
+
     expect(result.getId()).toBe('question_id');
   }));
 
@@ -130,7 +135,7 @@ describe('EditableQuestionBackendApiService', () => {
     editableQuestionBackendApiService
       .updateQuestionAsync(
         backendQuestionDict.id,
-        backendQuestionDict.version.toString(), // ✅ FIX: number → string
+        backendQuestionDict.version.toString(),
         'Question updated',
         []
       )
@@ -156,7 +161,7 @@ describe('EditableQuestionBackendApiService', () => {
       {
         id: 'skillId',
         task: 'remove',
-        difficulty: 0, // ✅ FIX: string → number
+        difficulty: 0,
       },
     ];
 
