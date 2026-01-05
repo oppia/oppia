@@ -482,21 +482,22 @@ export class BaseUser {
    * by the ElementHandle.
    */
   async waitForElementToBeClickable(
-    selector: string | ElementHandle<Element>
+    selector: string | ElementHandle<Element>,
+    timeout: number = 30000
   ): Promise<void> {
     const elementDesc = await this.getElementDescription(selector);
     showMessage(`Checking if element ${elementDesc} is clickable...`);
     const element =
       typeof selector === 'string'
-        ? await this.page.waitForSelector(selector)
+        ? await this.page.waitForSelector(selector, {timeout})
         : selector;
     try {
-      await this.page.waitForFunction(isElementClickable, {}, element);
+      await this.page.waitForFunction(isElementClickable, {timeout}, element);
     } catch (error) {
       if (error instanceof Error) {
         await this.page.evaluate(isElementClickable, element, true, true);
         error.message =
-          `Element ${elementDesc} took too long to be clickable.\n` +
+          `Element ${elementDesc} took too long to be clickable (timeout ${timeout} ms).\n` +
           'Original Error:\n' +
           error.message;
       }

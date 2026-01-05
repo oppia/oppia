@@ -2487,6 +2487,31 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Function to navigate to exploration editor by exploration ID.
+   * @param {string} explorationId - The exploration ID to open.
+   */
+  async navigateToExplorationEditorPageById(
+    explorationId: string
+  ): Promise<void> {
+    if (!explorationId) {
+      throw new Error(
+        'Exploration ID must be provided to navigate to its editor page.'
+      );
+    }
+
+    // Directly navigate to the editor URL for the given exploration ID.
+    await this.goto(`${baseUrl}/create/${explorationId}`, true);
+
+    // Wait for either the editor to load or an error page to appear.
+    await this.page.waitForFunction(() => {
+      return (
+        !!document.querySelector('.e2e-test-exploration-main-tab') ||
+        !!document.querySelector('.e2e-test-error-page-heading')
+      );
+    });
+  }
+
+  /**
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
@@ -2667,7 +2692,16 @@ export class ExplorationEditor extends BaseUser {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
-        await this.clickOnElementWithSelector(publishExplorationButtonSelector);
+        const publishButton = await this.page.$(
+          publishExplorationButtonSelector
+        );
+        if (!publishButton) {
+          throw new Error('Publish button not found.');
+        }
+        // Allow extra time for the publish button to become clickable to avoid
+        // flakiness due to transient overlays or network delays.
+        await this.waitForElementToBeClickable(publishButton, 60000);
+        await publishButton.click();
       }
     };
 
@@ -4894,6 +4928,18 @@ export class ExplorationEditor extends BaseUser {
     } else {
       throw new Error(`User ${username} is not a subscriber.`);
     }
+  }
+
+  /**
+   * Checks whether the current user can manage the exploration (i.e., is a manager/owner).
+   */
+  async expectUserToBeExplorationManager(): Promise<void> {
+    // Ensure we are on the settings tab where role management is displayed.
+    await this.navigateToSettingsTab();
+
+    // The edit roles button is only visible when the user has role modification permission.
+    await this.expectElementToBeVisible(editRoleButton);
+    showMessage('User can manage exploration roles.');
   }
 
   /**
