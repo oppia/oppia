@@ -451,8 +451,12 @@ export class TopicUpdateService {
       const currentChangeList: Change[] = this.undoRedoService.getChangeList();
       const indicesToDelete: number[] = [];
       for (let i = 0; i < currentChangeList.length; i++) {
-        let changeDict = currentChangeList[i].getBackendChangeObject() as TopicChange;
-        if (changeDict.cmd === TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC) {
+        let changeDict = currentChangeList[
+          i
+        ].getBackendChangeObject() as TopicChange;
+        if (
+          changeDict.cmd === TopicDomainConstants.CMD_MOVE_SKILL_ID_TO_SUBTOPIC
+        ) {
           if (changeDict.new_subtopic_id === subtopicId) {
             if (changeDict.old_subtopic_id === null) {
               indicesToDelete.push(i);
@@ -467,7 +471,10 @@ export class TopicUpdateService {
           } else if (changeDict.old_subtopic_id === subtopicId) {
             changeDict.old_subtopic_id = null;
           }
-        } else if (changeDict.cmd === TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC) {
+        } else if (
+          changeDict.cmd ===
+          TopicDomainConstants.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC
+        ) {
           if (changeDict.subtopic_id === subtopicId) {
             indicesToDelete.push(i);
           }
@@ -475,32 +482,43 @@ export class TopicUpdateService {
         currentChangeList[i].setBackendChangeObject(changeDict);
       }
       for (let i = 0; i < currentChangeList.length; i++) {
-        const backendChangeDict = currentChangeList[i].getBackendChangeObject() as TopicChange;
+        const backendChangeDict = currentChangeList[
+          i
+        ].getBackendChangeObject() as TopicChange;
         if ('subtopic_id' in backendChangeDict) {
           if (backendChangeDict.subtopic_id === subtopicId) {
             indicesToDelete.push(i);
             continue;
           }
-          if (backendChangeDict.subtopic_id !== undefined && backendChangeDict.subtopic_id > subtopicId) {
+          if (
+            backendChangeDict.subtopic_id !== undefined &&
+            backendChangeDict.subtopic_id > subtopicId
+          ) {
             backendChangeDict.subtopic_id--;
           }
         }
         if ('old_subtopic_id' in backendChangeDict) {
-          if (backendChangeDict.old_subtopic_id !== null &&
-              backendChangeDict.old_subtopic_id !== undefined &&
-              backendChangeDict.old_subtopic_id > subtopicId) {
+          if (
+            backendChangeDict.old_subtopic_id !== null &&
+            backendChangeDict.old_subtopic_id !== undefined &&
+            backendChangeDict.old_subtopic_id > subtopicId
+          ) {
             backendChangeDict.old_subtopic_id--;
           }
         }
         if ('new_subtopic_id' in backendChangeDict) {
-          if (backendChangeDict.new_subtopic_id !== undefined &&
-              backendChangeDict.new_subtopic_id > subtopicId) {
+          if (
+            backendChangeDict.new_subtopic_id !== undefined &&
+            backendChangeDict.new_subtopic_id > subtopicId
+          ) {
             backendChangeDict.new_subtopic_id--;
           }
         }
         currentChangeList[i].setBackendChangeObject(backendChangeDict);
       }
-      const newChangeList = currentChangeList.filter((change, idx) => indicesToDelete.indexOf(idx) === -1);
+      const newChangeList = currentChangeList.filter(
+        (change, idx) => indicesToDelete.indexOf(idx) === -1
+      );
       this.undoRedoService.setChangeList(newChangeList);
       topic.deleteSubtopic(subtopicId, newlyCreated);
       return;
@@ -553,7 +571,10 @@ export class TopicUpdateService {
         }
         const targetSubtopic = t.getSubtopicById(newSubtopicId);
         if (targetSubtopic) {
-          targetSubtopic.addSkill(skillSummary.getId(), skillSummary.getDescription());
+          targetSubtopic.addSkill(
+            skillSummary.getId(),
+            skillSummary.getDescription()
+          );
         }
       },
       () => {
@@ -563,11 +584,16 @@ export class TopicUpdateService {
         }
         if (oldSubtopicId === null) {
           topic.addUncategorizedSkill(
-            skillSummary.getId(), skillSummary.getDescription());
+            skillSummary.getId(),
+            skillSummary.getDescription()
+          );
         } else {
           const oldSubtopic = topic.getSubtopicById(oldSubtopicId);
           if (oldSubtopic) {
-            oldSubtopic.addSkill(skillSummary.getId(), skillSummary.getDescription());
+            oldSubtopic.addSkill(
+              skillSummary.getId(),
+              skillSummary.getDescription()
+            );
           }
         }
       }
@@ -598,7 +624,9 @@ export class TopicUpdateService {
         }
         if (!t.hasUncategorizedSkill(skillSummary.getId())) {
           t.addUncategorizedSkill(
-            skillSummary.getId(), skillSummary.getDescription());
+            skillSummary.getId(),
+            skillSummary.getDescription()
+          );
         }
       },
       () => {
@@ -629,12 +657,15 @@ export class TopicUpdateService {
       thumbnailFilename,
       oldThumbnailFilename,
       (changeDict: TopicChange, domainObject: DomainObject) => {
+        if (
+          changeDict.cmd !== TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY
+        ) {
+          return;
+        }
         const topicObj = domainObject as Topic;
         const sub = topicObj.getSubtopicById(subtopicId);
         if (sub) {
-          sub.setThumbnailFilename(
-            (changeDict as TopicChange & {new_value: string | null}).new_value
-          );
+          sub.setThumbnailFilename(changeDict.new_value as string | null);
         }
       },
       () => {
@@ -663,12 +694,15 @@ export class TopicUpdateService {
       urlFragment,
       oldUrlFragment,
       (changeDict: TopicChange, domainObject: DomainObject) => {
+        if (
+          changeDict.cmd !== TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY
+        ) {
+          return;
+        }
         const topicObj = domainObject as Topic;
         const sub = topicObj.getSubtopicById(subtopicId);
         if (sub) {
-          sub.setUrlFragment(
-            (changeDict as TopicChange & {new_value: string | null}).new_value
-          );
+          sub.setUrlFragment(changeDict.new_value as string | null);
         }
       },
       () => {
@@ -697,12 +731,15 @@ export class TopicUpdateService {
       thumbnailBgColor,
       oldThumbnailBgColor,
       (changeDict: TopicChange, domainObject: DomainObject) => {
+        if (
+          changeDict.cmd !== TopicDomainConstants.CMD_UPDATE_SUBTOPIC_PROPERTY
+        ) {
+          return;
+        }
         const topicObj = domainObject as Topic;
         const sub = topicObj.getSubtopicById(subtopicId);
         if (sub) {
-          sub.setThumbnailBgColor(
-            (changeDict as TopicChange & {new_value: string | null}).new_value
-          );
+          sub.setThumbnailBgColor(changeDict.new_value as string | null);
         }
       },
       () => {
@@ -748,7 +785,8 @@ export class TopicUpdateService {
     newSubtitledHtml: SubtitledHtml
   ): void {
     const oldSubtitledHtml = cloneDeep(
-      subtopicPage.getPageContents().getSubtitledHtml());
+      subtopicPage.getPageContents().getSubtitledHtml()
+    );
     this._applySubtopicPagePropertyChange(
       subtopicPage,
       TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
@@ -826,7 +864,8 @@ export class TopicUpdateService {
     newRecordedVoiceovers: RecordedVoiceovers
   ): void {
     const oldRecordedVoiceovers = cloneDeep(
-      subtopicPage.getPageContents().getRecordedVoiceovers());
+      subtopicPage.getPageContents().getRecordedVoiceovers()
+    );
     this._applySubtopicPagePropertyChange(
       subtopicPage,
       TopicDomainConstants.SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
@@ -835,10 +874,14 @@ export class TopicUpdateService {
       oldRecordedVoiceovers.toBackendDict(),
       (changeDict: TopicChange, domainObject: DomainObject) => {
         const subtopicPageObj = domainObject as SubtopicPage;
-        subtopicPageObj.getPageContents().setRecordedVoiceovers(newRecordedVoiceovers);
+        subtopicPageObj
+          .getPageContents()
+          .setRecordedVoiceovers(newRecordedVoiceovers);
       },
       () => {
-        subtopicPage.getPageContents().setRecordedVoiceovers(oldRecordedVoiceovers);
+        subtopicPage
+          .getPageContents()
+          .setRecordedVoiceovers(oldRecordedVoiceovers);
       }
     );
   }
@@ -873,7 +916,11 @@ export class TopicUpdateService {
     );
   }
 
-  rearrangeCanonicalStory(topic: Topic, fromIndex: number, toIndex: number): void {
+  rearrangeCanonicalStory(
+    topic: Topic,
+    fromIndex: number,
+    toIndex: number
+  ): void {
     this._applyChange(
       topic,
       TopicDomainConstants.CMD_REARRANGE_CANONICAL_STORY,
@@ -923,7 +970,10 @@ export class TopicUpdateService {
     );
   }
 
-  removeUncategorizedSkill(topic: Topic, skillSummary: ShortSkillSummary): void {
+  removeUncategorizedSkill(
+    topic: Topic,
+    skillSummary: ShortSkillSummary
+  ): void {
     const skillId = skillSummary.getId();
     this._applyChange(
       topic,
@@ -943,7 +993,9 @@ export class TopicUpdateService {
     topic: Topic,
     newSkillSummaries: ShortSkillSummary[]
   ): void {
-    const oldSkillSummaries = cloneDeep(topic.getSkillSummariesForDiagnosticTest());
+    const oldSkillSummaries = cloneDeep(
+      topic.getSkillSummariesForDiagnosticTest()
+    );
     const oldIds = oldSkillSummaries.map(s => s.getId());
     const newIds = newSkillSummaries.map(s => s.getId());
 
