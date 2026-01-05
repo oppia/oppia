@@ -30,6 +30,8 @@ from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Dict, List, Union, cast
+
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -345,7 +347,7 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         new_id = 'new_id'
 
         # Test list with nested dict.
-        value = [
+        value: List[Union[state_domain.SubtitledHtml, Dict[str, state_domain.SubtitledHtml]]] = [
             state_domain.SubtitledHtml(old_id, '<p>item1</p>'),
             {'key': state_domain.SubtitledHtml(old_id, '<p>item2</p>')},
         ]
@@ -354,8 +356,13 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             value, old_id, new_id
         )
 
-        self.assertEqual(value[0].content_id, new_id)
-        self.assertEqual(value[1]['key'].content_id, new_id)
+        # Here use cast because the value list has mixed Union types that mypy cannot narrow.
+        first = cast(state_domain.SubtitledHtml, value[0])  # pylint: disable=invalid-name
+        # Here use cast because mypy cannot infer the dict value type from the customization arg entry.
+        second = cast(Dict[str, state_domain.SubtitledHtml], value[1])  # pylint: disable=invalid-name
+
+        self.assertEqual(first.content_id, new_id)
+        self.assertEqual(second['key'].content_id, new_id)
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
