@@ -22,8 +22,6 @@ import {Subtopic} from 'domain/topic/subtopic.model';
 import {StudyGuide} from 'domain/topic/study-guide.model';
 import {SubtopicPage} from 'domain/topic/subtopic-page.model';
 import {SubtopicEditorTabComponent} from './subtopic-editor-tab.component';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model';
-import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {
   ComponentFixture,
