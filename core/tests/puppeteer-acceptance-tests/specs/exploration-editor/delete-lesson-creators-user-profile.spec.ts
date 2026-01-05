@@ -121,7 +121,7 @@ describe('Lesson Creator Profile Deletion', function () {
     // C: Check Shared -> expEditor2 should still be Manager.
     await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
     await expEditor2.expectUserToBeExplorationManager();
-  }, 600000); // 10-minute timeout passed as the 3rd argument to it().
+  }, 600000); // Passed 10-minute timeout as the 3rd argument to it().
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
