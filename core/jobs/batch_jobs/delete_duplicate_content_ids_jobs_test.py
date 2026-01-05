@@ -252,6 +252,111 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
         self.assertIsNone(result)
 
+    def test_replace_content_id_in_state_updates_answer_groups(self) -> None:
+        """Test helper updates answer group feedback content IDs."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_ag', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'content_old'
+        new_id = 'content_new'
+
+        # Create answer group with old content ID in feedback.
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    None,
+                    state_domain.SubtitledHtml(old_id, '<p>feedback</p>'),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [],
+                [],
+                None,
+            )
+        ]
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        self.assertEqual(
+            state.interaction.answer_groups[0].outcome.feedback.content_id,
+            new_id,
+        )
+
+    def test_replace_content_id_in_value_handles_objects_with_content_id(
+        self,
+    ) -> None:
+        """Test helper replaces content_id on objects."""
+        old_id = 'old_id'
+        new_id = 'new_id'
+        obj = state_domain.SubtitledHtml(old_id, '<p>text</p>')
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_value(  # pylint: disable=protected-access
+            obj, old_id, new_id
+        )
+
+        self.assertEqual(obj.content_id, new_id)
+
+    def test_replace_content_id_in_state_covers_hints_and_solution(
+        self,
+    ) -> None:
+        """Test helper updates hints and solution content IDs."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_hints', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'content_old'
+        new_id = 'content_new'
+
+        # Add hints and solution with old content ID.
+        state.interaction.hints = [
+            state_domain.Hint(state_domain.SubtitledHtml(old_id, '<p>hint</p>'))
+        ]
+        state.interaction.solution = state_domain.Solution(
+            'TextInput',
+            False,
+            'answer',
+            state_domain.SubtitledHtml(old_id, '<p>explanation</p>'),
+        )
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        self.assertEqual(
+            state.interaction.hints[0].hint_content.content_id, new_id
+        )
+        self.assertEqual(
+            state.interaction.solution.explanation.content_id, new_id
+        )
+
+    def test_replace_content_id_in_value_handles_list_and_dict(self) -> None:
+        """Test helper recursively handles lists and dicts."""
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Test list with nested dict.
+        value = [
+            state_domain.SubtitledHtml(old_id, '<p>item1</p>'),
+            {'key': state_domain.SubtitledHtml(old_id, '<p>item2</p>')},
+        ]
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_value(  # pylint: disable=protected-access
+            value, old_id, new_id
+        )
+
+        self.assertEqual(value[0].content_id, new_id)
+        self.assertEqual(value[1]['key'].content_id, new_id)
+
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
