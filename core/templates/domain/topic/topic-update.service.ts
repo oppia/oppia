@@ -22,7 +22,7 @@
  * story would always be linked to a topic.
  */
 
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -32,20 +32,20 @@ import {
   DomainObject,
   TopicChange,
 } from 'domain/editor/undo_redo/change.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
-import { Topic } from 'domain/topic/topic-object.model';
-import { ShortSkillSummary } from 'core/templates/domain/skill/short-skill-summary.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
+import {Topic} from 'domain/topic/topic-object.model';
+import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
 import {
   SubtitledHtml,
   SubtitledHtmlBackendDict,
 } from 'core/templates/domain/exploration/subtitled-html.model';
-import { SubtopicPage } from 'core/templates/domain/topic/subtopic-page.model';
+import {SubtopicPage} from 'core/templates/domain/topic/subtopic-page.model';
 import {
   RecordedVoiceovers,
   RecordedVoiceOverBackendDict,
 } from 'core/templates/domain/exploration/recorded-voiceovers.model';
-import { StudyGuide } from 'core/templates/domain/topic/study-guide.model';
+import {StudyGuide} from 'core/templates/domain/topic/study-guide.model';
 import {
   StudyGuideSection,
   StudyGuideSectionBackendDict,
@@ -91,7 +91,7 @@ type StudyGuideUpdateReverse = (
   providedIn: 'root',
 })
 export class TopicUpdateService {
-  constructor(private undoRedoService: UndoRedoService) { }
+  constructor(private undoRedoService: UndoRedoService) {}
   // Creates a change using an apply function, reverse function, a change
   // command and related parameters. The change is applied to a given
   // topic.
@@ -267,7 +267,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let name = (changeDict as { new_value: string }).new_value;
+        let name = (changeDict as {new_value: string}).new_value;
         topic.setName(name);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -293,7 +293,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let name = (changeDict as { new_value: string }).new_value;
+        let name = (changeDict as {new_value: string}).new_value;
         topic.setAbbreviatedName(name);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -319,7 +319,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let metaTagContent = (changeDict as { new_value: string }).new_value;
+        let metaTagContent = (changeDict as {new_value: string}).new_value;
         topic.setMetaTagContent(metaTagContent);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -350,7 +350,8 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let practiceTabIsDisplayed = (changeDict as { new_value: boolean }).new_value;
+        let practiceTabIsDisplayed = (changeDict as {new_value: boolean})
+          .new_value;
         topic.setPracticeTabIsDisplayed(practiceTabIsDisplayed);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -381,7 +382,8 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        const pageTitleFragmentForWeb = (changeDict as { new_value: string }).new_value;
+        const pageTitleFragmentForWeb = (changeDict as {new_value: string})
+          .new_value;
         topic.setPageTitleFragmentForWeb(pageTitleFragmentForWeb);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -407,7 +409,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let newUrlFragment = (changeDict as { new_value: string }).new_value;
+        let newUrlFragment = (changeDict as {new_value: string}).new_value;
         topic.setUrlFragment(newUrlFragment);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -433,7 +435,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let thumbnailFilename = (changeDict as { new_value: string }).new_value;
+        let thumbnailFilename = (changeDict as {new_value: string}).new_value;
         topic.setThumbnailFilename(thumbnailFilename);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -459,7 +461,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let thumbnailBgColor = (changeDict as { new_value: string }).new_value;
+        let thumbnailBgColor = (changeDict as {new_value: string}).new_value;
         topic.setThumbnailBgColor(thumbnailBgColor);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -485,7 +487,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        const description = (changeDict as { new_value: string }).new_value;
+        const description = (changeDict as {new_value: string}).new_value;
         topic.setDescription(description);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -511,7 +513,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let languageCode = (changeDict as { new_value: string }).new_value;
+        let languageCode = (changeDict as {new_value: string}).new_value;
         topic.setLanguageCode(languageCode);
       },
       (changeDict: TopicChange, domainObject: DomainObject) => {
@@ -548,7 +550,7 @@ export class TopicUpdateService {
         // ---- Undo ----
         const topic = domainObject as Topic;
         // FIX ISSUE 2: Replaced _getParameterFromChangeDict with direct cast
-        let subtopicId = (changeDict as { subtopic_id: number }).subtopic_id;
+        let subtopicId = (changeDict as {subtopic_id: number}).subtopic_id;
         topic.deleteSubtopic(subtopicId, true);
       }) as (
         backendChangeObject: TopicChange,
@@ -648,8 +650,10 @@ export class TopicUpdateService {
           }
           // When a newly created subtopic is deleted, the subtopics created
           // after it would have their id reduced by 1.
-          if (backendChangeDict.subtopic_id !== undefined &&
-            backendChangeDict.subtopic_id > subtopicId) {
+          if (
+            backendChangeDict.subtopic_id !== undefined &&
+            backendChangeDict.subtopic_id > subtopicId
+          ) {
             backendChangeDict.subtopic_id--;
           }
         }
@@ -665,8 +669,10 @@ export class TopicUpdateService {
           }
         }
         if ('new_subtopic_id' in backendChangeDict) {
-          if (backendChangeDict.new_subtopic_id !== undefined &&
-            backendChangeDict.new_subtopic_id > subtopicId) {
+          if (
+            backendChangeDict.new_subtopic_id !== undefined &&
+            backendChangeDict.new_subtopic_id > subtopicId
+          ) {
             backendChangeDict.new_subtopic_id--;
           }
         }
@@ -736,8 +742,7 @@ export class TopicUpdateService {
         const topic = domainObject as Topic;
         if (oldSubtopicId === null) {
           topic.removeUncategorizedSkill(skillSummary.getId());
-        }
-        else {
+        } else {
           const oldSubtopic = topic.getSubtopicById(oldSubtopicId);
           if (oldSubtopic) {
             oldSubtopic.removeSkill(skillSummary.getId());
@@ -860,7 +865,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let thumbnailFilename = (changeDict as { new_value: string }).new_value;
+        let thumbnailFilename = (changeDict as {new_value: string}).new_value;
         const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailFilename(thumbnailFilename);
@@ -901,7 +906,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let newUrlFragment = (changeDict as { new_value: string }).new_value;
+        let newUrlFragment = (changeDict as {new_value: string}).new_value;
         const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setUrlFragment(newUrlFragment);
@@ -942,7 +947,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let thumbnailBgColor = (changeDict as { new_value: string }).new_value;
+        let thumbnailBgColor = (changeDict as {new_value: string}).new_value;
         const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setThumbnailBgColor(thumbnailBgColor);
@@ -979,7 +984,7 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 1: Direct property access via cast
-        let title = (changeDict as { new_value: string }).new_value;
+        let title = (changeDict as {new_value: string}).new_value;
         const subtopic = topic.getSubtopicById(subtopicId);
         if (subtopic) {
           subtopic.setTitle(title);
@@ -1298,7 +1303,8 @@ export class TopicUpdateService {
         // ---- Apply ----
         const topic = domainObject as Topic;
         // FIX ISSUE 3: Direct property access via cast
-        let newSkillId = (changeDict as { uncategorized_skill_id: string }).uncategorized_skill_id;
+        let newSkillId = (changeDict as {uncategorized_skill_id: string})
+          .uncategorized_skill_id;
         topic.removeUncategorizedSkill(newSkillId);
       }) as (
         backendChangeObject: TopicChange,
@@ -1308,7 +1314,8 @@ export class TopicUpdateService {
         // ---- Undo ----
         const topic = domainObject as Topic;
         // FIX ISSUE 3: Direct property access via cast
-        let newSkillId = (changeDict as { uncategorized_skill_id: string }).uncategorized_skill_id;
+        let newSkillId = (changeDict as {uncategorized_skill_id: string})
+          .uncategorized_skill_id;
         topic.addUncategorizedSkill(newSkillId, skillSummary.getDescription());
       }) as (
         backendChangeObject: TopicChange,

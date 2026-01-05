@@ -16,22 +16,19 @@
  * @fileoverview Unit tests for EditableExplorationBackendApiService.
  */
 
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import { HttpErrorResponse } from '@angular/common/http';
+import {HttpErrorResponse} from '@angular/common/http';
 
-import { EditableExplorationBackendApiService } from
-  'domain/exploration/editable-exploration-backend-api.service';
-import { CsrfTokenService } from 'services/csrf-token.service';
-import { ExplorationBackendDict } from
-  'domain/exploration/exploration.model';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService:
-    EditableExplorationBackendApiService;
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -40,10 +37,7 @@ describe('EditableExplorationBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        EditableExplorationBackendApiService,
-        CsrfTokenService,
-      ],
+      providers: [EditableExplorationBackendApiService, CsrfTokenService],
     });
 
     editableExplorationBackendApiService = TestBed.inject(
@@ -100,7 +94,6 @@ describe('EditableExplorationBackendApiService', () => {
           linked_skill_id: null,
           inapplicable_skill_misconception_ids: [],
         },
-
       },
       title: 'Sample exploration',
       language_code: 'en',
@@ -191,7 +184,7 @@ describe('EditableExplorationBackendApiService', () => {
         'Updated exploration',
         []
       )
-      .then(() => { });
+      .then(() => {});
 
     const updateReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(updateReq.request.method).toBe('PUT');
@@ -203,7 +196,7 @@ describe('EditableExplorationBackendApiService', () => {
   it('should delete exploration', fakeAsync(() => {
     editableExplorationBackendApiService
       .deleteExplorationAsync('0')
-      .then(() => { });
+      .then(() => {});
 
     const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
     expect(deleteReq.request.method).toBe('DELETE');

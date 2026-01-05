@@ -21,10 +21,8 @@ import {
   Change,
   DomainObject,
 } from 'domain/editor/undo_redo/change.model';
-import {QuestionUndoRedoService} from
-  'domain/editor/undo_redo/question-undo-redo.service';
-import {QuestionDomainConstants} from
-  'domain/question/question-domain.constants';
+import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
+import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import cloneDeep from 'lodash/cloneDeep';
 import {Injectable} from '@angular/core';
 import {StateBackendDict} from 'domain/state/state.model';
@@ -136,25 +134,20 @@ export class QuestionUpdateService {
     question: Question,
     newIds: string[]
   ): void {
-    const oldIds = cloneDeep(
-      question.getInapplicableSkillMisconceptionIds()
-    );
+    const oldIds = cloneDeep(question.getInapplicableSkillMisconceptionIds());
 
     this._applyPropertyChange(
       question,
-      QuestionDomainConstants
-        .QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
+      QuestionDomainConstants.QUESTION_PROPERTY_INAPPLICABLE_SKILL_MISCONCEPTION_IDS,
       newIds,
       oldIds,
       (changeDict, domainObject) => {
-        (domainObject as Question)
-          .setInapplicableSkillMisconceptionIds(
-            this._getNewPropertyValueFromChangeDict(changeDict) as string[]
-          );
+        (domainObject as Question).setInapplicableSkillMisconceptionIds(
+          this._getNewPropertyValueFromChangeDict(changeDict) as string[]
+        );
       },
       (_changeDict, domainObject) => {
-        (domainObject as Question)
-          .setInapplicableSkillMisconceptionIds(oldIds);
+        (domainObject as Question).setInapplicableSkillMisconceptionIds(oldIds);
       }
     );
   }
@@ -168,10 +161,9 @@ export class QuestionUpdateService {
       newValue,
       oldValue,
       (changeDict, domainObject) => {
-        (domainObject as Question)
-          .setNextContentIdIndex(
-            this._getNewPropertyValueFromChangeDict(changeDict) as number
-          );
+        (domainObject as Question).setNextContentIdIndex(
+          this._getNewPropertyValueFromChangeDict(changeDict) as number
+        );
       },
       (_changeDict, domainObject) => {
         (domainObject as Question).setNextContentIdIndex(oldValue);

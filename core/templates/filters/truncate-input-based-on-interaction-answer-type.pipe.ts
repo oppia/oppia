@@ -16,10 +16,10 @@
  * @fileoverview TruncateInputBasedOnInteractionAnswerType Pipe for Oppia.
  */
 
-import { Pipe, PipeTransform } from '@angular/core';
+import {Pipe, PipeTransform} from '@angular/core';
 import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 type CodeAnswer = {
   code: string;
@@ -29,8 +29,9 @@ type CodeAnswer = {
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
 })
 export class TruncateInputBasedOnInteractionAnswerTypePipe
-  implements PipeTransform {
-  constructor(private truncatePipe: TruncatePipe) { }
+  implements PipeTransform
+{
+  constructor(private truncatePipe: TruncatePipe) {}
 
   transform(
     input: InteractionAnswer,
@@ -38,9 +39,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     length: number
   ): string {
     const interactionSpec =
-      INTERACTION_SPECS[
-      interactionId as keyof typeof INTERACTION_SPECS
-      ];
+      INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
 
     if (!interactionSpec) {
       throw new Error(`Unknown interaction id: ${interactionId}`);
@@ -49,15 +48,8 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     const answerType = interactionSpec.answer_type;
     let actualInputToTruncate = '';
 
-    if (
-      answerType === 'NormalizedString' ||
-      answerType === 'CodeEvaluation'
-    ) {
-      if (
-        typeof input === 'object' &&
-        input !== null &&
-        'code' in input
-      ) {
+    if (answerType === 'NormalizedString' || answerType === 'CodeEvaluation') {
+      if (typeof input === 'object' && input !== null && 'code' in input) {
         actualInputToTruncate = (input as CodeAnswer).code;
       } else if (typeof input === 'string') {
         actualInputToTruncate = input;

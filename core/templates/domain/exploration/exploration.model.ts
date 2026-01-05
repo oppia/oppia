@@ -120,10 +120,9 @@ export class Exploration extends BaseTranslatableObject {
       );
     }
 
-    const customizationArgs =
-      this.getInteractionCustomizationArgs(stateName) as
-        | EndExplorationCustomizationArgs
-        | null;
+    const customizationArgs = this.getInteractionCustomizationArgs(
+      stateName
+    ) as EndExplorationCustomizationArgs | null;
 
     return customizationArgs?.recommendedExplorationIds
       ? customizationArgs.recommendedExplorationIds.value
@@ -227,8 +226,7 @@ export class Exploration extends BaseTranslatableObject {
         explorationBackendResponse.exploration.next_content_id_index,
       exploration_metadata: explorationBackendResponse.exploration_metadata,
       is_version_of_draft_valid: false,
-      draft_change_list_id:
-        explorationBackendResponse.draft_change_list_id,
+      draft_change_list_id: explorationBackendResponse.draft_change_list_id,
     };
 
     return Exploration.createFromBackendDict(

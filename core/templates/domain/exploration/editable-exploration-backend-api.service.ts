@@ -17,8 +17,7 @@
  */
 
 import {HttpClient} from '@angular/common/http';
-import {ReadOnlyExplorationBackendApiService} from
-  'domain/exploration/read-only-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {ExplorationBackendDict} from './exploration.model';
@@ -32,8 +31,7 @@ import {Injectable} from '@angular/core';
 export class EditableExplorationBackendApiService {
   constructor(
     private httpClient: HttpClient,
-    private readOnlyExplorationBackendApiService:
-      ReadOnlyExplorationBackendApiService,
+    private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
@@ -67,22 +65,22 @@ export class EditableExplorationBackendApiService {
       )
       .pipe(
         tap(() =>
-          this.readOnlyExplorationBackendApiService
-            .deleteExplorationFromCache(explorationId)
+          this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
+            explorationId
+          )
         )
       )
       .toPromise();
   }
 
-  private async _deleteExplorationAsync(
-    explorationId: string
-  ): Promise<void> {
+  private async _deleteExplorationAsync(explorationId: string): Promise<void> {
     return this.httpClient
       .delete<void>(this._getExplorationUrl(explorationId, false))
       .pipe(
         tap(() =>
-          this.readOnlyExplorationBackendApiService
-            .deleteExplorationFromCache(explorationId)
+          this.readOnlyExplorationBackendApiService.deleteExplorationFromCache(
+            explorationId
+          )
         )
       )
       .toPromise();
@@ -143,8 +141,7 @@ export class EditableExplorationBackendApiService {
     uniqueProgressUrlId: string | null = null
   ): Promise<void> {
     if (isUserLoggedIn) {
-      const requestUrl =
-        '/explorehandler/checkpoint_reached/' + explorationId;
+      const requestUrl = '/explorehandler/checkpoint_reached/' + explorationId;
       return this.httpClient
         .put<void>(requestUrl, {
           most_recently_reached_checkpoint_exp_version:
@@ -180,8 +177,7 @@ export class EditableExplorationBackendApiService {
     mostRecentlyReachedCheckpointStateName: string
   ): Promise<{unique_progress_url_id: string}> {
     const requestUrl =
-      '/explorehandler/checkpoint_reached_by_logged_out_user/' +
-      explorationId;
+      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId;
     return this.httpClient
       .post<{unique_progress_url_id: string}>(requestUrl, {
         most_recently_reached_checkpoint_exp_version:
@@ -205,9 +201,7 @@ export class EditableExplorationBackendApiService {
       .toPromise();
   }
 
-  async resetExplorationProgressAsync(
-    explorationId: string
-  ): Promise<void> {
+  async resetExplorationProgressAsync(explorationId: string): Promise<void> {
     const requestUrl = '/explorehandler/restart/' + explorationId;
     return this.httpClient
       .put<void>(requestUrl, {
@@ -225,9 +219,7 @@ export class EditableExplorationBackendApiService {
       .toPromise();
   }
 
-  async deleteExplorationAsync(
-    explorationId: string
-  ): Promise<void> {
+  async deleteExplorationAsync(explorationId: string): Promise<void> {
     return this._deleteExplorationAsync(explorationId);
   }
 }

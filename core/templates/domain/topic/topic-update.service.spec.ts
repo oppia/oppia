@@ -16,16 +16,16 @@
  * @fileoverview Tests for Topic update service.
  */
 
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
-import { Topic, TopicBackendDict } from 'domain/topic/topic-object.model';
-import { TopicUpdateService } from 'domain/topic/topic-update.service';
-import { TestBed } from '@angular/core/testing';
-import { SubtopicPage } from './subtopic-page.model';
-import { StudyGuide } from './study-guide.model';
-import { RecordedVoiceovers } from 'domain/exploration/recorded-voiceovers.model';
-import { StudyGuideSection } from './study-guide-sections.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {UndoRedoService} from 'domain/editor/undo_redo/undo-redo.service';
+import {Topic, TopicBackendDict} from 'domain/topic/topic-object.model';
+import {TopicUpdateService} from 'domain/topic/topic-update.service';
+import {TestBed} from '@angular/core/testing';
+import {SubtopicPage} from './subtopic-page.model';
+import {StudyGuide} from './study-guide.model';
+import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
+import {StudyGuideSection} from './study-guide-sections.model';
 
 describe('Topic update service', function () {
   let topicUpdateService: TopicUpdateService;
@@ -39,7 +39,7 @@ describe('Topic update service', function () {
 
   let sampleTopicBackendObject: {
     topicDict: TopicBackendDict;
-    skillIdToDescriptionDict: { [key: string]: string };
+    skillIdToDescriptionDict: {[key: string]: string};
   } = {
     topicDict: {
       id: 'sample_topic_id',
@@ -166,7 +166,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for removing an additional ' +
-    'story id',
+      'story id',
     () => {
       topicUpdateService.removeAdditionalStory(_sampleTopic, 'story_2');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -180,7 +180,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for removing an additional ' +
-    'story id when an error is encountered',
+      'story id when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
@@ -203,7 +203,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for removing a canonical ' +
-    'story id',
+      'story id',
     () => {
       topicUpdateService.removeCanonicalStory(_sampleTopic, 'story_1');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -217,7 +217,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for removing a canonical ' +
-    'story id when an error is encountered',
+      'story id when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
@@ -244,7 +244,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for removing an ' +
-    'uncategorized skill id',
+      'uncategorized skill id',
     () => {
       topicUpdateService.removeUncategorizedSkill(
         _sampleTopic,
@@ -261,7 +261,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for removing an uncategorized ' +
-    'skill id when an error is encountered',
+      'skill id when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.removeUncategorizedSkill(
@@ -275,7 +275,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for updating the skill Ids ' +
-    'for diagnostic test',
+      'for diagnostic test',
     function () {
       _sampleTopic.setSkillSummariesForDiagnosticTest([_secondSkillSummary]);
       topicUpdateService.updateDiagnosticTestSkills(_sampleTopic, [
@@ -311,7 +311,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's name",
+      "for changing a topic's name",
     () => {
       topicUpdateService.setTopicName(_sampleTopic, 'new unique value');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -337,7 +337,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's description",
+      "for changing a topic's description",
     () => {
       topicUpdateService.setTopicDescription(_sampleTopic, 'new unique value');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -366,7 +366,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's abbreviated name",
+      "for changing a topic's abbreviated name",
     () => {
       topicUpdateService.setAbbreviatedTopicName(
         _sampleTopic,
@@ -395,7 +395,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's meta tag content",
+      "for changing a topic's meta tag content",
     () => {
       topicUpdateService.setMetaTagContent(
         _sampleTopic,
@@ -426,7 +426,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's page title",
+      "for changing a topic's page title",
     function () {
       topicUpdateService.setPageTitleFragmentForWeb(
         _sampleTopic,
@@ -445,7 +445,7 @@ describe('Topic update service', function () {
 
   it(
     "should set/unset changes to a topic's practice tab is " +
-    'displayed property',
+      'displayed property',
     () => {
       expect(_sampleTopic.getPracticeTabIsDisplayed()).toEqual(false);
 
@@ -459,7 +459,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's practice tab is displayed property",
+      "for changing a topic's practice tab is displayed property",
     () => {
       topicUpdateService.setPracticeTabIsDisplayed(_sampleTopic, true);
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -485,7 +485,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's url fragment",
+      "for changing a topic's url fragment",
     () => {
       topicUpdateService.setTopicUrlFragment(_sampleTopic, 'new-unique-value');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -514,7 +514,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's thumbnail filename",
+      "for changing a topic's thumbnail filename",
     () => {
       topicUpdateService.setTopicThumbnailFilename(
         _sampleTopic,
@@ -543,7 +543,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's thumbnail bg color",
+      "for changing a topic's thumbnail bg color",
     () => {
       topicUpdateService.setTopicThumbnailBgColor(
         _sampleTopic,
@@ -572,7 +572,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict ' +
-    "for changing a topic's language code",
+      "for changing a topic's language code",
     () => {
       topicUpdateService.setTopicLanguageCode(_sampleTopic, 'fr');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -588,7 +588,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for changing subtopic title ' +
-    'when the subtopic does not exist',
+      'when the subtopic does not exist',
     () => {
       expect(() => {
         topicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'whatever');
@@ -610,7 +610,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for changing subtopic ' +
-    'title',
+      'title',
     () => {
       topicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new unique value');
       expect(undoRedoService.getCommittableChangeList()).toEqual([
@@ -627,7 +627,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for changing subtopic ' +
-    'thumbnail filename when the subtopic does not exist',
+      'thumbnail filename when the subtopic does not exist',
     () => {
       expect(() => {
         topicUpdateService.setSubtopicThumbnailFilename(
@@ -641,9 +641,7 @@ describe('Topic update service', function () {
   );
 
   it("should set/unset changes to a subtopic's thumbnail" + 'filename', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailFilename(
       _sampleTopic,
@@ -655,14 +653,12 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailFilename()).toEqual(null);
   });
 
   it(
     'should create a proper backend change dict for changing subtopic ' +
-    'thumbnail filename',
+      'thumbnail filename',
     () => {
       topicUpdateService.setSubtopicThumbnailFilename(
         _sampleTopic,
@@ -683,7 +679,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for changing subtopic ' +
-    'thumbnail bg color when the subtopic does not exist',
+      'thumbnail bg color when the subtopic does not exist',
     () => {
       expect(() => {
         topicUpdateService.setSubtopicThumbnailBgColor(
@@ -698,7 +694,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for changing subtopic ' +
-    'url fragment',
+      'url fragment',
     () => {
       topicUpdateService.setSubtopicUrlFragment(
         _sampleTopic,
@@ -719,7 +715,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for changing subtopic ' +
-    'url fragment when the subtopic does not exist',
+      'url fragment when the subtopic does not exist',
     () => {
       expect(() => {
         topicUpdateService.setSubtopicUrlFragment(_sampleTopic, 10, 'whatever');
@@ -739,9 +735,7 @@ describe('Topic update service', function () {
   });
 
   it("should set/unset changes to a subtopic's thumbnail bg " + 'color', () => {
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
 
     topicUpdateService.setSubtopicThumbnailBgColor(_sampleTopic, 1, '#ffffff');
     expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
@@ -749,14 +743,12 @@ describe('Topic update service', function () {
     );
 
     undoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(
-      null
-    );
+    expect(_sampleTopic.getSubtopics()[0].getThumbnailBgColor()).toEqual(null);
   });
 
   it(
     'should create a proper backend change dict for changing subtopic ' +
-    'thumbnail bg color',
+      'thumbnail bg color',
     () => {
       topicUpdateService.setSubtopicThumbnailBgColor(
         _sampleTopic,
@@ -876,7 +868,7 @@ describe('Topic update service', function () {
         skill_ids: [],
         thumbnail_filename: null,
         thumbnail_bg_color: null,
-        url_fragment: 'title-two'
+        url_fragment: 'title-two',
       } as any,
       {
         id: 3,
@@ -884,7 +876,7 @@ describe('Topic update service', function () {
         skill_ids: [],
         thumbnail_filename: null,
         thumbnail_bg_color: null,
-        url_fragment: 'title-three'
+        url_fragment: 'title-three',
       } as any,
     ];
     sampleTopicBackendObject.topicDict.subtopics.push(...subtopicsDict);
@@ -929,7 +921,7 @@ describe('Topic update service', function () {
         skill_ids: ['skill_2'],
         thumbnail_filename: null,
         thumbnail_bg_color: null,
-        url_fragment: ''
+        url_fragment: '',
       } as any,
     ];
   });
@@ -991,7 +983,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for deleting a subtopic ' +
-    'when an error is encountered',
+      'when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.deleteSubtopic(_sampleTopic, 10);
@@ -1002,7 +994,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for moving subtopic' +
-    'when error is thrown',
+      'when error is thrown',
     () => {
       expect(() => {
         topicUpdateService.moveSkillToSubtopic(
@@ -1085,7 +1077,7 @@ describe('Topic update service', function () {
 
   it(
     'should correctly create changelists when moving a skill to a newly ' +
-    'created subtopic that has since been deleted',
+      'created subtopic that has since been deleted',
     () => {
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
       topicUpdateService.moveSkillToSubtopic(
@@ -1158,7 +1150,7 @@ describe('Topic update service', function () {
 
   it(
     'should create properly decrement subtopic ids of later subtopics when ' +
-    'a newly created subtopic is deleted',
+      'a newly created subtopic is deleted',
     () => {
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 3', 'frag-three');
@@ -1188,7 +1180,7 @@ describe('Topic update service', function () {
 
   it(
     'should properly decrement subtopic ids of moved subtopics ' +
-    'when a newly created subtopic is deleted',
+      'when a newly created subtopic is deleted',
     () => {
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 2', 'frag-two');
       topicUpdateService.addSubtopic(_sampleTopic, 'Title 3', 'frag-three');
@@ -1238,7 +1230,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for moving a skill id to a ' +
-    'subtopic',
+      'subtopic',
     () => {
       topicUpdateService.moveSkillToSubtopic(
         _sampleTopic,
@@ -1259,7 +1251,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for moving a skill id to a' +
-    'subtopic when an error is encountered',
+      'subtopic when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.moveSkillToSubtopic(
@@ -1310,7 +1302,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for removing a skill id ' +
-    'from a subtopic',
+      'from a subtopic',
     () => {
       topicUpdateService.removeSkillFromSubtopic(
         _sampleTopic,
@@ -1329,7 +1321,7 @@ describe('Topic update service', function () {
 
   it(
     'should not create a backend change dict for removing a skill id from a' +
-    'subtopic when an error is encountered',
+      'subtopic when an error is encountered',
     () => {
       expect(() => {
         topicUpdateService.removeSkillFromSubtopic(
@@ -1623,7 +1615,7 @@ describe('Topic update service', function () {
 
   it(
     'should create a proper backend change dict for changing subtopic ' +
-    'page audio data',
+      'page audio data',
     () => {
       var newRecordedVoiceoversDict = {
         voiceovers_mapping: {

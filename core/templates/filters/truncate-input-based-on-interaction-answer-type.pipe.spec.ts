@@ -17,10 +17,10 @@
  * Pipe for Oppia.
  */
 
-import { TruncateInputBasedOnInteractionAnswerTypePipe } from './truncate-input-based-on-interaction-answer-type.pipe';
-import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
-import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import { InteractionAnswer } from 'interactions/answer-defs';
+import {TruncateInputBasedOnInteractionAnswerTypePipe} from './truncate-input-based-on-interaction-answer-type.pipe';
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import {InteractionAnswer} from 'interactions/answer-defs';
 
 describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   let pipe: TruncateInputBasedOnInteractionAnswerTypePipe;
@@ -43,9 +43,7 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
       'Hey o...'
     );
 
-    expect(pipe.transform(codeReplAnswer, 'CodeRepl', 8)).toBe(
-      'Hey o...'
-    );
+    expect(pipe.transform(codeReplAnswer, 'CodeRepl', 8)).toBe('Hey o...');
 
     expect(() => {
       pipe.transform(codeReplAnswer, 'ImageClickInput', 8);
