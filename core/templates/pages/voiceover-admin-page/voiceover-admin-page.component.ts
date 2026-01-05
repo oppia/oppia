@@ -113,6 +113,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
     null;
   toastMessage: string = '';
 
+  languageAccentControl = new FormControl(null);
+
   ngOnInit(): void {
     this.voiceoverBackendApiService
       .fetchVoiceoverAdminDataAsync()
@@ -403,6 +405,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       this.selectedLanguageAccentForExplorationVoiceoverRegeneration
     );
     this.selectedLanguageAccentForExplorationVoiceoverRegeneration = null;
+    this.languageAccentControl.reset();
     this.cdr.detectChanges();
   }
 

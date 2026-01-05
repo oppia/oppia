@@ -137,7 +137,8 @@
       <div>
         <mat-form-field>
           <mat-label>Language Accent pair</mat-label>
-          <mat-select (selectionChange)="updateLanguageAccentForVoiceoverRegenerationChoice($event.value)"
+          <mat-select [formControl]="languageAccentControl"
+                      (selectionChange)="updateLanguageAccentForVoiceoverRegenerationChoice($event.value)"
                       class="e2e-test-language-accent-for-voiceover-regeneration-selector">
             <mat-option *ngFor="let choice of autogeneratableLanguageAccentCodes"
                         [value]="choice">
@@ -160,7 +161,7 @@
       <button class="btn btn-primary generate-voiceover-button"
               (click)="generateVoiceoversForExploration()"
               [disabled]="!selectedLanguageAccentForExplorationVoiceoverRegeneration">
-              Generate Button
+              Generate
       </button>
     </div>
   </div>
