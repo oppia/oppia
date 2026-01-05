@@ -355,7 +355,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
             )
         else:
             # The final else branch handles the case where the exploration
-            # exists and is curated.
+            # exists and it is linked to a published story.
 
             # A list of language codes for the exploration that contain
             # available content, including English and any translated languages.
@@ -415,7 +415,7 @@ class RegenerateVoiceoversForExplorationHandler(
     }
     HANDLER_ARGS_SCHEMAS = {'POST': {}}
 
-    @acl_decorators.can_voiceover_exploration
+    @acl_decorators.can_access_voiceover_admin_page
     def post(self, exploration_id: str, language_accent_code: str) -> None:
         """Regenerates the automatic voiceover for the specified exploration in
         the selected language and accent.
