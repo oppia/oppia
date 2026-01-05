@@ -274,11 +274,12 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             'exp_multi_dup', title='Test Exploration', category='Test'
         )
 
+        exploration.add_states(['State2', 'State3'])
+
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
 
-        exploration.add_states(['State2', 'State3'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
         state3 = exploration.states['State3']
