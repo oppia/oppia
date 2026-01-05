@@ -111,22 +111,31 @@
   </div>
 
   <div>
-    <div class="datepicker-container date-selector-inner-container">
-      <mat-form-field class="datepicker-form-container">
-        <mat-label>Enter a date range</mat-label>
-        <mat-date-range-input [formGroup]="range" [rangePicker]="picker" class="datepicker-input">
-          <input matStartDate formControlName="start" placeholder="Start date">
-          <input matEndDate formControlName="end" placeholder="End date">
-        </mat-date-range-input>
-        <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
-        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-date-range-picker #picker></mat-date-range-picker>
-      </mat-form-field>
+    <div class="datepicker-container">
+      <div class="date-selector-inner-container">
+        <mat-form-field class="datepicker-form-container">
+          <mat-label>Enter a date range</mat-label>
+          <mat-date-range-input [formGroup]="range" [rangePicker]="picker" class="datepicker-input">
+            <input matStartDate formControlName="start" placeholder="Start date">
+            <input matEndDate formControlName="end" placeholder="End date">
+          </mat-date-range-input>
+          <mat-hint>MM/DD/YYYY - MM/DD/YYYY</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker #picker></mat-date-range-picker>
+        </mat-form-field>
 
-      <button (click)="fetchVoiceoverRegenerationRecord()"
-              class="btn btn-primary apply-datepicker-button">
-        Apply
-      </button>
+        <button (click)="fetchVoiceoverRegenerationRecord()"
+                class="btn btn-primary apply-datepicker-button">
+          Apply
+        </button>
+      </div>
+
+      <div *ngIf="cloudTaskRunList.length === 100">
+        <p class="exceeding-limit-info-text">
+          <strong>Note: </strong>
+          Displaying the most recent 100 voiceover regeneration records (in descending order of "Last updated"). Please choose a narrower date range to view more specific results.
+        </p>
+      </div>
     </div>
 
   </div>
@@ -138,12 +147,6 @@
   <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
     <p class="info-text">
       <i>No records found for the selected date range.</i>
-    </p>
-  </div>
-
-  <div *ngIf="cloudTaskRunList.length === 100">
-    <p class="info-text">
-      <strong>Note: </strong>Displaying the most recent 100 voiceover regeneration records. Please choose a narrower date range to view more specific results.
     </p>
   </div>
 
@@ -206,15 +209,14 @@
     text-align: right;
   }
   .datepicker-container {
-    display: flex;
-    margin-left: 70%;
-    padding: 20px;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 1%;
+    margin-left: 1%;
   }
   .date-selector-inner-container {
     align-items: center;
     background-color: #fff;
     border-radius: 4px;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
@@ -222,6 +224,9 @@
     padding: 16px 20px;
     position: relative;
     vertical-align: top;
+  }
+  .exceeding-limit-info-text {
+    padding: 10px 20px;
   }
   .info-text {
     margin-left: 1%;
