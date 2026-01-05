@@ -26,24 +26,24 @@ import {
   Output,
 } from '@angular/core';
 import cloneDeep from 'lodash/cloneDeep';
-import { Subscription } from 'rxjs';
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StateInteractionIdService } from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import { MisconceptionSkillMap } from 'domain/skill/misconception.model';
-import { Outcome } from 'domain/exploration/outcome.model';
-import { Question } from 'domain/question/question.model';
-import { QuestionUpdateService } from 'domain/question/question-update.service';
-import { Solution } from 'domain/exploration/solution.model';
-import { Hint } from 'domain/exploration/hint-object.model';
-import { AnswerGroup } from 'domain/exploration/answer-group.model';
-import { State } from 'domain/state/state.model';
-import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { EditabilityService } from 'services/editability.service';
-import { InteractionData } from 'interactions/customization-args-defs';
-import { LoaderService } from 'services/loader.service';
-import { GenerateContentIdService } from 'services/generate-content-id.service';
+import {Subscription} from 'rxjs';
+import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
+import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
+import {Outcome} from 'domain/exploration/outcome.model';
+import {Question} from 'domain/question/question.model';
+import {QuestionUpdateService} from 'domain/question/question-update.service';
+import {Solution} from 'domain/exploration/solution.model';
+import {Hint} from 'domain/exploration/hint-object.model';
+import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import {State} from 'domain/state/state.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {SolutionValidityService} from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+import {EditabilityService} from 'services/editability.service';
+import {InteractionData} from 'interactions/customization-args-defs';
+import {LoaderService} from 'services/loader.service';
+import {GenerateContentIdService} from 'services/generate-content-id.service';
 
 @Component({
   selector: 'oppia-question-editor',
@@ -77,7 +77,7 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
     private stateEditorService: StateEditorService,
     private stateInteractionIdService: StateInteractionIdService,
     private urlInterpolationService: UrlInterpolationService
-  ) { }
+  ) {}
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
     this._updateQuestion(() => {
@@ -136,7 +136,8 @@ export class QuestionEditorComponent implements OnInit, OnDestroy {
       this.question,
       displayedValue
     );
-  } getStateContentPlaceholder(): string {
+  }
+  getStateContentPlaceholder(): string {
     return 'Type your question here.';
   }
 
