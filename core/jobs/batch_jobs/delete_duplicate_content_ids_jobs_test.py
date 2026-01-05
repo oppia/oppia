@@ -30,8 +30,6 @@ from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Any, Dict, cast
-
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
