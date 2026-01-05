@@ -356,10 +356,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             value, old_id, new_id
         )
 
-        # Here use cast because the value list has mixed Union types that mypy cannot narrow.
-        first = cast(state_domain.SubtitledHtml, value[0])  # pylint: disable=invalid-name
-        # Here use cast because mypy cannot infer the dict value type from the customization arg entry.
-        second = cast(Dict[str, state_domain.SubtitledHtml], value[1])  # pylint: disable=invalid-name
+        # Here use cast because value contains mixed Union[SubtitledHtml, Dict] and mypy needs type narrowing.
+        first = cast(state_domain.SubtitledHtml, value[0])  # pylint: disable=c0048
+        # Here use cast because mypy cannot infer nested Dict[str, SubtitledHtml] type from mixed list entry.
+        second = cast(Dict[str, state_domain.SubtitledHtml], value[1])  # pylint: disable=c0048
 
         self.assertEqual(first.content_id, new_id)
         self.assertEqual(second['key'].content_id, new_id)
