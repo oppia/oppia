@@ -347,7 +347,12 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         new_id = 'new_id'
 
         # Test list with nested dict.
-        value: List[Union[state_domain.SubtitledHtml, Dict[str, state_domain.SubtitledHtml]]] = [
+        value: List[
+            Union[
+                state_domain.SubtitledHtml,
+                Dict[str, state_domain.SubtitledHtml],
+            ]
+        ] = [
             state_domain.SubtitledHtml(old_id, '<p>item1</p>'),
             {'key': state_domain.SubtitledHtml(old_id, '<p>item2</p>')},
         ]
@@ -357,12 +362,61 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
 
         # Here use cast because value contains mixed Union[SubtitledHtml, Dict] and mypy needs type narrowing.
-        first = cast(state_domain.SubtitledHtml, value[0])  # pylint: disable=c0048
+        first = cast(
+            state_domain.SubtitledHtml, value[0]
+        )  # pylint: disable=c0048
         # Here use cast because mypy cannot infer nested Dict[str, SubtitledHtml] type from mixed list entry.
-        second = cast(Dict[str, state_domain.SubtitledHtml], value[1])  # pylint: disable=c0048
+        second = cast(
+            Dict[str, state_domain.SubtitledHtml], value[1]
+        )  # pylint: disable=c0048
 
         self.assertEqual(first.content_id, new_id)
         self.assertEqual(second['key'].content_id, new_id)
+
+    def test_replace_content_id_in_state_handles_missing_optional_fields(
+        self,
+    ) -> None:
+        """Test helper handles states without optional content ID fields."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_optional', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'content_old'
+        new_id = 'content_new'
+
+        # Ensure no hints or solution are set (they start as empty lists/None).
+        state.interaction.hints = []
+        state.interaction.solution = None
+        # Remove default_outcome to test None case.
+        state.interaction.default_outcome = None
+
+        # Should not raise any errors.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        self.assertEqual(len(state.interaction.hints), 0)
+        self.assertIsNone(state.interaction.solution)
+        self.assertIsNone(state.interaction.default_outcome)
+
+    def test_replace_content_id_in_value_ignores_non_matching_content_ids(
+        self,
+    ) -> None:
+        """Test helper ignores values with non-matching content IDs."""
+        old_id = 'old_id'
+        new_id = 'new_id'
+        other_id = 'other_id'
+
+        obj = state_domain.SubtitledHtml(other_id, '<p>text</p>')
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_value(  # pylint: disable=protected-access
+            obj, old_id, new_id
+        )
+
+        # Content ID should not change because it doesn't match old_id.
+        self.assertEqual(obj.content_id, other_id)
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
