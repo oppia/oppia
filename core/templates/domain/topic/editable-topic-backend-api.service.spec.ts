@@ -56,8 +56,6 @@ describe('Editable topic backend API service', () => {
       name: 'Topic Name',
       description: 'Topic Description',
       version: 1,
-
-      // ✅ STRICT-SAFE FIX
       abbreviated_name: '',
       thumbnail_filename: '',
       thumbnail_bg_color: '',

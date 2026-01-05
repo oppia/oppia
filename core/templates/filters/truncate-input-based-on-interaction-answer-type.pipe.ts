@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview TruncateInputBasedOnInteractionAnswerType Pipe for Oppia.
+ * @fileoverview TruncateInputBasedOnInteractionAnswerType Pipe for Oppia
  */
 
 import {Pipe, PipeTransform} from '@angular/core';
@@ -21,7 +21,7 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
-type CodeAnswer = {
+interface CodeAnswer {
   code: string;
 };
 

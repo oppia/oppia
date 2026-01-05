@@ -166,8 +166,6 @@ export class EditableExplorationBackendApiService {
         })
         .toPromise();
     }
-
-    // ✅ Strict-checks safe fallback
     return Promise.resolve();
   }
 
