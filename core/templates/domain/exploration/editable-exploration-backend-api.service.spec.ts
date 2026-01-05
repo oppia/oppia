@@ -23,15 +23,12 @@ import {
 } from '@angular/common/http/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 
-import {EditableExplorationBackendApiService} from
-  'domain/exploration/editable-exploration-backend-api.service';
+import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
-import {ExplorationBackendDict} from
-  'domain/exploration/exploration.model';
+import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService:
-    EditableExplorationBackendApiService;
+  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -40,10 +37,7 @@ describe('EditableExplorationBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        EditableExplorationBackendApiService,
-        CsrfTokenService,
-      ],
+      providers: [EditableExplorationBackendApiService, CsrfTokenService],
     });
 
     editableExplorationBackendApiService = TestBed.inject(
