@@ -39,6 +39,9 @@ const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
+const feedbackTabSelector = '.e2e-test-feedback-tab';
+const explorationFeedbackTabContentSelector = '.e2e-test-feedback-tab-content';
+const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
 
 export class Moderator extends BaseUser {
   /**
@@ -257,6 +260,24 @@ export class Moderator extends BaseUser {
   }
 
   /**
+   * Function to dismiss welcome modal if it is present.
+   */
+  async dismissWelcomeModalIfPresent(): Promise<void> {
+    try {
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
+    } catch (error) {
+      // Welcome Modal not found, we can continue.
+    }
+  }
+
+  /**
    * Checks if the timestamps in the commits or feedback messages are in descending order.
    * @param {'commit' | 'feedback messages'} table - The table to check the timestamps in.
    */
@@ -303,6 +324,8 @@ export class Moderator extends BaseUser {
       title
     );
     await this.clickAndWaitForNavigation(title);
+    await this.dismissWelcomeModalIfPresent();
+    await (this as any).navigateToFeedbackTab();
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector
@@ -416,6 +439,8 @@ export class Moderator extends BaseUser {
       explorationID
     );
     await this.clickAndWaitForNavigation(explorationID as string);
+    await this.dismissWelcomeModalIfPresent();
+    await (this as any).navigateToFeedbackTab();
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector

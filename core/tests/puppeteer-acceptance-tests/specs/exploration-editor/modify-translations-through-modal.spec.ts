@@ -80,7 +80,8 @@ describe('Exploration Editor', function () {
     // Navigate to the creator dashboard and create a new exploration.
     await explorationEditor.navigateToCreatorDashboardPage();
     await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
+    // Replaced dismissWelcomeModal with dismissWelcomeModalIfPresent for robustness.
+    await explorationEditor.dismissWelcomeModalIfPresent();
     await explorationEditor.updateCardContent(INTRODUCTION_CARD_CONTENT);
     await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
@@ -200,7 +201,7 @@ describe('Exploration Editor', function () {
       'Test Topic 1'
     );
     // We set an increased custom timeout since the setup takes too long unlike other specs.
-  }, 400000);
+  }, 600000);
 
   it(
     'should show translations of main content and edit them via the modal.',

@@ -1888,12 +1888,12 @@ export class LoggedInUser extends BaseUser {
     expectedFeedback: string,
     expectedResponse: string
   ): Promise<void> {
-    await this.page.waitForSelector(feedbackMessageSelector);
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length >= 2,
+      {},
+      feedbackMessageSelector
+    );
     const feedbackMessages = await this.page.$$(feedbackMessageSelector);
-
-    if (feedbackMessages.length < 2) {
-      throw new Error('Not enough feedback messages found.');
-    }
 
     const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
       el.textContent?.trim()
