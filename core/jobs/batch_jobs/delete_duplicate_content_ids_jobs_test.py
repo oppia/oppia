@@ -198,6 +198,124 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             ]
         )
 
+    def test_fix_job_with_multiple_answer_groups(self) -> None:
+        """Test fixing duplicates with multiple answer groups."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_multi_ag', title='Test', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2'])
+        state = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        dup_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state.content.content_id = dup_id
+        # Create multiple answer groups with feedback.
+        state.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    None,
+                    state_domain.SubtitledHtml(dup_id, '<p>feedback1</p>'),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [],
+                [],
+                None,
+            ),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    None,
+                    state_domain.SubtitledHtml(
+                        'content_other', '<p>feedback2</p>'
+                    ),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [],
+                [],
+                None,
+            ),
+        ]
+
+        state2.content.content_id = dup_id
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_multi_ag (version 1) - regenerated content '
+                    f'IDs: [\'{dup_id} -> content_3 in State2\']'
+                )
+            ]
+        )
+
+    def test_identify_job_multiple_duplicates(self) -> None:
+        """Test identifying multiple duplicate content IDs in same exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_multi_dup', title='Test Exploration', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2', 'State3'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        dup_id1 = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        dup_id2 = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state1.content.content_id = dup_id1
+        state2.content.content_id = dup_id1
+        state3.content.content_id = dup_id2
+
+        # Create another duplicate for dup_id2.
+        state1.interaction.hints = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(dup_id2, '<p>hint</p>')
+            )
+        ]
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Exploration exp_multi_dup (version 1) has duplicate content IDs: '
+                    f'{{\'{dup_id1}\': [\'Introduction\', \'State2\'], \'{dup_id2}\': [\'Introduction\', \'State3\']}}'
+                )
+            ]
+        )
+
     def test_fix_job_verifies_datastore_persistence(self) -> None:
         """Test that fixed explorations are persisted to datastore."""
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -362,13 +480,13 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         )
 
         # Here use cast because value contains mixed Union[SubtitledHtml, Dict] and mypy needs type narrowing.
-        first = cast(
+        first = cast(  # pylint: disable=c0048
             state_domain.SubtitledHtml, value[0]
-        )  # pylint: disable=c0048
+        )
         # Here use cast because mypy cannot infer nested Dict[str, SubtitledHtml] type from mixed list entry.
-        second = cast(
+        second = cast(  # pylint: disable=c0048
             Dict[str, state_domain.SubtitledHtml], value[1]
-        )  # pylint: disable=c0048
+        )
 
         self.assertEqual(first.content_id, new_id)
         self.assertEqual(second['key'].content_id, new_id)
