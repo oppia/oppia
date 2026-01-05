@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, cast
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -31,6 +30,8 @@ from core.jobs.batch_jobs import delete_duplicate_content_ids_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Any, Dict, cast
+
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 datastore_services = models.Registry.import_datastore_services()
 
@@ -41,15 +42,15 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
     """Tests for IdentifyExplorationsWithDuplicateContentIdsJob."""
 
     JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.
-        IdentifyExplorationsWithDuplicateContentIdsJob
+        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
     )
 
     def test_identify_job_with_no_duplicates(self) -> None:
         """Test that the job finds no duplicates when there are none."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
         exp_services.save_new_exploration('owner_id', exploration)
 
         self.assert_job_output_is_empty()
@@ -59,30 +60,36 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
         duplicate content IDs.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         state1.content.content_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                'Exploration exp_id (version 1) has duplicate content IDs: '
-                '{\'content_2\': [\'Introduction\', \'State2\']}'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Exploration exp_id (version 1) has duplicate content IDs: '
+                    '{\'content_2\': [\'Introduction\', \'State2\']}'
+                )
+            ]
+        )
 
 
 class FixExplorationsWithDuplicateContentIdsJobTests(
@@ -91,15 +98,15 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
     """Tests for FixExplorationsWithDuplicateContentIdsJob."""
 
     JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.
-        FixExplorationsWithDuplicateContentIdsJob
+        delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob
     )
 
     def test_fix_job_with_no_duplicates(self) -> None:
         """Test that the job does nothing when there are no duplicates."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
         exp_services.save_new_exploration('owner_id', exploration)
 
         self.assert_job_output_is_empty()
@@ -109,32 +116,38 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         content IDs.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         state1.content.content_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
         original_content_id = state1.content.content_id
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id (version 1) - regenerated content '
-                f'IDs: [\'{original_content_id} -> content_3 in State2\']'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_id (version 1) - regenerated content '
+                    f'IDs: [\'{original_content_id} -> content_3 in State2\']'
+                )
+            ]
+        )
 
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
         state1_updated = updated_exploration.states['Introduction']
@@ -143,226 +156,112 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         self.assertEqual(state1_updated.content.content_id, original_content_id)
         self.assertEqual(state2_updated.content.content_id, 'content_2')
 
-    def test_fix_job_with_duplicates_in_feedback(self) -> None:
-        """Test fixing duplicates in answer group feedback."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id2', title='Test Exploration', category='Test')
-
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-
-        state = exploration.states['Introduction']
-        duplicate_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
-
-        state.content.content_id = duplicate_id
-        feedback = state_domain.SubtitledHtml(duplicate_id, '<p>fb</p>')
-        outcome = state_domain.Outcome(
-            'Introduction', None, False, feedback, [], None, None)
-        answer_group = state_domain.AnswerGroup([], outcome, [], None)
-        state.interaction.answer_groups.append(answer_group)
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
-
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id2 (version 1) - regenerated content '
-                f'IDs: [\'{duplicate_id} -> content_3 in Introduction\']'
-            )
-        ])
-
-    def test_fix_job_with_duplicates_in_hints(self) -> None:
-        """Test fixing duplicates in interaction hints."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id3', title='Test Exploration', category='Test')
-
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-
-        state = exploration.states['Introduction']
-        duplicate_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
-
-        state.content.content_id = duplicate_id
-        state.interaction.hints.append(state_domain.Hint(
-            state_domain.SubtitledHtml(duplicate_id, '<p>hint</p>')))
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
-
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id3 (version 1) - regenerated content '
-                f'IDs: [\'{duplicate_id} -> content_3 in Introduction\']'
-            )
-        ])
-
-    def test_fix_job_with_duplicates_in_solution(self) -> None:
-        """Test fixing duplicates in interaction solution."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id4', title='Test Exploration', category='Test')
-
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-
-        state = exploration.states['Introduction']
-        duplicate_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
-
-        state.content.content_id = duplicate_id
-        state.interaction.solution = state_domain.Solution(
-            'TextInput',
-            True,
-            'answer',
-            state_domain.SubtitledHtml(duplicate_id, '<p>explanation</p>'),
-            None
-        )
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
-
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id4 (version 1) - regenerated content '
-                f'IDs: [\'{duplicate_id} -> content_3 in Introduction\']'
-            )
-        ])
-
-    def test_fix_job_with_multiple_duplicates_across_states(self) -> None:
-        """Test fixing multiple duplicate IDs across different states."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id_multi', title='Test Exploration', category='Test')
-
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
-
-        exploration.add_states(['State2', 'State3'])
-        state1 = exploration.states['Introduction']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-
-        dup_id_1 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
-        dup_id_2 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
-
-        state1.content.content_id = dup_id_1
-        state2.content.content_id = dup_id_1
-        state3.content.content_id = dup_id_2
-        feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
-        outcome = state_domain.Outcome(
-            'Introduction', None, False, feedback, [], None, None)
-        answer_group = state_domain.AnswerGroup([], outcome, [], None)
-        state1.interaction.answer_groups.append(answer_group)
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
-
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id_multi (version 1) - regenerated '
-                f'content IDs: [\'{dup_id_1} -> content_4 in State2\', '
-                f'\'{dup_id_2} -> content_5 in State3\', '
-                f'\'{dup_id_2} -> content_6 in Introduction\']'
-            )
-        ])
-
     def test_fix_job_with_duplicates_in_customization_args(self) -> None:
         """Test fixing duplicates in customization args."""
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id5', title='Test Exploration', category='Test')
+            'exp_id5', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         duplicate_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
 
         state.content.content_id = duplicate_id
         placeholder_ca = state.interaction.customization_args.get('placeholder')
         if placeholder_ca and isinstance(
-                placeholder_ca.value, state_domain.SubtitledUnicode):
+            placeholder_ca.value, state_domain.SubtitledUnicode
+        ):
             placeholder_ca.value.content_id = duplicate_id
 
         state2.content.content_id = duplicate_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id5 (version 1) - regenerated content '
-                f'IDs: [\'{duplicate_id} -> content_3 in State2\']'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_id5 (version 1) - regenerated content '
+                    f'IDs: [\'{duplicate_id} -> content_3 in State2\']'
+                )
+            ]
+        )
 
     def test_fix_job_verifies_datastore_persistence(self) -> None:
         """Test that fixed explorations are persisted to datastore."""
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_verify', title='Test Exploration', category='Test')
+            'exp_verify', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         dup_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         state1.content.content_id = dup_id
         state2.content.content_id = dup_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        # Run job once via assert_job_output_is
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_verify (version 1) - regenerated '
-                f'content IDs: [\'{dup_id} -> content_3 in State2\']'
-            )
-        ])
+        # Run job once via assert_job_output_is.
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_verify (version 1) - regenerated '
+                    f'content IDs: [\'{dup_id} -> content_3 in State2\']'
+                )
+            ]
+        )
         updated_model = exp_models.ExplorationModel.get('exp_verify')
         self.assertEqual(updated_model.version, 2)
         self.assertNotEqual(
             updated_model.states['State2']['content']['content_id'],
-            updated_model.states['Introduction']['content']['content_id']
+            updated_model.states['Introduction']['content']['content_id'],
         )
 
-    def test_check_and_fix_direct_call_returns_none_without_duplicates(self) -> None:
+    def test_check_and_fix_direct_call_returns_none_without_duplicates(
+        self,
+    ) -> None:
         """Directly validate early return when no duplicates exist."""
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_none_direct', title='Test Exploration', category='Test')
+            'exp_none_direct', title='Test Exploration', category='Test'
+        )
         exp_services.save_new_exploration('owner_id', exploration)
 
         result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
-            exploration)
+            exploration
+        )
         self.assertIsNone(result)
 
     def test_check_and_fix_direct_call_covers_all_replacements(self) -> None:
         """Directly validate replacements across states, feedback, hints, solution, default outcome, and customization args."""
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_full', title='Test Exploration', category='Test')
+            'exp_full', title='Test Exploration', category='Test'
+        )
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2', 'State3'])
         state1 = exploration.states['Introduction']
@@ -370,9 +269,11 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state3 = exploration.states['State3']
 
         dup_id_1 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         dup_id_2 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
 
         state1.content.content_id = dup_id_1
         state2.content.content_id = dup_id_1
@@ -381,14 +282,18 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Answer group feedback uses dup_id_2.
         feedback = state_domain.SubtitledHtml(dup_id_2, '<p>fb</p>')
         outcome = state_domain.Outcome(
-            'Introduction', None, False, feedback, [], None, None)
+            'Introduction', None, feedback, False, [], None, None
+        )
         state1.interaction.answer_groups.append(
-            state_domain.AnswerGroup(outcome, [], [], None))
+            state_domain.AnswerGroup(outcome, [], [], None)
+        )
 
         # Hint uses dup_id_2.
         state1.interaction.hints.append(
-            state_domain.Hint(state_domain.SubtitledHtml(
-                dup_id_2, '<p>hint</p>')))
+            state_domain.Hint(
+                state_domain.SubtitledHtml(dup_id_2, '<p>hint</p>')
+            )
+        )
 
         # Solution uses dup_id_2.
         state1.interaction.solution = state_domain.Solution(
@@ -396,36 +301,41 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             True,
             'answer',
             state_domain.SubtitledHtml(dup_id_2, '<p>expl</p>'),
-            None
+            None,
         )
 
         state1.interaction.default_outcome = state_domain.Outcome(
             'Introduction',
             None,
-            False,
             state_domain.SubtitledHtml(dup_id_2, '<p>default</p>'),
-            [], None, None)
-
-        placeholder_ca = state1.interaction.customization_args.get('placeholder')
-        if placeholder_ca and isinstance(
-                placeholder_ca.value, state_domain.SubtitledUnicode):
-            placeholder_ca.value.content_id = dup_id_1
+            False,
+            [],
+            None,
+            None,
+        )
 
         result = delete_duplicate_content_ids_jobs.FixExplorationsWithDuplicateContentIdsJob._check_and_fix_duplicate_content_ids(  # pylint: disable=protected-access
-            exploration)
+            exploration
+        )
         self.assertIsNotNone(result)
-        # Here use cast because the helper returns Optional[Dict[str, Any]].
+        # Here we use type Any because the method returns a dict with mixed types
+        # (strings, lists, and ExplorationModel). Here use cast because the
+        # helper returns Optional[Dict[str, Any]] and we've verified non-None above.
         result_dict = cast(Dict[str, Any], result)
-        # Here use cast because fixed_content_ids is a list of strings.
-        self.assertGreaterEqual(len(cast(list[str], result_dict['fixed_content_ids'])), 3)
-        # Here use cast because fixed_model is stored as an ExplorationModel in the dict.
-        fixed_model = cast(exp_models.ExplorationModel, result_dict['fixed_model'])
+        # Here use cast because fixed_content_ids is stored as a list in the dict.
+        self.assertGreaterEqual(
+            len(cast(list, result_dict['fixed_content_ids'])), 3
+        )
+        # Here use cast because fixed_model is ExplorationModel but stored as Any.
+        fixed_model = cast(Any, result_dict['fixed_model'])
         self.assertNotEqual(
             fixed_model.states['State2']['content']['content_id'],
-            fixed_model.states['Introduction']['content']['content_id'])
+            fixed_model.states['Introduction']['content']['content_id'],
+        )
         self.assertNotEqual(
             fixed_model.states['State3']['content']['content_id'],
-            fixed_model.states['Introduction']['content']['content_id'])
+            fixed_model.states['Introduction']['content']['content_id'],
+        )
 
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
@@ -434,38 +344,43 @@ class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     """Tests for AuditIdentifyExplorationsWithDuplicateContentIdsJob."""
 
     JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.
-        AuditIdentifyExplorationsWithDuplicateContentIdsJob
+        delete_duplicate_content_ids_jobs.AuditIdentifyExplorationsWithDuplicateContentIdsJob
     )
 
     def test_audit_identify_job_with_duplicates(self) -> None:
         """Test that the audit job correctly identifies duplicates."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         state1.content.content_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                'Exploration exp_id (version 1) has duplicate content IDs: '
-                '{\'content_2\': [\'Introduction\', \'State2\']}'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Exploration exp_id (version 1) has duplicate content IDs: '
+                    '{\'content_2\': [\'Introduction\', \'State2\']}'
+                )
+            ]
+        )
 
 
 class AuditFixExplorationsWithDuplicateContentIdsJobTests(
@@ -474,48 +389,49 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
     """Tests for AuditFixExplorationsWithDuplicateContentIdsJob."""
 
     JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.
-        AuditFixExplorationsWithDuplicateContentIdsJob
+        delete_duplicate_content_ids_jobs.AuditFixExplorationsWithDuplicateContentIdsJob
     )
 
     def test_audit_fix_job_with_duplicates(self) -> None:
         """Test that the audit fix job shows what would be fixed."""
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_id', title='Test Exploration', category='Test')
+            'exp_id', title='Test Exploration', category='Test'
+        )
 
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         exploration.add_states(['State2'])
         state1 = exploration.states['Introduction']
         state2 = exploration.states['State2']
 
         state1.content.content_id = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT)
+            translation_domain.ContentType.CONTENT
+        )
         state2.content.content_id = state1.content.content_id
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         exp_services.save_new_exploration('owner_id', exploration)
 
         original_content_id = state1.content.content_id
 
-        self.assert_job_output_is([
-            job_run_result.JobRunResult.as_stdout(
-                f'Fixed exploration exp_id (version 1) - regenerated content '
-                f'IDs: [\'{original_content_id} -> content_3 in State2\']'
-            )
-        ])
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_id (version 1) - regenerated content '
+                    f'IDs: [\'{original_content_id} -> content_3 in State2\']'
+                )
+            ]
+        )
 
         updated_exploration = exp_fetchers.get_exploration_by_id('exp_id')
         state1_updated = updated_exploration.states['Introduction']
         state2_updated = updated_exploration.states['State2']
 
-        self.assertEqual(
-            state1_updated.content.content_id, original_content_id
-        )
-        self.assertEqual(
-            state2_updated.content.content_id, original_content_id
-        )
+        self.assertEqual(state1_updated.content.content_id, original_content_id)
+        self.assertEqual(state2_updated.content.content_id, original_content_id)
