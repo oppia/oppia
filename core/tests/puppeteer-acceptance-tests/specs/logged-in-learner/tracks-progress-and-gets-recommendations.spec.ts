@@ -102,9 +102,6 @@ describe('Logged-In Learner', function () {
         'Algebra I'
       );
 
-      // Save topic draft to ensure changes are persisted before adding skill to diagnostic test.
-      await curriculumAdmin.saveTopicDraft('Algebra I');
-
       // Add skill to diagnostic test.
       // Navigate to topic editor first before adding skill to diagnostic test.
       await curriculumAdmin.addSkillToDiagnosticTest(
