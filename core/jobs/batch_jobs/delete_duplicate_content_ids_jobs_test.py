@@ -91,6 +91,55 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
             ]
         )
 
+    def test_identify_job_multiple_duplicates(self) -> None:
+        """Test identifying multiple duplicate content IDs in same exploration."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_multi_dup', title='Test Exploration', category='Test'
+        )
+
+        exploration.add_states(['State2', 'State3'])
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        dup_id1 = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+        dup_id2 = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state1.content.content_id = dup_id1
+        state2.content.content_id = dup_id1
+        state3.content.content_id = dup_id2
+
+        # Create another duplicate for dup_id2.
+        state1.interaction.hints = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(dup_id2, '<p>hint</p>')
+            )
+        ]
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Exploration exp_multi_dup (version 1) has duplicate content IDs: '
+                    f'{{\'{dup_id1}\': [\'Introduction\', \'State2\'], \'{dup_id2}\': [\'Introduction\', \'State3\']}}'
+                )
+            ]
+        )
+
 
 class FixExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
@@ -264,55 +313,6 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
                 job_run_result.JobRunResult.as_stdout(
                     f'Fixed exploration exp_multi_ag (version 1) - regenerated content '
                     f'IDs: [\'{dup_id} -> content_3 in State2\']'
-                )
-            ]
-        )
-
-    def test_identify_job_multiple_duplicates(self) -> None:
-        """Test identifying multiple duplicate content IDs in same exploration."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'exp_multi_dup', title='Test Exploration', category='Test'
-        )
-
-        exploration.add_states(['State2', 'State3'])
-
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-
-        state1 = exploration.states['Introduction']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-
-        dup_id1 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        )
-        dup_id2 = content_id_generator.generate(
-            translation_domain.ContentType.CONTENT
-        )
-
-        state1.content.content_id = dup_id1
-        state2.content.content_id = dup_id1
-        state3.content.content_id = dup_id2
-
-        # Create another duplicate for dup_id2.
-        state1.interaction.hints = [
-            state_domain.Hint(
-                state_domain.SubtitledHtml(dup_id2, '<p>hint</p>')
-            )
-        ]
-
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
-
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'Exploration exp_multi_dup (version 1) has duplicate content IDs: '
-                    f'{{\'{dup_id1}\': [\'Introduction\', \'State2\'], \'{dup_id2}\': [\'Introduction\', \'State3\']}}'
                 )
             ]
         )
