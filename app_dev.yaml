@@ -23,6 +23,10 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
+- url: /node_modules
+  static_dir: node_modules
+  secure: always
+  expiration: "90d"
 - url: /third_party/static
   static_dir: third_party/static
   secure: always

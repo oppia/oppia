@@ -69,8 +69,7 @@ export class InsertScriptService {
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.MATHJAX:
-          scriptElement.src =
-            '/third_party/static/MathJax-2.7.5/MathJax.js?config=default';
+          scriptElement.src = '/node_modules/mathjax/MathJax.js?config=default';
           break;
         case KNOWN_SCRIPTS.PENCILCODE:
           scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
