@@ -23,7 +23,7 @@ import {InteractionAnswer} from 'interactions/answer-defs';
 
 interface CodeAnswer {
   code: string;
-};
+}
 
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
