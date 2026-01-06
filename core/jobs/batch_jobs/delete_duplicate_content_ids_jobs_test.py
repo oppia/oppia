@@ -549,17 +549,22 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         old_id = 'old_id'
         new_id = 'new_id'
 
-        # Remove interaction entirely to test the if state.interaction: branch being False.
-        delattr(state, 'interaction')
+        # Use a mock interaction that is falsy to hit the false branch safely.
+        mock_interaction = mock.Mock(spec=state_domain.InteractionInstance)
+        mock_interaction.__bool__.return_value = False
+        # Here use cast because mock_interaction must be typed as InteractionInstance for state assignment.
+        state.interaction = cast(
+            state_domain.InteractionInstance, mock_interaction
+        )  # pylint: disable=c0048
         state.content.content_id = old_id
 
         delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
             state, old_id, new_id
         )
 
-        # Should only update content (which we already updated), not interaction.
+        # Should only update content; interaction remains falsy mock.
         self.assertEqual(state.content.content_id, new_id)
-        self.assertFalse(hasattr(state, 'interaction'))
+        self.assertFalse(state.interaction)
 
     def test_replace_content_id_in_state_with_matching_customization_arg(
         self,
