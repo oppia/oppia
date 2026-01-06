@@ -87,7 +87,7 @@ describe('Topic update service', () => {
       practice_tab_is_displayed: false,
       meta_tag_content: '',
       page_title_fragment_for_web: '',
-    } as TopicBackendDict,
+    } as unknown as TopicBackendDict,
     skillIdToDescriptionDict: {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
@@ -1027,7 +1027,7 @@ describe('Topic update service', () => {
         topicUpdateService.moveSkillToSubtopic(
           _sampleTopic,
           1,
-          null,
+          undefined as unknown as number,
           {} as ShortSkillSummary
         );
       }).toThrowError('New subtopic cannot be null');

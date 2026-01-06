@@ -177,15 +177,17 @@ describe('EditableExplorationBackendApiService', () => {
     fetchReq.flush(sampleDataResults);
     flushMicrotasks();
 
-    if (exploration === undefined) {
-      fail('Expected exploration to be defined after fetch');
+    if (exploration === undefined || exploration.version === undefined) {
+      fail('Expected exploration and version to be defined after fetch');
       return;
     }
+
+    const explorationVersion: number = exploration.version;
 
     editableExplorationBackendApiService
       .updateExplorationAsync(
         '0',
-        exploration.version,
+        explorationVersion,
         'Updated exploration',
         []
       )
