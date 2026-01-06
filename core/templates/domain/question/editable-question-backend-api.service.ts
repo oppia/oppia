@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to send and receive changes to a question in the
- * backend
+ * @fileoverview Service to send and receive changes to a question in the backend
  */
 
 import {Injectable} from '@angular/core';
@@ -51,7 +50,7 @@ export interface FetchQuestionBackendResponse {
 }
 
 export interface UpdateEditableQuestionBackendResponse {
-  questionDict: QuestionBackendDict;
+  question_dict: QuestionBackendDict;
 }
 
 export interface FetchQuestionResponse {
@@ -169,7 +168,7 @@ export class EditableQuestionBackendApiService {
         )
         .toPromise();
 
-      successCallback(cloneDeep(response.questionDict));
+      successCallback(cloneDeep(response.question_dict));
     } catch (errorResponse: unknown) {
       const httpError = errorResponse as {error?: {error?: string}};
       errorCallback(httpError.error?.error);

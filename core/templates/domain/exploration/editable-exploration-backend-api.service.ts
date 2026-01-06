@@ -22,7 +22,6 @@ import {tap} from 'rxjs/operators';
 
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {AppConstants} from 'app.constants';
 import {ExplorationBackendDict} from './exploration.model';
 import {ExplorationChange} from './exploration-draft.model';
 
@@ -30,11 +29,39 @@ import {ExplorationChange} from './exploration-draft.model';
   providedIn: 'root',
 })
 export class EditableExplorationBackendApiService {
+  private static readonly EXPLORATION_DATA_URL_TEMPLATE =
+    '/exploration_handler/data/<exploration_id>';
+
+  private static readonly EXPLORATION_DATA_DRAFT_URL_TEMPLATE =
+    '/exploration_handler/data/<exploration_id>?apply_draft=<apply_draft>';
+
   constructor(
     private httpClient: HttpClient,
     private readOnlyExplorationBackendApiService: ReadOnlyExplorationBackendApiService,
     private urlInterpolationService: UrlInterpolationService
   ) {}
+
+  private _getExplorationUrl(
+    explorationId: string,
+    applyDraft: boolean
+  ): string {
+    if (applyDraft) {
+      return this.urlInterpolationService.interpolateUrl(
+        EditableExplorationBackendApiService.EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
+        {
+          exploration_id: explorationId,
+          apply_draft: 'true',
+        }
+      );
+    }
+
+    return this.urlInterpolationService.interpolateUrl(
+      EditableExplorationBackendApiService.EXPLORATION_DATA_URL_TEMPLATE,
+      {
+        exploration_id: explorationId,
+      }
+    );
+  }
 
   private async _fetchExplorationAsync(
     explorationId: string,
@@ -87,27 +114,6 @@ export class EditableExplorationBackendApiService {
       .toPromise();
   }
 
-  private _getExplorationUrl(
-    explorationId: string,
-    applyDraft: boolean
-  ): string {
-    if (applyDraft) {
-      return this.urlInterpolationService.interpolateUrl(
-        AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE,
-        {
-          exploration_id: explorationId,
-          apply_draft: JSON.stringify(applyDraft),
-        }
-      );
-    }
-    return this.urlInterpolationService.interpolateUrl(
-      AppConstants.EDITABLE_EXPLORATION_DATA_URL_TEMPLATE,
-      {
-        exploration_id: explorationId,
-      }
-    );
-  }
-
   async fetchExplorationAsync(
     explorationId: string
   ): Promise<ExplorationBackendDict> {
@@ -134,6 +140,10 @@ export class EditableExplorationBackendApiService {
     );
   }
 
+  async deleteExplorationAsync(explorationId: string): Promise<void> {
+    return this._deleteExplorationAsync(explorationId);
+  }
+
   async recordMostRecentlyReachedCheckpointAsync(
     explorationId: string,
     mostRecentlyReachedCheckpointExpVersion: number,
@@ -142,9 +152,8 @@ export class EditableExplorationBackendApiService {
     uniqueProgressUrlId: string | null = null
   ): Promise<void> {
     if (isUserLoggedIn) {
-      const requestUrl = '/explorehandler/checkpoint_reached/' + explorationId;
       return this.httpClient
-        .put<void>(requestUrl, {
+        .put<void>(`/explorehandler/checkpoint_reached/${explorationId}`, {
           most_recently_reached_checkpoint_exp_version:
             mostRecentlyReachedCheckpointExpVersion,
           most_recently_reached_checkpoint_state_name:
@@ -154,19 +163,20 @@ export class EditableExplorationBackendApiService {
     }
 
     if (!isUserLoggedIn && uniqueProgressUrlId) {
-      const requestUrl =
-        '/explorehandler/checkpoint_reached_by_logged_out_user/' +
-        explorationId;
       return this.httpClient
-        .put<void>(requestUrl, {
-          unique_progress_url_id: uniqueProgressUrlId,
-          most_recently_reached_checkpoint_exp_version:
-            mostRecentlyReachedCheckpointExpVersion,
-          most_recently_reached_checkpoint_state_name:
-            mostRecentlyReachedCheckpointStateName,
-        })
+        .put<void>(
+          `/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`,
+          {
+            unique_progress_url_id: uniqueProgressUrlId,
+            most_recently_reached_checkpoint_exp_version:
+              mostRecentlyReachedCheckpointExpVersion,
+            most_recently_reached_checkpoint_state_name:
+              mostRecentlyReachedCheckpointStateName,
+          }
+        )
         .toPromise();
     }
+
     return Promise.resolve();
   }
 
@@ -175,15 +185,16 @@ export class EditableExplorationBackendApiService {
     mostRecentlyReachedCheckpointExpVersion: number,
     mostRecentlyReachedCheckpointStateName: string
   ): Promise<{unique_progress_url_id: string}> {
-    const requestUrl =
-      '/explorehandler/checkpoint_reached_by_logged_out_user/' + explorationId;
     return this.httpClient
-      .post<{unique_progress_url_id: string}>(requestUrl, {
-        most_recently_reached_checkpoint_exp_version:
-          mostRecentlyReachedCheckpointExpVersion,
-        most_recently_reached_checkpoint_state_name:
-          mostRecentlyReachedCheckpointStateName,
-      })
+      .post<{unique_progress_url_id: string}>(
+        `/explorehandler/checkpoint_reached_by_logged_out_user/${explorationId}`,
+        {
+          most_recently_reached_checkpoint_exp_version:
+            mostRecentlyReachedCheckpointExpVersion,
+          most_recently_reached_checkpoint_state_name:
+            mostRecentlyReachedCheckpointStateName,
+        }
+      )
       .toPromise();
   }
 
@@ -191,34 +202,26 @@ export class EditableExplorationBackendApiService {
     explorationId: string,
     uniqueProgressUrlId: string
   ): Promise<void> {
-    const requestUrl =
-      '/sync_logged_out_and_logged_in_progress/' + explorationId;
     return this.httpClient
-      .post<void>(requestUrl, {
+      .post<void>(`/sync_logged_out_and_logged_in_progress/${explorationId}`, {
         unique_progress_url_id: uniqueProgressUrlId,
       })
       .toPromise();
   }
 
   async resetExplorationProgressAsync(explorationId: string): Promise<void> {
-    const requestUrl = '/explorehandler/restart/' + explorationId;
     return this.httpClient
-      .put<void>(requestUrl, {
+      .put<void>(`/explorehandler/restart/${explorationId}`, {
         most_recently_reached_checkpoint_state_name: null,
       })
       .toPromise();
   }
 
   async recordLearnerHasViewedLessonInfoModalOnce(): Promise<void> {
-    const requestUrl = '/userinfohandler/data';
     return this.httpClient
-      .put<void>(requestUrl, {
+      .put<void>('/userinfohandler/data', {
         user_has_viewed_lesson_info_modal_once: true,
       })
       .toPromise();
-  }
-
-  async deleteExplorationAsync(explorationId: string): Promise<void> {
-    return this._deleteExplorationAsync(explorationId);
   }
 }
