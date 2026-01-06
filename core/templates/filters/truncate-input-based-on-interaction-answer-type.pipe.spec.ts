@@ -60,9 +60,19 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
     );
   });
 
-  it('should return empty string for null or undefined answer', () => {
-    expect(pipe.transform(null, 'TextInput', 10)).toBe('');
-    expect(pipe.transform(undefined, 'TextInput', 10)).toBe('');
+  it('should return empty string for empty TextInput answer', () => {
+    expect(pipe.transform('', 'TextInput', 10)).toBe('');
+  });
+
+  it('should return empty string for empty CodeRepl answer', () => {
+    const emptyCodeAnswer: InteractionAnswer = {
+      code: '',
+      output: '',
+      evaluation: '',
+      error: '',
+    };
+
+    expect(pipe.transform(emptyCodeAnswer, 'CodeRepl', 10)).toBe('');
   });
 
   it('should throw error for unknown interaction type', () => {
