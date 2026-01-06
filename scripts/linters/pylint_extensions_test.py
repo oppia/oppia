@@ -232,7 +232,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_comment_after_parenthesis_spans_single_line(
+    def test_if_with_comment_but_no_colon_continues_due_to_excluded(
         self,
     ) -> None:
         """Tests branch where comment exists but excluded remains True."""
@@ -258,7 +258,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_comment_after_parenthesis_spans_multiple_line_without_break(
+    def test_add_message_triggered_when_comment_after_bracket_not_followed_by_separator(
         self,
     ) -> None:
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
@@ -267,8 +267,8 @@ class HangingIndentCheckerTests(unittest.TestCase):
         with open(filename, 'w', encoding='utf-8') as tmp:
             tmp.write(
                 """self.post_json(a * b  # comment
-    )
-    """
+                )
+                """
             )
         node.file = filename
         node.path = filename
@@ -281,6 +281,82 @@ class HangingIndentCheckerTests(unittest.TestCase):
             msg_id='no-break-after-hanging-indent', line=1
         )
         with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_if_with_inline_comment_and_colon_is_excluded(self) -> None:
+        """Ensures control-flow statements with inline comments and colon
+        do not trigger hanging-indent warnings.
+        """
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w', encoding='utf-8') as tmp:
+            tmp.write(
+                """if (a + b > 0):  # check sum
+                    return a + b
+                """
+            )
+
+        node.file = filename
+        node.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node)
+        )
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_if_with_colon_and_no_comment_is_excluded(self) -> None:
+        """Ensures control-flow statements ending with colon
+        do not trigger hanging-indent warnings.
+        """
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w', encoding='utf-8') as tmp:
+            tmp.write(
+                """if (a + b > 0):
+                    return a + b
+                """
+            )
+
+        node.file = filename
+        node.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node)
+        )
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_multiline_if_with_comment_but_no_colon_on_header(self) -> None:
+        """Ensures multiline if-statements with comments on the first line
+        and colon on continuation lines do not raise false positives.
+        """
+        node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with open(filename, 'w', encoding='utf-8') as tmp:
+            tmp.write(
+                """if (a + b > 0)  # comment
+                    and (b - a > 0):
+                    return a + b
+                """
+            )
+
+        node.file = filename
+        node.path = filename
+
+        self.checker_test_object.checker.process_tokens(
+            pylint_utils.tokenize_module(node)
+        )
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
 
