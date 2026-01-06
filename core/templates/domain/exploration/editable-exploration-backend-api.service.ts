@@ -13,7 +13,7 @@
 // limitations under the License
 
 /**
- * @fileoverview Service to send changes to an exploration to the backend.
+ * @fileoverview Service to send changes to an exploration to the backend
  */
 
 import {HttpClient} from '@angular/common/http';
