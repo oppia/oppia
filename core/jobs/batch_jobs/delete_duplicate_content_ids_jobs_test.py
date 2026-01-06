@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core.domain import (
     exp_domain,
     exp_fetchers,
@@ -589,6 +591,56 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Verify the default outcome feedback content ID was updated.
         self.assertEqual(
             state.interaction.default_outcome.feedback.content_id, new_id
+        )
+
+    def test_replace_content_id_in_state_with_outcome_missing_feedback(
+        self,
+    ) -> None:
+        """Test when answer group outcome has no feedback attribute."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create a mock outcome without feedback attribute.
+        mock_outcome = mock.MagicMock(spec=[])
+        mock_answer_group = state_domain.AnswerGroup(
+            mock_outcome,
+            [],
+            [],
+            None,
+        )
+        state.interaction.answer_groups = [mock_answer_group]
+
+        # Should not raise error when hasattr(outcome, 'feedback') is False.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+    def test_replace_content_id_in_state_with_solution_missing_explanation(
+        self,
+    ) -> None:
+        """Test when solution has no explanation attribute."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test2', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create a mock solution without explanation attribute.
+        mock_solution = mock.MagicMock(spec=[])
+        state.interaction.solution = mock_solution
+
+        # Should not raise error when hasattr(solution, 'explanation') is False.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
         )
 
     def test_fix_job_with_empty_answer_groups(self) -> None:
