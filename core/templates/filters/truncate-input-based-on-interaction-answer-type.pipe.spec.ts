@@ -22,7 +22,7 @@ import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
-describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
+describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   let pipe: TruncateInputBasedOnInteractionAnswerTypePipe;
 
   beforeEach(() => {
@@ -31,22 +31,50 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
     );
   });
 
-  it('should correctly truncate input data', () => {
+  it('should truncate TextInput answers', () => {
+    const answer = 'Hey oppia users!';
+    expect(pipe.transform(answer, 'TextInput', 8)).toBe('Hey o...');
+  });
+
+  it('should truncate CodeRepl answers', () => {
     const codeReplAnswer: InteractionAnswer = {
-      code: 'Hey oppia  users!',
+      code: 'Hey oppia users!',
       output: '',
       evaluation: '',
       error: '',
     };
 
-    expect(pipe.transform('Hey oppia  users!', 'TextInput', 8)).toBe(
-      'Hey o...'
-    );
-
     expect(pipe.transform(codeReplAnswer, 'CodeRepl', 8)).toBe('Hey o...');
+  });
+
+  it('should truncate CodeEditor answers', () => {
+    const codeEditorAnswer: InteractionAnswer = {
+      code: 'console.log("Hello World");',
+      output: '',
+      evaluation: '',
+      error: '',
+    };
+
+    expect(pipe.transform(codeEditorAnswer, 'CodeEditor', 10)).toBe(
+      'console...'
+    );
+  });
+
+  it('should return empty string for null or undefined answer', () => {
+    expect(pipe.transform(null, 'TextInput', 10)).toBe('');
+    expect(pipe.transform(undefined, 'TextInput', 10)).toBe('');
+  });
+
+  it('should throw error for unknown interaction type', () => {
+    const answer: InteractionAnswer = {
+      code: 'Some code',
+      output: '',
+      evaluation: '',
+      error: '',
+    };
 
     expect(() => {
-      pipe.transform(codeReplAnswer, 'ImageClickInput', 8);
+      pipe.transform(answer, 'ImageClickInput', 8);
     }).toThrowError('Unknown interaction answer type');
   });
 });

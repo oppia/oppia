@@ -22,10 +22,10 @@ import {
 } from '@angular/common/http/testing';
 import {HttpErrorResponse} from '@angular/common/http';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {TopicBackendDict} from 'domain/topic/topic-object.model';
-import {AppConstants} from 'app.constants';
 import {TopicDomainConstants} from 'domain/topic/topic-domain.constants';
 
 interface TopicEditorBackendResponse {
@@ -43,9 +43,9 @@ interface TopicEditorBackendResponse {
   skill_creation_is_allowed: boolean;
 }
 
-describe('Editable topic backend API service', () => {
+describe('EditableTopicBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let editableTopicBackendApiService: EditableTopicBackendApiService;
+  let service: EditableTopicBackendApiService;
   let csrfService: CsrfTokenService;
 
   const sampleDataResults: TopicEditorBackendResponse = {
@@ -89,12 +89,11 @@ describe('Editable topic backend API service', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [EditableTopicBackendApiService, CsrfTokenService],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    editableTopicBackendApiService = TestBed.inject(
-      EditableTopicBackendApiService
-    );
+    service = TestBed.inject(EditableTopicBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.resolveTo('csrf-token');
@@ -107,9 +106,9 @@ describe('Editable topic backend API service', () => {
   it('should fetch topic successfully', fakeAsync(() => {
     let response: unknown = null;
 
-    editableTopicBackendApiService
-      .fetchTopicAsync('0')
-      .then((res: TopicEditorBackendResponse) => (response = res));
+    service.fetchTopicAsync('0').then((res: unknown) => {
+      response = res;
+    });
 
     const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
     expect(req.request.method).toBe('GET');
@@ -120,27 +119,25 @@ describe('Editable topic backend API service', () => {
   }));
 
   it('should handle fetch topic failure', fakeAsync(() => {
-    let error: string | null = null;
+    const successHandler = jasmine.createSpy('success');
+    const errorHandler = jasmine.createSpy('error');
 
-    editableTopicBackendApiService
-      .fetchTopicAsync('0')
-      .catch((err: HttpErrorResponse) => {
-        error = err.toString();
-      });
+    service.fetchTopicAsync('0').then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
     req.flush('Error', {status: 500, statusText: 'Server Error'});
 
     flushMicrotasks();
-    expect(error).toBeTruthy();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(errorHandler).toHaveBeenCalled();
   }));
 
   it('should update topic successfully', fakeAsync(() => {
     let response: unknown = null;
 
-    editableTopicBackendApiService
-      .updateTopicAsync('0', 1, 'commit', [])
-      .then((res: TopicEditorBackendResponse) => (response = res));
+    service.updateTopicAsync('0', 1, 'commit', []).then((res: unknown) => {
+      response = res;
+    });
 
     const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
     expect(req.request.method).toBe('PUT');
@@ -159,9 +156,9 @@ describe('Editable topic backend API service', () => {
   it('should delete topic successfully', fakeAsync(() => {
     let status: number | null = null;
 
-    editableTopicBackendApiService
-      .deleteTopicAsync('0')
-      .then((res: number) => (status = res));
+    service.deleteTopicAsync('0').then((res: number) => {
+      status = res;
+    });
 
     const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
     expect(req.request.method).toBe('DELETE');
@@ -173,11 +170,12 @@ describe('Editable topic backend API service', () => {
   }));
 
   it('should reject when doesTopicWithUrlFragmentExistAsync fails', fakeAsync(() => {
-    let error: HttpErrorResponse | null = null;
+    const successHandler = jasmine.createSpy('success');
+    const errorHandler = jasmine.createSpy('error');
 
-    editableTopicBackendApiService
+    service
       .doesTopicWithUrlFragmentExistAsync('test-fragment')
-      .catch((err: HttpErrorResponse) => (error = err));
+      .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
       TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE.replace(
@@ -189,15 +187,17 @@ describe('Editable topic backend API service', () => {
     req.flush({error: 'failure'}, {status: 500, statusText: 'Server Error'});
 
     flushMicrotasks();
-    expect(error).not.toBeNull();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(errorHandler).toHaveBeenCalled();
   }));
 
   it('should reject when getTopicIdToTopicNameAsync fails', fakeAsync(() => {
-    let error: string | null = null;
+    const successHandler = jasmine.createSpy('success');
+    const errorHandler = jasmine.createSpy('error');
 
-    editableTopicBackendApiService
+    service
       .getTopicIdToTopicNameAsync(['id1'])
-      .catch((err: HttpErrorResponse) => (error = err.error.error));
+      .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
       '/topic_id_to_topic_name_handler/?comma_separated_topic_ids=id1'
@@ -209,6 +209,7 @@ describe('Editable topic backend API service', () => {
     );
 
     flushMicrotasks();
-    expect(error).toBe('Backend failure');
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(errorHandler).toHaveBeenCalled();
   }));
 });
