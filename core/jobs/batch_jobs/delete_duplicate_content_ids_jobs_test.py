@@ -537,6 +537,60 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         # Content ID should not change because it doesn't match old_id.
         self.assertEqual(obj.content_id, other_id)
 
+    def test_replace_content_id_in_state_no_interaction(self) -> None:
+        """Test replacing content ID when state has no interaction."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_no_int', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # The state will have content but no interaction set.
+        # This tests the if state.interaction: branch being False.
+        state.content.content_id = old_id
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        # Should only update content (which we already updated), not interaction.
+        self.assertEqual(state.content.content_id, new_id)
+
+    def test_replace_content_id_in_state_with_default_outcome(
+        self,
+    ) -> None:
+        """Test replacing content ID in default outcome feedback."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_do', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_do_id'
+        new_id = 'new_do_id'
+
+        # Set default outcome with feedback.
+        state.interaction.default_outcome = state_domain.Outcome(
+            'Introduction',
+            None,
+            state_domain.SubtitledHtml(old_id, '<p>default feedback</p>'),
+            False,
+            [],
+            None,
+            None,
+        )
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        # Verify the default outcome feedback content ID was updated.
+        self.assertEqual(
+            state.interaction.default_outcome.feedback.content_id, new_id
+        )
+
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
