@@ -20,7 +20,6 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {HttpErrorResponse} from '@angular/common/http';
 import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
 
 import {EditableTopicBackendApiService} from 'domain/topic/editable-topic-backend-api.service';

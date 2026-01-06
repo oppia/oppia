@@ -41,7 +41,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     const interactionSpec =
       INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
 
-    if (!interactionSpec) {
+    if (!interactionSpec || !interactionSpec.answer_type) {
       throw new Error(`Unknown interaction id: ${interactionId}`);
     }
 
