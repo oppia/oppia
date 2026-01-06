@@ -637,7 +637,7 @@ export class TopicUpdateService {
           );
         }
       },
-      () => {
+      (changeDict: TopicChange, domainObject: DomainObject) => {
         const t = domainObject as Topic;
         t
           .getSubtopicById(subtopicId)
