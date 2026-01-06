@@ -21,8 +21,6 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {HttpErrorResponse} from '@angular/common/http';
-
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
@@ -75,7 +73,7 @@ describe('EditableExplorationBackendApiService', () => {
       .fetchExplorationAsync('0')
       .then((res: ExplorationBackendDict) => (result = res));
 
-    const req = httpTestingController.expectOne('/createhandler/data/0');
+    const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('GET');
     req.flush(sampleDataResults);
 
@@ -91,7 +89,7 @@ describe('EditableExplorationBackendApiService', () => {
       .then((res: ExplorationBackendDict) => (result = res));
 
     const req = httpTestingController.expectOne(
-      '/createhandler/data/0?apply_draft=true'
+      '/exploration_handler/data/0?apply_draft=true'
     );
     expect(req.request.method).toBe('GET');
     req.flush(sampleDataResults);
@@ -107,7 +105,7 @@ describe('EditableExplorationBackendApiService', () => {
       .updateExplorationAsync('0', 1, 'Updated', [])
       .then((res: ExplorationBackendDict) => (response = res));
 
-    const req = httpTestingController.expectOne('/createhandler/data/0');
+    const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('PUT');
     req.flush(sampleDataResults);
 
@@ -120,7 +118,7 @@ describe('EditableExplorationBackendApiService', () => {
 
     service.deleteExplorationAsync('0').then(() => (success = true));
 
-    const req = httpTestingController.expectOne('/createhandler/data/0');
+    const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('DELETE');
     req.flush({});
 
@@ -178,10 +176,9 @@ describe('EditableExplorationBackendApiService', () => {
       '/explorehandler/checkpoint_reached_by_logged_out_user/0'
     );
     expect(req.request.method).toBe('POST');
-
     req.flush({unique_progress_url_id: 'abc'});
-    flushMicrotasks();
 
+    flushMicrotasks();
     expect(response).toEqual({unique_progress_url_id: 'abc'});
   }));
 

@@ -63,12 +63,7 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   });
 
   it('should throw error for unknown interaction type', () => {
-    const answer: InteractionAnswer = {
-      code: 'Some code',
-      output: '',
-      evaluation: '',
-      error: '',
-    };
+    const answer = 'Some input';
 
     expect(() => {
       pipe.transform(answer, 'ImageClickInput', 8);
@@ -76,12 +71,7 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
   });
 
   it('should throw error when NormalizedString input is not a string', () => {
-    const invalidAnswer: InteractionAnswer = {
-      code: 'not valid',
-      output: '',
-      evaluation: '',
-      error: '',
-    };
+    const invalidAnswer = {} as unknown as string;
 
     expect(() => {
       pipe.transform(invalidAnswer, 'TextInput', 8);

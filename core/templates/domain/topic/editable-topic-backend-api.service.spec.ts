@@ -176,7 +176,7 @@ describe('EditableTopicBackendApiService', () => {
     });
 
     const req = httpTestingController.expectOne(
-      '/topic_editor_story_handler/data/0'
+      '/topic_editor_story_handler/0'
     );
     expect(req.request.method).toBe('GET');
 
@@ -232,7 +232,7 @@ describe('EditableTopicBackendApiService', () => {
     const req = httpTestingController.expectOne(
       TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE.replace(
         '<topic_name>',
-        'Topic Name'
+        encodeURIComponent('Topic Name')
       )
     );
 
