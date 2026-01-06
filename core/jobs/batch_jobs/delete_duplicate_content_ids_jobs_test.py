@@ -643,6 +643,81 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             state, old_id, new_id
         )
 
+    def test_replace_content_id_in_state_with_feedback_missing_content_id(
+        self,
+    ) -> None:
+        """Test when feedback object has no content_id attribute."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test3', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create mock feedback without content_id attribute.
+        mock_feedback = mock.MagicMock(spec=[])
+        mock_outcome = mock.MagicMock()
+        mock_outcome.feedback = mock_feedback
+
+        mock_answer_group = state_domain.AnswerGroup(
+            mock_outcome,
+            [],
+            [],
+            None,
+        )
+        state.interaction.answer_groups = [mock_answer_group]
+
+        # Should not raise error when hasattr(feedback, 'content_id') is False.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+    def test_replace_content_id_in_state_with_hint_missing_content_id(
+        self,
+    ) -> None:
+        """Test when hint has no hint_content attribute."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test4', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create mock hint without hint_content attribute.
+        mock_hint = mock.MagicMock(spec=[])
+        state.interaction.hints = [mock_hint]
+
+        # Should not raise error when hasattr(hint, 'hint_content') is False.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+    def test_replace_content_id_in_state_with_default_outcome_missing_attributes(
+        self,
+    ) -> None:
+        """Test when default outcome has missing attributes."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test5', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create mock default outcome without feedback attribute.
+        mock_outcome = mock.MagicMock(spec=[])
+        state.interaction.default_outcome = mock_outcome
+
+        # Should not raise error when hasattr checks fail.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
     def test_fix_job_with_empty_answer_groups(self) -> None:
         """Test fixing when answer groups exist but have no feedback."""
         exploration = exp_domain.Exploration.create_default_exploration(
