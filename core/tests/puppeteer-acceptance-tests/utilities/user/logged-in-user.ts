@@ -61,8 +61,8 @@ const confirmUsernameField = '.e2e-test-confirm-username-field';
 const confirmAccountDeletionButton = '.e2e-test-confirm-deletion-button';
 const agreeToTermsCheckbox = 'input.e2e-test-agree-to-terms-checkbox';
 const registerNewUserButton = 'button.e2e-test-register-user:not([disabled])';
-const desktopLessonCardTitleSelector = '.e2e-test-topic-in-current-goals';
-const lessonCardTitleSelector = '.e2e-test-topic-in-current-goals';
+const desktopLessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
 const desktopAddToPlayLaterButton = '.e2e-test-add-to-playlist-btn';
 const mobileAddToPlayLaterButton = '.e2e-test-mobile-add-to-playlist-btn';
 const mobileLessonCardTitleSelector = '.e2e-test-exp-summary-tile-title';
@@ -81,7 +81,7 @@ const communityLessonsExpanded =
   '.e2e-test-card-display-content.card-display-content-shown';
 const communityLessonsCollapsed =
   '.e2e-test-card-display-content.card-display-content-hidden';
-const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-topic-in-current-goals`;
+const lessonCardTitleInPlayLaterSelector = `${playLaterSectionSelector} .e2e-test-exploration-tile-title`;
 const mobileLessonCardOptionsDropdownButton =
   '.e2e-test-mobile-lesson-card-dropdown';
 const progressSectionSelector = '.e2e-test-progress-section';
