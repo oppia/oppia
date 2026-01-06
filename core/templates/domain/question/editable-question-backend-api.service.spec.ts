@@ -42,7 +42,7 @@ interface QuestionBackendDict {
 
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
-  let editableQuestionBackendApiService: EditableQuestionBackendApiService;
+  let service: EditableQuestionBackendApiService;
 
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
@@ -87,9 +87,7 @@ describe('EditableQuestionBackendApiService', () => {
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
-    editableQuestionBackendApiService = TestBed.inject(
-      EditableQuestionBackendApiService
-    );
+    service = TestBed.inject(EditableQuestionBackendApiService);
   });
 
   afterEach(() => {
@@ -99,7 +97,7 @@ describe('EditableQuestionBackendApiService', () => {
   it('should fetch a question successfully', fakeAsync(() => {
     let result: Question | undefined;
 
-    editableQuestionBackendApiService
+    service
       .fetchQuestionAsync('question_id')
       .then((data: FetchQuestionResponse) => {
         result = data.questionObject;
@@ -118,14 +116,20 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    expect(result!.getId()).toBe('question_id');
+
+    if (result === undefined) {
+      fail('Expected result to be defined');
+      return;
+    }
+
+    expect(result.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
     const errorHandler = jasmine.createSpy('error');
 
-    editableQuestionBackendApiService
+    service
       .fetchQuestionAsync('question_id')
       .then(successHandler, errorHandler);
 
@@ -143,14 +147,16 @@ describe('EditableQuestionBackendApiService', () => {
   it('should update a question successfully', fakeAsync(() => {
     let response: unknown = null;
 
-    editableQuestionBackendApiService
+    service
       .updateQuestionAsync(
         backendQuestionDict.id,
         backendQuestionDict.version.toString(),
         'Question updated',
         []
       )
-      .then((res: unknown) => (response = res));
+      .then((res: unknown) => {
+        response = res;
+      });
 
     const req = httpTestingController.expectOne(
       '/question_editor_handler/data/question_id'
@@ -167,7 +173,7 @@ describe('EditableQuestionBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
     const errorHandler = jasmine.createSpy('error');
 
-    editableQuestionBackendApiService
+    service
       .updateQuestionAsync(
         backendQuestionDict.id,
         backendQuestionDict.version.toString(),
@@ -198,7 +204,7 @@ describe('EditableQuestionBackendApiService', () => {
       },
     ];
 
-    editableQuestionBackendApiService
+    service
       .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
       .then(successHandler);
 
@@ -225,7 +231,7 @@ describe('EditableQuestionBackendApiService', () => {
       },
     ];
 
-    editableQuestionBackendApiService
+    service
       .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
       .then(successHandler, errorHandler);
 

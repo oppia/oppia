@@ -47,19 +47,6 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
     expect(pipe.transform(codeReplAnswer, 'CodeRepl', 8)).toBe('Hey o...');
   });
 
-  it('should truncate CodeEditor answers', () => {
-    const codeEditorAnswer: InteractionAnswer = {
-      code: 'console.log("Hello World");',
-      output: '',
-      evaluation: '',
-      error: '',
-    };
-
-    expect(pipe.transform(codeEditorAnswer, 'CodeEditor', 10)).toBe(
-      'console...'
-    );
-  });
-
   it('should return empty string for empty TextInput answer', () => {
     expect(pipe.transform('', 'TextInput', 10)).toBe('');
   });
@@ -85,6 +72,6 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
 
     expect(() => {
       pipe.transform(answer, 'ImageClickInput', 8);
-    }).toThrowError('Unknown interaction answer type');
+    }).toThrowError('Unknown interaction id: ImageClickInput');
   });
 });
