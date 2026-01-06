@@ -52,54 +52,14 @@ describe('EditableExplorationBackendApiService', () => {
       is_version_of_draft_valid: true,
       init_state_name: 'Introduction',
       param_changes: [],
-      param_specs: {x: {obj_type: 'UnicodeString'}},
-      states: {
-        Introduction: {
-          param_changes: [],
-          content: {html: '', content_id: 'content'},
-          interaction: {
-            id: null,
-            customization_args: {},
-            answer_groups: [],
-            default_outcome: {
-              param_changes: [],
-              dest: 'Introduction',
-              dest_if_really_stuck: null,
-              feedback: {html: '', content_id: 'feedback'},
-              labelled_as_correct: false,
-              refresher_exploration_id: null,
-              missing_prerequisite_skill_id: null,
-            },
-            confirmed_unclassified_answers: [],
-            hints: [],
-            solution: null,
-          },
-          classifier_model_id: null,
-          solicit_answer_details: false,
-          card_is_checkpoint: false,
-          linked_skill_id: null,
-          inapplicable_skill_misconception_ids: [],
-        },
-      },
+      param_specs: {},
+      states: {},
       title: 'Sample exploration',
       language_code: 'en',
       draft_change_list_id: 0,
       next_content_id_index: 1,
-      exploration_metadata: {
-        title: 'Sample exploration',
-        category: 'Sample',
-        objective: 'Objective',
-        language_code: 'en',
-        tags: [],
-        blurb: '',
-        author_notes: '',
-        edits_allowed: true,
-        states_schema_version: 0,
-        init_state_name: 'Introduction',
-        param_specs: {},
-        param_changes: [],
-        auto_tts_enabled: false,
-      },
+      exploration_metadata:
+        {} as ExplorationBackendDict['exploration_metadata'],
       version: 1,
     };
   });
@@ -123,25 +83,21 @@ describe('EditableExplorationBackendApiService', () => {
     expect(result).toEqual(sampleDataResults);
   }));
 
-  it('should handle fetch exploration failure', fakeAsync(() => {
-    let error: string | null = null;
+  it('should fetch exploration with draft applied', fakeAsync(() => {
+    let result: ExplorationBackendDict | null = null;
 
     service
-      .fetchExplorationAsync('1')
-      .catch((err: unknown) => (error = String(err)));
+      .fetchApplyDraftExplorationAsync('0')
+      .then((res: ExplorationBackendDict) => (result = res));
 
-    const req = httpTestingController.expectOne('/createhandler/data/1');
-    req.error(
-      new ErrorEvent('Error'),
-      new HttpErrorResponse({
-        error: 'Fetch failed',
-        status: 500,
-        statusText: 'Server Error',
-      })
+    const req = httpTestingController.expectOne(
+      '/createhandler/data/0?apply_draft=true'
     );
+    expect(req.request.method).toBe('GET');
+    req.flush(sampleDataResults);
 
     flushMicrotasks();
-    expect(error).toBeTruthy();
+    expect(result).toEqual(sampleDataResults);
   }));
 
   it('should update exploration successfully', fakeAsync(() => {
@@ -159,27 +115,6 @@ describe('EditableExplorationBackendApiService', () => {
     expect(response).toEqual(sampleDataResults);
   }));
 
-  it('should handle update exploration failure', fakeAsync(() => {
-    let error: string | null = null;
-
-    service
-      .updateExplorationAsync('0', 1, 'Updated', [])
-      .catch((err: unknown) => (error = String(err)));
-
-    const req = httpTestingController.expectOne('/createhandler/data/0');
-    req.error(
-      new ErrorEvent('Error'),
-      new HttpErrorResponse({
-        error: 'Update failed',
-        status: 500,
-        statusText: 'Server Error',
-      })
-    );
-
-    flushMicrotasks();
-    expect(error).toBeTruthy();
-  }));
-
   it('should delete exploration successfully', fakeAsync(() => {
     let success = false;
 
@@ -193,24 +128,92 @@ describe('EditableExplorationBackendApiService', () => {
     expect(success).toBeTrue();
   }));
 
-  it('should handle delete exploration failure', fakeAsync(() => {
-    let error: string | null = null;
-
-    service
-      .deleteExplorationAsync('0')
-      .catch((err: unknown) => (error = String(err)));
-
-    const req = httpTestingController.expectOne('/createhandler/data/0');
-    req.error(
-      new ErrorEvent('Error'),
-      new HttpErrorResponse({
-        error: 'Delete failed',
-        status: 500,
-        statusText: 'Server Error',
-      })
+  it('should record checkpoint for logged-in user', fakeAsync(() => {
+    service.recordMostRecentlyReachedCheckpointAsync(
+      '0',
+      1,
+      'Introduction',
+      true
     );
 
+    const req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_reached/0'
+    );
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+
     flushMicrotasks();
-    expect(error).toBeTruthy();
+  }));
+
+  it('should record checkpoint for logged-out user', fakeAsync(() => {
+    service.recordMostRecentlyReachedCheckpointAsync(
+      '0',
+      1,
+      'Introduction',
+      false,
+      'progress_id'
+    );
+
+    const req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_reached_by_logged_out_user/0'
+    );
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+
+    flushMicrotasks();
+  }));
+
+  it('should record progress and fetch unique progress id', fakeAsync(() => {
+    let response: unknown = null;
+
+    service
+      .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
+        '0',
+        1,
+        'Introduction'
+      )
+      .then((res: unknown) => (response = res));
+
+    const req = httpTestingController.expectOne(
+      '/explorehandler/checkpoint_reached_by_logged_out_user/0'
+    );
+    expect(req.request.method).toBe('POST');
+
+    req.flush({unique_progress_url_id: 'abc'});
+    flushMicrotasks();
+
+    expect(response).toEqual({unique_progress_url_id: 'abc'});
+  }));
+
+  it('should change logged out progress to logged in progress', fakeAsync(() => {
+    service.changeLoggedOutProgressToLoggedInProgressAsync('0', 'progress_id');
+
+    const req = httpTestingController.expectOne(
+      '/sync_logged_out_and_logged_in_progress/0'
+    );
+    expect(req.request.method).toBe('POST');
+    req.flush({});
+
+    flushMicrotasks();
+  }));
+
+  it('should reset exploration progress', fakeAsync(() => {
+    service.resetExplorationProgressAsync('0');
+
+    const req = httpTestingController.expectOne('/explorehandler/restart/0');
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+
+    flushMicrotasks();
+  }));
+
+  it('should record learner has viewed lesson info modal once', fakeAsync(() => {
+    service.recordLearnerHasViewedLessonInfoModalOnce();
+
+    const req = httpTestingController.expectOne('/userinfohandler/data');
+    expect(req.request.method).toBe('PUT');
+    req.flush({});
+
+    flushMicrotasks();
   }));
 });

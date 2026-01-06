@@ -74,4 +74,25 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
       pipe.transform(answer, 'ImageClickInput', 8);
     }).toThrowError('Unknown interaction id: ImageClickInput');
   });
+
+  it('should throw error when NormalizedString input is not a string', () => {
+    const invalidAnswer: InteractionAnswer = {
+      code: 'not valid',
+      output: '',
+      evaluation: '',
+      error: '',
+    };
+
+    expect(() => {
+      pipe.transform(invalidAnswer, 'TextInput', 8);
+    }).toThrowError('Expected string input for NormalizedString');
+  });
+
+  it('should throw error when CodeEvaluation input is invalid', () => {
+    const invalidAnswer = 'invalid code input' as unknown as InteractionAnswer;
+
+    expect(() => {
+      pipe.transform(invalidAnswer, 'CodeRepl', 8);
+    }).toThrowError('Invalid input for code-based interaction');
+  });
 });

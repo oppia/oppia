@@ -26,19 +26,10 @@ import {
   EditableQuestionBackendApiService,
   SkillLinkageModificationsArray,
   FetchQuestionResponse,
+  CreateQuestionResponse,
 } from 'domain/question/editable-question-backend-api.service';
-import {Question} from 'domain/question/question.model';
-
-interface QuestionBackendDict {
-  id: string;
-  question_state_data: unknown;
-  question_state_data_schema_version: number;
-  linked_skill_ids: string[];
-  inapplicable_skill_misconception_ids: string[];
-  next_content_id_index: number;
-  language_code: string;
-  version: number;
-}
+import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -47,35 +38,23 @@ describe('EditableQuestionBackendApiService', () => {
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
     question_state_data: {
-      param_changes: [],
-      content: {
-        html: '<p>Question</p>',
-        content_id: 'content',
-      },
+      content: {html: '<p>Question</p>', content_id: 'content'},
       interaction: {
         id: 'TextInput',
         answer_groups: [],
         confirmed_unclassified_answers: [],
-        customization_args: {
-          placeholder: {
-            value: {
-              content_id: 'placeholder',
-              unicode_str: '',
-            },
-          },
-          rows: {value: 1},
-          catchMisspellings: {value: false},
-        },
+        customization_args: {},
         default_outcome: null,
         param_changes: [],
         hints: [],
         solution: null,
       },
+      param_changes: [],
     },
     question_state_data_schema_version: 1,
     linked_skill_ids: ['skill_id'],
     inapplicable_skill_misconception_ids: [],
-    next_content_id_index: 0,
+    next_content_idid_index: 0,
     language_code: 'en',
     version: 1,
   };
@@ -104,7 +83,10 @@ describe('EditableQuestionBackendApiService', () => {
       });
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/question_id'
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
     expect(req.request.method).toBe('GET');
 
@@ -116,12 +98,10 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-
-    if (result === undefined) {
-      fail('Expected result to be defined');
+    if (!result) {
+      fail('Expected question object');
       return;
     }
-
     expect(result.getId()).toBe('question_id');
   }));
 
@@ -134,12 +114,18 @@ describe('EditableQuestionBackendApiService', () => {
       .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/question_id'
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
 
-    req.flush('Error', {status: 500, statusText: 'Server Error'});
-    flushMicrotasks();
+    req.flush(
+      {error: {error: 'Backend error'}},
+      {status: 500, statusText: 'Server Error'}
+    );
 
+    flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalled();
   }));
@@ -148,22 +134,20 @@ describe('EditableQuestionBackendApiService', () => {
     let response: unknown = null;
 
     service
-      .updateQuestionAsync(
-        backendQuestionDict.id,
-        backendQuestionDict.version.toString(),
-        'Question updated',
-        []
-      )
+      .updateQuestionAsync('question_id', '1', 'commit', [])
       .then((res: unknown) => {
         response = res;
       });
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/question_id'
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
     expect(req.request.method).toBe('PUT');
 
-    req.flush({question_dict: backendQuestionDict});
+    req.flush({questionDict: backendQuestionDict});
     flushMicrotasks();
 
     expect(response).not.toBeNull();
@@ -174,21 +158,22 @@ describe('EditableQuestionBackendApiService', () => {
     const errorHandler = jasmine.createSpy('error');
 
     service
-      .updateQuestionAsync(
-        backendQuestionDict.id,
-        backendQuestionDict.version.toString(),
-        'Question updated',
-        []
-      )
+      .updateQuestionAsync('question_id', '1', 'commit', [])
       .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
-      '/question_editor_handler/data/question_id'
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
 
-    req.flush('Error', {status: 500, statusText: 'Server Error'});
-    flushMicrotasks();
+    req.flush(
+      {error: {error: 'Backend error'}},
+      {status: 500, statusText: 'Server Error'}
+    );
 
+    flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalled();
   }));
@@ -197,11 +182,7 @@ describe('EditableQuestionBackendApiService', () => {
     const successHandler = jasmine.createSpy('success');
 
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
-      {
-        id: 'skillId',
-        task: 'remove',
-        difficulty: 0,
-      },
+      {id: 'skillId', task: 'remove', difficulty: 0},
     ];
 
     service
@@ -209,7 +190,10 @@ describe('EditableQuestionBackendApiService', () => {
       .then(successHandler);
 
     const req = httpTestingController.expectOne(
-      '/manage_question_skill_link/question_id'
+      QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
     expect(req.request.method).toBe('PUT');
 
@@ -224,11 +208,7 @@ describe('EditableQuestionBackendApiService', () => {
     const errorHandler = jasmine.createSpy('error');
 
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
-      {
-        id: 'skillId',
-        task: 'remove',
-        difficulty: 0,
-      },
+      {id: 'skillId', task: 'remove', difficulty: 0},
     ];
 
     service
@@ -236,12 +216,60 @@ describe('EditableQuestionBackendApiService', () => {
       .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
-      '/manage_question_skill_link/question_id'
+      QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE.replace(
+        '<question_id>',
+        'question_id'
+      )
     );
 
-    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    req.flush(
+      {error: {error: 'Backend error'}},
+      {status: 500, statusText: 'Server Error'}
+    );
+
+    flushMicrotasks();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(errorHandler).toHaveBeenCalled();
+  }));
+
+  it('should create question successfully', fakeAsync(() => {
+    let response: CreateQuestionResponse | null = null;
+
+    service
+      .createQuestionAsync([], [], backendQuestionDict, [])
+      .then((res: CreateQuestionResponse) => {
+        response = res;
+      });
+
+    const req = httpTestingController.expectOne(
+      QuestionDomainConstants.QUESTION_CREATION_URL
+    );
+    expect(req.request.method).toBe('POST');
+
+    req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
+    expect(response).toEqual({questionId: 'new_question_id'});
+  }));
+
+  it('should handle create question failure', fakeAsync(() => {
+    const successHandler = jasmine.createSpy('success');
+    const errorHandler = jasmine.createSpy('error');
+
+    service
+      .createQuestionAsync([], [], backendQuestionDict, [])
+      .then(successHandler, errorHandler);
+
+    const req = httpTestingController.expectOne(
+      QuestionDomainConstants.QUESTION_CREATION_URL
+    );
+
+    req.flush(
+      {error: {error: 'Backend failure'}},
+      {status: 500, statusText: 'Server Error'}
+    );
+
+    flushMicrotasks();
     expect(successHandler).not.toHaveBeenCalled();
     expect(errorHandler).toHaveBeenCalled();
   }));
