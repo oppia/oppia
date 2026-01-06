@@ -42,22 +42,26 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
       INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
 
     if (!interactionSpec) {
-      throw new Error(`Unknown interaction id: ${interactionId}`);
+      return '';
     }
 
     const answerType = interactionSpec.answer_type;
     let actualInputToTruncate = '';
 
     if (answerType === 'NormalizedString' || answerType === 'CodeEvaluation') {
-      if (typeof input === 'object' && input !== null && 'code' in input) {
-        actualInputToTruncate = (input as CodeAnswer).code;
-      } else if (typeof input === 'string') {
+      if (typeof input === 'string') {
         actualInputToTruncate = input;
+      } else if (
+        typeof input === 'object' &&
+        input !== null &&
+        'code' in input
+      ) {
+        actualInputToTruncate = (input as CodeAnswer).code;
       } else {
-        throw new Error('Invalid input for code-based interaction');
+        actualInputToTruncate = '';
       }
     } else {
-      throw new Error('Unknown interaction answer type');
+      actualInputToTruncate = '';
     }
 
     return this.truncatePipe.transform(actualInputToTruncate, length);

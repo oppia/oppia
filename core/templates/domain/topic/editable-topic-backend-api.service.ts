@@ -8,12 +8,12 @@
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
- * @fileoverview Service to send changes to a topic to the backend.
+ * @fileoverview Service to send changes to a topic to the backend
  */
 
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
@@ -131,11 +131,9 @@ export class EditableTopicBackendApiService {
     successCallback: (value: FetchTopicResponse) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let topicDataUrl = this.urlInterpolationService.interpolateUrl(
+    const topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      {
-        topic_id: topicId,
-      }
+      {topic_id: topicId}
     );
 
     this.http
@@ -143,21 +141,17 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          if (successCallback) {
-            successCallback({
-              topicDict: response.topic_dict,
-              groupedSkillSummaries: response.grouped_skill_summary_dicts,
-              skillIdToDescriptionDict: response.skill_id_to_description_dict,
-              skillQuestionCountDict: {
-                ...response.skill_question_count_dict,
-              },
-              skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
-              classroomUrlFragment: response.classroom_url_fragment,
-              classroomName: response.classroom_name,
-              skillCreationIsAllowed: response.skill_creation_is_allowed,
-              curriculumAdminUsernames: response.curriculum_admin_usernames,
-            });
-          }
+          successCallback({
+            topicDict: response.topic_dict,
+            groupedSkillSummaries: response.grouped_skill_summary_dicts,
+            skillIdToDescriptionDict: response.skill_id_to_description_dict,
+            skillQuestionCountDict: {...response.skill_question_count_dict},
+            skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
+            classroomUrlFragment: response.classroom_url_fragment,
+            classroomName: response.classroom_name,
+            skillCreationIsAllowed: response.skill_creation_is_allowed,
+            curriculumAdminUsernames: response.curriculum_admin_usernames,
+          });
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -170,11 +164,9 @@ export class EditableTopicBackendApiService {
     successCallback: (value: StorySummaryBackendDict[]) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let storiesDataUrl = this.urlInterpolationService.interpolateUrl(
+    const storiesDataUrl = this.urlInterpolationService.interpolateUrl(
       TopicDomainConstants.TOPIC_EDITOR_STORY_URL_TEMPLATE,
-      {
-        topic_id: topicId,
-      }
+      {topic_id: topicId}
     );
 
     this.http
@@ -182,10 +174,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          let canonicalStorySummaries = response.canonical_story_summary_dicts;
-          if (successCallback) {
-            successCallback(canonicalStorySummaries);
-          }
+          successCallback(response.canonical_story_summary_dicts);
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -199,7 +188,7 @@ export class EditableTopicBackendApiService {
     successCallback: (value: SubtopicPageBackendDict) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
+    const subtopicPageDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE,
       {
         topic_id: topicId,
@@ -212,10 +201,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          let topic = response.subtopic_page;
-          if (successCallback) {
-            successCallback(topic);
-          }
+          successCallback(response.subtopic_page);
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -229,7 +215,7 @@ export class EditableTopicBackendApiService {
     successCallback: (value: StudyGuideBackendDict) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let studyGuideDataUrl = this.urlInterpolationService.interpolateUrl(
+    const studyGuideDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.STUDY_GUIDE_EDITOR_DATA_URL_TEMPLATE,
       {
         topic_id: topicId,
@@ -242,10 +228,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          let topic = response.study_guide;
-          if (successCallback) {
-            successCallback(topic);
-          }
+          successCallback(response.study_guide);
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -258,20 +241,17 @@ export class EditableTopicBackendApiService {
     successCallback: (value: number) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let topicDataUrl = this.urlInterpolationService.interpolateUrl(
+    const topicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      {
-        topic_id: topicId,
-      }
+      {topic_id: topicId}
     );
+
     this.http
       .delete<DeleteTopicBackendResponse>(topicDataUrl)
       .toPromise()
       .then(
         response => {
-          if (successCallback) {
-            successCallback(response.status);
-          }
+          successCallback(response.status);
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -287,86 +267,27 @@ export class EditableTopicBackendApiService {
     successCallback: (value: UpdateTopicResponse) => void,
     errorCallback: (reason: string) => void
   ): void {
-    let editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
+    const editableTopicDataUrl = this.urlInterpolationService.interpolateUrl(
       AppConstants.EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      {
-        topic_id: topicId,
-      }
+      {topic_id: topicId}
     );
 
-    // Rename topic_and_subtopic_page_change_dicts to
-    // topic_and_subtopic_change_dicts.
-    let putData = {
+    const putData = {
       version: topicVersion,
       commit_message: commitMessage,
       topic_and_subtopic_page_change_dicts: changeList,
     };
+
     this.http
       .put<UpdateTopicBackendResponse>(editableTopicDataUrl, putData)
       .toPromise()
       .then(
         response => {
-          if (successCallback) {
-            // Here also, a dict with 2 fields are passed instead of just 2
-            // parameters, due to the same reason as written for _fetchTopic().
-            successCallback({
-              topicDict: response.topic_dict,
-              skillIdToDescriptionDict: response.skill_id_to_description_dict,
-              skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
-            });
-          }
-        },
-        errorResponse => {
-          errorCallback(errorResponse.error);
-        }
-      );
-  }
-
-  private _doesTopicWithUrlFragmentExist(
-    topicUrlFragment: string,
-    successCallback: (value: boolean) => void,
-    errorCallback: (errorResponse: HttpErrorResponse) => void
-  ): void {
-    let topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
-      TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
-      {
-        topic_url_fragment: topicUrlFragment,
-      }
-    );
-    this.http
-      .get<DoesTopicWithUrlFragmentExistBackendResponse>(topicUrlFragmentUrl)
-      .toPromise()
-      .then(
-        response => {
-          if (successCallback) {
-            successCallback(response.topic_url_fragment_exists);
-          }
-        },
-        errorResponse => {
-          errorCallback(errorResponse);
-        }
-      );
-  }
-
-  private _doesTopicWithNameExist(
-    topicName: string,
-    successCallback: (value: boolean) => void,
-    errorCallback: (reason: string) => void
-  ): void {
-    let topicNameUrl = this.urlInterpolationService.interpolateUrl(
-      TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE,
-      {
-        topic_name: topicName,
-      }
-    );
-    this.http
-      .get<DoesTopicWithNameExistBackendResponse>(topicNameUrl)
-      .toPromise()
-      .then(
-        response => {
-          if (successCallback) {
-            successCallback(response.topic_name_exists);
-          }
+          successCallback({
+            topicDict: response.topic_dict,
+            skillIdToDescriptionDict: response.skill_id_to_description_dict,
+            skillIdToRubricsDict: response.skill_id_to_rubrics_dict,
+          });
         },
         errorResponse => {
           errorCallback(errorResponse.error);
@@ -404,16 +325,6 @@ export class EditableTopicBackendApiService {
     });
   }
 
-  /**
-   * Updates a topic in the backend with the provided topic ID.
-   * The changes only apply to the topic of the given version and the
-   * request to update the topic will fail if the provided topic
-   * version is older than the current version stored in the backend. Both
-   * the changes and the message to associate with those changes are used
-   * to commit a change to the topic. The new topic is passed to
-   * the success callback, if one is provided to the returned promise
-   * object. Errors are passed to the error callback, if one is provided.
-   */
   async updateTopicAsync(
     topicId: string,
     topicVersion: number,
@@ -452,6 +363,52 @@ export class EditableTopicBackendApiService {
     });
   }
 
+  private _doesTopicWithUrlFragmentExist(
+    topicUrlFragment: string,
+    successCallback: (value: boolean) => void,
+    errorCallback: (errorResponse: HttpErrorResponse) => void
+  ): void {
+    const topicUrlFragmentUrl = this.urlInterpolationService.interpolateUrl(
+      TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE,
+      {topic_url_fragment: topicUrlFragment}
+    );
+
+    this.http
+      .get<DoesTopicWithUrlFragmentExistBackendResponse>(topicUrlFragmentUrl)
+      .toPromise()
+      .then(
+        response => {
+          successCallback(response.topic_url_fragment_exists);
+        },
+        errorResponse => {
+          errorCallback(errorResponse);
+        }
+      );
+  }
+
+  private _doesTopicWithNameExist(
+    topicName: string,
+    successCallback: (value: boolean) => void,
+    errorCallback: (reason: string) => void
+  ): void {
+    const topicNameUrl = this.urlInterpolationService.interpolateUrl(
+      TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE,
+      {topic_name: topicName}
+    );
+
+    this.http
+      .get<DoesTopicWithNameExistBackendResponse>(topicNameUrl)
+      .toPromise()
+      .then(
+        response => {
+          successCallback(response.topic_name_exists);
+        },
+        errorResponse => {
+          errorCallback(errorResponse.error);
+        }
+      );
+  }
+
   private _getTopicIdToTopicName(
     topicIds: string[],
     successCallback: (value: TopicIdToTopicNameResponse) => void,
@@ -470,9 +427,7 @@ export class EditableTopicBackendApiService {
       .toPromise()
       .then(
         response => {
-          if (successCallback) {
-            successCallback(response.topic_id_to_topic_name);
-          }
+          successCallback(response.topic_id_to_topic_name);
         },
         errorResponse => {
           errorCallback(errorResponse.error.error);

@@ -8,13 +8,13 @@
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
  * @fileoverview Service to send and receive changes to a question in the
- * backend.
+ * backend
  */
 
 import {Injectable} from '@angular/core';
@@ -81,38 +81,34 @@ export class EditableQuestionBackendApiService {
     successCallback: (value: CreateQuestionResponse) => void,
     errorCallback: (reason?: string) => void
   ): Promise<void> {
-    return new Promise(() => {
-      const body = new FormData();
-      const filenames = imagesData.map(obj => obj.filename);
-      const imageBlobs = imagesData.map(obj => obj.imageBlob);
+    const body = new FormData();
+    const filenames = imagesData.map(obj => obj.filename);
+    const imageBlobs = imagesData.map(obj => obj.imageBlob);
 
-      const postData = {
-        question_dict: questionObject,
-        skill_ids: skillIds,
-        skill_difficulties: skillDifficulties,
-        filenames: JSON.stringify(filenames),
-      };
+    const postData = {
+      question_dict: questionObject,
+      skill_ids: skillIds,
+      skill_difficulties: skillDifficulties,
+      filenames: JSON.stringify(filenames),
+    };
 
-      body.append('payload', JSON.stringify(postData));
-      imageBlobs.forEach((blob, idx) => {
-        body.append(`image${idx}`, blob);
-      });
+    body.append('payload', JSON.stringify(postData));
+    imageBlobs.forEach((blob, idx) => {
+      body.append(`image${idx}`, blob);
+    });
 
-      this.http
+    try {
+      const response = await this.http
         .post<CreateQuestionResponseBackendDict>(
           QuestionDomainConstants.QUESTION_CREATION_URL,
           body
         )
-        .toPromise()
-        .then(
-          response => {
-            successCallback({questionId: response.question_id});
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error?.error);
-          }
-        );
-    });
+        .toPromise();
+
+      successCallback({questionId: response.question_id});
+    } catch (errorResponse: any) {
+      errorCallback(errorResponse.error?.error);
+    }
   }
 
   private async _fetchQuestionAsync(
@@ -120,32 +116,28 @@ export class EditableQuestionBackendApiService {
     successCallback: (value: FetchQuestionResponse) => void,
     errorCallback: (reason?: string) => void
   ): Promise<void> {
-    return new Promise(() => {
-      const questionDataUrl = this.urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {question_id: questionId}
-      );
+    const questionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+      {question_id: questionId}
+    );
 
-      this.http
+    try {
+      const response = await this.http
         .get<FetchQuestionBackendResponse>(questionDataUrl)
-        .toPromise()
-        .then(
-          response => {
-            const questionObject = Question.createFromBackendDict(
-              response.question_dict
-            );
-            const skillDicts = cloneDeep(response.associated_skill_dicts ?? []);
+        .toPromise();
 
-            successCallback({
-              questionObject,
-              associated_skill_dicts: skillDicts,
-            });
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error?.error);
-          }
-        );
-    });
+      const questionObject = Question.createFromBackendDict(
+        response.question_dict
+      );
+      const skillDicts = cloneDeep(response.associated_skill_dicts ?? []);
+
+      successCallback({
+        questionObject,
+        associated_skill_dicts: skillDicts,
+      });
+    } catch (errorResponse: any) {
+      errorCallback(errorResponse.error?.error);
+    }
   }
 
   private async _updateQuestionAsync(
@@ -156,34 +148,29 @@ export class EditableQuestionBackendApiService {
     successCallback: (value: QuestionBackendDict) => void,
     errorCallback: (reason?: string) => void
   ): Promise<void> {
-    return new Promise(() => {
-      const editableQuestionDataUrl =
-        this.urlInterpolationService.interpolateUrl(
-          QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-          {question_id: questionId}
-        );
+    const editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+      {question_id: questionId}
+    );
 
-      const putData = {
-        version: questionVersion,
-        commit_message: commitMessage,
-        change_list: changeList,
-      };
+    const putData = {
+      version: questionVersion,
+      commit_message: commitMessage,
+      change_list: changeList,
+    };
 
-      this.http
+    try {
+      const response = await this.http
         .put<UpdateEditableQuestionBackendResponse>(
           editableQuestionDataUrl,
           putData
         )
-        .toPromise()
-        .then(
-          response => {
-            successCallback(cloneDeep(response.questionDict));
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error?.error);
-          }
-        );
-    });
+        .toPromise();
+
+      successCallback(cloneDeep(response.questionDict));
+    } catch (errorResponse: any) {
+      errorCallback(errorResponse.error?.error);
+    }
   }
 
   private async _editQuestionSkillLinksAsync(
@@ -192,29 +179,23 @@ export class EditableQuestionBackendApiService {
     successCallback: () => void,
     errorCallback: (reason?: string) => void
   ): Promise<void> {
-    return new Promise(() => {
-      /** ✅ FIX 1: correct PLURAL endpoint */
-      const editQuestionSkillLinkUrl =
-        this.urlInterpolationService.interpolateUrl(
-          QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
-          {question_id: questionId}
-        );
+    const editQuestionSkillLinkUrl =
+      this.urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
+        {question_id: questionId}
+      );
 
-      this.http
+    try {
+      await this.http
         .put(editQuestionSkillLinkUrl, {
           skill_ids_task_list: skillIdsTaskArray,
         })
-        .toPromise()
-        .then(
-          () => {
-            /** ✅ FIX 2: clean success resolution */
-            successCallback();
-          },
-          errorResponse => {
-            errorCallback(errorResponse.error?.error);
-          }
-        );
-    });
+        .toPromise();
+
+      successCallback();
+    } catch (errorResponse: any) {
+      errorCallback(errorResponse.error?.error);
+    }
   }
 
   async createQuestionAsync(

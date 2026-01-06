@@ -8,22 +8,23 @@
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied
 // See the License for the specific language governing permissions and
-// limitations under the License.
+// limitations under the License
 
 /**
- * @fileoverview Service to send changes to a exploration to the backend
+ * @fileoverview Service to send changes to an exploration to the backend
  */
 
 import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {tap} from 'rxjs/operators';
+
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {ExplorationBackendDict} from './exploration.model';
 import {ExplorationChange} from './exploration-draft.model';
-import {tap} from 'rxjs/operators';
-import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
