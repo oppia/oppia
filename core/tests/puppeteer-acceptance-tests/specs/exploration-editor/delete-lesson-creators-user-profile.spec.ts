@@ -59,7 +59,16 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // Navigate to Settings tab and handle viewport scrolling for role assignment.
+    // Handle Mobile Viewport: Open navbar if links are hidden behind the hamburger menu.
+    const viewport = await expEditor1.page.viewport();
+    const isMobile = viewport ? viewport.width < 600 : false;
+    if (isMobile) {
+      await expEditor1.clickOnElementWithSelector(
+        '.oppia-navbar-mobile-tabs-toggle'
+      );
+    }
+
+    // Navigate to Settings tab and handle viewport scrolling for roles.
     await expEditor1.clickOnElementWithSelector(
       'a.e2e-test-exploration-settings-tab'
     );
@@ -96,32 +105,29 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
     const wholeNumbersExpId = await expEditor1.getExplorationId();
 
-    // Must update content to enable the "Save Draft" button.
-    await expEditor1.updateCardContent('This is a draft that will be deleted.');
+    await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
 
     // 2. The Account Deletion.
-    // Move to global preferences page to find the delete button.
     await expEditor1.navigateToPreferencesPage();
-
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
     showMessage('Account deleted for expEditor1.');
 
     // 3. Verification as expEditor2.
 
-    // A: Check Draft -> Should result in 404 error page.
+    // A: Check Draft -> 404 error page.
     await expEditor2.navigateToExplorationEditorPageById(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
 
-    // B: Check Published -> Should still be live.
+    // B: Check Published -> Still live.
     await expEditor2.navigateToExplorationEditorPageById(negativeNumbersExpId);
     await expEditor2.expectExplorationToBePublished();
 
-    // C: Check Shared -> expEditor2 should still be Manager.
+    // C: Check Shared -> expEditor2 still Manager.
     await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
     await expEditor2.expectUserToBeExplorationManager();
-  }, 600000); // Passed 10-minute timeout as the 3rd argument to it().
+  }, 600000); // 10-minute timeout for heavy test workflow.
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
