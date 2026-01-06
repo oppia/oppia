@@ -42,26 +42,25 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
       INTERACTION_SPECS[interactionId as keyof typeof INTERACTION_SPECS];
 
     if (!interactionSpec) {
-      return '';
+      throw new Error(`Unknown interaction id: ${interactionId}`);
     }
 
     const answerType = interactionSpec.answer_type;
     let actualInputToTruncate = '';
 
-    if (answerType === 'NormalizedString' || answerType === 'CodeEvaluation') {
-      if (typeof input === 'string') {
-        actualInputToTruncate = input;
-      } else if (
-        typeof input === 'object' &&
-        input !== null &&
-        'code' in input
-      ) {
+    if (answerType === 'NormalizedString') {
+      if (typeof input !== 'string') {
+        throw new Error('Expected string input for NormalizedString');
+      }
+      actualInputToTruncate = input;
+    } else if (answerType === 'CodeEvaluation') {
+      if (typeof input === 'object' && input !== null && 'code' in input) {
         actualInputToTruncate = (input as CodeAnswer).code;
       } else {
-        actualInputToTruncate = '';
+        throw new Error('Invalid input for code-based interaction');
       }
     } else {
-      actualInputToTruncate = '';
+      throw new Error(`Unsupported answer type: ${answerType}`);
     }
 
     return this.truncatePipe.transform(actualInputToTruncate, length);

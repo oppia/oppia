@@ -106,8 +106,9 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback({questionId: response.question_id});
-    } catch (errorResponse: any) {
-      errorCallback(errorResponse.error?.error);
+    } catch (errorResponse: unknown) {
+      const httpError = errorResponse as {error?: {error?: string}};
+      errorCallback(httpError.error?.error);
     }
   }
 
@@ -135,8 +136,9 @@ export class EditableQuestionBackendApiService {
         questionObject,
         associated_skill_dicts: skillDicts,
       });
-    } catch (errorResponse: any) {
-      errorCallback(errorResponse.error?.error);
+    } catch (errorResponse: unknown) {
+      const httpError = errorResponse as {error?: {error?: string}};
+      errorCallback(httpError.error?.error);
     }
   }
 
@@ -168,8 +170,9 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback(cloneDeep(response.questionDict));
-    } catch (errorResponse: any) {
-      errorCallback(errorResponse.error?.error);
+    } catch (errorResponse: unknown) {
+      const httpError = errorResponse as {error?: {error?: string}};
+      errorCallback(httpError.error?.error);
     }
   }
 
@@ -193,8 +196,9 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback();
-    } catch (errorResponse: any) {
-      errorCallback(errorResponse.error?.error);
+    } catch (errorResponse: unknown) {
+      const httpError = errorResponse as {error?: {error?: string}};
+      errorCallback(httpError.error?.error);
     }
   }
 
