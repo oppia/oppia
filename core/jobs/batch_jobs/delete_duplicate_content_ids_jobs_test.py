@@ -549,8 +549,8 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         old_id = 'old_id'
         new_id = 'new_id'
 
-        # The state will have content but no interaction set.
-        # This tests the if state.interaction: branch being False.
+        # Remove interaction entirely to test the if state.interaction: branch being False.
+        delattr(state, 'interaction')
         state.content.content_id = old_id
 
         delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
@@ -559,6 +559,40 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 
         # Should only update content (which we already updated), not interaction.
         self.assertEqual(state.content.content_id, new_id)
+        self.assertFalse(hasattr(state, 'interaction'))
+
+    def test_replace_content_id_in_state_with_matching_customization_arg(
+        self,
+    ) -> None:
+        """Test replacing content ID in customization args when it matches."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_ca_match', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_ca_id'
+        new_id = 'new_ca_id'
+
+        # Create a SubtitledUnicode with the old_id in customization args.
+        placeholder_ca = state.interaction.customization_args.get('placeholder')
+        if placeholder_ca:
+            placeholder_ca.value = state_domain.SubtitledUnicode(
+                old_id, 'placeholder text'
+            )
+
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+        # Verify the content ID was updated in customization args.
+        updated_placeholder = state.interaction.customization_args.get(
+            'placeholder'
+        )
+        if updated_placeholder and isinstance(
+            updated_placeholder.value, state_domain.SubtitledUnicode
+        ):
+            self.assertEqual(updated_placeholder.value.content_id, new_id)
 
     def test_replace_content_id_in_state_with_default_outcome(
         self,
@@ -639,6 +673,30 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
         state.interaction.solution = mock_solution
 
         # Should not raise error when hasattr(solution, 'explanation') is False.
+        delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
+            state, old_id, new_id
+        )
+
+    def test_replace_content_id_in_state_with_solution_explanation_missing_content_id(
+        self,
+    ) -> None:
+        """Test when solution explanation has no content_id attribute."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_test6', title='Test', category='Test'
+        )
+        state = exploration.states['Introduction']
+        state.update_interaction_id('TextInput')
+
+        old_id = 'old_id'
+        new_id = 'new_id'
+
+        # Create mock explanation without content_id attribute.
+        mock_explanation = mock.MagicMock(spec=[])
+        mock_solution = mock.MagicMock()
+        mock_solution.explanation = mock_explanation
+        state.interaction.solution = mock_solution
+
+        # Should not raise error when hasattr(explanation, 'content_id') is False.
         delete_duplicate_content_ids_jobs._replace_content_id_in_state(  # pylint: disable=protected-access
             state, old_id, new_id
         )
