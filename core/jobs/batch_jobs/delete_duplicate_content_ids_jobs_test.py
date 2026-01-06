@@ -591,6 +591,135 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
             state.interaction.default_outcome.feedback.content_id, new_id
         )
 
+    def test_fix_job_with_empty_answer_groups(self) -> None:
+        """Test fixing when answer groups exist but have no feedback."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_empty_ag', title='Test', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        dup_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state1.content.content_id = dup_id
+        state2.content.content_id = dup_id
+
+        # Add answer group with outcome with feedback that doesn't match.
+        # This tests hasattr checks pass but content_id doesn't match old_id.
+        state1.interaction.answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    None,
+                    state_domain.SubtitledHtml('other_id', '<p>feedback</p>'),
+                    False,
+                    [],
+                    None,
+                    None,
+                ),
+                [],
+                [],
+                None,
+            )
+        ]
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_empty_ag (version 1) - regenerated content '
+                    f'IDs: [\'{dup_id} -> content_3 in State2\']'
+                )
+            ]
+        )
+
+    def test_fix_job_with_no_solution(self) -> None:
+        """Test fixing when state has no solution."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_no_sol', title='Test', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        dup_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state1.content.content_id = dup_id
+        state2.content.content_id = dup_id
+        state1.interaction.solution = None
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_no_sol (version 1) - regenerated content '
+                    f'IDs: [\'{dup_id} -> content_3 in State2\']'
+                )
+            ]
+        )
+
+    def test_fix_job_with_no_hints(self) -> None:
+        """Test fixing when state has no hints."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_no_hints', title='Test', category='Test'
+        )
+
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
+
+        exploration.add_states(['State2'])
+        state1 = exploration.states['Introduction']
+        state2 = exploration.states['State2']
+
+        dup_id = content_id_generator.generate(
+            translation_domain.ContentType.CONTENT
+        )
+
+        state1.content.content_id = dup_id
+        state2.content.content_id = dup_id
+        state1.interaction.hints = []
+
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
+
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    f'Fixed exploration exp_no_hints (version 1) - regenerated content '
+                    f'IDs: [\'{dup_id} -> content_3 in State2\']'
+                )
+            ]
+        )
+
 
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
