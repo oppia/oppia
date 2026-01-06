@@ -29,10 +29,6 @@ import {
 } from 'domain/question/editable-question-backend-api.service';
 import {Question} from 'domain/question/question.model';
 
-/**
- * Local backend dict shape
- * (QuestionBackendDict is not exported in Oppia)
- */
 interface QuestionBackendDict {
   id: string;
   question_state_data: unknown;
@@ -121,16 +117,29 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    if (result === undefined) {
-      fail('Expected result to be defined');
-      return;
-    }
+    expect(result).toBeDefined();
+    expect(result!.getId()).toBe('question_id');
+  }));
 
-    expect(result.getId()).toBe('question_id');
+  it('should handle fetch question failure', fakeAsync(() => {
+    let error: string | null = null;
+
+    editableQuestionBackendApiService
+      .fetchQuestionAsync('question_id')
+      .catch((err: unknown) => (error = err as string | null));
+
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/question_id'
+    );
+
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    flushMicrotasks();
+
+    expect(error).toBeTruthy();
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
+    let response: unknown = null;
 
     editableQuestionBackendApiService
       .updateQuestionAsync(
@@ -139,22 +148,42 @@ describe('EditableQuestionBackendApiService', () => {
         'Question updated',
         []
       )
-      .then(successHandler);
+      .then((res: unknown) => (response = res));
 
     const req = httpTestingController.expectOne(
       '/question_editor_handler/data/question_id'
     );
     expect(req.request.method).toBe('PUT');
 
-    req.flush({
-      question_dict: backendQuestionDict,
-    });
-
+    req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
-    expect(successHandler).toHaveBeenCalled();
+
+    expect(response).not.toBeNull();
   }));
 
-  it('should edit an existing question skill links', fakeAsync(() => {
+  it('should handle update question failure', fakeAsync(() => {
+    let error: string | null = null;
+
+    editableQuestionBackendApiService
+      .updateQuestionAsync(
+        backendQuestionDict.id,
+        backendQuestionDict.version.toString(),
+        'Question updated',
+        []
+      )
+      .catch((err: unknown) => (error = err as string | null));
+
+    const req = httpTestingController.expectOne(
+      '/question_editor_handler/data/question_id'
+    );
+
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    flushMicrotasks();
+
+    expect(error).toBeTruthy();
+  }));
+
+  it('should edit question skill links successfully', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
 
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
@@ -178,5 +207,30 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
+  }));
+
+  it('should handle edit question skill links failure', fakeAsync(() => {
+    let error: string | null = null;
+
+    const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
+      {
+        id: 'skillId',
+        task: 'remove',
+        difficulty: 0,
+      },
+    ];
+
+    editableQuestionBackendApiService
+      .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
+      .catch((err: unknown) => (error = err as string | null));
+
+    const req = httpTestingController.expectOne(
+      '/manage_question_skill_link/question_id'
+    );
+
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    flushMicrotasks();
+
+    expect(error).toBeTruthy();
   }));
 });

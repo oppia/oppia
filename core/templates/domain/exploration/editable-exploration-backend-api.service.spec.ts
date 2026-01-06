@@ -28,7 +28,7 @@ import {CsrfTokenService} from 'services/csrf-token.service';
 import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 
 describe('EditableExplorationBackendApiService', () => {
-  let editableExplorationBackendApiService: EditableExplorationBackendApiService;
+  let service: EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
 
@@ -40,15 +40,11 @@ describe('EditableExplorationBackendApiService', () => {
       providers: [EditableExplorationBackendApiService, CsrfTokenService],
     });
 
-    editableExplorationBackendApiService = TestBed.inject(
-      EditableExplorationBackendApiService
-    );
+    service = TestBed.inject(EditableExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
-    spyOn(csrfService, 'getTokenAsync').and.returnValue(
-      Promise.resolve('sample-csrf-token')
-    );
+    spyOn(csrfService, 'getTokenAsync').and.resolveTo('csrf-token');
 
     sampleDataResults = {
       auto_tts_enabled: false,
@@ -56,18 +52,11 @@ describe('EditableExplorationBackendApiService', () => {
       is_version_of_draft_valid: true,
       init_state_name: 'Introduction',
       param_changes: [],
-      param_specs: {
-        x: {
-          obj_type: 'UnicodeString',
-        },
-      },
+      param_specs: {x: {obj_type: 'UnicodeString'}},
       states: {
         Introduction: {
           param_changes: [],
-          content: {
-            html: '',
-            content_id: 'content',
-          },
+          content: {html: '', content_id: 'content'},
           interaction: {
             id: null,
             customization_args: {},
@@ -76,10 +65,7 @@ describe('EditableExplorationBackendApiService', () => {
               param_changes: [],
               dest: 'Introduction',
               dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'feedback',
-              },
+              feedback: {html: '', content_id: 'feedback'},
               labelled_as_correct: false,
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
@@ -122,93 +108,109 @@ describe('EditableExplorationBackendApiService', () => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing exploration', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
+  it('should fetch exploration successfully', fakeAsync(() => {
+    let result: ExplorationBackendDict | null = null;
 
-    editableExplorationBackendApiService
+    service
       .fetchExplorationAsync('0')
-      .then(successHandler, failHandler);
+      .then((res: ExplorationBackendDict) => (result = res));
 
     const req = httpTestingController.expectOne('/createhandler/data/0');
     expect(req.request.method).toBe('GET');
     req.flush(sampleDataResults);
 
     flushMicrotasks();
-
-    expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-    expect(failHandler).not.toHaveBeenCalled();
+    expect(result).toEqual(sampleDataResults);
   }));
 
-  it('should use rejection handler on backend failure', fakeAsync(() => {
-    const successHandler = jasmine.createSpy('success');
-    const failHandler = jasmine.createSpy('fail');
+  it('should handle fetch exploration failure', fakeAsync(() => {
+    let error: string | null = null;
 
-    editableExplorationBackendApiService
+    service
       .fetchExplorationAsync('1')
-      .then(successHandler, failHandler);
+      .catch((err: unknown) => (error = String(err)));
 
     const req = httpTestingController.expectOne('/createhandler/data/1');
     req.error(
       new ErrorEvent('Error'),
       new HttpErrorResponse({
-        error: 'Error loading exploration 1',
+        error: 'Fetch failed',
         status: 500,
-        statusText: 'Internal Server Error',
+        statusText: 'Server Error',
       })
     );
 
     flushMicrotasks();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
+    expect(error).toBeTruthy();
   }));
 
-  it('should update exploration after fetch', fakeAsync(() => {
-    let exploration: ExplorationBackendDict | undefined;
+  it('should update exploration successfully', fakeAsync(() => {
+    let response: ExplorationBackendDict | null = null;
 
-    editableExplorationBackendApiService
-      .fetchExplorationAsync('0')
-      .then((data: ExplorationBackendDict) => {
-        exploration = data;
-      });
+    service
+      .updateExplorationAsync('0', 1, 'Updated', [])
+      .then((res: ExplorationBackendDict) => (response = res));
 
-    const fetchReq = httpTestingController.expectOne('/createhandler/data/0');
-    fetchReq.flush(sampleDataResults);
-    flushMicrotasks();
-
-    if (exploration === undefined || exploration.version === undefined) {
-      fail('Expected exploration and version to be defined after fetch');
-      return;
-    }
-
-    const explorationVersion: number = exploration.version;
-
-    editableExplorationBackendApiService
-      .updateExplorationAsync(
-        '0',
-        explorationVersion,
-        'Updated exploration',
-        []
-      )
-      .then(() => {});
-
-    const updateReq = httpTestingController.expectOne('/createhandler/data/0');
-    expect(updateReq.request.method).toBe('PUT');
-    updateReq.flush(sampleDataResults);
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    expect(req.request.method).toBe('PUT');
+    req.flush(sampleDataResults);
 
     flushMicrotasks();
+    expect(response).toEqual(sampleDataResults);
   }));
 
-  it('should delete exploration', fakeAsync(() => {
-    editableExplorationBackendApiService
+  it('should handle update exploration failure', fakeAsync(() => {
+    let error: string | null = null;
+
+    service
+      .updateExplorationAsync('0', 1, 'Updated', [])
+      .catch((err: unknown) => (error = String(err)));
+
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    req.error(
+      new ErrorEvent('Error'),
+      new HttpErrorResponse({
+        error: 'Update failed',
+        status: 500,
+        statusText: 'Server Error',
+      })
+    );
+
+    flushMicrotasks();
+    expect(error).toBeTruthy();
+  }));
+
+  it('should delete exploration successfully', fakeAsync(() => {
+    let success = false;
+
+    service.deleteExplorationAsync('0').then(() => (success = true));
+
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    expect(req.request.method).toBe('DELETE');
+    req.flush({});
+
+    flushMicrotasks();
+    expect(success).toBeTrue();
+  }));
+
+  it('should handle delete exploration failure', fakeAsync(() => {
+    let error: string | null = null;
+
+    service
       .deleteExplorationAsync('0')
-      .then(() => {});
+      .catch((err: unknown) => (error = String(err)));
 
-    const deleteReq = httpTestingController.expectOne('/createhandler/data/0');
-    expect(deleteReq.request.method).toBe('DELETE');
-    deleteReq.flush({});
+    const req = httpTestingController.expectOne('/createhandler/data/0');
+    req.error(
+      new ErrorEvent('Error'),
+      new HttpErrorResponse({
+        error: 'Delete failed',
+        status: 500,
+        statusText: 'Server Error',
+      })
+    );
 
     flushMicrotasks();
+    expect(error).toBeTruthy();
   }));
 });
