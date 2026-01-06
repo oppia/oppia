@@ -60,7 +60,7 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
         throw new Error('Invalid input for code-based interaction');
       }
     } else {
-      throw new Error('Unknown interaction answer type');
+      throw new Error(`Unknown interaction id: ${interactionId}`);
     }
 
     return this.truncatePipe.transform(actualInputToTruncate, length);
