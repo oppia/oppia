@@ -103,7 +103,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
     end: new FormControl(null),
   });
 
-  explorationIDForVoiceoverRegeneration: string | null = '';
+  explorationIDForVoiceoverRegeneration: string = '';
   explorationDataResponseForVoiceoverRegeneration: string | null = null;
   explorationTitleForVoiceoverRegeneration: string | null = null;
   explorationDataForVoiceoverRegenerationIsLoading: boolean = false;
@@ -370,15 +370,15 @@ export class VoiceoverAdminPageComponent implements OnInit {
     this.explorationDataForVoiceoverRegenerationIsLoading = true;
     this.voiceoverBackendApiService
       .fetchExplorationDataForVoiceoverAsync(
-        this.explorationIDForVoiceoverRegeneration
+        this.explorationIDForVoiceoverRegeneration as string
       )
       .then(response => {
         this.explorationDataResponseForVoiceoverRegeneration =
           response.responseMessage;
         this.explorationDataForVoiceoverRegenerationIsLoading = false;
 
-        this.explorationTitleForVoiceoverRegeneration =
-          response.explorationData?.explorationTitle;
+        this.explorationTitleForVoiceoverRegeneration = response.explorationData
+          ?.explorationTitle as string;
         this.isExplorationDataResponseContainerShown = true;
         this.autogeneratableLanguageAccentCodes =
           response.explorationData?.autogeneratableLanguageAccentCodes || [];
@@ -401,15 +401,15 @@ export class VoiceoverAdminPageComponent implements OnInit {
       10000
     );
     this.voiceoverBackendApiService.regenerateVoiceoversForExplorationAsync(
-      this.explorationIDForVoiceoverRegeneration,
-      this.selectedLanguageAccentForExplorationVoiceoverRegeneration
+      this.explorationIDForVoiceoverRegeneration as string,
+      this.selectedLanguageAccentForExplorationVoiceoverRegeneration as string
     );
     this.selectedLanguageAccentForExplorationVoiceoverRegeneration = null;
     this.languageAccentControl.reset();
     this.cdr.detectChanges();
   }
 
-  showToast(message: string, timeout = 10000) {
+  showToast(message: string, timeout = 10000): void {
     this.toastMessage = message;
     this.cdr.detectChanges();
 

@@ -911,6 +911,8 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration process was initiated.
         author_id: str. The ID of the user who triggered the voiceover
             regeneration, either directly or indirectly.
+        specific_language_accent_code: Optional[str]. The specific language
+            accent code to use for voiceover regeneration, if provided.
     """
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.

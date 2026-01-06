@@ -103,7 +103,7 @@
     <div class="exploration-data-request-input-container">
       <span class="exploration-id-label">Exploration ID: </span>
 
-      <input class="exploration-id-input" [(ngModel)]="explorationIDForVoiceoverRegeneration" type="text" />
+      <input class="exploration-id-input" [(ngModel)]="explorationIDForVoiceoverRegeneration" type="text">
 
       <button class="btn btn-primary exploration-data-request-button"
               *ngIf="!explorationDataResponseForVoiceoverRegeneration"
@@ -270,8 +270,8 @@
     float: right;
   }
   .exploration-id-label, .exploration-title-label,  .language-accent-code-label {
-    width: 30%;
     font-weight: bold;
+    width: 30%;
   }
   .exploration-data-request-button {
     margin-left: 10px;
@@ -286,7 +286,7 @@
     margin-left: 50%;
   }
   .exploration-data-response-message-container {
-    color: #ff0000;
+    color: #f00;
   }
   .information-toast {
     background-color: #4caf50;

@@ -334,15 +334,15 @@ export class VoiceoverBackendApiService {
         .toPromise()
         .then(
           response => {
+            let explorationData: ExplorationDataForVoiceoverRegenerationType | null =
+              null;
             if (response?.exploration_data) {
-              var explorationData = {
+              explorationData = {
                 explorationTitle: response.exploration_data.exploration_title,
                 autogeneratableLanguageAccentCodes:
                   response.exploration_data
                     .autogeneratable_language_accent_codes,
               };
-            } else {
-              explorationData = null;
             }
 
             let responseData = {
