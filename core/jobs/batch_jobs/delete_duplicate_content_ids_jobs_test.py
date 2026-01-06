@@ -135,7 +135,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJobTests(
             [
                 job_run_result.JobRunResult.as_stdout(
                     'Exploration exp_multi_dup (version 1) has duplicate content IDs: '
-                    f'{{\'{dup_id1}\': [\'Introduction\', \'State2\'], \'{dup_id2}\': [\'Introduction\', \'State3\']}}'
+                    f'{{\'{dup_id2}\': [\'Introduction\', \'State3\'], \'{dup_id1}\': [\'Introduction\', \'State2\']}}'
                 )
             ]
         )
