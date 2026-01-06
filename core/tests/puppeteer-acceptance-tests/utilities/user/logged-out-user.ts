@@ -316,7 +316,7 @@ const unselectedFilterOptionsSelector = '.e2e-test-deselected';
 const selectedFilterOptionsSelector = '.e2e-test-selected';
 const languageFilterDropdownToggler =
   '.oppia-search-bar-dropdown-toggle-button';
-const lessonCardTitleSelector = '.e2e-test-exploration-tile-title';
+const lessonCardTitleSelector = '.e2e-test-topic-in-current-goals';
 const explorationTitleSelector = '.e2e-test-exp-summary-tile-title';
 const explorationRatingSelector = '.e2e-test-exp-summary-tile-rating';
 const desktopStoryTitleSelector = '.e2e-test-story-title-in-topic-page';
