@@ -31,6 +31,13 @@ import {
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+
+class MockCsrfTokenService {
+  getTokenAsync(): Promise<string> {
+    return Promise.resolve('csrf-token');
+  }
+}
 
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -71,7 +78,14 @@ describe('EditableQuestionBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableQuestionBackendApiService, UrlInterpolationService],
+      providers: [
+        EditableQuestionBackendApiService,
+        UrlInterpolationService,
+        {
+          provide: CsrfTokenService,
+          useClass: MockCsrfTokenService,
+        },
+      ],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -88,8 +102,8 @@ describe('EditableQuestionBackendApiService', () => {
 
     service
       .fetchQuestionAsync('question_id')
-      .then((data: FetchQuestionResponse): void => {
-        result = data.questionObject;
+      .then((res: FetchQuestionResponse) => {
+        result = res.questionObject;
       });
 
     const req = httpTestingController.expectOne(
@@ -114,12 +128,12 @@ describe('EditableQuestionBackendApiService', () => {
     expect(result.getId()).toBe('question_id');
   }));
 
-  it('should fail if associated_skill_dicts is missing', fakeAsync(() => {
+  it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
     let errorResult: unknown;
 
     service.fetchQuestionAsync('question_id').then(
-      (): void => {},
-      (err: unknown): void => {
+      () => {},
+      (err: unknown) => {
         errorResult = err;
       }
     );
@@ -145,7 +159,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
-      .then((res: QuestionBackendDict): void => {
+      .then((res: QuestionBackendDict) => {
         result = res;
       });
 
@@ -162,21 +176,21 @@ describe('EditableQuestionBackendApiService', () => {
 
     expect(result).toBeDefined();
     if (result === undefined) {
-      fail('Expected updated question');
+      fail('Expected update response');
     }
     expect(result.id).toBe('question_id');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
-    let success = false;
-
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {id: 'skillId', task: 'remove', difficulty: 0},
     ];
 
+    let success = false;
+
     service
       .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
-      .then((): void => {
+      .then(() => {
         success = true;
       });
 
@@ -199,7 +213,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
-      .then((res: CreateQuestionResponse): void => {
+      .then((res: CreateQuestionResponse) => {
         result = res;
       });
 
