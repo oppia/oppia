@@ -134,6 +134,7 @@ describe('Blog Post Writer', function () {
     await blogPostWriter.updateBlogBodyUsingAllRTEFeatures();
 
     // Preview the blog post.
+    await blogPostWriter.scrollToTopOfPage(); // Scroll to top of the page so the background in screenshot matches.
     await blogPostWriter.previewBlogPost();
     await blogPostWriter.expectScreenshotToMatch('blogPostPreview', __dirname);
 
