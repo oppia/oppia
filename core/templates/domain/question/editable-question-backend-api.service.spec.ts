@@ -130,9 +130,8 @@ describe('EditableQuestionBackendApiService', () => {
     expect(errorResult).toBeNull();
     expect(result).not.toBeNull();
 
-    if (result !== null) {
-      expect(result.questionObject.getId()).toBe('question_id');
-    }
+    const fetchedResult = result as FetchQuestionResponse;
+    expect(fetchedResult.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle missing associated_skill_dicts', fakeAsync(() => {
@@ -160,9 +159,9 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    if (result !== null) {
-      expect(result.associated_skill_dicts).toEqual([]);
-    }
+
+    const fetchedResult = result as FetchQuestionResponse;
+    expect(fetchedResult.associated_skill_dicts).toEqual([]);
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -216,9 +215,9 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    if (result !== null) {
-      expect(result.id).toBe('question_id');
-    }
+
+    const updatedQuestion = result as QuestionBackendDict;
+    expect(updatedQuestion.id).toBe('question_id');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
