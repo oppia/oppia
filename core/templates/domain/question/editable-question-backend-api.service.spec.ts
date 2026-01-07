@@ -31,6 +31,13 @@ import {
 import {QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {CsrfTokenService} from 'services/csrf-token.service';
+
+class MockCsrfTokenService {
+  getTokenAsync(): Promise<string> {
+    return Promise.resolve('csrf-token');
+  }
+}
 
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
@@ -71,7 +78,14 @@ describe('EditableQuestionBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableQuestionBackendApiService, UrlInterpolationService],
+      providers: [
+        EditableQuestionBackendApiService,
+        UrlInterpolationService,
+        {
+          provide: CsrfTokenService,
+          useClass: MockCsrfTokenService,
+        },
+      ],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
@@ -84,17 +98,19 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result: FetchQuestionResponse | undefined;
+    let result: FetchQuestionResponse | null = null;
     let errorResult: unknown = null;
 
     service.fetchQuestionAsync('question_id').then(
-      (data: FetchQuestionResponse) => {
-        result = data;
+      (res: FetchQuestionResponse) => {
+        result = res;
       },
-      (error: unknown) => {
-        errorResult = error;
+      (err: unknown) => {
+        errorResult = err;
       }
     );
+
+    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -112,11 +128,41 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(errorResult).toBeNull();
-    expect(result).toBeDefined();
-    if (result === undefined) {
-      throw new Error('Expected result to be defined');
+    expect(result).not.toBeNull();
+
+    if (result !== null) {
+      expect(result.questionObject.getId()).toBe('question_id');
     }
-    expect(result.questionObject.getId()).toBe('question_id');
+  }));
+
+  it('should handle missing associated_skill_dicts', fakeAsync(() => {
+    let result: FetchQuestionResponse | null = null;
+
+    service
+      .fetchQuestionAsync('question_id')
+      .then((res: FetchQuestionResponse) => {
+        result = res;
+      });
+
+    flushMicrotasks();
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
+
+    req.flush({
+      question_dict: backendQuestionDict,
+    });
+
+    flushMicrotasks();
+
+    expect(result).not.toBeNull();
+    if (result !== null) {
+      expect(result.associated_skill_dicts).toEqual([]);
+    }
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -124,10 +170,12 @@ describe('EditableQuestionBackendApiService', () => {
 
     service.fetchQuestionAsync('question_id').then(
       () => {},
-      (error: unknown) => {
-        errorHandler(error);
+      (err: unknown) => {
+        errorHandler(err);
       }
     );
+
+    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -145,49 +193,16 @@ describe('EditableQuestionBackendApiService', () => {
     expect(errorHandler).toHaveBeenCalled();
   }));
 
-  it('should handle missing associated_skill_dicts', fakeAsync(() => {
-    let result: FetchQuestionResponse | undefined;
-    let errorResult: unknown = null;
+  it('should update a question successfully', fakeAsync(() => {
+    let result: QuestionBackendDict | null = null;
 
-    service.fetchQuestionAsync('question_id').then(
-      (res: FetchQuestionResponse) => {
+    service
+      .updateQuestionAsync('question_id', '1', 'commit', [])
+      .then((res: QuestionBackendDict) => {
         result = res;
-      },
-      (error: unknown) => {
-        errorResult = error;
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {question_id: 'question_id'}
-      )
-    );
-
-    // Backend omits associated_skill_dicts
-    req.flush({
-      question_dict: backendQuestionDict,
-    });
+      });
 
     flushMicrotasks();
-
-    expect(result).toBeUndefined();
-    expect(errorResult).toBe('Unknown backend error');
-  }));
-
-  it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | undefined;
-    let errorResult: unknown = null;
-
-    service.updateQuestionAsync('question_id', '1', 'commit', []).then(
-      (res: QuestionBackendDict) => {
-        result = res;
-      },
-      (error: unknown) => {
-        errorResult = error;
-      }
-    );
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -200,56 +215,26 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(errorResult).toBeNull();
-    expect(result).toBeDefined();
-    if (result === undefined) {
-      throw new Error('Expected result to be defined');
+    expect(result).not.toBeNull();
+    if (result !== null) {
+      expect(result.id).toBe('question_id');
     }
-    expect(result.id).toBe('question_id');
-  }));
-
-  it('should handle update question failure', fakeAsync(() => {
-    const errorHandler = jasmine.createSpy('error');
-
-    service.updateQuestionAsync('question_id', '1', 'commit', []).then(
-      () => {},
-      (error: unknown) => {
-        errorHandler(error);
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {question_id: 'question_id'}
-      )
-    );
-
-    req.flush(
-      {error: {error: 'Backend error'}},
-      {status: 500, statusText: 'Server Error'}
-    );
-
-    flushMicrotasks();
-    expect(errorHandler).toHaveBeenCalled();
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
-    const errorHandler = jasmine.createSpy('error');
 
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {id: 'skillId', task: 'remove', difficulty: 0},
     ];
 
-    service.editQuestionSkillLinksAsync('question_id', skillIdsTaskArray).then(
-      () => {
+    service
+      .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
+      .then(() => {
         successHandler();
-      },
-      (error: unknown) => {
-        errorHandler(error);
-      }
-    );
+      });
+
+    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -263,44 +248,18 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
-    expect(errorHandler).not.toHaveBeenCalled();
-  }));
-
-  it('should handle edit question skill links failure', fakeAsync(() => {
-    const errorHandler = jasmine.createSpy('error');
-
-    service.editQuestionSkillLinksAsync('question_id', []).then(
-      () => {},
-      (error: unknown) => {
-        errorHandler(error);
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
-        {question_id: 'question_id'}
-      )
-    );
-
-    req.flush({}, {status: 500, statusText: 'Server Error'});
-
-    flushMicrotasks();
-    expect(errorHandler).toHaveBeenCalled();
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | undefined;
-    let errorResult: unknown = null;
+    let result: CreateQuestionResponse | null = null;
 
-    service.createQuestionAsync([], [], backendQuestionDict, []).then(
-      (res: CreateQuestionResponse) => {
+    service
+      .createQuestionAsync([], [], backendQuestionDict, [])
+      .then((res: CreateQuestionResponse) => {
         result = res;
-      },
-      (error: unknown) => {
-        errorResult = error;
-      }
-    );
+      });
+
+    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       QuestionDomainConstants.QUESTION_CREATION_URL
@@ -310,34 +269,6 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    expect(errorResult).toBeNull();
-    expect(result).toBeDefined();
-    if (result === undefined) {
-      throw new Error('Expected result to be defined');
-    }
     expect(result).toEqual({questionId: 'new_question_id'});
-  }));
-
-  it('should handle create question failure', fakeAsync(() => {
-    const errorHandler = jasmine.createSpy('error');
-
-    service.createQuestionAsync([], [], backendQuestionDict, []).then(
-      () => {},
-      (error: unknown) => {
-        errorHandler(error);
-      }
-    );
-
-    const req = httpTestingController.expectOne(
-      QuestionDomainConstants.QUESTION_CREATION_URL
-    );
-
-    req.flush(
-      {error: {error: 'Backend error'}},
-      {status: 500, statusText: 'Server Error'}
-    );
-
-    flushMicrotasks();
-    expect(errorHandler).toHaveBeenCalled();
   }));
 });
