@@ -755,7 +755,7 @@ describe('Subtopic editor tab', () => {
       'id',
       'Topic name',
       'Abbrev',
-      '', // empty url fragment
+      '',
       'Description',
       'en',
       [],
@@ -928,7 +928,6 @@ describe('Subtopic editor tab', () => {
 
     component.changeActiveSectionIndex(1);
 
-    // Should not change since it returns early
     expect(component.activeSectionIndex).toEqual(0);
   });
 

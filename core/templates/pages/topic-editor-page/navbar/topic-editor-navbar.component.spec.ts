@@ -970,7 +970,6 @@ describe('Topic Editor Navbar', () => {
 
     componentInstance._validateTopic();
 
-    // Should not modify validationIssues since it returns early
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.prepublishValidationIssues).toEqual([]);
   });
