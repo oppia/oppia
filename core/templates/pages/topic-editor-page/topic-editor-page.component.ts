@@ -124,9 +124,11 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
       if (!activeTab.startsWith('subtopic') && !lastSubtopicIdVisited) {
         this.topicEditorRoutingService.navigateToTopicPreviewTab();
       } else {
-        const subtopicId =
-          this.topicEditorRoutingService.getSubtopicIdFromUrl() ??
-          lastSubtopicIdVisited;
+        const subtopicIdFromUrl =
+          this.topicEditorRoutingService.getSubtopicIdFromUrl();
+        const subtopicId = Number.isNaN(subtopicIdFromUrl)
+          ? lastSubtopicIdVisited
+          : subtopicIdFromUrl;
         this.topicEditorRoutingService.navigateToSubtopicPreviewTab(subtopicId);
       }
     });
@@ -135,9 +137,11 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   selectMainTab(): void {
     this.confirmBeforeLeavingQuestions(() => {
       const activeTab = this.getActiveTabName();
-      const subtopicId =
-        this.topicEditorRoutingService.getSubtopicIdFromUrl() ??
-        this.topicEditorRoutingService.getLastSubtopicIdVisited();
+      const subtopicIdFromUrl =
+        this.topicEditorRoutingService.getSubtopicIdFromUrl();
+      const subtopicId = Number.isNaN(subtopicIdFromUrl)
+        ? this.topicEditorRoutingService.getLastSubtopicIdVisited()
+        : subtopicIdFromUrl;
       const lastTabVisited = this.topicEditorRoutingService.getLastTabVisited();
 
       if (activeTab.startsWith('subtopic') || lastTabVisited === 'subtopic') {
