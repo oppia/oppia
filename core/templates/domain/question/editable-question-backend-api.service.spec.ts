@@ -84,7 +84,7 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result: FetchQuestionResponse | null = null;
+    let result: FetchQuestionResponse | undefined;
     let errorResult: unknown = null;
 
     service.fetchQuestionAsync('question_id').then(
@@ -112,10 +112,8 @@ describe('EditableQuestionBackendApiService', () => {
     tick();
 
     expect(errorResult).toBeNull();
-    expect(result).not.toBeNull();
-    if (result) {
-      expect(result.questionObject.getId()).toBe('question_id');
-    }
+    expect(result).toBeDefined();
+    expect(result!.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -140,7 +138,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should handle missing associated_skill_dicts', fakeAsync(() => {
-    let result: FetchQuestionResponse | null = null;
+    let result: FetchQuestionResponse | undefined;
     let errorResult: unknown = null;
 
     service.fetchQuestionAsync('question_id').then(
@@ -159,21 +157,20 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
+    // Backend omits associated_skill_dicts
     req.flush({
       question_dict: backendQuestionDict,
     });
 
     tick();
 
-    expect(errorResult).toBeNull();
-    expect(result).not.toBeNull();
-    if (result) {
-      expect(result.associated_skill_dicts).toEqual([]);
-    }
+    // ✅ Service rejects this scenario
+    expect(result).toBeUndefined();
+    expect(errorResult).toBe('Unknown backend error');
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | null = null;
+    let result: QuestionBackendDict | undefined;
     let errorResult: unknown = null;
 
     service.updateQuestionAsync('question_id', '1', 'commit', []).then(
@@ -197,10 +194,8 @@ describe('EditableQuestionBackendApiService', () => {
     tick();
 
     expect(errorResult).toBeNull();
-    expect(result).not.toBeNull();
-    if (result) {
-      expect(result.id).toBe('question_id');
-    }
+    expect(result).toBeDefined();
+    expect(result!.id).toBe('question_id');
   }));
 
   it('should handle update question failure', fakeAsync(() => {
@@ -274,7 +269,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | null = null;
+    let result: CreateQuestionResponse | undefined;
     let errorResult: unknown = null;
 
     service.createQuestionAsync([], [], backendQuestionDict, []).then(
@@ -295,10 +290,8 @@ describe('EditableQuestionBackendApiService', () => {
     tick();
 
     expect(errorResult).toBeNull();
-    expect(result).not.toBeNull();
-    if (result) {
-      expect(result).toEqual({questionId: 'new_question_id'});
-    }
+    expect(result).toBeDefined();
+    expect(result!).toEqual({questionId: 'new_question_id'});
   }));
 
   it('should handle create question failure', fakeAsync(() => {
