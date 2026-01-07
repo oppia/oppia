@@ -59,15 +59,12 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // Handle Mobile Viewport: Open navbar if links are hidden behind the hamburger menu.
-    const viewport = await expEditor1.page.viewport();
-    const isMobile = viewport ? viewport.width < 600 : false;
-    if (isMobile) {
+    // Handle mobile-specific UI: Toggle the navbar menu if the viewport is at mobile width.
+    if (await expEditor1.isViewportAtMobileWidth()) {
       await expEditor1.clickOnElementWithSelector(
         '.oppia-navbar-mobile-tabs-toggle'
       );
     }
-
     // Navigate to Settings tab and handle viewport scrolling for roles.
     await expEditor1.clickOnElementWithSelector(
       'a.e2e-test-exploration-settings-tab'
