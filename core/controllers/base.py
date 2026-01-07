@@ -909,10 +909,16 @@ class BaseHandler(
             }
             self._render_exception(values)
             return
+        request_url =self.url if self.request else "Unknown URL"
+        handler_name = self.__class_.name_
 
         self._log_exception_message(
-            exception_type, LogType.EXCEPTION, 'Exception raised'
-        )
+    exception_type,
+    LogType.EXCEPTION,
+    f'Exception in handler {handler_name} at URL {request_url}'
+)
+
+        
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
