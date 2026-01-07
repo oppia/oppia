@@ -351,7 +351,7 @@
 /core/templates/services/guppy-initialization.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/math-interactions.service.ts @oppia/lace-frontend-reviewers
 /extensions/domain*.py @oppia/lace-frontend-reviewers
-/extensions/interactions/ @oppia/lace-backend-reviewers
+/extensions/interactions/ @oppia/lace-frontend-reviewers
 /extensions/objects/ @oppia/lace-backend-reviewers
 /extensions/objects/templates/filepath-editor.component*.ts @oppia/lace-frontend-reviewers
 /extensions/objects/templates/filepath-editor.component.html @oppia/lace-frontend-reviewers

@@ -74,12 +74,14 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
 
   manualVoiceover!: Voiceover | undefined;
   manualVoiceoverCurrentDuration: number = 0;
+  roundedManualVoiceoverCurrentDuration: number = 0;
   manualVoiceoverTotalDuration!: number;
   manualVoiceoverProgress: number = 0;
   isManualVoiceoverPlaying: boolean = false;
 
   automaticVoiceover!: Voiceover | undefined;
   automaticVoiceoverCurrentDuration: number = 0;
+  roundedAutomaticVoiceoverCurrentDuration: number = 0;
   automaticVoiceoverTotalDuration!: number;
   automaticVoiceoverProgress: number = 0;
   isAutomaticVoiceoverPlaying: boolean = false;
@@ -200,6 +202,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         if (this.isManualVoiceoverPlaying) {
           this.manualVoiceoverCurrentDuration =
             this.audioPlayerService.getCurrentTimeInSecs();
+          this.roundedManualVoiceoverCurrentDuration = Math.round(
+            this.manualVoiceoverCurrentDuration
+          );
           this.manualVoiceoverProgress = Math.round(
             (this.manualVoiceoverCurrentDuration /
               this.manualVoiceoverTotalDuration) *
@@ -209,6 +214,9 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
         if (this.isAutomaticVoiceoverPlaying) {
           this.automaticVoiceoverCurrentDuration =
             this.audioPlayerService.getCurrentTimeInSecs();
+          this.roundedAutomaticVoiceoverCurrentDuration = Math.round(
+            this.automaticVoiceoverCurrentDuration
+          );
           this.automaticVoiceoverProgress = Math.round(
             (this.automaticVoiceoverCurrentDuration /
               this.automaticVoiceoverTotalDuration) *
@@ -218,8 +226,10 @@ export class VoiceoverCardComponent implements OnInit, AfterViewChecked {
       } else if (!this.audioPlayerService.isTrackLoaded()) {
         this.automaticVoiceoverProgress = 0;
         this.automaticVoiceoverCurrentDuration = 0;
+        this.roundedAutomaticVoiceoverCurrentDuration = 0;
         this.manualVoiceoverCurrentDuration = 0;
         this.manualVoiceoverProgress = 0;
+        this.roundedManualVoiceoverCurrentDuration = 0;
       }
 
       if (!this.audioPlayerService.isPlaying()) {
