@@ -337,21 +337,18 @@ def create_messages(
         thread_model = thread_models[index]
         if updated_status:
             message_model.updated_status = updated_status
-            if message_model.message_id == 0:
-                # New thread.
-                if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if message_model.message_id == 0:
+                    # New thread.
                     event_services.FeedbackThreadCreatedEventHandler.record(
                         thread_model.entity_id
                     )
-            else:
-                # Thread status changed.
-                if thread_model.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                    (
-                        event_services.FeedbackThreadStatusChangedEventHandler.record(
-                            thread_model.entity_id,
-                            thread_model.status,
-                            updated_status,
-                        )
+                else:
+                    # Thread status changed.
+                    event_services.FeedbackThreadStatusChangedEventHandler.record(
+                        thread_model.entity_id,
+                        thread_model.status,
+                        updated_status,
                     )
         if updated_subject:
             message_model.updated_subject = updated_subject
@@ -1442,7 +1439,6 @@ def _add_message_to_email_buffer(
             exploration_id,
             has_suggestion,
         )
-
     if message_length:
         # Send feedback message email only if message text is non empty (the
         # message text can be empty in the case when only status is changed).
