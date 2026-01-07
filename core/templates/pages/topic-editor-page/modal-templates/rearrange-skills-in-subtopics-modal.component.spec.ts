@@ -322,4 +322,100 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     } as unknown as ShortSkillSummary;
     component.isSkillDeleted(skillSummary);
   });
+
+  it('should return early from initEditor when topic is null', () => {
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(null);
+    component.initEditor();
+    expect(component.topic).toBeNull();
+  });
+
+  it('should return early from onMoveSkillEnd when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      previousContainer: {
+        data: ['1', '2'],
+      },
+      container: {
+        data: ['3'],
+      },
+      item: {},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.onMoveSkillEnd(event, 1);
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from onMoveSkillEnd when skillSummaryToMove is null', () => {
+    component.ngOnInit();
+    component.skillSummaryToMove = null as unknown as ShortSkillSummary;
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      previousContainer: {
+        data: ['1', '2'],
+      },
+      container: {
+        data: ['3'],
+      },
+      item: {},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.onMoveSkillEnd(event, 1);
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicTitle when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let subtopicTitleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
+    component.updateSubtopicTitle(1);
+    expect(subtopicTitleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should set oldSubtopicId to null when oldSubtopicId is falsy in onMoveSkillStart', () => {
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(0, skillSummary);
+    expect(component.oldSubtopicId).toBeNull();
+  });
+
+  it('should return true when skill description is null in isSkillDeleted', () => {
+    let deletedSkillSummary = {
+      getDescription: () => null,
+    } as unknown as ShortSkillSummary;
+    expect(component.isSkillDeleted(deletedSkillSummary)).toBeTrue();
+  });
+
+  it('should return false when skill description exists in isSkillDeleted', () => {
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    expect(component.isSkillDeleted(skillSummary)).toBeFalse();
+  });
+
+  it('should reset editableName when editNameOfSubtopicWithId is called with null', () => {
+    component.editableName = 'some name';
+    component.selectedSubtopicId = 5;
+    component.editNameOfSubtopicWithId(null);
+    expect(component.editableName).toEqual('');
+    expect(component.selectedSubtopicId).toEqual(0);
+  });
+
+  it('should not call removeSkillFromSubtopic when newSubtopicId equals oldSubtopicId', () => {
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+      previousContainer: {
+        data: ['1', '2'],
+      },
+      container: {
+        data: ['3'],
+      },
+      item: {},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillEnd(event, 1);
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+  });
 });

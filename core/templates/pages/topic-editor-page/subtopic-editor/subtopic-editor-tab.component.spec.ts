@@ -739,4 +739,222 @@ describe('Subtopic editor tab', () => {
     expect(component.sectionsListIsShown).toEqual(true);
     expect(component.skillsListIsShown).toEqual(true);
   });
+
+  it('should return early from initEditor when topic is null', () => {
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(null);
+    spyOn(topicEditorRoutingService, 'navigateToMainTab');
+
+    component.initEditor();
+
+    expect(component.topic).toBeNull();
+    expect(topicEditorRoutingService.navigateToMainTab).not.toHaveBeenCalled();
+  });
+
+  it('should return early from initEditor when topic url fragment is null', () => {
+    let topicWithoutUrlFragment = new Topic(
+      'id',
+      'Topic name',
+      'Abbrev',
+      '', // empty url fragment
+      'Description',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      topicWithoutUrlFragment
+    );
+    spyOn(topicEditorStateService, 'loadSubtopicPage');
+
+    component.initEditor();
+
+    expect(topicEditorStateService.loadSubtopicPage).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicTitle when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let titleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
+
+    component.updateSubtopicTitle('New title');
+
+    expect(titleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicTitle when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let titleSpy = spyOn(topicUpdateService, 'setSubtopicTitle');
+
+    component.updateSubtopicTitle('New title');
+
+    expect(titleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from drop when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let rearrangeSpy = spyOn(topicUpdateService, 'rearrangeSkillInSubtopic');
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<string[]>;
+
+    component.drop(event);
+
+    expect(rearrangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from drop when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let rearrangeSpy = spyOn(topicUpdateService, 'rearrangeSkillInSubtopic');
+    const event = {
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<string[]>;
+
+    component.drop(event);
+
+    expect(rearrangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicUrlFragment when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let urlFragmentSpy = spyOn(topicUpdateService, 'setSubtopicUrlFragment');
+
+    component.updateSubtopicUrlFragment('new-url');
+
+    expect(urlFragmentSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicUrlFragment when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let urlFragmentSpy = spyOn(topicUpdateService, 'setSubtopicUrlFragment');
+
+    component.updateSubtopicUrlFragment('new-url');
+
+    expect(urlFragmentSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicThumbnailFilename when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let thumbnailSpy = spyOn(
+      topicUpdateService,
+      'setSubtopicThumbnailFilename'
+    );
+
+    component.updateSubtopicThumbnailFilename('new-file.svg');
+
+    expect(thumbnailSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicThumbnailFilename when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let thumbnailSpy = spyOn(
+      topicUpdateService,
+      'setSubtopicThumbnailFilename'
+    );
+
+    component.updateSubtopicThumbnailFilename('new-file.svg');
+
+    expect(thumbnailSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicThumbnailBgColor when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let bgColorSpy = spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+
+    component.updateSubtopicThumbnailBgColor('#000000');
+
+    expect(bgColorSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateSubtopicThumbnailBgColor when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let bgColorSpy = spyOn(topicUpdateService, 'setSubtopicThumbnailBgColor');
+
+    component.updateSubtopicThumbnailBgColor('#000000');
+
+    expect(bgColorSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateHtmlData when subtopicPage is null', () => {
+    component.subtopicPage = null as unknown as SubtopicPage;
+    let htmlSpy = spyOn(topicUpdateService, 'setSubtopicPageContentsHtml');
+
+    component.updateHtmlData();
+
+    expect(htmlSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateHtmlData when subtopic is null', () => {
+    component.subtopic = null as unknown as Subtopic;
+    let htmlSpy = spyOn(topicUpdateService, 'setSubtopicPageContentsHtml');
+
+    component.updateHtmlData();
+
+    expect(htmlSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeSkillFromSubtopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let removeSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+
+    component.removeSkillFromSubtopic(skillSummary);
+
+    expect(removeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeSkillFromTopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let removeSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+
+    component.removeSkillFromTopic(skillSummary);
+
+    expect(removeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from changeActiveSectionIndex when studyGuide is null', () => {
+    component.studyGuide = null as unknown as StudyGuide;
+    component.activeSectionIndex = 0;
+
+    component.changeActiveSectionIndex(1);
+
+    // Should not change since it returns early
+    expect(component.activeSectionIndex).toEqual(0);
+  });
+
+  it('should return early from openAddSectionModal when studyGuide is null', () => {
+    component.studyGuide = null as unknown as StudyGuide;
+    let modalSpy = spyOn(ngbModal, 'open');
+
+    component.openAddSectionModal();
+
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from deleteSection when studyGuide is null', () => {
+    component.studyGuide = null as unknown as StudyGuide;
+    let modalSpy = spyOn(ngbModal, 'open');
+
+    component.deleteSection(0, '');
+
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return true when skill description is null (deleted skill)', () => {
+    let deletedSkillSummary = ShortSkillSummary.create(
+      'skill_1',
+      null as unknown as string
+    );
+    expect(component.isSkillDeleted(deletedSkillSummary)).toEqual(true);
+  });
 });

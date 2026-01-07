@@ -899,4 +899,229 @@ describe('Topic editor tab directive', () => {
       newUrlFragment
     );
   });
+
+  it('should return early from drop when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let rearrangeSpy = spyOn(topicUpdateService, 'rearrangeSubtopic');
+    component.drop({
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<Subtopic[]>);
+    expect(rearrangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from drop when subtopics is null', () => {
+    component.subtopics = null as unknown as Subtopic[];
+    let rearrangeSpy = spyOn(topicUpdateService, 'rearrangeSubtopic');
+    component.drop({
+      previousIndex: 1,
+      currentIndex: 2,
+    } as CdkDragDrop<Subtopic[]>);
+    expect(rearrangeSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from initEditor when topic is null', () => {
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(null);
+    component.initEditor();
+    expect(component.topic).toBeNull();
+  });
+
+  it('should return early from initEditor when entityType is null', () => {
+    const mockPageContextService = TestBed.inject(PageContextService);
+    spyOn(mockPageContextService, 'getEntityType').and.returnValue(null);
+    component.initEditor();
+  });
+
+  it('should return empty array from getEligibleSkillSummariesForDiagnosticTest when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    expect(component.getEligibleSkillSummariesForDiagnosticTest()).toEqual([]);
+  });
+
+  it('should return early from addSkillForDiagnosticTest when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'updateDiagnosticTestSkills');
+    component.addSkillForDiagnosticTest();
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from addSkillForDiagnosticTest when skillToAdd is null', () => {
+    component.skillForDiagnosticTestFormControl.setValue(null);
+    let updateSpy = spyOn(topicUpdateService, 'updateDiagnosticTestSkills');
+    component.addSkillForDiagnosticTest();
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeSkillFromDiagnosticTest when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'updateDiagnosticTestSkills');
+    component.removeSkillFromDiagnosticTest(skillSummary);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from refreshTopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let loadSpy = spyOn(topicEditorStateService, 'loadTopic');
+    component.refreshTopic();
+    expect(loadSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicName when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setTopicName');
+    component.updateTopicName('New Name');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicUrlFragment when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setTopicUrlFragment');
+    component.updateTopicUrlFragment('new-url');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicThumbnailFilename when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setTopicThumbnailFilename');
+    component.updateTopicThumbnailFilename('new.svg');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicThumbnailBgColor when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setTopicThumbnailBgColor');
+    component.updateTopicThumbnailBgColor('#000000');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicDescription when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setTopicDescription');
+    component.updateTopicDescription('new description');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicMetaTagContent when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setMetaTagContent');
+    component.updateTopicMetaTagContent('new content');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updateTopicPageTitleFragmentForWeb when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setPageTitleFragmentForWeb');
+    component.updateTopicPageTitleFragmentForWeb('new title');
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from updatePracticeTabIsDisplayed when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'setPracticeTabIsDisplayed');
+    component.updatePracticeTabIsDisplayed(true);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from deleteUncategorizedSkillFromTopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'removeUncategorizedSkill');
+    component.deleteUncategorizedSkillFromTopic(skillSummary);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeSkillFromSubtopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.removeSkillFromSubtopic(1, skillSummary);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from removeSkillFromTopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.removeSkillFromTopic(1, skillSummary);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from deleteSubtopic when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let updateSpy = spyOn(topicUpdateService, 'deleteSubtopic');
+    component.deleteSubtopic(1);
+    expect(updateSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return "0 Stories" from getPreviewFooter when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    expect(component.getPreviewFooter()).toEqual('0 Stories');
+  });
+
+  it('should return early from changeSubtopicAssignment when topic is null', () => {
+    component.topic = null as unknown as Topic;
+    let modalSpy = spyOn(ngbModal, 'open');
+    component.changeSubtopicAssignment(1, skillSummary);
+    expect(modalSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early from showSkillEditOptions when subtopicIndex is null but skillIndex is not', () => {
+    component.showSkillEditOptions(null, 1);
+    expect(component.selectedSkillEditOptionsIndex).toEqual({});
+  });
+
+  it('should return early from showSkillEditOptions when skillIndex is null but subtopicIndex is not', () => {
+    component.showSkillEditOptions(1, null);
+    expect(component.selectedSkillEditOptionsIndex).toEqual({});
+  });
+
+  it('should toggle subtopic edit options to null when same index clicked', () => {
+    component.subtopicEditOptionsAreShown = 1;
+    component.showSubtopicEditOptions(1);
+    expect(component.subtopicEditOptionsAreShown).toBeNull();
+  });
+
+  it('should toggle uncategorized skill options to null when same index clicked', () => {
+    component.uncategorizedEditOptionsIndex = 1;
+    component.toggleUncategorizedSkillOptions(1);
+    expect(component.uncategorizedEditOptionsIndex).toBeNull();
+  });
+
+  it('should close reassign modal when cancelled', fakeAsync(() => {
+    class MockNgbModalRef {
+      componentInstance = {
+        subtopics: null,
+      };
+    }
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.reject(),
+    } as NgbModalRef);
+    spyOn(component, 'initEditor');
+    component.reassignSkillsInSubtopics();
+    tick();
+    expect(component.initEditor).not.toHaveBeenCalled();
+  }));
+
+  it('should close change subtopic assignment modal when cancelled', fakeAsync(() => {
+    class MockNgbModalRef {
+      componentInstance = {
+        subtopics: null,
+      };
+    }
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: MockNgbModalRef,
+      result: Promise.reject(),
+    } as NgbModalRef);
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    component.changeSubtopicAssignment(1, skillSummary);
+    tick();
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  }));
+
+  it('should update practice tab to false without checking question count', () => {
+    let topicPracticeTabSpy = spyOn(
+      topicUpdateService,
+      'setPracticeTabIsDisplayed'
+    );
+    component.skillQuestionCountDict = {skill1: 1};
+    component.updatePracticeTabIsDisplayed(false);
+    expect(topicPracticeTabSpy).toHaveBeenCalledWith(component.topic, false);
+  });
 });

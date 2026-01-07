@@ -413,4 +413,56 @@ describe('Topic editor page', () => {
       component.ngOnDestroy();
     }
   );
+
+  it('should return "Topic Editor" when topic has not loaded', () => {
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
+    expect(component.getNavbarText()).toBe('Topic Editor');
+  });
+
+  it('should navigate to subtopic preview when lastSubtopicIdVisited is set', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(
+      topicEditorRoutingService,
+      'getLastSubtopicIdVisited'
+    ).and.returnValue(2);
+    const subtopicPreviewSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicPreviewTab'
+    );
+    component.openTopicViewer();
+    expect(subtopicPreviewSpy).toHaveBeenCalledWith(2);
+  });
+
+  it('should navigate to subtopic editor when lastTabVisited is subtopic', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(topicEditorRoutingService, 'getLastTabVisited').and.returnValue(
+      'subtopic'
+    );
+    spyOn(topicEditorRoutingService, 'getSubtopicIdFromUrl').and.returnValue(
+      null
+    );
+    spyOn(
+      topicEditorRoutingService,
+      'getLastSubtopicIdVisited'
+    ).and.returnValue(3);
+    const subtopicEditorSpy = spyOn(
+      topicEditorRoutingService,
+      'navigateToSubtopicEditorWithId'
+    );
+    component.selectMainTab();
+    expect(subtopicEditorSpy).toHaveBeenCalledWith(3);
+  });
+
+  it('should directly run callback when no changes in questions tab', () => {
+    spyOn(component, 'getActiveTabName').and.returnValue('questions');
+    spyOn(questionUndoRedoService, 'hasChanges').and.returnValue(false);
+
+    component.confirmBeforeLeavingQuestions(runSpy);
+
+    expect(runSpy).toHaveBeenCalled();
+  });
 });
