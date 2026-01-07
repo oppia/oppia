@@ -21,7 +21,9 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+
 import {EditableExplorationBackendApiService} from 'domain/exploration/editable-exploration-backend-api.service';
+import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {ExplorationBackendDict} from 'domain/exploration/exploration.model';
 
@@ -29,20 +31,27 @@ describe('EditableExplorationBackendApiService', () => {
   let service: EditableExplorationBackendApiService;
   let httpTestingController: HttpTestingController;
   let csrfService: CsrfTokenService;
+  let readOnlyService: ReadOnlyExplorationBackendApiService;
 
   let sampleDataResults: ExplorationBackendDict;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [EditableExplorationBackendApiService, CsrfTokenService],
+      providers: [
+        EditableExplorationBackendApiService,
+        ReadOnlyExplorationBackendApiService,
+        CsrfTokenService,
+      ],
     });
 
     service = TestBed.inject(EditableExplorationBackendApiService);
     csrfService = TestBed.inject(CsrfTokenService);
+    readOnlyService = TestBed.inject(ReadOnlyExplorationBackendApiService);
     httpTestingController = TestBed.inject(HttpTestingController);
 
     spyOn(csrfService, 'getTokenAsync').and.resolveTo('csrf-token');
+    spyOn(readOnlyService, 'deleteExplorationFromCache');
 
     sampleDataResults = {
       auto_tts_enabled: false,
@@ -69,9 +78,9 @@ describe('EditableExplorationBackendApiService', () => {
   it('should fetch exploration successfully', fakeAsync(() => {
     let result: ExplorationBackendDict | null = null;
 
-    service
-      .fetchExplorationAsync('0')
-      .then((res: ExplorationBackendDict) => (result = res));
+    service.fetchExplorationAsync('0').then((res: ExplorationBackendDict) => {
+      result = res;
+    });
 
     const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('GET');
@@ -86,7 +95,9 @@ describe('EditableExplorationBackendApiService', () => {
 
     service
       .fetchApplyDraftExplorationAsync('0')
-      .then((res: ExplorationBackendDict) => (result = res));
+      .then((res: ExplorationBackendDict) => {
+        result = res;
+      });
 
     const req = httpTestingController.expectOne(
       '/exploration_handler/data/0?apply_draft=true'
@@ -98,32 +109,39 @@ describe('EditableExplorationBackendApiService', () => {
     expect(result).toEqual(sampleDataResults);
   }));
 
-  it('should update exploration successfully', fakeAsync(() => {
+  it('should update exploration and clear cache', fakeAsync(() => {
     let response: ExplorationBackendDict | null = null;
 
     service
       .updateExplorationAsync('0', 1, 'Updated', [])
-      .then((res: ExplorationBackendDict) => (response = res));
+      .then((res: ExplorationBackendDict) => {
+        response = res;
+      });
 
     const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('PUT');
     req.flush(sampleDataResults);
 
     flushMicrotasks();
+
     expect(response).toEqual(sampleDataResults);
+    expect(readOnlyService.deleteExplorationFromCache).toHaveBeenCalledWith(
+      '0'
+    );
   }));
 
-  it('should delete exploration successfully', fakeAsync(() => {
-    let success = false;
-
-    service.deleteExplorationAsync('0').then(() => (success = true));
+  it('should delete exploration and clear cache', fakeAsync(() => {
+    service.deleteExplorationAsync('0');
 
     const req = httpTestingController.expectOne('/exploration_handler/data/0');
     expect(req.request.method).toBe('DELETE');
     req.flush({});
 
     flushMicrotasks();
-    expect(success).toBeTrue();
+
+    expect(readOnlyService.deleteExplorationFromCache).toHaveBeenCalledWith(
+      '0'
+    );
   }));
 
   it('should record checkpoint for logged-in user', fakeAsync(() => {
@@ -143,7 +161,7 @@ describe('EditableExplorationBackendApiService', () => {
     flushMicrotasks();
   }));
 
-  it('should record checkpoint for logged-out user', fakeAsync(() => {
+  it('should record checkpoint for logged-out user with progress id', fakeAsync(() => {
     service.recordMostRecentlyReachedCheckpointAsync(
       '0',
       1,
@@ -156,13 +174,30 @@ describe('EditableExplorationBackendApiService', () => {
       '/explorehandler/checkpoint_reached_by_logged_out_user/0'
     );
     expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({
+      unique_progress_url_id: 'progress_id',
+      most_recently_reached_checkpoint_exp_version: 1,
+      most_recently_reached_checkpoint_state_name: 'Introduction',
+    });
     req.flush({});
 
     flushMicrotasks();
   }));
 
+  it('should resolve silently when logged out without progress id', fakeAsync(() => {
+    service.recordMostRecentlyReachedCheckpointAsync(
+      '0',
+      1,
+      'Introduction',
+      false,
+      null
+    );
+
+    flushMicrotasks();
+  }));
+
   it('should record progress and fetch unique progress id', fakeAsync(() => {
-    let response: unknown = null;
+    let response: {unique_progress_url_id: string} | null = null;
 
     service
       .recordProgressAndFetchUniqueProgressIdOfLoggedOutLearner(
@@ -170,7 +205,9 @@ describe('EditableExplorationBackendApiService', () => {
         1,
         'Introduction'
       )
-      .then((res: unknown) => (response = res));
+      .then((res: {unique_progress_url_id: string}) => {
+        response = res;
+      });
 
     const req = httpTestingController.expectOne(
       '/explorehandler/checkpoint_reached_by_logged_out_user/0'

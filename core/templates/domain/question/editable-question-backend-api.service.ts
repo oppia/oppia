@@ -78,7 +78,7 @@ export class EditableQuestionBackendApiService {
     questionObject: QuestionBackendDict,
     imagesData: ImageData[],
     successCallback: (value: CreateQuestionResponse) => void,
-    errorCallback: (reason?: string) => void
+    errorCallback: (reason: string) => void
   ): Promise<void> {
     const body = new FormData();
     const filenames = imagesData.map(obj => obj.filename);
@@ -107,14 +107,14 @@ export class EditableQuestionBackendApiService {
       successCallback({questionId: response.question_id});
     } catch (errorResponse: unknown) {
       const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error);
+      errorCallback(httpError.error?.error ?? 'Unknown backend error');
     }
   }
 
   private async _fetchQuestionAsync(
     questionId: string,
     successCallback: (value: FetchQuestionResponse) => void,
-    errorCallback: (reason?: string) => void
+    errorCallback: (reason: string) => void
   ): Promise<void> {
     const questionDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
@@ -129,15 +129,16 @@ export class EditableQuestionBackendApiService {
       const questionObject = Question.createFromBackendDict(
         response.question_dict
       );
-      const skillDicts = cloneDeep(response.associated_skill_dicts ?? []);
 
       successCallback({
         questionObject,
-        associated_skill_dicts: skillDicts,
+        associated_skill_dicts: cloneDeep(
+          response.associated_skill_dicts ?? []
+        ),
       });
     } catch (errorResponse: unknown) {
       const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error);
+      errorCallback(httpError.error?.error ?? 'Unknown backend error');
     }
   }
 
@@ -147,7 +148,7 @@ export class EditableQuestionBackendApiService {
     commitMessage: string,
     changeList: BackendChangeObject[],
     successCallback: (value: QuestionBackendDict) => void,
-    errorCallback: (reason?: string) => void
+    errorCallback: (reason: string) => void
   ): Promise<void> {
     const editableQuestionDataUrl = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
@@ -171,7 +172,7 @@ export class EditableQuestionBackendApiService {
       successCallback(cloneDeep(response.question_dict));
     } catch (errorResponse: unknown) {
       const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error);
+      errorCallback(httpError.error?.error ?? 'Unknown backend error');
     }
   }
 
@@ -179,7 +180,7 @@ export class EditableQuestionBackendApiService {
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[],
     successCallback: () => void,
-    errorCallback: (reason?: string) => void
+    errorCallback: (reason: string) => void
   ): Promise<void> {
     const editQuestionSkillLinkUrl =
       this.urlInterpolationService.interpolateUrl(
@@ -197,7 +198,7 @@ export class EditableQuestionBackendApiService {
       successCallback();
     } catch (errorResponse: unknown) {
       const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error);
+      errorCallback(httpError.error?.error ?? 'Unknown backend error');
     }
   }
 

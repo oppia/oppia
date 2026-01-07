@@ -304,4 +304,122 @@ describe('EditableTopicBackendApiService', () => {
     flushMicrotasks();
     expect(response).toEqual({id1: 'Topic One'});
   }));
+
+  it('should reject when fetchStoriesAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.fetchStoriesAsync('0').catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne(
+      '/topic_editor_story_handler/0'
+    );
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+
+    flushMicrotasks();
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when fetchSubtopicPageAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.fetchSubtopicPageAsync('0', 1).catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne(
+      '/subtopic_page_editor_handler/data/0/1'
+    );
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+
+    flushMicrotasks();
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when fetchStudyGuideAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.fetchStudyGuideAsync('0', 1).catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne(
+      '/study_guide_editor_handler/data/0/1'
+    );
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+
+    flushMicrotasks();
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when updateTopicAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.updateTopicAsync('0', 1, 'commit', []).catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+
+    flushMicrotasks();
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when deleteTopicAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.deleteTopicAsync('0').catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne('/topic_editor_handler/data/0');
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+
+    flushMicrotasks();
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when doesTopicWithNameExistAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service.doesTopicWithNameExistAsync('Topic').catch((err: unknown) => {
+      error = err;
+    });
+
+    const req = httpTestingController.expectOne(
+      TopicDomainConstants.TOPIC_NAME_HANDLER_URL_TEMPLATE.replace(
+        '<topic_name>',
+        encodeURIComponent('Topic')
+      )
+    );
+
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    flushMicrotasks();
+
+    expect(error).toBeDefined();
+  }));
+
+  it('should reject when doesTopicWithUrlFragmentExistAsync fails', fakeAsync(() => {
+    let error: unknown;
+
+    service
+      .doesTopicWithUrlFragmentExistAsync('topic-fragment')
+      .catch((err: unknown) => {
+        error = err;
+      });
+
+    const req = httpTestingController.expectOne(
+      TopicDomainConstants.TOPIC_URL_FRAGMENT_HANDLER_URL_TEMPLATE.replace(
+        '<topic_url_fragment>',
+        'topic-fragment'
+      )
+    );
+
+    req.flush('Error', {status: 500, statusText: 'Server Error'});
+    flushMicrotasks();
+
+    expect(error).toBeDefined();
+  }));
 });
