@@ -82,7 +82,7 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result: Question | undefined;
+    let result!: Question;
 
     service
       .fetchQuestionAsync('question_id')
@@ -105,9 +105,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).toBeDefined();
-    const nonNullResult = result as Question;
-    expect(nonNullResult.getId()).toBe('question_id');
+    expect(result.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -132,7 +130,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should handle missing associated_skill_dicts', fakeAsync(() => {
-    let response: FetchQuestionResponse | null = null;
+    let response!: FetchQuestionResponse;
 
     service
       .fetchQuestionAsync('question_id')
@@ -153,13 +151,11 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(response).not.toBeNull();
-    const nonNullResponse = response as FetchQuestionResponse;
-    expect(nonNullResponse.associated_skill_dicts).toEqual([]);
+    expect(response.associated_skill_dicts).toEqual([]);
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let response: QuestionBackendDict | null = null;
+    let response!: QuestionBackendDict;
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
@@ -178,9 +174,7 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(response).not.toBeNull();
-    const nonNullResponse = response as QuestionBackendDict;
-    expect(nonNullResponse.id).toBe('question_id');
+    expect(response.id).toBe('question_id');
   }));
 
   it('should handle update question failure', fakeAsync(() => {
@@ -252,7 +246,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let response: CreateQuestionResponse | null = null;
+    let response!: CreateQuestionResponse;
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
