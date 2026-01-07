@@ -231,7 +231,7 @@ class BlogPostModel(base_models.BaseModel):
             published_on = (
                 utils.get_time_in_millisecs(blog_post_model.published_on)
                 if blog_post_model.published_on is not None else None
-                )
+            )
             user_data[blog_post_model.id] = {
                 'title': blog_post_model.title,
                 'content': blog_post_model.content,
