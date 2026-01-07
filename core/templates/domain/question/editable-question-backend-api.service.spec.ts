@@ -106,7 +106,12 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    expect(result!.getId()).toBe('question_id');
+
+    if (result === undefined) {
+      fail('Expected result to be defined');
+    }
+
+    expect(result.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -153,7 +158,12 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).not.toBeNull();
-    expect(response!.associated_skill_dicts).toEqual([]);
+
+    if (response === null) {
+      fail('Expected response to be non-null');
+    }
+
+    expect(response.associated_skill_dicts).toEqual([]);
   }));
 
   it('should update a question successfully', fakeAsync(() => {
@@ -176,8 +186,13 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(response).toBeDefined();
-    expect(response!.id).toBe('question_id');
+    expect(response).not.toBeNull();
+
+    if (response === null) {
+      fail('Expected response to be non-null');
+    }
+
+    expect(response.id).toBe('question_id');
   }));
 
   it('should handle update question failure', fakeAsync(() => {
