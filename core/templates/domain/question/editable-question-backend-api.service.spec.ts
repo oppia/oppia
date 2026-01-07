@@ -20,7 +20,7 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
-import {TestBed, fakeAsync, flushMicrotasks} from '@angular/core/testing';
+import {TestBed, fakeAsync, tick} from '@angular/core/testing';
 
 import {
   EditableQuestionBackendApiService,
@@ -28,7 +28,7 @@ import {
   FetchQuestionResponse,
   CreateQuestionResponse,
 } from 'domain/question/editable-question-backend-api.service';
-import {QuestionBackendDict, Question} from 'domain/question/question.model';
+import {QuestionBackendDict} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 
@@ -107,7 +107,7 @@ describe('EditableQuestionBackendApiService', () => {
       associated_skill_dicts: [],
     });
 
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(errorHandler).not.toHaveBeenCalled();
@@ -130,7 +130,7 @@ describe('EditableQuestionBackendApiService', () => {
       {status: 500, statusText: 'Server Error'}
     );
 
-    flushMicrotasks();
+    tick();
     expect(errorHandler).toHaveBeenCalled();
   }));
 
@@ -156,7 +156,7 @@ describe('EditableQuestionBackendApiService', () => {
       question_dict: backendQuestionDict,
     });
 
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(errorHandler).not.toHaveBeenCalled();
@@ -182,7 +182,7 @@ describe('EditableQuestionBackendApiService', () => {
     expect(req.request.method).toBe('PUT');
 
     req.flush({question_dict: backendQuestionDict});
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(errorHandler).not.toHaveBeenCalled();
@@ -207,7 +207,7 @@ describe('EditableQuestionBackendApiService', () => {
       {status: 500, statusText: 'Server Error'}
     );
 
-    flushMicrotasks();
+    tick();
     expect(errorHandler).toHaveBeenCalled();
   }));
 
@@ -232,7 +232,7 @@ describe('EditableQuestionBackendApiService', () => {
     expect(req.request.method).toBe('PUT');
 
     req.flush({});
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(errorHandler).not.toHaveBeenCalled();
@@ -254,7 +254,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     req.flush({}, {status: 500, statusText: 'Server Error'});
 
-    flushMicrotasks();
+    tick();
     expect(errorHandler).toHaveBeenCalled();
   }));
 
@@ -275,7 +275,7 @@ describe('EditableQuestionBackendApiService', () => {
     expect(req.request.method).toBe('POST');
 
     req.flush({question_id: 'new_question_id'});
-    flushMicrotasks();
+    tick();
 
     expect(successHandler).toHaveBeenCalled();
     expect(errorHandler).not.toHaveBeenCalled();
@@ -297,7 +297,7 @@ describe('EditableQuestionBackendApiService', () => {
       {status: 500, statusText: 'Server Error'}
     );
 
-    flushMicrotasks();
+    tick();
     expect(errorHandler).toHaveBeenCalled();
   }));
 });
