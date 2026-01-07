@@ -106,10 +106,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    if (result === undefined) {
-      throw new Error('Expected result to be defined');
-    }
-    expect(result.getId()).toBe('question_id');
+    const nonNullResult = result as Question;
+    expect(nonNullResult.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -149,7 +147,6 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
-    // IMPORTANT: backend omits associated_skill_dicts
     req.flush({
       question_dict: backendQuestionDict,
     });
@@ -157,10 +154,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).not.toBeNull();
-    if (response === null) {
-      throw new Error('Expected response not to be null');
-    }
-    expect(response.associated_skill_dicts).toEqual([]);
+    const nonNullResponse = response as FetchQuestionResponse;
+    expect(nonNullResponse.associated_skill_dicts).toEqual([]);
   }));
 
   it('should update a question successfully', fakeAsync(() => {
@@ -184,10 +179,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).not.toBeNull();
-    if (response === null) {
-      throw new Error('Expected response not to be null');
-    }
-    expect(response.id).toBe('question_id');
+    const nonNullResponse = response as QuestionBackendDict;
+    expect(nonNullResponse.id).toBe('question_id');
   }));
 
   it('should handle update question failure', fakeAsync(() => {
