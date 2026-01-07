@@ -27,7 +27,6 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {TopicManager} from '../../utilities/user/topic-manager';
-import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 
@@ -45,35 +44,24 @@ describe('Logged-In Learner', function () {
         'learner',
         'learner@example.com'
       );
-      showMessage('Created loggedInLearner');
-
       curriculumAdmin = await UserFactory.createNewUser(
         'curriculumAdm',
         'curriculumAdmin@example.com',
         [ROLES.CURRICULUM_ADMIN]
       );
-      showMessage('Created curriculumAdmin');
-
       releaseCoordinator = await UserFactory.createNewUser(
         'releaseCoordinator',
         'release_coordinator@example.com',
         [ROLES.RELEASE_COORDINATOR]
       );
-      showMessage('Created releaseCoordinator');
-
-      // Close super admin browser.
-      await UserFactory.closeSuperAdminBrowser();
-      showMessage('Closed super-admin browser');
 
       // Enable redesigned learner dashboard.
       await releaseCoordinator.enableFeatureFlag(
         'show_redesigned_learner_dashboard'
       );
-      showMessage('Enabled feature flag');
 
       // Reload the page to ensure redesigned learner dashboard is shown.
       await loggedInLearner.reloadPage();
-      showMessage('Reloaded learner page');
 
       // Create explorations with continue button and end exploration interactions.
       // Each exploration will have 3 cards: 2 with Continue button, 1 with End Exploration.
@@ -83,7 +71,6 @@ describe('Logged-In Learner', function () {
           'Algebra',
           3
         );
-      showMessage(`Created explorationId1=${explorationId1}`);
 
       explorationId2 =
         await curriculumAdmin.createAndPublishExplorationWithCards(
@@ -91,29 +78,22 @@ describe('Logged-In Learner', function () {
           'Algebra',
           3
         );
-      showMessage(`Created explorationId2=${explorationId2}`);
 
       // Create topic, subtopic, and skill.
       await curriculumAdmin.createTopic('Algebra I', 'algebra-i');
-      showMessage('Created topic Algebra I');
-
       await curriculumAdmin.createSubtopicForTopic(
         'Negative Numbers',
         'negative-numbers',
         'Algebra I'
       );
-      showMessage('Created subtopic Negative Numbers');
-
       await curriculumAdmin.createSkillForTopic(
         'Negative Numbers',
         'Algebra I',
         false
       );
-      showMessage('Created skill Negative Numbers');
 
       // Add 3 questions to the skill.
       await curriculumAdmin.createQuestionsForSkill('Negative Numbers', 3);
-      showMessage('Added questions to skill');
 
       // Assign skill to subtopic.
       await curriculumAdmin.assignSkillToSubtopicInTopicEditor(
@@ -121,7 +101,6 @@ describe('Logged-In Learner', function () {
         'Negative Numbers',
         'Algebra I'
       );
-      showMessage('Assigned skill to subtopic');
 
       // Add skill to diagnostic test.
       // Navigate to topic editor first before adding skill to diagnostic test.
@@ -129,11 +108,9 @@ describe('Logged-In Learner', function () {
         'Negative Numbers',
         'Algebra I'
       );
-      showMessage('Added skill to diagnostic test');
 
       // Publish topic.
       await curriculumAdmin.publishDraftTopic('Algebra I');
-      showMessage('Published topic Algebra I');
 
       // Create classroom and add topic to it.
       await curriculumAdmin.createAndPublishClassroom(
@@ -141,7 +118,6 @@ describe('Logged-In Learner', function () {
         'math',
         'Algebra I'
       );
-      showMessage('Created and published classroom');
 
       // Add story and chapters.
       await curriculumAdmin.addStoryToTopic(
@@ -149,25 +125,16 @@ describe('Logged-In Learner', function () {
         'the-broken-calculator',
         'Algebra I'
       );
-      showMessage('Added story to topic');
-
       await curriculumAdmin.addChapter(
         'Test Chapter 1',
         explorationId1 as string
       );
-      showMessage('Added chapter 1 to story');
-
       await curriculumAdmin.addChapter(
         'Test Chapter 2',
         explorationId2 as string
       );
-      showMessage('Added chapter 2 to story');
-
       await curriculumAdmin.saveStoryDraft();
-      showMessage('Saved story draft');
-
       await curriculumAdmin.publishStoryDraft();
-      showMessage('Published story draft');
     },
     // Test takes longer than default timeout.
     600000
