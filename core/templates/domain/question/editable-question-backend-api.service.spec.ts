@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for EditableQuestionBackendApiService
+ * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
 import {
@@ -106,7 +106,10 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    expect(result!.getId()).toBe('question_id');
+    if (result === undefined) {
+      throw new Error('Expected result to be defined');
+    }
+    expect(result.getId()).toBe('question_id');
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -146,6 +149,7 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
+    // IMPORTANT: backend omits associated_skill_dicts
     req.flush({
       question_dict: backendQuestionDict,
     });
@@ -153,7 +157,10 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).not.toBeNull();
-    expect(response!.associated_skill_dicts).toEqual([]);
+    if (response === null) {
+      throw new Error('Expected response not to be null');
+    }
+    expect(response.associated_skill_dicts).toEqual([]);
   }));
 
   it('should update a question successfully', fakeAsync(() => {
@@ -177,7 +184,10 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).not.toBeNull();
-    expect(response!.id).toBe('question_id');
+    if (response === null) {
+      throw new Error('Expected response not to be null');
+    }
+    expect(response.id).toBe('question_id');
   }));
 
   it('should handle update question failure', fakeAsync(() => {
