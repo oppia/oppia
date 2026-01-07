@@ -35,6 +35,7 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let service: EditableQuestionBackendApiService;
+  let urlInterpolationService: UrlInterpolationService;
 
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
@@ -75,6 +76,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(EditableQuestionBackendApiService);
+    urlInterpolationService = TestBed.inject(UrlInterpolationService);
   });
 
   afterEach(() => {
@@ -91,9 +93,9 @@ describe('EditableQuestionBackendApiService', () => {
       });
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
     expect(req.request.method).toBe('GET');
@@ -114,9 +116,9 @@ describe('EditableQuestionBackendApiService', () => {
     service.fetchQuestionAsync('question_id').then(() => {}, errorHandler);
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
 
@@ -139,9 +141,9 @@ describe('EditableQuestionBackendApiService', () => {
       });
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
 
@@ -164,9 +166,9 @@ describe('EditableQuestionBackendApiService', () => {
       });
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
     expect(req.request.method).toBe('PUT');
@@ -185,9 +187,9 @@ describe('EditableQuestionBackendApiService', () => {
       .then(() => {}, errorHandler);
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
 
@@ -212,9 +214,9 @@ describe('EditableQuestionBackendApiService', () => {
       .then(successHandler);
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
     expect(req.request.method).toBe('PUT');
@@ -233,9 +235,9 @@ describe('EditableQuestionBackendApiService', () => {
       .then(() => {}, errorHandler);
 
     const req = httpTestingController.expectOne(
-      QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE.replace(
-        '<question_id>',
-        'question_id'
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
+        {question_id: 'question_id'}
       )
     );
 
