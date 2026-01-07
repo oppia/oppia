@@ -85,12 +85,13 @@ describe('EditableQuestionBackendApiService', () => {
 
   it('should fetch a question successfully', fakeAsync(() => {
     let result!: Question;
+    const errorHandler = jasmine.createSpy('error');
 
     service
       .fetchQuestionAsync('question_id')
       .then((data: FetchQuestionResponse) => {
         result = data.questionObject;
-      });
+      }, errorHandler);
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -108,6 +109,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result.getId()).toBe('question_id');
+    expect(errorHandler).not.toHaveBeenCalled();
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -133,12 +135,13 @@ describe('EditableQuestionBackendApiService', () => {
 
   it('should handle missing associated_skill_dicts', fakeAsync(() => {
     let response!: FetchQuestionResponse;
+    const errorHandler = jasmine.createSpy('error');
 
     service
       .fetchQuestionAsync('question_id')
       .then((res: FetchQuestionResponse) => {
         response = res;
-      });
+      }, errorHandler);
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -154,16 +157,18 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response.associated_skill_dicts).toEqual([]);
+    expect(errorHandler).not.toHaveBeenCalled();
   }));
 
   it('should update a question successfully', fakeAsync(() => {
     let response!: QuestionBackendDict;
+    const errorHandler = jasmine.createSpy('error');
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
       .then((res: QuestionBackendDict) => {
         response = res;
-      });
+      }, errorHandler);
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -177,6 +182,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response.id).toBe('question_id');
+    expect(errorHandler).not.toHaveBeenCalled();
   }));
 
   it('should handle update question failure', fakeAsync(() => {
@@ -204,6 +210,7 @@ describe('EditableQuestionBackendApiService', () => {
 
   it('should edit question skill links successfully', fakeAsync(() => {
     const successHandler = jasmine.createSpy('success');
+    const errorHandler = jasmine.createSpy('error');
 
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {id: 'skillId', task: 'remove', difficulty: 0},
@@ -211,7 +218,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     service
       .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
-      .then(successHandler);
+      .then(successHandler, errorHandler);
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -225,6 +232,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
+    expect(errorHandler).not.toHaveBeenCalled();
   }));
 
   it('should handle edit question skill links failure', fakeAsync(() => {
@@ -249,12 +257,13 @@ describe('EditableQuestionBackendApiService', () => {
 
   it('should create question successfully', fakeAsync(() => {
     let response!: CreateQuestionResponse;
+    const errorHandler = jasmine.createSpy('error');
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
       .then((res: CreateQuestionResponse) => {
         response = res;
-      });
+      }, errorHandler);
 
     const req = httpTestingController.expectOne(
       QuestionDomainConstants.QUESTION_CREATION_URL
@@ -265,6 +274,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(response).toEqual({questionId: 'new_question_id'});
+    expect(errorHandler).not.toHaveBeenCalled();
   }));
 
   it('should handle create question failure', fakeAsync(() => {
