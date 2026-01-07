@@ -98,8 +98,8 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result: FetchQuestionResponse | null = null;
-    let errorResult: unknown = null;
+    let result: FetchQuestionResponse | undefined;
+    let errorResult: unknown;
 
     service.fetchQuestionAsync('question_id').then(
       (res: FetchQuestionResponse) => {
@@ -109,8 +109,6 @@ describe('EditableQuestionBackendApiService', () => {
         errorResult = err;
       }
     );
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -127,23 +125,21 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(errorResult).toBeNull();
-    expect(result).not.toBeNull();
-
-    const fetchedResult = result as FetchQuestionResponse;
-    expect(fetchedResult.questionObject.getId()).toBe('question_id');
+    expect(errorResult).toBeUndefined();
+    if (result === undefined) {
+      fail('Expected result to be defined');
+    }
+    expect(result.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle missing associated_skill_dicts', fakeAsync(() => {
-    let result: FetchQuestionResponse | null = null;
+    let result: FetchQuestionResponse | undefined;
 
     service
       .fetchQuestionAsync('question_id')
       .then((res: FetchQuestionResponse) => {
         result = res;
       });
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -158,10 +154,10 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-
-    const fetchedResult = result as FetchQuestionResponse;
-    expect(fetchedResult.associated_skill_dicts).toEqual([]);
+    if (result === undefined) {
+      fail('Expected result to be defined');
+    }
+    expect(result.associated_skill_dicts).toEqual([]);
   }));
 
   it('should handle fetch question failure', fakeAsync(() => {
@@ -173,8 +169,6 @@ describe('EditableQuestionBackendApiService', () => {
         errorHandler(err);
       }
     );
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -193,15 +187,13 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | null = null;
+    let result: QuestionBackendDict | undefined;
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
       .then((res: QuestionBackendDict) => {
         result = res;
       });
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -214,10 +206,10 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-
-    const updatedQuestion = result as QuestionBackendDict;
-    expect(updatedQuestion.id).toBe('question_id');
+    if (result === undefined) {
+      fail('Expected result to be defined');
+    }
+    expect(result.id).toBe('question_id');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
@@ -232,8 +224,6 @@ describe('EditableQuestionBackendApiService', () => {
       .then(() => {
         successHandler();
       });
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -250,15 +240,13 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | null = null;
+    let result: CreateQuestionResponse | undefined;
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
       .then((res: CreateQuestionResponse) => {
         result = res;
       });
-
-    flushMicrotasks();
 
     const req = httpTestingController.expectOne(
       QuestionDomainConstants.QUESTION_CREATION_URL
