@@ -59,11 +59,11 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // Wait for the toggle to be visible to avoid timeouts.
+    // Handle mobile-specific UI: Toggle the navbar menu if the viewport is at mobile width.
     if (await expEditor1.isViewportAtMobileWidth()) {
       await expEditor1.page.waitForSelector(
         '.oppia-navbar-mobile-tabs-toggle',
-        {visible: true}
+        {visible: true, timeout: 20000}
       );
       await expEditor1.clickOnElementWithSelector(
         '.oppia-navbar-mobile-tabs-toggle'
@@ -79,7 +79,8 @@ describe('Lesson Creator Profile Deletion', function () {
       timeout: 20000,
     });
 
-    // Explicitly wait for the username input and scroll it into center.
+    // Ensure the role username input is visible and centered.
+    // This avoids "Element not clickable" errors caused by sticky UI overlaps.
     await expEditor1.page.waitForSelector('.e2e-test-role-username', {
       visible: true,
     });
