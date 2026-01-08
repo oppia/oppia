@@ -28,8 +28,8 @@ import {LoggedInUser} from '../../utilities/user/logged-in-user';
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Lesson Creator Profile Deletion', function () {
-  let expEditor1: ExplorationEditor & LoggedInUser;
-  let expEditor2: ExplorationEditor & LoggedInUser;
+  let expEditor1!: ExplorationEditor & LoggedInUser;
+  let expEditor2!: ExplorationEditor & LoggedInUser;
 
   beforeAll(async function () {
     expEditor1 = await UserFactory.createNewUser(
@@ -79,13 +79,17 @@ describe('Lesson Creator Profile Deletion', function () {
       timeout: 20000,
     });
 
-    // Scroll role container into view to ensure clickable state.
+    // Explicitly wait for the username input and scroll it into center.
+    await expEditor1.page.waitForSelector('.e2e-test-role-username', {
+      visible: true,
+    });
     await expEditor1.page.evaluate(() => {
-      const element = document.querySelector('.oppia-edit-roles-btn-container');
-      if (element) {
-        element.scrollIntoView();
+      const input = document.querySelector('.e2e-test-role-username');
+      if (input) {
+        input.scrollIntoView({block: 'center'});
       }
     });
+
     await expEditor1.assignUserToManagerRole('expEditor2');
 
     // Exploration B: Published.
