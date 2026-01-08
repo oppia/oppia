@@ -59,12 +59,17 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // Handle mobile-specific UI: Toggle the navbar menu if the viewport is at mobile width.
+    // Wait for the toggle to be visible to avoid timeouts.
     if (await expEditor1.isViewportAtMobileWidth()) {
+      await expEditor1.page.waitForSelector(
+        '.oppia-navbar-mobile-tabs-toggle',
+        {visible: true}
+      );
       await expEditor1.clickOnElementWithSelector(
         '.oppia-navbar-mobile-tabs-toggle'
       );
     }
+
     // Navigate to Settings tab and handle viewport scrolling for roles.
     await expEditor1.clickOnElementWithSelector(
       'a.e2e-test-exploration-settings-tab'
