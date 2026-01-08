@@ -914,7 +914,6 @@ describe('Questions List Component', () => {
         component.canEditQuestion = true;
         component.selectSkillModalIsShown = true;
 
-        // Note: The global spy handles the logic, but it's re-defined here specifically for the test case
         (
           editableQuestionBackendApiService.fetchQuestionAsync as jasmine.Spy
         ).and.returnValue(
