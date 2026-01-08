@@ -214,3 +214,74 @@ class CloudTaskRunModelUnitTest(test_utils.GenericTestBase):
                 r'Failed to generate a unique ID after \d+ attempts',
             ):
                 cloud_task_models.CloudTaskRunModel.get_new_id()
+
+
+class VoiceoverRegenerationTaskMappingModelUnitTest(test_utils.GenericTestBase):
+    """Test the VoiceoverRegenerationTaskMappingModel class."""
+
+    def test_get_export_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_export_policy(),
+            {
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_to_content_status_map': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    def test_get_model_association_to_user_not_corresponding_to_user(
+        self,
+    ) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_deletion_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_should_get_models_by_exp_id(self) -> None:
+        model_1 = cloud_task_models.VoiceoverRegenerationTaskMappingModel(
+            id='exp1:taskrun1',
+            exploration_id='exp1',
+            cloud_task_run_id='taskrun1',
+            language_accent_to_content_status_map={
+                'en-uk': {'content_1': 'SUCCEEDED'}
+            },
+        )
+        model_1.put()
+
+        model_2 = cloud_task_models.VoiceoverRegenerationTaskMappingModel(
+            id='exp1:taskrun2',
+            exploration_id='exp1',
+            cloud_task_run_id='taskrun2',
+            language_accent_to_content_status_map={
+                'en-us': {'content_2': 'FAILED_AND_AWAITING_RETRY'}
+            },
+        )
+        model_2.put()
+
+        model_3 = cloud_task_models.VoiceoverRegenerationTaskMappingModel(
+            id='exp2:taskrun3',
+            exploration_id='exp2',
+            cloud_task_run_id='taskrun3',
+            language_accent_to_content_status_map={
+                'en-au': {'content_3': 'RUNNING'}
+            },
+        )
+        model_3.put()
+
+        fetched_models = cloud_task_models.VoiceoverRegenerationTaskMappingModel.get_voiceover_regeneration_tasks_by_exploration_id(
+            'exp1'
+        )
+
+        self.assertEqual(len(fetched_models), 2)
+        fetched_model_ids = [model.id for model in fetched_models]
+        expected_model_ids = ['exp1:taskrun1', 'exp1:taskrun2']
+        self.assertItemsEqual(fetched_model_ids, expected_model_ids)
