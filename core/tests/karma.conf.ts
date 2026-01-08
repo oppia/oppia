@@ -113,9 +113,6 @@ module.exports = function (config: InstanceType<typeof karma.Config>) {
       'core/tests/data/*.json': ['json_fixtures'],
     },
     client: {
-      // This throws "Type '{ jasmine: { random: true; seed: number; }; }' is not assignable to type 'ClientOptions'".
-      // We need to suppress this error because Karma actually supports the 'jasmine' property at runtime,
-      // but its TypeScript type definitions in '@types/karma' are outdated and do not include it.
       jasmine: {
         random: true,
         seed: jasmineSeed,
