@@ -255,6 +255,16 @@ describe('Questions List Component', () => {
     });
 
     component.selectedSkillId = 'skillId1';
+
+    spyOn(
+      editableQuestionBackendApiService,
+      'fetchQuestionAsync'
+    ).and.returnValue(
+      Promise.resolve({
+        questionObject: question,
+        associated_skill_dicts: [],
+      })
+    );
   });
 
   it(
@@ -904,9 +914,9 @@ describe('Questions List Component', () => {
         component.canEditQuestion = true;
         component.selectSkillModalIsShown = true;
 
-        spyOn(
-          editableQuestionBackendApiService,
-          'fetchQuestionAsync'
+        // Note: The global spy handles the logic, but it's re-defined here specifically for the test case
+        (
+          editableQuestionBackendApiService.fetchQuestionAsync as jasmine.Spy
         ).and.returnValue(
           Promise.resolve({
             associated_skill_dicts: [
@@ -946,9 +956,8 @@ describe('Questions List Component', () => {
 
       component.canEditQuestion = true;
       component.selectSkillModalIsShown = false;
-      spyOn(
-        editableQuestionBackendApiService,
-        'fetchQuestionAsync'
+      (
+        editableQuestionBackendApiService.fetchQuestionAsync as jasmine.Spy
       ).and.returnValue(
         Promise.reject({
           error: 'Failed to fetch question.',
