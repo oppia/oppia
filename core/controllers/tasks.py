@@ -30,6 +30,7 @@ from core.domain import (
     stats_services,
     suggestion_registry,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_services,
     wipeout_service,
 )
@@ -320,6 +321,14 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
                 payload['fn_identifier']
             ]
+
+            # If the deferred task is a voiceover regeneration task, append the
+            # cloud task model ID to the arguments list.
+            if voiceover_cloud_task_services.is_voiceover_regeneration_task_function(
+                payload['fn_identifier']
+            ):
+                payload['args'].append(cloud_task_model_id)
+
             deferred_task_function(*payload['args'], **payload['kwargs'])
 
             cloud_task_run_domain_instance.latest_job_state = 'SUCCEEDED'
