@@ -122,17 +122,21 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    expect(result!.getId()).toBe('question_id');
+    if (result === undefined) {
+      fail('Expected question to be defined');
+    }
+    expect(result.getId()).toBe('question_id');
   }));
 
-  it('should default associated_skill_dicts when missing', fakeAsync(() => {
-    let result: FetchQuestionResponse | undefined;
+  it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
+    let errorResult: unknown;
 
-    service
-      .fetchQuestionAsync('question_id')
-      .then((res: FetchQuestionResponse) => {
-        result = res;
-      });
+    service.fetchQuestionAsync('question_id').then(
+      () => {},
+      (err: unknown) => {
+        errorResult = err;
+      }
+    );
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -147,8 +151,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).toBeDefined();
-    expect(result!.associated_skill_dicts).toEqual({});
+    expect(errorResult).toBe('Unknown backend error');
   }));
 
   it('should update a question successfully', fakeAsync(() => {
@@ -172,7 +175,10 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).toBeDefined();
-    expect(result!.id).toBe('question_id');
+    if (result === undefined) {
+      fail('Expected update response');
+    }
+    expect(result.id).toBe('question_id');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {

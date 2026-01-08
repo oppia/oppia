@@ -42,7 +42,8 @@ export interface SkillLinkageModificationsArray {
 }
 
 export interface FetchQuestionBackendResponse {
-  associated_skill_dicts: SkillBackendDict[];
+  // 🔧 FIX: optional to correctly reflect backend + test behavior
+  associated_skill_dicts?: SkillBackendDict[];
   is_super_admin: boolean;
   question_dict: QuestionBackendDict;
   user_email: string;
@@ -126,19 +127,27 @@ export class EditableQuestionBackendApiService {
         .get<FetchQuestionBackendResponse>(questionDataUrl)
         .toPromise();
 
+      if (!response.associated_skill_dicts) {
+        throw new Error('Missing associated_skill_dicts');
+      }
+
       const questionObject = Question.createFromBackendDict(
         response.question_dict
       );
 
       successCallback({
         questionObject,
-        associated_skill_dicts: cloneDeep(
-          response.associated_skill_dicts ?? []
-        ),
+        associated_skill_dicts: cloneDeep(response.associated_skill_dicts),
       });
     } catch (errorResponse: unknown) {
-      const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error ?? 'Unknown backend error');
+      const httpError = errorResponse as {
+        error?: {error?: string};
+        message?: string;
+      };
+
+      errorCallback(
+        httpError.error?.error ?? httpError.message ?? 'Unknown backend error'
+      );
     }
   }
 
