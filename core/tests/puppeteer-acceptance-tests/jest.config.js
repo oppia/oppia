@@ -16,6 +16,8 @@
  * @fileoverview Jest config file.
  */
 
+const path = require('path');
+
 module.exports = {
   globals: {
     'ts-jest': {
@@ -25,7 +27,7 @@ module.exports = {
   testMatch: ['**/?(*.)+(spec).[t]s'],
   transform: {'^.+\\.ts?$': 'ts-jest'},
   preset: 'ts-jest',
-  testEnvironment: './custom-jest-environment.js',
+  testEnvironment: path.resolve(__dirname, 'custom-jest-environment.js'),
   testTimeout: 300000,
   // Stop running tests after the first failure to avoid cascading failures
   // and save CI time.

@@ -266,6 +266,8 @@ export default {
     '../oppia_full_stack_test_failure_screenshots/acceptance'
   ),
   TEST_DOWNLOAD_DIR: path.resolve('../oppia_acceptance_test_downloads'),
+  TEST_SNAPSHOTS_DIR:
+    '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests',
 };
 
 export const FILEPATHS = {
