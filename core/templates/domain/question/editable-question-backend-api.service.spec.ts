@@ -113,7 +113,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result!.questionObject.getId()).toBe('question_id');
+    const response = result as FetchQuestionResponse;
+    expect(response.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle associated_skill_dicts when it is an object', fakeAsync(() => {
@@ -144,7 +145,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result!.associated_skill_dicts).toEqual([]);
+    const response = result as FetchQuestionResponse;
+    expect(response.associated_skill_dicts).toEqual([]);
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
@@ -210,7 +212,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result!.id).toBe('question_id');
+    const response = result as QuestionBackendDict;
+    expect(response.id).toBe('question_id');
   }));
 
   it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
@@ -306,7 +309,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result!.questionId).toBe('new_question_id');
+    const response = result as CreateQuestionResponse;
+    expect(response.questionId).toBe('new_question_id');
   }));
 
   it('should create question successfully when images are provided', fakeAsync(() => {
@@ -332,7 +336,8 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result!.questionId).toBe('new_question_id');
+    const response = result as CreateQuestionResponse;
+    expect(response.questionId).toBe('new_question_id');
   }));
 
   it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
