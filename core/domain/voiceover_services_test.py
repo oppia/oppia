@@ -1035,7 +1035,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1103,7 +1103,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1137,7 +1137,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         )
 
         with self.assertRaisesRegex(Exception, error):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1200,7 +1200,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'send_email_to_voiceover_admins_and_tech_leads_after_regeneration',
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1359,7 +1359,7 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             'regenerate_voiceovers_of_exploration',
             mock_regenerate_voiceovers_of_exploration,
         ):
-            voiceover_services.regenerate_voiceovers_for_updated_exploration(
+            voiceover_services.regenerate_voiceovers_on_exploration_update(
                 exploration_id=exploration_id,
                 exploration_title=exploration_title,
                 exploration_version=exploration_version,
@@ -1696,11 +1696,8 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             self.mock_send_email_to_voiceover_admins_and_tech_leads,
         ):
             (
-                voiceover_services.regenerate_voiceovers_on_exploration_curation(
-                    exploration_id,
-                    date_time,
-                    author_id,
-                    cloud_task_run_model_id,
+                voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+                    exploration_id, date_time, author_id
                 )
             )
 
