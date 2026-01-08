@@ -116,7 +116,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result?.questionObject.getId()).toBe('question_id');
+    expect(result!.questionObject.getId()).toBe('question_id');
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
@@ -182,7 +182,7 @@ describe('EditableQuestionBackendApiService', () => {
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result?.id).toBe('question_id');
+    expect(result!.id).toBe('question_id');
   }));
 
   it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
@@ -232,7 +232,7 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({});
     flushMicrotasks();
 
-    expect(success).toBeTrue();
+    expect(success).toBe(true);
   }));
 
   it('should fail when editQuestionSkillLinksAsync backend request fails', fakeAsync(() => {
@@ -272,13 +272,13 @@ describe('EditableQuestionBackendApiService', () => {
     );
 
     expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBeTrue();
+    expect(req.request.body instanceof FormData).toBe(true);
 
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
     expect(result).not.toBeNull();
-    expect(result?.questionId).toBe('new_question_id');
+    expect(result!.questionId).toBe('new_question_id');
   }));
 
   it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
