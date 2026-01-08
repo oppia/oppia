@@ -119,6 +119,34 @@ describe('EditableQuestionBackendApiService', () => {
     expect(result!.questionObject.getId()).toBe('question_id');
   }));
 
+  it('should handle associated_skill_dicts when it is an object', fakeAsync(() => {
+    let result: FetchQuestionResponse | null = null;
+
+    service.fetchQuestionAsync('question_id').then(
+      (res: FetchQuestionResponse) => {
+        result = res;
+      },
+      (err: string) => fail(err)
+    );
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
+
+    req.flush({
+      question_dict: backendQuestionDict,
+      associated_skill_dicts: {},
+    });
+
+    flushMicrotasks();
+
+    expect(result).not.toBeNull();
+    expect(result!.associated_skill_dicts).toEqual([]);
+  }));
+
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
     let errorResult: string | null = null;
 
@@ -266,6 +294,32 @@ describe('EditableQuestionBackendApiService', () => {
       },
       (err: string) => fail(err)
     );
+
+    const req = httpTestingController.expectOne(
+      QuestionDomainConstants.QUESTION_CREATION_URL
+    );
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBe(true);
+
+    req.flush({question_id: 'new_question_id'});
+    flushMicrotasks();
+
+    expect(result).not.toBeNull();
+    expect(result!.questionId).toBe('new_question_id');
+  }));
+
+  it('should create question successfully when images are provided', fakeAsync(() => {
+    let result: CreateQuestionResponse | null = null;
+
+    const imageBlob = new Blob(['image'], {type: 'image/png'});
+    const imagesData = [{filename: 'image1.png', imageBlob}];
+
+    service
+      .createQuestionAsync([], [], backendQuestionDict, imagesData)
+      .then((res: CreateQuestionResponse) => {
+        result = res;
+      });
 
     const req = httpTestingController.expectOne(
       QuestionDomainConstants.QUESTION_CREATION_URL
