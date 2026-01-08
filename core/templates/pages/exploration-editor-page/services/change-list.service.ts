@@ -340,6 +340,14 @@ export class ChangeListService {
     );
   }
 
+  doesChangeListAffectAutoVoiceovers(): boolean {
+    // The following commands affect auto generated voiceovers.
+    let changeCmds = ['edit_state_property', 'edit_translation'];
+    return this.explorationChangeList.some(change => {
+      return changeCmds.includes(change.cmd);
+    });
+  }
+
   getTranslationChangeList(): ExplorationChange[] {
     return cloneDeep(
       this.explorationChangeList.filter(change => {
