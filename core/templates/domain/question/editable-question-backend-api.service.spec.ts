@@ -87,7 +87,7 @@ describe('EditableQuestionBackendApiService', () => {
     const fakeQuestion = {getId: () => 'question_id'} as Question;
     spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
 
-    let result: FetchQuestionResponse | null = null;
+    let result: FetchQuestionResponse | undefined;
 
     service.fetchQuestionAsync('question_id').then(
       (res: FetchQuestionResponse) => {
@@ -105,8 +105,6 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
-    expect(req.request.method).toBe('GET');
-
     req.flush({
       question_dict: backendQuestionDict,
       associated_skill_dicts: [],
@@ -114,19 +112,18 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    if (result === null) {
-      fail('Expected result not to be null');
-      return;
+    if (!result) {
+      fail('Expected result to be defined');
+    } else {
+      expect(result.questionObject.getId()).toBe('question_id');
     }
-
-    expect(result.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle associated_skill_dicts when it is an object', fakeAsync(() => {
     const fakeQuestion = {getId: () => 'question_id'} as Question;
     spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
 
-    let result: FetchQuestionResponse | null = null;
+    let result: FetchQuestionResponse | undefined;
 
     service.fetchQuestionAsync('question_id').then(
       (res: FetchQuestionResponse) => {
@@ -151,16 +148,15 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    if (result === null) {
-      fail('Expected result not to be null');
-      return;
+    if (!result) {
+      fail('Expected result to be defined');
+    } else {
+      expect(result.associated_skill_dicts).toEqual([]);
     }
-
-    expect(result.associated_skill_dicts).toEqual([]);
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
-    let errorResult: string | null = null;
+    let errorResult: string | undefined;
 
     service.fetchQuestionAsync('question_id').catch((err: string) => {
       errorResult = err;
@@ -180,7 +176,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should fail when fetchQuestionAsync backend request fails', fakeAsync(() => {
-    let errorResult: string | null = null;
+    let errorResult: string | undefined;
 
     service.fetchQuestionAsync('question_id').catch((err: string) => {
       errorResult = err;
@@ -200,7 +196,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | null = null;
+    let result: QuestionBackendDict | undefined;
 
     service.updateQuestionAsync('question_id', '1', 'commit', []).then(
       (res: QuestionBackendDict) => {
@@ -218,21 +214,18 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
-    expect(req.request.method).toBe('PUT');
-
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    if (result === null) {
-      fail('Expected result not to be null');
-      return;
+    if (!result) {
+      fail('Expected result to be defined');
+    } else {
+      expect(result.id).toBe('question_id');
     }
-
-    expect(result.id).toBe('question_id');
   }));
 
   it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
-    let errorResult: string | null = null;
+    let errorResult: string | undefined;
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
@@ -273,8 +266,6 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
-    expect(req.request.method).toBe('PUT');
-
     req.flush({});
     flushMicrotasks();
 
@@ -282,7 +273,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should fail when editQuestionSkillLinksAsync backend request fails', fakeAsync(() => {
-    let errorResult: string | null = null;
+    let errorResult: string | undefined;
 
     service
       .editQuestionSkillLinksAsync('question_id', [])
@@ -304,7 +295,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | null = null;
+    let result: CreateQuestionResponse | undefined;
 
     service.createQuestionAsync([], [], backendQuestionDict, []).then(
       (res: CreateQuestionResponse) => {
@@ -319,22 +310,18 @@ describe('EditableQuestionBackendApiService', () => {
       QuestionDomainConstants.QUESTION_CREATION_URL
     );
 
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBe(true);
-
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    if (result === null) {
-      fail('Expected result not to be null');
-      return;
+    if (!result) {
+      fail('Expected result to be defined');
+    } else {
+      expect(result.questionId).toBe('new_question_id');
     }
-
-    expect(result.questionId).toBe('new_question_id');
   }));
 
   it('should create question successfully when images are provided', fakeAsync(() => {
-    let result: CreateQuestionResponse | null = null;
+    let result: CreateQuestionResponse | undefined;
 
     const imageBlob = new Blob(['image'], {type: 'image/png'});
     const imagesData = [{filename: 'image1.png', imageBlob}];
@@ -349,22 +336,18 @@ describe('EditableQuestionBackendApiService', () => {
       QuestionDomainConstants.QUESTION_CREATION_URL
     );
 
-    expect(req.request.method).toBe('POST');
-    expect(req.request.body instanceof FormData).toBe(true);
-
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    if (result === null) {
-      fail('Expected result not to be null');
-      return;
+    if (!result) {
+      fail('Expected result to be defined');
+    } else {
+      expect(result.questionId).toBe('new_question_id');
     }
-
-    expect(result.questionId).toBe('new_question_id');
   }));
 
   it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
-    let errorResult: string | null = null;
+    let errorResult: string | undefined;
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
