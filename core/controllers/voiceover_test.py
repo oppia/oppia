@@ -691,7 +691,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
         ]
     )
-    def test_regenerate_voiceovers_on_exploration_curation(self) -> None:
+    def test_regenerate_voiceovers_on_exploration_added_to_topic(self) -> None:
         entity_voiceovers = (
             voiceover_services.get_entity_voiceovers_for_given_exploration(
                 self.exploration_id, 'exploration', 2
@@ -734,7 +734,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Explicitly invoking the function here to simulate its usual execution
         # via a deferred job.
-        voiceover_services.regenerate_voiceovers_on_exploration_curation(
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
             created_on_time_str,
             feconf.SYSTEM_COMMITTER_ID,
@@ -848,7 +848,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Explicitly invoking the function here to simulate its usual execution
         # via a deferred job.
-        voiceover_services.regenerate_voiceovers_on_exploration_curation(
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
             created_on_time_str,
             feconf.SYSTEM_COMMITTER_ID,
@@ -922,7 +922,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Explicitly calling the function here to simulate its usual invocation
         # via a deferred job.
-        voiceover_services.regenerate_voiceovers_for_updated_exploration(
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
             self.exploration_id,
             updated_exp.title,
             updated_exp.version,
@@ -1038,7 +1038,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Explicitly invoking the function here to simulate its usual execution
         # via a deferred job.
-        voiceover_services.regenerate_voiceovers_on_exploration_curation(
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
             self.exploration_id,
             created_on_time_str,
             feconf.SYSTEM_COMMITTER_ID,
@@ -1131,7 +1131,7 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
 
         # Explicitly calling the function here to simulate its usual invocation
         # via a deferred job.
-        voiceover_services.regenerate_voiceovers_for_updated_exploration(
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
             self.exploration_id,
             updated_exp.title,
             updated_exp.version,

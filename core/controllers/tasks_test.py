@@ -567,7 +567,7 @@ class TasksTests(test_utils.EmailTestBase):
             queue_name,
             task_id,
         )
-        function_id = 'regenerate_voiceovers_on_exploration_curation'
+        function_id = 'regenerate_voiceovers_on_exploration_added_to_topic'
 
         payload = {
             'fn_identifier': function_id,
