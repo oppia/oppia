@@ -73,8 +73,6 @@ describe('EditableQuestionBackendApiService', () => {
     next_content_id_index: 0,
     language_code: 'en',
     version: 1,
-    created_on_msec: 1620000000000,
-    last_updated_msec: 1620000000000,
   };
 
   beforeEach(() => {
