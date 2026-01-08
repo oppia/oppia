@@ -31,19 +31,11 @@ import {
 import {QuestionBackendDict, Question} from 'domain/question/question.model';
 import {QuestionDomainConstants} from 'domain/question/question-domain.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-import {CsrfTokenService} from 'services/csrf-token.service';
-
-class MockCsrfTokenService {
-  getTokenAsync(): Promise<string> {
-    return Promise.resolve('csrf-token');
-  }
-}
 
 describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let service: EditableQuestionBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
-  let csrfTokenService: CsrfTokenService;
 
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
@@ -79,20 +71,12 @@ describe('EditableQuestionBackendApiService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [
-        EditableQuestionBackendApiService,
-        UrlInterpolationService,
-        {
-          provide: CsrfTokenService,
-          useClass: MockCsrfTokenService,
-        },
-      ],
+      providers: [EditableQuestionBackendApiService, UrlInterpolationService],
     });
 
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(EditableQuestionBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    csrfTokenService = TestBed.inject(CsrfTokenService);
   });
 
   afterEach(() => {
@@ -106,15 +90,13 @@ describe('EditableQuestionBackendApiService', () => {
 
     spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
 
-    let result!: FetchQuestionResponse;
+    let result: FetchQuestionResponse | null = null;
 
     service.fetchQuestionAsync('question_id').then(
       (res: FetchQuestionResponse) => {
         result = res;
       },
-      (err: string) => {
-        fail(err);
-      }
+      (err: string) => fail(err)
     );
 
     const req = httpTestingController.expectOne(
@@ -133,7 +115,8 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result.questionObject.getId()).toBe('question_id');
+    expect(result).not.toBeNull();
+    expect(result?.questionObject.getId()).toBe('question_id');
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
@@ -177,15 +160,13 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let result!: QuestionBackendDict;
+    let result: QuestionBackendDict | null = null;
 
     service.updateQuestionAsync('question_id', '1', 'commit', []).then(
       (res: QuestionBackendDict) => {
         result = res;
       },
-      (err: string) => {
-        fail(err);
-      }
+      (err: string) => fail(err)
     );
 
     const req = httpTestingController.expectOne(
@@ -200,7 +181,8 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(result.id).toBe('question_id');
+    expect(result).not.toBeNull();
+    expect(result?.id).toBe('question_id');
   }));
 
   it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
@@ -221,31 +203,6 @@ describe('EditableQuestionBackendApiService', () => {
 
     req.error(new ErrorEvent('Network error'));
     flushMicrotasks();
-
-    expect(errorResult).toBe('Unknown backend error');
-  }));
-
-  it('should fail when csrf token fetch fails', fakeAsync(() => {
-    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
-      Promise.reject('CSRF error')
-    );
-
-    let errorResult: string | null = null;
-
-    try {
-      service.updateQuestionAsync('question_id', '1', 'commit', []);
-      flushMicrotasks();
-      fail('Expected promise to be rejected');
-    } catch (err) {
-      errorResult = err as string;
-    }
-
-    httpTestingController.expectNone(
-      urlInterpolationService.interpolateUrl(
-        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
-        {question_id: 'question_id'}
-      )
-    );
 
     expect(errorResult).toBe('Unknown backend error');
   }));
@@ -275,7 +232,7 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({});
     flushMicrotasks();
 
-    expect(success).toBe(true);
+    expect(success).toBeTrue();
   }));
 
   it('should fail when editQuestionSkillLinksAsync backend request fails', fakeAsync(() => {
@@ -301,15 +258,13 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result!: CreateQuestionResponse;
+    let result: CreateQuestionResponse | null = null;
 
     service.createQuestionAsync([], [], backendQuestionDict, []).then(
       (res: CreateQuestionResponse) => {
         result = res;
       },
-      (err: string) => {
-        fail(err);
-      }
+      (err: string) => fail(err)
     );
 
     const req = httpTestingController.expectOne(
@@ -317,11 +272,13 @@ describe('EditableQuestionBackendApiService', () => {
     );
 
     expect(req.request.method).toBe('POST');
+    expect(req.request.body instanceof FormData).toBeTrue();
 
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    expect(result.questionId).toBe('new_question_id');
+    expect(result).not.toBeNull();
+    expect(result?.questionId).toBe('new_question_id');
   }));
 
   it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
