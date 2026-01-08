@@ -84,10 +84,7 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    const fakeQuestion = {
-      getId: () => 'question_id',
-    } as Question;
-
+    const fakeQuestion = {getId: () => 'question_id'} as Question;
     spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
 
     let result: FetchQuestionResponse | null = null;
@@ -120,6 +117,9 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should handle associated_skill_dicts when it is an object', fakeAsync(() => {
+    const fakeQuestion = {getId: () => 'question_id'} as Question;
+    spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
+
     let result: FetchQuestionResponse | null = null;
 
     service.fetchQuestionAsync('question_id').then(
