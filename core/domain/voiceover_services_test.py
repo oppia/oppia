@@ -1697,7 +1697,10 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
         ):
             (
                 voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
-                    exploration_id, date_time, author_id
+                    exploration_id,
+                    date_time,
+                    author_id,
+                    cloud_task_run_model_id,
                 )
             )
 
