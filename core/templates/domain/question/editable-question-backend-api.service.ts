@@ -125,7 +125,6 @@ export class EditableQuestionBackendApiService {
         .get<FetchQuestionBackendResponse>(questionDataUrl)
         .toPromise();
 
-      // ✅ EXACT validation required by spec
       if (!Array.isArray(response.associated_skill_dicts)) {
         throw new Error();
       }
@@ -139,7 +138,6 @@ export class EditableQuestionBackendApiService {
         associated_skill_dicts: cloneDeep(response.associated_skill_dicts),
       });
     } catch {
-      // ✅ MUST match spec exactly
       errorCallback('Unknown backend error');
     }
   }
