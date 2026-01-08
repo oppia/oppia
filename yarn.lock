@@ -20097,17 +20097,6 @@ webpack-merge@^5.0.8:
     clone-deep "^4.0.1"
     wildcard "^2.0.0"
 
-webpack-rtl-plugin@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/webpack-rtl-plugin/-/webpack-rtl-plugin-2.0.0.tgz#78502f8de2994460472cbe17109fe07bc8026674"
-  integrity sha512-lROgFkiPjapg9tcZ8FiLWeP5pJoG00018aEjLTxSrVldPD1ON+LPlhKPHjb7eE8Bc0+KL23pxcAjWDGOv9+UAw==
-  dependencies:
-    "@romainberger/css-diff" "^1.0.3"
-    async "^2.0.0"
-    cssnano "4.1.10"
-    rtlcss "2.4.0"
-    webpack-sources "1.3.0"
-
 webpack-sources@1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-1.3.0.tgz#2a28dcb9f1f45fe960d8f1493252b5ee6530fa85"
