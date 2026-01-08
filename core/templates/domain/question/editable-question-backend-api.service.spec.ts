@@ -98,16 +98,19 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
+    const fakeQuestion = {
+      getId: () => 'question_id',
+    } as Question;
+
+    spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
+
     let result: Question | null = null;
 
-    service.fetchQuestionAsync('question_id').then(
-      (res: FetchQuestionResponse) => {
+    service
+      .fetchQuestionAsync('question_id')
+      .then((res: FetchQuestionResponse) => {
         result = res.questionObject;
-      },
-      (_err: unknown) => {
-        fail('Unexpected error');
-      }
-    );
+      });
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -131,12 +134,9 @@ describe('EditableQuestionBackendApiService', () => {
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
     let errorResult: unknown;
 
-    service.fetchQuestionAsync('question_id').then(
-      () => {},
-      (err: unknown) => {
-        errorResult = err;
-      }
-    );
+    service.fetchQuestionAsync('question_id').catch((err: unknown) => {
+      errorResult = err;
+    });
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
