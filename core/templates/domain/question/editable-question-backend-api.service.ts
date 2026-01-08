@@ -42,7 +42,7 @@ export interface SkillLinkageModificationsArray {
 }
 
 export interface FetchQuestionBackendResponse {
-  associated_skill_dicts?: SkillBackendDict[];
+  associated_skill_dicts?: SkillBackendDict[] | {};
   is_super_admin: boolean;
   question_dict: QuestionBackendDict;
   user_email: string;
@@ -72,99 +72,98 @@ export class EditableQuestionBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {}
 
-  private async _fetchQuestionAsync(
+  private _fetchQuestionAsync(
     questionId: string,
     successCallback: (value: FetchQuestionResponse) => void,
     errorCallback: (reason: string) => void
-  ): Promise<void> {
+  ): void {
     const url = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
       {question_id: questionId}
     );
 
-    try {
-      const response = await this.http
-        .get<FetchQuestionBackendResponse>(url)
-        .toPromise();
+    this.http.get<FetchQuestionBackendResponse>(url).subscribe(
+      response => {
+        if (!('associated_skill_dicts' in response)) {
+          errorCallback('Unknown backend error');
+          return;
+        }
 
-      if (
-        response.associated_skill_dicts === undefined ||
-        !Array.isArray(response.associated_skill_dicts)
-      ) {
+        const questionObject = Question.createFromBackendDict(
+          response.question_dict
+        );
+
+        const associatedSkillDicts = Array.isArray(
+          response.associated_skill_dicts
+        )
+          ? response.associated_skill_dicts
+          : [];
+
+        successCallback({
+          questionObject,
+          associated_skill_dicts: cloneDeep(associatedSkillDicts),
+        });
+      },
+      () => {
         errorCallback('Unknown backend error');
-        return;
       }
-
-      const questionObject = Question.createFromBackendDict(
-        response.question_dict
-      );
-
-      successCallback({
-        questionObject,
-        associated_skill_dicts: cloneDeep(response.associated_skill_dicts),
-      });
-    } catch {
-      errorCallback('Unknown backend error');
-    }
+    );
   }
 
-  private async _updateQuestionAsync(
+  private _updateQuestionAsync(
     questionId: string,
     questionVersion: string,
     commitMessage: string,
     changeList: BackendChangeObject[],
     successCallback: (value: QuestionBackendDict) => void,
     errorCallback: (reason: string) => void
-  ): Promise<void> {
+  ): void {
     const url = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
       {question_id: questionId}
     );
 
-    try {
-      const response = await this.http
-        .put<UpdateEditableQuestionBackendResponse>(url, {
-          version: questionVersion,
-          commit_message: commitMessage,
-          change_list: changeList,
-        })
-        .toPromise();
-
-      successCallback(cloneDeep(response.question_dict));
-    } catch {
-      errorCallback('Unknown backend error');
-    }
+    this.http
+      .put<UpdateEditableQuestionBackendResponse>(url, {
+        version: questionVersion,
+        commit_message: commitMessage,
+        change_list: changeList,
+      })
+      .subscribe(
+        response => {
+          successCallback(cloneDeep(response.question_dict));
+        },
+        () => {
+          errorCallback('Unknown backend error');
+        }
+      );
   }
 
-  private async _editQuestionSkillLinksAsync(
+  private _editQuestionSkillLinksAsync(
     questionId: string,
     skillIdsTaskArray: SkillLinkageModificationsArray[],
     successCallback: () => void,
     errorCallback: (reason: string) => void
-  ): Promise<void> {
+  ): void {
     const url = this.urlInterpolationService.interpolateUrl(
       QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
       {question_id: questionId}
     );
 
-    try {
-      await this.http
-        .put(url, {skill_ids_task_list: skillIdsTaskArray})
-        .toPromise();
-      successCallback();
-    } catch {
-      errorCallback('Unknown backend error');
-    }
+    this.http.put(url, {skill_ids_task_list: skillIdsTaskArray}).subscribe(
+      () => successCallback(),
+      () => errorCallback('Unknown backend error')
+    );
   }
 
-  private async _createQuestionAsync(
+  private _createQuestionAsync(
     skillIds: string[],
     skillDifficulties: number[],
     questionDict: QuestionBackendDict,
     imagesData: ImageData[],
     successCallback: (value: CreateQuestionResponse) => void,
     errorCallback: (reason: string) => void
-  ): Promise<void> {
+  ): void {
     const body = new FormData();
 
     body.append(
@@ -181,18 +180,19 @@ export class EditableQuestionBackendApiService {
       body.append(`image${i}`, img.imageBlob);
     });
 
-    try {
-      const response = await this.http
-        .post<CreateQuestionResponseBackendDict>(
-          QuestionDomainConstants.QUESTION_CREATION_URL,
-          body
-        )
-        .toPromise();
-
-      successCallback({questionId: response.question_id});
-    } catch {
-      errorCallback('Unknown backend error');
-    }
+    this.http
+      .post<CreateQuestionResponseBackendDict>(
+        QuestionDomainConstants.QUESTION_CREATION_URL,
+        body
+      )
+      .subscribe(
+        response => {
+          successCallback({questionId: response.question_id});
+        },
+        () => {
+          errorCallback('Unknown backend error');
+        }
+      );
   }
 
   fetchQuestionAsync(questionId: string): Promise<FetchQuestionResponse> {
