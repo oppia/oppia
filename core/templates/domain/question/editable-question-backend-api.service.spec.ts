@@ -116,7 +116,7 @@ describe('EditableQuestionBackendApiService', () => {
 
     req.flush({
       question_dict: backendQuestionDict,
-      associated_skill_dicts: {},
+      associated_skill_dicts: [],
     });
 
     flushMicrotasks();
