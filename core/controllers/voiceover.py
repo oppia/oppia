@@ -24,6 +24,7 @@ from core.domain import (
     feature_flag_services,
     opportunity_services,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
@@ -315,4 +316,34 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 feconf.SYSTEM_COMMITTER_ID,
                 datetime.datetime.utcnow().isoformat(),
             )
+        self.render_json(self.values)
+
+
+class VoiceoverRegenerationRequestToCloudTaskHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Retrieves the status of all voiceover-regeneration requests queued in
+    Cloud Tasks for the specified exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id: str) -> None:
+        """Retrieves the status of all voiceover-regeneration requests queued in
+        Cloud Tasks for the specified exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        self.values.update(
+            voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                exploration_id
+            )
+        )
         self.render_json(self.values)
