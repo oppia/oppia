@@ -26,6 +26,7 @@ import {ResponseMusicNotesInput} from './directives/oppia-response-music-notes-i
 import {ShortResponseMusicNotesInput} from './directives/oppia-short-response-music-notes-input.component';
 import {CommonModule} from '@angular/common';
 import {ObjectComponentsModule} from '../../../extensions/objects/object-components.module';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import {ObjectComponentsModule} from '../../../extensions/objects/object-compone
     MaterialModule,
     TranslateModule,
     ObjectComponentsModule,
+    DragDropModule,
   ],
   declarations: [
     MusicNotesInputComponent,

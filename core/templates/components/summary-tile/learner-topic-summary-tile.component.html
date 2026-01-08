@@ -22,7 +22,7 @@
       </div>
     </a>
   </mat-card>
-  <a *ngIf="redesignFeatureFlag" class="d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
+  <a *ngIf="redesignFeatureFlag" class="e2e-test-learner-topic-summary-tile d-flex flex-column flex-shrink-0 oppia-class-card text-decoration-none" [href]="getTopicLink()" target="{{ openInNewWindow ? '_blank' : '_self' }}">
     <div class="oppia-class-card-img rounded-top" [ngStyle]="{'background-color': thumbnailBgColor}">
       <img alt="" class="h-100 oppia-thumbnail-image" [src]="thumbnailUrl">
     </div>

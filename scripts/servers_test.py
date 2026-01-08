@@ -553,7 +553,7 @@ class ManagedProcessTests(test_utils.TestBase):
 
         self.assertEqual(
             popen_calls[0].program_args,
-            '%s/bin/elasticsearch -q' % common.ES_PATH,
+            f'{common.ES_PATH}/bin/elasticsearch -q -E xpack.security.enabled=false -E cluster.routing.allocation.disk.threshold_enabled=false',
         )
         self.assertEqual(
             popen_calls[0].kwargs,
