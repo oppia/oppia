@@ -635,6 +635,48 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
+   * Navigates to the home section of the learner dashboard for redesigned dashboard.
+   */
+  async navigateToHomeSectionInRedesignedDashboard(): Promise<void> {
+    if (await this.isViewportAtMobileWidth()) {
+      // Redesigned dashboard (mobile) uses the same tab selector as desktop.
+      await this.page.waitForSelector(homeSectionSelector);
+      await this.clickOnElementWithSelector(homeSectionSelector);
+
+      try {
+        await this.page.waitForSelector(homeSectionGreetingElement, {
+          timeout: 10000,
+        });
+      } catch (error) {
+        if (error instanceof puppeteer.errors.TimeoutError) {
+          // Try clicking again if does not opens the expected page.
+          await this.clickOnElementWithSelector(homeSectionSelector);
+        } else {
+          throw error;
+        }
+      }
+
+      await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+        visible: true,
+      });
+    } else {
+      // Desktop (legacy and redesigned) both expose .e2e-test-home-section.
+      await this.page.waitForSelector(homeSectionSelector);
+      const homeSectionElement = await this.page.$(homeSectionSelector);
+      if (!homeSectionElement) {
+        throw new Error('Home section not found.');
+      }
+      await this.waitForElementToBeClickable(homeSectionElement);
+      await homeSectionElement.click();
+    }
+
+    await this.waitForPageToFullyLoad();
+    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
+      visible: true,
+    });
+  }
+
+  /**
    * Navigates to the goals section of the learner dashboard.
    */
   async navigateToGoalsSection(): Promise<void> {
@@ -1214,6 +1256,57 @@ export class LoggedInUser extends BaseUser {
     } catch (error) {
       const newError = new Error(
         `Failed to play lesson from dashboard: ${error}`
+      );
+      newError.stack = (error as Error).stack;
+      throw newError;
+    }
+  }
+
+  /**
+   * Function to play a specific lesson from the redesigned learner dashboard.
+   * @param {string} lessonName - The name of the lesson to be played.
+   */
+  async playLessonFromDashboardInRedesignedDashboard(
+    lessonName: string
+  ): Promise<void> {
+    try {
+      const redesignedCardSelector = learnerDashSelectors.lessonCard.content;
+      const redesignedTitleSelector = learnerDashSelectors.lessonCard.heading;
+      const redesignedButtonSelector = learnerDashSelectors.lessonCard.button;
+
+      await this.page.waitForSelector(redesignedCardSelector, {
+        visible: true,
+        timeout: 30000,
+      });
+
+      const cards = await this.page.$$(redesignedCardSelector);
+      for (const card of cards) {
+        const title = await card.$eval(redesignedTitleSelector, el =>
+          el.textContent?.trim()
+        );
+        if (title === lessonName) {
+          const playButton = await card.$(redesignedButtonSelector);
+          if (!playButton) {
+            throw new Error('Play/Resume button not found on lesson card.');
+          }
+          await Promise.all([
+            this.page.waitForNavigation({
+              waitUntil: 'networkidle2',
+              timeout: 60000,
+            }),
+            playButton.click(),
+          ]);
+          await this.page.waitForSelector(
+            '.e2e-test-conversation-skin-cards-container',
+            {visible: true, timeout: 60000}
+          );
+          return;
+        }
+      }
+      throw new Error(`Lesson "${lessonName}" not found in redesigned cards.`);
+    } catch (error) {
+      const newError = new Error(
+        `Failed to play lesson from redesigned dashboard: ${error}`
       );
       newError.stack = (error as Error).stack;
       throw newError;
@@ -2953,6 +3046,49 @@ export class LoggedInUser extends BaseUser {
       return;
     }
     throw new Error(`Lesson not found: ${lessonTitle}`);
+  }
+
+  /**
+   * Function to resume a lesson from the redesigned learner dashboard.
+   * @param {string} lessonTitle - The title of the lesson.
+   */
+  async resumeLessonFromLearnerDashboardInRedesignedDashboard(
+    lessonTitle: string
+  ): Promise<void> {
+    const redesignedCardSelector = learnerDashSelectors.lessonCard.content;
+    const redesignedTitleSelector = learnerDashSelectors.lessonCard.heading;
+    const redesignedButtonSelector = learnerDashSelectors.lessonCard.button;
+
+    await this.page.waitForSelector(redesignedCardSelector, {
+      visible: true,
+      timeout: 30000,
+    });
+
+    const cards = await this.page.$$(redesignedCardSelector);
+    for (const card of cards) {
+      const title = await card.$eval(redesignedTitleSelector, el =>
+        el.textContent?.trim()
+      );
+      if (title && title.includes(lessonTitle)) {
+        const resumeBtn = await card.$(redesignedButtonSelector);
+        if (!resumeBtn) {
+          throw new Error('Resume button not found on redesigned lesson card.');
+        }
+        await Promise.all([
+          this.page.waitForNavigation({
+            waitUntil: 'networkidle2',
+            timeout: 60000,
+          }),
+          resumeBtn.click(),
+        ]);
+        await this.page.waitForSelector(
+          '.e2e-test-conversation-skin-cards-container',
+          {visible: true, timeout: 60000}
+        );
+        return;
+      }
+    }
+    throw new Error(`Lesson not found in redesigned cards: ${lessonTitle}`);
   }
 
   /**

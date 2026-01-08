@@ -154,7 +154,7 @@ describe('Logged-In Learner', function () {
     );
 
     // Navigate to Home section.
-    await loggedInLearner.navigateToHomeSection();
+    await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
 
     // Verify "Learn Something New" section is visible and contains "Test Chapter 1" lesson.
     await loggedInLearner.expectLearnSomethingNewSectionInRedesignedDashboardToBePresent();
@@ -168,7 +168,9 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Select "Test Chapter 1" lesson from learner dashboard.
-    await loggedInLearner.playLessonFromDashboard('Test Chapter 1');
+    await loggedInLearner.playLessonFromDashboardInRedesignedDashboard(
+      'Test Chapter 1'
+    );
 
     // Play lesson halfway (continue to next card to make progress).
     await loggedInLearner.continueToNextCard();
@@ -199,7 +201,9 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Resume "Test Chapter 1" lesson from Continue where you left off section.
-    await loggedInLearner.resumeLessonFromLearnerDashboard('Test Chapter 1');
+    await loggedInLearner.resumeLessonFromLearnerDashboardInRedesignedDashboard(
+      'Test Chapter 1'
+    );
 
     // Complete the lesson by continuing to the end.
     await loggedInLearner.continueToNextCard();
@@ -240,7 +244,9 @@ describe('Logged-In Learner', function () {
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Select "Test Chapter 2" lesson from Learn Something New section.
-    await loggedInLearner.playLessonFromDashboard('Test Chapter 2');
+    await loggedInLearner.playLessonFromDashboardInRedesignedDashboard(
+      'Test Chapter 2'
+    );
 
     // Complete the lesson by continuing to the end.
     await loggedInLearner.continueToNextCard();
