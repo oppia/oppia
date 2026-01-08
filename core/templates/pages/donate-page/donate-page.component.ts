@@ -184,11 +184,8 @@ export class DonatePageComponent implements OnInit {
     const searchParams = new URLSearchParams(
       this.windowRef.nativeWindow.location.search
     );
-    const params: Record<string, string> = {};
-    searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
-    if ('thanks' in params) {
+    const params = Object.fromEntries(searchParams.entries());
+    if (params.hasOwnProperty('thanks')) {
       this.ngbModal.open(ThanksForDonatingModalComponent, {
         backdrop: 'static',
         size: 'xl',
