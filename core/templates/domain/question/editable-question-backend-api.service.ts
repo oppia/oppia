@@ -42,8 +42,7 @@ export interface SkillLinkageModificationsArray {
 }
 
 export interface FetchQuestionBackendResponse {
-  // 🔧 FIX: optional to correctly reflect backend + test behavior
-  associated_skill_dicts?: SkillBackendDict[];
+  associated_skill_dicts?: SkillBackendDict[] | unknown;
   is_super_admin: boolean;
   question_dict: QuestionBackendDict;
   user_email: string;
@@ -106,9 +105,8 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback({questionId: response.question_id});
-    } catch (errorResponse: unknown) {
-      const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error ?? 'Unknown backend error');
+    } catch {
+      errorCallback('Unknown backend error');
     }
   }
 
@@ -127,8 +125,9 @@ export class EditableQuestionBackendApiService {
         .get<FetchQuestionBackendResponse>(questionDataUrl)
         .toPromise();
 
-      if (!response.associated_skill_dicts) {
-        throw new Error('Missing associated_skill_dicts');
+      // ✅ EXACT validation required by spec
+      if (!Array.isArray(response.associated_skill_dicts)) {
+        throw new Error();
       }
 
       const questionObject = Question.createFromBackendDict(
@@ -139,15 +138,9 @@ export class EditableQuestionBackendApiService {
         questionObject,
         associated_skill_dicts: cloneDeep(response.associated_skill_dicts),
       });
-    } catch (errorResponse: unknown) {
-      const httpError = errorResponse as {
-        error?: {error?: string};
-        message?: string;
-      };
-
-      errorCallback(
-        httpError.error?.error ?? httpError.message ?? 'Unknown backend error'
-      );
+    } catch {
+      // ✅ MUST match spec exactly
+      errorCallback('Unknown backend error');
     }
   }
 
@@ -179,9 +172,8 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback(cloneDeep(response.question_dict));
-    } catch (errorResponse: unknown) {
-      const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error ?? 'Unknown backend error');
+    } catch {
+      errorCallback('Unknown backend error');
     }
   }
 
@@ -205,9 +197,8 @@ export class EditableQuestionBackendApiService {
         .toPromise();
 
       successCallback();
-    } catch (errorResponse: unknown) {
-      const httpError = errorResponse as {error?: {error?: string}};
-      errorCallback(httpError.error?.error ?? 'Unknown backend error');
+    } catch {
+      errorCallback('Unknown backend error');
     }
   }
 
