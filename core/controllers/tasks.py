@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import json
+import traceback
 
 from core import feconf
 from core.controllers import acl_decorators, base
@@ -270,10 +271,10 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             wipeout_service.remove_user_from_activities_with_associated_rights_models
         ),
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE']: (
-            voiceover_services.regenerate_voiceovers_for_updated_exploration
+            voiceover_services.regenerate_voiceovers_on_exploration_update
         ),
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
-            voiceover_services.regenerate_voiceovers_on_exploration_curation
+            voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
         ),
     }
 
@@ -289,6 +290,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         """
         # The request body has bytes type, thus we need to decode it first.
         payload = json.loads(self.request.body.decode('utf-8'))
+
         if 'fn_identifier' not in payload:
             raise Exception(
                 'This request cannot defer tasks because it does not contain a '
@@ -305,16 +307,16 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 'The payload must contain a cloud_task_model_id attribute.'
             )
 
-        cloud_task_model_id = payload['cloud_task_model_id']
-        cloud_task_run_domain_instance = (
-            taskqueue_services.get_cloud_task_run_by_model_id(
-                cloud_task_model_id
-            )
-        )
-        assert cloud_task_run_domain_instance is not None
-        cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
-
         try:
+            cloud_task_model_id = payload['cloud_task_model_id']
+            cloud_task_run_domain_instance = (
+                taskqueue_services.get_cloud_task_run_by_model_id(
+                    cloud_task_model_id
+                )
+            )
+            assert cloud_task_run_domain_instance is not None
+            cloud_task_run_domain_instance.latest_job_state = 'RUNNING'
+
             deferred_task_function = self.DEFERRED_TASK_FUNCTIONS[
                 payload['fn_identifier']
             ]
@@ -326,6 +328,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 cloud_task_run_domain_instance
             )
         except Exception as e:
+            assert cloud_task_run_domain_instance is not None
             # The maximum number of retries is enforced only for voiceover
             # regeneration tasks, as these depend on a cloud service. Retrying
             # indefinitely without investigating failures could result in
@@ -345,9 +348,11 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     'FAILED_AND_AWAITING_RETRY'
                 )
 
+            stack_trace = traceback.format_exc()
+            error_message = '%s\n---------\n%s' % (str(e), stack_trace)
             (
                 cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
-                    str(e)
+                    error_message
                 )
             )
 
