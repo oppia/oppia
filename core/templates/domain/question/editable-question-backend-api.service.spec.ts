@@ -43,6 +43,7 @@ describe('EditableQuestionBackendApiService', () => {
   let httpTestingController: HttpTestingController;
   let service: EditableQuestionBackendApiService;
   let urlInterpolationService: UrlInterpolationService;
+  let csrfTokenService: CsrfTokenService;
 
   const backendQuestionDict: QuestionBackendDict = {
     id: 'question_id',
@@ -91,6 +92,7 @@ describe('EditableQuestionBackendApiService', () => {
     httpTestingController = TestBed.inject(HttpTestingController);
     service = TestBed.inject(EditableQuestionBackendApiService);
     urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
   });
 
   afterEach(() => {
@@ -110,7 +112,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: FetchQuestionResponse) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -146,10 +150,7 @@ describe('EditableQuestionBackendApiService', () => {
       )
     );
 
-    req.flush({
-      question_dict: backendQuestionDict,
-    });
-
+    req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
     expect(errorResult).toBe('Unknown backend error');
@@ -182,7 +183,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: QuestionBackendDict) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -222,6 +225,24 @@ describe('EditableQuestionBackendApiService', () => {
     expect(errorResult).toBe('Unknown backend error');
   }));
 
+  it('should fail when csrf token fetch fails', fakeAsync(() => {
+    spyOn(csrfTokenService, 'getTokenAsync').and.returnValue(
+      Promise.reject('CSRF error')
+    );
+
+    let errorResult: string | null = null;
+
+    service
+      .updateQuestionAsync('question_id', '1', 'commit', [])
+      .catch((err: string) => {
+        errorResult = err;
+      });
+
+    flushMicrotasks();
+
+    expect(errorResult).toBe('Unknown backend error');
+  }));
+
   it('should edit question skill links successfully', fakeAsync(() => {
     const skillIdsTaskArray: SkillLinkageModificationsArray[] = [
       {id: 'skillId', task: 'remove', difficulty: 0},
@@ -229,12 +250,11 @@ describe('EditableQuestionBackendApiService', () => {
 
     let success = false;
 
-    service.editQuestionSkillLinksAsync('question_id', skillIdsTaskArray).then(
-      () => {
+    service
+      .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
+      .then(() => {
         success = true;
-      },
-      (err: string) => fail(err)
-    );
+      });
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -280,7 +300,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: CreateQuestionResponse) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(

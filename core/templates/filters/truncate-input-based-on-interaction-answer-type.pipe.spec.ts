@@ -88,8 +88,17 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
 
   it('should throw error for unsupported answer types', () => {
     const answer = 'Some input';
+
     expect(() => {
       pipe.transform(answer, 'MultipleChoiceInput', 8);
     }).toThrowError('Unknown interaction id: MultipleChoiceInput');
+  });
+
+  it('should throw error when interaction spec has no answer_type', () => {
+    const answer = 'Some input';
+
+    expect(() => {
+      pipe.transform(answer, 'CodeEditor', 8);
+    }).toThrowError('Unknown interaction id: CodeEditor');
   });
 });
