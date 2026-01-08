@@ -93,7 +93,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: FetchQuestionResponse) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -112,9 +114,12 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    const response = result as FetchQuestionResponse;
-    expect(response.questionObject.getId()).toBe('question_id');
+    if (result === null) {
+      fail('Expected result not to be null');
+      return;
+    }
+
+    expect(result.questionObject.getId()).toBe('question_id');
   }));
 
   it('should handle associated_skill_dicts when it is an object', fakeAsync(() => {
@@ -127,7 +132,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: FetchQuestionResponse) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -144,9 +151,12 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    const response = result as FetchQuestionResponse;
-    expect(response.associated_skill_dicts).toEqual([]);
+    if (result === null) {
+      fail('Expected result not to be null');
+      return;
+    }
+
+    expect(result.associated_skill_dicts).toEqual([]);
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
@@ -196,7 +206,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: QuestionBackendDict) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -211,9 +223,12 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    const response = result as QuestionBackendDict;
-    expect(response.id).toBe('question_id');
+    if (result === null) {
+      fail('Expected result not to be null');
+      return;
+    }
+
+    expect(result.id).toBe('question_id');
   }));
 
   it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
@@ -295,7 +310,9 @@ describe('EditableQuestionBackendApiService', () => {
       (res: CreateQuestionResponse) => {
         result = res;
       },
-      (err: string) => fail(err)
+      (err: string) => {
+        fail(err);
+      }
     );
 
     const req = httpTestingController.expectOne(
@@ -308,9 +325,12 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    const response = result as CreateQuestionResponse;
-    expect(response.questionId).toBe('new_question_id');
+    if (result === null) {
+      fail('Expected result not to be null');
+      return;
+    }
+
+    expect(result.questionId).toBe('new_question_id');
   }));
 
   it('should create question successfully when images are provided', fakeAsync(() => {
@@ -335,9 +355,12 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    const response = result as CreateQuestionResponse;
-    expect(response.questionId).toBe('new_question_id');
+    if (result === null) {
+      fail('Expected result not to be null');
+      return;
+    }
+
+    expect(result.questionId).toBe('new_question_id');
   }));
 
   it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
