@@ -232,13 +232,20 @@ describe('EditableQuestionBackendApiService', () => {
 
     let errorResult: string | null = null;
 
-    service
-      .updateQuestionAsync('question_id', '1', 'commit', [])
-      .catch((err: string) => {
-        errorResult = err;
-      });
+    try {
+      service.updateQuestionAsync('question_id', '1', 'commit', []);
+      flushMicrotasks();
+      fail('Expected promise to be rejected');
+    } catch (err) {
+      errorResult = err as string;
+    }
 
-    flushMicrotasks();
+    httpTestingController.expectNone(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
 
     expect(errorResult).toBe('Unknown backend error');
   }));
