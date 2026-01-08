@@ -187,19 +187,30 @@ class AutomaticVoiceoverRegenerationRecordHandler(
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
-        cloud_task_run_objects = (
+        cloud_task_run_objects = sorted(
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 start_date_obj,
                 end_date_obj,
-            )
+            ),
+            key=lambda task_run: task_run.last_updated,
+            reverse=True,
         )
+
+        # During testing, we observed that the UI remains usable with around
+        # 5,000 records, but performance degrades significantly at 15,000
+        # records. Setting a limit of 100 ensures a safe and consistent user
+        # experience and prevents users from being overwhelmed by excessive
+        # records.
+        maximum_allowed_records = 100
 
         self.values.update(
             {
                 'automatic_voiceover_regeneration_records': [
                     cloud_task_run.to_dict()
-                    for cloud_task_run in cloud_task_run_objects
+                    for cloud_task_run in cloud_task_run_objects[
+                        :maximum_allowed_records
+                    ]
                 ]
             }
         )
