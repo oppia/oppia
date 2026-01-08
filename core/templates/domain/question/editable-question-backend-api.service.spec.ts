@@ -104,13 +104,14 @@ describe('EditableQuestionBackendApiService', () => {
 
     spyOn(Question, 'createFromBackendDict').and.returnValue(fakeQuestion);
 
-    let result: Question | null = null;
+    let result!: FetchQuestionResponse;
 
-    service
-      .fetchQuestionAsync('question_id')
-      .then((res: FetchQuestionResponse) => {
-        result = res.questionObject;
-      });
+    service.fetchQuestionAsync('question_id').then(
+      (res: FetchQuestionResponse) => {
+        result = res;
+      },
+      (err: string) => fail(err)
+    );
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -118,6 +119,7 @@ describe('EditableQuestionBackendApiService', () => {
         {question_id: 'question_id'}
       )
     );
+
     expect(req.request.method).toBe('GET');
 
     req.flush({
@@ -127,14 +129,13 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    expect(result!.getId()).toBe('question_id');
+    expect(result.questionObject.getId()).toBe('question_id');
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
-    let errorResult: unknown;
+    let errorResult: string | null = null;
 
-    service.fetchQuestionAsync('question_id').catch((err: unknown) => {
+    service.fetchQuestionAsync('question_id').catch((err: string) => {
       errorResult = err;
     });
 
@@ -154,13 +155,58 @@ describe('EditableQuestionBackendApiService', () => {
     expect(errorResult).toBe('Unknown backend error');
   }));
 
+  it('should fail when fetchQuestionAsync backend request fails', fakeAsync(() => {
+    let errorResult: string | null = null;
+
+    service.fetchQuestionAsync('question_id').catch((err: string) => {
+      errorResult = err;
+    });
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
+
+    req.error(new ErrorEvent('Network error'));
+    flushMicrotasks();
+
+    expect(errorResult).toBe('Unknown backend error');
+  }));
+
   it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | null = null;
+    let result!: QuestionBackendDict;
+
+    service.updateQuestionAsync('question_id', '1', 'commit', []).then(
+      (res: QuestionBackendDict) => {
+        result = res;
+      },
+      (err: string) => fail(err)
+    );
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
+
+    expect(req.request.method).toBe('PUT');
+
+    req.flush({question_dict: backendQuestionDict});
+    flushMicrotasks();
+
+    expect(result.id).toBe('question_id');
+  }));
+
+  it('should fail when updateQuestionAsync backend request fails', fakeAsync(() => {
+    let errorResult: string | null = null;
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
-      .then((res: QuestionBackendDict) => {
-        result = res;
+      .catch((err: string) => {
+        errorResult = err;
       });
 
     const req = httpTestingController.expectOne(
@@ -169,13 +215,11 @@ describe('EditableQuestionBackendApiService', () => {
         {question_id: 'question_id'}
       )
     );
-    expect(req.request.method).toBe('PUT');
 
-    req.flush({question_dict: backendQuestionDict});
+    req.error(new ErrorEvent('Network error'));
     flushMicrotasks();
 
-    expect(result).not.toBeNull();
-    expect(result!.id).toBe('question_id');
+    expect(errorResult).toBe('Unknown backend error');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
@@ -185,11 +229,12 @@ describe('EditableQuestionBackendApiService', () => {
 
     let success = false;
 
-    service
-      .editQuestionSkillLinksAsync('question_id', skillIdsTaskArray)
-      .then(() => {
+    service.editQuestionSkillLinksAsync('question_id', skillIdsTaskArray).then(
+      () => {
         success = true;
-      });
+      },
+      (err: string) => fail(err)
+    );
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -197,6 +242,7 @@ describe('EditableQuestionBackendApiService', () => {
         {question_id: 'question_id'}
       )
     );
+
     expect(req.request.method).toBe('PUT');
 
     req.flush({});
@@ -205,23 +251,66 @@ describe('EditableQuestionBackendApiService', () => {
     expect(success).toBe(true);
   }));
 
-  it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | null = null;
+  it('should fail when editQuestionSkillLinksAsync backend request fails', fakeAsync(() => {
+    let errorResult: string | null = null;
 
     service
-      .createQuestionAsync([], [], backendQuestionDict, [])
-      .then((res: CreateQuestionResponse) => {
-        result = res;
+      .editQuestionSkillLinksAsync('question_id', [])
+      .catch((err: string) => {
+        errorResult = err;
       });
+
+    const req = httpTestingController.expectOne(
+      urlInterpolationService.interpolateUrl(
+        QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE,
+        {question_id: 'question_id'}
+      )
+    );
+
+    req.error(new ErrorEvent('Network error'));
+    flushMicrotasks();
+
+    expect(errorResult).toBe('Unknown backend error');
+  }));
+
+  it('should create question successfully', fakeAsync(() => {
+    let result!: CreateQuestionResponse;
+
+    service.createQuestionAsync([], [], backendQuestionDict, []).then(
+      (res: CreateQuestionResponse) => {
+        result = res;
+      },
+      (err: string) => fail(err)
+    );
 
     const req = httpTestingController.expectOne(
       QuestionDomainConstants.QUESTION_CREATION_URL
     );
+
     expect(req.request.method).toBe('POST');
 
     req.flush({question_id: 'new_question_id'});
     flushMicrotasks();
 
-    expect(result).toEqual({questionId: 'new_question_id'});
+    expect(result.questionId).toBe('new_question_id');
+  }));
+
+  it('should fail when createQuestionAsync backend request fails', fakeAsync(() => {
+    let errorResult: string | null = null;
+
+    service
+      .createQuestionAsync([], [], backendQuestionDict, [])
+      .catch((err: string) => {
+        errorResult = err;
+      });
+
+    const req = httpTestingController.expectOne(
+      QuestionDomainConstants.QUESTION_CREATION_URL
+    );
+
+    req.error(new ErrorEvent('Network error'));
+    flushMicrotasks();
+
+    expect(errorResult).toBe('Unknown backend error');
   }));
 });

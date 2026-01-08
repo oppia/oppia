@@ -62,7 +62,7 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
     expect(pipe.transform(emptyCodeAnswer, 'CodeRepl', 10)).toBe('');
   });
 
-  it('should throw error for unknown interaction type', () => {
+  it('should throw error for unknown interaction id', () => {
     const answer = 'Some input';
 
     expect(() => {
@@ -84,5 +84,12 @@ describe('TruncateInputBasedOnInteractionAnswerTypePipe', () => {
     expect(() => {
       pipe.transform(invalidAnswer, 'CodeRepl', 8);
     }).toThrowError('Invalid input for code-based interaction');
+  });
+
+  it('should throw error for unsupported answer types', () => {
+    const answer = 'Some input';
+    expect(() => {
+      pipe.transform(answer, 'MultipleChoiceInput', 8);
+    }).toThrowError('Unknown interaction id: MultipleChoiceInput');
   });
 });
