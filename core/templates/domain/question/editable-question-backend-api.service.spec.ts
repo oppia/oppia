@@ -73,8 +73,8 @@ describe('EditableQuestionBackendApiService', () => {
     next_content_id_index: 0,
     language_code: 'en',
     version: 1,
-    created_on: 1620000000000,
-    last_updated: 1620000000000,
+    created_on_msec: 1620000000000,
+    last_updated_msec: 1620000000000,
   };
 
   beforeEach(() => {
@@ -100,13 +100,16 @@ describe('EditableQuestionBackendApiService', () => {
   });
 
   it('should fetch a question successfully', fakeAsync(() => {
-    let result: Question | undefined;
+    let result: Question | null = null;
 
-    service
-      .fetchQuestionAsync('question_id')
-      .then((res: FetchQuestionResponse) => {
+    service.fetchQuestionAsync('question_id').then(
+      (res: FetchQuestionResponse) => {
         result = res.questionObject;
-      });
+      },
+      (_err: unknown) => {
+        fail('Unexpected error');
+      }
+    );
 
     const req = httpTestingController.expectOne(
       urlInterpolationService.interpolateUrl(
@@ -123,11 +126,8 @@ describe('EditableQuestionBackendApiService', () => {
 
     flushMicrotasks();
 
-    expect(result).toBeDefined();
-    if (result === undefined) {
-      fail('Expected question to be defined');
-    }
-    expect(result.getId()).toBe('question_id');
+    expect(result).not.toBeNull();
+    expect(result!.getId()).toBe('question_id');
   }));
 
   it('should fail when associated_skill_dicts is missing', fakeAsync(() => {
@@ -157,7 +157,7 @@ describe('EditableQuestionBackendApiService', () => {
   }));
 
   it('should update a question successfully', fakeAsync(() => {
-    let result: QuestionBackendDict | undefined;
+    let result: QuestionBackendDict | null = null;
 
     service
       .updateQuestionAsync('question_id', '1', 'commit', [])
@@ -176,11 +176,8 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({question_dict: backendQuestionDict});
     flushMicrotasks();
 
-    expect(result).toBeDefined();
-    if (result === undefined) {
-      fail('Expected update response');
-    }
-    expect(result.id).toBe('question_id');
+    expect(result).not.toBeNull();
+    expect(result!.id).toBe('question_id');
   }));
 
   it('should edit question skill links successfully', fakeAsync(() => {
@@ -207,11 +204,11 @@ describe('EditableQuestionBackendApiService', () => {
     req.flush({});
     flushMicrotasks();
 
-    expect(success).toBeTrue();
+    expect(success).toBe(true);
   }));
 
   it('should create question successfully', fakeAsync(() => {
-    let result: CreateQuestionResponse | undefined;
+    let result: CreateQuestionResponse | null = null;
 
     service
       .createQuestionAsync([], [], backendQuestionDict, [])
