@@ -561,6 +561,21 @@ class UserGroupDict(TypedDict):
     
 class UserEmailPreferences:
     """Domain object for a user's email preferences."""
+        def __init__(
+        self,
+        user_id: str,
+        site_updates: Optional[bool],
+        editor_role_notifications: bool,
+        feedback_message_notifications: bool,
+        subscription_notifications: bool,
+    ) -> None:
+        self.user_id = user_id
+        self.site_updates = site_updates
+        self.editor_role_notifications = editor_role_notifications
+        self.feedback_message_notifications = feedback_message_notifications
+        self.subscription_notifications = subscription_notifications
+
+    
 
 
 class UserGroup:
