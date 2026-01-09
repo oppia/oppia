@@ -2501,11 +2501,6 @@ def update_question_suggestion(
         inapplicable_skill_misconception_ids = []
 
     question_dict = suggestion.change_cmd.question_dict
-    question_dict['question_state_data'] = question_state_data
-    question_dict['next_content_id_index'] = next_content_id_index
-    question_dict['inapplicable_skill_misconception_ids'] = (
-        inapplicable_skill_misconception_ids
-    )
     new_change_obj = (
         question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
             {
@@ -2520,6 +2515,7 @@ def update_question_suggestion(
                     'inapplicable_skill_misconception_ids': (
                         inapplicable_skill_misconception_ids
                     ),
+                    'version': question_dict['version'],
                     'next_content_id_index': next_content_id_index,
                 },
                 'skill_id': suggestion.change_cmd.skill_id,
