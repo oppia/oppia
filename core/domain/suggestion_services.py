@@ -2518,9 +2518,7 @@ def update_question_suggestion(
                     ),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        suggestion.change_cmd.question_dict[
-                            'inapplicable_skill_misconception_ids'
-                        ]
+                        inapplicable_skill_misconception_ids
                     ),
                     'next_content_id_index': next_content_id_index,
                 },
