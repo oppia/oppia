@@ -95,6 +95,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   voiceArtistsDataCount: number = 0;
   fetchingrenegenratedVoiceoverData: boolean = false;
+  regenerationRecordsErrorMessage: string | null = null;
 
   range = new FormGroup({
     start: new FormControl(null),
