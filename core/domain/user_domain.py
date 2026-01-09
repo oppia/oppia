@@ -26,6 +26,10 @@ from core.constants import constants
 
 from typing import Dict, List, Optional, TypedDict
 
+from typing import Optional
+from core import utils
+
+
 
 # TODO(#15105): Refactor UserSettings to limit the number of Optional
 # fields used in UserSettingsDict.
@@ -574,6 +578,38 @@ class UserEmailPreferences:
         self.editor_role_notifications = editor_role_notifications
         self.feedback_message_notifications = feedback_message_notifications
         self.subscription_notifications = subscription_notifications
+          
+        def validate(self) -> None:
+        """Validates the properties of this UserEmailPreferences object."""
+        if not isinstance(self.user_id, str):
+            raise utils.ValidationError('user_id must be a string.')
+        if not self.user_id:
+            raise utils.ValidationError('user_id must be non-empty.')
+
+        if self.site_updates is not None and not isinstance(
+            self.site_updates, bool
+        ):
+            raise utils.ValidationError(
+                'site_updates must be a boolean or None.'
+            )
+
+        if not isinstance(self.editor_role_notifications, bool):
+            raise utils.ValidationError(
+                'editor_role_notifications must be a boolean.'
+            )
+
+        if not isinstance(self.feedback_message_notifications, bool):
+            raise utils.ValidationError(
+                'feedback_message_notifications must be a boolean.'
+            )
+
+        if not isinstance(self.subscription_notifications, bool):
+            raise utils.ValidationError(
+                'subscription_notifications must be a boolean.'
+            )
+
+
+
 
     
 
