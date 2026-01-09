@@ -558,6 +558,9 @@ class UserGroupDict(TypedDict):
     user_group_id: str
     name: str
     member_usernames: List[str]
+    
+class UserEmailPreferences:
+    """Domain object for a user's email preferences."""
 
 
 class UserGroup:
