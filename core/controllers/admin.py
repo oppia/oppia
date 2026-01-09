@@ -1340,12 +1340,18 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            initial_dummy_opportunites_generation = (
-                skill_services.does_skill_with_description_exist(
-                    'Dummy Skill 1'
-                )
-                is False
+            existing_skill = skill_fetchers.get_skill_by_description(
+                'Dummy Skill 1'
             )
+            if existing_skill is not None:
+                skill_id = existing_skill.id
+
+            skill_exists = (
+                skill_fetchers.get_skill_by_id(skill_id, strict=False)
+                is not None
+            )
+
+            initial_dummy_opportunites_generation = not skill_exists
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
@@ -1422,12 +1428,100 @@ class AdminHandler(
                 )
             else:
                 skill = skill_fetchers.get_skill_by_id(skill_id)
-                question_1 = question_services.get_question_by_id(question_id_1)
-                question_2 = question_services.get_question_by_id(question_id_2)
-                question_3 = question_services.get_question_by_id(question_id_3)
-                story = story_fetchers.get_story_by_id(story_id)
 
-            # Generating the explorations to be added to the story.
+                try:
+                    topic = topic_fetchers.get_topic_by_id(topic_id)
+                except Exception:
+                    existing_topic = topic_fetchers.get_topic_by_name(
+                        'Dummy Topic 1', strict=False
+                    )
+                    if existing_topic is not None:
+                        topic_id = existing_topic.id
+                        topic = existing_topic
+                    else:
+                        topic = topic_domain.Topic.create_default_topic(
+                            topic_id,
+                            'Dummy Topic 1',
+                            'dummy-topic-one',
+                            'description',
+                            'fragm',
+                        )
+                        topic.update_meta_tag_content('dummy-meta')
+                        raw_image = b''
+                        with open(
+                            'core/tests/data/thumbnail.svg',
+                            'rt',
+                            encoding='utf-8',
+                        ) as svg_file:
+                            svg_file_content = svg_file.read()
+                            raw_image = svg_file_content.encode('ascii')
+                        fs_services.save_original_and_compressed_versions_of_image(
+                            'thumbnail.svg',
+                            feconf.ENTITY_TYPE_TOPIC,
+                            topic_id,
+                            raw_image,
+                            'thumbnail',
+                            False,
+                        )
+                        topic_services.update_thumbnail_filename(
+                            topic, 'thumbnail.svg'
+                        )
+                        topic.update_thumbnail_bg_color('#C6DCDA')
+                        topic.add_uncategorized_skill_id(skill_id)
+                        topic.update_skill_ids_for_diagnostic_test([skill_id])
+                        topic_services.save_new_topic(self.user_id, topic)
+
+                try:
+                    story = story_fetchers.get_story_by_id(story_id)
+                except Exception:
+                    story = story_domain.Story.create_default_story(
+                        story_id,
+                        'Dummy Story',
+                        'Description',
+                        topic_id,
+                        'dummy-story',
+                    )
+                    story_services.save_new_story(self.user_id, story)
+                    if story_id not in topic.get_canonical_story_ids():
+                        topic_services.add_canonical_story(
+                            self.user_id, topic_id, story_id
+                        )
+
+                existing_questions = (
+                    question_services.get_questions_by_skill_ids(
+                        3, [skill_id], False
+                    )
+                )
+
+                if len(existing_questions) >= 3:
+                    question_1 = existing_questions[0]
+                    question_2 = existing_questions[1]
+                    question_3 = existing_questions[2]
+                else:
+                    question_1 = self._create_dummy_question(
+                        question_id_1, 'Question 1', [skill_id]
+                    )
+                    question_2 = self._create_dummy_question(
+                        question_id_2, 'Question 2', [skill_id]
+                    )
+                    question_3 = self._create_dummy_question(
+                        question_id_3, 'Question 3', [skill_id]
+                    )
+
+                    question_services.add_question(self.user_id, question_1)
+                    question_services.add_question(self.user_id, question_2)
+                    question_services.add_question(self.user_id, question_3)
+
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_1.id, skill_id, 0.3
+                    )
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_2.id, skill_id, 0.3
+                    )
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_3.id, skill_id, 0.3
+                    )
+
             exploration_ids_to_publish = []
             story_node_dicts = []
             exp_counter = len(story.story_contents.nodes)

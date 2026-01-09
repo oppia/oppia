@@ -2458,6 +2458,32 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_can_generate_translation_opportunities_after_dummy_structures_data(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        self.post_json(
+            '/adminhandler',
+            {'action': 'generate_dummy_new_structures_data'},
+            csrf_token=csrf_token,
+        )
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 5,
+            },
+            csrf_token=csrf_token,
+        )
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        self.assertEqual(len(generated_exps), 8)
+        self.logout()
+
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
