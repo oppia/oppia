@@ -25,6 +25,8 @@ import string
 from core import feconf, utils
 from core.constants import constants
 from core.platform import models
+from core.domain import user_domain
+
 
 from typing import (
     Dict,
@@ -1064,6 +1066,31 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
     )
+    
+        def to_domain_object(self) -> user_domain.UserEmailPreferences:
+        """Returns the domain object representation of this model."""
+        return user_domain.UserEmailPreferences(
+            user_id=self.id,
+            site_updates=self.site_updates,
+            editor_role_notifications=self.editor_role_notifications,
+            feedback_message_notifications=self.feedback_message_notifications,
+            subscription_notifications=self.subscription_notifications,
+        )
+        def update_from_domain_object(
+        self, domain_object: user_domain.UserEmailPreferences
+    ) -> None:
+        """Updates this model from the given domain object."""
+        self.site_updates = domain_object.site_updates
+        self.editor_role_notifications = (
+            domain_object.editor_role_notifications
+        )
+        self.feedback_message_notifications = (
+            domain_object.feedback_message_notifications
+        )
+        self.subscription_notifications = (
+            domain_object.subscription_notifications
+        )
+
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1122,6 +1149,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
                 'feedback_message_notifications': user_email_preferences.feedback_message_notifications,
                 'subscription_notifications': user_email_preferences.subscription_notifications,
             }
+    
         else:
             return {}
 
