@@ -362,7 +362,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_without_data_action_upload_topic_similarities_is_not_performed(
+def test_without_data_action_upload_topic_similarities_is_not_performed(
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -703,6 +703,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+        self.logout()
+
     def test_load_new_structures_data(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -746,10 +748,69 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(translation_opportunities), 3)
         self.logout()
 
+    def test_admin_actions_idempotency(self) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        # Call generate_dummy_new_structures_data twice.
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {'action': 'generate_dummy_new_structures_data'},
+                csrf_token=csrf_token,
+            )
+
+        # Verify no duplicate topics/skills.
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        self.assertEqual(len(topic_summaries), 1)
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 3)
+
+        # Call generate_dummy_translation_opportunities twice.
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_translation_opportunities',
+                    'num_dummy_translation_opportunities_to_generate': 3
+                },
+                csrf_token=csrf_token,
+            )
+
+        # Verify no duplicate topics/skills (story nodes will increase, which is fine).
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
+        self.assertEqual(len(topic_summaries), 1)
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 3)
+
+        # Call generate_dummy_skill_and_questions twice.
+        for _ in range(2):
+            self.post_json(
+                '/adminhandler',
+                {
+                    'action': 'generate_dummy_new_skill_data'
+                },
+                csrf_token=csrf_token,
+            )
+        
+        # Should only have 1 more skill (Dummy Skill for Questions) + 3 from before = 4.
+        skill_summaries = skill_services.get_all_skill_summaries()
+        self.assertEqual(len(skill_summaries), 4)
+
+        # Verify questions for the unique skill are only created once (15 questions).
+        skill_id = next(s.id for s in skill_summaries if s.description == 'Dummy Skill for Questions')
+        questions, _ = question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
+            100, [skill_id], 0
+        )
+        self.assertEqual(len(questions), 15)
+
+        self.logout()
+
     @test_utils.enable_feature_flags(
         [feature_flag_list.FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES]
     )
-    def test_load_new_structures_data_with_study_guides(self) -> None:
+   def test_load_new_structures_data_with_study_guides(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
@@ -1065,8 +1126,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
-    def test_upload_topic_similarities(self) -> None:
+   def test_upload_topic_similarities(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -1417,7 +1477,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             {
                 'action': 'update_platform_parameter_rules',
                 'platform_param_name': 'param_name',
-                'new_rules': {},
+              'new_rules': {},
                 'commit_message': 'test update param',
             },
             csrf_token=csrf_token,
@@ -1798,8 +1858,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(published_exps, {})
 
         self.logout()
-
-
 class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy question suggestions."""
 
@@ -2022,7 +2080,6 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
         self.assertNotEqual(generated_stories_count, 5)
         self.logout()
 
-
 class GenerateDummyChaptersTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy chapters."""
 
@@ -2121,7 +2178,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(generated_chapters_count, 7)
         self.logout()
 
-    def test_generate_dummy_chapters_when_story_contents_is_not_none(  # pylint: disable=line-too-long
+  def test_generate_dummy_chapters_when_story_contents_is_not_none(  # pylint: disable=line-too-long
         self,
     ) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -2183,7 +2240,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(len(story.story_contents.nodes), 3)
         self.logout()
 
-    def test_chapter_linkage_after_dummy_generation(self) -> None:
+   def test_chapter_linkage_after_dummy_generation(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
@@ -2246,8 +2303,7 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertEqual(node_4.destination_node_ids, ['node_5'])
         self.assertEqual(node_5.destination_node_ids, [])
         self.logout()
-
-    def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
+   def test_raises_error_if_not_curriculum_admin(  # pylint: disable=line-too-long
         self,
     ) -> None:
         user_email = 'user1@example.com'
@@ -2297,7 +2353,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(generated_chapters_count, 7)
         self.logout()
 
-
 class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
     """Checks the conditions for generation of dummy translation
     opportunities."""
@@ -2325,7 +2380,8 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 10)
         self.logout()
 
-    def test_admins_can_generate_dummy_translation_opportunities_multiple_times(
+
+   def test_admins_can_generate_dummy_translation_opportunities_multiple_times(
         self,
     ) -> None:  # pylint: disable=line-too-long
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2348,7 +2404,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
             self.assertEqual(len(published_exps), 5 * i)
         self.logout()
 
-    def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(
+   def test_handler_raises_error_with_non_int_num_dummy_translation_opportunities_to_generate(
         self,
     ) -> None:  # pylint: disable=line-too-long
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2379,7 +2435,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_without_num_dummy_exps_generate_dummy_translation_opportunites_action_is_not_performed(
+   def test_without_num_dummy_exps_generate_dummy_translation_opportunites_action_is_not_performed(
         self,
     ) -> None:  # pylint: disable=line-too-long
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2408,7 +2464,7 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_cannot_generate_dummy_translation_opportunities_in_production_mode(
+   def test_cannot_generate_dummy_translation_opportunities_in_production_mode(
         self,
     ) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
@@ -2433,7 +2489,6 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.assertEqual(published_exps, {})
 
         self.logout()
-
     def test_non_admins_cannot_generate_dummy_translation_opportunities(
         self,
     ) -> None:
@@ -2560,7 +2615,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-    def test_removing_role_with_invalid_username(self) -> None:
+   def test_removing_role_with_invalid_username(self) -> None:
         username = 'invaliduser'
 
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
@@ -2664,7 +2719,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
     def test_removing_moderator_role_from_user_roles(self) -> None:
         user_email = 'user1@example.com'
         username = 'user1'
@@ -2804,7 +2858,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             },
         )
 
-
 class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
     """Tests for RegenerateTopicSummariesHandler."""
 
@@ -2860,8 +2913,6 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=200,
             )
-
-
 class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
     """Tests for GenerateStudyGuideModelsHandler."""
 
@@ -2911,7 +2962,6 @@ class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=200,
             )
-
 
 class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
     """Tests for DeleteStudyGuideModelsHandler."""
@@ -3011,7 +3061,6 @@ class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
                 {},
                 expected_status_int=200,
             )
-
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
@@ -3202,7 +3251,6 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TranslationCoordinatorRoleHandler."""
@@ -3499,7 +3547,6 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
             },
         )
         self.logout()
-
 
 class BannedUsersHandlerTest(test_utils.GenericTestBase):
     """Tests for BannedUsersHandler."""
@@ -4186,8 +4233,6 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=404,
         )
-
-
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
 
@@ -4462,6 +4507,7 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         )
 
 
+
 class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
     """Tests the generation of dummy blog post data."""
 
@@ -4564,7 +4610,6 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         )
         self.assertEqual(blog_post_count, 0)
         self.logout()
-
 
 class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     """Tests for interaction by exploration handler."""
