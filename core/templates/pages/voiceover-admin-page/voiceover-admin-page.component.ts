@@ -439,6 +439,11 @@ export class VoiceoverAdminPageComponent implements OnInit {
       functionId === 'regenerate_voiceovers_on_exploration_added_to_topic'
     ) {
       return 'Exploration added to topic';
+    } else if (
+      functionId ===
+      'regenerate_voiceovers_of_exploration_for_given_language_accent'
+    ) {
+      return 'Voiceover regeneration for the exploration in the chosen language accent.';
     }
     return '';
   }
