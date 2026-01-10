@@ -246,12 +246,17 @@ export class RteHelperModalComponent {
     this.customizationArgsFormSubscription.unsubscribe();
   }
 
-  onCustomizationArgsFormChange(value: Record<string, any>): void {
+  onCustomizationArgsFormChange(value: unknown[]): void {
     this.clearRteErrorMessage();
     if (this.componentId === this.COMPONENT_ID_MATH) {
-      let rawLatex: string = value[0].raw_latex;
-      let mathExpressionSvgIsBeingProcessed: boolean =
-        value[0].mathExpressionSvgIsBeingProcessed;
+      const mathValue = value as [
+        {raw_latex: string; mathExpressionSvgIsBeingProcessed: boolean},
+      ];
+
+      const rawLatex = mathValue[0].raw_latex;
+      const mathExpressionSvgIsBeingProcessed =
+        mathValue[0].mathExpressionSvgIsBeingProcessed;
+
       if (mathExpressionSvgIsBeingProcessed || rawLatex === '') {
         this.updateRteErrorMessage(
           'Waiting for math expression SVG to be processed...'
@@ -259,9 +264,12 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_VIDEO) {
-      let start: number = value[1];
-      let end: number = value[2];
-      if (value[0] === '') {
+      const videoValue = value as [string, number, number];
+
+      const start = videoValue[1];
+      const end = videoValue[2];
+
+      if (videoValue[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure that the Youtube URL or id is valid.'
         );
@@ -275,16 +283,19 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_TABS) {
-      // Value[0] corresponds to all tab contents and titles.
-      for (let tabIndex = 0; tabIndex < value[0].length; tabIndex++) {
-        if (value[0][tabIndex].title === '') {
+      const tabsValue = value as [{title: string; content: string}[]];
+
+      for (let tabIndex = 0; tabIndex < tabsValue[0].length; tabIndex++) {
+        const tab = tabsValue[0][tabIndex];
+
+        if (tab.title === '') {
           this.updateRteErrorMessage(
             'Please ensure that the title of tab ' +
               (tabIndex + 1) +
               ' is filled.'
           );
           break;
-        } else if (value[0][tabIndex].content === '') {
+        } else if (tab.content === '') {
           this.updateRteErrorMessage(
             'Please ensure that the content of tab ' +
               (tabIndex + 1) +
@@ -295,7 +306,7 @@ export class RteHelperModalComponent {
           // Check content length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].content,
+              tab.content,
               this.COMPONENT_ID_TABS_CONTENT
             )
           ) {
@@ -308,7 +319,7 @@ export class RteHelperModalComponent {
           // Check title length.
           if (
             this.isContentLengthExceeded(
-              value[0][tabIndex].title,
+              tab.title,
               this.COMPONENT_ID_TABS_HEADING
             )
           ) {
@@ -322,8 +333,9 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_LINK) {
-      let url: string = value[0];
-      let text: string = value[1];
+      const linkValue = value as [string, string];
+      let url = linkValue[0];
+      let text = linkValue[1];
 
       // Check URL and text lengths.
       if (this.isContentLengthExceeded(url, this.COMPONENT_ID_LINK)) {
@@ -341,12 +353,12 @@ export class RteHelperModalComponent {
       }
 
       if (!text.trim()) {
-        value[1] = url;
+        linkValue[1] = url;
         text = url;
       } else {
         // First check if the `text` looks like a URL.
         const suffixes = ['.com', '.org', '.edu', '.gov'];
-        let textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
+        const textLooksLikeUrl = suffixes.some(suffix => text.endsWith(suffix));
         if (!textLooksLikeUrl) {
           this.clearRteErrorMessage();
         } else {
@@ -373,11 +385,15 @@ export class RteHelperModalComponent {
         }
       }
     } else if (this.componentId === this.COMPONENT_ID_COLLAPSIBLE) {
-      // Check heading and content lengths for collapsible components.
+      const collapsibleValue = value as [
+        string | undefined,
+        string | undefined,
+      ];
+
       if (
-        value[0] &&
+        collapsibleValue[0] &&
         this.isContentLengthExceeded(
-          value[0],
+          collapsibleValue[0],
           this.COMPONENT_ID_COLLAPSIBLE_HEADING
         )
       ) {
@@ -388,9 +404,9 @@ export class RteHelperModalComponent {
       }
 
       if (
-        value[1] &&
+        collapsibleValue[1] &&
         this.isContentLengthExceeded(
-          value[1],
+          collapsibleValue[1],
           this.COMPONENT_ID_COLLAPSIBLE_CONTENT
         )
       ) {
@@ -400,29 +416,36 @@ export class RteHelperModalComponent {
         return;
       }
     } else if (this.componentId === this.COMPONENT_ID_WORKEDEXAMPLE) {
+      const weValue = value as [string, string];
       if (
-        value[0] &&
-        this.isContentLengthExceeded(value[0], this.COMPONENT_ID_WORKEDEXAMPLE)
+        weValue[0] &&
+        this.isContentLengthExceeded(
+          weValue[0],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The question is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
-      } else if (value[0] === '') {
+      } else if (weValue[0] === '') {
         this.updateRteErrorMessage(
           'Please ensure the worked example has a question.'
         );
       }
 
       if (
-        value[1] &&
-        this.isContentLengthExceeded(value[1], this.COMPONENT_ID_WORKEDEXAMPLE)
+        weValue[1] &&
+        this.isContentLengthExceeded(
+          weValue[1],
+          this.COMPONENT_ID_WORKEDEXAMPLE
+        )
       ) {
         this.updateRteErrorMessage(
           `The answer is too long. Please use at most ${this.getCharacterLimit(this.COMPONENT_ID_WORKEDEXAMPLE)} characters.`
         );
         return;
-      } else if (value[1] === '') {
+      } else if (weValue[1] === '') {
         this.updateRteErrorMessage(
           'Please ensure the worked example has an answer.'
         );
