@@ -271,6 +271,8 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
+    // Must set skillSummaryToMove before setting oldSubtopicId to null.
+    component.skillSummaryToMove = ShortSkillSummary.create('1', 'Skill 1');
     component.oldSubtopicId = null;
     component.onMoveSkillEnd(event, null);
     expect(removeSkillSpy).not.toHaveBeenCalled();
@@ -456,112 +458,6 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
 
-  it('should return early when both newSubtopicId and oldSubtopicId are null in onMoveSkillEnd', () => {
-    const event = {
-      previousIndex: 0,
-      currentIndex: 1,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['3'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
-
-    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
-    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-    component.ngOnInit();
-    let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
-    // Set oldSubtopicId to null by passing null/0 to onMoveSkillStart.
-    component.onMoveSkillStart(null, skillSummary);
-    // Call onMoveSkillEnd with newSubtopicId as null.
-    component.onMoveSkillEnd(event, null);
-
-    // Both should not be called because we return early when both are null.
-    expect(removeSkillSpy).not.toHaveBeenCalled();
-    expect(moveSkillSpy).not.toHaveBeenCalled();
-  });
-
-  it('should return early when moving skill from uncategorized to uncategorized', () => {
-    const uncategorizedContainer1 = {
-      id: 'uncategorized1',
-      data: [ShortSkillSummary.create('1', 'Skill 1')],
-    };
-    const uncategorizedContainer2 = {
-      id: 'uncategorized2',
-      data: [ShortSkillSummary.create('2', 'Skill 2')],
-    };
-    const event = {
-      previousIndex: 0,
-      currentIndex: 0,
-      previousContainer: uncategorizedContainer1,
-      container: uncategorizedContainer2,
-      item: {data: uncategorizedContainer1.data[0]},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
-
-    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
-    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-    component.ngOnInit();
-    let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
-    // Set oldSubtopicId to null (from uncategorized).
-    component.onMoveSkillStart(null, skillSummary);
-    // Move to uncategorized (newSubtopicId = null).
-    component.onMoveSkillEnd(event, null);
-
-    // Should return early without calling any update service.
-    expect(removeSkillSpy).not.toHaveBeenCalled();
-    expect(moveSkillSpy).not.toHaveBeenCalled();
-  });
-
-  it(
-    'should return early when newSubtopicId is null and oldSubtopicId is ' +
-      'null with cross-container transfer',
-    () => {
-      // Create two distinct container objects to ensure we enter the else
-      // branch (transferArrayItem path).
-      const sourceContainer = {
-        id: 'source',
-        data: [
-          ShortSkillSummary.create('1', 'Skill 1'),
-          ShortSkillSummary.create('2', 'Skill 2'),
-        ],
-      };
-      const destinationContainer = {
-        id: 'destination',
-        data: [ShortSkillSummary.create('3', 'Skill 3')],
-      };
-      const event = {
-        previousIndex: 0,
-        currentIndex: 0,
-        previousContainer: sourceContainer,
-        container: destinationContainer,
-        item: {data: sourceContainer.data[0]},
-      } as unknown as CdkDragDrop<ShortSkillSummary[]>;
-
-      let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
-      let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-      spyOn(component, 'initEditor');
-
-      component.ngOnInit();
-      let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
-      // Explicitly set oldSubtopicId to null to simulate moving from
-      // uncategorized.
-      component.oldSubtopicId = null;
-      component.skillSummaryToMove = skillSummary;
-
-      // Call onMoveSkillEnd with newSubtopicId as null (moving to
-      // uncategorized). This should trigger the inner return statement when
-      // both newSubtopicId and oldSubtopicId are null.
-      component.onMoveSkillEnd(event, null);
-
-      // The inner return should be hit, so neither service method should be
-      // called.
-      expect(removeSkillSpy).not.toHaveBeenCalled();
-      expect(moveSkillSpy).not.toHaveBeenCalled();
-    }
-  );
-
   it('should set error message when subtopic name validation fails', () => {
     spyOn(subtopicValidationService, 'checkValidSubtopicName').and.returnValue(
       false
@@ -650,48 +546,5 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     spyOn(component.directiveSubscriptions, 'unsubscribe');
     component.ngOnDestroy();
     expect(component.directiveSubscriptions.unsubscribe).toHaveBeenCalled();
-  });
-
-  it('should return early when newSubtopicId is null and oldSubtopicId is null in cross-container move', () => {
-    // This test specifically covers the branch:
-    // if (newSubtopicId === null) { if (this.oldSubtopicId === null) { return; } }
-    const sourceContainerData = [ShortSkillSummary.create('1', 'Skill 1')];
-    const destContainerData = [ShortSkillSummary.create('2', 'Skill 2')];
-
-    const sourceContainer = {
-      id: 'source',
-      data: sourceContainerData,
-    };
-    const destContainer = {
-      id: 'destination',
-      data: destContainerData,
-    };
-
-    // Ensure previousContainer !== container to enter the else branch.
-    const event = {
-      previousIndex: 0,
-      currentIndex: 0,
-      previousContainer: sourceContainer,
-      container: destContainer,
-      item: {data: sourceContainerData[0]},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
-
-    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
-    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
-
-    component.ngOnInit();
-
-    // Set up the component state directly before calling onMoveSkillEnd.
-    // This ensures oldSubtopicId is null (simulating drag from uncategorized).
-    component.skillSummaryToMove = ShortSkillSummary.create('1', 'Skill 1');
-    component.oldSubtopicId = null;
-
-    // Call with newSubtopicId = null (dropping into uncategorized).
-    // This should hit: if (newSubtopicId === null) { if (this.oldSubtopicId === null) { return; } }
-    component.onMoveSkillEnd(event, null);
-
-    // Neither service should be called because we return early.
-    expect(removeSkillSpy).not.toHaveBeenCalled();
-    expect(moveSkillSpy).not.toHaveBeenCalled();
   });
 });
