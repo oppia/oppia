@@ -129,9 +129,12 @@ export class RearrangeSkillsInSubtopicsModalComponent
       }
 
       if (newSubtopicId === null) {
+        // Note: oldSubtopicId cannot be null here because if both were null,
+        // the check above (newSubtopicId === this.oldSubtopicId) would have
+        // already returned.
         this.topicUpdateService.removeSkillFromSubtopic(
           this.topic,
-          this.oldSubtopicId!,
+          this.oldSubtopicId as number,
           this.skillSummaryToMove
         );
       } else {
