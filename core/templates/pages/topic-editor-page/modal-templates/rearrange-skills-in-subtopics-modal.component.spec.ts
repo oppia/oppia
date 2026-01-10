@@ -418,4 +418,60 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     component.onMoveSkillEnd(event, 1);
     expect(removeSkillSpy).not.toHaveBeenCalled();
   });
+
+  it('should call moveItemInArray when item is moved within the same container', () => {
+    const containerData = [
+      ShortSkillSummary.create('1', 'Skill 1'),
+      ShortSkillSummary.create('2', 'Skill 2'),
+      ShortSkillSummary.create('3', 'Skill 3'),
+    ];
+    const container = {
+      id: 'sameContainer',
+      data: containerData,
+    };
+    const event = {
+      previousIndex: 0,
+      currentIndex: 2,
+      previousContainer: container,
+      container: container,
+      item: {data: containerData[0]},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
+    component.onMoveSkillStart(1, skillSummary);
+    component.onMoveSkillEnd(event, 1);
+
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+  });
+
+  it('should return early when both newSubtopicId and oldSubtopicId are null in onMoveSkillEnd', () => {
+    const event = {
+      previousIndex: 0,
+      currentIndex: 1,
+      previousContainer: {
+        data: ['1', '2'],
+      },
+      container: {
+        data: ['3'],
+      },
+      item: {},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill description');
+    // Set oldSubtopicId to null by passing null/0 to onMoveSkillStart.
+    component.onMoveSkillStart(null, skillSummary);
+    // Call onMoveSkillEnd with newSubtopicId as null.
+    component.onMoveSkillEnd(event, null);
+
+    // Both should not be called because we return early when both are null.
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  });
 });

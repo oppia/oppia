@@ -1336,6 +1336,17 @@ describe('Topic update service', function () {
     }
   );
 
+  it('should throw error when removing skill from non-existent subtopic', () => {
+    expect(() => {
+      topicUpdateService.removeSkillFromSubtopic(
+        _sampleTopic,
+        10,
+        _secondSkillSummary
+      );
+    }).toThrowError("Subtopic with id 10 doesn't exist");
+    expect(undoRedoService.getCommittableChangeList()).toEqual([]);
+  });
+
   it('should add and delete a study guide section', () => {
     var newSampleSectionDict = {
       heading: {
