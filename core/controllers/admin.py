@@ -1429,15 +1429,15 @@ class AdminHandler(
             else:
                 skill = skill_fetchers.get_skill_by_id(skill_id)
 
-                try:
-                    topic = topic_fetchers.get_topic_by_id(topic_id)
-                except Exception:
+                topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+
+                if topic is None:
                     existing_topic = topic_fetchers.get_topic_by_name(
                         'Dummy Topic 1', strict=False
                     )
                     if existing_topic is not None:
-                        topic_id = existing_topic.id
                         topic = existing_topic
+                        topic_id = existing_topic.id
                     else:
                         topic = topic_domain.Topic.create_default_topic(
                             topic_id,
@@ -1471,9 +1471,9 @@ class AdminHandler(
                         topic.update_skill_ids_for_diagnostic_test([skill_id])
                         topic_services.save_new_topic(self.user_id, topic)
 
-                try:
-                    story = story_fetchers.get_story_by_id(story_id)
-                except Exception:
+                story = story_fetchers.get_story_by_id(story_id, strict=False)
+
+                if story is None:
                     story = story_domain.Story.create_default_story(
                         story_id,
                         'Dummy Story',
@@ -1482,10 +1482,11 @@ class AdminHandler(
                         'dummy-story',
                     )
                     story_services.save_new_story(self.user_id, story)
-                    if story_id not in topic.get_canonical_story_ids():
-                        topic_services.add_canonical_story(
-                            self.user_id, topic_id, story_id
-                        )
+
+                if story_id not in topic.get_canonical_story_ids():
+                    topic_services.add_canonical_story(
+                        self.user_id, topic_id, story_id
+                    )
 
                 existing_questions = (
                     question_services.get_questions_by_skill_ids(

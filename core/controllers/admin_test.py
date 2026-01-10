@@ -2484,6 +2484,127 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.assertEqual(len(generated_exps), 8)
         self.logout()
 
+    def test_can_generate_translation_opportunities_with_existing_skill_but_no_topic(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_id = 'dummySkillId'
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation 1</p>'],
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                ['<p>Explanation 2</p>'],
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                ['<p>Explanation 3</p>'],
+            ),
+        ]
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, 'Dummy Skill 1', rubrics
+        )
+        skill.update_explanation(
+            state_domain.SubtitledHtml('1', '<p>Dummy Explanation 1</p>')
+        )
+        skill_services.save_new_skill(admin_id, skill)
+
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        self.assertEqual(len(generated_exps), 2)
+
+        topic = topic_fetchers.get_topic_by_name('Dummy Topic 1', strict=False)
+        self.assertIsNotNone(topic)
+
+        story = story_fetchers.get_story_by_id('dummyStoryId', strict=False)
+        self.assertIsNotNone(story)
+
+        self.logout()
+
+    def test_can_generate_translation_opportunities_with_skill_but_no_questions(
+        self,
+    ) -> None:
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+
+        skill_id = 'dummySkillId'
+        topic_id = 'dummyTopicId'
+        story_id = 'dummyStoryId'
+
+        rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0],
+                ['<p>Explanation 1</p>'],
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1],
+                ['<p>Explanation 2</p>'],
+            ),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2],
+                ['<p>Explanation 3</p>'],
+            ),
+        ]
+        skill = skill_domain.Skill.create_default_skill(
+            skill_id, 'Dummy Skill 1', rubrics
+        )
+        skill.update_explanation(
+            state_domain.SubtitledHtml('1', '<p>Dummy Explanation 1</p>')
+        )
+        skill_services.save_new_skill(admin_id, skill)
+
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id, 'Dummy Topic 1', 'dummy-topic-one', 'description', 'fragm'
+        )
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.add_uncategorized_skill_id(skill_id)
+        topic.update_skill_ids_for_diagnostic_test([skill_id])
+        topic_services.save_new_topic(admin_id, topic)
+
+        story = story_domain.Story.create_default_story(
+            story_id,
+            'Dummy Story',
+            'Description',
+            topic_id,
+            'dummy-story',
+        )
+        story_services.save_new_story(admin_id, story)
+        topic_services.add_canonical_story(admin_id, topic_id, story_id)
+        self.post_json(
+            '/adminhandler',
+            {
+                'action': 'generate_dummy_translation_opportunities',
+                'num_dummy_translation_opportunities_to_generate': 2,
+            },
+            csrf_token=csrf_token,
+        )
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        self.assertEqual(len(generated_exps), 2)
+        questions = question_services.get_questions_by_skill_ids(
+            3, [skill_id], False
+        )
+        self.assertEqual(len(questions), 3)
+
+        self.logout()
+
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
