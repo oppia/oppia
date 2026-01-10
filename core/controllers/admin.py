@@ -1354,12 +1354,15 @@ class AdminHandler(
         Returns:
             entity. The fetched or created entity.
         """
-        entity = fetch_by_id_fn(entity_id, strict=False)
-        if entity is None and fetch_by_attr_fn:
-            entity = fetch_by_attr_fn(attr_value, strict=False) if hasattr(
-                fetch_by_attr_fn, '__code__') and 'strict' in fetch_by_attr_fn.__code__.co_varnames else fetch_by_attr_fn(attr_value)
+       # First, try to fetch by the hard-coded ID.
+       entity = fetch_by_id_fn(entity_id, strict=False)
 
-        if entity is None:
+# If not found by ID, try to fetch by alternative attribute.
+       if entity is None and fetch_by_attr_fn is not None:
+    # All fetcher functions in the codebase support strict parameter.
+          entity = fetch_by_attr_fn(attr_value, strict=False)
+           
+       if entity is None:
             entity = create_fn()
             save_fn(self.user_id, entity)
             # Clear cache to ensure consistency.
