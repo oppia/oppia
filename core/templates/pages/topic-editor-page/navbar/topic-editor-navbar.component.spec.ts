@@ -1086,4 +1086,38 @@ describe('Topic Editor Navbar', () => {
 
     expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
   });
+
+  it('should publish already published topic without redirecting to dashboard', fakeAsync(() => {
+    componentInstance.topicId = 'topic_1';
+    componentInstance.topic = topic;
+    spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
+      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+    );
+    spyOn(alertsService, 'addSuccessMessage');
+    // Topic is already published.
+    componentInstance.topicRights = TopicRights.createFromBackendDict({
+      published: true,
+      can_publish_topic: true,
+      can_edit_topic: true,
+    });
+
+    componentInstance.publishTopic();
+    tick(100);
+
+    expect(alertsService.addSuccessMessage).toHaveBeenCalledWith(
+      'Topic published.',
+      1000
+    );
+    expect(componentInstance.topicRights.isPublished()).toBeTrue();
+    // Should not redirect to dashboard since topic was already published.
+    expect(windowRef.nativeWindow.location.href).not.toBe(
+      '/topics-and-skills-dashboard'
+    );
+  }));
+
+  it('should return default Editor text for unknown active tab in getMobileNavigatorText', () => {
+    let routingSpy = spyOn(topicEditorRoutingService, 'getActiveTabName');
+    routingSpy.and.returnValue('unknown_tab');
+    expect(componentInstance.getMobileNavigatorText()).toEqual('Editor');
+  });
 });

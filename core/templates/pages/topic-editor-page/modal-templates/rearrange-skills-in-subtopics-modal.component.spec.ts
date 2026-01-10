@@ -474,4 +474,35 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(removeSkillSpy).not.toHaveBeenCalled();
     expect(moveSkillSpy).not.toHaveBeenCalled();
   });
+
+  it('should return early when moving skill from uncategorized to uncategorized', () => {
+    const uncategorizedContainer1 = {
+      id: 'uncategorized1',
+      data: [ShortSkillSummary.create('1', 'Skill 1')],
+    };
+    const uncategorizedContainer2 = {
+      id: 'uncategorized2',
+      data: [ShortSkillSummary.create('2', 'Skill 2')],
+    };
+    const event = {
+      previousIndex: 0,
+      currentIndex: 0,
+      previousContainer: uncategorizedContainer1,
+      container: uncategorizedContainer2,
+      item: {data: uncategorizedContainer1.data[0]},
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+
+    let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
+    let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
+    component.ngOnInit();
+    let skillSummary = ShortSkillSummary.create('1', 'Skill 1');
+    // Set oldSubtopicId to null (from uncategorized).
+    component.onMoveSkillStart(null, skillSummary);
+    // Move to uncategorized (newSubtopicId = null).
+    component.onMoveSkillEnd(event, null);
+
+    // Should return early without calling any update service.
+    expect(removeSkillSpy).not.toHaveBeenCalled();
+    expect(moveSkillSpy).not.toHaveBeenCalled();
+  });
 });
