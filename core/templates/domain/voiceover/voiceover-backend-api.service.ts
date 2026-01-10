@@ -102,6 +102,16 @@ export interface RegenerateVoiceoverResponse {
   sentenceTokenWithDurations: TokensWithDurationType[];
 }
 
+export interface ExplorationVoiceoverRegenerationStatusBackendResponse {
+  language_accent_to_content_status_map: LanguageAccentToContentStatusMap;
+}
+
+export interface LanguageAccentToContentStatusMap {
+  [languageAccentCode: string]: {
+    [contentId: string]: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -288,6 +298,36 @@ export class VoiceoverBackendApiService {
               );
             }
             resolve(cloudTaskRunList);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async fetchLatestVoiceoverRegenerationStatusAsync(
+    explorationID: string
+  ): Promise<LanguageAccentToContentStatusMap> {
+    const voiceoverRegenerationStatusUrl =
+      this.urlInterpolationService.interpolateUrl(
+        VoiceoverDomainConstants.EXPLORATION_VOICEOVER_REGENERATION_STATUS_URL,
+        {
+          exploration_id: explorationID,
+        }
+      );
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<ExplorationVoiceoverRegenerationStatusBackendResponse>(
+          voiceoverRegenerationStatusUrl
+        )
+        .toPromise()
+        .then(
+          response => {
+            let languageAccentToContentStatusMap =
+              response.language_accent_to_content_status_map;
+            resolve(languageAccentToContentStatusMap);
           },
           errorResponse => {
             reject(errorResponse?.error);

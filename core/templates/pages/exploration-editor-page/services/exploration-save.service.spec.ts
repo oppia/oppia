@@ -929,6 +929,10 @@ describe('Exploration save service ' + 'while saving changes', () => {
     spyOn(pageContextService, 'isExplorationLinkedToStory').and.returnValue(
       true
     );
+    spyOn(
+      changeListService,
+      'doesChangeListAffectAutoVoiceovers'
+    ).and.returnValue(true);
     let regenerateVoiceoverSpy = spyOn(
       voiceoverBackendApiService,
       'regenerateVoiceoverOnExplorationUpdateAsync'
@@ -1132,4 +1136,37 @@ describe('Exploration save service ' + 'while saving changes', () => {
       expect(modalSpy).toHaveBeenCalled();
     })
   );
+
+  it('should get change list content ID', () => {
+    let changeList = [
+      {
+        cmd: 'edit_state_property',
+        state_name: 'Hola',
+        property_name: 'content',
+        new_value: {
+          content_id: 'content_0',
+          html: '<p>New Content</p>',
+        },
+        old_value: {
+          content_id: 'content_0',
+          html: 'old value',
+        },
+      },
+      {
+        cmd: 'edit_translation',
+        content_id: 'content_1',
+        language_code: 'hi',
+        translation: {
+          content_value: 'new translation',
+          content_format: 'html',
+          needs_update: false,
+        },
+      },
+    ];
+
+    let contentIdList =
+      explorationSaveService.getChangeListContentIds(changeList);
+
+    expect(contentIdList).toEqual(['content_0', 'content_1']);
+  });
 });
