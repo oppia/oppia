@@ -25,8 +25,8 @@ from __future__ import annotations
 import copy
 import itertools
 
-from core.constants import constants
 from core import feconf
+from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
