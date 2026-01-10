@@ -98,9 +98,9 @@
             </span>
           </a>
           <ul ngbDropdownMenu
-              [ngStyle]="{'left.px': learnDropdownOffset}"
               [ngClass]="{
                 'dropdown-menu oppia-navbar-dropdown learn-dropdown-menu classroom-enabled': true,
+                'dropdown-menu-end': isLanguageRTL(),
                 'two-columns': classroomSummariesLength == 2,
                 'three-columns': classroomSummariesLength >= 3
               }"
@@ -247,7 +247,6 @@
             </span>
           </a>
           <ul ngbDropdownMenu
-              [ngStyle]="{'left.px': getInvolvedMenuOffset}"
               class="dropdown-menu oppia-navbar-dropdown get-involved-dropdown"
               (mouseover)="openSubmenu($event, 'getInvolvedMenu')"
               (mouseleave)="closeSubmenuIfNotMobile($event)">

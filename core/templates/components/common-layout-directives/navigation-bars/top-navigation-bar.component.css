@@ -616,3 +616,32 @@
     }
   }
 }
+:lang(ar) .get-involved-dropdown .des {
+  padding-left: 0;
+  padding-right: 36px;
+}
+
+:lang(ar) .top-section .heading-text,
+:lang(ar) .bottom-section .heading-text {
+  margin-left: 0;
+  margin-right: 7px;
+}
+
+:lang(ar) .bottom-section .heading-text {
+  margin-right: 9px;
+}
+
+:lang(ar) .oppia-navbar-arrow-right {
+  padding-left: 0;
+  padding-right: 8px;
+  transform: scaleX(-1);
+}
+
+:lang(ar) .learn-dropdown-menu .nav-item-main {
+  direction: rtl;
+}
+
+:lang(ar) .get-involved-dropdown .d-flex {
+  direction: rtl;
+}
+
