@@ -4507,7 +4507,6 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
         )
 
 
-
 class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
     """Tests the generation of dummy blog post data."""
 
