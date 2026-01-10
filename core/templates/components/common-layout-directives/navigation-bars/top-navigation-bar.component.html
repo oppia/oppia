@@ -62,7 +62,7 @@
       <ul *ngIf="!windowIsNarrow && !pageIsIframed"
           class="nav oppia-navbar-tabs">
         <li [ngClass]="{'show' : activeMenuName === 'homeMenu'}"
-            *ngIf="authStatusResolved && !userIsLoggedIn"
+            [hidden]="!authStatusResolved || userIsLoggedIn"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
             aria-hidden="false"
             class="nav-item  oppia-navbar-clickable-dropdown e2e-test-home-oppia-list-item">
@@ -351,7 +351,7 @@
       </div>
       <ul ngbDropdownMenu class="dropdown-menu oppia-navbar-dropdown language-dropdown"
           [ngClass]="{'oppia-embedded-navbar-dropdown': pageIsIframed}"
-          [style.margin-top]="authStatusResolved && userIsLoggedIn ? '-10px': '0'"
+          [style.margin-top]="userIsLoggedIn ? '-10px': '0'"
           (mouseover)="openSubmenu($event, 'languageMenu')"
           (mouseleave)="closeSubmenuIfNotMobile($event)">
         <li class="nav-item" [ngClass]="'e2e-test-i18n-language-' + language.id" *ngFor="let language of supportedSiteLanguages; let last = last">
@@ -372,7 +372,7 @@
     <li [ngClass]="{'show' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         #profileDropdown="ngbDropdown"
-        *ngIf="authStatusResolved && userIsLoggedIn&& !pageIsIframed"
+        [hidden]="!authStatusResolved || !userIsLoggedIn || pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
@@ -525,7 +525,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="authStatusResolved && !userIsLoggedIn && username !== '' && !pageIsIframed"
+        [hidden]="!authStatusResolved || userIsLoggedIn || username === '' || pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
