@@ -32,4 +32,10 @@ module.exports = merge(common, {
     aggregateTimeout: 500,
     poll: 1000,
   },
+  stats: {
+    warningsFilter: [
+      /export '.*' was not found in/,
+      /export .* was not found in/,
+    ],
+  },
 });
