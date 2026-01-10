@@ -193,6 +193,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-and-search-blog-posts.spec.ts"
     },
     {
+      "name": "logged-out-user/view-the-blog",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/view-the-blog.spec.ts"
+    },
+    {
       "name": "practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties",
       "module": "core/tests/puppeteer-acceptance-tests/specs/practice-question-submitter/submit-practice-questions-with-different-interactions-and-difficulties.spec.ts"
     },

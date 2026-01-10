@@ -936,6 +936,20 @@ export class BlogPostEditor extends BaseUser {
     await this.clickOnElementWithSelector(selector);
     await this.expectElementToBeVisible(viewContainerSelector);
   }
+
+  /**
+   * Checks if a blog post with the given title exists on the blog page.
+   * @param title - The title of the blog post to check for.
+   * @returns A promise that resolves to true if the blog post exists, false otherwise.
+   */
+  async checkIfBlogPostExists(title: string): Promise<boolean> {
+    await this.goto(testConstants.URLs.Blog);
+    const blogTitles = await this.page.$$eval(
+      '.e2e-test-blog-post-tile-title',
+      elements => elements.map(element => element.textContent?.trim())
+    );
+    return blogTitles.includes(title);
+  }
 }
 
 export let BlogPostEditorFactory = (): BlogPostEditor => new BlogPostEditor();
