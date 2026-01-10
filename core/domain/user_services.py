@@ -1913,20 +1913,40 @@ def update_email_preferences(
     email_preferences_model = user_models.UserEmailPreferencesModel.get(
         user_id, strict=False
     )
-    if email_preferences_model is None:
-        email_preferences_model = user_models.UserEmailPreferencesModel(
-            id=user_id
-        )
-
-    email_preferences_model.editor_role_notifications = (
+   if email_preferences_model is None:
+        email_preferences = user_domain.UserEmailPreferences(
+            user_id=user_id,
+            site_updates=can_receive_email_updates,
+            editor_role_notifications=can_receive_editor_role_email,
+            feedback_message_notifications=can_receive_feedback_email,
+            subscription_notifications=can_receive_subscription_email,
+    )
+    else:
+        email_preferences = (
+            email_preferences_model.to_domain_object()
+                )
+    email_preferences.site_updates = can_receive_email_updates
+    email_preferences.editor_role_notifications = (
         can_receive_editor_role_email
     )
-    email_preferences_model.feedback_message_notifications = (
+    email_preferences.feedback_message_notifications = (
         can_receive_feedback_email
     )
-    email_preferences_model.subscription_notifications = (
+    email_preferences.subscription_notifications = (
         can_receive_subscription_email
     )
+    email_preferences.validate()
+    if email_preferences_model is None:
+         email_preferences_model = user_models.UserEmailPreferencesModel(
+                id=user_id
+            )
+        
+    email_preferences_model.update_from_domain_object(
+        email_preferences
+    )
+    email_preferences_model.put()
+
+
     email = get_email_from_user_id(user_id)
     # Mailchimp database should not be updated in servers where sending
     # emails is not allowed.
@@ -1935,6 +1955,7 @@ def update_email_preferences(
             platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
         )
     )
+    user_creation_successful= True
     if not bulk_email_db_already_updated and server_can_send_emails:
         user_creation_successful = (
             bulk_email_services.add_or_update_user_status(
@@ -1944,14 +1965,15 @@ def update_email_preferences(
                 can_receive_email_updates=can_receive_email_updates,
             )
         )
-        if not user_creation_successful:
-            email_preferences_model.site_updates = False
-            email_preferences_model.update_timestamps()
-            email_preferences_model.put()
-            return True
-    email_preferences_model.site_updates = can_receive_email_updates
-    email_preferences_model.update_timestamps()
-    email_preferences_model.put()
+    if not user_creation_successful:
+        email_preferences.site_updates = False
+        email_preferences.validate()
+        email_preferences_model.update_from_domain_object(
+            email_preferences
+        )
+        email_preferences_model.put()
+        return True
+ 
     return False
 
 
@@ -1970,13 +1992,21 @@ def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
     )
     if email_preferences_model is None:
         return user_domain.UserGlobalPrefs.create_default_prefs()
+        
     else:
-        return user_domain.UserGlobalPrefs(
-            email_preferences_model.site_updates,
-            email_preferences_model.editor_role_notifications,
-            email_preferences_model.feedback_message_notifications,
-            email_preferences_model.subscription_notifications,
-        )
+    email_preferences = (
+        email_preferences_model.to_domain_object()
+    )
+    email_preferences.validate()
+
+    return user_domain.UserGlobalPrefs(
+        email_preferences.site_updates,
+        email_preferences.editor_role_notifications,
+        email_preferences.feedback_message_notifications,
+        email_preferences.subscription_notifications,
+    )
+
+  )
 
 
 def get_users_email_preferences(
@@ -2001,12 +2031,18 @@ def get_users_email_preferences(
         if email_preferences_model is None:
             result.append(user_domain.UserGlobalPrefs.create_default_prefs())
         else:
-            result.append(
-                user_domain.UserGlobalPrefs(
-                    email_preferences_model.site_updates,
-                    email_preferences_model.editor_role_notifications,
-                    email_preferences_model.feedback_message_notifications,
-                    email_preferences_model.subscription_notifications,
+           email_preferences = (
+            email_preferences_model.to_domain_object()
+            )
+            email_preferences.validate()
+
+        result.append(
+            user_domain.UserGlobalPrefs(
+                email_preferences.site_updates,
+                email_preferences.editor_role_notifications,
+                email_preferences.feedback_message_notifications,
+                email_preferences.subscription_notifications,
+            
                 )
             )
 
