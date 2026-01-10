@@ -32,4 +32,6 @@ export const VoiceoverDomainConstants = {
     '/exploration_voiceovers_data/<exploration_id>',
   REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL:
     '/regenerate_voiceovers_for_exploration/<exploration_id>/<language_accent_code>',
+  EXPLORATION_VOICEOVER_REGENERATION_STATUS_URL:
+    '/exploration_voiceover_regeneration_status_url/<exploration_id>',
 } as const;
