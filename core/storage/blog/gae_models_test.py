@@ -204,6 +204,35 @@ class BlogPostModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, test_data)
 
+    def test_export_data_published_on_valid_date(self) -> None:
+        user_id = 'user_1'
+        fake_date = datetime.datetime(2023, 1, 1, 12, 0, 0)
+        blog_post_model = blog_models.BlogPostModel(
+            id='blog_one',
+            author_id=user_id,
+            content=self.CONTENT,
+            title=self.TITLE,
+            published_on=fake_date,
+            url_fragment='sample-url-fragment',
+            tags=self.TAGS,
+            thumbnail_filename=self.THUMBNAIL,
+        )
+        blog_post_model.update_timestamps()
+        blog_post_model.put()
+        user_data = blog_models.BlogPostModel.export_data(user_id)
+        expected_millis = utils.get_time_in_millisecs(fake_date)
+        test_data = {
+            'blog_one': {
+                'title': self.TITLE,
+                'content': self.CONTENT,
+                'url_fragment': 'sample-url-fragment',
+                'tags': self.TAGS,
+                'thumbnail_filename': self.THUMBNAIL,
+                'published_on': expected_millis,
+            }
+        }
+        self.assertEqual(user_data, test_data)
+
 
 class BlogPostSummaryModelTest(test_utils.GenericTestBase):
     """Tests for the BlogPostSummaryModel class."""
