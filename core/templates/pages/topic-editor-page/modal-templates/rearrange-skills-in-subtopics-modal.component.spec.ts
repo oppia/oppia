@@ -642,7 +642,6 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     component.onMoveSkillStart(1, skillSummary);
     component.onMoveSkillEnd(event, 2);
 
-    // initEditor is called once during ngOnInit and once after onMoveSkillEnd.
     expect(component.initEditor).toHaveBeenCalledTimes(2);
   });
 
@@ -668,7 +667,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       data: destContainerData,
     };
 
-    // Ensure previousContainer !== container to enter the else branch
+    // Ensure previousContainer !== container to enter the else branch.
     const event = {
       previousIndex: 0,
       currentIndex: 0,
@@ -682,16 +681,16 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
 
     component.ngOnInit();
 
-    // Set up the component state directly before calling onMoveSkillEnd
-    // This ensures oldSubtopicId is null (simulating drag from uncategorized)
+    // Set up the component state directly before calling onMoveSkillEnd.
+    // This ensures oldSubtopicId is null (simulating drag from uncategorized).
     component.skillSummaryToMove = ShortSkillSummary.create('1', 'Skill 1');
     component.oldSubtopicId = null;
 
-    // Call with newSubtopicId = null (dropping into uncategorized)
+    // Call with newSubtopicId = null (dropping into uncategorized).
     // This should hit: if (newSubtopicId === null) { if (this.oldSubtopicId === null) { return; } }
     component.onMoveSkillEnd(event, null);
 
-    // Neither service should be called because we return early
+    // Neither service should be called because we return early.
     expect(removeSkillSpy).not.toHaveBeenCalled();
     expect(moveSkillSpy).not.toHaveBeenCalled();
   });
