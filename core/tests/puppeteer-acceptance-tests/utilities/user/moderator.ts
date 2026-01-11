@@ -39,9 +39,13 @@ const explorationEditorContainerSelector = 'oppia-exploration-editor-page-root';
 const moderatorPageContainerSelector = '.e2e-test-moderator-page';
 const toastMessageSelector = '.e2e-test-toast-message';
 const warningToastMessageSelector = '.e2e-test-toast-warning-message';
-const feedbackTabSelector = '.e2e-test-feedback-tab';
-const explorationFeedbackTabContentSelector = '.e2e-test-feedback-tab-content';
 const dismissWelcomeModalSelector = 'button.e2e-test-dismiss-welcome-modal';
+const feedBackButtonTab = '.e2e-test-feedback-tab a';
+const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const mobileNavbarOptions = '.navbar-mobile-options';
+const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
+const mobileNavbarDropdown = 'div.e2e-test-mobile-options-dropdown';
+const mobileNavbarPane = '.oppia-exploration-editor-tabs-dropdown';
 
 export class Moderator extends BaseUser {
   /**
@@ -325,7 +329,7 @@ export class Moderator extends BaseUser {
     );
     await this.clickAndWaitForNavigation(title);
     await this.dismissWelcomeModalIfPresent();
-    await (this as any).navigateToFeedbackTab();
+    await this.navigateToFeedbackTab();
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector
@@ -344,6 +348,33 @@ export class Moderator extends BaseUser {
       );
     }
     showMessage('User is on the feedback tab of the exploration editor.');
+  }
+
+  /**
+   * Function to navigate to the feedback tab of the exploration editor.
+   */
+  async navigateToFeedbackTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileFeedbackTabButton);
+    } else {
+      await this.dismissWelcomeModalIfPresent();
+      await this.page
+        .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+        .catch(() => {});
+      // We click the anchor tag directly inside the tab to be more precise.
+      await this.clickOnElementWithSelector(feedBackButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    await this.page.waitForSelector(explorationFeedbackTabContainerSelector, {
+      visible: true,
+    });
   }
 
   /**
@@ -440,7 +471,7 @@ export class Moderator extends BaseUser {
     );
     await this.clickAndWaitForNavigation(explorationID as string);
     await this.dismissWelcomeModalIfPresent();
-    await (this as any).navigateToFeedbackTab();
+    await this.navigateToFeedbackTab();
 
     await this.expectElementToBeVisible(
       explorationFeedbackTabContainerSelector

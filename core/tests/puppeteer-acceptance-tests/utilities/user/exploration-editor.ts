@@ -251,7 +251,6 @@ const explorationFeedbackCardActiveSelector =
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
 const stayInEditorButtonSelector = '.e2e-test-stay-in-editor-button';
-const goToFeedbackButtonSelector = '.e2e-test-go-to-feedback-button';
 
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
@@ -4959,10 +4958,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} explorationId - The ID of the exploration to play.
    */
   async playExploration(explorationId: string): Promise<void> {
-    await Promise.all([
-      this.page.waitForNavigation({ waitUntil: ['load', 'networkidle0'] }),
-      this.goto(`${baseUrl}/explore/${explorationId}`),
-    ]);
+    await this.goto(`${baseUrl}/explore/${explorationId}`);
   }
 
   /**
@@ -5189,7 +5185,7 @@ export class ExplorationEditor extends BaseUser {
       showMessage(
         `Switching content type from ${activeContentType} to ${contentType}`
       );
-      await this.clickOnElementWithSelector(contentType);
+      await this.clickOnElementWithText(contentType);
     }
 
     await this.clickOnElementWithSelector(editTranslationSelector);

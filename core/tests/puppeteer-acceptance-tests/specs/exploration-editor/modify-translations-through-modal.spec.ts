@@ -59,18 +59,12 @@ describe('Exploration Editor', function () {
   beforeAll(async function () {
     explorationEditor = await UserFactory.createNewUser(
       'explorationEditor',
-      'exploration_editor@example.com'
+      'exploration_editor@example.com',
+      [ROLES.CURRICULUM_ADMIN, ROLES.RELEASE_COORDINATOR]
     );
-    curriculumAdmin = await UserFactory.createNewUser(
-      'curriculumAdm',
-      'curriculum_admin@example.com',
-      [ROLES.CURRICULUM_ADMIN]
-    );
-    releaseCoordinator = await UserFactory.createNewUser(
-      'releaseCoordinator',
-      'release_coordinator@example.com',
-      [ROLES.RELEASE_COORDINATOR]
-    );
+    curriculumAdmin = explorationEditor as unknown as CurriculumAdmin &
+      TopicManager;
+    releaseCoordinator = explorationEditor as unknown as ReleaseCoordinator;
 
     // Enable the feature flag.
     await releaseCoordinator.enableFeatureFlag(
@@ -197,11 +191,14 @@ describe('Exploration Editor', function () {
       'Test Story 1',
       'test-story-one',
       'Test Chapter 1',
-      explorationId,
+      explorationId as string,
       'Test Topic 1'
     );
-    // We set an increased custom timeout since the setup takes too long unlike other specs.
-  }, 600000);
+
+    await explorationEditor.goto(
+      testConstants.URLs.BaseURL + '/create/' + explorationId
+    );
+  }, 800000);
 
   it(
     'should show translations of main content and edit them via the modal.',
