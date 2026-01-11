@@ -24,6 +24,7 @@ from core.domain import (
     exp_services,
     feedback_services,
     platform_parameter_list,
+    rights_manager,
     stats_domain,
     stats_services,
     taskqueue_services,
@@ -59,6 +60,9 @@ class TasksTests(test_utils.EmailTestBase):
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
 
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title'
@@ -525,6 +529,57 @@ class TasksTests(test_utils.EmailTestBase):
         )
         self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
 
+        self.post_task(
+            url,
+            payload,
+            expect_errors=False,
+            expected_status_int=200,
+            csrf_token=csrf_token,
+            headers=headers,
+        )
+
+        cloud_task_run_model_obj = (
+            taskqueue_services.get_cloud_task_run_by_model_id(new_model_id)
+        )
+        assert cloud_task_run_model_obj is not None
+        self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
+
+    def test_should_handle_voiceover_deferred_tasks_successfully(self) -> None:
+        exploration_id = 'exploration_id'
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+
+        url = feconf.TASK_URL_DEFERRED
+        csrf_token = self.get_new_csrf_token()
+        headers = {
+            'X-Appengine-QueueName': 'queue',
+            'X-Appengine-TaskName': 'None',
+            'X-AppEngine-Fake-Is-Admin': '1',
+        }
+        new_model_id = 'cloud_task_model_id'
+        project_id = 'dev-project-id'
+        location_id = 'us-central'
+        task_id = uuid.uuid4().hex
+        queue_name = 'test_queue_name'
+        task_name = 'projects/%s/locations/%s/queues/%s/tasks/%s' % (
+            project_id,
+            location_id,
+            queue_name,
+            task_id,
+        )
+        function_id = 'regenerate_voiceovers_on_exploration_added_to_topic'
+
+        payload = {
+            'fn_identifier': function_id,
+            'cloud_task_model_id': new_model_id,
+            'args': [exploration_id, '2025-12-13 21:08:46', 'author_id'],
+            'kwargs': {},
+        }
+
+        cloud_task_run_model = taskqueue_services.create_new_cloud_task_model(
+            new_model_id, task_name, function_id
+        )
+        self.assertEqual(cloud_task_run_model.latest_job_state, 'PENDING')
         self.post_task(
             url,
             payload,
