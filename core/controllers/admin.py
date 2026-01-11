@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Controllers for the admin view."""
 
 from __future__ import annotations
 
@@ -1347,12 +1348,9 @@ class AdminHandler(
         # If still not found, create a new entity.
         if entity is None:
             entity = create_fn()
-             # Satisfy MyPy.
-            assert self.user_id is not None
             save_fn(self.user_id, entity)
             # Clear cache to ensure consistency after direct model updates.
-            namespace: Any = cache_namespace
-            caching_services.delete_multi(namespace, None, [entity.id])
+            caching_services.delete_multi(cache_namespace, None, [entity.id])
 
         return entity
 
@@ -1523,10 +1521,8 @@ class AdminHandler(
                 )
                 # Unconditionally set EndExploration interaction to ensure validation passes.
                 exploration.states[exploration.init_state_name].update_interaction_id('EndExploration')
-                # Explicit type for MyPy.
-                recommended_exp_ids: List[str] = []
                 exploration.states[exploration.init_state_name].update_interaction_customization_args({
-                    'recommendedExplorationIds': {'value': recommended_exp_ids}
+                    'recommendedExplorationIds': {'value': []}
                 })
                 exploration.states[exploration.init_state_name].update_interaction_default_outcome(None)
                 exp_services.save_new_exploration(self.user_id, exploration)
@@ -1554,8 +1550,8 @@ class AdminHandler(
                 })
 
             def generate_dummy_story_nodes(
-                node_id: int, stop_update: bool, title: str, description: str, exp_id: str
-            ) -> None:
+                node_id, stop_update, title, description, exp_id
+            ):
                 # We need to determine if we are adding a NEW node or updating existing?
                 # The prompt implies we just add new chapters.
                 # Use story_services.update_story with 'add_story_node'.
@@ -1628,7 +1624,6 @@ class AdminHandler(
                          'new_value': ['%s%d' % (story_domain.NODE_ID_PREFIX, next_node_id_num)]
                      }))
 
-                assert self.user_id is not None
                 story_services.update_story(
                     self.user_id, story_id, change_list, 'Added story node'
                 )
@@ -1648,15 +1643,14 @@ class AdminHandler(
             for i, node_dict in enumerate(story_node_dicts):
                 # Re-fetch story to get latest next_node_id
                 story = story_fetchers.get_story_by_id(story_id)
-                 generate_dummy_story_nodes(
-                    0, False, str(node_dict['title']), str(node_dict['description']), str(node_dict['exp_id'])
+                generate_dummy_story_nodes(
+                    0, False, node_dict['title'], node_dict['description'], node_dict['exp_id']
                 )
                 
                 # Update exploration category logic (outside generate func to keep it simple)
-                assert self.user_id is not None
                 exp_services.update_exploration(
                         self.user_id,
-                        str(node_dict['exp_id']),
+                        node_dict['exp_id'],
                         [
                             exp_domain.ExplorationChange(
                                 {
