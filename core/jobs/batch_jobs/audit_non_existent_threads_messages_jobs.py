@@ -145,7 +145,7 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
-        invalid_messages = (
+        _ = (
             message_models
             | 'Filter messages with non-existent threads'
             >> beam.Filter(
