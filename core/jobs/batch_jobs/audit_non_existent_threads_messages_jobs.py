@@ -39,10 +39,9 @@ class AuditNonExistentThreadsMessagesJob(base_jobs.JobBase):
         """Runs the audit job.
 
         Returns:
-            PCollection[JobRunResult]. One result per invalid message
-            plus a stats entry with the total count.
+            PCollection[JobRunResult]. One result per invalid message plus a
+            stats entry with the total count.
         """
-
         thread_ids = (
             self.pipeline
             | 'Get GeneralFeedbackThreadModels'
@@ -113,7 +112,6 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the beam job."""
-
         thread_ids = (
             self.pipeline
             | 'Get GeneralFeedbackThreadModels'
@@ -145,7 +143,7 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
-        _ = (
+        invalid_messages = (
             message_models
             | 'Filter messages with non-existent threads'
             >> beam.Filter(
@@ -154,8 +152,6 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 ),
                 beam.pvalue.AsList(thread_ids),
             )
-            | 'Extract key' >> beam.Map(lambda model: model.key)
-            | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
         )
 
         invalid_user_threads = (
@@ -167,9 +163,79 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 ),
                 beam.pvalue.AsList(thread_ids),
             )
-            | 'Extract key for user threads'
-            >> beam.Map(lambda model: model.key)
+        )
+
+        deleted_message_logs = (
+            invalid_messages
+            | 'Log deleted messages'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Deleted GeneralFeedbackMessageModel: '
+                        f'id={model.id}, '
+                        f'thread_id={model.thread_id}, '
+                        f'message_id={model.message_id}'
+                    )
+                )
+            )
+        )
+
+        deleted_user_thread_logs = (
+            invalid_user_threads
+            | 'Log deleted user threads'
+            >> beam.Map(
+                lambda model: job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Deleted GeneralFeedbackThreadUserModel: '
+                        f'id={model.id}, '
+                        f'user_id={model.user_id}, '
+                        f'thread_id={model.thread_id}'
+                    )
+                )
+            )
+        )
+
+        deleted_message_results = (
+            invalid_messages
+            | 'Extract message keys' >> beam.Map(lambda model: model.key)
+            | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
+        )
+
+        deleted_user_thread_results = (
+            invalid_user_threads
+            | 'Extract user thread keys' >> beam.Map(lambda model: model.key)
             | 'Delete non-existent user threads' >> ndb_io.DeleteModels()
         )
 
-        return invalid_user_threads
+        deleted_message_count = (
+            invalid_messages
+            | 'Count deleted messages'
+            >> beam.combiners.Count.Globally().with_defaults(0)
+            | 'Report deleted message count'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    f'deleted_feedback_message_models_count: {count}'
+                )
+            )
+        )
+
+        deleted_user_thread_count = (
+            invalid_user_threads
+            | 'Count deleted user threads'
+            >> beam.combiners.Count.Globally().with_defaults(0)
+            | 'Report deleted user thread count'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    f'deleted_user_thread_models_count: {count}'
+                )
+            )
+        )
+
+        return (
+            deleted_message_logs,
+            deleted_user_thread_logs,
+            deleted_message_count,
+            deleted_user_thread_count,
+            deleted_message_results,
+            deleted_user_thread_results,
+        ) | 'Flatten deletion outputs' >> beam.Flatten()

@@ -44,13 +44,7 @@ class AuditNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
     )
 
     def test_empty_datastore(self) -> None:
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'invalid_feedback_message_models_count: 0'
-                )
-            ]
-        )
+        self.assert_job_output_is([])
 
     def test_message_with_existing_thread(self) -> None:
         thread = self.create_model(
@@ -78,13 +72,7 @@ class AuditNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
 
         self.put_multi([thread, message])
 
-        self.assert_job_output_is(
-            [
-                job_run_result.JobRunResult.as_stdout(
-                    'invalid_feedback_message_models_count: 0'
-                )
-            ]
-        )
+        self.assert_job_output_is([])
 
     def test_message_with_non_existent_thread(self) -> None:
         message = self.create_model(
@@ -242,7 +230,32 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
             ]
         )
 
-        self.run_job()
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Deleted GeneralFeedbackMessageModel: '
+                        f'id={invalid_message.id}, '
+                        f'thread_id={invalid_message.thread_id}, '
+                        f'message_id={invalid_message.message_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    (
+                        'Deleted GeneralFeedbackThreadUserModel: '
+                        f'id={invalid_thread_user.id}, '
+                        f'thread_id={invalid_thread_user.thread_id}, '
+                        f'user_id={invalid_thread_user.user_id}'
+                    )
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'deleted_feedback_message_models_count: 1'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'deleted_user_thread_models_count: 1'
+                ),
+            ]
+        )
 
         self.assertIsNotNone(
             feedback_models.GeneralFeedbackMessageModel.get(
@@ -250,17 +263,19 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
             )
         )
 
-        self.assertIsNone(
+        with self.assertRaisesRegex(
+            Exception, 'Entity for class GeneralFeedbackMessageModel'
+        ):
             feedback_models.GeneralFeedbackMessageModel.get(
                 invalid_message.thread_id, invalid_message.message_id
             )
-        )
 
-        self.assertIsNone(
+        with self.assertRaisesRegex(
+            Exception, 'Entity for class GeneralFeedbackThreadUserModel'
+        ):
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 invalid_thread_user.user_id, invalid_thread_user.thread_id
             )
-        )
 
         self.assertIsNotNone(
             feedback_models.GeneralFeedbackThreadUserModel.get(
@@ -268,5 +283,3 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
                 thread_id=valid_thread_user.thread_id,
             )
         )
-
-        self.assert_job_output_is_empty()
