@@ -79,9 +79,9 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # 'FrontendStoryNodeDict', and this is done because below we
         # are adding new keys that are not defined on the 'StoryNodeDict'.
         ordered_node_dicts: List[FrontendStoryNodeDict] = [
-            node.to_dict()
+            node.to_dict()  # type: ignore[misc]
             for node in story.story_contents.get_ordered_nodes()
-            if node.status != constants.STORY_NODE_STATUS_DRAFT  # type: ignore[misc]
+            if node.status != constants.STORY_NODE_STATUS_DRAFT
         ]
         for node in ordered_node_dicts:
             node['completed'] = False
