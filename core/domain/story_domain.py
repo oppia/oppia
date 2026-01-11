@@ -2411,14 +2411,18 @@ class Story:
             self.update_initial_node(story_node_to_move.id)
         else:
             left_neighbour = story_content_nodes[to_index - 1]
-            self.update_node_destination_node_ids(left_neighbour.id, [story_node_to_move.id])
+            self.update_node_destination_node_ids(
+                left_neighbour.id, [story_node_to_move.id]
+            )
 
         if to_index == len(story_content_nodes) - 1:
             # Node is moved to the end of the storyline.
             self.update_node_destination_node_ids(story_node_to_move.id, [])
         else:
             right_neighbour = story_content_nodes[to_index + 1]
-            self.update_node_destination_node_ids(story_node_to_move.id, [right_neighbour.id])
+            self.update_node_destination_node_ids(
+                story_node_to_move.id, [right_neighbour.id]
+            )
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str
