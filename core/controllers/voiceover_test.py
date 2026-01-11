@@ -21,7 +21,6 @@ import uuid
 
 from core import constants, feature_flag_list, feconf
 from core.domain import (
-    cloud_task_domain,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -37,16 +36,8 @@ from core.domain import (
     translation_domain,
     translation_fetchers,
     user_services,
-    voiceover_cloud_task_services,
     voiceover_domain,
     voiceover_services,
-    exp_domain,
-    exp_services,
-    topic_domain,
-    topic_services,
-    story_domain,
-    story_services,
-    translation_domain,
 )
 from core.tests import test_utils
 
@@ -1612,5 +1603,4 @@ class RegenerateVoiceoversForExplorationHandlerTests(
             ),
             self.swap(taskqueue_services, 'defer', self.mock_defer),
         ):
-            print('Calling post_json')
             self.post_json(handler_url, {}, csrf_token=csrf_token)
