@@ -1198,7 +1198,7 @@ class AdminHandler(
         else:
             raise Exception('Cannot load new structures data in production.')
 
-  def _generate_dummy_skill_and_questions(self) -> None:
+    def _generate_dummy_skill_and_questions(self) -> None:
         """Generate and loads the database with a skill and 15 questions
         linked to the skill.
 
