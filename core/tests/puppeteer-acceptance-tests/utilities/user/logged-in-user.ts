@@ -1893,7 +1893,6 @@ export class LoggedInUser extends BaseUser {
       {},
       feedbackMessageSelector
     );
-    const feedbackMessages = await this.page.$$(feedbackMessageSelector);
 
     const actualFeedback = await this.page.$eval(feedbackMessageSelector, el =>
       el.textContent?.trim()
