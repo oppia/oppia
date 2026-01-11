@@ -1314,8 +1314,6 @@ class AdminHandler(
         create_fn: Callable[[], Any],
         save_fn: Callable[[str, Any], None],
         cache_namespace: str,
-        # Here we use type Any because the fetcher attributes can vary significantly
-        # across different entity types (e.g., skill description vs topic name).
         fetch_by_attr_fn: Optional[Callable[..., Any]] = None,
         attr_value: Optional[str] = None
     ) -> Any:
@@ -1353,9 +1351,6 @@ class AdminHandler(
             assert self.user_id is not None
             save_fn(self.user_id, entity)
             # Clear cache to ensure consistency after direct model updates.
-            # The type is strict Literal, but we pass generic str. Ignore for now or cast.
-            # Using Any to bypass strict literal check for this generic helper.
-            # Here we use type Any because verify the cache namespace is generic string.
             namespace: Any = cache_namespace
             caching_services.delete_multi(namespace, None, [entity.id])
 
@@ -1544,7 +1539,7 @@ class AdminHandler(
             new_exp_ids = [eid for eid in generated_exp_ids if eid not in existing_exp_ids]
             
             if not new_exp_ids:
-               if True: # Always try publish if called
+                if initial_dummy_opportunites_generation := True: # Always try publish if called
                      pass
 
             story_node_dicts = []
@@ -1558,8 +1553,8 @@ class AdminHandler(
                     'exp_id': exp_id,
                 })
 
-             def generate_dummy_story_nodes(
-                _node_id: int, _stop_update: bool, title: str, description: str, exp_id: str
+            def generate_dummy_story_nodes(
+                node_id: int, stop_update: bool, title: str, description: str, exp_id: str
             ) -> None:
                 # We need to determine if we are adding a NEW node or updating existing?
                 # The prompt implies we just add new chapters.
@@ -1583,7 +1578,7 @@ class AdminHandler(
                 else:
                     last_node_id = None
 
-                # new_node_id = story.story_contents.next_node_id
+                new_node_id = story.story_contents.next_node_id 
                 # (This property updates in memory? No, only after save. Wait, story is a domain object).
                 # If we modify story object, we must save it or use update_story.
                 # update_story handles backend.
@@ -1653,10 +1648,9 @@ class AdminHandler(
             for i, node_dict in enumerate(story_node_dicts):
                 # Re-fetch story to get latest next_node_id
                 story = story_fetchers.get_story_by_id(story_id)
-                generate_dummy_story_nodes(
-                    0, False, str(node_dict['title']),
-                    str(node_dict['description']), str(node_dict['exp_id']))
-
+                 generate_dummy_story_nodes(
+                    0, False, str(node_dict['title']), str(node_dict['description']), str(node_dict['exp_id'])
+                )
                 
                 # Update exploration category logic (outside generate func to keep it simple)
                 assert self.user_id is not None
