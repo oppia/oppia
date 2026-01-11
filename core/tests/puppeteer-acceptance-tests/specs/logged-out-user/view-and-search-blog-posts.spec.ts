@@ -88,6 +88,24 @@ describe('Logged-out User', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
+  it(
+    'should be able to click on a blog post and view its details',
+    async function () {
+      await loggedOutUser.clickOnFirstBlogPost();
+      await loggedOutUser.expectBlogPostPageElementsToBeVisible();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show no results message when searching for unrelated keyword',
+    async function () {
+      await loggedOutUser.filterBlogPostsByKeyword('fashion');
+      await loggedOutUser.expectNoBlogPostsFoundMessage();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();
   });

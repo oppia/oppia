@@ -420,6 +420,9 @@ const blogPostTitleContainerSelector =
   '.e2e-test-blog-post-page-title-container';
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
+const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
+const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
+const blogAuthorNameSelector = '.e2e-test-author-name';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
 
 // Common Selectors.
@@ -1158,6 +1161,64 @@ export class LoggedOutUser extends BaseUser {
     if (newFirstPostTitle === firstPostTitle) {
       throw new Error('Next button did not navigate to the next page');
     }
+  }
+
+  /**
+   * Clicks on the first blog post in the list to navigate to the blog post page.
+   */
+  async clickOnFirstBlogPost(): Promise<void> {
+    const blogPostsFound = await this.checkIfBlogPostsAreFound();
+    if (!blogPostsFound) {
+      throw new Error('No blog posts found to click on');
+    }
+
+    await this.page.waitForSelector(blogPostTitleSelector, {visible: true});
+    await this.clickAndWaitForNavigation(blogPostTitleSelector, true);
+
+    // Wait for blog post page to load.
+    await this.page.waitForSelector(blogPostContentSelector, {visible: true});
+  }
+
+  /**
+   * Verifies that the blog welcome heading is visible.
+   */
+  async expectBlogWelcomeHeadingToBeVisible(): Promise<void> {
+    await this.page.waitForSelector(blogWelcomeHeadingSelector, {
+      visible: true,
+    });
+    const element = await this.page.$(blogWelcomeHeadingSelector);
+    if (!element) {
+      throw new Error('Blog welcome heading is not visible');
+    }
+  }
+
+  /**
+   * Verifies that the "no blog posts found" message is visible.
+   */
+  async expectNoBlogPostsFoundMessage(): Promise<void> {
+    await this.page.waitForSelector(blogNoResultsFoundSelector, {
+      visible: true,
+    });
+    const element = await this.page.$(blogNoResultsFoundSelector);
+    if (!element) {
+      throw new Error('Expected "no blog posts found" message, but not found');
+    }
+  }
+
+  /**
+   * Verifies that blog post page elements are visible (title, author, tags).
+   */
+  async expectBlogPostPageElementsToBeVisible(): Promise<void> {
+    // Verify title container is visible.
+    await this.page.waitForSelector(blogPostTitleContainerSelector, {
+      visible: true,
+    });
+
+    // Verify author name is visible.
+    await this.page.waitForSelector(blogAuthorNameSelector, {visible: true});
+
+    // Verify tags are visible.
+    await this.page.waitForSelector(blogPostTagSelector, {visible: true});
   }
 
   /**
