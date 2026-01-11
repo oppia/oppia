@@ -2405,7 +2405,7 @@ class Story:
 
         self.delete_node(story_node_to_move.id)
         story_content_nodes.insert(to_index, story_node_to_move)
-        
+
         if to_index == 0:
             # Node is moved to the start of the storyline.
             self.update_initial_node(story_node_to_move.id)
@@ -2419,7 +2419,6 @@ class Story:
         else:
             right_neighbour = story_content_nodes[to_index + 1]
             self.update_node_destination_node_ids(story_node_to_move.id, [right_neighbour.id])
-
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str
