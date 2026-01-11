@@ -703,6 +703,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
+        self.logout()
+
     def test_load_new_structures_data(self) -> None:
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.login(self.CURRICULUM_ADMIN_EMAIL, is_super_admin=True)
