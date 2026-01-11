@@ -188,8 +188,8 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                     (
                         'Deleted GeneralFeedbackThreadUserModel: '
                         f'id={model.id}, '
-                        f'user_id={model.user_id}, '
-                        f'thread_id={model.thread_id}'
+                        f'thread_id={model.thread_id}, '
+                        f'user_id={model.user_id} '
                     )
                 )
             )

@@ -245,7 +245,7 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
                         'Deleted GeneralFeedbackThreadUserModel: '
                         f'id={invalid_thread_user.id}, '
                         f'thread_id={invalid_thread_user.thread_id}, '
-                        f'user_id={invalid_thread_user.user_id}'
+                        f'user_id={invalid_thread_user.user_id} '
                     )
                 ),
                 job_run_result.JobRunResult.as_stdout(
@@ -270,12 +270,11 @@ class RemoveNonExistentThreadsMessagesJobTest(job_test_utils.JobTestBase):
                 invalid_message.thread_id, invalid_message.message_id
             )
 
-        with self.assertRaisesRegex(
-            Exception, 'Entity for class GeneralFeedbackThreadUserModel'
-        ):
+        self.assertIsNone(
             feedback_models.GeneralFeedbackThreadUserModel.get(
                 invalid_thread_user.user_id, invalid_thread_user.thread_id
             )
+        )
 
         self.assertIsNotNone(
             feedback_models.GeneralFeedbackThreadUserModel.get(
