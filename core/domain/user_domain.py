@@ -16,6 +16,7 @@
 
 """Domain objects for user."""
 
+
 from __future__ import annotations
 
 import datetime
