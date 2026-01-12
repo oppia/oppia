@@ -68,6 +68,12 @@
       "name": "exploration-editor/manage-exploration-misconceptions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
     },
+
+    {
+      "name": "exploration-editor/modify-an-existing-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-an-existing-exploration.spec.ts"
+    },
+
     {
       "name": "exploration-editor/modify-translations-through-modal",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"

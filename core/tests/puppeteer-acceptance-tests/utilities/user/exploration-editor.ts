@@ -7158,6 +7158,166 @@ export class ExplorationEditor extends BaseUser {
       false
     );
   }
+
+  /**
+   * Deletes a card/state from the exploration graph.
+   */
+  async deleteState(stateName: string): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.openExplorationStateGraphInMobileView();
+    } else {
+      await this.navigateToCard(stateName);
+    }
+
+    await this.page.waitForSelector('oppia-exploration-graph', {visible: true});
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForTimeout(800);
+
+      await this.page.waitForFunction(
+        () => {
+          return document.querySelectorAll('g.e2e-test-node').length > 0;
+        },
+        {timeout: 60000}
+      );
+
+      const nodeClicked = await this.page.evaluate((name: string) => {
+        const nodes = Array.from(document.querySelectorAll('g.e2e-test-node'));
+
+        const targetNode =
+          nodes.find(
+            node => node.querySelector('title')?.textContent?.trim() === name
+          ) ||
+          nodes.find(node => {
+            const rect = node.querySelector('rect.e2e-test-node-background');
+            const aria = rect?.getAttribute('aria-label') || '';
+            return aria.includes(name);
+          });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const rect = targetNode.querySelector(
+          'rect.e2e-test-node-background'
+        ) as SVGGraphicsElement | null;
+
+        if (!rect) {
+          return false;
+        }
+
+        rect.scrollIntoView({block: 'center', inline: 'center'});
+
+        rect.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+
+        return true;
+      }, stateName);
+
+      if (!nodeClicked) {
+        throw new Error(
+          `Node not found in mobile graph for card: ${stateName}`
+        );
+      }
+
+      await this.page.waitForTimeout(500);
+
+      const deleteClicked = await this.page.evaluate((name: string) => {
+        const nodes = Array.from(document.querySelectorAll('g.e2e-test-node'));
+
+        const targetNode =
+          nodes.find(
+            node => node.querySelector('title')?.textContent?.trim() === name
+          ) ||
+          nodes.find(node => {
+            const rect = node.querySelector('rect.e2e-test-node-background');
+            const aria = rect?.getAttribute('aria-label') || '';
+            return aria.includes(name);
+          });
+
+        if (!targetNode) {
+          return false;
+        }
+
+        const delRect = targetNode.querySelector(
+          'g.e2e-test-delete-node rect.oppia-node-delete'
+        ) as SVGGraphicsElement | null;
+
+        if (!delRect) {
+          return false;
+        }
+
+        delRect.scrollIntoView({block: 'center', inline: 'center'});
+
+        delRect.dispatchEvent(
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+          })
+        );
+
+        return true;
+      }, stateName);
+
+      if (!deleteClicked) {
+        throw new Error(
+          `Delete button not found in mobile graph for card: ${stateName}`
+        );
+      }
+    } else {
+      const crossSelector = `g.e2e-test-delete-node text[aria-label^="Delete ${stateName}"]`;
+
+      await this.page.waitForSelector(crossSelector, {
+        visible: true,
+        timeout: 60000,
+      });
+
+      const crossHandle = await this.page.$(crossSelector);
+      if (!crossHandle) {
+        throw new Error('Delete cross not found for card: ' + stateName);
+      }
+
+      await crossHandle.evaluate(el => {
+        (el as SVGGraphicsElement).scrollIntoView();
+      });
+
+      await crossHandle.click({delay: 10});
+    }
+    await this.page.waitForSelector('.e2e-test-confirm-delete-state', {
+      visible: true,
+      timeout: 60000,
+    });
+    await this.clickOnElementWithSelector('.e2e-test-confirm-delete-state');
+
+    await this.page.waitForFunction(
+      (name: string) => {
+        const labels = document.querySelectorAll('.e2e-test-node-label');
+        return !Array.from(labels).some(l => l.textContent?.trim() === name);
+      },
+      {},
+      stateName
+    );
+    if (this.isViewportAtMobileWidth()) {
+      const closeBtn = await this.page.$(closeModalButtonSelector);
+      if (closeBtn) {
+        await this.clickOnElementWithSelector(closeModalButtonSelector);
+      }
+
+      await this.page.keyboard.press('Escape');
+      await this.page.mouse.click(10, 10);
+
+      await this.page.waitForSelector(explorationStateGraphModalSelector, {
+        hidden: true,
+        timeout: 60000,
+      });
+    }
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>
