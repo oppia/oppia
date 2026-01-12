@@ -1289,7 +1289,8 @@ def _get_all_recipient_ids(
     participant_ids = {
         message.author_id
         for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)
+        if message.author_id
+        and user_services.is_user_registered(message.author_id)
     }
 
     batch_recipient_ids = owner_ids - {author_id}
@@ -1412,6 +1413,14 @@ def _add_message_to_email_buffer(
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
     """
     thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+    # Only exploration threads should trigger email-buffer processing. For
+    # other entity types (skills, topics, etc.) there are no exploration
+    # rights to consult and attempting to fetch them results in
+    # EntityNotFoundError during tests. Skip email handling for non-explorations
+    # to preserve existing behaviour of not sending emails for those types.
+    if thread.entity_type != feconf.ENTITY_TYPE_EXPLORATION:
+        return
+
     exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
