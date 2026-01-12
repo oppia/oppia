@@ -21,6 +21,7 @@ import uuid
 
 from core import constants, feature_flag_list, feconf
 from core.domain import (
+    cloud_task_domain,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -36,6 +37,7 @@ from core.domain import (
     translation_domain,
     translation_fetchers,
     user_services,
+    voiceover_cloud_task_services,
     voiceover_domain,
     voiceover_services,
 )
@@ -469,6 +471,54 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
         self.assertEqual(
             json_response['automatic_voiceover_regeneration_records'],
             [cloud_task_run.to_dict()],
+        )
+        self.logout()
+
+
+class AutomaticVoiceoverRegenerationStatusHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate automatic voiceover regeneration status handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+    def test_get_automatic_voiceover_regeneration_status(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+
+        json_response = self.get_json(
+            '/exploration_voiceover_regeneration_status_url/%s' % exploration_id
+        )
+        self.assertEqual(
+            json_response['language_accent_to_content_status_map'],
+            {'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}},
         )
         self.logout()
 
@@ -1387,7 +1437,9 @@ class ExplorationDataForVoiceoverRegenerationHandlerTests(
         )
         self._add_exploration_to_published_topic()
 
-    def _create_and_publish_exploration(self, exploration_id, title) -> None:
+    def _create_and_publish_exploration(
+        self, exploration_id: str, title: str
+    ) -> None:
         """Creates and publishes a new exploration."""
         self.exploration = self.save_new_valid_exploration(
             exploration_id,
@@ -1571,13 +1623,13 @@ class RegenerateVoiceoversForExplorationHandlerTests(
 ):
     def mock_defer(
         self,
-        _function_id,
-        _queue_id,
-        _exploration_id,
-        _language_accent_code,
-        _user_id,
-        _datetime_str,
-    ):
+        _function_id: str,
+        _queue_id: str,
+        _exploration_id: str,
+        _language_accent_code: str,
+        _user_id: str,
+        _datetime_str: str,
+    ) -> None:
         pass
 
     @test_utils.enable_feature_flags(

@@ -27,11 +27,12 @@ from core.domain import (
     opportunity_services,
     taskqueue_services,
     translation_fetchers,
+    voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
 
-from typing import Dict, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class VoiceoverAdminDataHandler(
@@ -321,6 +322,36 @@ class RegenerateVoiceoverOnExpUpdateHandler(
         self.render_json(self.values)
 
 
+class VoiceoverRegenerationRequestToCloudTaskHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Retrieves the status of all voiceover-regeneration requests queued in
+    Cloud Tasks for the specified exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id: str) -> None:
+        """Retrieves the status of all voiceover-regeneration requests queued in
+        Cloud Tasks for the specified exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        self.values.update(
+            voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                exploration_id
+            )
+        )
+        self.render_json(self.values)
+
+
 class ExplorationDataForVoiceoverRegenerationHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -329,7 +360,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}}
     }
     HANDLER_ARGS_SCHEMAS = {'GET': {}}
@@ -339,7 +370,9 @@ class ExplorationDataForVoiceoverRegenerationHandler(
         """Fetches exploration data required for regenerating automatic
         voiceovers for a given exploration.
         """
-        exploration = exp_fetchers.get_exploration_by_id(exploration_id, False)
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False
+        )
 
         language_accent_codes_mapping = (
             voiceover_services.get_all_language_accent_codes_for_voiceovers()
@@ -351,7 +384,9 @@ class ExplorationDataForVoiceoverRegenerationHandler(
             )
         )
 
-        response_data = {}
+        response_data: Dict[str, Optional[str | Dict[str, str | List[str]]]] = (
+            {}
+        )
 
         if exploration is None:
             response_data['exploration_data'] = None
@@ -389,7 +424,7 @@ class ExplorationDataForVoiceoverRegenerationHandler(
 
             for language_code in exploration_language_codes:
                 language_accent_codes_to_autogeneration_support = (
-                    language_accent_codes_mapping.get(language_code)
+                    language_accent_codes_mapping.get(language_code, {})
                 )
 
                 for (
@@ -420,7 +455,7 @@ class RegenerateVoiceoversForExplorationHandler(
     selected language and accent."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {
+    URL_PATH_ARGS_SCHEMAS = {
         'exploration_id': {'schema': {'type': 'basestring'}},
         'language_accent_code': {'schema': {'type': 'basestring'}},
     }

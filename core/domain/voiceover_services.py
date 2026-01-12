@@ -1180,7 +1180,7 @@ def regenerate_voiceovers_on_exploration_update(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1242,7 +1242,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1318,7 +1318,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        language_accent_code,
+        specific_language_accent_code=language_accent_code,
     )
 
 
