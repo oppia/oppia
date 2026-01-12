@@ -1379,6 +1379,10 @@ URLS = [
         '/automatic_voiceover_regeneration_record',
         voiceover.AutomaticVoiceoverRegenerationRecordHandler,
     ),
+    get_redirect_route(
+        r'/exploration_voiceover_regeneration_status_url/<exploration_id>',
+        voiceover.VoiceoverRegenerationRequestToCloudTaskHandler,
+    ),
 ]
 
 # Adding redirects for topic landing pages.
