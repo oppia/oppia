@@ -25,8 +25,6 @@ from core import feconf
 from core.domain import (
     email_manager,
     feedback_domain,
-    platform_parameter_list,
-    platform_parameter_services,
     rights_manager,
     subscription_services,
     taskqueue_services,
