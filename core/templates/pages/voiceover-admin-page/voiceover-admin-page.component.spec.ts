@@ -499,6 +499,12 @@ describe('Voiceover Admin Page component ', () => {
     const expectedText2 = 'Exploration added to topic';
     expect(component.getFunctionIdText(functionId2)).toBe(expectedText2);
 
+    const functionId3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent';
+    const expectedText3 =
+      'Voiceover regeneration for the exploration in the chosen language accent';
+    expect(component.getFunctionIdText(functionId3)).toBe(expectedText3);
+
     expect(component.getFunctionIdText('unknown_function_id')).toBe('');
   });
 });

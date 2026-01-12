@@ -443,7 +443,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       functionId ===
       'regenerate_voiceovers_of_exploration_for_given_language_accent'
     ) {
-      return 'Voiceover regeneration for the exploration in the chosen language accent.';
+      return 'Voiceover regeneration for the exploration in the chosen language accent';
     }
     return '';
   }
