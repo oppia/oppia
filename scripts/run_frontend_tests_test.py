@@ -264,6 +264,70 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                             ]
                         )
 
+    def test_frontend_tests_run_on_changed_files_no_specs_found(self) -> None:
+        def mock_get_remote_name() -> str:
+            return 'origin'
+
+        def mock_get_refs():
+            return []
+
+        def mock_get_changed_files(unused_refs, unused_remote):
+            return {}
+
+        def mock_get_staged_acmrt_files():
+            return []
+
+        get_remote_name_swap = self.swap(
+            git_changes_utils,
+            'get_local_git_repository_remote_name',
+            mock_get_remote_name,
+        )
+        get_refs_swap = self.swap(
+            git_changes_utils,
+            'get_refs',
+            mock_get_refs,
+        )
+        get_changed_files_swap = self.swap(
+            git_changes_utils,
+            'get_changed_files',
+            mock_get_changed_files,
+        )
+        get_staged_acmrt_files_swap = self.swap(
+            git_changes_utils,
+            'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files,
+        )
+
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with (
+                        get_remote_name_swap,
+                        get_refs_swap,
+                        get_changed_files_swap,
+                        get_staged_acmrt_files_swap,
+                    ):
+                        with self.assertRaises(SystemExit) as cm:
+                            run_frontend_tests.main(
+                                args=['--run_on_changed_files_in_branch']
+                            )
+        self.assertEqual(cm.exception.code, 1)
+
+    def test_frontend_tests_with_specs_to_run_no_specs_found_disallow_no_spec(
+        self,
+    ) -> None:
+        with self.swap_success_Popen, self.print_swap, self.swap_build:
+            with self.swap_install_third_party_libs, self.swap_common:
+                with self.swap_check_frontend_coverage:
+                    with self.assertRaises(SystemExit) as cm:
+                        run_frontend_tests.main(
+                            args=[
+                                '--specs_to_run',
+                                'invalid.ts',
+                            ]
+                        )
+        self.assertEqual(cm.exception.code, 1)
+
     def test_frontend_tests_with_run_on_changed_files_in_branch(self) -> None:
         git_refs = [
             git_changes_utils.GitRef(
