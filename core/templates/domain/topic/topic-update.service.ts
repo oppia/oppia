@@ -167,7 +167,7 @@ export class TopicUpdateService {
     propertyName: string,
     subtopicId: number,
     newValue: string,
-    oldValue: string | null | undefined,
+    oldValue: string | null,
     apply: TopicUpdateApply,
     reverse: TopicUpdateReverse
   ) {
