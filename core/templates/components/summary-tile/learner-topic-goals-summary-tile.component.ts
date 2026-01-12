@@ -143,8 +143,9 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       this.storyName = this.storySummaryToDisplay.getTitle();
 
       this.storyNodeLink = this.getStoryNodeLink();
-      let totalStoryNodesCount =
-        this.storySummaryToDisplay.getAllNodes().length;
+      let totalStoryNodesCount = this.getPublishedNodesCount(
+        this.storySummaryToDisplay
+      );
       let completedNodesCount =
         this.storySummaryToDisplay.getCompletedNodeTitles().length;
       const allNodes = this.storySummaryToDisplay.getAllNodes();
@@ -153,9 +154,13 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
       }
 
       this.statusIsPublished = this.storyNode?.getPublishedStatus();
-      this.storyProgress = Math.floor(
-        (completedNodesCount / totalStoryNodesCount) * 100
-      );
+      if (totalStoryNodesCount === 0) {
+        this.storyProgress = 0;
+      } else {
+        this.storyProgress = Math.floor(
+          (completedNodesCount / totalStoryNodesCount) * 100
+        );
+      }
     }
   }
 
@@ -169,6 +174,14 @@ export class LearnerTopicGoalsSummaryTileComponent implements OnInit {
   isSerialChapterFeatureLearnerFlagEnabled(): boolean {
     return this.platformFeatureService.status.SerialChapterLaunchLearnerView
       .isEnabled;
+  }
+
+  getPublishedNodesCount(story: StorySummary): number {
+    if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return story.getAllNodes().filter(node => node.getPublishedStatus())
+        .length;
+    }
+    return story.getAllNodes().length;
   }
 
   isNewChapterLabelVisible(): boolean {

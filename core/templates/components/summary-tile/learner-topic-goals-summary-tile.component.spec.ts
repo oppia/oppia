@@ -211,4 +211,288 @@ describe('Learner Topic Goals Summary Tile Component', () => {
 
     expect(mockEvent.preventDefault).not.toHaveBeenCalled();
   });
+
+  describe('getPublishedNodesCount', () => {
+    it('should return all nodes count when serial chapter feature is disabled', () => {
+      mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+        false;
+      component.ngOnInit();
+      const story = component.storySummaryToDisplay;
+
+      const count = component.getPublishedNodesCount(story);
+      expect(count).toEqual(2);
+    });
+
+    it('should return only published nodes count when serial chapter feature is enabled', () => {
+      mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+        true;
+      const draftNode = {
+        id: 'node_draft',
+        thumbnail_filename: 'image3.png',
+        title: 'Draft Chapter',
+        description: 'Description',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [],
+        outline: 'Outline',
+        exploration_id: 'exp_3',
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Draft',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: null,
+        unpublishing_reason: null,
+      };
+      const learnerTopicSummaryBackendDictWithDraft = {
+        id: 'sample_topic_id_2',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
+        total_published_node_count: 2,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        classroom_name: 'math',
+        classroom_url_fragment: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1', 'Chapter 2', 'Draft Chapter'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 2'],
+            all_node_dicts: [
+              {
+                id: 'node_1',
+                thumbnail_filename: 'image1.png',
+                title: 'Chapter 1',
+                description: 'Description 1',
+                prerequisite_skill_ids: ['skill_1'],
+                acquired_skill_ids: ['skill_2'],
+                destination_node_ids: ['node_2'],
+                outline: 'Outline',
+                exploration_id: 'exp_1',
+                outline_is_finalized: false,
+                thumbnail_bg_color: '#a33f40',
+                status: 'Published',
+                planned_publication_date_msecs: 100,
+                last_modified_msecs: 100,
+                first_publication_date_msecs: 200,
+                unpublishing_reason: null,
+              },
+              {
+                id: 'node_2',
+                thumbnail_filename: 'image2.png',
+                title: 'Chapter 2',
+                description: 'Description 1',
+                prerequisite_skill_ids: ['skill_1'],
+                acquired_skill_ids: ['skill_2'],
+                destination_node_ids: ['node_3'],
+                outline: 'Outline',
+                exploration_id: 'exp_2',
+                outline_is_finalized: false,
+                thumbnail_bg_color: '#a33f40',
+                status: 'Published',
+                planned_publication_date_msecs: 100,
+                last_modified_msecs: 100,
+                first_publication_date_msecs: 200,
+                unpublishing_reason: null,
+              },
+              draftNode,
+            ],
+            url_fragment: 'story-title',
+            topic_name: 'Topic Name',
+            classroom_url_fragment: 'math',
+            topic_url_fragment: 'topic-name',
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [],
+        degrees_of_mastery: {},
+        skill_descriptions: {},
+      };
+      component.topicSummary = LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDictWithDraft
+      );
+      component.ngOnInit();
+      const story = component.storySummaryToDisplay;
+
+      const count = component.getPublishedNodesCount(story);
+      expect(count).toEqual(2);
+    });
+  });
+
+  describe('Story progress calculation with serial chapter feature', () => {
+    it('should calculate storyProgress using published nodes only when feature enabled', () => {
+      mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+        true;
+      const draftNode = {
+        id: 'node_draft',
+        thumbnail_filename: 'image3.png',
+        title: 'Draft Chapter',
+        description: 'Description',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [],
+        outline: 'Outline',
+        exploration_id: 'exp_3',
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Draft',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: null,
+        unpublishing_reason: null,
+      };
+      const learnerTopicSummaryBackendDictWithDraft = {
+        id: 'sample_topic_id_3',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
+        total_published_node_count: 2,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        classroom_name: 'math',
+        classroom_url_fragment: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Chapter 1', 'Chapter 2', 'Draft Chapter'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: ['Chapter 1'],
+            all_node_dicts: [
+              {
+                id: 'node_1',
+                thumbnail_filename: 'image1.png',
+                title: 'Chapter 1',
+                description: 'Description 1',
+                prerequisite_skill_ids: ['skill_1'],
+                acquired_skill_ids: ['skill_2'],
+                destination_node_ids: ['node_2'],
+                outline: 'Outline',
+                exploration_id: 'exp_1',
+                outline_is_finalized: false,
+                thumbnail_bg_color: '#a33f40',
+                status: 'Published',
+                planned_publication_date_msecs: 100,
+                last_modified_msecs: 100,
+                first_publication_date_msecs: 200,
+                unpublishing_reason: null,
+              },
+              {
+                id: 'node_2',
+                thumbnail_filename: 'image2.png',
+                title: 'Chapter 2',
+                description: 'Description 1',
+                prerequisite_skill_ids: ['skill_1'],
+                acquired_skill_ids: ['skill_2'],
+                destination_node_ids: ['node_3'],
+                outline: 'Outline',
+                exploration_id: 'exp_2',
+                outline_is_finalized: false,
+                thumbnail_bg_color: '#a33f40',
+                status: 'Published',
+                planned_publication_date_msecs: 100,
+                last_modified_msecs: 100,
+                first_publication_date_msecs: 200,
+                unpublishing_reason: null,
+              },
+              draftNode,
+            ],
+            url_fragment: 'story-title',
+            topic_name: 'Topic Name',
+            classroom_url_fragment: 'math',
+            topic_url_fragment: 'topic-name',
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [],
+        degrees_of_mastery: {},
+        skill_descriptions: {},
+      };
+      component.topicSummary = LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDictWithDraft
+      );
+      component.ngOnInit();
+
+      expect(component.storyProgress).toEqual(50);
+    });
+
+    it('should return 0 progress when no published nodes exist', () => {
+      mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
+        true;
+      const draftNode = {
+        id: 'node_draft',
+        thumbnail_filename: 'image3.png',
+        title: 'Draft Chapter',
+        description: 'Description',
+        prerequisite_skill_ids: [],
+        acquired_skill_ids: [],
+        destination_node_ids: [],
+        outline: 'Outline',
+        exploration_id: 'exp_3',
+        outline_is_finalized: false,
+        thumbnail_bg_color: '#a33f40',
+        status: 'Draft',
+        planned_publication_date_msecs: 100,
+        last_modified_msecs: 100,
+        first_publication_date_msecs: null,
+        unpublishing_reason: null,
+      };
+      const learnerTopicSummaryBackendDictAllDraft = {
+        id: 'sample_topic_id_4',
+        name: 'Topic Name',
+        language_code: 'en',
+        description: 'description',
+        version: 1,
+        story_titles: ['Story 1'],
+        total_published_node_count: 0,
+        thumbnail_filename: 'image.svg',
+        thumbnail_bg_color: '#C6DCDA',
+        classroom_name: 'math',
+        classroom_url_fragment: 'math',
+        practice_tab_is_displayed: false,
+        canonical_story_summary_dict: [
+          {
+            id: '0',
+            title: 'Story Title',
+            description: 'Story Description',
+            node_titles: ['Draft Chapter'],
+            thumbnail_filename: 'image.svg',
+            thumbnail_bg_color: '#F8BF74',
+            story_is_published: true,
+            completed_node_titles: [],
+            all_node_dicts: [draftNode],
+            url_fragment: 'story-title',
+            topic_name: 'Topic Name',
+            classroom_url_fragment: 'math',
+            topic_url_fragment: 'topic-name',
+          },
+        ],
+        url_fragment: 'topic-name',
+        subtopics: [],
+        degrees_of_mastery: {},
+        skill_descriptions: {},
+      };
+      component.topicSummary = LearnerTopicSummary.createFromBackendDict(
+        learnerTopicSummaryBackendDictAllDraft
+      );
+      component.ngOnInit();
+
+      expect(component.storyProgress).toEqual(0);
+    });
+  });
 });

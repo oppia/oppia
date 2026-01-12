@@ -10,7 +10,7 @@
             </p>
             <div class="goal-list-center">
               <p class="goal-list-progress-text">
-                {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS' | translate: {current: story.getCompletedNodeTitles().length, total: story.getNodeTitles().length} }}
+                {{ 'I18N_LEARNER_DASHBOARD_GOALS_SECTION_LIST_STORY_PROGRESS' | translate: {current: story.getCompletedNodeTitles().length, total: getPublishedNodesCount(story)} }}
               </p>
               <div class="goal-list-progress-bar">
                 <div [ngStyle]="{'width': getStoryProgress(story) + '%'}"> </div>
@@ -23,7 +23,7 @@
               <oppia-content-toggle-button (contentToggleEmitter)="handleToggleState($event, story.getId())"> </oppia-content-toggle-button>
             </div>
               <!--TODO(#18384): Resume state, can only check if node is completed or not.-->
-            <a *ngIf="story.getAllNodes().length !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
+            <a *ngIf="getPublishedNodesCount(story) !== story.getCompletedNodeTitles().length && !isExpanded(story.getId())"
                class="oppia-learner-dash-button-sm oppia-learner-dash-button--goals-list align-self-end e2e-test-start-lesson-button"
                [ngClass]="getStartButtonClass(story, allCurrentNodes[i])"
                [attr.href]="getStartButtonHref(story, allCurrentNodes[i])"

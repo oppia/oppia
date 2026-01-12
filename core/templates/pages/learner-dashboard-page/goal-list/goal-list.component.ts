@@ -58,13 +58,6 @@ export class GoalListComponent implements OnInit {
       .map(story => this.getMostRecentCompletedNode(story));
   }
 
-  getStoryProgress(story: StorySummary): number {
-    return (
-      (story.getCompletedNodeTitles().length / story.getNodeTitles().length) *
-      100
-    );
-  }
-
   getChapterProgress(storyNode: StoryNode): number {
     const explorationId = storyNode.getExplorationId();
     if (!explorationId) {
@@ -156,6 +149,22 @@ export class GoalListComponent implements OnInit {
   isSerialChapterFeatureLearnerFlagEnabled(): boolean {
     return this.platformFeatureService.status.SerialChapterLaunchLearnerView
       .isEnabled;
+  }
+
+  getPublishedNodesCount(story: StorySummary): number {
+    if (this.isSerialChapterFeatureLearnerFlagEnabled()) {
+      return story.getAllNodes().filter(node => node.getPublishedStatus())
+        .length;
+    }
+    return story.getAllNodes().length;
+  }
+
+  getStoryProgress(story: StorySummary): number {
+    const totalNodes = this.getPublishedNodesCount(story);
+    if (totalNodes === 0) {
+      return 0;
+    }
+    return (story.getCompletedNodeTitles().length / totalNodes) * 100;
   }
 
   getStartButtonClass(story: StorySummary, nodeIndex: number): string {
