@@ -38,6 +38,7 @@ from . import (
     common,
     install_python_dev_dependencies,
     install_third_party_libs,
+    npm_static_assets,
     scripts_test_utils,
     servers,
 )
@@ -975,18 +976,18 @@ class BuildTests(test_utils.GenericTestBase):
             'core/tests/data/third_party/css/third_party.min.css'
         )
 
-    def test_npm_library_configs_css_added_to_filepaths(self) -> None:
-        """Test that CSS from NPM_LIBRARY_CONFIGS is added to dependency
+    def test_npm_static_asset_configs_css_added_to_filepaths(self) -> None:
+        """Test that CSS from NPM_STATIC_ASSET_CONFIGS is added to dependency
         filepaths.
         """
         mock_npm_configs = [
             {
                 'name': 'TestLib1',
-                'css_path': 'test/path/lib1.css',
+                'css_paths': ['test/path/lib1.css'],
             },
             {
                 'name': 'TestLib2',
-                'css_path': 'test/path/lib2.css',
+                'css_paths': ['test/path/lib2.css'],
             },
         ]
 
@@ -1000,7 +1001,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
         )
         npm_configs_swap = self.swap(
-            build, 'NPM_LIBRARY_CONFIGS', mock_npm_configs
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
         )
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
@@ -1032,12 +1033,14 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertIn('test/path/lib1.css', join_files_called['css_paths'])
             self.assertIn('test/path/lib2.css', join_files_called['css_paths'])
 
-    def test_npm_library_configs_missing_css_raises_exception(self) -> None:
-        """Test that missing CSS from NPM_LIBRARY_CONFIGS raises exception."""
+    def test_npm_static_asset_configs_missing_css_raises_exception(
+        self,
+    ) -> None:
+        """Test that missing CSS from NPM_STATIC_ASSET_CONFIGS raises exception."""
         mock_npm_configs = [
             {
                 'name': 'MissingLib',
-                'css_path': 'nonexistent/lib.css',
+                'css_paths': ['nonexistent/lib.css'],
             },
         ]
 
@@ -1051,7 +1054,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
         )
         npm_configs_swap = self.swap(
-            build, 'NPM_LIBRARY_CONFIGS', mock_npm_configs
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
         )
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
@@ -1065,8 +1068,8 @@ class BuildTests(test_utils.GenericTestBase):
                 ):
                     build.build_third_party_libs(temp_dir)
 
-    def test_npm_library_configs_fonts_copied_correctly(self) -> None:
-        """Test that fonts from NPM_LIBRARY_CONFIGS are copied correctly."""
+    def test_npm_static_asset_configs_fonts_copied_correctly(self) -> None:
+        """Test that fonts from NPM_STATIC_ASSET_CONFIGS are copied correctly."""
         mock_npm_configs = [
             {
                 'name': 'TestLib',
@@ -1096,7 +1099,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
         )
         npm_configs_swap = self.swap(
-            build, 'NPM_LIBRARY_CONFIGS', mock_npm_configs
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
         )
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
@@ -1133,7 +1136,7 @@ class BuildTests(test_utils.GenericTestBase):
                     with execute_tasks_swap, copy_tasks_swap:
                         build.build_third_party_libs(temp_dir)
 
-            # Verify all font files were collected (excluding directories)
+            # Verify all files were collected (isfile() filters directories)
             self.assertEqual(len(execute_tasks_calls['font_files']), 3)
             self.assertIn(
                 'test/fonts/font1.woff', execute_tasks_calls['font_files']
@@ -1141,9 +1144,14 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertIn(
                 'test/fonts/font2.woff', execute_tasks_calls['font_files']
             )
+            self.assertIn(
+                'test/fonts/readme.txt', execute_tasks_calls['font_files']
+            )
 
-    def test_npm_library_configs_missing_fonts_raises_exception(self) -> None:
-        """Test that missing fonts directory from NPM_LIBRARY_CONFIGS raises
+    def test_npm_static_asset_configs_missing_fonts_raises_exception(
+        self,
+    ) -> None:
+        """Test that missing fonts directory from NPM_STATIC_ASSET_CONFIGS raises
         exception.
         """
         mock_npm_configs = [
@@ -1163,7 +1171,7 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
         )
         npm_configs_swap = self.swap(
-            build, 'NPM_LIBRARY_CONFIGS', mock_npm_configs
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
         )
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
