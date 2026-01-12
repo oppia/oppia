@@ -24,7 +24,7 @@ import uuid
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Final, Type
+from typing import Dict, Final, List, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -286,6 +286,83 @@ class CloudTaskRunModel(base_models.BaseModel):
             CloudTaskRunModel.query(
                 datastore_services.all_of(
                     cls.queue_id == queue_id,
+                    cls.deleted  # pylint: disable=singleton-comparison
+                    == False,
+                )
+            ).fetch()
+        )
+
+
+class VoiceoverRegenerationTaskMappingModel(base_models.BaseModel):
+    """The model maps an exploration's voiceover regeneration request to its
+    Cloud Task run.
+
+    The model key is formed by combining the exploration ID and cloud task run
+    ID, separated by a colon (:), ensuring a unique entry for each regeneration
+    task request.
+    """
+
+    # The exploration ID for which the voiceover regeneration is requested.
+    exploration_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # ID of the corresponding CloudTaskRunModel.
+    cloud_task_run_id = datastore_services.StringProperty(
+        required=True, indexed=True
+    )
+
+    # A dictionary mapping language-accent codes to nested dicts, each nested
+    # dict containing content IDs as keys and regeneration status as values.
+    language_accent_to_content_status_map = datastore_services.JsonProperty(
+        required=True, indexed=False
+    )
+
+    @staticmethod
+    def get_deletion_policy() -> base_models.DELETION_POLICY:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_model_association_to_user() -> (
+        base_models.MODEL_ASSOCIATION_TO_USER
+    ):
+        """Model does not contain user data."""
+        return base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER
+
+    @classmethod
+    def get_export_policy(cls) -> Dict[str, base_models.EXPORT_POLICY]:
+        """Model doesn't contain any data directly corresponding to a user."""
+        return dict(
+            super(cls, cls).get_export_policy(),
+            **{
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_to_content_status_map': (
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE
+                ),
+            },
+        )
+
+    @classmethod
+    def get_voiceover_regeneration_tasks_by_exploration_id(
+        cls, exploration_id: str
+    ) -> List[VoiceoverRegenerationTaskMappingModel]:
+        """The method fetches all voiceover regeneration task requests for the
+        given exploration ID.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+
+        Returns:
+            list(VoiceoverRegenerationTaskMappingModel). A list of
+            VoiceoverRegenerationTaskMappingModel instances matching the given
+            exploration ID.
+        """
+        return list(
+            VoiceoverRegenerationTaskMappingModel.query(
+                datastore_services.all_of(
+                    cls.exploration_id == exploration_id,
                     cls.deleted  # pylint: disable=singleton-comparison
                     == False,
                 )
