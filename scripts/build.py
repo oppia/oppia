@@ -32,6 +32,7 @@ from scripts import (
     common,
     install_python_dev_dependencies,
     install_third_party_libs,
+    npm_static_assets,
     servers,
 )
 
@@ -154,20 +155,6 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 )
 
 HASH_BLOCK_SIZE = 2**20
-
-# Configuration for npm packages that need to be bundled into third_party.css
-# and copied to build directory (packages migrated from dependencies.json).
-NPM_LIBRARY_CONFIGS = [
-    {
-        'name': 'Bootstrap',
-        'css_path': os.path.join('node_modules', 'bootstrap', 'dist', 'css', 'bootstrap.css'),
-    },
-    {
-        'name': 'FontAwesome',
-        'css_path': os.path.join('node_modules', '@fortawesome', 'fontawesome-free', 'css', 'all.min.css'),
-        'fonts_dir': os.path.join('node_modules', '@fortawesome', 'fontawesome-free', 'webfonts'),
-    },
-]
 
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
 
@@ -662,17 +649,17 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     dependency_filepaths = get_dependencies_filepaths()
 
-    # Add CSS from npm packages that have been migrated from dependencies.json.
-    for npm_lib in NPM_LIBRARY_CONFIGS:
-        css_path = npm_lib.get('css_path')
-        if css_path and not os.path.exists(css_path):
-            raise Exception(
-                '%s CSS not found at %s. '
-                'Run "python -m scripts.install_third_party_libs" to install all '
-                'dependencies.'
-                % (npm_lib['name'], css_path)
-            )
-        if css_path:
+    # Add CSS from npm packages that require static-asset handling.
+    # These are defined in npm_static_assets.py instead of being webpack-bundled.
+    for npm_lib in npm_static_assets.NPM_STATIC_ASSET_CONFIGS:
+        css_paths = npm_lib.get('css_paths', [])
+        for css_path in css_paths:
+            if not os.path.exists(css_path):
+                raise Exception(
+                    '%s CSS not found at %s. '
+                    'Run "python -m scripts.install_third_party_libs" to install '
+                    'all dependencies.' % (npm_lib['name'], css_path)
+                )
             dependency_filepaths['css'].append(css_path)
 
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
@@ -688,16 +675,15 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
         )
     )
 
-    # Copy fonts from npm packages that have been migrated from dependencies.json.
-    for npm_lib in NPM_LIBRARY_CONFIGS:
+    # Copy fonts from npm packages that require static-asset handling.
+    for npm_lib in npm_static_assets.NPM_STATIC_ASSET_CONFIGS:
         fonts_dir = npm_lib.get('fonts_dir')
         if fonts_dir:
             if not os.path.exists(fonts_dir):
                 raise Exception(
                     '%s fonts directory not found at %s. '
-                    'Run "python -m scripts.install_third_party_libs" to install all '
-                    'dependencies.'
-                    % (npm_lib['name'], fonts_dir)
+                    'Run "python -m scripts.install_third_party_libs" to install '
+                    'all dependencies.' % (npm_lib['name'], fonts_dir)
                 )
             font_files = []
             for font_file in os.listdir(fonts_dir):
