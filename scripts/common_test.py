@@ -1414,11 +1414,13 @@ class UrlRetrieveTests(CommonTests):
                 self.url = test_url
 
             def getcode(self) -> int:
+                """Return the HTTP status code."""
                 return 200
 
         def mock_urlopen(
             source_url: str, context: ssl.SSLContext
         ) -> MockResponse:
+            """Mock urlopen that returns a MockResponse."""
             self.assertEqual(source_url, test_url)
             self._assert_ssl_context_matches_default(context)
             return MockResponse()
