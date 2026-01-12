@@ -115,10 +115,14 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-5.3/',
             )
 
+        def mock_glob(pattern: str) -> List[str]:
+            return []
+
         readlines_swap = self.swap(
             run_lint_checks.FileCache, 'readlines', mock_readlines
         )
-        with readlines_swap:
+        glob_swap = self.swap(glob, 'glob', mock_glob)
+        with readlines_swap, glob_swap:
             error_messages = other_files_linter.CustomLintChecksManager(
                 FILE_CACHE
             ).check_skip_files_in_app_dev_yaml()
