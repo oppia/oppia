@@ -53,6 +53,7 @@ venv/
 .local/*
 yarn-error.log
 .env
+.npmrc
 .pytest_cache/v/cache/*
 .lighthouseci
 .direnv/*
