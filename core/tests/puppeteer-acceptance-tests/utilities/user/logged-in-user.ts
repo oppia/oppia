@@ -638,41 +638,13 @@ export class LoggedInUser extends BaseUser {
    * Navigates to the home section of the learner dashboard for redesigned dashboard.
    */
   async navigateToHomeSectionInRedesignedDashboard(): Promise<void> {
-    if (await this.isViewportAtMobileWidth()) {
-      // Redesigned dashboard (mobile) uses the same tab selector as desktop.
-      await this.page.waitForSelector(homeSectionSelector);
-      await this.clickOnElementWithSelector(homeSectionSelector);
-
-      try {
-        await this.page.waitForSelector(homeSectionGreetingElement, {
-          timeout: 10000,
-        });
-      } catch (error) {
-        if (error instanceof puppeteer.errors.TimeoutError) {
-          // Try clicking again if does not opens the expected page.
-          await this.clickOnElementWithSelector(homeSectionSelector);
-        } else {
-          throw error;
-        }
-      }
-
-      await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-        visible: true,
-      });
-    } else {
-      // Desktop (legacy and redesigned) both expose .e2e-test-home-section.
-      await this.page.waitForSelector(homeSectionSelector);
-      const homeSectionElement = await this.page.$(homeSectionSelector);
-      if (!homeSectionElement) {
-        throw new Error('Home section not found.');
-      }
-      await this.waitForElementToBeClickable(homeSectionElement);
-      await homeSectionElement.click();
-    }
-
+    // Only use new selector in redesigned dashboard (mobile & desktop)
+    await this.page.waitForSelector('.e2e-test-home-section', {timeout: 60000});
+    await this.clickOnElementWithSelector('.e2e-test-home-section');
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
-      visible: true,
+    // Main dashboard section visible check.
+    await this.page.waitForSelector('.e2e-test-learner-dash-section', {
+      timeout: 60000,
     });
   }
 
