@@ -72,16 +72,12 @@ oppia-input-response-pair .oppia-loading-dot-one,
 oppia-input-response-pair .oppia-loading-dot-two,
 oppia-input-response-pair .oppia-loading-dot-three {
   background-color: #666;
-  display: inline-block;
-  height: 5px; 
-  width: 5px;       
-  margin-right: 4px;
   border-radius: 50%;
+  display: inline-block;
   font-size: 0;    
-}
-
-oppia-input-response-pair .oppia-loading-dot-three {
-  margin-right: 0;
+  height: 5px; 
+  margin-right: 4px;
+  width: 5px;  
 }
 
 oppia-input-response-pair .oppia-loading-dot-one {
@@ -106,6 +102,7 @@ oppia-input-response-pair .oppia-loading-dot-two {
 
 oppia-input-response-pair .oppia-loading-dot-three {
   -webkit-animation: dot 1.0s infinite;
+   margin-right: 0;
   -moz-animation: dot 1.0s infinite;
   animation: dot 1.0s infinite;
   -webkit-animation-delay: 0.4s;
