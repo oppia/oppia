@@ -16,5 +16,5 @@
  * @fileoverview This file imports the skulpt library.
  */
 
-import 'skulpt/dist/skulpt.min.js';
-import 'skulpt/dist/skulpt-stdlib.js';
+import 'skulpt-dist/skulpt.min.js';
+import 'skulpt-dist/skulpt-stdlib.js';
