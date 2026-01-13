@@ -68,16 +68,23 @@ oppia-input-response-pair .oppia-popover {
   max-width: 300px;
 }
 
-oppia-input-response-pair .conversation-skin-feedback-dot-one,
-oppia-input-response-pair .conversation-skin-feedback-dot-two,
-oppia-input-response-pair .conversation-skin-feedback-dot-three {
+oppia-input-response-pair .oppia-loading-dot-one,
+oppia-input-response-pair .oppia-loading-dot-two,
+oppia-input-response-pair .oppia-loading-dot-three {
   background-color: #666;
   display: inline-block;
-  height: 2px;
-  width: 2px;
+  height: 5px; 
+  width: 5px;       
+  margin-right: 4px;
+  border-radius: 50%;
+  font-size: 0;    
 }
 
-oppia-input-response-pair .conversation-skin-feedback-dot-one {
+oppia-input-response-pair .oppia-loading-dot-three {
+  margin-right: 0;
+}
+
+oppia-input-response-pair .oppia-loading-dot-one {
   -webkit-animation: dot 1.0s infinite;
   -moz-animation: dot 1.0s infinite;
   animation: dot 1.0s infinite;
@@ -87,7 +94,7 @@ oppia-input-response-pair .conversation-skin-feedback-dot-one {
   opacity: 0;
 }
 
-oppia-input-response-pair .conversation-skin-feedback-dot-two {
+oppia-input-response-pair .oppia-loading-dot-two {
   -webkit-animation: dot 1.0s infinite;
   -moz-animation: dot 1.0s infinite;
   animation: dot 1.0s infinite;
@@ -97,7 +104,7 @@ oppia-input-response-pair .conversation-skin-feedback-dot-two {
   opacity: 0;
 }
 
-oppia-input-response-pair .conversation-skin-feedback-dot-three {
+oppia-input-response-pair .oppia-loading-dot-three {
   -webkit-animation: dot 1.0s infinite;
   -moz-animation: dot 1.0s infinite;
   animation: dot 1.0s infinite;
