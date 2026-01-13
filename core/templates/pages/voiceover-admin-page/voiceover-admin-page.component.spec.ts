@@ -396,4 +396,16 @@ describe('Voiceover Admin Page component ', () => {
     component.openCloudTaskRunDetailModal('cloudTaskRunId');
     expect(ngbModal.open).toHaveBeenCalled();
   });
+
+  it('should get frontend function id text', () => {
+    const functionId1 = 'regenerate_voiceovers_on_exploration_update';
+    const expectedText1 = 'Exploration content updated';
+    expect(component.getFunctionIdText(functionId1)).toBe(expectedText1);
+
+    const functionId2 = 'regenerate_voiceovers_on_exploration_added_to_topic';
+    const expectedText2 = 'Exploration added to topic';
+    expect(component.getFunctionIdText(functionId2)).toBe(expectedText2);
+
+    expect(component.getFunctionIdText('unknown_function_id')).toBe('');
+  });
 });
