@@ -23,7 +23,7 @@ import os
 
 from core.tests import test_utils
 
-from typing import Final
+from typing import Dict, Final, List
 
 from . import html_linter, run_lint_checks
 
@@ -38,14 +38,23 @@ VALID_HTML_FILEPATH: Final = os.path.join(LINTER_TESTS_DIR, 'valid.html')
 INVALID_STYLE_INDENTATION_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_style_indentation.html'
 )
+VALID_STYLE_INDENTATION_HTML_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_style_indentation.html'
+)
 INVALID_INDENTATION_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_indentation.html'
 )
 INVALID_QUOTES_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_quotes.html'
 )
+VALID_QUOTES_HTML_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_quotes.html'
+)
 INVALID_ALIGNMENT_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_alignment_of_tags.html'
+)
+VALID_ALIGNMENT_HTML_FILEPATH: Final = os.path.join(
+    LINTER_TESTS_DIR, 'valid_alignment_of_tags.html'
 )
 INVALID_MISSING_HTML_TAG_HTML_FILEPATH: Final = os.path.join(
     LINTER_TESTS_DIR, 'invalid_missing_html_tag.html'
@@ -86,6 +95,18 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         )
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_custom_linter_with_valid_style_indentation(self) -> None:
+        lint_task_report = html_linter.HTMLLintChecksManager(
+            [VALID_STYLE_INDENTATION_HTML_FILEPATH], FILE_CACHE
+        ).check_html_tags_and_attributes()
+
+        self.assertEqual(
+            ['SUCCESS  HTML tag and attribute check passed'],
+            lint_task_report.get_report(),
+        )
+        self.assertEqual('HTML tag and attribute', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_custom_linter_with_invalid_indentation(self) -> None:
         lint_task_report = html_linter.HTMLLintChecksManager(
@@ -129,6 +150,17 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         )
         self.assertEqual('HTML tag and attribute', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
+
+    def test_custom_linter_with_valid_alignment(self) -> None:
+        lint_task_report = html_linter.HTMLLintChecksManager(
+            [VALID_ALIGNMENT_HTML_FILEPATH], FILE_CACHE
+        ).check_html_tags_and_attributes()
+        self.assertEqual(
+            ['SUCCESS  HTML tag and attribute check passed'],
+            lint_task_report.get_report(),
+        )
+        self.assertEqual('HTML tag and attribute', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
 
     def test_custom_linter_with_invalid_tags(self) -> None:
         with self.assertRaisesRegex(
@@ -259,6 +291,14 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
         self.assertEqual('HTMLLint', lint_task_report.name)
         self.assertTrue(lint_task_report.failed)
 
+    def test_third_party_linter_without_lint_errors(self) -> None:
+        lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
+            [VALID_QUOTES_HTML_FILEPATH]
+        ).lint_html_files()
+        self.assertEqual([], lint_task_report.trimmed_messages)
+        self.assertEqual('HTMLLint', lint_task_report.name)
+        self.assertFalse(lint_task_report.failed)
+
     def test_third_party_perform_all_lint_checks(self) -> None:
         lint_task_report = html_linter.ThirdPartyHTMLLintChecksManager(
             [INVALID_QUOTES_HTML_FILEPATH]
@@ -277,3 +317,37 @@ class CustomHTMLParserTests(test_utils.LinterTestBase):
                 third_party_linter, html_linter.ThirdPartyHTMLLintChecksManager
             )
         )
+
+    def test_trimmed_output_false_branch(self) -> None:
+        fake_linter_output = (
+            '/path/to/file/invalid_quotes.html: line 10, col 20, line contains trailing whitespace\n'
+            'some unrelated line\n'
+            'not empty last line'
+        )
+
+        trimmed_output = html_linter.ThirdPartyHTMLLintChecksManager._get_trimmed_error_output(  # pylint: disable=protected-access
+            fake_linter_output
+        )
+
+        expected_output = f'{fake_linter_output}\n'
+        self.assertEqual(trimmed_output, expected_output)
+
+    def test_check_space_between_attributes_and_values_false(self) -> None:
+        file_lines = ('<div id="test-class" class ="test">',)
+
+        parser = html_linter.CustomHTMLParser(
+            filepath='dummy.html', file_lines=file_lines, failed=False
+        )
+
+        tag = 'div'
+        attr = 'class'
+        value = 'test'
+        value_in_quotes = True
+        attr_pos_mapping: Dict[str, List[int]] = {}
+
+        parser._check_space_between_attributes_and_values(  # pylint: disable=protected-access
+            tag, attr, value, file_lines[0], value_in_quotes, attr_pos_mapping
+        )
+
+        self.assertTrue(parser.failed)
+        self.assertTrue(any('class' in msg for msg in parser.error_messages))
