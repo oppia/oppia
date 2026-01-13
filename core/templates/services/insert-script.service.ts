@@ -68,11 +68,12 @@ export class InsertScriptService {
           scriptElement.setAttribute('paypalExpress', 'false');
           scriptElement.async = true;
           break;
-        case KNOWN_SCRIPTS.MATHJAX:
+        case KNOWN_SCRIPTS.MATHJAX: {
           // Serve MathJax directly from the local node_modules folder in dev.
           const mathJaxBasePath = '/node_modules/mathjax/';
           scriptElement.src = `${mathJaxBasePath}MathJax.js?config=default`;
           break;
+        }
         case KNOWN_SCRIPTS.PENCILCODE:
           scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
           break;
