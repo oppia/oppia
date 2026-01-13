@@ -162,6 +162,11 @@
   width: 686px;
 }
 
+.breadcrumbs-container .classroom-information-container .classroom-text-container {
+  flex-grow: 1;
+  min-width: 0;
+}
+
 .breadcrumbs-container .classroom-information-container {
   align-items: start;
   display: flex;
@@ -193,6 +198,10 @@
   margin: 0;
   padding-right: 10px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 600px; 
 }
 
 .breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
@@ -204,6 +213,11 @@
   line-height: 68px;
   padding-right: 10px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  margin: 0;
+  max-width: 520px;
 }
 
 .breadcrumbs-container .classroom-breadcrumbs .desktop-breadcrumbs {
@@ -265,6 +279,10 @@
   font-weight: 400;
   letter-spacing: -0.02em;
   text-align: center;
+}
+
+.breadcrumbs-container .classroom-information-container .classroom-thumbnail-container {
+  flex-shrink: 0;
 }
 
 .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
@@ -347,17 +365,22 @@
     font-style: normal;
     line-height: 22px;
     padding-right: 0;
-    white-space: pre-wrap;
-    
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
   }
+  
   .breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
     font-size: 28px;
     letter-spacing: -0.02em;
     line-height: 36px;
     margin-top: 10px;
     padding-right: 0;
-    white-space: pre-wrap;
-
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
   }
 
   .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
@@ -386,5 +409,4 @@
   .oppia-classroom-search-container .oppia-classrooms-search-section .search-box-text-container {
     align-items: center;
   }
-
 }
