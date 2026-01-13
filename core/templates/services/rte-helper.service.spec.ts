@@ -373,9 +373,15 @@ describe('Rte Helper Service', () => {
   });
 
   it('should evaluate when rich text component is not inline', () => {
-    expect(rteHelperService.isInlineComponent('video')).toBe(false);
-    expect(rteHelperService.isInlineComponent('tabs')).toBe(false);
-    expect(rteHelperService.isInlineComponent('image')).toBe(false);
+    expect(
+      rteHelperService.isInlineComponent('video' as unknown as never)
+    ).toBe(false);
+    expect(rteHelperService.isInlineComponent('tabs' as unknown as never)).toBe(
+      false
+    );
+    expect(
+      rteHelperService.isInlineComponent('image' as unknown as never)
+    ).toBe(false);
   });
 
   it('should open customization modal', () => {
