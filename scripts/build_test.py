@@ -978,7 +978,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_npm_static_asset_configs_css_added_to_filepaths(self) -> None:
         """Test that CSS from NPM_STATIC_ASSET_CONFIGS is added to dependency
-        filepaths."""
+        filepaths.
+        """
         mock_npm_configs = [
             {
                 'name': 'TestLib1',
@@ -1014,7 +1015,7 @@ class BuildTests(test_utils.GenericTestBase):
             execute_tasks_swap = self.swap(
                 build, '_execute_tasks', lambda _: None
             )
-            join_files_called = {'css_paths': []}
+            join_files_called: Dict[str, List[str]] = {'css_paths': []}
 
             def mock_join_files(
                 css_paths: List[str], unused_stream: io.TextIOWrapper
@@ -1035,7 +1036,8 @@ class BuildTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that missing CSS from NPM_STATIC_ASSET_CONFIGS raises
-        exception."""
+        exception.
+        """
         mock_npm_configs = [
             {
                 'name': 'MissingLib',
@@ -1104,9 +1106,9 @@ class BuildTests(test_utils.GenericTestBase):
         listdir_swap = self.swap(os, 'listdir', mock_listdir)
         isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
 
-        execute_tasks_calls = {'font_files': []}
+        execute_tasks_calls: Dict[str, List[str]] = {'font_files': []}
 
-        def mock_execute_tasks(tasks: Deque[threading.Thread]) -> None:
+        def mock_execute_tasks(unused_tasks: Deque[threading.Thread]) -> None:
             pass
 
         def mock_generate_copy_tasks(
@@ -1116,8 +1118,11 @@ class BuildTests(test_utils.GenericTestBase):
             return collections.deque()
 
         with tempfile.TemporaryDirectory() as temp_dir:
+            def mock_ensure_directory_exists(dirpath: str) -> None:
+                os.makedirs(dirpath, exist_ok=True)
+
             ensure_dir_swap = self.swap(
-                common, 'ensure_directory_exists', lambda _: None
+                common, 'ensure_directory_exists', mock_ensure_directory_exists
             )
             execute_tasks_swap = self.swap(
                 build, '_execute_tasks', mock_execute_tasks
@@ -1148,7 +1153,8 @@ class BuildTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that missing fonts directory from NPM_STATIC_ASSET_CONFIGS
-        raises exception."""
+        raises exception.
+        """
         mock_npm_configs = [
             {
                 'name': 'MissingFontsLib',
@@ -1159,7 +1165,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
             return {'css': [], 'js': [], 'fonts': []}
 
-        def mock_exists(path: str) -> bool:
+        def mock_exists(unused_path: str) -> bool:
             return False
 
         get_deps_swap = self.swap(
@@ -1171,8 +1177,11 @@ class BuildTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
         with tempfile.TemporaryDirectory() as temp_dir:
+            def mock_ensure_directory_exists(dirpath: str) -> None:
+                os.makedirs(dirpath, exist_ok=True)
+
             ensure_dir_swap = self.swap(
-                common, 'ensure_directory_exists', lambda _: None
+                common, 'ensure_directory_exists', mock_ensure_directory_exists
             )
             execute_tasks_swap = self.swap(
                 build, '_execute_tasks', lambda _: None

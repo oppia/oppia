@@ -57,10 +57,11 @@ class NpmStaticAssetsTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(bootstrap_config)
+        assert bootstrap_config is not None
         self.assertIn('css_paths', bootstrap_config)
         self.assertGreater(len(bootstrap_config['css_paths']), 0)
 
-        # Bootstrap CSS path should contain 'bootstrap'
+        # Bootstrap CSS path should contain 'bootstrap'.
         css_path = bootstrap_config['css_paths'][0]
         self.assertIn('bootstrap', css_path.lower())
 
@@ -72,14 +73,15 @@ class NpmStaticAssetsTests(test_utils.GenericTestBase):
         )
 
         self.assertIsNotNone(fa_config)
+        assert fa_config is not None
         self.assertIn('css_paths', fa_config)
         self.assertGreater(len(fa_config['css_paths']), 0)
         self.assertIn('fonts_dir', fa_config)
 
-        # FontAwesome should have multiple CSS files
+        # FontAwesome should have multiple CSS files.
         self.assertGreaterEqual(len(fa_config['css_paths']), 4)
 
-        # Verify expected CSS files are present
+        # Verify expected CSS files are present.
         css_files = [os.path.basename(p) for p in fa_config['css_paths']]
         expected_files = [
             'fontawesome.min.css',

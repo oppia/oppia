@@ -115,7 +115,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
                 '- third_party/static/bootstrap-5.3/',
             )
 
-        def mock_glob(pattern: str) -> List[str]:
+        def mock_glob(unused_pattern: str) -> List[str]:
             return []
 
         readlines_swap = self.swap(
