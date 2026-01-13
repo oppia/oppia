@@ -1593,8 +1593,6 @@ class ExplorationDataForVoiceoverRegenerationHandlerTests(
             False,
         )
 
-        # updated_exp = exp_fetchers.get_exploration_by_id(self.exploration_id)
-
         # Adding language accent support for Oppia's voiceovers.
         language_codes_mapping: Dict[str, Dict[str, bool]] = {
             'en': {'en-US': True, 'en-IN': False},
