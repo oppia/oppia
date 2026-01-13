@@ -46,6 +46,10 @@ handlers:
   static_dir: dist/
   secure: always
   expiration: "0"
+- url: /node_modules
+  static_dir: node_modules
+  secure: always
+  expiration: "0"
 - url: /assets/audio
   static_dir: assets/audio
   secure: always

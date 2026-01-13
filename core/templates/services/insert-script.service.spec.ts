@@ -141,7 +141,7 @@ describe('InsertScriptService', () => {
     );
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
-      expect(mockScriptElement.src).toContain(
+      expect(mockScriptElement.src).toBe(
         '/node_modules/mathjax/MathJax.js?config=default'
       );
       done();
