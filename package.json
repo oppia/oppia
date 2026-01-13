@@ -202,13 +202,13 @@
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
+    "skulpt-dist": "git+https://github.com/skulpt/skulpt-dist#7b61d",
     "stream-browserify": "^3.0.0",
     "ts-morph": "^22.0.0",
     "tslib": "^2.0.0",
     "vanilla-picker": "^2.10.1",
     "wavesurfer.js": "^5.2.0",
-    "wdio-intercept-service": "^4.2.2",
-    "skulpt": "1.2.0"
+    "wdio-intercept-service": "^4.2.2"
   },
   "resolutions": {
     "@types/babel__traverse": "7.20.6",
