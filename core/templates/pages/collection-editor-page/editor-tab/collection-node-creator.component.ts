@@ -19,7 +19,12 @@
 import {Component} from '@angular/core';
 import {ExplorationCreationBackendApiService} from 'components/entity-creation-services/exploration-creation-backend-api.service';
 import {Collection} from 'domain/collection/collection.model';
-import {ExplorationSummaryBackendApiService} from 'domain/summary/exploration-summary-backend-api.service';
+import {
+  ExplorationSummaryBackendApiService,
+  ExplorationSummaryDict,
+} from 'domain/summary/exploration-summary-backend-api.service';
+import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {AppConstants} from 'app.constants';
 import {NormalizeWhitespacePipe} from 'filters/string-utility-filters/normalize-whitespace.pipe';
 import {AlertsService} from 'services/alerts.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -81,7 +86,9 @@ export class CollectionNodeCreatorComponent {
             this.collectionLinearizerService.appendCollectionNode(
               this.collection,
               newExplorationId,
-              summaryBackendObject
+              this._getLearnerExplorationSummaryBackendDict(
+                summaryBackendObject
+              )
             );
           } else {
             this.alertsService.addWarning(
@@ -138,5 +145,24 @@ export class CollectionNodeCreatorComponent {
   addExploration(): void {
     this.addExplorationToCollection(this.newExplorationId);
     this.newExplorationId = '';
+  }
+
+  private _getLearnerExplorationSummaryBackendDict(
+    summary: ExplorationSummaryDict
+  ): LearnerExplorationSummaryBackendDict {
+    return {
+      ...summary,
+      activity_type: AppConstants.ENTITY_TYPE.EXPLORATION,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      created_on_msec: 0,
+      last_updated_msec: 0,
+      tags: summary.tags as unknown as string[],
+    };
   }
 }

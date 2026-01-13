@@ -32,6 +32,7 @@ import {CollectionNode} from 'domain/collection/collection-node.model';
 import {Collection} from 'domain/collection/collection.model';
 import {CollectionPlayerBackendApiService} from './services/collection-player-backend-api.service';
 import {LearnerExplorationSummaryBackendDict} from 'domain/summary/learner-exploration-summary.model';
+import {CollectionPlaythrough} from 'domain/collection/collection-playthrough.model';
 
 import './collection-player-page.component.css';
 
@@ -73,7 +74,7 @@ export interface CollectionHandler {
 export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   directiveSubscriptions = new Subscription();
   collection!: Collection;
-  collectionPlaythrough;
+  collectionPlaythrough!: CollectionPlaythrough;
   currentExplorationId!: string;
   summaryToPreview!: LearnerExplorationSummaryBackendDict;
   pathSvgParameters!: string;
@@ -89,11 +90,11 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   ICON_X_LEFT_PX!: number;
   ICON_X_RIGHT_PX!: number;
   collectionId!: string;
-  nextExplorationId!: string;
-  collectionSummary;
+  nextExplorationId: string | null = null;
+  collectionSummary: string | null = null;
   isLoggedIn: boolean = false;
   explorationCardIsShown: boolean = false;
-  elementToScrollTo: string;
+  elementToScrollTo: string = '';
 
   constructor(
     private guestCollectionProgressService: GuestCollectionProgressService,
@@ -132,17 +133,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   }
 
   getNextRecommendedCollectionNodes(): CollectionNode {
-    return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getNextExplorationId()
-    );
+    const nextExplorationId = this.collectionPlaythrough.getNextExplorationId();
+    if (nextExplorationId === null) {
+      throw new Error('Next exploration ID cannot be null');
+    }
+    return this.getCollectionNodeForExplorationId(nextExplorationId);
   }
 
   getCompletedExplorationNodes(): CollectionNode {
     return this.getCollectionNodeForExplorationId(
-      this.collectionPlaythrough.getCompletedExplorationIds()
+      this.collectionPlaythrough.getCompletedExplorationIds()[0]
     );
   }
-
   getNonRecommendedCollectionNodeCount(): number {
     return (
       this.collection.getCollectionNodeCount() -
@@ -154,10 +156,9 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   updateExplorationPreview(explorationId: string): void {
     this.explorationCardIsShown = true;
     this.currentExplorationId = explorationId;
-    this.summaryToPreview =
-      this.getCollectionNodeForExplorationId(
-        explorationId
-      ).getExplorationSummaryObject();
+    this.summaryToPreview = this.getCollectionNodeForExplorationId(
+      explorationId
+    ).getExplorationSummaryObject() as LearnerExplorationSummaryBackendDict;
   }
 
   // Calculates the SVG parameters required to draw the curved path.
@@ -208,14 +209,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   generatePathIconParameters(): IconParametersArray[] {
     let collectionNodes = this.collection.getCollectionNodes();
     let iconParametersArray = [];
+    let firstNodeSummary = collectionNodes[0].getExplorationSummaryObject();
+    if (!firstNodeSummary) {
+      throw new Error('Exploration summary missing for first node');
+    }
     iconParametersArray.push({
-      thumbnailIconUrl: collectionNodes[0]
-        .getExplorationSummaryObject()
-        .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+      thumbnailIconUrl: firstNodeSummary.thumbnail_icon_url.replace(
+        'subjects',
+        'inverted_subjects'
+      ),
       left: '225px',
       top: '35px',
-      thumbnailBgColor:
-        collectionNodes[0].getExplorationSummaryObject().thumbnail_bg_color,
+      thumbnailBgColor: firstNodeSummary.thumbnail_bg_color,
     });
 
     // Here x and y represent the co-ordinates for the icons in the
@@ -237,14 +242,18 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
         x = this.ICON_X_MIDDLE_PX;
         y += this.ICON_Y_INCREMENT_PX;
       }
+      let nodeSummary = collectionNodes[i].getExplorationSummaryObject();
+      if (!nodeSummary) {
+        throw new Error('Exploration summary missing for node ' + i);
+      }
       iconParametersArray.push({
-        thumbnailIconUrl: collectionNodes[i]
-          .getExplorationSummaryObject()
-          .thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+        thumbnailIconUrl: nodeSummary.thumbnail_icon_url.replace(
+          'subjects',
+          'inverted_subjects'
+        ),
         left: x + 'px',
         top: y + 'px',
-        thumbnailBgColor:
-          collectionNodes[i].getExplorationSummaryObject().thumbnail_bg_color,
+        thumbnailBgColor: nodeSummary.thumbnail_bg_color,
       });
     }
     return iconParametersArray;
@@ -262,12 +271,15 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
     } else if ((index + 1) % 4 === 0) {
       return '-55px';
     }
+    return '';
   }
 
   scrollToLocation(el: string): void {
     this.elementToScrollTo = el;
     const element = document.getElementById(el);
-    element.scrollIntoView({behavior: 'smooth'});
+    if (element) {
+      element.scrollIntoView({behavior: 'smooth'});
+    }
   }
 
   closeOnClickingOutside(): void {
@@ -327,7 +339,6 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loaderService.showLoadingScreen('Loading');
-    this.collection = null;
     this.collectionId = this.urlService.getCollectionIdFromUrl();
     this.explorationCardIsShown = false;
     // The pathIconParameters is an array containing the co-ordinates,

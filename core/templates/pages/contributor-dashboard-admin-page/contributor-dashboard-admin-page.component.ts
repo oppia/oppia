@@ -27,14 +27,14 @@ interface ViewContributionReviewers {
   filterCriterion: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
 interface AddContributionReviewer {
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -42,7 +42,7 @@ interface RemoveContributionReviewer {
   method: string;
   username: string;
   category: string | null;
-  languageCode: string;
+  languageCode: string | null;
   isValid: () => boolean;
 }
 
@@ -92,13 +92,13 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
   UserIsTranslationAdmin: boolean = false;
   isNewUiEnabled: boolean = false;
 
-  USER_FILTER_CRITERION_ROLE: string;
-  USER_FILTER_CRITERION_USERNAME: string;
-  CD_USER_RIGHTS_CATEGORIES: Record<string, string>;
+  USER_FILTER_CRITERION_ROLE: string = '';
+  USER_FILTER_CRITERION_USERNAME: string = '';
+  CD_USER_RIGHTS_CATEGORIES: Record<string, string> = {};
 
   contributionReviewersDataFetched: boolean = false;
   contributionReviewersResult: ContributionReviewersResult = {};
-  translationContributionStatsFetched: boolean;
+  translationContributionStatsFetched: boolean = false;
   translationContributionStatsResults: TranslationContributionStat[] = [];
   languageCodesAndDescriptions: LanguageCodeDescription[] = [];
   formData!: FormData;
@@ -143,6 +143,7 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
           ) {
             return Boolean(this.formData.viewContributionReviewers.username);
           }
+          return false;
         },
       },
       addContributionReviewer: {
@@ -272,6 +273,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.statusMessage = 'Adding contribution rights...';
     this.taskRunningInBackground = true;
 
+    if (formResponse.category === null) {
+      throw new Error('Category cannot be null');
+    }
     this.contributorDashboardAdminBackendApiService
       .addContributionReviewerAsync(
         formResponse.category,
@@ -303,6 +307,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     if (
       formResponse.filterCriterion === AppConstants.USER_FILTER_CRITERION_ROLE
     ) {
+      if (formResponse.category === null) {
+        throw new Error('Category cannot be null');
+      }
       this.contributorDashboardAdminBackendApiService
         .viewContributionReviewersAsync(
           formResponse.category,
@@ -364,6 +371,9 @@ export class ContributorDashboardAdminPageComponent implements OnInit {
     this.statusMessage = 'Processing query...';
     this.taskRunningInBackground = true;
 
+    if (formResponse.category === null) {
+      throw new Error('Category cannot be null');
+    }
     this.contributorDashboardAdminBackendApiService
       .removeContributionReviewerAsync(
         formResponse.category,

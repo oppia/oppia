@@ -374,7 +374,7 @@ describe('Collection player page component', () => {
       tick();
       let res = component.isCompletedExploration('123');
 
-      expect(res).toBeFalse();
+      expect(res).toBe(false);
     })
   );
 
@@ -395,10 +395,11 @@ describe('Collection player page component', () => {
       tick();
 
       // This happens when collection is not loaded.
-      component.collectionPlaythrough = undefined;
+      component.collectionPlaythrough =
+        undefined as unknown as CollectionPlaythrough;
       let res = component.isCompletedExploration('123');
 
-      expect(res).toBeFalse();
+      expect(res).toBe(false);
     })
   );
 
@@ -654,7 +655,7 @@ describe('Collection player page component', () => {
         'mobile-path-anchor-0'
       );
       expect(component.updateExplorationPreview).toHaveBeenCalledWith('exp_id');
-      expect(component.explorationCardIsShown).toBeTrue();
+      expect(component.explorationCardIsShown).toBe(true);
 
       fixture.detectChanges();
 
@@ -666,7 +667,7 @@ describe('Collection player page component', () => {
 
       expect(component.closeOnClickingOutside).toHaveBeenCalled();
       expect(component.scrollToLocation).toHaveBeenCalled();
-      expect(component.explorationCardIsShown).toBeFalse();
+      expect(component.explorationCardIsShown).toBe(false);
     })
   );
 });
