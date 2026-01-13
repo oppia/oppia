@@ -104,8 +104,8 @@ oppia-input-response-pair .oppia-loading-dot-three {
   -moz-animation: dot 1.0s infinite;
   -webkit-animation: dot 1.0s infinite;
   animation: dot 1.0s infinite;
-  animation-delay: 0.4s;
   -moz-animation-delay: 0.4s;
+  animation-delay: 0.4s;
   -webkit-animation-delay: 0.4s;
   margin-right: 0;
   opacity: 0;
