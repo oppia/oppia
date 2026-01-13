@@ -21,16 +21,16 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
+
+const DUMMY_PASS_BEAM_JOB = 'DummyPassJob';
+const DUMMY_FAIL_BEAM_JOB = 'DummyFailJob';
+const DUMMY_PASS_BEAM_JOB_OUTPUT = 'SUCCESS: Dummy job completed successfully';
+const DUMMY_FAIL_BEAM_JOB_ERROR =
+  'Exception: DummyFailJob intentionally failed.';
 
 describe('Release Coordinator', function () {
   let releaseCoordinator: ReleaseCoordinator;
-  let explorationEditor: ExplorationEditor;
-  let explorationId: string;
 
   beforeAll(async function () {
     releaseCoordinator = await UserFactory.createNewUser(
@@ -38,26 +38,6 @@ describe('Release Coordinator', function () {
       'releaseCoordinator@example.com',
       [testConstants.Roles.RELEASE_COORDINATOR]
     );
-
-    explorationEditor = await UserFactory.createNewUser(
-      'explorationEditor',
-      'exploration_editor@example.com'
-    );
-
-    // Creating data for the beam job.
-    await explorationEditor.navigateToCreatorDashboardPage();
-    await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-    await explorationEditor.dismissWelcomeModal();
-    await explorationEditor.updateCardContent(
-      'We will be learning Expressions today.'
-    );
-    await explorationEditor.addMathInteraction(
-      INTERACTION_TYPES.NUMERIC_EXPRESSION
-    );
-    await explorationEditor.closeInteractionResponseModal();
-
-    await explorationEditor.saveExplorationDraft();
-    explorationId = await explorationEditor.getExplorationId();
   });
 
   it('should be able to visit release coordinator page', async function () {
@@ -68,27 +48,31 @@ describe('Release Coordinator', function () {
     );
   });
 
-  it('should be able to run beam job (Success)', async function () {
-    await releaseCoordinator.selectAndRunJob(
-      'FindMathExplorationsWithRulesJob'
-    );
+  it('should be able to run beam job (success)', async function () {
+    await releaseCoordinator.selectAndRunJob(DUMMY_PASS_BEAM_JOB);
     // Beam jobs, take a while to run.
     await releaseCoordinator.waitForJobToComplete();
-
-    await releaseCoordinator.viewAndCopyJobOutput();
-    // Check if the job output is as expected.
-    await releaseCoordinator.expectJobOutputToBe(
-      `('${explorationId}', 'Introduction', [])`
-    );
     await releaseCoordinator.expectJobStatusToBeSuccessful(
       1, // First job.
       true // Successful.
     );
+
+    await releaseCoordinator.viewAndCopyJobOutput();
+    // Check if the job output is as expected.
+    await releaseCoordinator.expectJobOutputToBe(DUMMY_PASS_BEAM_JOB_OUTPUT);
   });
 
-  it('should be able to handle beam job failure', async function () {
-    // TODO(#23331): Once we have a dummy job that always fails,
-    // add steps to run the dummy job and check if the job status is failure.
+  it('should be able to handle beam job (failure)', async function () {
+    await releaseCoordinator.closeOutputModal();
+    await releaseCoordinator.selectAndRunJob(DUMMY_FAIL_BEAM_JOB);
+    await releaseCoordinator.waitForJobToComplete();
+    await releaseCoordinator.expectJobStatusToBeSuccessful(
+      1, // Latest job of DummyFailJob.
+      false // Failure.
+    );
+
+    await releaseCoordinator.viewJobOutput();
+    await releaseCoordinator.expectJobOutputToBe(DUMMY_FAIL_BEAM_JOB_ERROR);
   });
 
   afterAll(async function () {
