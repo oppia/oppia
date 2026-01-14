@@ -1048,7 +1048,7 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
             return {'css': [], 'js': [], 'fonts': []}
 
-        def mock_exists(path: str) -> bool:
+        def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
             return False
 
         get_deps_swap = self.swap(
@@ -1118,6 +1118,7 @@ class BuildTests(test_utils.GenericTestBase):
             return collections.deque()
 
         with tempfile.TemporaryDirectory() as temp_dir:
+
             def mock_ensure_directory_exists(dirpath: str) -> None:
                 os.makedirs(dirpath, exist_ok=True)
 
@@ -1177,6 +1178,7 @@ class BuildTests(test_utils.GenericTestBase):
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
         with tempfile.TemporaryDirectory() as temp_dir:
+
             def mock_ensure_directory_exists(dirpath: str) -> None:
                 os.makedirs(dirpath, exist_ok=True)
 
