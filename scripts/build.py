@@ -662,6 +662,29 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     )
 
 
+def copy_mathjax_to_build() -> None:
+    """Copies MathJax from node_modules to build/third_party/mathjax for
+    production use.
+    """
+    print('Copying MathJax from node_modules to build directory')
+    source_mathjax_dir = os.path.join('node_modules', 'mathjax')
+    target_mathjax_dir = os.path.join('build', 'third_party', 'mathjax')
+
+    if not os.path.isdir(source_mathjax_dir):
+        raise Exception(
+            'MathJax not found in node_modules. '
+            'Please run: npm install or yarn install'
+        )
+
+    # Remove existing directory if it exists.
+    if os.path.isdir(target_mathjax_dir):
+        shutil.rmtree(target_mathjax_dir)
+
+    # Copy MathJax directory.
+    shutil.copytree(source_mathjax_dir, target_mathjax_dir)
+    print('MathJax copied successfully to %s' % target_mathjax_dir)
+
+
 def build_using_ng() -> None:
     """Execute angular build process. This runs the angular compiler and
     generates an ahead of time compiled bundle. This bundle can be found in the
@@ -1483,6 +1506,7 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         else:
             build_using_webpack(WEBPACK_PROD_CONFIG)
         build_using_ng()
+        copy_mathjax_to_build()
         generate_app_yaml(deploy_mode=options.deploy_mode)
         generate_build_directory(hashes)
 

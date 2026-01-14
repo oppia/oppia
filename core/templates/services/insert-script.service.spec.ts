@@ -21,6 +21,7 @@ import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
+import {AppConstants} from 'app.constants';
 
 class MockRenderer {
   createElement(tag: string) {
@@ -140,10 +141,12 @@ describe('InsertScriptService', () => {
       }
     );
 
+    const expectedPath = AppConstants.DEV_MODE
+      ? '/node_modules/mathjax/MathJax.js?config=default'
+      : '/build/third_party/mathjax/MathJax.js?config=default';
+
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
-      expect(mockScriptElement.src).toBe(
-        '/node_modules/mathjax/MathJax.js?config=default'
-      );
+      expect(mockScriptElement.src).toBe(expectedPath);
       done();
     });
 

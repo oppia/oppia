@@ -17,6 +17,7 @@
  */
 
 import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
+import {AppConstants} from 'app.constants';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
@@ -69,8 +70,10 @@ export class InsertScriptService {
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.MATHJAX: {
-          // Serve MathJax directly from the local node_modules folder in dev.
-          const mathJaxBasePath = '/node_modules/mathjax/';
+          // Serve MathJax from node_modules in dev, from build directory in prod.
+          const mathJaxBasePath = AppConstants.DEV_MODE
+            ? '/node_modules/mathjax/'
+            : '/build/third_party/mathjax/';
           scriptElement.src = `${mathJaxBasePath}MathJax.js?config=default`;
           break;
         }
