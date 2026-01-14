@@ -1,6 +1,6 @@
-<div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable()">
+<div class="oppia-new-audio-bar" *ngIf="isAudioBarAvailable() && isAudioAvailableInCurrentLanguageAccent()" [ngClass]="{'expanded-sidebar': getSidebarIsExpanded()}">
   <i class="fas fa-headphones desktop-mode"></i>
-  <p class=" desktop-mode">Listen to this lesson in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
+  <p class=" desktop-mode">Listen in <span *ngIf="languageAccentDescriptions.length === 1">{{selectedLanguageAccentDescription}}</span></p>
 
   <div class="oppia-new-audio-header-control-buttons" #audioControls>
     <div class="oppia-new-audio-header-select desktop-mode" *ngIf="languageAccentDescriptions.length > 1">

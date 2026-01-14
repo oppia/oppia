@@ -179,7 +179,7 @@ oppia-conversation-display .conversation-skin-inline-interaction {
 oppia-conversation-display .conversation-skin-inline-interaction .form-control {
   border: none;
   outline: none;
-  padding: 0;
+  resize: none;
 }
 
 oppia-conversation-display input.form-control:focus {

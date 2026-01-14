@@ -175,7 +175,8 @@ export class ShareLessonModalComponent {
   }
 
   getPageUrl(): string {
-    return this.urlService.getCurrentLocation().href;
+    const url = this.urlService.getCurrentLocation();
+    return url.origin + url.pathname;
   }
 
   getAuthors(): string {

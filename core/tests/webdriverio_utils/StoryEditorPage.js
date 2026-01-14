@@ -109,6 +109,9 @@ var StoryEditorPage = function () {
     '.e2e-test-planned-publication-date-input'
   );
   var nodeOutlineEditor = $('.e2e-test-add-chapter-outline');
+  var nodeOutlineEditorContainer = $(
+    '.e2e-test-chapter-outline-editor-container'
+  );
   var nodeOutlineFinalizeCheckbox = $('.e2e-test-finalize-outline');
   var nodeOutlineEditorRteContentSelector = function () {
     return $$('.e2e-test-rte');
@@ -605,6 +608,10 @@ var StoryEditorPage = function () {
     await editor.clear();
     await richTextInstructions(editor);
     await action.click('Chapter node editor', nodeOutlineEditor);
+    await action.click(
+      'Chapter outline editor container',
+      nodeOutlineEditorContainer
+    );
     await action.click('Node outline save button', nodeOutlineSaveButton);
     await action.click('Finalize outline', nodeOutlineFinalizeCheckbox);
   };

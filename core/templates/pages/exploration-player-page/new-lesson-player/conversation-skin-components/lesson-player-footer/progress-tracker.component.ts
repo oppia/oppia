@@ -71,20 +71,20 @@ export class ProgressTrackerComponent implements OnInit, OnDestroy {
       )
       .then(response => {
         this.explorationTitle = response.exploration.title;
+        this.directiveSubscriptions.add(
+          this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(
+            () => {
+              if (this.checkpointCount) {
+                this.showProgressReminderModal();
+              } else {
+                this.checkpointCount =
+                  this.checkpointProgressService.fetchCheckpointCount();
+                this.showProgressReminderModal();
+              }
+            }
+          )
+        );
       });
-
-    this.directiveSubscriptions.add(
-      this.playerPositionService.onLoadedMostRecentCheckpoint.subscribe(() => {
-        if (this.checkpointCount) {
-          this.showProgressReminderModal();
-        } else {
-          this.checkpointProgressService.fetchCheckpointCount().then(count => {
-            this.checkpointCount = count;
-            this.showProgressReminderModal();
-          });
-        }
-      })
-    );
 
     const urlParams = this.urlService.getUrlParams();
     this.loggedOutProgressUniqueUrlId =

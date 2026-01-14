@@ -153,6 +153,7 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
     const chapterProgressSummaryDict = {
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
+      is_chapter_complete: false,
     };
     const chaptersProgress = ChapterProgressSummary.createFromBackendDict(
       chapterProgressSummaryDict
@@ -198,10 +199,12 @@ describe('LearnerGroupLearnerSpecificProgressComponent', () => {
     const chapterProgressSummaryDict1 = {
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
+      is_chapter_complete: false,
     };
     const chapterProgressSummaryDict2 = {
       total_checkpoints_count: 4,
       visited_checkpoints_count: 3,
+      is_chapter_complete: false,
     };
 
     const chaptersProgress1 = ChapterProgressSummary.createFromBackendDict(

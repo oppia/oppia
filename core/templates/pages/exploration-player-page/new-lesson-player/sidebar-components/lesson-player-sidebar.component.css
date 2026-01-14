@@ -6,7 +6,6 @@
 
 .oppia-lesson-player-sidebar {
   display: flex;
-  height: 100%;
 }
 
 .lesson-player-sidebar-top {
@@ -68,12 +67,13 @@
 
 .player-desktop-sidebar-menu {
   background-color: #f2f4f7;
+  bottom: 0;
   box-shadow: 1px 0 0 2px rgba(0, 0, 0, 0.30);
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 96px);
   justify-content: space-between;
-  position: relative;
+  position: fixed;
   width: 80px;
   z-index: 1;
 }
@@ -180,6 +180,10 @@
 .rating-star-block svg {
   height: 24px;
   width: 24px;
+}
+
+.expanded-sidebar-label {
+  font-size: 14px;
 }
 
 @media screen and (max-width: 767px) {

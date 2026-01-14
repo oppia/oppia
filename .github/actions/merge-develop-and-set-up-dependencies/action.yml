@@ -49,7 +49,7 @@ runs:
           echo "Reinstalling pip and dev dependencies via install_python_dev_dependencies.py..."
           curl -sS https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py
           python -m pip uninstall pip -y
-          python /tmp/get-pip.py pip==25.2
+          python /tmp/get-pip.py pip==25.3
           python -m scripts.install_python_dev_dependencies
         else
           echo "pip is working correctly."

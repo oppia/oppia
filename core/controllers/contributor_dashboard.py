@@ -858,8 +858,7 @@ class TranslatableTopicNamesHandler(
 
     @acl_decorators.open_access
     def get(self) -> None:
-        # Only published topics are translatable.
-        topic_summaries = topic_fetchers.get_published_topic_summaries()
+        topic_summaries = topic_fetchers.get_all_topic_summaries()
         topic_names = [summary.name for summary in topic_summaries]
         self.values = {'topic_names': topic_names}
         self.render_json(self.values)
@@ -896,7 +895,7 @@ class TranslatableTopicNamesPerClassroomHandler(
 
         # Group topics by classroom and format response.
         topics_per_classroom: Dict[str, List[str]] = {}
-        for summary in topic_fetchers.get_published_topic_summaries():
+        for summary in topic_fetchers.get_all_topic_summaries():
             classroom_name = topic_id_to_classroom.get(summary.id, '')
             topics_per_classroom.setdefault(classroom_name, []).append(
                 summary.name

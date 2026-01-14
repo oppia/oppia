@@ -15,10 +15,9 @@
       {{ activeContribution.details.chapter_title }}
     </span>
     <button type="button"
-            class="close oppia-close-button-position"
+            class="btn-close oppia-close-button-position"
             (click)="cancel()"
             aria-label="Close">
-      <span aria-hidden="true">&times;</span>
     </button>
     <h4 class="oppia-translation-modal-author-header">
       Submitted by {{ authorName }} in {{ languageDescription }} language
@@ -37,7 +36,7 @@
     <p>See your submitted translation below. Please submit a new translation to address the requested revisions.</p>
   </div>
   <section class="oppia-suggestion-review-container e2e-test-review-content-container">
-    <div class="oppia-suggestion-review-panel-container float-left">
+    <div class="oppia-suggestion-review-panel-container float-start">
       <div class="oppia-suggestion-review-panel-header-container">
         <strong>Content to translate:</strong>
       </div>
@@ -60,11 +59,11 @@
         {{ isContentExpanded ? "View Less" : "View More" }}
       </div>
     </div>
-    <div class="oppia-suggestion-review-panel-container float-right">
+    <div class="oppia-suggestion-review-panel-container float-end">
       <div dir="auto"
            class="oppia-suggestion-review-panel-header-container oppia-translation-panel">
         <strong> Translation:</strong>
-        <button class="btn btn-sm btn-secondary float-right"
+        <button class="btn btn-sm btn-secondary float-end"
                 *ngIf="!startedEditing && status === 'review' && canEditTranslation"
                 (click)="editSuggestion()">
           Edit
@@ -104,12 +103,12 @@
         </div>
       </div>
       <div class="oppia-translation-review-edit-buttons">
-        <button class="btn btn-secondary mr-2"
+        <button class="btn btn-secondary me-2"
                 *ngIf="startedEditing"
                 (click)="cancelEdit()">
           Cancel
         </button>
-        <button class="e2e-test-update-translation-button btn btn-success ml-2"
+        <button class="e2e-test-update-translation-button btn btn-success ms-2"
                 *ngIf="startedEditing"
                 (click)="updateSuggestion()"
                 [disabled]="updateIsDisabled">
@@ -150,14 +149,14 @@
            class="oppia-image-review-panel"
            *ngIf="explorationImagesString">
     <div class="oppia-common-scroll-container">
-      <div class="oppia-exploration-image-container float-left">
+      <div class="oppia-exploration-image-container float-start">
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
                                     [rteString]="explorationImagesString"
                                     [altTextIsDisplayed]="altTextIsDisplayed"
                                     #contentPanelWithAltText>
         </oppia-rte-output-display>
       </div>
-      <div class="oppia-suggestion-image-container float-right">
+      <div class="oppia-suggestion-image-container float-end">
         <oppia-rte-output-display *ngIf="!contentTypeIsSetOfStrings"
                                     [rteString]="suggestionImagesString"
                                     [altTextIsDisplayed]="altTextIsDisplayed"

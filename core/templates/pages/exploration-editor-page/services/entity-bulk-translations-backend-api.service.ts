@@ -23,7 +23,7 @@ import {LanguageCodeToEntityTranslations} from 'services/entity-translations.ser
 import {
   EntityTranslation,
   LanguageCodeToEntityTranslationBackendDict,
-} from 'domain/translation/EntityTranslationObjectFactory';
+} from 'domain/translation/entity-translation.model';
 
 @Injectable({
   providedIn: 'root',

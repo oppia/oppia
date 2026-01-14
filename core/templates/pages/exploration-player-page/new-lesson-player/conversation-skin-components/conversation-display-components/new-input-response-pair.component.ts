@@ -37,11 +37,48 @@ import isString from 'lodash/isString';
 import './new-input-response-pair.component.css';
 import {VoiceoverPlayerService} from '../../../services/voiceover-player.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {animate, style, transition, trigger} from '@angular/animations';
 
 @Component({
   selector: 'oppia-new-input-response-pair',
   templateUrl: './new-input-response-pair.component.html',
   styleUrls: ['./new-input-response-pair.component.css'],
+  animations: [
+    trigger('fadeInOut', [
+      transition(':enter', [
+        style({
+          opacity: 0,
+          height: '0px',
+          marginTop: '0px',
+          marginBottom: '0px',
+          overflow: 'hidden',
+        }),
+        animate(
+          '500ms ease',
+          style({
+            opacity: 1,
+            height: '*',
+            marginTop: '*',
+            marginBottom: '*',
+          })
+        ),
+      ]),
+      transition(':leave', [
+        style({
+          overflow: 'hidden',
+        }),
+        animate(
+          '500ms ease',
+          style({
+            opacity: 0,
+            height: '0px',
+            marginTop: '0px',
+            marginBottom: '0px',
+          })
+        ),
+      ]),
+    ]),
+  ],
 })
 export class NewInputResponsePairComponent {
   // This property is initialized using component interactions

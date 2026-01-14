@@ -24,6 +24,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 })
 export class MobileMenuService {
   private menuVisibleSubject = new BehaviorSubject<boolean>(false);
+  sidebarIsExpanded = false;
 
   getMenuVisibility(): Observable<boolean> {
     return this.menuVisibleSubject.asObservable();
@@ -32,5 +33,13 @@ export class MobileMenuService {
   toggleMenuVisibility(): void {
     const currentValue = this.menuVisibleSubject.getValue();
     this.menuVisibleSubject.next(!currentValue);
+  }
+
+  toggleSidebar(): void {
+    this.sidebarIsExpanded = !this.sidebarIsExpanded;
+  }
+
+  getSidebarIsExpanded(): boolean {
+    return this.sidebarIsExpanded;
   }
 }

@@ -9,7 +9,7 @@
           {{ 'I18N_LESSON_PLAYER_OPEN_SIDEBAR' | translate }}
           <i class="fa fa-lg fa-chevron-right"></i>
         </div>
-        <div *ngIf="sidebarIsExpanded">
+        <div *ngIf="sidebarIsExpanded" class="expanded-sidebar-label">
           {{ 'I18N_LESSON_PLAYER_CLOSE_SIDEBAR' | translate }}
           <i class="fa fa-lg fa-chevron-left lesson-player-sidebar-chevron"></i>
         </div>
@@ -27,21 +27,28 @@
       </div>
     </div>
     <div class="player-sidebar-button-container">
-      <button class="player-sidebar-button" (click)="showShareLessonModal()" aria-label="Share lesson">
+      <button class="player-sidebar-button" (click)="showShareLessonModal()" aria-label="Share lesson"
+          matTooltip="{{ 'I18N_SHARE_LESSON' | translate }}"
+          matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-share-alt"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-share-alt"></i>
           {{ 'I18N_SHARE_LESSON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" (click)="showFeedbackModal()" aria-label="Give feedback">
+      <button class="player-sidebar-button" aria-label="Give feedback" (click)="showFeedbackModal()"
+          matTooltip="{{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}"
+          matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-comments"></i>
           {{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" *ngIf="isUserLoggedIn()" (click)="showFlagExplorationModal()" aria-label="Report content">
+      <button class="player-sidebar-button" aria-label="Report content" (click)="showFlagExplorationModal()"
+          *ngIf="isUserLoggedIn()"
+          matTooltip="{{ 'I18N_LESSON_PLAYER_REPORT_BUTTON' | translate }}"
+          matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-flag"></i>
         <span *ngIf="sidebarIsExpanded">
           <i class="fa fa-lg fa-flag"></i>

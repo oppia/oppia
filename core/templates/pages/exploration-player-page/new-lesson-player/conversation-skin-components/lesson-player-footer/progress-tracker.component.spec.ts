@@ -93,7 +93,7 @@ class MockPlayerPositionService {
 class MockCheckpointProgressService {
   fetchCheckpointCount = jasmine
     .createSpy('fetchCheckpointCount')
-    .and.returnValue(Promise.resolve(5));
+    .and.returnValue(5);
   getMostRecentlyReachedCheckpointIndex = jasmine
     .createSpy('getMostRecentlyReachedCheckpointIndex')
     .and.returnValue(3);
@@ -250,6 +250,23 @@ describe('ProgressTrackerComponent', () => {
     );
   });
 
+  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', fakeAsync(() => {
+    component.checkpointCount = 0;
+    mockCheckpointProgressService.fetchCheckpointCount.and.returnValue(5);
+    spyOn(component, 'showProgressReminderModal');
+
+    component.ngOnInit();
+    tick();
+
+    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
+
+    expect(
+      mockCheckpointProgressService.fetchCheckpointCount
+    ).toHaveBeenCalled();
+    expect(component.checkpointCount).toBe(5);
+    expect(component.showProgressReminderModal).toHaveBeenCalled();
+  }));
+
   it('should set loggedOutProgressUniqueUrlId from progressUrlService when pid does not exist', () => {
     mockUrlService.getUrlParams.and.returnValue({});
     mockProgressUrlService.getUniqueProgressUrlId.and.returnValue('service-id');
@@ -272,28 +289,15 @@ describe('ProgressTrackerComponent', () => {
     expect(component.loggedOutProgressUniqueUrl).toBeUndefined();
   });
 
-  it('should show progress reminder modal when checkpoint count exists and onLoadedMostRecentCheckpoint emits', () => {
+  it('should show progress reminder modal when checkpoint count exists and onLoadedMostRecentCheckpoint emits', fakeAsync(() => {
     component.checkpointCount = 5;
     spyOn(component, 'showProgressReminderModal');
 
     component.ngOnInit();
-    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
-
-    expect(component.showProgressReminderModal).toHaveBeenCalled();
-  });
-
-  it('should fetch checkpoint count and show progress reminder modal when checkpoint count is zero', fakeAsync(() => {
-    component.checkpointCount = 0;
-    spyOn(component, 'showProgressReminderModal');
-
-    component.ngOnInit();
-    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
     tick();
 
-    expect(
-      mockCheckpointProgressService.fetchCheckpointCount
-    ).toHaveBeenCalled();
-    expect(component.checkpointCount).toBe(5);
+    mockPlayerPositionService.emitLoadedMostRecentCheckpoint();
+
     expect(component.showProgressReminderModal).toHaveBeenCalled();
   }));
 

@@ -1,4 +1,4 @@
-<div class="form-inline oppia-training-panel-container">
+<div class="d-flex align-items-center oppia-training-panel-container">
   <div class="oppia-training-panel-header">
     <span><strong>If Oppia encounters the answer:</strong></span>
   </div>
@@ -29,10 +29,10 @@
 
             <br>
 
-            <span class="oppia-float-right" *ngIf="outcome.dest != getCurrentStateName()">
+            <span class="oppia-float-end" *ngIf="outcome.dest != getCurrentStateName()">
               → {{outcome.dest}}
             </span>
-            <span class="oppia-float-right" *ngIf="outcome.dest == getCurrentStateName()">
+            <span class="oppia-float-end" *ngIf="outcome.dest == getCurrentStateName()">
               <em>→ (try again)</em>
             </span>
           </button>
@@ -66,7 +66,7 @@
     margin-top: 10px;
   }
 
-  .oppia-float-right {
+  .oppia-float-end {
     float: right;
   }
 </style>

@@ -1,7 +1,7 @@
 <div role="form">
   <div class="e2e-test-schema-based-dict-editor" *ngFor="let property of propertySchemas; let idx = index">
-    <div class="form-group">
-      <label for="{{ fieldIds[property.name] }}">{{ getHumanReadablePropertyDescription(property) }}</label>
+    <div class="mb-3">
+      <label for="{{ fieldIds[property.name] }}" class="form-label">{{ getHumanReadablePropertyDescription(property) }}</label>
       <div id="{{ fieldIds[property.name] }}" *ngIf="localValue">
         <schema-based-editor [schema]="getSchema(idx)" [disabled]="disabled"
                              [ngModel]="localValue[property.name]"

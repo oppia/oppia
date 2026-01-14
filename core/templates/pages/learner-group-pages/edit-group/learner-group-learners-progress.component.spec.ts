@@ -244,6 +244,7 @@ describe('LearnerGroupLearnersProgressComponent', () => {
     const chapterProgressSummaryDict = {
       total_checkpoints_count: 6,
       visited_checkpoints_count: 4,
+      is_chapter_complete: false,
     };
     const chaptersProgress = ChapterProgressSummary.createFromBackendDict(
       chapterProgressSummaryDict

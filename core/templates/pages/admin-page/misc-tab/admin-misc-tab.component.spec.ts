@@ -790,6 +790,142 @@ describe('Admin misc tab component ', () => {
     expect(component.stateName).toBe('');
   });
 
+  describe('when generating study guide models', () => {
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
+        adminBackendApiService,
+        'generateStudyGuideModelsAsync'
+      );
+    });
+    it('should generate all study guide models successfully', fakeAsync(() => {
+      studyGuideModelSpy.and.returnValue(Promise.resolve());
+
+      component.generateStudyGuideModels();
+      tick();
+
+      expect(studyGuideModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully generated all study guide models.'
+      );
+    }));
+
+    it(
+      'should not generate study guide models in case of ' + 'server error',
+      fakeAsync(() => {
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
+
+        component.generateStudyGuideModels();
+        tick();
+
+        expect(studyGuideModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error'
+        );
+      })
+    );
+  });
+
+  describe('when deleting study guide models', () => {
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
+        adminBackendApiService,
+        'deleteStudyGuideModelsAsync'
+      );
+    });
+    it('should delete all study guide models successfully', fakeAsync(() => {
+      studyGuideModelSpy.and.returnValue(Promise.resolve());
+
+      component.deleteStudyGuideModels();
+      tick();
+
+      expect(studyGuideModelSpy).toHaveBeenCalled();
+      expect(statusMessageSpy).toHaveBeenCalledWith(
+        'Successfully deleted all study guide models.'
+      );
+    }));
+
+    it(
+      'should not delete study guide models in case of ' + 'server error',
+      fakeAsync(() => {
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
+
+        component.deleteStudyGuideModels();
+        tick();
+
+        expect(studyGuideModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error'
+        );
+      })
+    );
+  });
+
+  describe('when verifying study guide models', () => {
+    let studyGuideModelSpy: jasmine.Spy;
+    beforeEach(() => {
+      studyGuideModelSpy = spyOn(
+        adminBackendApiService,
+        'verifyStudyGuideModelsAsync'
+      );
+    });
+    it(
+      'should verify all study guide models successfully ' +
+        'and return issues if they exist',
+      fakeAsync(() => {
+        studyGuideModelSpy.and.returnValue(
+          Promise.resolve({issues: [['issue1', 'issue2']]})
+        );
+
+        component.verifyStudyGuideModels();
+        tick();
+
+        expect(studyGuideModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledTimes(2);
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Starting the verification of all Study Guide Models...'
+        );
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Issues found: issue1,issue2'
+        );
+      })
+    );
+
+    it(
+      'should verify all study guide models successfully ' +
+        "and return no issues found if they don't exist",
+      fakeAsync(() => {
+        studyGuideModelSpy.and.returnValue(Promise.resolve({issues: [[]]}));
+
+        component.verifyStudyGuideModels();
+        tick();
+
+        expect(studyGuideModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledTimes(2);
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Starting the verification of all Study Guide Models...'
+        );
+        expect(statusMessageSpy).toHaveBeenCalledWith('No issues found.');
+      })
+    );
+
+    it(
+      'should not verify study guide models in case of ' + 'server error',
+      fakeAsync(() => {
+        studyGuideModelSpy.and.rejectWith('Internal Server Error');
+
+        component.verifyStudyGuideModels();
+        tick();
+
+        expect(studyGuideModelSpy).toHaveBeenCalled();
+        expect(statusMessageSpy).toHaveBeenCalledWith(
+          'Server error: Internal Server Error'
+        );
+      })
+    );
+  });
+
   describe('when clicking on the Lookup Exploration Interaction IDs button', () => {
     it('should return interaction IDs if the exploration exists', fakeAsync(() => {
       let interactionSpy = spyOn(

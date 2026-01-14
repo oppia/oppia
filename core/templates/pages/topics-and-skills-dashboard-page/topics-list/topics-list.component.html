@@ -139,7 +139,7 @@
         </p>
       </td>
       <td>
-        <div class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-left': 'text-center'">
+        <div class="list-summary" [ngClass]="partiallyPublishedStoriesCounts[idx] || fullyPublishedStoriesCounts[idx] ? 'text-start': 'text-center'">
           <div *ngIf="partiallyPublishedStoriesCounts[idx]">
             {{ partiallyPublishedStoriesCounts[idx] }} Partial ({{ publishedChaptersInPartiallyPublishedStories[idx] }}/{{ totalChaptersInPartiallyPublishedStories[idx] }} chapters)
           </div>
@@ -153,7 +153,7 @@
         </div>
       </td>
       <td>
-        <p class="list-summary" [ngClass]="topic.getTotalUpcomingChaptersCount() || topic.getTotalOverdueChaptersCount() ? 'text-left': 'text-center'">
+        <p class="list-summary" [ngClass]="topic.getTotalUpcomingChaptersCount() || topic.getTotalOverdueChaptersCount() ? 'text-start': 'text-center'">
           <span *ngIf="topic.getTotalUpcomingChaptersCount()"> {{ getUpcomingChapterNotificationsText(topic) }}</span>
           <span *ngIf="topic.getTotalOverdueChaptersCount()"> {{ getOverdueChapterNotificationsText(topic) }}</span>
           <span *ngIf="!topic.getTotalUpcomingChaptersCount() && !topic.getTotalOverdueChaptersCount()">--</span>

@@ -19,13 +19,8 @@ extensions/**/*.ts
 # Python test files.
 *_test.py
 
-# Docker related files.
-docker-compose.yml
-Makefile
-
 # Other folders to ignore.
 core/tests/
-docker/
 local_compiled_js_for_test/
 node_modules/
 scripts/

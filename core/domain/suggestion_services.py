@@ -23,12 +23,13 @@ import heapq
 import logging
 import re
 
-from core import feconf, utils
+from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
     contribution_stats_services,
     email_manager,
     exp_fetchers,
+    feature_flag_services,
     feedback_services,
     html_cleaner,
     html_validation_service,
@@ -42,6 +43,7 @@ from core.domain import (
     translation_domain,
     user_domain,
     user_services,
+    voiceover_services,
 )
 from core.platform import models
 
@@ -900,6 +902,24 @@ def accept_suggestion(
         # Need to update the corresponding user proficiency model after we
         # updated the domain object.
         _update_user_proficiency(user_proficiency)
+
+    # Generates voiceovers for approved translation suggestions.
+    if (
+        feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            None,
+        )
+        and suggestion.change_cmd.cmd == 'add_written_translation'
+    ):
+        translated_content = suggestion.change_cmd.translation_html
+        content_id = suggestion.change_cmd.content_id
+        voiceover_services.generate_voiceover_from_translated_content(
+            suggestion.target_id,
+            suggestion.target_version_at_submission,
+            translated_content,
+            content_id,
+            suggestion.language_code,
+        )
 
 
 def reject_suggestion(

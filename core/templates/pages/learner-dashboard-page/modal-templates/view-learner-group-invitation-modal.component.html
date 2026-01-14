@@ -3,8 +3,7 @@
     <p class="primary-color">
       <span translate="I18N_LEARNER_GROUP_DETAILS_TITLE"></span>
     </p>
-    <div type="button" class="close" aria-label="Close" (click)="cancel()">
-      <span aria-hidden="true">&times;</span>
+    <div type="button" class="btn-close" aria-label="Close" (click)="cancel()">
     </div>
   </div>
 </div>
@@ -79,11 +78,10 @@
     padding: 6px 16px;
   }
 
-  .modal-header .close {
+  .modal-header .btn-close {
     cursor: pointer;
-    font-size: 28px;
-    margin: -1rem 0 -1rem auto;
-    padding: 1rem 0;
+    margin: 0.75rem 0 0.75rem auto;
+    opacity: 0.5;
   }
 
   .group-title,

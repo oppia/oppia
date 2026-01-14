@@ -18,10 +18,13 @@ from __future__ import annotations
 
 import datetime
 
-from core import feconf
+from core import feature_flag_list, feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    feature_flag_services,
+    opportunity_services,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
@@ -113,96 +116,6 @@ class VoiceoverLanguageCodesMappingHandler(
         self.render_json(self.values)
 
 
-class PutVoiceArtistMetadataHandlerNormalizedPayloadDict(TypedDict):
-    """Dict representation of VoiceArtistMetadataHandler's normalized_payload
-    dictionary.
-    """
-
-    voice_artist_id: str
-    language_code: str
-    language_accent_code: str
-
-
-class VoiceArtistMetadataHandler(
-    base.BaseHandler[
-        PutVoiceArtistMetadataHandlerNormalizedPayloadDict, Dict[str, str]
-    ]
-):
-    """Handler class to manage voice artist data for the voiceover admin page."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS = {
-        'GET': {},
-        'PUT': {
-            'voice_artist_id': {'schema': {'type': 'basestring'}},
-            'language_code': {'schema': {'type': 'basestring'}},
-            'language_accent_code': {'schema': {'type': 'basestring'}},
-        },
-    }
-
-    @acl_decorators.can_access_voiceover_admin_page
-    def get(self) -> None:
-        """Retrieves voice artist data for the voiceover admin page."""
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-        voice_artist_id_to_voice_artist_name = (
-            voiceover_services.get_voice_artist_ids_to_voice_artist_names()
-        )
-
-        self.values.update(
-            {
-                'voice_artist_id_to_language_mapping': voice_artist_id_to_language_mapping,
-                'voice_artist_id_to_voice_artist_name': voice_artist_id_to_voice_artist_name,
-            }
-        )
-        self.render_json(self.values)
-
-    @acl_decorators.can_access_voiceover_admin_page
-    def put(self) -> None:
-        """Updates voice artist data from the voiceover admin page."""
-        assert self.normalized_payload is not None
-        voice_artist_id = self.normalized_payload['voice_artist_id']
-        language_code = self.normalized_payload['language_code']
-        language_accent_code = self.normalized_payload['language_accent_code']
-
-        voiceover_services.update_voice_artist_language_mapping(
-            voice_artist_id, language_code, language_accent_code
-        )
-        self.render_json(self.values)
-
-
-class GetSampleVoiceoversForGivenVoiceArtistHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler class to get sample contributed voiceovers of a voice artist in
-    a given language.
-    """
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS = {
-        'voice_artist_id': {'schema': {'type': 'basestring'}},
-        'language_code': {'schema': {'type': 'basestring'}},
-    }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_voiceover_admin_page
-    def get(self, voice_artist_id: str, language_code: str) -> None:
-        exploration_id_to_filenames = (
-            voiceover_services.get_voiceover_filenames(
-                voice_artist_id=voice_artist_id, language_code=language_code
-            )
-        )
-
-        self.values.update(
-            {
-                'exploration_id_to_filenames': exploration_id_to_filenames,
-            }
-        )
-        self.render_json(self.values)
-
-
 class EntityVoiceoversBulkHandler(
     base.BaseHandler[Dict[str, str], Dict[str, str]]
 ):
@@ -275,19 +188,30 @@ class AutomaticVoiceoverRegenerationRecordHandler(
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
-        cloud_task_run_objects = (
+        cloud_task_run_objects = sorted(
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 start_date_obj,
                 end_date_obj,
-            )
+            ),
+            key=lambda task_run: task_run.last_updated,
+            reverse=True,
         )
+
+        # During testing, we observed that the UI remains usable with around
+        # 5,000 records, but performance degrades significantly at 15,000
+        # records. Setting a limit of 100 ensures a safe and consistent user
+        # experience and prevents users from being overwhelmed by excessive
+        # records.
+        maximum_allowed_records = 100
 
         self.values.update(
             {
                 'automatic_voiceover_regeneration_records': [
                     cloud_task_run.to_dict()
-                    for cloud_task_run in cloud_task_run_objects
+                    for cloud_task_run in cloud_task_run_objects[
+                        :maximum_allowed_records
+                    ]
                 ]
             }
         )
@@ -345,4 +269,81 @@ class RegenerateAutomaticVoiceoverHandler(
             }
         )
 
+        self.render_json(self.values)
+
+
+class RegenerateVoiceoverOnExpUpdateHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Regenerates the automatic voiceover for the given exploration data
+    when an exploration is updated.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}},
+        'exploration_version': {'schema': {'type': 'int'}},
+        'exploration_title': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
+
+    @acl_decorators.can_voiceover_exploration
+    def post(
+        self,
+        exploration_id: str,
+        exploration_version: int,
+        exploration_title: str,
+    ) -> None:
+        """Regenerates the voiceover for the given exploration data when an
+        exploration is updated.
+        """
+        # Asynchronously regenerates voiceovers using a deferred job when
+        # curated exploration content changes.
+        if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id
+        ) and feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            None,
+        ):
+            taskqueue_services.defer(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+                ],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                exploration_id,
+                exploration_title,
+                exploration_version,
+                feconf.SYSTEM_COMMITTER_ID,
+                datetime.datetime.utcnow().isoformat(),
+            )
+        self.render_json(self.values)
+
+
+class VoiceoverRegenerationRequestToCloudTaskHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Retrieves the status of all voiceover-regeneration requests queued in
+    Cloud Tasks for the specified exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id: str) -> None:
+        """Retrieves the status of all voiceover-regeneration requests queued in
+        Cloud Tasks for the specified exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        self.values.update(
+            voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                exploration_id
+            )
+        )
         self.render_json(self.values)

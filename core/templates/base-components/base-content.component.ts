@@ -31,6 +31,7 @@ import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {NavigationEnd, Router} from '@angular/router';
 import './base-content.component.css';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 @Component({
   selector: 'oppia-base-content',
@@ -53,6 +54,7 @@ export class BaseContentComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private keyboardShortcutService: KeyboardShortcutService,
     private loaderService: LoaderService,
+    private platformFeatureService: PlatformFeatureService,
     private pageTitleService: PageTitleService,
     private sidebarStatusService: SidebarStatusService,
     private urlService: UrlService,
@@ -117,6 +119,14 @@ export class BaseContentComponent {
     return (
       this.windowRef.nativeWindow.location.hostname ===
       'oppiaserver.appspot.com'
+    );
+  }
+
+  isNewLessonPlayerEnabled(): boolean {
+    const pathnameArray = this.urlService.getPathname().split('/');
+    return (
+      this.platformFeatureService.status.NewLessonPlayer.isEnabled &&
+      pathnameArray.includes('lesson')
     );
   }
 

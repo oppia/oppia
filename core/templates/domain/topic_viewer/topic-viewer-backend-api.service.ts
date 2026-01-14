@@ -16,7 +16,6 @@
  * @fileoverview Service to get topic data.
  */
 
-import {} from '@angular/upgrade/static';
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 

@@ -30,6 +30,7 @@
 .completed-checkpoint-node {
   background-color: #00645c;
   border-radius: 50%;
+  cursor: pointer;
   display: flex;
   height: 12px;
   justify-content: center;

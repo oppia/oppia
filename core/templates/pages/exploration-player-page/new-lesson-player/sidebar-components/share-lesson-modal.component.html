@@ -58,7 +58,7 @@
       <p>Copy and paste this code into your website.</p>
 
       <div class="cc-attribution-text">
-        <input type="text" class="cc-attribution-input" [value]="embedCode" readonly aria-label="Embed code to copy">
+        <textarea class="cc-attribution-input" [value]="embedCode" readonly aria-label="Embed code to copy"></textarea>
         <button mat-button class="copy-cc-btn" (click)="copyEmbedCode()" aria-label="Copy embed code">
           <span class="button-content">Copy HTML code<mat-icon>link</mat-icon></span>
         </button>
@@ -70,10 +70,10 @@
     <p class="cc-attribution-header" role="heading" aria-level="3">Generate Creative Commons Attribution</p>
 
     <div class="cc-attribution">
-      <p>1. Copy and paste the credit <br> 2. Attach a copy of the "CC BY SA 4.0 license"</p>
+      <p>1. Copy and paste the credit <br> 2. Attach a copy of the <a href="https://creativecommons.org/licenses/by-sa/4.0/legalcode" target="_blank" rel="noopener">"CC BY SA 4.0 license"</a></p>
 
       <div class="cc-attribution-text">
-        <input type="text" class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text">
+        <textarea class="cc-attribution-input" [value]="ccAttributionText" readonly aria-label="Creative Commons attribution text"></textarea>
         <button mat-button class="copy-cc-btn" (click)="copyAttribution()" aria-label="Copy attribution text">
           <span class="button-content">
             {{'Copy Attribution' | translate}}
@@ -90,8 +90,8 @@
   </ng-container>
 </div>
 
-<div class="oppia-share-lesson-modal-footer" [ngStyle]="modalState != modalStates.COPY ? { 'justify-content': 'flex-end' } : {}">
-  <span class="lesson-attribution-text" *ngIf="modalState == modalStates.COPY" (click)="showAttributionModal()" role="link" tabindex="0">
+<div class="oppia-share-lesson-modal-footer" *ngIf="modalState == modalStates.COPY" [ngStyle]="modalState != modalStates.COPY ? { 'justify-content': 'flex-end' } : {}">
+  <span class="lesson-attribution-text" (click)="showAttributionModal()" role="link" tabindex="0">
     {{'How to attribute this lesson' | translate}}
   </span>
   <button *ngIf="isWindowNarrow()" mat-button class="cancel-button" (click)="closeModal()" aria-label="Cancel and close the modal">

@@ -52,7 +52,6 @@ import {TutorCardComponent} from './tutor-card.component';
 import {I18nLanguageCodeService} from '../../../../services/i18n-language-code.service';
 import {EndChapterCheckMarkComponent} from './end-chapter-check-mark.component';
 import {EndChapterConfettiComponent} from './end-chapter-confetti.component';
-import {PlatformFeatureService} from '../../../../services/platform-feature.service';
 import {InteractionCustomizationArgs} from '../../../../../../extensions/interactions/customization-args-defs';
 import {UserInfo} from '../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
@@ -71,19 +70,6 @@ class MockWindowRef {
       };
     },
   };
-}
-
-class MockPlatformFeatureService {
-  get status(): object {
-    return {
-      EnableVoiceoverContribution: {
-        isEnabled: false,
-      },
-      AddVoiceoverWithAccent: {
-        isEnabled: false,
-      },
-    };
-  }
 }
 
 class MockTranslateService {
@@ -170,10 +156,6 @@ describe('Tutor card component', () => {
         {
           provide: WindowRef,
           useClass: MockWindowRef,
-        },
-        {
-          provide: PlatformFeatureService,
-          useClass: MockPlatformFeatureService,
         },
         {
           provide: TranslateService,

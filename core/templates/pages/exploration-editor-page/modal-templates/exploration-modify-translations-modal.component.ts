@@ -22,7 +22,7 @@ import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-e
 import {PageContextService} from 'services/page-context.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {LanguageUtilService} from 'domain/utilities/language-util.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {ChangeListService} from '../services/change-list.service';
 import {
   ModifyTranslationOpportunity,

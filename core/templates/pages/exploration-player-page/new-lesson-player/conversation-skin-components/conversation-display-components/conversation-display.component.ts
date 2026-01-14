@@ -546,4 +546,8 @@ export class ConversationDisplayComponent {
       terminalCardCondition
     );
   }
+
+  isInExplorationPlayerContext(): boolean {
+    return this.pageContextService.isInExplorationContext();
+  }
 }

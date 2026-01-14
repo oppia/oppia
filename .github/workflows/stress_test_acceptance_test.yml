@@ -1,0 +1,100 @@
+# This workflow is used to run the acceptance tests multiple times.
+# It's not used in the CI, but is used to test the flakiness of an acceptance test.
+
+name: Stress Test (Acceptance Test)
+
+permissions: read-all
+on:
+  workflow_dispatch:
+    inputs:
+      num_runs:
+        # Maximum 256 jobs can be generated using matrix. We also use matrix from mobile and desktop
+        # viewport. So, maximum number of times a test-suite can be run is 128.
+        # Ref: https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstrategymatrix
+        description: 'Number of times to run the acceptance tests (Max: 128).'
+        required: true
+        default: '10'
+        type: choice
+        options:
+          - '1'
+          - '2'
+          - '3'
+          - '5'
+          - '10'
+          - '20'
+          - '50'
+          - '100'
+      test_suite:
+        description: 'Name of acceptance test suite to run (e.g. "interested-donor/make-a-donation").'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    env:
+      NUM_RUNS: ${{ inputs.num_runs }}
+    steps:
+      - name: Generate Matrix
+        id: set-matrix
+        shell: bash
+        run: |
+          MATRIX=$(seq 1 "$NUM_RUNS" | jq -R . | jq -s -c .)
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+
+  build:
+    name: Build the app, and store build files as an artifact
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
+
+  run_acceptance_test:
+    needs: [build, generate-matrix]
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        run: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+        viewport-type: ['desktop', 'mobile']
+    name: "[${{ matrix.viewport-type == 'mobile' && 'Mob' || 'Desk'}}] ${{ inputs.test_suite }}"
+    env:
+      TEST_SUITE: ${{ inputs.test_suite }}
+    steps:
+      - name: Sanitize test_suite input
+        run: |
+          if [[ "$TEST_SUITE" =~ [^a-zA-Z/-] ]]; then
+            echo "TEST_SUITE contains invalid characters (only letters, slashes, and dashes allowed)."
+            exit 1
+          else
+            echo "TEST_SUITE is valid."
+          fi
+      - name: Checkout repository so that local actions can be used
+        uses: actions/checkout@v4
+      - name: Merge develop and set up dependencies
+        uses: ./.github/actions/merge-develop-and-set-up-dependencies
+      - name: Generate build files
+        uses: ./.github/actions/generate-build-files
+      - name: Generate modified suite name for artifacts
+        id: generate_suite_name_for_artifacts
+        # Replace slashes in the filename with underscores.
+        run: |
+          SUITE_NAME=$TEST_SUITE-${{ matrix.run }}-${{ matrix.viewport-type }}
+          echo "MODIFIED_SUITE_NAME=${SUITE_NAME//\//_}" >> $GITHUB_OUTPUT
+      - name: Run ${{ matrix.viewport-type == 'mobile' && 'Mobile' || 'Desktop' }} Acceptance Test
+        uses: ./.github/actions/run-a-specific-acceptance-test
+        with:
+          test-suite: ${{ inputs.test_suite }}
+          viewport-type: ${{ matrix.viewport-type }}
+          enable-screen-recording: true
+          modified-suite-name-for-uploads: ${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}

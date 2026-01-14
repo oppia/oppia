@@ -102,6 +102,17 @@ describe('RTE display component', () => {
     ).and.returnValue(new EventEmitter<string>());
   }));
 
+  // Remove all HTML comments safely, doing a multi-pass to handle incomplete
+  // matches.
+  var removeHtmlComments = function (input: string): string {
+    let previous: string;
+    do {
+      previous = input;
+      input = input.replace(/<!--[^>]*-->/g, '');
+    } while (input !== previous);
+    return input;
+  };
+
   // NOTE: Debugging might be a bit confusing sometimes, especially if this the
   // first time you are looking at component tests that test html. To access
   // the html of the component, you can do so by using
@@ -119,7 +130,7 @@ describe('RTE display component', () => {
     let rteComponentDe: DebugElement = fixture.debugElement;
 
     // eslint-disable-next-line oppia/no-inner-html
-    let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+    let html = removeHtmlComments(fixture.nativeElement.innerHTML);
     expect(html).toBe('');
 
     fixture.detectChanges();
@@ -165,7 +176,7 @@ describe('RTE display component', () => {
 
     expect(() => {
       // eslint-disable-next-line oppia/no-inner-html
-      let html = fixture.nativeElement.innerHTML.replace(/<!--[^>]*-->/g, '');
+      let html = removeHtmlComments(fixture.nativeElement.innerHTML);
       expect(html).toBe('');
 
       fixture.detectChanges();

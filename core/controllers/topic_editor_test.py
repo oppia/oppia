@@ -394,7 +394,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -426,7 +426,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-one',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -463,7 +463,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'story_url_fragment': 'story-frag-two',
         }
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
             'rb',
             encoding=None,
@@ -504,7 +504,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             url_fragment='original',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -1069,7 +1069,7 @@ class TopicEditorTests(
         self.assertEqual(
             {
                 'subtitled_html': {
-                    'html': '<p>New Data</p>',
+                    'html': '<p><strong>new heading</strong></p>\n\n<p>New Data</p>',
                     'content_id': 'content',
                 },
                 'recorded_voiceovers': {'voiceovers_mapping': {'content': {}}},

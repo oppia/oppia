@@ -78,14 +78,30 @@ var invisibilityOf = async function (element, errorMessage) {
 
 /**
  * Consider adding this method after each browser.url() call.
- * However, note that it does not guarantee that the page is fully loaded. It
- * is advised to add additional page-specific checks to each page's get()
+ * It is advised to add additional page-specific checks to each page's get()
  * method that verify the visibility of elements that are guaranteed to be
  * on that page.
  */
 var pageToFullyLoad = async function () {
+  // Wait for the document to be fully loaded, including all sub-resources.
+  // This ensures static HTML elements (like meta tags in <head>) can be
+  // queried reliably.
+  await browser.waitUntil(
+    async () => {
+      var readyState = await browser.execute(() => document.readyState);
+      return readyState === 'complete';
+    },
+    {
+      timeout: DEFAULT_WAIT_TIME_MSECS,
+      timeoutMsg:
+        'Document did not reach ready state "complete"\n' +
+        new Error().stack +
+        '\n',
+    }
+  );
+
+  // Then wait for Angular's loading indicator to disappear.
   var loadingMessage = await $('.e2e-test-loading-fullpage');
-  // Wait for the message to disappear.
   await loadingMessage.waitForDisplayed({
     timeout: 15000,
     reverse: true,

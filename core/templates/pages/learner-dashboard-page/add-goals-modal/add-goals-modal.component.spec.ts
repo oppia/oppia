@@ -220,4 +220,35 @@ describe('AddGoalsModalComponent', () => {
       .args[0] as Set<string>;
     expect(actualSet).toEqual(new Set(['0']));
   });
+
+  it('should not add a new topic if 5 topics are already selected', () => {
+    component.checkedTopics = new Set(['t1', 't2', 't3', 't4', 't5']);
+    component.onChange('t6');
+    expect(component.checkedTopics.size).toBe(5);
+    expect(component.checkedTopics.has('t6')).toBeFalse();
+    expect(component.checkedTopics.has('t1')).toBeTrue();
+    expect(component.checkedTopics.has('t2')).toBeTrue();
+    expect(component.checkedTopics.has('t3')).toBeTrue();
+    expect(component.checkedTopics.has('t4')).toBeTrue();
+    expect(component.checkedTopics.has('t5')).toBeTrue();
+  });
+  describe('setsAreEqual', () => {
+    it('should return true for equal sets', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['1', '2']);
+      expect(component.setsAreEqual(a, b)).toBeTrue();
+    });
+
+    it('should return false when sets have different sizes', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['1']);
+      expect(component.setsAreEqual(a, b)).toBeFalse();
+    });
+
+    it('should return false when sets have same size but different elements', () => {
+      const a = new Set(['1', '2']);
+      const b = new Set(['2', '3']);
+      expect(component.setsAreEqual(a, b)).toBeFalse();
+    });
+  });
 });

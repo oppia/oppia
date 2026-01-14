@@ -1,58 +1,60 @@
 <div class="card-navigation-control row space-between center" [ngStyle]="isIframed?{'position': 'absolute'}: {}">
   <!-- Wrapping div on first button keeps the second button right-aligned
   even when the first button is not present. -->
-  <div class="row-item row-item-previous-card">
-    <!-- *ngIf on this second wrapping div because *ngIf lags on buttons. -->
-    <ng-container *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
+  <div class="control-container">
+    <div class="row-item row-item-previous-card">
+      <!-- *ngIf on this second wrapping div because *ngIf lags on buttons. -->
+      <ng-container *ngIf="hasPrevious && !helpCardHasContinueButton && navigationThroughCardHistoryIsEnabled">
+        <button mat-raised-button
+                aria-label="Previous Card"
+                (click)="moveBackByOneCard()"
+                class="oppia-back-button oppia-nav-button oppia-nav-left-button">
+          <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
+        </button>
+      </ng-container>
+    </div>
+    <oppia-progress-tracker *ngIf="progressTrackerIsVisible" [userIsLoggedIn]="userIsLoggedIn" [ngClass]="{ 'hide-save-btn': userIsLoggedIn }"></oppia-progress-tracker>
+    <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
       <button mat-raised-button
-              aria-label="Previous Card"
-              (click)="moveBackByOneCard()"
-              class="oppia-back-button oppia-nav-button oppia-nav-left-button">
-        <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C4;</i>
-      </button>
-    </ng-container>
-  </div>
-  <div *ngIf="hasNext && navigationThroughCardHistoryIsEnabled" class="row-item row-item-next-card">
-    <button mat-raised-button
-            (click)="moveForwardByOneCard()"
-            aria-label="Next Card"
-            class="oppia-nav-right-button oppia-next-button oppia-nav-button">
-      <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
-    </button>
-  </div>
-  <oppia-progress-tracker *ngIf="progressTrackerIsVisible" [userIsLoggedIn]="userIsLoggedIn" [ngClass]="{ 'hide-save-btn': userIsLoggedIn }"></oppia-progress-tracker>
-  <ng-container *ngIf="!hasNext">
-    <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
-      <button mat-button
-              class="btn btn-secondary  oppia-skip-button"
-              *ngIf="skipButtonIsShown"
-              (click)="skipCurrentQuestion()">
-        I don't know
-      </button>
-      <!-- Special case for the 'Continue' interaction. -->
-      <button mat-button
-              *ngIf="interactionId === 'Continue'"
-              (click)="submit.emit()"
-              class="oppia-learner-confirm-button oppia-autofocus"
-              oppiaFocusOn="continue-btn">
-        {{ interactionCustomizationArgs.buttonText.value.unicode }}
-        <i class="fas fa-arrow-right oppia-arrow"></i>
-      </button>
-      <button mat-button
-              *ngIf="doesInteractionHaveNavSubmitButton()"
-              class="oppia-learner-submit-answer-button"
-              (click)="submit.emit()"
-              [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
-        {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+              (click)="moveForwardByOneCard()"
+              aria-label="Next Card"
+              class="oppia-nav-right-button oppia-next-button oppia-nav-button">
+        <i class="material-icons oppia-vcenter" aria-hidden="true">&#xE5C8;</i>
       </button>
     </div>
-    <oppia-continue-button *ngIf="shouldContinueButtonBeShown()" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
-                            [isLearnAgainButton]="isLearnAgainButton"
-                            (clickContinueButton)="onClickContinueButton()">
-    </oppia-continue-button>
-    <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
-                            [isLearnAgainButton]="isLearnAgainButton"
-                            (clickContinueButton)="clickContinueToReviseButton.emit()">
-    </oppia-continue-button>
-  </ng-container>
+    <ng-container *ngIf="!hasNext">
+      <div *ngIf="submitButtonIsShown && !shouldContinueButtonBeShown() && !helpCardHasContinueButton" class="oppia-nav-button right-side-buttons">
+        <button mat-button
+                class="btn btn-secondary  oppia-skip-button"
+                *ngIf="skipButtonIsShown"
+                (click)="skipCurrentQuestion()">
+          I don't know
+        </button>
+        <!-- Special case for the 'Continue' interaction. -->
+        <button mat-button
+                *ngIf="interactionId === 'Continue'"
+                (click)="submit.emit()"
+                class="oppia-learner-confirm-button oppia-autofocus"
+                oppiaFocusOn="continue-btn">
+          {{ interactionCustomizationArgs.buttonText.value.unicode }}
+          <i class="fas fa-arrow-right oppia-arrow"></i>
+        </button>
+        <button mat-button
+                *ngIf="doesInteractionHaveNavSubmitButton()"
+                class="oppia-learner-submit-answer-button"
+                (click)="submit.emit()"
+                [disabled]="displayedCard.showNoResponseError() || displayedCard.showInvalidResponseError()">
+          {{ 'I18N_INTERACTIONS_SUBMIT' | translate }}
+        </button>
+      </div>
+      <oppia-continue-button *ngIf="shouldContinueButtonBeShown()" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
+                              [isLearnAgainButton]="isLearnAgainButton"
+                              (clickContinueButton)="onClickContinueButton()">
+      </oppia-continue-button>
+      <oppia-continue-button *ngIf="!shouldContinueButtonBeShown() && showContinueToReviseButton" [focusLabel]="CONTINUE_BUTTON_FOCUS_LABEL" class="d-block continue-button"
+                              [isLearnAgainButton]="isLearnAgainButton"
+                              (clickContinueButton)="clickContinueToReviseButton.emit()">
+      </oppia-continue-button>
+    </ng-container>
+  </div>
 </div>

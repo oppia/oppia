@@ -1,49 +1,50 @@
-<div class="modal-header">
-  <h3>
-    {{ 'I18N_PLAYER_REPORT_MODAL_HEADER' | translate }}
-  </h3>
-</div>
-<div class="modal-body oppia-long-text">
-  <h4>
-    <span><b>{{ 'I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate }}</b></span>
-  </h4>
-  <form>
-    <div class="oppia-flag-modal-long-text radio">
-      <label>
-        <input type="radio" value="ad" [(ngModel)]="flag"
-               [ngModelOptions]="{standalone: true}"
-               (change)="showFlagMessageTextarea(flag)">
-        {{ 'I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate }}
-      </label>
-    </div>
-    <div class="oppia-flag-modal-long-text radio">
-      <label>
-        <input type="radio" value="poor_experience" [(ngModel)]="flag"
-               [ngModelOptions]="{standalone: true}"
-               (change)="showFlagMessageTextarea(flag)">
-        {{ 'I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate }}
-      </label>
-    </div>
-    <div class="oppia-flag-modal-long-text radio">
-      <label>
-        <input type="radio" value="other" [(ngModel)]="flag"
-               [ngModelOptions]="{standalone: true}"
-               (change)="showFlagMessageTextarea(flag)">
-        {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
-      </label>
-      <ng-container *ngIf="flagMessageTextareaIsShown">
-        <p>{{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}</p>
-        <textarea rows="3" cols="50" [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}" class="form-control report-exploration-dialog-box-textarea" oppiaFocusOn="flagMessageTextarea">
-        </textarea>
-      </ng-container>
-    </div>
-  </form>
-</div>
-<div class="modal-footer">
-  <button class="btn btn-secondary" (click)="closeModal()">
-    {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate }}
-  </button>
-  <button class="btn btn-success" (click)="submitReport()" [disabled]="!flagMessage">
-    {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT' | translate }}
-  </button>
-</div>
+<ng-container *ngIf="!thankYouModalIsShown">
+  <div class="modal-header">
+    <h3>
+      {{ 'I18N_PLAYER_REPORT_MODAL_HEADER' | translate }}
+    </h3>
+  </div>
+  <div class="modal-body oppia-long-text">
+    <h4>
+      <span><b>{{ 'I18N_PLAYER_REPORT_MODAL_BODY_HEADER' | translate }}</b></span>
+    </h4>
+    <form>
+      <div class="oppia-flag-modal-long-text radio">
+        <label>
+          <input type="radio" value="ad" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
+          {{ 'I18N_PLAYER_REPORT_MODAL_BODY_AD' | translate }}
+        </label>
+      </div>
+      <div class="oppia-flag-modal-long-text radio">
+        <label>
+          <input type="radio" value="poor_experience" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
+          {{ 'I18N_PLAYER_REPORT_MODAL_BODY_POOR_EXPERIENCE' | translate }}
+        </label>
+      </div>
+      <div class="oppia-flag-modal-long-text radio">
+        <label>
+          <input type="radio" value="other" [(ngModel)]="flag" [ngModelOptions]="{standalone: true}" (change)="showFlagMessageTextarea(flag)">
+          {{ 'I18N_PLAYER_REPORT_MODAL_BODY_OTHER' | translate }}
+        </label>
+        <ng-container *ngIf="flagMessageTextareaIsShown">
+          <p>{{ 'I18N_PLAYER_REPORT_MODAL_BODY_ADDITIONAL_DETAILS' | translate }}</p>
+          <textarea rows="3" cols="50" [(ngModel)]="flagMessage" [ngModelOptions]="{standalone: true}" class="form-control report-exploration-dialog-box-textarea" oppiaFocusOn="flagMessageTextarea">
+          </textarea>
+        </ng-container>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="closeModal()">
+      {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_CANCEL' | translate }}
+    </button>
+    <button class="btn btn-success" (click)="submitReport()" [disabled]="!flagMessage">
+      {{ 'I18N_PLAYER_REPORT_MODAL_FOOTER_SUBMIT' | translate }}
+    </button>
+  </div>
+</ng-container>
+
+<oppia-customizable-thank-you-modal
+  *ngIf="thankYouModalIsShown"
+  [modalMessageI18nKey]="'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'">
+</oppia-customizable-thank-you-modal>

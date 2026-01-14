@@ -40,11 +40,7 @@ describe('Oppia click hexbins visualization', function () {
   let assetsBackendApiService: AssetsBackendApiService;
   let bannerDe: DebugElement;
   let bannerEl: HTMLElement;
-  let tooltipTarget = {
-    x: 0,
-    y: 0,
-    length: 10,
-  } as Hexbin;
+  let tooltipTarget: Hexbin;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -73,7 +69,19 @@ describe('Oppia click hexbins visualization', function () {
       'url'
     );
 
-    component.tooltipTarget = tooltipTarget;
+    // Create a proper iterable mock for Hexbin (extends Array).
+    tooltipTarget = Object.assign(
+      [
+        {
+          answer: {clickPosition: [0.5, 0.5], clickedRegions: [] as string[]},
+          frequency: 2,
+        },
+      ],
+      {x: 0, y: 0}
+    ) as Hexbin;
+
+    // Make the tooltip hidden by default.
+    component.tooltipTarget = null;
     component.data = [
       {answer: {clickPosition: [0.03, 0.03], clickedRegions: []}, frequency: 2},
       {answer: {clickPosition: [0.5, 0.5], clickedRegions: []}, frequency: 1},
@@ -108,12 +116,28 @@ describe('Oppia click hexbins visualization', function () {
     component.showTooltip(tooltipTarget);
     tick();
 
+    expect(component.getTooltipNumClicks()).toEqual(2);
+
     component.hideTooltip(tooltipTarget);
     tick();
 
     expect(component.tooltipTarget).toBe(null);
-    expect(component.getTooltipNumClicks()).toEqual(2);
   }));
+
+  it('should return 0 clicks when tooltip target is null', () => {
+    component.tooltipTarget = null;
+    expect(component.getTooltipNumClicks()).toEqual(0);
+  });
+
+  it('should return false when tooltip is not visible', () => {
+    component.tooltipTarget = null;
+    expect(component.isTooltipVisible()).toBe(false);
+  });
+
+  it('should return true when tooltip is visible', () => {
+    component.tooltipTarget = tooltipTarget;
+    expect(component.isTooltipVisible()).toBe(true);
+  });
 
   it('should intialize component', fakeAsync(() => {
     component.ngOnInit();

@@ -61,6 +61,7 @@ import {
 import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {delay} from 'rxjs/operators';
+import {WindowRef} from 'services/contextual/window-ref.service';
 
 class MockNgbModal {
   open() {
@@ -68,6 +69,12 @@ class MockNgbModal {
       result: Promise.resolve(),
     };
   }
+}
+
+class MockWindowRef {
+  nativeWindow = {
+    scrollTo: (x, y) => {},
+  };
 }
 
 class MockPlatformFeatureService {
@@ -131,6 +138,10 @@ describe('Contributions and review component', () => {
         {
           provide: MatSnackBarRef,
           useClass: MockMatSnackBarRef,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
         },
         PageContextService,
         ContributionAndReviewService,
@@ -2216,6 +2227,24 @@ describe('Contributions and review component', () => {
         'translate_content'
       );
     });
+    it('should update topicReady when active topic changes', fakeAsync(() => {
+      const getActiveTopicNameSpy = spyOn(
+        translationTopicService,
+        'getActiveTopicName'
+      );
+
+      getActiveTopicNameSpy.and.returnValue(null);
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeFalse();
+
+      getActiveTopicNameSpy.and.returnValue('Math');
+      mockActiveTopicEventEmitter.emit();
+      tick();
+
+      expect(component.topicReady).toBeTrue();
+    }));
   });
 
   describe(

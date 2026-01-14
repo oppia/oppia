@@ -25,7 +25,6 @@ import subprocess
 
 from core.tests import test_utils
 
-import psutil
 from typing import List, Tuple
 
 from . import pre_commit_hook
@@ -236,7 +235,7 @@ class PreCommitHookTests(test_utils.GenericTestBase):
             unused_cmd_tokens: List[str],
             stdout: int = subprocess.PIPE,
             stderr: int = subprocess.PIPE,
-        ) -> psutil.Popen:
+        ) -> subprocess.Popen[bytes]:
             return process
 
         with self.swap(subprocess, 'Popen', mock_popen):

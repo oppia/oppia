@@ -59,8 +59,7 @@ import sys
 import threading
 import time
 
-from core import feconf, utils
-
+import pytest
 from typing import Dict, Final, List, Optional, Tuple, cast
 
 from . import (
@@ -155,9 +154,15 @@ _PARSER.add_argument(
     action='store_true',
 )
 _PARSER.add_argument(
-    '--skip-install',
+    '--skip_install',
     help='optional; if specified, skips the installation of '
     'third party libraries',
+    action='store_true',
+)
+_PARSER.add_argument(
+    '--use_pytest',
+    help='optional; if specified, uses pytest as the test runner instead of '
+    'the default gae_suite runner',
     action='store_true',
 )
 
@@ -287,7 +292,7 @@ def get_all_test_targets_from_shard(shard_name: str) -> List[str]:
     Returns:
         list(str). The dotted module names that belong to the shard.
     """
-    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
         # Here we use cast because we are narrowing down the type
         # since we know the type of shards_spec as it is the content
         # of the file backend_test_shards.json.
@@ -308,7 +313,7 @@ def check_shards_match_tests(include_load_tests: bool = True) -> str:
     Raises:
         Exception. Failed to find duplicated module in shards.
     """
-    with utils.open_file(SHARDS_SPEC_PATH, 'r') as shards_file:
+    with open(SHARDS_SPEC_PATH, 'r', encoding='utf-8') as shards_file:
         shards_spec = json.load(shards_file)
     shard_modules = sorted(
         [module for shard in shards_spec.values() for module in shard]
@@ -443,6 +448,113 @@ def check_test_results(
     return total_count, total_errors, total_failures, time_report
 
 
+def convert_args_to_pytest(parsed_args: argparse.Namespace) -> List[str]:
+    """Convert run_backend_tests.py arguments to pytest arguments.
+
+    Args:
+        parsed_args: argparse.Namespace. Parsed command-line arguments.
+
+    Returns:
+        list(str). List of pytest command-line arguments.
+
+    Raises:
+        Exception. The shard configuration in backend_test_shards.json doesn't
+            match the actual test files on the filesystem when using the
+            --test_shard flag. This can happen when (a) a test file listed in
+            the JSON shards file doesn't exist, (b) a test file exists but
+            isn't listed in any shard, or (c) a test file is listed in
+            multiple shards.
+    """
+    pytest_args = []
+
+    # Add verbosity flag.
+    pytest_args.append('-v' if parsed_args.verbose else '-q')
+
+    # Add coverage flags if requested.
+    if parsed_args.generate_coverage_report:
+        pytest_args.extend(['--cov=.', '--cov-report=term-missing'])
+        if not parsed_args.ignore_coverage:
+            pytest_args.append('--cov-fail-under=100')
+
+    # Handle test selection.
+    if parsed_args.test_targets:
+        # Convert dot notation to pytest path notation.
+        for test_target in parsed_args.test_targets.split(','):
+            # Check if this is a specific test (has _test. in it).
+            # Since _test always appears as a suffix on module names, we can
+            # simply split on '.' and find the part ending with '_test'.
+            if '_test.' in test_target:
+                # Find the module ending with _test.
+                parts = test_target.split('.')
+                test_idx = next(
+                    i for i, part in enumerate(parts) if part.endswith('_test')
+                )
+
+                # Original format: module.path_test.ClassName(.method_name).
+                # Convert to: module/path_test.py::ClassName(::method_name).
+                test_path = '%s.py::%s' % (
+                    '/'.join(parts[: test_idx + 1]),
+                    '::'.join(parts[test_idx + 1 :]),
+                )
+
+                pytest_args.append(test_path)
+            elif test_target.endswith('_test'):
+                # Just a test module.
+                test_path = test_target.replace('.', '/') + '.py'
+                pytest_args.append(test_path)
+            else:
+                # Not a test file, add _test suffix.
+                test_path = test_target.replace('.', '/') + '_test.py'
+                pytest_args.append(test_path)
+    elif parsed_args.test_path:
+        pytest_args.append(parsed_args.test_path)
+    elif parsed_args.test_shard:
+        # Get all test targets from shard and convert to paths.
+        validation_error = check_shards_match_tests(include_load_tests=True)
+        if validation_error:
+            raise Exception(validation_error)
+        all_test_targets = get_all_test_targets_from_shard(
+            parsed_args.test_shard
+        )
+        for test_target in all_test_targets:
+            test_path = test_target.replace('.', '/') + '.py'
+            pytest_args.append(test_path)
+    elif parsed_args.run_on_changed_files_in_branch:
+        changed_files = git_changes_utils.get_changed_python_test_files()
+        for test_target in changed_files:
+            test_path = test_target.replace('.', '/') + '.py'
+            pytest_args.append(test_path)
+    else:
+        # Run all tests.
+        if parsed_args.exclude_load_tests:
+            pytest_args.append('--ignore=core/tests/load_tests')
+        # Default: run all tests in current directory.
+        pytest_args.append('.')
+
+    return pytest_args
+
+
+def run_tests_with_pytest(parsed_args: argparse.Namespace) -> int:
+    """Run tests using pytest instead of gae_suite.
+
+    Args:
+        parsed_args: argparse.Namespace. Parsed command-line arguments.
+
+    Returns:
+        int. Exit code from pytest (0 for success, non-zero for failure).
+    """
+    pytest_args = convert_args_to_pytest(parsed_args)
+
+    print('Running tests with pytest...')
+    print('Pytest arguments: %s' % ' '.join(pytest_args))
+    print('')
+
+    # Run pytest with the converted arguments.
+    exit_code = pytest.main(pytest_args)
+
+    return exit_code
+
+
 def main(args: Optional[List[str]] = None) -> None:
     """Run the tests."""
     parsed_args = _PARSER.parse_args(args=args)
@@ -466,14 +578,30 @@ def main(args: Optional[List[str]] = None) -> None:
         raise Exception('The delimiter in test_path should be a slash (/)')
     if not parsed_args.skip_install:
         install_third_party_libs.main()
-    with contextlib.ExitStack() as stack:
-        # TODO(#18260): Remove this when we permanently move to the
-        # Dockerized Setup.
-        if not feconf.OPPIA_IS_DOCKERIZED:  # docker: no cover
+
+    # If --use_pytest flag is set, delegate to pytest and return early.
+    if parsed_args.use_pytest:
+        with contextlib.ExitStack() as stack:
             stack.enter_context(
                 servers.managed_cloud_datastore_emulator(clear_datastore=True)
             )
             stack.enter_context(servers.managed_redis_server())
+
+            # Run tests with pytest.
+            exit_code = run_tests_with_pytest(parsed_args)
+
+        if exit_code != 0:
+            raise Exception('Tests failed with exit code %d' % exit_code)
+
+        print('')
+        print('Done!')
+        return
+
+    with contextlib.ExitStack() as stack:
+        stack.enter_context(
+            servers.managed_cloud_datastore_emulator(clear_datastore=True)
+        )
+        stack.enter_context(servers.managed_redis_server())
         if parsed_args.test_targets:
             all_test_targets = []
             test_targets = parsed_args.test_targets.split(',')
@@ -514,24 +642,6 @@ def main(args: Optional[List[str]] = None) -> None:
             all_test_targets = get_all_test_targets_from_shard(
                 parsed_args.test_shard
             )
-            # TODO(#18260): Remove this when we permanently move to the
-            # Dockerized Setup.
-            if feconf.OPPIA_IS_DOCKERIZED:  # docker: no cover
-                # The following tests are excluded from running in the Docker
-                # since they will be removed after the Dockerized setup is
-                # permanently moved to.
-                docker_exclude_tests = [
-                    'scripts.install_third_party_libs_test',
-                    'scripts.install_python_dev_dependencies_test',
-                    'scripts.install_python_prod_dependencies_test',
-                    'scripts.build_test',
-                    'scripts.run_acceptance_tests_test',
-                ]
-                all_test_targets = [
-                    test
-                    for test in all_test_targets
-                    if test not in docker_exclude_tests
-                ]
         elif parsed_args.run_on_changed_files_in_branch:
             all_test_targets = list(
                 git_changes_utils.get_changed_python_test_files()
@@ -654,7 +764,7 @@ def main(args: Optional[List[str]] = None) -> None:
             raise Exception('Backend test coverage is not 100%')
 
     if parsed_args.generate_time_report:
-        with utils.open_file(TIME_REPORT_PATH, 'w') as time_report_file:
+        with open(TIME_REPORT_PATH, 'w', encoding='utf-8') as time_report_file:
             time_report_file.write(json.dumps(time_report, indent=4))
 
     print('')
@@ -687,8 +797,8 @@ def check_coverage(
         combine_process = subprocess.run(
             [sys.executable, '-m', 'coverage', 'combine'],
             capture_output=True,
-            encoding='utf-8',
             check=False,
+            encoding='utf-8',
         )
         no_combine = combine_process.stdout.strip() == 'No data to combine'
         if combine_process.returncode and not no_combine:
@@ -714,7 +824,7 @@ def check_coverage(
         env['COVERAGE_FILE'] = data_file
 
     process = subprocess.run(
-        cmd, capture_output=True, encoding='utf-8', env=env, check=False
+        cmd, capture_output=True, env=env, check=False, encoding='utf-8'
     )
     if process.stdout.strip() == 'No data to report.':
         # File under test is exempt from coverage according to the

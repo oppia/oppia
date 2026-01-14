@@ -79,6 +79,10 @@ class FeatureNames(enum.Enum):
     SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS = (
         'show_regenerated_voiceovers_to_learners'
     )
+    ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS = (
+        'enable_background_voiceover_synthesis'
+    )
+    ENABLE_READY_FOR_REVIEW_TEST = 'enable_ready_for_review_test'
 
 
 # Names of feature objects defined in FeatureNames should be added
@@ -97,6 +101,7 @@ class FeatureNames(enum.Enum):
 # testers. 'prod' feature has been fully tested so that it can be enabled in the
 # production environment.
 
+
 # Names of features in dev stage, the corresponding feature flag instances must
 # be in dev stage otherwise it will cause a test error in the backend test.
 DEV_FEATURES_LIST = [
@@ -104,6 +109,7 @@ DEV_FEATURES_LIST = [
     FeatureNames.SHOW_TRANSLATION_SIZE,
     FeatureNames.REDESIGNED_TOPIC_VIEWER_PAGE,
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS,
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST,
 ]
 
 # Names of features in test stage, the corresponding feature flag instances must
@@ -117,9 +123,8 @@ TEST_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS,
     FeatureNames.NEW_LESSON_PLAYER,
     FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
-    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS,
-    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
 ]
 
 # Names of features in prod stage, the corresponding feature flag instances must
@@ -128,13 +133,11 @@ PROD_FEATURES_LIST: List[FeatureNames] = [
     FeatureNames.DUMMY_FEATURE_FLAG_FOR_E2E_TESTS,
     FeatureNames.IS_IMPROVEMENTS_TAB_ENABLED,
     FeatureNames.LEARNER_GROUPS_ARE_ENABLED,
-    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS,
     FeatureNames.EXPLORATION_EDITOR_CAN_TAG_MISCONCEPTIONS,
-    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
     FeatureNames.SHOW_REDESIGNED_LEARNER_DASHBOARD,
+    FeatureNames.ENABLE_WORKED_EXAMPLES_RTE_COMPONENT,
+    FeatureNames.SHOW_RESTRUCTURED_STUDY_GUIDES,
 ]
 
 # Names of features that should not be used anymore, e.g. features that are
@@ -147,6 +150,10 @@ DEPRECATED_FEATURE_NAMES: List[FeatureNames] = [
     FeatureNames.DIAGNOSTIC_TEST,
     FeatureNames.END_CHAPTER_CELEBRATION,
     FeatureNames.CHECKPOINT_CELEBRATION,
+    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION,
+    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK,
+    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST,
+    FeatureNames.ADD_VOICEOVER_WITH_ACCENT,
 ]
 
 FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
@@ -212,33 +219,11 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.ADD_VOICEOVER_WITH_ACCENT.value: (
-        (
-            'The flag allows voice artists to add voiceovers in a specific '
-            'accent for the given language.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
     FeatureNames.CD_ALLOW_UNDOING_TRANSLATION_REVIEW.value: (
         (
             'This flag allows translation reviewers to undo translation '
             'suggestion review on the contributor dashboard.',
             feature_flag_domain.ServerMode.TEST,
-        )
-    ),
-    FeatureNames.ENABLE_VOICEOVER_CONTRIBUTION.value: (
-        (
-            'The flag controls whether voiceover contributions from the '
-            'voiceover tab of the exploration editor page is enabled or '
-            'disabled during voiceover migration.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
-    FeatureNames.AUTO_UPDATE_EXP_VOICE_ARTIST_LINK.value: (
-        (
-            'The flag allows auto-updating of the exploration voice artists '
-            'link model after an exploration update.',
-            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.EXPLORATION_EDITOR_CAN_MODIFY_TRANSLATIONS.value: (
@@ -278,13 +263,6 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             feature_flag_domain.ServerMode.TEST,
         )
     ),
-    FeatureNames.LABEL_ACCENT_TO_VOICE_ARTIST.value: (
-        (
-            'The flag enables the voice artist accent labeling feature '
-            'on the voiceover admin page.',
-            feature_flag_domain.ServerMode.PROD,
-        )
-    ),
     FeatureNames.SHOW_VOICEOVER_TAB_FOR_NON_CURATED_EXPLORATIONS.value: (
         (
             'The flag enables the voiceover tab for non-curated explorations.',
@@ -297,7 +275,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'and learners to access the updated study guide user interface '
             '(the actual content displayed by the study guides will be the '
             'same, just the user interface will be different).',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.ENABLE_TRANSLATION_OPPORTUNITIES_WITH_NEW_OPP_MODELS.value: (
@@ -311,7 +289,7 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
         (
             'Allows creators to add worked examples to the review material '
             'section of skills and explanation of the study guides.',
-            feature_flag_domain.ServerMode.TEST,
+            feature_flag_domain.ServerMode.PROD,
         )
     ),
     FeatureNames.SHOW_REGENERATED_VOICEOVERS_TO_LEARNERS.value: (
@@ -319,6 +297,19 @@ FEATURE_FLAG_NAME_TO_DESCRIPTION_AND_FEATURE_STAGE = {
             'This flag allows learners to see the regenerated voiceovers '
             'in the exploration player.',
             feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value: (
+        (
+            'The flag enables the asynchronous voiceover synthesis for the '
+            'curated exploration contents.',
+            feature_flag_domain.ServerMode.TEST,
+        )
+    ),
+    FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value: (
+        (
+            'This flag enables ready_for_review_test, which controls the learner’s redirection to the Review Test upon lesson completion.',
+            feature_flag_domain.ServerMode.DEV,
         )
     ),
 }

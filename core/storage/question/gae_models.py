@@ -320,7 +320,7 @@ class QuestionModel(base_models.VersionedModel):
     def get_all_questions(
         cls,
         offset: int,
-        question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+        question_count: int = constants.MAX_QUESTIONS_FETCHABLE,
     ) -> Sequence[QuestionModel]:
         """Fetches the list of questions in batches.
 
@@ -333,8 +333,11 @@ class QuestionModel(base_models.VersionedModel):
         """
         question_count = min(question_count, constants.MAX_QUESTIONS_FETCHABLE)
 
-        return cls.query().order(-cls.last_updated).fetch(
-            question_count, offset=offset)
+        return (
+            cls.query()
+            .order(-cls.last_updated)
+            .fetch(question_count, offset=offset)
+        )
 
 
 class QuestionSkillLinkModel(base_models.BaseModel):

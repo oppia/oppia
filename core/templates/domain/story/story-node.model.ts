@@ -134,6 +134,10 @@ export class StoryNode {
     return this._status;
   }
 
+  getPublishedStatus(): boolean {
+    return this._status === 'Published';
+  }
+
   getPlannedPublicationDateMsecs(): number | null {
     return this._plannedPublicationDateMsecs;
   }

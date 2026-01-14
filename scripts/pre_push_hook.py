@@ -60,8 +60,6 @@ from scripts import (  # pylint: disable=wrong-import-position
     install_python_prod_dependencies,
 )
 
-from core import feconf  # isort:skip # pylint: disable=wrong-import-position
-
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT: Final = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
@@ -72,9 +70,7 @@ FILE_DIR: Final = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR: Final = os.path.join(FILE_DIR, os.pardir, os.pardir)
 LINTER_FILE_FLAG: Final = '--files'
 
-# Path to currently running python interpreter,
-# it is required to resolve python version conflict in docker.
-PYTHON_CMD: Final = sys.executable if feconf.OPPIA_IS_DOCKERIZED else 'python'
+PYTHON_CMD: Final = 'python'
 
 OPPIA_PARENT_DIR: Final = os.path.join(
     FILE_DIR, os.pardir, os.pardir, os.pardir
@@ -85,7 +81,13 @@ FRONTEND_TEST_CMDS: Final = [
     'scripts.run_frontend_tests',
     '--check_coverage',
 ]
-BACKEND_TEST_CMDS: Final = [PYTHON_CMD, '-m', 'scripts.run_backend_tests']
+BACKEND_TEST_CMDS: Final = [
+    PYTHON_CMD,
+    '-m',
+    'scripts.run_backend_tests',
+    '--ignore_coverage',
+    '--skip_install',
+]
 BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD: Final = [
     PYTHON_CMD,
     '-m',
@@ -353,6 +355,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 continue
 
             if files_to_lint:
+                print('Running backend lint checks...')
                 lint_status = start_linter(files_to_lint)
                 if lint_status != 0:
                     print(
@@ -360,17 +363,16 @@ def main(args: Optional[List[str]] = None) -> None:
                     )
                     sys.exit(1)
 
-            # When using Docker, we run MYPY checks in docker/pre_push_hook.sh
-            # itself.
-            if not feconf.OPPIA_IS_DOCKERIZED:
-                mypy_check_status = execute_mypy_checks()
-                if mypy_check_status != 0:
-                    print(
-                        'Push failed, please correct the mypy type annotation '
-                        'issues above.'
-                    )
-                    sys.exit(mypy_check_status)
+            print('Running mypy checks...')
+            mypy_check_status = execute_mypy_checks()
+            if mypy_check_status != 0:
+                print(
+                    'Push failed, please correct the mypy type annotation '
+                    'issues above.'
+                )
+                sys.exit(mypy_check_status)
 
+            print('Running backend-associated-test-file checks ...')
             backend_associated_test_file_check_status = (
                 run_script_and_get_returncode(
                     BACKEND_ASSOCIATED_TEST_FILE_CHECK_CMD
@@ -385,6 +387,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
+                print('Running TypeScript checks ...')
                 typescript_checks_status = run_script_and_get_returncode(
                     TYPESCRIPT_CHECKS_CMDS
                 )
@@ -394,6 +397,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
             strict_typescript_checks_status = 0
             if does_diff_include_ts_files(files_to_lint):
+                print('Running strict TypeScript checks ...')
                 strict_typescript_checks_status = run_script_and_get_returncode(
                     STRICT_TYPESCRIPT_CHECKS_CMDS
                 )
@@ -411,6 +415,7 @@ def main(args: Optional[List[str]] = None) -> None:
                 files_to_lint
             )
             if js_or_ts_files:
+                print('Running frontend tests ...')
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append('--allow_no_spec')
                 frontend_test_cmds.append(
@@ -422,6 +427,7 @@ def main(args: Optional[List[str]] = None) -> None:
             if frontend_status != 0:
                 print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
+
             if does_diff_include_ci_config_or_test_files(files_to_lint):
                 ci_check_status = run_script_and_get_returncode(
                     TESTS_ARE_CAPTURED_IN_CI_CHECK_CMDS
@@ -432,12 +438,14 @@ def main(args: Optional[List[str]] = None) -> None:
                     'in ci check.'
                 )
                 sys.exit(1)
+
             python_test_files = (
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     files_to_lint
                 )
             )
             if python_test_files:
+                print('Running backend tests ...')
                 backend_test_cmds = BACKEND_TEST_CMDS.copy()
                 backend_test_cmds.append(
                     '--test_targets=%s' % ','.join(python_test_files)

@@ -24,10 +24,13 @@ from core.domain import (
     learner_group_fetchers,
     learner_group_services,
     topic_domain,
+    topic_fetchers,
     topic_services,
 )
 from core.platform import models
 from core.tests import test_utils
+
+from typing import Literal, Optional, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -338,6 +341,36 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
 
         subtopic_summary_dicts = matching_syllabus['subtopic_summary_dicts']
         self.assertEqual(len(subtopic_summary_dicts), 0)
+
+    def test_get_matching_syllabus_when_published_topic_fetch_fails(
+        self,
+    ) -> None:
+        # Test that get_matching_learner_group_syllabus_to_add raises an
+        # exception when a published topic cannot be fetched.
+
+        def mock_get_topic_by_id(
+            topic_id: str,
+            strict: Union[Literal[True], Literal[False]],
+        ) -> Optional[topic_domain.Topic]:
+            if topic_id == self.TOPIC_ID_0:
+                raise Exception('Topic not found')
+            return topic_fetchers.get_topic_by_id(topic_id, strict=strict)
+
+        with self.assertRaisesRegex(
+            Exception,
+            'Topic with id %s could not be fetched: Topic not found'
+            % self.TOPIC_ID_0,
+        ):
+            with self.swap(
+                topic_fetchers, 'get_topic_by_id', mock_get_topic_by_id
+            ):
+                learner_group_services.get_matching_learner_group_syllabus_to_add(
+                    self.LEARNER_GROUP_ID,
+                    'Place',
+                    'All',
+                    'All',
+                    constants.DEFAULT_LANGUAGE_CODE,
+                )
 
     def test_add_learner_to_learner_group(self) -> None:
         # Test for invited learner.

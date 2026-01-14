@@ -42,22 +42,22 @@ single test or test suite.
 )
 
 _PARSER.add_argument(
-    '--skip-install',
+    '--skip_install',
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true',
 )
 _PARSER.add_argument(
-    '--skip-build',
+    '--skip_build',
     help='If true, skips building files. The default value is false.',
     action='store_true',
 )
 _PARSER.add_argument(
-    '--sharding-instances',
+    '--sharding_instances',
     type=int,
     default=3,
     help='Sets the number of parallel browsers to open while sharding. '
     'Sharding must be disabled (either by passing in false to --sharding '
-    'or 1 to --sharding-instances) if running any tests in isolation '
+    'or 1 to --sharding_instances) if running any tests in isolation '
     '(fit or fdescribe).',
 )
 _PARSER.add_argument(

@@ -38,6 +38,7 @@ export class LessonFeedbackModalComponent {
   isSubmitterAnonymized: boolean = false;
   isLoggedIn: boolean = false;
   MAX_REVIEW_MESSAGE_LENGTH = AppConstants.MAX_REVIEW_MESSAGE_LENGTH;
+  thankYouModalIsShown: boolean = false;
 
   constructor(
     @Optional() private ngbActiveModal: NgbActiveModal,
@@ -72,11 +73,7 @@ export class LessonFeedbackModalComponent {
       );
     }
 
-    if (this.ngbActiveModal) {
-      this.ngbActiveModal.close();
-    } else {
-      this.bottomSheetRef.dismiss();
-    }
+    this.thankYouModalIsShown = true;
   }
 
   closeModal(): void {

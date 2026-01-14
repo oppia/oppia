@@ -39,6 +39,7 @@ import './oppia-footer.component.css';
 export class OppiaFooterComponent {
   emailAddress: string | null = null;
   name: string | null = null;
+  newsletterTouched: boolean = false;
   siteFeedbackFormUrl: string = AppConstants.SITE_FEEDBACK_FORM_URL;
   currentYear: number = new Date().getFullYear();
   PAGES_REGISTERED_WITH_FRONTEND = AppConstants.PAGES_REGISTERED_WITH_FRONTEND;
@@ -68,6 +69,9 @@ export class OppiaFooterComponent {
   }
 
   validateEmailAddress(): boolean {
+    if (!this.emailAddress) {
+      return false;
+    }
     let regex = new RegExp(AppConstants.EMAIL_REGEX);
     return regex.test(String(this.emailAddress));
   }
@@ -88,6 +92,10 @@ export class OppiaFooterComponent {
   }
 
   subscribeToMailingList(): void {
+    this.newsletterTouched = true;
+    if (!this.validateEmailAddress()) {
+      return;
+    }
     // Convert null or empty string to null for consistency.
     const userName = this.name ? String(this.name) : null;
     if (this.isAlreadySubscribed(String(this.emailAddress))) {
@@ -126,17 +134,15 @@ export class OppiaFooterComponent {
     }
   }
 
-  navigateToAboutPage(): void {
+  onAboutLinkClick(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.ABOUT
     );
-    this.windowRef.nativeWindow.location.href = '/about';
   }
 
-  navigateToTeachPage(): void {
+  onTeachLinkClick(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.TEACH
     );
-    this.windowRef.nativeWindow.location.href = '/teach';
   }
 }

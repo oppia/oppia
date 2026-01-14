@@ -34,8 +34,8 @@ import {MarkTranslationsAsNeedingUpdateModalComponent} from './mark-translations
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {ModifyTranslationsModalComponent} from '../../../pages/exploration-editor-page/modal-templates/exploration-modify-translations-modal.component';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 
 class MockActiveModal {
   close(): void {

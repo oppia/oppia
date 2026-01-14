@@ -916,7 +916,7 @@ export class ConversationFlowService {
 
         // Move to most recently reached checkpoint card.
         this._changeCard(indexToRedirectTo);
-        this.playerPositionService.onLoadedMostRecentCheckpoint.emit();
+        this.playerPositionService.onLoadedMostRecentCheckpoint.next();
       });
   }
 

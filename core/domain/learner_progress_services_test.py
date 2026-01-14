@@ -838,6 +838,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learnt_topic_ids(self.user_id), [])
 
         # Add a topic to the learnt list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_0
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0
         )
@@ -846,6 +853,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Completing a topic again has no effect.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_0
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0
         )
@@ -854,6 +868,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Add a topic to the partially learnt list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_1
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.record_topic_started(
             self.user_id, self.TOPIC_ID_1
         )
@@ -865,6 +886,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # If the topic is present in the partially learnt list, on completion
         # it is removed from the partially learnt list and added to the learnt
         # list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_3
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1
         )
@@ -877,6 +905,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Marking a topic as learnt removes it from the topics to learn list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_2
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.validate_and_add_topic_to_learn_goal(
             self.user_id, self.TOPIC_ID_2
         )
@@ -1114,6 +1149,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # If a topic has been learnt, it is not added to the partially learnt
         # list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_1
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1
         )
@@ -1388,9 +1430,23 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_learnt_topic_ids(self.user_id), [])
 
         # Add two topics to the learnt list.
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_0
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0
         )
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_1
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_1
         )
@@ -1609,7 +1665,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_progress_services.get_all_learnt_topic_ids(self.user_id), []
         )
-
+        completed_story_ids1 = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_0
+        )
+        for story_id in completed_story_ids1:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         # Add a topic to the learnt list.
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_0
@@ -1618,6 +1680,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             learner_progress_services.get_all_learnt_topic_ids(self.user_id),
             [self.TOPIC_ID_0],
         )
+        completed_story_ids2 = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_1
+        )
+        for story_id in completed_story_ids2:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
 
         # Add another topic.
         learner_progress_services.mark_topic_as_learnt(
@@ -2504,6 +2573,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Ensure topic is not added if in learn goal list."""
+        completed_story_ids = topic_fetchers.get_story_ids_linked_to_topic(
+            self.TOPIC_ID_3
+        )
+        for story_id in completed_story_ids:
+            learner_progress_services.mark_story_as_completed(
+                self.user_id, story_id
+            )
         # Mark the topic as already learnt for the user.
         learner_progress_services.mark_topic_as_learnt(
             self.user_id, self.TOPIC_ID_3

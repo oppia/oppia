@@ -30,9 +30,9 @@ import {StateTranslationEditorComponent} from './state-translation-editor.compon
 import {MarkAudioAsNeedingUpdateModalComponent} from 'components/forms/forms-templates/mark-audio-as-needing-update-modal.component';
 import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {ChangeListService} from 'pages/exploration-editor-page/services/change-list.service';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {EntityTranslationsService} from 'services/entity-translations.services';
-import {EntityTranslation} from 'domain/translation/EntityTranslationObjectFactory';
+import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {TranslationStatusService} from '../services/translation-status.service';
 import {PageContextService} from 'services/page-context.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';

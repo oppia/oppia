@@ -2,7 +2,7 @@
 <div class="navbar-mobile-container">
   <div class="navbar-mobile-options e2e-test-mobile-navigation-bar-container" *ngIf="mobileNavOptionsAreShown">
     <div  placement="top-start" class="exp-nav-dropdown-container">
-      <div ngbDropdown class="exp-nav-dropdown-content" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <div ngbDropdown class="exp-nav-dropdown-content" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <a>
           <i class="fa fa-pen"></i>
           Options
@@ -112,7 +112,7 @@
           </div>
         </div>
 
-        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" id="discardButtonPopup" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></div>
+        <div ngbDropdownToggle class="exp-nav-dropdown-icon e2e-test-mobile-changes-dropdown" id="discardButtonPopup" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></div>
 
         <ul ngbDropdownMenu class="dropdown-menu discard-publish e2e-test-state-changes-dropdown" aria-labelledby="discardButtonPopup">
           <button ngbDropdownItem class="btn btn-light e2e-test-mobile-exploration-discard-tab" (click)="discardChanges()" [disabled]="autosaveIsInProgress">

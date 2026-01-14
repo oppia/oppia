@@ -28,13 +28,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {UrlService} from 'services/contextual/url.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ShareLessonModalComponent} from './share-lesson-modal.component';
-import {
-  FlagExplorationModalResult,
-  NewFlagExplorationModalComponent,
-} from './flag-lesson-modal.component';
-import {LearnerLocalNavBackendApiService} from 'pages/exploration-player-page/services/learner-local-nav-backend-api.service';
-import {AlertsService} from 'services/alerts.service';
-import {CustomizableThankYouModalComponent} from './customizable-thank-you-modal.component';
+import {NewFlagExplorationModalComponent} from './flag-lesson-modal.component';
 import {LessonFeedbackModalComponent} from './lesson-feedback-modal.component';
 import {
   MatBottomSheet,
@@ -69,8 +63,6 @@ export class LessonPlayerSidebarComponent implements OnInit {
     private urlService: UrlService,
     @Optional() private ngbModal: NgbModal,
     @Optional() private bottomSheet: MatBottomSheet,
-    private learnerLocalNavBackendApiService: LearnerLocalNavBackendApiService,
-    private alertsService: AlertsService,
     private conversationFlowService: ConversationFlowService,
     private windowDimensionsService: WindowDimensionsService
   ) {}
@@ -101,7 +93,8 @@ export class LessonPlayerSidebarComponent implements OnInit {
   }
 
   toggleSidebar(): void {
-    this.sidebarIsExpanded = !this.sidebarIsExpanded;
+    this.mobileMenuService.toggleSidebar();
+    this.sidebarIsExpanded = this.mobileMenuService.getSidebarIsExpanded();
   }
 
   isHackyExpDescTranslationDisplayed(): boolean {
@@ -141,46 +134,11 @@ export class LessonPlayerSidebarComponent implements OnInit {
       const bottomSheetRef = this.bottomSheet.open(
         NewFlagExplorationModalComponent
       );
-      bottomSheetRef
-        .afterDismissed()
-        .subscribe((result: FlagExplorationModalResult) => {
-          if (result) {
-            this.mobileMenuService.toggleMenuVisibility();
-            this.learnerLocalNavBackendApiService
-              .postReportAsync(this.explorationId, result)
-              .then(
-                () => {
-                  this.showThankYouModal(
-                    'I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY'
-                  );
-                },
-                error => {
-                  this.alertsService.addWarning(error);
-                }
-              );
-          }
-        });
       return bottomSheetRef;
     } else {
       const modalRef = this.ngbModal.open(NewFlagExplorationModalComponent, {
         backdrop: 'static',
       });
-
-      modalRef.result.then(
-        (result: FlagExplorationModalResult) => {
-          this.learnerLocalNavBackendApiService
-            .postReportAsync(this.explorationId, result)
-            .then(
-              () => {},
-              error => {
-                this.alertsService.addWarning(error);
-              }
-            );
-
-          this.showThankYouModal('I18N_PLAYER_REPORT_SUCCESS_MODAL_BODY');
-        },
-        () => {}
-      );
       return modalRef;
     }
   }
@@ -192,47 +150,11 @@ export class LessonPlayerSidebarComponent implements OnInit {
       const bottomSheetRef = this.bottomSheet.open(
         LessonFeedbackModalComponent
       );
-      bottomSheetRef.afterDismissed().subscribe(result => {
-        if (result !== 'cancel') {
-          this.mobileMenuService.toggleMenuVisibility();
-          this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
-        }
-      });
       return bottomSheetRef;
     } else {
       const modalRef = this.ngbModal.open(LessonFeedbackModalComponent, {
         backdrop: 'static',
       });
-
-      modalRef.result.then(
-        () => {
-          this.showThankYouModal('I18N_PLAYER_THANK_FEEDBACK');
-        },
-        () => {}
-      );
-      return modalRef;
-    }
-  }
-
-  showThankYouModal(
-    i18nKey: string
-  ): NgbModalRef | MatBottomSheetRef<CustomizableThankYouModalComponent> {
-    if (this.isMobileScreenSize()) {
-      const bottomSheetRef = this.bottomSheet.open(
-        CustomizableThankYouModalComponent,
-        {
-          data: {
-            modalMessageI18nKey: i18nKey,
-          },
-        }
-      );
-      return bottomSheetRef;
-    } else {
-      const modalRef = this.ngbModal.open(CustomizableThankYouModalComponent, {
-        backdrop: true,
-      });
-
-      modalRef.componentInstance.modalMessageI18nKey = i18nKey;
       return modalRef;
     }
   }

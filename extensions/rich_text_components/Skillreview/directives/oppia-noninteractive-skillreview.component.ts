@@ -115,11 +115,7 @@ export class NoninteractiveSkillreview implements OnInit, OnChanges {
       AppConstants.ENTITY_TYPE.SKILL,
       this.skillId
     );
-    // The catch at the end was needed according to this thread:
-    // https://github.com/angular-ui/bootstrap/issues/6501, where in
-    // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
-    // The catch prevents that when clicking outside as well as for
-    // cancel.
+
     const modalRef = this.ngbModal.open(
       OppiaNoninteractiveSkillreviewConceptCardModalComponent,
       {backdrop: true}

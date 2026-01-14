@@ -208,8 +208,7 @@ def migrate_state_schema(
 
 
 def get_all_questions(
-    offset: int = 0,
-    question_count: int = constants.MAX_QUESTIONS_FETCHABLE
+    offset: int = 0, question_count: int = constants.MAX_QUESTIONS_FETCHABLE
 ) -> List[question_domain.Question]:
     """Returns all the questions.
 
@@ -226,7 +225,6 @@ def get_all_questions(
         return []
 
     question_models_list = question_models.QuestionModel.get_all_questions(
-        offset, question_count)
-    return [
-        get_question_from_model(model) for model in question_models_list
-    ]
+        offset, question_count
+    )
+    return [get_question_from_model(model) for model in question_models_list]

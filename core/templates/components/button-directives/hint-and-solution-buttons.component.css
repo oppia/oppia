@@ -7,8 +7,8 @@ oppia-hint-and-solution-buttons .list-inline {
   right: 0;
 }
 
-oppia-hint-and-solution-buttons .close {
-  bottom: 10px;
+oppia-hint-and-solution-buttons .btn-close {
+  bottom: 6px;
   font-size: 22px;
   margin-left: 10px;
   position: relative;
@@ -18,7 +18,7 @@ oppia-hint-and-solution-buttons .hint-box-add-ons {
   left: -5.5px;
 }
 
-oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
   left: 0;
 }
 
@@ -112,7 +112,7 @@ oppia-hint-and-solution-buttons .hint-box::before {
 }
 
 @media screen and (max-width: 768px) {
-  oppia-hint-and-solution-buttons .hint-box-add-ons .close {
+  oppia-hint-and-solution-buttons .hint-box-add-ons .btn-close {
     bottom: 10px;
     font-size: 22px;
     left: 310px;

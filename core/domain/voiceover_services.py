@@ -22,19 +22,26 @@ import datetime
 import json
 import os
 
-from core import feconf, utils
+from core import feconf
+from core.constants import constants
 from core.domain import (
     email_manager,
     exp_domain,
+    exp_fetchers,
+    platform_parameter_list,
+    platform_parameter_services,
     state_domain,
+    translation_domain,
+    translation_fetchers,
     user_services,
+    voiceover_cloud_task_services,
     voiceover_domain,
     voiceover_regeneration_services,
 )
 from core.platform import models
 from core.storage.voiceover import gae_models
 
-from typing import Dict, List, Optional, Sequence, Tuple, cast
+from typing import Dict, List, Optional, Tuple, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -295,12 +302,23 @@ def compute_voiceover_related_change(
             )
 
             for entity_voiceovers in all_entity_voiceovers:
-                if entity_voiceovers.language_accent_code in (
-                    language_accent_codes
+                # If the language code is English, it indicates that the
+                # English content was modified, so all associated
+                # voiceovers must be marked as needing update.
+                if (
+                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    and entity_voiceovers.language_accent_code
+                    not in language_accent_codes
                 ):
-                    entity_voiceovers.mark_manual_voiceovers_as_needing_update(
-                        change.content_id
-                    )
+                    continue
+
+                entity_voiceovers.mark_voiceovers_as_needing_update(
+                    change.content_id, feconf.VoiceoverType.MANUAL
+                )
+                entity_voiceovers.mark_voiceovers_as_needing_update(
+                    change.content_id, feconf.VoiceoverType.AUTO
+                )
+
         elif change.cmd == exp_domain.CMD_REMOVE_VOICEOVERS:
             language_code = change.language_code
             language_accent_codes = language_code_to_language_accent_mapping[
@@ -311,12 +329,22 @@ def compute_voiceover_related_change(
             )
 
             for entity_voiceovers in all_entity_voiceovers:
-                if entity_voiceovers.language_accent_code in (
-                    language_accent_codes
+                # If the language code is English, it indicates that the
+                # English content was modified, so all associated
+                # voiceovers must be removed.
+                if (
+                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    and entity_voiceovers.language_accent_code
+                    not in language_accent_codes
                 ):
-                    entity_voiceovers.remove_voiceover(
-                        change.content_id, feconf.VoiceoverType.MANUAL
-                    )
+                    continue
+
+                entity_voiceovers.remove_voiceover(
+                    change.content_id, feconf.VoiceoverType.MANUAL
+                )
+                entity_voiceovers.remove_voiceover(
+                    change.content_id, feconf.VoiceoverType.AUTO
+                )
 
     for entity_voiceovers in entity_voiceover_id_to_entity_voiceovers.values():
         entity_voiceovers_dict = entity_voiceovers.to_dict()
@@ -544,7 +572,7 @@ def get_language_accent_master_list() -> Dict[str, Dict[str, str]]:
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'language_accent_master_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         language_accent_master_list: Dict[str, Dict[str, str]] = json.loads(
             f.read()
         )
@@ -612,7 +640,7 @@ def get_autogeneratable_language_accent_list() -> Dict[str, Dict[str, str]]:
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         autogeneratable_language_accent_list: Dict[str, Dict[str, str]] = (
             json.loads(f.read())
         )
@@ -631,324 +659,6 @@ def get_autogeneratable_language_accent_codes() -> List[str]:
         get_autogeneratable_language_accent_list().keys()
     )
     return language_accent_codes
-
-
-def get_all_voice_artist_language_accent_mapping() -> Dict[str, Dict[str, str]]:
-    """The method returns a dict with all voice artist IDs as keys and nested
-    dicts as values. Each nested dict contains language codes as keys and
-    language accent codes as values.
-
-    Returns:
-        dict(str, dict(str, str)). A dict representing voice artist IDs to
-        language mappings.
-    """
-    voice_artist_id_to_language_mapping: Dict[str, Dict[str, str]] = {}
-    all_voice_artist_to_language_mapping: Dict[str, Dict[str, str]] = {}
-
-    voice_artist_metadata_models: Sequence[
-        voiceover_models.VoiceArtistMetadataModel
-    ] = voiceover_models.VoiceArtistMetadataModel.get_all().fetch()
-
-    exploration_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel
-    ] = voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-
-    for voice_artist_metadata_model in voice_artist_metadata_models:
-        voice_artist_id = voice_artist_metadata_model.id
-        language_code_to_accent = (
-            voice_artist_metadata_model.language_code_to_accent
-        )
-
-        voice_artist_id_to_language_mapping[voice_artist_id] = (
-            language_code_to_accent
-        )
-
-    for exp_voice_artist_model in exploration_voice_artist_link_models:
-        content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping
-        )
-
-        for (
-            lang_voiceover_mapping_tuple
-        ) in content_id_to_voiceovers_mapping.values():
-
-            for (
-                lang_code,
-                voiceover_tuple,
-            ) in lang_voiceover_mapping_tuple.items():
-
-                voice_artist_id = voiceover_tuple[0]
-
-                accent_type = ''
-                if (
-                    voice_artist_id in voice_artist_id_to_language_mapping
-                    and lang_code
-                    in voice_artist_id_to_language_mapping[voice_artist_id]
-                ):
-                    accent_type = voice_artist_id_to_language_mapping[
-                        voice_artist_id
-                    ][lang_code]
-
-                if voice_artist_id not in all_voice_artist_to_language_mapping:
-                    all_voice_artist_to_language_mapping[voice_artist_id] = {}
-
-                all_voice_artist_to_language_mapping[voice_artist_id][
-                    lang_code
-                ] = accent_type
-
-    return all_voice_artist_to_language_mapping
-
-
-def get_voice_artist_ids_to_voice_artist_names() -> Dict[str, str]:
-    """The method returns a dict with all the voice artist IDs as keys and
-    their respective usernames as values.
-
-    Returns:
-        dict(str, str). A dict with all the voice artist IDs as keys and their
-        respective usernames as values.
-    """
-    voice_artist_id_to_voice_artist_name: Dict[str, str] = {}
-
-    exploration_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel
-    ] = voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-
-    for exp_voice_artist_model in exploration_voice_artist_link_models:
-        content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping
-        )
-
-        for (
-            lang_voiceover_mapping_tuple
-        ) in content_id_to_voiceovers_mapping.values():
-
-            for voiceover_tuple in lang_voiceover_mapping_tuple.values():
-
-                voice_artist_id = voiceover_tuple[0]
-
-                if voice_artist_id in voice_artist_id_to_voice_artist_name:
-                    continue
-
-                voice_artist_name = user_services.get_username(voice_artist_id)
-
-                voice_artist_id_to_voice_artist_name[voice_artist_id] = (
-                    voice_artist_name
-                )
-
-    return voice_artist_id_to_voice_artist_name
-
-
-def get_voiceover_filenames(
-    voice_artist_id: str, language_code: str
-) -> Dict[str, List[str]]:
-    """The function returns a dictionary where each exploration ID corresponds
-    to a list of filenames. These exploration IDs represent the explorations
-    in which a specified voice artist has contributed voiceovers. The list of
-    filenames contains up to five entries, representing the longest-duration
-    voiceovers contributed by the specified artist.
-
-    Args:
-        voice_artist_id: str. The voice artist ID for which filenames should be
-            fetched.
-        language_code: str. The language in which voiceovers have been
-            contributed.
-
-    Returns:
-        dict(str, list(str)). A dict with exploration IDs as keys and list of
-        voiceover filenames as values.
-    """
-
-    exploration_id_to_filenames: Dict[str, List[str]] = {}
-    filename_to_exp_id: Dict[str, str] = {}
-    contributed_voiceovers: List[state_domain.VoiceoverDict] = []
-
-    exp_voice_artist_link_models: Sequence[
-        voiceover_models.ExplorationVoiceArtistsLinkModel
-    ] = voiceover_models.ExplorationVoiceArtistsLinkModel.get_all().fetch()
-
-    for exp_voice_artist_model in exp_voice_artist_link_models:
-        exploration_id = exp_voice_artist_model.id
-        content_id_to_voiceovers_mapping = (
-            exp_voice_artist_model.content_id_to_voiceovers_mapping
-        )
-
-        for (
-            lang_code_to_voiceover_mapping
-        ) in content_id_to_voiceovers_mapping.values():
-
-            for (
-                lang_code,
-                voiceover_mapping_tuple,
-            ) in lang_code_to_voiceover_mapping.items():
-
-                if lang_code != language_code:
-                    continue
-
-                retrieved_voice_artist_id = voiceover_mapping_tuple[0]
-                voiceover_dict = voiceover_mapping_tuple[1]
-
-                if voice_artist_id != retrieved_voice_artist_id:
-                    continue
-
-                filename_to_exp_id[voiceover_dict['filename']] = exploration_id
-
-                contributed_voiceovers.append(voiceover_dict)
-
-    # The key for sorting is defined separately because of a mypy bug.
-    # A [no-any-return] is thrown if key is defined in the sort()
-    # method instead.
-    # https://github.com/python/mypy/issues/9590
-    k = lambda voiceover: voiceover['duration_secs']
-    contributed_voiceovers.sort(key=k, reverse=True)
-
-    if (
-        len(contributed_voiceovers)
-        > MAX_SAMPLE_VOICEOVERS_FOR_GIVEN_VOICE_ARTIST
-    ):
-        # According to the product specifications, up to five sample voiceovers
-        # will be provided to voiceover administrators to assist them in
-        # identifying the particular accent needed for the given voiceover in a
-        # specific language.
-        contributed_voiceovers = contributed_voiceovers[:5]
-
-    for voiceover_dict in contributed_voiceovers:
-        filename = voiceover_dict['filename']
-        exp_id = filename_to_exp_id[filename]
-        if exp_id not in exploration_id_to_filenames:
-            exploration_id_to_filenames[exp_id] = []
-        exploration_id_to_filenames[exp_id].append(filename)
-
-    return exploration_id_to_filenames
-
-
-def update_voice_artist_metadata(
-    voice_artist_id: str, language_code_to_accent: Dict[str, str]
-) -> None:
-    """The method updates or creates metadata for a voice artist in the
-    VoiceArtistMetadataModel.
-
-    Args:
-        voice_artist_id: str. The ID of the voice artist for which metadata
-            needs to be updated.
-        language_code_to_accent: dict(str, str). A dict representing the
-            language accent codes as keys and accent codes as their
-            corresponding value.
-    """
-    voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel.get(
-        voice_artist_id, strict=False
-    )
-
-    if voice_artist_metadata_model is None:
-        voiceover_models.VoiceArtistMetadataModel.create_model(
-            voice_artist_id, language_code_to_accent
-        )
-    else:
-        voice_artist_metadata_model.language_code_to_accent = (
-            language_code_to_accent
-        )
-        voice_artist_metadata_model.update_timestamps()
-        voice_artist_metadata_model.put()
-
-
-def update_voice_artist_language_mapping(
-    voice_artist_id: str, language_code: str, language_accent_code: str
-) -> None:
-    """The method updates the language accent information for the given voice
-    artist in the given language code.
-
-    Args:
-        voice_artist_id: str. The voice artist ID for which language accent
-            needs to be updated.
-        language_code: str. The language code for which the accent needs to be
-            updated.
-        language_accent_code: str. The updated language accent code.
-    """
-    voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel.get(
-        voice_artist_id, strict=False
-    )
-    language_code_to_accent = {}
-
-    if voice_artist_metadata_model is None:
-        voice_artist_metadata_model = (
-            create_voice_artist_metadata_model_instance(
-                voice_artist_id=voice_artist_id, language_code_to_accent={}
-            )
-        )
-    else:
-        language_code_to_accent = (
-            voice_artist_metadata_model.language_code_to_accent
-        )
-
-    language_code_to_accent[language_code] = language_accent_code
-
-    voice_artist_metadata_model.language_code_to_accent = (
-        language_code_to_accent
-    )
-
-    voice_artist_metadata_model.update_timestamps()
-    voice_artist_metadata_model.put()
-
-
-def create_voice_artist_metadata_model_instance(
-    voice_artist_id: str, language_code_to_accent: Dict[str, str]
-) -> voiceover_models.VoiceArtistMetadataModel:
-    """Creates a VoiceArtistMetadataModel instance.
-
-    Args:
-        voice_artist_id: str. The ID of the voice artist for which new model
-            will be created.
-        language_code_to_accent: dict(str, str). A dict representing the
-            language codes as keys and accent codes as their corresponding
-            values.
-
-    Returns:
-        VoiceArtistMetadataModel. A new VoiceArtistMetadataModel instance
-        that connects voiceover artists with the languages in which they have
-        provided voiceovers.
-    """
-    voice_artist_metadata_model = voiceover_models.VoiceArtistMetadataModel(
-        id=voice_artist_id, language_code_to_accent=language_code_to_accent
-    )
-    voice_artist_metadata_model.update_timestamps()
-
-    return voice_artist_metadata_model
-
-
-def create_exploration_voice_artists_link_model_instance(
-    exploration_id: str,
-    content_id_to_voiceovers_mapping: (
-        voiceover_domain.ContentIdToVoiceoverMappingType
-    ),
-) -> voiceover_models.ExplorationVoiceArtistsLinkModel:
-    """Instantiates an ExplorationVoiceArtistsLinkModel, establishing a link
-    between the latest content IDs within an exploration and the corresponding
-    IDs of voice artists who provided voiceovers in the specified language code.
-    Instances of this class are keyed by the exploration ID.
-
-    Args:
-        exploration_id: str. The ID of the exploration for which new model will
-            be created.
-        content_id_to_voiceovers_mapping: ContentIdToVoiceoverMappingType. The
-            dictionary contains information about voice artists and their
-            provided voiceovers in the exploration with the given exploration
-            ID. The dict maps content IDs to nested dicts. Each nested dicts
-            maps language code to voice artist and voiceover tuple.
-
-    Returns:
-        ExplorationVoiceArtistsLinkModel. An instance of
-        ExplorationVoiceArtistsLinkModel, establishing a link between the latest
-        content IDs within an exploration and the corresponding IDs of
-        voice artists who provided voiceovers.
-    """
-    exploration_voice_artists_link_model = (
-        voiceover_models.ExplorationVoiceArtistsLinkModel(
-            id=exploration_id,
-            content_id_to_voiceovers_mapping=content_id_to_voiceovers_mapping,
-        )
-    )
-    exploration_voice_artists_link_model.update_timestamps()
-
-    return exploration_voice_artists_link_model
 
 
 def compute_voiceover_related_changes_upon_revert(
@@ -1099,6 +809,107 @@ def send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
     )
 
 
+def _remove_empty_contents_for_voiceover_regeneration(
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]],
+) -> None:
+    """Removes empty contents from the provided input.
+
+    Args:
+        language_code_to_contents_mapping: dict. A dictionary mapping language
+            codes to the corresponding content IDs and their associated HTML
+            that require voiceover regeneration.
+    """
+    for (
+        _,
+        content_ids_to_content_values,
+    ) in language_code_to_contents_mapping.items():
+        content_ids_to_remove = [
+            content_id
+            for content_id, html in (content_ids_to_content_values.items())
+            if not html.strip()
+        ]
+        for content_id in content_ids_to_remove:
+            del content_ids_to_content_values[content_id]
+
+
+def extract_english_voiceover_texts_from_exploration(
+    exploration: exp_domain.Exploration,
+) -> Dict[str, Dict[str, str]]:
+    """Extracts English voiceover texts from the given exploration.
+
+    Args:
+        exploration: Exploration. The exploration from which to
+            extract English voiceover texts.
+
+    Returns:
+        dict. A dictionary that maps the language code (English) to its
+        corresponding content IDs and their associated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for state in exploration.states.values():
+        content_id_to_translatable_content = (
+            state.get_translatable_contents_collection()
+        ).content_id_to_translatable_content
+
+        for translatable_content in content_id_to_translatable_content.values():
+            content_id = translatable_content.content_id
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            content_value = translatable_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault('en', {})[
+                content_id
+            ] = content_value
+
+    return language_code_to_contents_mapping
+
+
+def extract_translated_voiceover_texts_from_entity_translations(
+    entity_translations: List[translation_domain.EntityTranslation],
+) -> Dict[str, Dict[str, str]]:
+    """Retrieves translated voiceover texts from an exploration’s entity
+    translations object.
+
+    Args:
+        entity_translations: List[translation_domain.EntityTranslation]. A list
+            of entity translations to extract voiceover texts from.
+
+    Returns:
+        dict. A dictionary mapping language codes to their corresponding content
+        IDs and translated values.
+    """
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    for entity_translation in entity_translations:
+        language_code = entity_translation.language_code
+        translations = entity_translation.translations
+
+        for content_id, translated_content in translations.items():
+
+            # Rule inputs are not considered for voiceover generation.
+            if content_id.startswith('rule_input'):
+                continue
+
+            # Voiceovers should only be regenerated if the translation is
+            # updated.
+            if translated_content.needs_update:
+                continue
+
+            content_value = translated_content.content_value
+            assert isinstance(content_value, str)
+
+            language_code_to_contents_mapping.setdefault(language_code, {})[
+                content_id
+            ] = content_value
+
+    return language_code_to_contents_mapping
+
+
 def _regenerate_voiceovers_for_given_contents(
     exploration_id: str,
     exploration_title: str,
@@ -1106,6 +917,7 @@ def _regenerate_voiceovers_for_given_contents(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     date_time: str,
     author_id: str,
+    task_run_id: Optional[str] = None,
 ) -> None:
     """Private helper method to regenerate voiceovers for specified contents
     of an exploration.
@@ -1124,10 +936,18 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration process was initiated.
         author_id: str. The ID of the user who triggered the voiceover
             regeneration, either directly or indirectly.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task. If None, the method is invoked by a
+            synchronous process and task-tracking is not required.
     """
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
+
+    # Remove empty contents from the voiceover regeneration mapping.
+    _remove_empty_contents_for_voiceover_regeneration(
+        language_code_to_contents_mapping
+    )
 
     # A list of error collections that occurred during the
     # voiceover regeneration.
@@ -1165,6 +985,34 @@ def _regenerate_voiceovers_for_given_contents(
     # A list of language accents for which voiceovers are regenerated.
     language_accents_used_for_voiceover_regeneration = []
 
+    requested_task_is_async: bool = task_run_id is not None
+
+    if requested_task_is_async:
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
+        voiceover_regeneration_task = (
+            voiceover_cloud_task_services.get_voiceover_regeneration_task(
+                exploration_id, task_run_id
+            )
+        )
+
+    if requested_task_is_async and voiceover_regeneration_task is None:
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
+        voiceover_regeneration_task = voiceover_cloud_task_services.create_voiceover_regeneration_task_with_status_generating(
+            exploration_id,
+            task_run_id,
+            language_code_to_contents_mapping,
+            language_code_to_autogeneratable_accent_codes,
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover_regeneration_task is not None
+
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task
+        )
+
     for language_code in language_codes:
         language_accent_codes = (
             language_code_to_autogeneratable_accent_codes.get(language_code, [])
@@ -1192,6 +1040,17 @@ def _regenerate_voiceovers_for_given_contents(
                 language_accent_code,
             )
 
+            failed_content_ids = [
+                error[0] for error in errors_while_voiceover_regeneration
+            ]
+
+            if requested_task_is_async:
+                # Ruling out the possibility of None for mypy type checking.
+                assert voiceover_regeneration_task is not None
+                voiceover_regeneration_task.update_final_content_status_for_cloud_task_run(
+                    language_accent_code, failed_content_ids
+                )
+
             if errors_while_voiceover_regeneration:
                 error_collections_during_voiceover_regeneration.append(
                     {
@@ -1204,24 +1063,39 @@ def _regenerate_voiceovers_for_given_contents(
                     errors_while_voiceover_regeneration
                 )
 
-    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
-        exploration_id,
-        exploration_title,
-        date_time,
-        language_accents_used_for_voiceover_regeneration,
-        error_collections_during_voiceover_regeneration,
-        number_of_contents_for_voiceover_regeneration,
-        number_of_contents_failed_to_regenerate,
-        author_id,
+    if requested_task_is_async:
+        # Ruling out the possibility of None for mypy type checking.
+        assert voiceover_regeneration_task is not None
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task
+        )
+
+    # Confirming that the app can deliver emails.
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
     )
+    if server_can_send_emails:
+        send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+            exploration_id,
+            exploration_title,
+            date_time,
+            language_accents_used_for_voiceover_regeneration,
+            error_collections_during_voiceover_regeneration,
+            number_of_contents_for_voiceover_regeneration,
+            number_of_contents_failed_to_regenerate,
+            author_id,
+        )
 
 
-def regenerate_voiceover_for_updated_exploration(
+def regenerate_voiceovers_on_exploration_update(
     exploration_id: str,
     exploration_title: str,
     exploration_version: int,
     author_id: str,
     date_time: str,
+    task_run_id: Optional[str] = None,
 ) -> None:
     """Regenerates voiceovers for the updated exploration based on the changes
     made in the exploration content (in English) or translations (in other
@@ -1240,6 +1114,8 @@ def regenerate_voiceover_for_updated_exploration(
             exploration.
         date_time: str. The date and time when the changes were
             made to the exploration.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task.
 
     Raises:
         Exception. If the voiceover regeneration fails for any of the content
@@ -1298,4 +1174,178 @@ def regenerate_voiceover_for_updated_exploration(
         language_code_to_contents_mapping,
         date_time,
         author_id,
+        task_run_id,
+    )
+
+
+def regenerate_voiceovers_on_exploration_added_to_topic(
+    exploration_id: str,
+    date_time: str,
+    author_id: str,
+    task_run_id: Optional[str] = None,
+) -> None:
+    """Regenerates all voiceovers (in English and in all the available
+    translated languages) for the given exploration when it is curated — i.e.,
+    added to a published story.
+
+    NOTE: This is a time-intensive operation and must be executed via a
+    deferred task to ensure it runs asynchronously.
+
+    Args:
+        exploration_id: str. The ID of the exploration to regenerate
+            voiceovers for.
+        date_time: str. The timestamp when the exploration was curated.
+        author_id: str. The ID of the user who curated the exploration.
+        task_run_id: str|None. The unique identifier for the voiceover
+            regeneration task.
+    """
+    # A dictionary where each key is a language code, and each value is a
+    # content mapping dictionary. The content mapping dictionary contains
+    # content IDs as keys and their corresponding HTML content as values.
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+
+    exploration_version = exploration.version
+    exploration_title = exploration.title
+
+    # Retrieve all English-language contents from the exploration.
+    language_code_to_contents_mapping.update(
+        extract_english_voiceover_texts_from_exploration(exploration)
+    )
+
+    # Retrieve all translated contents of the exploration.
+    entity_translations = (
+        translation_fetchers.get_all_entity_translations_for_entity(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+        )
+    )
+    language_code_to_contents_mapping.update(
+        extract_translated_voiceover_texts_from_entity_translations(
+            entity_translations
+        )
+    )
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        date_time,
+        author_id,
+        task_run_id,
+    )
+
+
+def regenerate_voiceovers_of_exploration_for_given_language_accent(
+    exploration_id: str,
+    language_accent_code: str,
+    author_id: str,
+    date_time: str,
+) -> None:
+    """Regenerates voiceovers of the provided exploration for the given
+    language accent code.
+
+    NOTE: This is a time-intensive operation and must be executed via a
+    deferred task to ensure it runs asynchronously.
+
+    Args:
+        exploration_id: str. The ID of the exploration for which voiceovers
+            need to be regenerated.
+        language_accent_code: str. The language accent code for which
+            voiceovers need to be regenerated.
+        author_id: str. The ID of the user who initiated the voiceover
+            regeneration.
+        date_time: str. The timestamp when the voiceover regeneration was
+            initiated.
+
+    Raises:
+        Exception. If the provided language accent code is invalid.
+    """
+    # A dictionary where each key is a language code, and each value is a
+    # content mapping dictionary. The content mapping dictionary contains
+    # content IDs as keys and their corresponding HTML content as values.
+    language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
+
+    language_code = get_language_code_from_language_accent_code(
+        language_accent_code
+    )
+
+    if language_code is None:
+        raise Exception(
+            'Invalid language accent code: %s' % language_accent_code
+        )
+
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+
+    exploration_version = exploration.version
+    exploration_title = exploration.title
+
+    if language_code == constants.DEFAULT_LANGUAGE_CODE:
+        # Retrieve all English-language contents from the exploration.
+        language_code_to_contents_mapping.update(
+            extract_english_voiceover_texts_from_exploration(exploration)
+        )
+    else:
+        # Retrieve all translated contents of the exploration in the given
+        # language code.
+        entity_translation = translation_fetchers.get_entity_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            exploration_id,
+            exploration_version,
+            language_code,
+        )
+        language_code_to_contents_mapping.update(
+            extract_translated_voiceover_texts_from_entity_translations(
+                [entity_translation]
+            )
+        )
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        date_time,
+        author_id,
+    )
+
+
+def generate_voiceover_from_translated_content(
+    exploration_id: str,
+    exploration_version: int,
+    translation_content: str,
+    content_id: str,
+    language_code: str,
+) -> None:
+    """Generates a new voiceover for translated content once translation
+    suggestions are approved by reviewers.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        exploration_version: int. The version of the exploration.
+        translation_content: str. The translated content for which the
+            voiceover needs to be generated.
+        content_id: str. The content ID for which the voiceover is being
+            generated.
+        language_code: str. The language code for the voiceover.
+    """
+    language_code_to_contents_mapping = {
+        language_code: {content_id: translation_content}
+    }
+    exploration = exp_fetchers.get_exploration_by_id(exploration_id)
+    assert exploration is not None
+    exploration_title = exploration.title
+
+    _regenerate_voiceovers_for_given_contents(
+        exploration_id,
+        exploration_title,
+        exploration_version,
+        language_code_to_contents_mapping,
+        datetime.datetime.utcnow().isoformat(),
+        feconf.SYSTEM_COMMITTER_ID,
     )

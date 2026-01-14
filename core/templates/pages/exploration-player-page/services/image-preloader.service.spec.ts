@@ -384,6 +384,16 @@ describe('Image preloader service', () => {
 
   let exploration: Exploration;
 
+  // Helper to flush platform feature-flags evaluation request if present.
+  const flushFeatureFlagsIfQueued = () => {
+    const featureFlagsReq = httpTestingController.match(req =>
+      req.url.includes('/feature_flags_evaluation_handler')
+    );
+    if (featureFlagsReq && featureFlagsReq.length) {
+      featureFlagsReq.forEach(req => req.flush({}));
+    }
+  };
+
   beforeEach(() => {
     imagePreloaderService = TestBed.get(ImagePreloaderService);
     pageContextService = TestBed.get(PageContextService);
@@ -413,7 +423,9 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
-    expect(imagePreloaderService.inExplorationPlayer()).toBeTrue();
+    flushFeatureFlagsIfQueued();
+
+    expect(imagePreloaderService.inExplorationPlayer()).toBeTruthy();
 
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
@@ -421,22 +433,24 @@ describe('Image preloader service', () => {
   });
 
   it('should not be in exploration player before init is called', () => {
-    expect(imagePreloaderService.inExplorationPlayer()).toBeFalse();
+    expect(imagePreloaderService.inExplorationPlayer()).toBeFalsy();
   });
 
   it('should maintain the correct number of download requests in queue', fakeAsync(() => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     // Max files to download simultaneously is 3.
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
-    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeTrue();
-    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeTrue();
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTruthy();
+    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeTruthy();
+    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeTruthy();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalsy();
 
     flushMicrotasks();
 
@@ -444,7 +458,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename2, filename3, filename4]);
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTruthy();
 
     flushMicrotasks();
 
@@ -465,15 +479,17 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
-    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeFalse();
-    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeFalse();
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalsy();
+    expect(imagePreloaderService.isLoadingImageFile(filename2)).toBeFalsy();
+    expect(imagePreloaderService.isLoadingImageFile(filename3)).toBeFalsy();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalsy();
   }));
 
   it('should properly restart pre-loading from a new state', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
+
+    flushFeatureFlagsIfQueued();
 
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
@@ -488,7 +504,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename4]);
-    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTruthy();
   });
 
   it(
@@ -498,13 +514,15 @@ describe('Image preloader service', () => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
+      flushFeatureFlagsIfQueued();
+
       httpTestingController.expectOne(requestUrl1);
       httpTestingController.expectOne(requestUrl2);
       httpTestingController.expectOne(requestUrl3);
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalsy();
 
       imagePreloaderService.onStateChange('State 6');
 
@@ -512,11 +530,11 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename4]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTruthy();
 
       flushMicrotasks();
 
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalsy();
     })
   );
 
@@ -526,6 +544,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       httpTestingController.expectOne(requestUrl1).flush(imageBlob);
       httpTestingController.expectOne(requestUrl2).flush(imageBlob);
@@ -542,14 +562,14 @@ describe('Image preloader service', () => {
       ).toEqual([filename4]);
 
       imagePreloaderService.onStateChange('State 6');
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTrue();
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeTruthy();
 
       flushMicrotasks();
 
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([]);
-      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalse();
+      expect(imagePreloaderService.isLoadingImageFile(filename4)).toBeFalsy();
     })
   );
 
@@ -560,6 +580,8 @@ describe('Image preloader service', () => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
       flushMicrotasks();
+
+      flushFeatureFlagsIfQueued();
 
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
@@ -591,6 +613,8 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2).flush(imageBlob);
     expect(
@@ -606,12 +630,12 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename3, filename4]);
-    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeFalse();
+    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeFalsy();
 
     flushMicrotasks();
 
-    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeTrue();
-    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeFalse();
+    expect(imagePreloaderService.isInFailedDownload(filename3)).toBeTruthy();
+    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeFalsy();
 
     imagePreloaderService.restartImagePreloader('State 6');
 
@@ -620,12 +644,14 @@ describe('Image preloader service', () => {
       .flush(imageBlob, {status: 408, statusText: 'Status Text'});
     flushMicrotasks();
 
-    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeTrue();
+    expect(imagePreloaderService.isInFailedDownload(filename4)).toBeTruthy();
   }));
 
   it('should calculate the dimensions of the image file', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
+
+    flushFeatureFlagsIfQueued();
 
     httpTestingController.expectOne(requestUrl1);
     httpTestingController.expectOne(requestUrl2);
@@ -668,13 +694,15 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController.expectOne(requestUrl1).flush(imageBlob);
     httpTestingController.expectOne(requestUrl2);
     httpTestingController.expectOne(requestUrl3);
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTruthy();
 
     flushMicrotasks();
 
@@ -682,7 +710,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename2, filename3, filename4]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalsy();
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
@@ -706,6 +734,8 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController
       .expectOne(requestUrl1)
       .flush(new Blob(['svg image'], {type: 'image/svg+xml'}));
@@ -714,7 +744,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTruthy();
 
     flushMicrotasks();
 
@@ -722,7 +752,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename2, filename3, filename4]);
-    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalse();
+    expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeFalsy();
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
@@ -751,6 +781,8 @@ describe('Image preloader service', () => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
+      flushFeatureFlagsIfQueued();
+
       httpTestingController
         .expectOne(requestUrl1)
         .flush(imageBlob, {status: 404, statusText: 'Status Text'});
@@ -759,7 +791,7 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalsy();
 
       flushMicrotasks();
 
@@ -767,7 +799,7 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename2, filename3, filename4]);
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTruthy();
 
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
@@ -785,7 +817,7 @@ describe('Image preloader service', () => {
       httpTestingController.expectOne(requestUrl1).flush(imageBlob);
       flushMicrotasks();
 
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalsy();
       expect(onSuccess).toHaveBeenCalled();
       expect(onFailure).not.toHaveBeenCalled();
     })
@@ -795,6 +827,8 @@ describe('Image preloader service', () => {
     imagePreloaderService.init(exploration);
     imagePreloaderService.kickOffImagePreloader(initStateName);
 
+    flushFeatureFlagsIfQueued();
+
     httpTestingController
       .expectOne(requestUrl1)
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});
@@ -803,7 +837,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename1, filename2, filename3]);
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalsy();
 
     flushMicrotasks();
 
@@ -811,7 +845,7 @@ describe('Image preloader service', () => {
     expect(
       imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
     ).toEqual([filename2, filename3, filename4]);
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
+    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTruthy();
 
     var onSuccess = jasmine.createSpy('success');
     var onFailure = jasmine.createSpy('fail');
@@ -825,7 +859,7 @@ describe('Image preloader service', () => {
       .flush(imageBlob, {status: 404, statusText: 'Status Text'});
     flushMicrotasks();
 
-    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
+    expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTruthy();
     expect(onSuccess).not.toHaveBeenCalled();
     expect(onFailure).toHaveBeenCalled();
   }));
@@ -836,6 +870,8 @@ describe('Image preloader service', () => {
     fakeAsync(() => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
+
+      flushFeatureFlagsIfQueued();
 
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
@@ -856,7 +892,7 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTrue();
+      expect(imagePreloaderService.isLoadingImageFile(filename1)).toBeTruthy();
 
       flushMicrotasks();
 
@@ -877,6 +913,8 @@ describe('Image preloader service', () => {
       imagePreloaderService.init(exploration);
       imagePreloaderService.kickOffImagePreloader(initStateName);
 
+      flushFeatureFlagsIfQueued();
+
       var onSuccess = jasmine.createSpy('success');
       var onFailure = jasmine.createSpy('fail');
 
@@ -892,7 +930,7 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename1, filename2, filename3]);
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalse();
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeFalsy();
 
       flushMicrotasks();
 
@@ -900,7 +938,7 @@ describe('Image preloader service', () => {
       expect(
         imagePreloaderService.getFilenamesOfImageCurrentlyDownloading()
       ).toEqual([filename2, filename3, filename4]);
-      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTrue();
+      expect(imagePreloaderService.isInFailedDownload(filename1)).toBeTruthy();
 
       expect(onSuccess).not.toHaveBeenCalled();
       expect(onFailure).toHaveBeenCalled();

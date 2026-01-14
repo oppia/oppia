@@ -14,15 +14,15 @@
 
 /**
  * @fileoverview Service to fetch and store EntityTranslation for the given
- * entity in a given langauge.
+ * entity in a given language.
  */
 
 import {Injectable} from '@angular/core';
-import {TranslatedContent} from 'domain/exploration/TranslatedContentObjectFactory';
+import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {
   EntityTranslation,
   LanguageCodeToEntityTranslationBackendDict,
-} from 'domain/translation/EntityTranslationObjectFactory';
+} from 'domain/translation/entity-translation.model';
 import {EntityTranslationBackendApiService} from 'pages/exploration-editor-page/services/entity-translation-backend-api.service';
 import {AlertsService} from './alerts.service';
 

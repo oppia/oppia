@@ -19,13 +19,25 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from core import feconf
+from core import constants, feature_flag_list, feconf
 from core.domain import (
+    cloud_task_domain,
+    exp_domain,
+    exp_fetchers,
+    exp_services,
+    opportunity_services,
     rights_domain,
     rights_manager,
     state_domain,
+    story_domain,
+    story_services,
     taskqueue_services,
+    topic_domain,
+    topic_services,
+    translation_domain,
+    translation_fetchers,
     user_services,
+    voiceover_cloud_task_services,
     voiceover_domain,
     voiceover_services,
 )
@@ -122,162 +134,6 @@ class VoiceoverLanguageCodesMappingHandlerTests(test_utils.GenericTestBase):
             'Expected dict, received en-US',
         )
 
-        self.logout()
-
-
-class VoiceArtistMetadataHandlerTests(test_utils.GenericTestBase):
-    """The class validates functionality related to voice artist metadata model."""
-
-    def setUp(self) -> None:
-        super().setUp()
-        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
-        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
-        auth_id = 'someUser'
-        self.voice_artist_username = 'username'
-        user_settings = user_services.create_new_user(
-            auth_id, 'user@example.com'
-        )
-        self.voice_artist_id = user_settings.user_id
-        user_services.set_username(
-            self.voice_artist_id, self.voice_artist_username
-        )
-
-        self.voiceover1: state_domain.VoiceoverDict = {
-            'filename': 'filename1.mp3',
-            'file_size_bytes': 3000,
-            'needs_update': False,
-            'duration_secs': 6.1,
-        }
-        self.voiceover2: state_domain.VoiceoverDict = {
-            'filename': 'filename2.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.9,
-        }
-        self.voiceover3: state_domain.VoiceoverDict = {
-            'filename': 'filename3.mp3',
-            'file_size_bytes': 3500,
-            'needs_update': False,
-            'duration_secs': 5.0,
-        }
-
-        self.language_code_to_accent: Dict[str, str] = {
-            'en': 'en-US',
-            'hi': 'hi-IN',
-        }
-
-        self.content_id_to_voiceovers_mapping: (
-            voiceover_domain.ContentIdToVoiceoverMappingType
-        ) = {
-            'content_1': {'en': (self.voice_artist_id, self.voiceover1)},
-            'content_2': {'hi': (self.voice_artist_id, self.voiceover2)},
-            'content_3': {'ar': (self.voice_artist_id, self.voiceover1)},
-        }
-
-        exploration_voice_artist_link_model = voiceover_services.create_exploration_voice_artists_link_model_instance(
-            exploration_id='exploration_id',
-            content_id_to_voiceovers_mapping=(
-                self.content_id_to_voiceovers_mapping
-            ),
-        )
-        exploration_voice_artist_link_model.put()
-
-        voiceover_services.update_voice_artist_metadata(
-            voice_artist_id=self.voice_artist_id,
-            language_code_to_accent=(self.language_code_to_accent),
-        )
-
-    def test_get_voice_artist_data_for_voiceover_admin_page(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-
-        expected_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': ''}
-        }
-        expected_voice_artist_id_to_voice_artist_name = {
-            self.voice_artist_id: self.voice_artist_username
-        }
-        json_response = self.get_json(feconf.VOICE_ARTIST_METADATA_HANDLER)
-
-        self.assertDictEqual(
-            json_response['voice_artist_id_to_language_mapping'],
-            expected_voice_artist_id_to_language_mapping,
-        )
-        self.assertDictEqual(
-            json_response['voice_artist_id_to_voice_artist_name'],
-            expected_voice_artist_id_to_voice_artist_name,
-        )
-        self.logout()
-
-    def test_should_update_voice_artist_language_mapping(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-        csrf_token = self.get_new_csrf_token()
-
-        initial_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': ''}
-        }
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-
-        self.assertDictEqual(
-            voice_artist_id_to_language_mapping,
-            initial_voice_artist_id_to_language_mapping,
-        )
-
-        payload = {
-            'voice_artist_id': self.voice_artist_id,
-            'language_code': 'ar',
-            'language_accent_code': 'ar-EG',
-        }
-        self.put_json(
-            feconf.VOICE_ARTIST_METADATA_HANDLER, payload, csrf_token=csrf_token
-        )
-
-        final_voice_artist_id_to_language_mapping = {
-            self.voice_artist_id: {'en': 'en-US', 'hi': 'hi-IN', 'ar': 'ar-EG'}
-        }
-        voice_artist_id_to_language_mapping = (
-            voiceover_services.get_all_voice_artist_language_accent_mapping()
-        )
-
-        self.assertDictEqual(
-            voice_artist_id_to_language_mapping,
-            final_voice_artist_id_to_language_mapping,
-        )
-        self.logout()
-
-    def test_get_exp_id_to_filenames_for_given_voice_artist(self) -> None:
-        self.login(self.VOICEOVER_ADMIN_EMAIL, is_super_admin=True)
-
-        handler_url = '%s/%s/%s' % (
-            feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-            self.voice_artist_id,
-            'en',
-        )
-
-        expected_exp_id_to_filenames = {'exploration_id': ['filename1.mp3']}
-
-        json_response = self.get_json(handler_url)
-
-        self.assertDictEqual(
-            json_response['exploration_id_to_filenames'],
-            expected_exp_id_to_filenames,
-        )
-
-        handler_url = '%s/%s/%s' % (
-            feconf.GET_SAMPLE_VOICEOVERS_FOR_VOICE_ARTIST,
-            self.voice_artist_id,
-            'hi',
-        )
-
-        expected_exp_id_to_filenames = {'exploration_id': ['filename2.mp3']}
-
-        json_response = self.get_json(handler_url)
-
-        self.assertDictEqual(
-            json_response['exploration_id_to_filenames'],
-            expected_exp_id_to_filenames,
-        )
         self.logout()
 
 
@@ -460,6 +316,107 @@ class RegenerateAutomaticVoiceoverHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class RegenerateVoiceoverOnExpUpdateHandlerTests(test_utils.GenericTestBase):
+    """Test to regenerate voiceover on exploration update."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL
+        )
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id
+        )
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL
+        )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.exploration = self.save_new_valid_exploration(
+            'exp_id', self.owner_id, title='Exploration 1'
+        )
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.exploration.id,
+            self.voice_artist_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
+    def test_should_be_able_to_regenerate_voiceovers(self) -> None:
+        self.login(self.VOICE_ARTIST_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        deferred_calls = []
+
+        def mock_defer(
+            function_id: str,
+            queue_name: str,
+            exploration_id: str,
+            exploration_title: str,
+            exploration_version: int,
+            committer_id: str,
+            datetime_str: str,
+        ) -> None:
+            deferred_calls.append(
+                {
+                    'function_id': function_id,
+                    'queue_name': queue_name,
+                    'exploration_id': exploration_id,
+                    'exploration_title': exploration_title,
+                    'exploration_version': exploration_version,
+                    'committer_id': committer_id,
+                    'datetime_str': datetime_str,
+                }
+            )
+
+        exploration_id = self.exploration.id
+        exploration_version = self.exploration.version
+        exploration_title = self.exploration.title
+
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+            exploration_id,
+            exploration_version,
+            exploration_title,
+        )
+
+        with (
+            self.swap(
+                opportunity_services,
+                'is_exploration_available_for_contribution',
+                lambda _: True,
+            ),
+            self.swap(taskqueue_services, 'defer', mock_defer),
+        ):
+            self.post_json(handler_url, {}, csrf_token=csrf_token)
+
+        self.assertEqual(len(deferred_calls), 1)
+        args = deferred_calls[0]
+
+        expected_func_name = (
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+            ]
+        )
+
+        self.assertEqual(args['function_id'], expected_func_name)
+        self.assertEqual(args['queue_name'], 'voiceover-regeneration')
+        self.assertEqual(args['exploration_id'], exploration_id)
+        self.assertEqual(args['exploration_title'], exploration_title)
+        self.assertEqual(args['exploration_version'], exploration_version)
+        self.assertEqual(args['committer_id'], feconf.SYSTEM_COMMITTER_ID)
+        self.logout()
+
+
 class AutomaticVoiceoverRegenerationRecordHandlerTests(
     test_utils.GenericTestBase
 ):
@@ -516,3 +473,895 @@ class AutomaticVoiceoverRegenerationRecordHandlerTests(
             [cloud_task_run.to_dict()],
         )
         self.logout()
+
+
+class AutomaticVoiceoverRegenerationStatusHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate automatic voiceover regeneration status handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+    def test_get_automatic_voiceover_regeneration_status(self) -> None:
+        self.login(self.CURRICULUM_ADMIN_EMAIL)
+        task_run_id = 'task_run_id'
+        exploration_id = 'exploration_id'
+        language_accent_to_content_status_map = {
+            'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}
+        }
+        voiceover_regeneration_task_mapping = (
+            cloud_task_domain.VoiceoverRegenerationTaskMapping(
+                exploration_id,
+                task_run_id,
+                language_accent_to_content_status_map,
+            )
+        )
+
+        voiceover_cloud_task_services.save_voiceover_regeneration_task_run_mapping(
+            voiceover_regeneration_task_mapping
+        )
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id
+        )
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+
+        json_response = self.get_json(
+            '/exploration_voiceover_regeneration_status_url/%s' % exploration_id
+        )
+        self.assertEqual(
+            json_response['language_accent_to_content_status_map'],
+            {'en-US': {'content_0': 'SUCCEEDED', 'content_1': 'SUCCEEDED'}},
+        )
+        self.logout()
+
+
+class AutomaticVoiceoverRegenerationIntegrationTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate automatic voiceover regeneration integration."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.AUTHOR_EMAIL = 'author@example.com'
+        self.AUTHOR_EMAIL_2 = 'author2@example.com'
+        self.REVIEWER_EMAIL = 'reviewer@example.com'
+
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.AUTHOR_EMAIL_2, 'author2')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL
+        )
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id
+        )
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+
+        self.exploration_id = 'W50hotX4h_Up'
+        self.TOPIC_ID_1 = 'topic_id_1'
+        self.STORY_ID_1 = 'story_id_1'
+
+        # Creating an exploration and assigning roles.
+        self._create_and_publish_exploration()
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.exploration.id,
+            self.voiceover_admin_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
+        rights_manager.assign_role_for_exploration(
+            self.admin,
+            self.exploration.id,
+            self.author_id,
+            rights_domain.ROLE_EDITOR,
+        )
+
+    def _create_and_publish_exploration(self) -> None:
+        """Creates and publishes a new exploration."""
+        self.exploration = self.save_new_valid_exploration(
+            self.exploration_id,
+            self.owner_id,
+            title='title1',
+            category=constants.constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exploration_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>This is the first card of the exploration.</p>',
+                        },
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'End State',
+                        'new_value': {
+                            'content_id': 'content_3',
+                            'html': '<p>This is the last card of the exploration.</p>',
+                        },
+                    }
+                ),
+            ],
+            'Changes content.',
+        )
+
+    def _add_exploration_to_published_topic(self) -> None:
+        """Adds the exploration to a published topic i.e., making it curated."""
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm'
+        )
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url',
+            )
+        ]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID_1,
+            'A story',
+            'Description',
+            self.TOPIC_ID_1,
+            'story-two',
+        )
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
+
+        story_services.update_story(
+            self.owner_id,
+            self.STORY_ID_1,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_1',
+                        'title': 'Node1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': self.exploration_id,
+                    }
+                ),
+            ],
+            'Changes.',
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+        ]
+    )
+    def test_regenerate_voiceovers_on_exploration_added_to_topic(self) -> None:
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # At the outset, there are no entity voiceovers for the newly created
+        # exploration.
+        self.assertEqual(len(entity_voiceovers), 0)
+
+        # Adding the exploration to a published topic.
+        self._add_exploration_to_published_topic()
+
+        # Adding the exploration to a published topic triggers voiceover
+        # regeneration through the Cloud Task service, confirming that a
+        # deferred request exists in the model.
+        cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+        function_id = cloud_task_runs[0].function_id
+        task_run_id = cloud_task_runs[0].task_run_id
+        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
+
+        # Verifying that a Cloud Task run is created to regenerate the
+        # voiceovers.
+        self.assertEqual(len(cloud_task_runs), 1)
+        self.assertEqual(
+            function_id,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
+            ],
+        )
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        # Explicitly invoking the function here to simulate its usual execution
+        # via a deferred job.
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+            self.exploration_id,
+            created_on_time_str,
+            feconf.SYSTEM_COMMITTER_ID,
+            task_run_id,
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # Verifying that a single entity voiceovers model is created in the
+        # en-US accent.
+        self.assertEqual(len(entity_voiceovers), 1)
+        self.assertEqual(entity_voiceovers[0].entity_id, self.exploration_id)
+        self.assertEqual(entity_voiceovers[0].language_accent_code, 'en-US')
+
+        # The exploration contains two non-empty contents, content_0 and
+        # content_3, that are voiceovered automatically.
+        self.assertListEqual(
+            ['content_0', 'content_3'],
+            list(entity_voiceovers[0].voiceovers_mapping.keys()),
+        )
+
+        # The audio offset here is a dummy value generated in the local
+        # environment.
+        dummy_audio_offset = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+        automated_voiceovers_audio_offsets_msecs = {
+            'content_0': dummy_audio_offset,
+            'content_3': dummy_audio_offset,
+        }
+
+        self.assertDictEqual(
+            entity_voiceovers[0].automated_voiceovers_audio_offsets_msecs,
+            automated_voiceovers_audio_offsets_msecs,
+        )
+
+        automatic_voiceover_1 = entity_voiceovers[0].voiceovers_mapping[
+            'content_0'
+        ]['auto']
+        manual_voiceover_1 = entity_voiceovers[0].voiceovers_mapping[
+            'content_0'
+        ]['manual']
+        automatic_voiceover_2 = entity_voiceovers[0].voiceovers_mapping[
+            'content_3'
+        ]['auto']
+        manual_voiceover_2 = entity_voiceovers[0].voiceovers_mapping[
+            'content_3'
+        ]['manual']
+
+        self.assertIsNotNone(automatic_voiceover_1)
+        self.assertIsNone(manual_voiceover_1)
+        self.assertIsNotNone(automatic_voiceover_2)
+        self.assertIsNone(manual_voiceover_2)
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+        ]
+    )
+    def test_regenerate_voiceovers_on_exploration_update(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # At the outset, there are no entity voiceovers for the newly created
+        # exploration.
+        self.assertEqual(len(entity_voiceovers), 0)
+
+        # Adding the exploration to a published topic.
+        self._add_exploration_to_published_topic()
+
+        # Adding the exploration to a published topic triggers voiceover
+        # regeneration through the Cloud Task service, confirming that a
+        # deferred request exists in the model.
+        cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+        function_id = cloud_task_runs[0].function_id
+        task_run_id = cloud_task_runs[0].task_run_id
+        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
+
+        # Verifying that a Cloud Task run is created to regenerate the
+        # voiceovers.
+        self.assertEqual(len(cloud_task_runs), 1)
+        self.assertEqual(
+            function_id,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
+            ],
+        )
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': False},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        # Explicitly invoking the function here to simulate its usual execution
+        # via a deferred job.
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+            self.exploration_id,
+            created_on_time_str,
+            feconf.SYSTEM_COMMITTER_ID,
+            task_run_id,
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # Verifying that a single entity voiceovers model is created in the
+        # en-US accent.
+        self.assertEqual(len(entity_voiceovers), 1)
+        self.assertEqual(entity_voiceovers[0].entity_id, self.exploration_id)
+        self.assertEqual(entity_voiceovers[0].language_accent_code, 'en-US')
+        self.assertEqual(entity_voiceovers[0].entity_version, 2)
+
+        # Updating the exploration to version 3 by modifying a content.
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exploration_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>This is the updated first card of the exploration.</p>',
+                        },
+                    }
+                )
+            ],
+            'Updated content of the first card.',
+        )
+
+        updated_exp = exp_fetchers.get_exploration_by_id(self.exploration_id)
+        self.assertEqual(updated_exp.version, 3)
+
+        # Simulating the frontend request that triggers voiceover regeneration
+        # after an exploration update via a deferred job.
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+            self.exploration_id,
+            updated_exp.version,
+            updated_exp.title,
+        )
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(handler_url, {}, csrf_token=csrf_token)
+
+        cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+
+        # Updating a curated exploration triggers voiceover regeneration via
+        # the Cloud Task service, confirming that a deferred request exists in
+        # the model.
+        cloud_task_run = cloud_task_runs[1]
+        function_id = cloud_task_run.function_id
+        task_run_id = cloud_task_run.task_run_id
+        created_on_time_str = cloud_task_run.created_on.isoformat()
+        self.assertEqual(
+            function_id,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+            ],
+        )
+
+        # Explicitly calling the function here to simulate its usual invocation
+        # via a deferred job.
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            self.exploration_id,
+            updated_exp.title,
+            updated_exp.version,
+            feconf.SYSTEM_COMMITTER_ID,
+            created_on_time_str,
+            task_run_id,
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 3
+            )
+        )
+
+        # Verifying that a single entity voiceovers model is created in the
+        # en-US accent.
+        self.assertEqual(len(entity_voiceovers), 1)
+        self.assertEqual(entity_voiceovers[0].entity_id, self.exploration_id)
+        self.assertEqual(entity_voiceovers[0].language_accent_code, 'en-US')
+        self.assertEqual(entity_voiceovers[0].entity_version, 3)
+
+        # The audio offset here is dummy which is generated in local environment.
+        dummy_audio_offset = [
+            {'token': 'This', 'audio_offset_msecs': 0.0},
+            {'token': 'is', 'audio_offset_msecs': 100.0},
+            {'token': 'a', 'audio_offset_msecs': 200.0},
+            {'token': 'test', 'audio_offset_msecs': 300.0},
+            {'token': 'text', 'audio_offset_msecs': 400.0},
+        ]
+        automated_voiceovers_audio_offsets_msecs = {
+            'content_0': dummy_audio_offset,
+            'content_3': dummy_audio_offset,
+        }
+        self.assertDictEqual(
+            entity_voiceovers[0].automated_voiceovers_audio_offsets_msecs,
+            automated_voiceovers_audio_offsets_msecs,
+        )
+        # The exploration contains two non-empty contents, content_0 and
+        # content_3, that are voiceovered automatically.
+        self.assertListEqual(
+            ['content_0', 'content_3'],
+            list(entity_voiceovers[0].voiceovers_mapping.keys()),
+        )
+
+        automatic_voiceover_1 = entity_voiceovers[0].voiceovers_mapping[
+            'content_0'
+        ]['auto']
+        manual_voiceover_1 = entity_voiceovers[0].voiceovers_mapping[
+            'content_0'
+        ]['manual']
+        automatic_voiceover_2 = entity_voiceovers[0].voiceovers_mapping[
+            'content_3'
+        ]['auto']
+        manual_voiceover_2 = entity_voiceovers[0].voiceovers_mapping[
+            'content_3'
+        ]['manual']
+
+        self.assertIsNotNone(automatic_voiceover_1)
+        self.assertIsNone(manual_voiceover_1)
+        self.assertIsNotNone(automatic_voiceover_2)
+        self.assertIsNone(manual_voiceover_2)
+
+        self.logout()
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+        ]
+    )
+    def test_regenerate_voiceovers_on_translation_addition(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # At the outset, there are no entity voiceovers for the newly created
+        # exploration.
+        self.assertEqual(len(entity_voiceovers), 0)
+
+        # Adding the exploration to a published topic.
+        self._add_exploration_to_published_topic()
+
+        # Adding the exploration to a published topic triggers voiceover
+        # regeneration through the Cloud Task service, confirming that a
+        # deferred request exists in the model.
+        cloud_task_runs = taskqueue_services.get_all_cloud_task_runs()
+        function_id = cloud_task_runs[0].function_id
+        task_run_id = cloud_task_runs[0].task_run_id
+        created_on_time_str = cloud_task_runs[0].created_on.isoformat()
+
+        # Verifying that a Cloud Task run is created to regenerate the
+        # voiceovers.
+        self.assertEqual(len(cloud_task_runs), 1)
+        self.assertEqual(
+            function_id,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION'
+            ],
+        )
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        # Explicitly invoking the function here to simulate its usual execution
+        # via a deferred job.
+        voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic(
+            self.exploration_id,
+            created_on_time_str,
+            feconf.SYSTEM_COMMITTER_ID,
+            task_run_id,
+        )
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # Verifying that a single entity voiceovers model is created in the
+        # en-US accent.
+        self.assertEqual(len(entity_voiceovers), 1)
+        self.assertEqual(entity_voiceovers[0].entity_id, self.exploration_id)
+        self.assertEqual(entity_voiceovers[0].language_accent_code, 'en-US')
+        self.assertEqual(entity_voiceovers[0].entity_version, 2)
+
+        # Updating the exploration to version 3 by translating content.
+        exp_services.update_exploration(
+            self.owner_id,
+            self.exploration_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_TRANSLATION,
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'translation': translation_domain.TranslatedContent(
+                            'यह पहला कार्ड है',
+                            translation_domain.TranslatableContentFormat.HTML,
+                            False,
+                        ).to_dict(),
+                    }
+                )
+            ],
+            'Added translations',
+            False,
+        )
+
+        updated_exp = exp_fetchers.get_exploration_by_id(self.exploration_id)
+        self.assertEqual(updated_exp.version, 3)
+
+        # An entity translation is created after the exploration is updated.
+        entity_translation = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION,
+                self.exploration_id,
+                3,
+            )
+        )[0].to_dict()
+
+        self.assertEqual(entity_translation['language_code'], 'hi')
+        self.assertEqual(entity_translation['entity_version'], 3)
+        self.assertEqual(entity_translation['entity_id'], self.exploration_id)
+        self.assertEqual(
+            entity_translation['translations']['content_0']['content_value'],
+            'यह पहला कार्ड है',
+        )
+
+        # Simulating the frontend request that triggers voiceover regeneration
+        # after an exploration update via a deferred job.
+        handler_url = '/regenerate_voiceover_on_exp_update/%s/%s/%s' % (
+            self.exploration_id,
+            updated_exp.version,
+            updated_exp.title,
+        )
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(handler_url, {}, csrf_token=csrf_token)
+
+        cloud_task_runs = sorted(
+            taskqueue_services.get_all_cloud_task_runs(),
+            key=lambda task_run: task_run.created_on,
+        )
+
+        # Updating a curated exploration triggers voiceover regeneration via
+        # the Cloud Task service, confirming that a deferred request exists in
+        # the model.
+        cloud_task_run = cloud_task_runs[1]
+        function_id = cloud_task_run.function_id
+        task_run_id = cloud_task_run.task_run_id
+        created_on_time_str = cloud_task_run.created_on.isoformat()
+        self.assertEqual(
+            function_id,
+            feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
+            ],
+        )
+
+        # Explicitly calling the function here to simulate its usual invocation
+        # via a deferred job.
+        voiceover_services.regenerate_voiceovers_on_exploration_update(
+            self.exploration_id,
+            updated_exp.title,
+            updated_exp.version,
+            feconf.SYSTEM_COMMITTER_ID,
+            created_on_time_str,
+            task_run_id,
+        )
+
+        entity_voiceovers = sorted(
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 3
+            ),
+            key=lambda ev: ev.language_accent_code,
+        )
+
+        # Verifying that two entity voiceovers models are created for the en-US
+        # and hi-IN accents.
+        self.assertEqual(len(entity_voiceovers), 2)
+
+        english_entity_voiceover = entity_voiceovers[0]
+        hindi_entity_voiceover = entity_voiceovers[1]
+
+        self.assertEqual(english_entity_voiceover.entity_version, 3)
+        self.assertEqual(hindi_entity_voiceover.entity_version, 3)
+
+        self.assertEqual(english_entity_voiceover.language_accent_code, 'en-US')
+        self.assertEqual(hindi_entity_voiceover.language_accent_code, 'hi-IN')
+
+        self.assertListEqual(
+            ['content_0', 'content_3'],
+            list(english_entity_voiceover.voiceovers_mapping.keys()),
+        )
+        # Hindi translation was added only for the first content.
+        self.assertListEqual(
+            ['content_0'],
+            list(hindi_entity_voiceover.voiceovers_mapping.keys()),
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+        ]
+    )
+    def test_regenerate_voiceovers_on_translation_suggestion_acceptance(
+        self,
+    ) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        entity_voiceovers_list = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # At the outset, there are no entity voiceovers for the newly created
+        # exploration.
+        self.assertEqual(len(entity_voiceovers_list), 0)
+
+        # Adding the exploration to a published topic.
+        self._add_exploration_to_published_topic()
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        csrf_token_1 = self.get_new_csrf_token()
+        updated_exp = exp_fetchers.get_exploration_by_id(self.exploration_id)
+
+        # Simulating the submission of a translation suggestion from the
+        # frontend.
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.exploration_id,
+                'target_version_at_submission': updated_exp.version,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>This is the first card of the exploration.</p>',
+                    'translation_html': '<p>यह पहला कार्ड है</p>',
+                    'data_format': 'html',
+                },
+                'description': 'test',
+                'files': {},
+            },
+            csrf_token=csrf_token_1,
+        )
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s'
+            % (feconf.SUGGESTION_LIST_URL_PREFIX, self.voiceover_admin_id)
+        )['suggestions'][0]
+
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token_2 = self.get_new_csrf_token()
+
+        # Accepting the translation suggestion triggers voiceover regeneration.
+        self.put_json(
+            '%s/exploration/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id'],
+            ),
+            {
+                'action': 'accept',
+                'commit_message': 'commit message',
+                'review_message': 'Accepted',
+            },
+            csrf_token=csrf_token_2,
+        )
+
+        self.logout()
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )[0]
+        )
+
+        self.assertEqual(entity_voiceovers.language_accent_code, 'hi-IN')
+        self.assertEqual(entity_voiceovers.entity_version, 2)
+        self.assertListEqual(
+            ['content_0'], list(entity_voiceovers.voiceovers_mapping.keys())
+        )
+
+    @test_utils.enable_feature_flags(
+        [
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS,
+            feature_flag_list.FeatureNames.AUTOMATIC_VOICEOVER_REGENERATION_FROM_EXP,
+        ]
+    )
+    def test_should_not_regenerate_voiceovers_on_translation_suggestion_rejection(
+        self,
+    ) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+
+        # At the outset, there are no entity voiceovers for the newly created
+        # exploration.
+        self.assertEqual(len(entity_voiceovers), 0)
+
+        # Adding the exploration to a published topic.
+        self._add_exploration_to_published_topic()
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True},
+            'hi': {'hi-IN': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+
+        csrf_token_1 = self.get_new_csrf_token()
+        updated_exp = exp_fetchers.get_exploration_by_id(self.exploration_id)
+
+        # Simulating the submission of a translation suggestion from the
+        # frontend.
+        self.post_json(
+            '%s/' % feconf.SUGGESTION_URL_PREFIX,
+            {
+                'suggestion_type': (feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT),
+                'target_type': feconf.ENTITY_TYPE_EXPLORATION,
+                'target_id': self.exploration_id,
+                'target_version_at_submission': updated_exp.version,
+                'change_cmd': {
+                    'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+                    'state_name': 'Introduction',
+                    'content_id': 'content_0',
+                    'language_code': 'hi',
+                    'content_html': '<p>This is the first card of the exploration.</p>',
+                    'translation_html': '<p>यह पहला कार्ड है</p>',
+                    'data_format': 'html',
+                },
+                'description': 'test',
+                'files': {},
+            },
+            csrf_token=csrf_token_1,
+        )
+
+        suggestion_to_reject = self.get_json(
+            '%s?author_id=%s'
+            % (feconf.SUGGESTION_LIST_URL_PREFIX, self.voiceover_admin_id)
+        )['suggestions'][0]
+
+        self.logout()
+
+        self.login(self.AUTHOR_EMAIL)
+        csrf_token_2 = self.get_new_csrf_token()
+
+        # Rejecting the translation suggestion does not trigger voiceover
+        # regeneration.
+        self.put_json(
+            '%s/exploration/%s/%s'
+            % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_reject['target_id'],
+                suggestion_to_reject['suggestion_id'],
+            ),
+            {
+                'action': 'reject',
+                'commit_message': 'commit message',
+                'review_message': 'Rejected',
+            },
+            csrf_token=csrf_token_2,
+        )
+
+        self.logout()
+
+        entity_voiceovers = (
+            voiceover_services.get_entity_voiceovers_for_given_exploration(
+                self.exploration_id, 'exploration', 2
+            )
+        )
+        self.assertEqual(len(entity_voiceovers), 0)

@@ -85,15 +85,15 @@ export class NumberWithUnits {
     // which isn't allowed. Refer objects.py L#956.
     let unitsString = Units.fromList(this.units).toString();
     if (unitsString.includes('$')) {
-      unitsString = unitsString.replace('$', '');
+      unitsString = unitsString.replace(/\$/g, '');
       numberWithUnitsString += '$' + ' ';
     }
     if (unitsString.includes('Rs')) {
-      unitsString = unitsString.replace('Rs', '');
+      unitsString = unitsString.replace(/Rs/g, '');
       numberWithUnitsString += 'Rs' + ' ';
     }
     if (unitsString.includes('₹')) {
-      unitsString = unitsString.replace('₹', '');
+      unitsString = unitsString.replace(/₹/g, '');
       numberWithUnitsString += '₹' + ' ';
     }
 

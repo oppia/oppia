@@ -59,22 +59,26 @@ class ElasticSearchClient:
                         platform_parameter_list.ParamName.ES_USERNAME.value
                     )
                 )
+
+                es_password = secrets_services.get_secret('ES_PASSWORD') or ''
+
+                # Use cloud setup if cloud_id is present, otherwise fall back to local.
+                # Only one of cloud_id or hosts can be used with the Elasticsearch v8 client.
+
+                cloud_id = es_cloud_id or None
+                hosts = (
+                    None
+                    if es_cloud_id
+                    else [f'http://{feconf.ES_HOST}:{feconf.ES_LOCALHOST_PORT}']
+                )
+                verify_certs = bool(es_cloud_id)
+
                 self._client = elasticsearch.Elasticsearch(
-                    (
-                        ('%s:%s' % (feconf.ES_HOST, feconf.ES_LOCALHOST_PORT))
-                        if es_cloud_id == ''
-                        else None
-                    ),
-                    cloud_id=es_cloud_id,
-                    http_auth=(
-                        (
-                            es_username,
-                            secrets_services.get_secret('ES_PASSWORD'),
-                        )
-                        if es_cloud_id
-                        else None
-                    ),
-                    timeout=30,
+                    cloud_id=cloud_id,
+                    hosts=hosts,
+                    basic_auth=(es_username, es_password),
+                    request_timeout=30,
+                    verify_certs=verify_certs,
                 )
 
         return self._client
@@ -131,7 +135,8 @@ def _fetch_response_from_elastic_search(
         response = ES.get_client().search(
             body=query_definition,
             index=index_name,
-            params={'size': num_docs_to_fetch, 'from': offset},
+            size=num_docs_to_fetch,
+            from_=offset,
         )
     except elasticsearch.NotFoundError:
         # The index does not exist yet. Create it and return an empty result.
@@ -162,7 +167,7 @@ def _create_index(index_name: str) -> None:
         elasticsearch.RequestError. The index already exists.
     """
     assert isinstance(index_name, str)
-    ES.get_client().indices.create(index_name)
+    ES.get_client().indices.create(index=index_name)
 
 
 # Here we use type Any because the argument 'documents' represents the list of
@@ -186,6 +191,7 @@ def add_documents_to_index(
     Raises:
         SearchException. A document cannot be added to the index.
     """
+
     assert isinstance(index_name, str)
 
     for document in documents:
@@ -193,13 +199,13 @@ def add_documents_to_index(
     for document in documents:
         try:
             response = ES.get_client().index(
-                index_name, document, id=document['id']
+                index=index_name, document=document, id=document['id']
             )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and repeat the operation.
             _create_index(index_name)
             response = ES.get_client().index(
-                index_name, document, id=document['id']
+                index=index_name, document=document, id=document['id']
             )
 
         if response is None or response['_shards']['failed'] > 0:
@@ -222,7 +228,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
     for doc_id in doc_ids:
         try:
             document_exists_in_index = ES.get_client().exists(
-                index_name, doc_id
+                index=index_name, id=doc_id
             )
         except elasticsearch.NotFoundError:
             # The index does not exist yet. Create it and set
@@ -231,7 +237,7 @@ def delete_documents_from_index(doc_ids: List[str], index_name: str) -> None:
             document_exists_in_index = False
 
         if document_exists_in_index:
-            ES.get_client().delete(index_name, doc_id)
+            ES.get_client().delete(index=index_name, id=doc_id)
 
 
 def clear_index(index_name: str) -> None:
@@ -244,7 +250,9 @@ def clear_index(index_name: str) -> None:
     # More details on clearing an index can be found here:
     # https://elasticsearch-py.readthedocs.io/en/master/api.html#elasticsearch.Elasticsearch.delete_by_query
     # https://stackoverflow.com/questions/57778438/delete-all-documents-from-elasticsearch-index-in-python-3-x
-    ES.get_client().delete_by_query(index_name, {'query': {'match_all': {}}})
+    ES.get_client().delete_by_query(
+        index=index_name, body={'query': {'match_all': {}}}
+    )
 
 
 def search(

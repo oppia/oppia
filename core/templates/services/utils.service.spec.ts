@@ -202,7 +202,12 @@ describe('Utils Service', () => {
       ['///', '/'],
       ['%', '/'],
       ['a', '/'],
+      ['/this is not a url', '/'],
+      ['/directory-traversal/../abc', '/'],
+      ['/dashboard?query=javascript:', '/'],
+      ['/dashboard#javascript:', '/'],
       ['/', '/'],
+      ['/صباح الخير', '/'],
       ['/learner-dashboard', '/learner-dashboard'],
     ];
 
@@ -216,5 +221,44 @@ describe('Utils Service', () => {
         expect(uts.getSafeReturnUrl(encodedInputUrl)).toEqual(expectedUrl);
       });
     }
+  });
+
+  describe('verifying origin of URL when returning a safe URL', () => {
+    let originalUrl: string;
+    let originalBaseUri: string;
+
+    beforeEach(function () {
+      originalUrl = document.URL;
+      originalBaseUri = document.baseURI;
+      // Mock the document.URL property.
+      Object.defineProperty(document, 'URL', {
+        writable: true,
+        value: 'https://cdn.example.com/images/pic.png',
+      });
+      // Mock the document.baseURI property.
+      Object.defineProperty(document, 'baseURI', {
+        writable: true,
+        value: 'https://example.com',
+      });
+    });
+
+    afterEach(function () {
+      // Restore the original URL.
+      Object.defineProperty(document, 'URL', {
+        writable: true,
+        value: originalUrl,
+      });
+      // Restore the original baseURI.
+      Object.defineProperty(document, 'baseURI', {
+        writable: true,
+        value: originalBaseUri,
+      });
+    });
+
+    it('should return the root URL because the origins do not match', () => {
+      // The origin of the following (example.com) doesn't match the origin of
+      // document.URL (cdn.example.com).
+      expect(uts.getSafeReturnUrl('/api/v1')).toEqual('/');
+    });
   });
 });

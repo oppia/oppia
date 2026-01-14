@@ -29,13 +29,8 @@ import {
   LanguageCodesMapping,
   LanguageAccentMasterList,
   LanguageAccentCodesToSupportsAutogeneration,
-  VoiceArtistIdToLanguageMapping,
-  VoiceArtistIdToVoiceArtistName,
 } from 'domain/voiceover/voiceover-backend-api.service';
 import {VoiceoverRemovalConfirmModalComponent} from './modals/language-accent-removal-confirm-modal.component';
-import {VoiceArtistLanguageMapping} from './voice-artist-language-mapping.model';
-import {AddAccentToVoiceoverLanguageModalComponent} from './modals/add-accent-to-voiceover-language-modal.component';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 import {NativeDateAdapter} from '@angular/material/core';
 import {FormControl, FormGroup} from '@angular/forms';
 import {CloudTaskRun} from 'domain/cloud-task/cloud-task-run.model';
@@ -64,7 +59,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   constructor(
     private ngbModal: NgbModal,
     private voiceoverBackendApiService: VoiceoverBackendApiService,
-    private platformFeatureService: PlatformFeatureService,
     private cdr: ChangeDetectorRef,
     private languageUtilService: LanguageUtilService
   ) {}
@@ -78,9 +72,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
   pageIsInitialized: boolean = false;
   languageAccentDropdownIsShown: boolean = false;
   languageAccentCodeIsPresent: boolean = false;
-  voiceArtistIdToLanguageMappingList!: VoiceArtistLanguageMapping[];
-  voiceArtistIdToLanguageMapping!: VoiceArtistIdToLanguageMapping;
-  voiceArtistIdToVoiceArtistName!: VoiceArtistIdToVoiceArtistName;
   languageAccentMasterList!: LanguageAccentMasterList;
   cloudSupportedLanguageAccentCodes: string[] = [];
   columnsToDisplay: string[] = [
@@ -104,6 +95,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
 
   voiceArtistsDataCount: number = 0;
   fetchingrenegenratedVoiceoverData: boolean = false;
+  regenerationRecordsErrorMessage: string | null = null;
 
   range = new FormGroup({
     start: new FormControl(null),
@@ -129,68 +121,6 @@ export class VoiceoverAdminPageComponent implements OnInit {
         this.pageIsInitialized = true;
         this.cdr.detectChanges();
       });
-    this.voiceoverBackendApiService
-      .fetchVoiceArtistMetadataAsync()
-      .then(response => {
-        this.voiceArtistIdToLanguageMapping =
-          response.voiceArtistIdToLanguageMapping;
-        this.voiceArtistIdToLanguageMappingList =
-          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
-            this.voiceArtistIdToLanguageMapping
-          );
-        this.voiceArtistsDataCount =
-          this.voiceArtistIdToLanguageMappingList.length;
-        this.voiceArtistIdToVoiceArtistName =
-          response.voiceArtistIdToVoiceArtistName;
-      });
-  }
-
-  isLabelingVoiceArtistFeatureEnabled(): boolean {
-    return this.platformFeatureService.status.LabelAccentToVoiceArtist
-      .isEnabled;
-  }
-
-  addLanguageAccentForVoiceArtist(
-    voiceArtistId: string,
-    languageCode: string
-  ): void {
-    let languageAccentCodes = this.languageAccentMasterList[languageCode];
-    let modalRef: NgbModalRef = this.ngbModal.open(
-      AddAccentToVoiceoverLanguageModalComponent,
-      {
-        backdrop: 'static',
-      }
-    );
-    let currentLanguageAccentCode =
-      this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode];
-
-    modalRef.componentInstance.languageCode = languageCode;
-    modalRef.componentInstance.voiceArtistId = voiceArtistId;
-    modalRef.componentInstance.voiceArtistName =
-      this.voiceArtistIdToVoiceArtistName[voiceArtistId];
-    modalRef.componentInstance.languageAccentCode = currentLanguageAccentCode;
-    modalRef.componentInstance.languageAccentCodes = languageAccentCodes;
-
-    modalRef.result.then(
-      languageAccentCode => {
-        this.voiceArtistIdToLanguageMapping[voiceArtistId][languageCode] =
-          languageAccentCode;
-        this.voiceArtistIdToLanguageMappingList =
-          VoiceArtistLanguageMapping.createVoiceArtistLanguageMappingList(
-            this.voiceArtistIdToLanguageMapping
-          );
-        this.voiceoverBackendApiService.updateVoiceArtistToLanguageAccentAsync(
-          voiceArtistId,
-          languageCode,
-          languageAccentCode
-        );
-      },
-      () => {
-        // Note to developers:
-        // This callback is triggered when the Cancel button is
-        // clicked. No further action is needed.
-      }
-    );
   }
 
   initializeLanguageAccentCodesFields(
@@ -350,6 +280,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
           Object.keys(this.supportedLanguageAccentCodesToDescriptions)
             .length !== 0;
         this.saveUpdatedLanguageAccentSupport();
+        this.cdr.detectChanges();
       },
       () => {
         // Note to developers:
@@ -406,8 +337,21 @@ export class VoiceoverAdminPageComponent implements OnInit {
       AutogeneratedVoiceoverRunInfoModalComponent,
       {
         backdrop: 'static',
+        size: 'xl',
+        centered: true,
       }
     );
     modalRef.componentInstance.cloudTaskRun = cloudTaskRun;
+  }
+
+  getFunctionIdText(functionId: string): string {
+    if (functionId === 'regenerate_voiceovers_on_exploration_update') {
+      return 'Exploration content updated';
+    } else if (
+      functionId === 'regenerate_voiceovers_on_exploration_added_to_topic'
+    ) {
+      return 'Exploration added to topic';
+    }
+    return '';
   }
 }

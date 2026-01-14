@@ -260,6 +260,7 @@
   list-style-type: none;
   padding-left: 0;
   padding-top: 10px;
+  position: relative;
 }
 
 .oppia-lesson-info-header {

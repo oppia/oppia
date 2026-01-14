@@ -476,7 +476,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         self.login(self.BLOG_EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {'thumbnail_filename': 'test_svg.svg'}
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -497,7 +497,7 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         payload = {'thumbnail_filename': 'cafe.flac'}
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'dummy_large_image.jpg'),
             'rb',
             encoding=None,
