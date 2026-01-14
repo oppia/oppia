@@ -462,4 +462,65 @@ describe('Voiceover backend API service', function () {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should be able to fetch voiceover regeneration status', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    const explorationID = 'exp_123';
+
+    voiceoverBackendApiService
+      .fetchLatestVoiceoverRegenerationStatusAsync(explorationID)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/exploration_voiceover_regeneration_status_url/${explorationID}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
+
+    let backendResponse = {
+      language_accent_to_content_status_map: {
+        'en-US': {content_0: 'FAILED', content_1: 'SUCCEEDED'},
+      },
+    };
+
+    let expectedVoiceoverRegenerationStatus = {
+      'en-US': {content_0: 'FAILED', content_1: 'SUCCEEDED'},
+    };
+
+    req.flush(backendResponse);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      expectedVoiceoverRegenerationStatus
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle error callback while fetching voiceover regeneration status', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    const explorationID = 'exp_123';
+
+    voiceoverBackendApiService
+      .fetchLatestVoiceoverRegenerationStatusAsync(explorationID)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/exploration_voiceover_regeneration_status_url/${explorationID}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });
