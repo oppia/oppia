@@ -96,7 +96,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
   cloudTaskRunIdToIndex: {[cloudTaskRunId: string]: number} = {};
 
   voiceArtistsDataCount: number = 0;
-  fetchingregeneratedVoiceoverData: boolean = false;
+  fetchingRegeneratedVoiceoverData: boolean = false;
   regenerationRecordsErrorMessage: string | null = null;
 
   range = new FormGroup({
@@ -321,8 +321,8 @@ export class VoiceoverAdminPageComponent implements OnInit {
   }
 
   fetchVoiceoverRegenerationRecord(): void {
-    this.fetchingregeneratedVoiceoverData =
-      !this.fetchingregeneratedVoiceoverData;
+    this.fetchingRegeneratedVoiceoverData =
+      !this.fetchingRegeneratedVoiceoverData;
 
     let startDate = this.range.value.start;
     let startDateText = startDate ? startDate.toISOString() : '';
@@ -335,7 +335,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
       .then(
         response => {
           this.cloudTaskRunList = response;
-          this.fetchingregeneratedVoiceoverData = false;
+          this.fetchingRegeneratedVoiceoverData = false;
 
           for (let i = 0; i < this.cloudTaskRunList.length; i++) {
             this.cloudTaskRunIdToIndex[this.cloudTaskRunList[i].id] = i;
@@ -344,7 +344,7 @@ export class VoiceoverAdminPageComponent implements OnInit {
           this.cdr.detectChanges();
         },
         () => {
-          this.fetchingregeneratedVoiceoverData = false;
+          this.fetchingRegeneratedVoiceoverData = false;
         }
       );
   }

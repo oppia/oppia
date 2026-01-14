@@ -218,11 +218,11 @@
 
   </div>
 
-  <div *ngIf="fetchingregeneratedVoiceoverData">
+  <div *ngIf="fetchingRegeneratedVoiceoverData">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <div *ngIf="!fetchingregeneratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
+  <div *ngIf="!fetchingRegeneratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
     <p class="info-text">
       <i>No records found for the selected date range.</i>
     </p>
