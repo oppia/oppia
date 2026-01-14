@@ -1040,6 +1040,7 @@ export class BaseUser {
     newPage: Page | undefined = undefined,
     screenshotOptions: puppeteer.ScreenshotOptions = {}
   ): Promise<void> {
+    const specName = process.env.SPEC_NAME;
     const currentPage = typeof newPage !== 'undefined' ? newPage : this.page;
     await currentPage.mouse.move(0, 0);
     // To wait for all images to load and the page to be stable.
@@ -1078,6 +1079,8 @@ export class BaseUser {
       }
     }
 
+    const runningInCI = __dirname.startsWith('/home/runner');
+
     try {
       const screenshot = await currentPage.screenshot(screenshotOptions);
       expect(screenshot).toMatchImageSnapshot({
@@ -1089,22 +1092,40 @@ export class BaseUser {
          * The following checks if the tests are running on CI. If it is, the folder diff-snapshots will be uploaded as
          * artifacts in the github workflow.
          */
-        customDiffDir: __dirname.startsWith('/home/runner')
+        customDiffDir: runningInCI
           ? path.join(
-              '/home/runner/work/oppia/oppia/core/tests/puppeteer-acceptance-tests/diff-snapshots',
-              path.basename(dirName)
+              testConstants.TEST_SNAPSHOTS_DIR,
+              specName,
+              path.basename(dirName),
+              'diff-snapshots'
             )
           : path.join(testPath, dirName, 'diff-snapshots'),
+        storeReceivedOnFailure: true, // Store the new screenshots seperately from the composed diff screenshots on failure.
+        customReceivedDir: runningInCI
+          ? path.join(
+              testConstants.TEST_SNAPSHOTS_DIR,
+              specName,
+              path.basename(dirName),
+              'new-snapshots'
+            )
+          : path.join(testPath, dirName, 'new-snapshots'),
       });
     } catch (error) {
-      if (__dirname.startsWith('/home/runner')) {
-        throw new Error(
-          error.message +
-            '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the screenshot(s).'
-        );
-      } else {
-        throw new Error(error.message);
+      var errorMessage = error.message;
+      if (runningInCI) {
+        errorMessage +=
+          '\r\nDownload the artifact folder diff-snapshots from the github workflow to check the difference between the old screenshot(s)' +
+          ' and the new one(s). To download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
+          ' folder name should be something like diff-snapshots_(suite-name)_desktop_original. The diff screenshot(s) should end with "-diff".';
       }
+      errorMessage +=
+        '\r\nPlease update the screenshots if the UI changed. If screenshot comparisons consistently show the same difference percentage across ' +
+        'multiple test runs, the baseline screenshot(s) should be updated.\r\nTo update the screenshots(s), you should ' +
+        'run the tests in CI, download the artifact folder new-snapshots from the github workflow and use the screenshots in that folder to ' +
+        'replace the old one(s).\r\nTo download the folder, go to "Summary" of the CI Job of the PR and find the "Artifacts" section. The artifact' +
+        ' folder name should be something like new-snapshots_(suite-name)_desktop_original.' +
+        ' The new screenshot(s) should end with "-received". When replacing the screenshot(s), make sure to change the postfix "-received" to "-snap".';
+      throw new Error(errorMessage);
     }
   }
 

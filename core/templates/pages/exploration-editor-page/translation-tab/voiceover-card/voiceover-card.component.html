@@ -1,6 +1,6 @@
 <mat-card>
   <h3>Voiceovers</h3>
-  <div *ngIf="voiceoversAreLoaded">
+  <div *ngIf="voiceoversAreLoaded && !voiceoverAdminConfigIsLoading">
     <div *ngIf="unsupportedLanguageCode" class="unsupported-language-warning">
       <i>Voiceover functionality for this language is not yet supported in Oppia.
         Please contact a server admin if you would like it to be added.
@@ -8,12 +8,19 @@
     </div>
     <div *ngIf="!unsupportedLanguageCode && !contentAvailableForVoiceovers" class="content-unavailable-warning">
       <i>
-        There is no content available for voiceover in the selected language.
+        No content is available for voiceover in the selected language.
+        As a result, manual or automatic voiceovers cannot be added or regenerated at this state.
       </i>
+    </div>
+    <div *ngIf="doesTranslationForActiveContentNeedsUpdate()" class="content-unavailable-warning">
+      <i>
+        The translation for this content is outdated. Please update the translation before updating the voiceovers.
+      </i>
+
     </div>
   </div>
 
-  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode">
+  <div *ngIf="voiceoversAreLoaded && !unsupportedLanguageCode && !voiceoverAdminConfigIsLoading">
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceover</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
@@ -36,6 +43,7 @@
         <div class="voiceover-action-buttons">
           <button (click)="toggleAudioNeedsUpdate()"
                   class="e2e-test-audio-status-update-button"
+                  [disabled]="doesTranslationForActiveContentNeedsUpdate()"
                   [ngClass]="manualVoiceover.needsUpdate == true ? 'needs-update-button-icon' : 'does-not-needs-update-button-icon'">
             <mat-icon matTooltip="Audio needs update"
                       *ngIf="manualVoiceover.needsUpdate"
@@ -56,13 +64,13 @@
 
       </div>
 
-      <div *ngIf="manualVoiceover" class="stale-manual-voiceover-warning">
+      <div *ngIf="manualVoiceover && !doesTranslationForActiveContentNeedsUpdate()" class="stale-manual-voiceover-warning">
         <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
       <div class="add-voiceover-button-container" *ngIf="!manualVoiceover">
         <button (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
-                [disabled]="!contentAvailableForVoiceovers">
+                [disabled]="!contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
           <mat-icon>attach_file</mat-icon>
           ADD MANUAL VOICEOVER
         </button>
@@ -70,9 +78,10 @@
     </div>
 
     <div class="automatic-voiceovers" *ngIf="isAutomaticVoiceoverRegenerationFromExpFeatureEnabled()">
-      <h4 class="voiceover-type-heading">Automatic Voiceover (generated using cloud service)</h4>
+      <h4 class="voiceover-type-heading">Automatic Voiceover (generated using Azure)</h4>
       <div *ngIf="shouldShowAutoVoiceoverRegenerationSection()">
-        <div class="voiceovers-component" *ngIf="automaticVoiceover">
+        <div class="voiceovers-component"
+             *ngIf="automaticVoiceover && automaticVoiceoverGenerationStatus !== 'GENERATING'">
           <button class="btn btn-secondary audio-button" (click)="playAndPauseVoiceover(automaticVoiceover.filename, 'auto')">
             <mat-icon *ngIf="!isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Play">play_arrow</mat-icon>
             <mat-icon *ngIf="isAutomaticVoiceoverPlaying && !automaticVoiceoverIsLoading" matTooltip="Pause">pause_arrow</mat-icon>
@@ -87,7 +96,7 @@
           </span>
           <div class="voiceover-action-buttons">
             <button (click)="generateVoiceover()"
-                    [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers"
+                    [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()"
                     class="regenerate-voiceover-button">
               <mat-icon matTooltip="Regenerate voiceover" *ngIf="!isAutomaticVoiceoverGenerating">
                 sync
@@ -98,10 +107,37 @@
             </button>
           </div>
         </div>
-        <div class="add-voiceover-button-container" *ngIf="!automaticVoiceover">
+        <div *ngIf="automaticVoiceoverGenerationStatus === 'GENERATING'">
+          <div class="voiceovers-component">
+            <button class="btn btn-secondary audio-button" [disabled]="true">
+              <mat-icon matTooltip="Play">play_arrow</mat-icon>
+            </button>
+            <mat-progress-bar mode="indeterminate"
+                              class="voiceover-progress">
+            </mat-progress-bar>
+            <span class="voiceover-timer">
+              00:00 / 00:00
+            </span>
+            <div class="voiceover-action-buttons">
+              <button (click)="generateVoiceover()"
+                      [disabled]="true"
+                      class="regenerate-voiceover-button">
+                <mat-icon>sync</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="automatic-voiceover-enable-instruction">
+            <span>
+              Automatic voiceover for this content is currently being generated
+              in the background. Please wait until the process is complete.
+            </span>
+          </div>
+        </div>
+        <div class="add-voiceover-button-container"
+             *ngIf="!automaticVoiceover && automaticVoiceoverGenerationStatus !== 'GENERATING'">
           <button (click)="generateVoiceover()"
                   class="add-automatic-voiceover-button e2e-test-regenerate-voiceover"
-                  [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers">
+                  [disabled]="!isGenerateAutomaticVoiceoverOptionEnabled || !contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
             <span *ngIf="!isAutomaticVoiceoverGenerating">
               <mat-icon>sync</mat-icon>
               GENERATE AUTOMATIC VOICEOVER
@@ -111,6 +147,14 @@
               <span><mat-icon class="rotating">rotate_right</mat-icon></span>
             </span>
           </button>
+        </div>
+        <div class="automatic-voiceover-enable-instruction"
+             *ngIf="automaticVoiceoverGenerationStatus === 'FAILED'">
+          <span>
+            Automatic voiceover regeneration for this content has failed.
+            Please contact voiceover admin for more details, or try regenerating
+            the voiceover manually.
+          </span>
         </div>
         <div class="automatic-voiceover-enable-instruction"
              *ngIf="!isGenerateAutomaticVoiceoverOptionEnabled">
@@ -123,13 +167,17 @@
     </div>
   </div>
 
-  <div *ngIf="!voiceoversAreLoaded">
+  <div *ngIf="!voiceoversAreLoaded || voiceoverAdminConfigIsLoading">
     <p>Loading...</p>
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 </mat-card>
 
 <style>
+  .voiceover-action-buttons {
+    display: flex;
+    margin-left: 10px;
+  }
   .voiceover-type-heading {
     font-weight: bold;
     margin: 2%;
@@ -174,7 +222,6 @@
   }
   .voiceover-timer {
     text-align: center;
-    width: 25%;
   }
   .audio-button {
     background-color: #009688;
@@ -182,8 +229,20 @@
     color: #fff;
     margin: 10px;
   }
+  .audio-button-space {
+    background-color: transparent;
+    border-radius: 20px;
+    color: transparent;
+    margin: 10px;
+    visibility: hidden;
+  }
   .voiceover-progress {
     margin: 10px;
+    width: 50%;
+  }
+  .voiceover-progress-loading {
+    margin: 10px;
+    margin-left: 10%;
     width: 50%;
   }
   .voiceovers-component {
@@ -246,21 +305,6 @@
     color: #d14836;
     margin: 0 4%;
   }
-
-  .voiceover-action-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    width: 25%;
-  }
-
-  .voiceover-action-buttons button:first-child {
-    grid-column: 1;
-  }
-
-  .voiceover-action-buttons button:nth-child(2) {
-    grid-column: 2;
-  }
-
   .unsupported-language-warning {
     color: #d14836;
     margin: 0 2%;
