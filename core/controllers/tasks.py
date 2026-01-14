@@ -277,6 +277,11 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         fn_ids_to_names['FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION']: (
             voiceover_services.regenerate_voiceovers_on_exploration_added_to_topic
         ),
+        fn_ids_to_names[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+        ]: (
+            voiceover_services.regenerate_voiceovers_of_exploration_for_given_language_accent
+        ),
     }
 
     @acl_decorators.can_perform_tasks_in_taskqueue
