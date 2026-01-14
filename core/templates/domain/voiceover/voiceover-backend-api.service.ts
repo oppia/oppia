@@ -102,6 +102,26 @@ export interface RegenerateVoiceoverResponse {
   sentenceTokenWithDurations: TokensWithDurationType[];
 }
 
+interface ExplorationDataForVoiceoverRegenerationBackendType {
+  exploration_title: string;
+  autogeneratable_language_accent_codes: string[];
+}
+
+interface ExplorationDataForVoiceoverRegenerationType {
+  explorationTitle: string;
+  autogeneratableLanguageAccentCodes: string[];
+}
+
+interface ExplorationDataForVoiceoverRegenerationBackendDict {
+  exploration_data: ExplorationDataForVoiceoverRegenerationBackendType | null;
+  response_message: string | null;
+}
+
+export interface ExplorationDataForVoiceoverRegenerationResponse {
+  explorationData: ExplorationDataForVoiceoverRegenerationType | null;
+  responseMessage: string | null;
+}
+
 export interface ExplorationVoiceoverRegenerationStatusBackendResponse {
   language_accent_to_content_status_map: LanguageAccentToContentStatusMap;
 }
@@ -305,7 +325,6 @@ export class VoiceoverBackendApiService {
         );
     });
   }
-
   async fetchLatestVoiceoverRegenerationStatusAsync(
     explorationID: string
   ): Promise<LanguageAccentToContentStatusMap> {
@@ -334,5 +353,65 @@ export class VoiceoverBackendApiService {
           }
         );
     });
+  }
+
+  async fetchExplorationDataForVoiceoverAsync(
+    explorationID: string
+  ): Promise<ExplorationDataForVoiceoverRegenerationResponse> {
+    let explorationDataUrl = this.urlInterpolationService.interpolateUrl(
+      VoiceoverDomainConstants.GET_EXPLORATION_VOICEOVERS_DATA_URL,
+      {
+        exploration_id: explorationID,
+      }
+    );
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<ExplorationDataForVoiceoverRegenerationBackendDict>(
+          explorationDataUrl
+        )
+        .toPromise()
+        .then(
+          response => {
+            let explorationData: ExplorationDataForVoiceoverRegenerationType | null =
+              null;
+            if (response?.exploration_data) {
+              explorationData = {
+                explorationTitle: response.exploration_data.exploration_title,
+                autogeneratableLanguageAccentCodes:
+                  response.exploration_data
+                    .autogeneratable_language_accent_codes,
+              };
+            }
+
+            let responseData = {
+              explorationData: explorationData,
+              responseMessage: response.response_message,
+            };
+            resolve(responseData);
+          },
+          errorResponse => {
+            reject(errorResponse?.error);
+          }
+        );
+    });
+  }
+
+  async regenerateVoiceoversForExplorationAsync(
+    explorationID: string,
+    languageAccentCode: string
+  ): Promise<void> {
+    let regenerateVoiceoversForExplorationUrl =
+      this.urlInterpolationService.interpolateUrl(
+        VoiceoverDomainConstants.REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL,
+        {
+          exploration_id: explorationID,
+          language_accent_code: languageAccentCode,
+        }
+      );
+
+    return this.http
+      .post<void>(regenerateVoiceoversForExplorationUrl, {})
+      .toPromise();
   }
 }
