@@ -132,7 +132,7 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             fixing explorations with duplicate content IDs.
         """
 
-        explorations_to_fix = (
+        fixed_explorations = (
             self.pipeline
             | 'Get all exploration models' >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False))
@@ -146,14 +146,14 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
-                explorations_to_fix
+                fixed_explorations
                 | 'Extract fixed exploration models' >> beam.Map(
                     lambda result: result['fixed_model'])
                 | 'Put fixed models' >> ndb_io.PutModels()
             )
 
         return (
-            explorations_to_fix
+            fixed_explorations
             | 'Create job run results' >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
                     f'Fixed exploration {result["exp_id"]} '
@@ -320,14 +320,6 @@ def _replace_content_id_in_value(
         for item_value in value.values():
             _replace_content_id_in_value(
                 item_value, old_content_id, new_content_id)
-
-
-class AuditIdentifyExplorationsWithDuplicateContentIdsJob(
-    IdentifyExplorationsWithDuplicateContentIdsJob
-):
-    """Audit job for IdentifyExplorationsWithDuplicateContentIdsJob."""
-
-    DATASTORE_UPDATES_ALLOWED = False
 
 
 class AuditFixExplorationsWithDuplicateContentIdsJob(

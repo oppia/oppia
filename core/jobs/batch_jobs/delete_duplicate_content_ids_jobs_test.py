@@ -165,10 +165,10 @@ class FixExplorationsWithDuplicateContentIdsJobTests(
 class AuditIdentifyExplorationsWithDuplicateContentIdsJobTests(
     job_test_utils.JobTestBase
 ):
-    """Tests for AuditIdentifyExplorationsWithDuplicateContentIdsJob."""
+    """Tests for IdentifyExplorationsWithDuplicateContentIdsJob in audit mode."""
 
     JOB_CLASS = (
-        delete_duplicate_content_ids_jobs.AuditIdentifyExplorationsWithDuplicateContentIdsJob
+        delete_duplicate_content_ids_jobs.IdentifyExplorationsWithDuplicateContentIdsJob
     )
 
     def test_audit_identify_job_with_duplicates(self) -> None:
