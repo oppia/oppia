@@ -46,7 +46,10 @@ class DummyFailJobTests(job_test_utils.JobTestBase):
 
     def test_dummy_fail_job_outputs_failure(self) -> None:
         """Test that DummyFailJob outputs a failure result."""
-        with self.assertRaisesRegex(
-            Exception, 'DummyFailJob intentionally failed.'
-        ):
-            self.run_job()
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stderr(
+                    'ERROR: Dummy job failed as expected'
+                )
+            ]
+        )
