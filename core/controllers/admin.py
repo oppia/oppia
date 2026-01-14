@@ -2647,9 +2647,6 @@ class TopicManagerRoleHandler(
                 )
 
             topic_manager = user_services.get_user_actions_info(user_id)
-            print(
-                "assigned role", user_services.get_user_settings(user_id).roles
-            )
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager,
@@ -2710,17 +2707,15 @@ class QuestionAdminRoleHandler(
     @acl_decorators.can_access_admin_page
     def put(self) -> None:
         """Adds or removes the question role for a user.
+
         Raises:
             NotFoundException. User with given username does not exist.
         """
         assert self.normalized_payload is not None
         username = self.normalized_payload['username']
         action = self.normalized_payload['action']
-        print("username:", username)
-        print("action:", action)
 
         user_settings = user_services.get_user_settings_from_username(username)
-        print(user_settings)
         if user_settings is None:
             raise self.NotFoundException(
                 'User with given username does not exist.'
@@ -2732,10 +2727,6 @@ class QuestionAdminRoleHandler(
                 user_services.add_user_role(
                     user_id, feconf.ROLE_ID_QUESTION_ADMIN
                 )
-            print(
-                "user assigned role",
-                user_services.get_user_settings(user_id).roles,
-            )
 
         else:
             # The handler schema defines the possible values of 'action'.
@@ -2751,7 +2742,6 @@ class QuestionAdminRoleHandler(
             user_services.remove_user_role(
                 user_id, feconf.ROLE_ID_QUESTION_ADMIN
             )
-        print("Question Admin")
         self.render_json({})
 
 

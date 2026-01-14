@@ -43,7 +43,7 @@ import {TopicBackendDict, Topic} from 'domain/topic/topic-object.model';
 import {AlertsService} from 'services/alerts.service';
 import {TopicEditorStateService} from './topic-editor-state.service';
 
-fdescribe('Topic editor state service', () => {
+describe('Topic editor state service', () => {
   let topicEditorStateService: TopicEditorStateService;
   let mockEditableTopicBackendApiService: MockEditableTopicBackendApiService;
   let alertsService: AlertsService;

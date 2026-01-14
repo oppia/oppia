@@ -3207,8 +3207,8 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
 class QuestionAdminRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for QualityAdminRoleHandler."""
 
-    def setUp(self):
-        return super().setUp()
+    def setUp(self) -> None:
+        super().setUp()
         self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
 
     def test_handler_with_invalid_username(self) -> None:

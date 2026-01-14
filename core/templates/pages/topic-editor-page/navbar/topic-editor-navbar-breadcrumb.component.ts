@@ -66,7 +66,5 @@ export class TopicEditorNavbarBreadcrumbComponent {
     );
     this.topic = this.topicEditorStateService.getTopic();
     this.topicRights = this.topicEditorStateService.getTopicRights();
-    console.log('edit-topic', this.topicRights.canEditTopic());
-    console.log('edit-questions', this.topicRights.canEditQuestion());
   }
 }

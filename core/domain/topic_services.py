@@ -1916,10 +1916,12 @@ def check_can_edit_question(
     topic_rights: Optional[topic_domain.TopicRights],
 ) -> bool:
     """Checks whether the user can edit questions.
+
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
         topic_rights: TopicRights or None. Rights object for the given topic.
+
     Returns:
         bool. Whether the given user can view questions.
     """
