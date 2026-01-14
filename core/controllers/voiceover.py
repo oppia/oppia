@@ -24,6 +24,7 @@ from core.domain import (
     feature_flag_services,
     opportunity_services,
     taskqueue_services,
+    voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
@@ -187,19 +188,30 @@ class AutomaticVoiceoverRegenerationRecordHandler(
 
         # Fetch only those records that are related to voiceover regeneration
         # and are within the specified date range.
-        cloud_task_run_objects = (
+        cloud_task_run_objects = sorted(
             taskqueue_services.get_cloud_task_run_by_given_params(
                 taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
                 start_date_obj,
                 end_date_obj,
-            )
+            ),
+            key=lambda task_run: task_run.last_updated,
+            reverse=True,
         )
+
+        # During testing, we observed that the UI remains usable with around
+        # 5,000 records, but performance degrades significantly at 15,000
+        # records. Setting a limit of 100 ensures a safe and consistent user
+        # experience and prevents users from being overwhelmed by excessive
+        # records.
+        maximum_allowed_records = 100
 
         self.values.update(
             {
                 'automatic_voiceover_regeneration_records': [
                     cloud_task_run.to_dict()
-                    for cloud_task_run in cloud_task_run_objects
+                    for cloud_task_run in cloud_task_run_objects[
+                        :maximum_allowed_records
+                    ]
                 ]
             }
         )
@@ -304,4 +316,34 @@ class RegenerateVoiceoverOnExpUpdateHandler(
                 feconf.SYSTEM_COMMITTER_ID,
                 datetime.datetime.utcnow().isoformat(),
             )
+        self.render_json(self.values)
+
+
+class VoiceoverRegenerationRequestToCloudTaskHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Retrieves the status of all voiceover-regeneration requests queued in
+    Cloud Tasks for the specified exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_play_exploration
+    def get(self, exploration_id: str) -> None:
+        """Retrieves the status of all voiceover-regeneration requests queued in
+        Cloud Tasks for the specified exploration.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+
+        self.values.update(
+            voiceover_cloud_task_services.get_existing_voiceover_regeneration_requests_in_task_queue(
+                exploration_id
+            )
+        )
         self.render_json(self.values)

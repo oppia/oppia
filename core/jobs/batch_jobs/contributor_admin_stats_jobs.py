@@ -264,6 +264,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 'translation_general_suggestions_stats': translation_general_suggestions_stats,
             }
             | 'Merge Translation models' >> beam.CoGroupByKey()
+            | 'Filter valid translation cases'
+            >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data[1]['translation_contribution_stats']) > 0
+                )
+            )
             | 'Transform translation contribution stats'
             >> beam.MapTuple(
                 lambda key, value: self.transform_translation_contribution_stats(
@@ -306,6 +312,12 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 'question_general_suggestions_stats': question_general_suggestions_stats,
             }
             | 'Merge Question models' >> beam.CoGroupByKey()
+            | 'Filter valid question cases'
+            >> beam.Filter(
+                lambda grouped_data: (
+                    len(grouped_data[1]['question_contribution_stats']) > 0
+                )
+            )
             | 'Transform question contribution stats'
             >> beam.MapTuple(
                 lambda key, value: self.transform_question_contribution_stats(
@@ -500,6 +512,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 stat.topic_id
             ):
                 translation_contribution_stats.remove(stat)
+
+        if len(translation_contribution_stats) == 0:
+            # No need to generate total contribution stats if there is no valid stats model.
+            return None
 
         try:
             topic_ids = [v.topic_id for v in translation_contribution_stats]
@@ -745,6 +761,10 @@ class GenerateContributorAdminStatsJob(base_jobs.JobBase):
                 stat.topic_id
             ):
                 question_contribution_stats.remove(stat)
+
+        if len(question_contribution_stats) == 0:
+            # No need to generate total contribution stats if there is no valid stats model.
+            return None
 
         try:
             topic_ids = [v.topic_id for v in question_contribution_stats]
