@@ -103,7 +103,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isQuestionCoordinator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
-  isQuestionAdmin: boolean = false;
   pageIsIframed: boolean = false;
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
