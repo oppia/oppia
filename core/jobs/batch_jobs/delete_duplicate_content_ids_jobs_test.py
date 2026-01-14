@@ -264,7 +264,9 @@ class AuditFixExplorationsWithDuplicateContentIdsJobTests(
 class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
     """Tests for helper functions that replace content IDs."""
 
-    def test_replace_content_id_in_state_updates_nested_references(self) -> None:
+    def test_replace_content_id_in_state_updates_nested_references(
+        self,
+    ) -> None:
         class FakeContent:
             """Simple object carrying a content_id used in tests."""
 
@@ -282,9 +284,7 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
             # Here we use type Any because customization args can hold lists,
             # dicts, or nested domain-like objects and we only exercise
             # traversal in the helper, not specific shapes.
-            def __init__(
-                self, value: Any, content_ids: List[str]
-            ) -> None:
+            def __init__(self, value: Any, content_ids: List[str]) -> None:
                 self.value = value
                 self._content_ids = content_ids
 
@@ -338,14 +338,18 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
         class FakeState:
             """State stub bundling content and interaction."""
 
-            def __init__(self, content: FakeContent, interaction: FakeInteraction) -> None:
+            def __init__(
+                self, content: FakeContent, interaction: FakeInteraction
+            ) -> None:
                 self.content = content
                 self.interaction = interaction
 
         duplicate_id = 'duplicate_id'
         replacement_id = 'replacement_id'
 
-        customization_values: List[Union[Dict[str, FakeContent], FakeContent]] = [
+        customization_values: List[
+            Union[Dict[str, FakeContent], FakeContent]
+        ] = [
             {'nested': FakeContent(duplicate_id)},
             FakeContent(duplicate_id),
         ]
@@ -395,7 +399,9 @@ class ReplaceContentIdHelpersTests(test_utils.GenericTestBase):
             interaction.solution.explanation.content_id, replacement_id
         )
 
-    def test_replace_content_id_in_state_handles_missing_interaction(self) -> None:
+    def test_replace_content_id_in_state_handles_missing_interaction(
+        self,
+    ) -> None:
         class FakeContent:
             """Content stub with a content_id."""
 

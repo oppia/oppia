@@ -48,19 +48,22 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         explorations_with_duplicates = (
             self.pipeline
-            | 'Get all exploration models' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Transform to exploration domain objects' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
-            | 'Check for duplicate content IDs' >> beam.Map(
-                self._check_for_duplicate_content_ids)
-            | 'Filter explorations with duplicates' >> beam.Filter(
-                lambda result: result is not None)
+            | 'Get all exploration models'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Transform to exploration domain objects'
+            >> beam.Map(exp_fetchers.get_exploration_from_model)
+            | 'Check for duplicate content IDs'
+            >> beam.Map(self._check_for_duplicate_content_ids)
+            | 'Filter explorations with duplicates'
+            >> beam.Filter(lambda result: result is not None)
         )
 
         return (
             explorations_with_duplicates
-            | 'Create job run results' >> beam.Map(
+            | 'Create job run results'
+            >> beam.Map(
                 lambda result: job_run_result.JobRunResult.as_stdout(
                     f'Exploration {result["exp_id"]} '
                     f'(version {result["version"]}) '
@@ -71,7 +74,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
     @staticmethod
     def _check_for_duplicate_content_ids(
-        exploration: exp_domain.Exploration
+        exploration: exp_domain.Exploration,
     ) -> Dict[str, Union[str, int, Dict[str, List[str]]]] | None:
         """Check if an exploration has duplicate content IDs.
 
@@ -104,8 +107,8 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             duplicate_details = {}
             for duplicate_id in duplicate_content_ids:
                 states_with_duplicate = [
-                    state_name for state_name, content_ids in
-                    state_to_content_ids.items()
+                    state_name
+                    for state_name, content_ids in state_to_content_ids.items()
                     if duplicate_id in content_ids
                 ]
                 duplicate_details[duplicate_id] = states_with_duplicate
@@ -113,7 +116,7 @@ class IdentifyExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             return {
                 'exp_id': exploration.id,
                 'version': exploration.version,
-                'duplicates': duplicate_details
+                'duplicates': duplicate_details,
             }
 
         return None
@@ -134,41 +137,40 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         fixed_explorations = (
             self.pipeline
-            | 'Get all exploration models' >> ndb_io.GetModels(
-                exp_models.ExplorationModel.get_all(include_deleted=False))
-            | 'Transform to exploration domain objects' >> beam.Map(
-                exp_fetchers.get_exploration_from_model)
-            | 'Check for duplicate content IDs' >> beam.Map(
-                self._check_and_fix_duplicate_content_ids)
-            | 'Filter fixed explorations' >> beam.Filter(
-                lambda result: result is not None)
+            | 'Get all exploration models'
+            >> ndb_io.GetModels(
+                exp_models.ExplorationModel.get_all(include_deleted=False)
+            )
+            | 'Transform to exploration domain objects'
+            >> beam.Map(exp_fetchers.get_exploration_from_model)
+            | 'Check for duplicate content IDs'
+            >> beam.Map(self._check_and_fix_duplicate_content_ids)
+            | 'Filter fixed explorations'
+            >> beam.Filter(lambda result: result is not None)
         )
 
         if self.DATASTORE_UPDATES_ALLOWED:
             unused_put_results = (
                 fixed_explorations
-                | 'Extract fixed exploration models' >> beam.Map(
-                    lambda result: result['fixed_model'])
+                | 'Extract fixed exploration models'
+                >> beam.Map(lambda result: result['fixed_model'])
                 | 'Put fixed models' >> ndb_io.PutModels()
             )
 
-        return (
-            fixed_explorations
-            | 'Create job run results' >> beam.Map(
-                lambda result: job_run_result.JobRunResult.as_stdout(
-                    f'Fixed exploration {result["exp_id"]} '
-                    f'(version {result["version"]}) - '
-                    f'regenerated content IDs: {result["fixed_content_ids"]}'
-                )
+        return fixed_explorations | 'Create job run results' >> beam.Map(
+            lambda result: job_run_result.JobRunResult.as_stdout(
+                f'Fixed exploration {result["exp_id"]} '
+                f'(version {result["version"]}) - '
+                f'regenerated content IDs: {result["fixed_content_ids"]}'
             )
         )
 
     @staticmethod
     def _check_and_fix_duplicate_content_ids(
-        exploration: exp_domain.Exploration
-        ) -> (
-        Dict[str, Union[str, int, List[str],
-                       'exp_models.ExplorationModel']] | None
+        exploration: exp_domain.Exploration,
+    ) -> (
+        Dict[str, Union[str, int, List[str], 'exp_models.ExplorationModel']]
+        | None
     ):
         """Check and fix duplicate content IDs in an exploration.
 
@@ -201,15 +203,17 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
             return None
 
         from core.domain import translation_domain
+
         content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index)
+            exploration.next_content_id_index
+        )
 
         fixed_content_ids = []
 
         for duplicate_id in duplicate_content_ids:
             states_with_duplicate = [
-                state_name for state_name, content_ids in
-                state_to_content_ids.items()
+                state_name
+                for state_name, content_ids in state_to_content_ids.items()
                 if duplicate_id in content_ids
             ]
 
@@ -218,28 +222,33 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
                 state = exploration.states[state_name]
 
                 new_content_id = content_id_generator.generate(
-                    translation_domain.ContentType.CONTENT)
+                    translation_domain.ContentType.CONTENT
+                )
 
                 _replace_content_id_in_state(
-                    state, duplicate_id, new_content_id)
+                    state, duplicate_id, new_content_id
+                )
                 fixed_content_ids.append(
-                    f'{duplicate_id} -> {new_content_id} in {state_name}')
+                    f'{duplicate_id} -> {new_content_id} in {state_name}'
+                )
 
         exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index)
+            content_id_generator.next_content_id_index
+        )
 
         with datastore_services.get_ndb_context():
             updated_model = exp_models.ExplorationModel.get(exploration.id)
             updated_model.states = exploration.to_dict()['states']
             updated_model.next_content_id_index = (
-                exploration.next_content_id_index)
+                exploration.next_content_id_index
+            )
             updated_model.version += 1
 
             return {
                 'exp_id': exploration.id,
                 'version': exploration.version,
                 'fixed_content_ids': fixed_content_ids,
-                'fixed_model': updated_model
+                'fixed_model': updated_model,
             }
 
 
@@ -255,8 +264,10 @@ def _replace_content_id_in_state(
         old_content_id: str. The old content ID to replace.
         new_content_id: str. The new content ID to use.
     """
-    if (hasattr(state.content, 'content_id') and
-            state.content.content_id == old_content_id):
+    if (
+        hasattr(state.content, 'content_id')
+        and state.content.content_id == old_content_id
+    ):
         state.content.content_id = new_content_id
 
     if state.interaction:
@@ -266,36 +277,50 @@ def _replace_content_id_in_state(
             if old_content_id in content_ids:
                 # Replace the content ID in the value.
                 _replace_content_id_in_value(
-                    ca_value.value, old_content_id, new_content_id)
+                    ca_value.value, old_content_id, new_content_id
+                )
 
         for answer_group in state.interaction.answer_groups:
-            if (hasattr(answer_group.outcome, 'feedback') and
-                    hasattr(answer_group.outcome.feedback, 'content_id')):
+            if hasattr(answer_group.outcome, 'feedback') and hasattr(
+                answer_group.outcome.feedback, 'content_id'
+            ):
                 if answer_group.outcome.feedback.content_id == old_content_id:
                     answer_group.outcome.feedback.content_id = new_content_id
 
-        if (state.interaction.default_outcome and
-                hasattr(state.interaction.default_outcome, 'feedback') and
-                hasattr(state.interaction.default_outcome.feedback,
-                        'content_id')):
-            if (state.interaction.default_outcome.feedback.content_id ==
-                    old_content_id):
+        if (
+            state.interaction.default_outcome
+            and hasattr(state.interaction.default_outcome, 'feedback')
+            and hasattr(
+                state.interaction.default_outcome.feedback, 'content_id'
+            )
+        ):
+            if (
+                state.interaction.default_outcome.feedback.content_id
+                == old_content_id
+            ):
                 state.interaction.default_outcome.feedback.content_id = (
-                    new_content_id)
+                    new_content_id
+                )
 
         for hint in state.interaction.hints:
-            if (hasattr(hint, 'hint_content') and
-                    hasattr(hint.hint_content, 'content_id')):
+            if hasattr(hint, 'hint_content') and hasattr(
+                hint.hint_content, 'content_id'
+            ):
                 if hint.hint_content.content_id == old_content_id:
                     hint.hint_content.content_id = new_content_id
 
-        if (state.interaction.solution and
-                hasattr(state.interaction.solution, 'explanation') and
-                hasattr(state.interaction.solution.explanation, 'content_id')):
-            if (state.interaction.solution.explanation.content_id ==
-                    old_content_id):
+        if (
+            state.interaction.solution
+            and hasattr(state.interaction.solution, 'explanation')
+            and hasattr(state.interaction.solution.explanation, 'content_id')
+        ):
+            if (
+                state.interaction.solution.explanation.content_id
+                == old_content_id
+            ):
                 state.interaction.solution.explanation.content_id = (
-                    new_content_id)
+                    new_content_id
+                )
 
 
 # Here we use type Any because the customization arg value can be of
@@ -319,7 +344,8 @@ def _replace_content_id_in_value(
     elif isinstance(value, dict):
         for item_value in value.values():
             _replace_content_id_in_value(
-                item_value, old_content_id, new_content_id)
+                item_value, old_content_id, new_content_id
+            )
 
 
 class AuditFixExplorationsWithDuplicateContentIdsJob(
