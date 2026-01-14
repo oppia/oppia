@@ -82,7 +82,7 @@ export class TopicQuestionsTabComponent
         this.getSkillsCategorizedByTopics = response.categorizedSkillsDict;
         this.getUntriagedSkillSummaries = response.untriagedSkillSummaries;
       });
-    this.canEditQuestion = this.topicRights.canEditTopic();
+    this.canEditQuestion = this.topicRights.canEditQuestion();
     this.questionEditorOpened =
       this.topicEditorStateService.isQuestionEditorOpened();
     this.newQuestionEditor = this.topicEditorStateService.isNewQuestionEditor();

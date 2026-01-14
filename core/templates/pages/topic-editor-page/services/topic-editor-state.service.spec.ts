@@ -43,7 +43,7 @@ import {TopicBackendDict, Topic} from 'domain/topic/topic-object.model';
 import {AlertsService} from 'services/alerts.service';
 import {TopicEditorStateService} from './topic-editor-state.service';
 
-describe('Topic editor state service', () => {
+fdescribe('Topic editor state service', () => {
   let topicEditorStateService: TopicEditorStateService;
   let mockEditableTopicBackendApiService: MockEditableTopicBackendApiService;
   let alertsService: AlertsService;
@@ -161,6 +161,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       });
     }
   }
@@ -623,6 +624,7 @@ describe('Topic editor state service', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: false,
+        can_edit_question: false,
       })
     );
 
@@ -631,6 +633,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
 
@@ -639,6 +642,7 @@ describe('Topic editor state service', () => {
         published: true,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
   });

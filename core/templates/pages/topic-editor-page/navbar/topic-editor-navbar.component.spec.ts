@@ -174,7 +174,7 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.discardChangesButtonIsShown).toBeFalse();
     expect(componentInstance.validationIssues).toEqual([]);
     expect(componentInstance.topicRights).toEqual(
-      new TopicRights(false, false, false)
+      new TopicRights(false, false, false, false)
     );
   });
 
@@ -457,6 +457,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();
@@ -494,6 +495,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
@@ -507,6 +509,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = [];
@@ -520,6 +523,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = ['warn1'];
     componentInstance.prepublishValidationIssues = [];
@@ -533,6 +537,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.validationIssues = [];
     componentInstance.prepublishValidationIssues = ['warn1'];
@@ -574,6 +579,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     spyOn(topicEditorStateService, 'saveTopic').and.callFake(
@@ -610,6 +616,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(alertsService, 'addSuccessMessage');
     componentInstance.saveChanges();
@@ -705,6 +712,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
@@ -722,6 +730,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: true,
         can_edit_topic: true,
+        can_edit_question: true,
       })
     );
   }));
@@ -731,6 +740,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: false,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     spyOn(topicRightsBackendApiService, 'unpublishTopicAsync').and.returnValue(
       Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
@@ -747,6 +757,7 @@ describe('Topic Editor Navbar', () => {
       published: true,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
     componentInstance.showTopicEditOptions = true;
 
@@ -784,6 +795,7 @@ describe('Topic Editor Navbar', () => {
       published: false,
       can_publish_topic: true,
       can_edit_topic: true,
+      can_edit_question: true,
     });
 
     componentInstance.publishTopic();
@@ -816,6 +828,7 @@ describe('Topic Editor Navbar', () => {
         published: false,
         can_publish_topic: false,
         can_edit_topic: true,
+        can_edit_question: true,
       });
 
       componentInstance.publishTopic();

@@ -2989,6 +2989,150 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
+class QuestionAdminRoleHandlerTest(test_utils.GenericTestBase):
+    """Tests for QualityAdminRoleHandler."""
+
+    def setUp(self):
+        return super().setUp()
+        self.admin_id = self.get_user_id_from_email(self.SUPER_ADMIN_EMAIL)
+
+    def test_handler_with_invalid_username(self) -> None:
+        username = 'invaliduser'
+
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/qualityadminrolehandler',
+            {'action': 'assign', 'username': username},
+            csrf_token=csrf_token,
+            expected_status_int=404,
+        )
+
+    def test_adding_question_admin_role_to_user(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username},
+        )
+
+        self.assertEqual(
+            response_dict,
+            {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': [],
+            },
+        )
+        # Check role correctly gets updated.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/questionadminrolehandler',
+            {
+                'action': 'assign',
+                'username': username,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username},
+        )
+        self.assertEqual(
+            response_dict,
+            {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_QUESTION_ADMIN,
+                ],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': [],
+            },
+        )
+
+        self.logout()
+
+    def test_deassigning_question_admin_role_from_user(self) -> None:
+        user_email = 'user1@example.com'
+        username = 'user1'
+        self.signup(user_email, username)
+        self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username},
+        )
+        self.assertEqual(
+            response_dict,
+            {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': [],
+            },
+        )
+        # Check role correctly gets assigned.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/questionadminrolehandler',
+            {
+                'action': 'assign',
+                'username': username,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username},
+        )
+        self.assertEqual(
+            response_dict,
+            {
+                'roles': [
+                    feconf.ROLE_ID_FULL_USER,
+                    feconf.ROLE_ID_QUESTION_ADMIN,
+                ],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': [],
+            },
+        )
+        # Check role correctly gets deassigned.
+        csrf_token = self.get_new_csrf_token()
+        response_dict = self.put_json(
+            '/questionadminrolehandler',
+            {
+                'action': 'deassign',
+                'username': username,
+            },
+            csrf_token=csrf_token,
+        )
+        self.assertEqual(response_dict, {})
+
+        response_dict = self.get_json(
+            feconf.ADMIN_ROLE_HANDLER_URL,
+            params={'filter_criterion': 'username', 'username': username},
+        )
+        self.assertEqual(
+            response_dict,
+            {
+                'roles': [feconf.ROLE_ID_FULL_USER],
+                'banned': False,
+                'managed_topic_ids': [],
+                'coordinated_language_ids': [],
+            },
+        )
+
+        self.logout()
+
+
 class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TranslationCoordinatorRoleHandler."""
 

@@ -2584,6 +2584,9 @@ class TopicManagerRoleHandler(
                 )
 
             topic_manager = user_services.get_user_actions_info(user_id)
+            print(
+                "assigned role", user_services.get_user_settings(user_id).roles
+            )
             topic_services.assign_role(
                 user_services.get_system_user(),
                 topic_manager,
@@ -2608,6 +2611,84 @@ class TopicManagerRoleHandler(
                 user_id, feconf.ROLE_ID_TOPIC_MANAGER
             )
 
+        self.render_json({})
+
+
+class QuestionAdminRoleHandlerNormalizedPayloadDict(TypedDict):
+    """Dict representation of QuestionAdmin's normalized_payload
+    dictionary.
+    """
+
+    username: str
+    action: str
+
+
+class QuestionAdminRoleHandler(
+    base.BaseHandler[
+        QuestionAdminRoleHandlerNormalizedPayloadDict, Dict[str, str]
+    ]
+):
+    """Handler to assign or deassigning a question admin."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS = {
+        'PUT': {
+            'username': {'schema': {'type': 'basestring'}},
+            'action': {
+                'schema': {
+                    'type': 'basestring',
+                    'choices': ['assign', 'deassign'],
+                }
+            },
+        }
+    }
+
+    @acl_decorators.can_access_admin_page
+    def put(self) -> None:
+        """Adds or removes the question role for a user.
+        Raises:
+            NotFoundException. User with given username does not exist.
+        """
+        assert self.normalized_payload is not None
+        username = self.normalized_payload['username']
+        action = self.normalized_payload['action']
+        print("username:", username)
+        print("action:", action)
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        print(user_settings)
+        if user_settings is None:
+            raise self.NotFoundException(
+                'User with given username does not exist.'
+            )
+
+        user_id = user_settings.user_id
+        if action == 'assign':
+            if not feconf.ROLE_ID_QUESTION_ADMIN in user_settings.roles:
+                user_services.add_user_role(
+                    user_id, feconf.ROLE_ID_QUESTION_ADMIN
+                )
+            print(
+                "user assigned role",
+                user_services.get_user_settings(user_id).roles,
+            )
+
+        else:
+            # The handler schema defines the possible values of 'action'.
+            # If 'action' has a value other than those defined in the schema,
+            # a Bad Request error will be thrown. Hence, 'action' must be
+            # 'deassign' if this branch is executed.
+            assert action == 'deassign'
+
+            # The case where user does not have manager rights it will be
+            # caught before in topic_services.deassign_manager_role_from_topic
+            # method.
+            assert not topic_fetchers.get_topic_rights_with_user(user_id)
+            user_services.remove_user_role(
+                user_id, feconf.ROLE_ID_QUESTION_ADMIN
+            )
+        print("Question Admin")
         self.render_json({})
 
 

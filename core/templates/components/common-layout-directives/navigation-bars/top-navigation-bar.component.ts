@@ -94,6 +94,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isModerator: boolean = false;
   isCurriculumAdmin: boolean = false;
   isTopicManager: boolean = false;
+  isQuestionAdmin: boolean = false;
   pageIsIframed: boolean = false;
   isSuperAdmin: boolean = false;
   isBlogAdmin: boolean = false;
@@ -267,6 +268,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
       this.isTopicManager = userInfo.isTopicManager();
+      this.isQuestionAdmin = userInfo.isQuestionAdmin();
       this.isSuperAdmin = userInfo.isSuperAdmin();
       this.isBlogAdmin = userInfo.isBlogAdmin();
       this.isBlogPostEditor = userInfo.isBlogPostEditor();

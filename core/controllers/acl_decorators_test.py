@@ -6824,18 +6824,32 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-
-        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
         self.signup(self.user_a_email, self.user_a)
         self.signup(self.user_b_email, self.user_b)
 
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.topic_id = topic_fetchers.get_new_topic_id()
-        self.save_new_topic(self.topic_id, self.admin_id)
+        self.save_new_skill('skill_1', self.admin_id)
+        self.save_new_topic(
+            topic_id=self.topic_id,
+            owner_id=self.admin_id,
+            uncategorized_skill_ids=['skill_1'],
+        )
+        self.save_new_topic(
+            topic_id='other_topic',
+            owner_id=self.admin_id,
+            name='other_topic',
+            abbreviated_name='other_topic',
+            url_fragment='other-topic',
+        )
         content_id_generator = translation_domain.ContentIdGenerator()
         self.save_new_question(
             self.question_id,
@@ -6844,8 +6858,8 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
             ['skill_1'],
             content_id_generator.next_content_id_index,
         )
-        self.set_topic_managers([self.user_a], self.topic_id)
-
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
+        self.set_topic_managers([self.user_a], 'other_topic')
         self.mock_testapp = webtest.TestApp(
             webapp2.WSGIApplication(
                 [
@@ -6885,13 +6899,33 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
 
-    def test_topic_manager_can_edit_question(self) -> None:
-        self.login(self.user_a_email)
+    def test_question_admin_can_edit_question(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id
             )
         self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_question(self) -> None:
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_question/%s' % self.question_id
+            )
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_of_different_topic_cannot_edit_question(
+        self,
+    ) -> None:
+        self.login(self.user_a_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_edit_question/%s' % self.question_id,
+                expected_status_int=401,
+            )
         self.logout()
 
     def test_any_user_cannot_edit_question(self) -> None:
@@ -7042,6 +7076,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         super().setUp()
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
         self.signup(self.user_a_email, self.user_a)
         self.signup(self.user_b_email, self.user_b)
 
@@ -7053,6 +7088,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(self.topic_id, self.admin_id)
         self.set_topic_managers([self.user_a], self.topic_id)
+        self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
 
         self.mock_testapp = webtest.TestApp(
             webapp2.WSGIApplication(
@@ -7083,8 +7119,8 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
 
-    def test_topic_manager_can_delete_question(self) -> None:
-        self.login(self.user_a_email)
+    def test_question_admins_can_delete_question(self) -> None:
+        self.login(self.QUESTION_ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id
