@@ -81,6 +81,14 @@ describe('Voiceover regeneration information modal', () => {
       expectedText2
     );
 
+    const functionId3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent';
+    const expectedText3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent \n ("Voiceover regeneration for the exploration in the chosen language accent")';
+    expect(componentInstance.getFunctionIdText(functionId3)).toBe(
+      expectedText3
+    );
+
     expect(componentInstance.getFunctionIdText('unknown_function_id')).toBe('');
   });
 });

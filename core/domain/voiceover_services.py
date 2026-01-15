@@ -378,9 +378,6 @@ def compute_voiceover_related_change(
     return new_voiceovers_models
 
 
-# NOTE TO DEVELOPERS: The method is not ready for use since the corresponding
-# model does not contain any data yet. Issue #19590 tracks the changes required
-# in order to use this function.
 def get_all_language_accent_codes_for_voiceovers() -> (
     Dict[str, Dict[str, bool]]
 ):
@@ -917,6 +914,7 @@ def _regenerate_voiceovers_for_given_contents(
     language_code_to_contents_mapping: Dict[str, Dict[str, str]],
     date_time: str,
     author_id: str,
+    specific_language_accent_code: Optional[str] = None,
     task_run_id: Optional[str] = None,
 ) -> None:
     """Private helper method to regenerate voiceovers for specified contents
@@ -936,6 +934,8 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration process was initiated.
         author_id: str. The ID of the user who triggered the voiceover
             regeneration, either directly or indirectly.
+        specific_language_accent_code: Optional[str]. The specific language
+            accent code to use for voiceover regeneration, if provided.
         task_run_id: str|None. The unique identifier for the voiceover
             regeneration task. If None, the method is invoked by a
             synchronous process and task-tracking is not required.
@@ -1023,6 +1023,12 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
         for language_accent_code in language_accent_codes:
+            if (
+                specific_language_accent_code is not None
+                and language_accent_code != specific_language_accent_code
+            ):
+                continue
+
             language_accents_used_for_voiceover_regeneration.append(
                 language_accent_codes_to_descriptions.get(
                     language_accent_code, ''
@@ -1174,7 +1180,7 @@ def regenerate_voiceovers_on_exploration_update(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1236,7 +1242,7 @@ def regenerate_voiceovers_on_exploration_added_to_topic(
         language_code_to_contents_mapping,
         date_time,
         author_id,
-        task_run_id,
+        task_run_id=task_run_id,
     )
 
 
@@ -1312,6 +1318,7 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
         language_code_to_contents_mapping,
         date_time,
         author_id,
+        specific_language_accent_code=language_accent_code,
     )
 
 
