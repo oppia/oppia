@@ -473,6 +473,22 @@
           </a>
         </li>
         <li class="nav-item">
+          <a *ngIf="(isReleaseCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/release-coordinator"
+             class="dropdown-item nav-link e2e-release-coordinator-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_RELEASE_COORDINATOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a *ngIf="(isTranslationAdmin || isTranslationCoordinator || isQuestionAdmin || isQuestionCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/contributor-admin-dashboard"
+             class="dropdown-item nav-link e2e-test-contributor-admin-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_ADMIN_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/blog-dashboard"
