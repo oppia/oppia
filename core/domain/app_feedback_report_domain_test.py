@@ -30,7 +30,8 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import List
+from typing import Any, Dict, List, Optional
+
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -82,7 +83,9 @@ EVENT_LOGS = ['event1', 'event2']
 LOGCAT_LOGS = ['logcat1', 'logcat2']
 USER_SELECTED_ITEMS: List[str] = []
 USER_TEXT_INPUT = 'add and admin'
-ANDROID_REPORT_INFO: app_feedback_report_models.ReportInfoDict = {
+ANDROID_REPORT_INFO: Dict[str, Any] = {
+
+
     'user_feedback_selected_items': USER_SELECTED_ITEMS,
     'user_feedback_other_text_input': USER_TEXT_INPUT,
     'event_logs': ['event1', 'event2'],
@@ -662,20 +665,19 @@ class AppFeedbackReportDomainTests(test_utils.GenericTestBase):
 
     def _assert_validation_error(
         self,
-        report_obj: app_feedback_report_domain.AppFeedbackReport,
+        entry_point_obj: app_feedback_report_domain.StudyGuideEntryPoint,
         expected_error_substring: str,
     ) -> None:
-        """Checks that the feedback report passes validation.
-
-        Args:
-            report_obj: AppFeedbackReport. The domain object to validate.
-            expected_error_substring: str. String that should be a substring
-                of the expected error message.
-        """
-        with self.assertRaisesRegex(
+     """Checks that the entry point raises a validation error."""
+     with self.assertRaisesRegex(
             utils.ValidationError, expected_error_substring
         ):
-            report_obj.validate()
+            app_feedback_report_domain.AppFeedbackReport.require_valid_entry_point_exploration(
+                exploration_id=entry_point_obj.exploration_id,
+                story_id=entry_point_obj.story_id,
+                expected_story_id='some_other_story_id',
+            )
+
 
     def _assert_not_implemented_error(
         self,
@@ -1252,18 +1254,18 @@ class LessonPlayerEntryPointDomainTests(test_utils.GenericTestBase):
             'with id',
         )
 
-    @mock.patch('core.domain.exp_services.get_story_id_linked_to_exploration')
-    def test_validation_with_valid_story_id(
-        self, mock_get_story_id_linked_to_exploration: mock.MagicMock
-    ) -> None:
-        mock_get_story_id_linked_to_exploration.return_value = 'story_id'
-        # Here the method should return None and not raise any exceptions.
-        self.assertIsNone(
-            self.entry_point.require_valid_entry_point_exploration(
-                exploration_id=self.entry_point.exploration_id,
-                story_id=self.entry_point.story_id,
-            )
+    def test_validation_with_valid_story_id(self) -> None:
+    # Here the method should return None and not raise any exceptions.
+     self.assertIsNone(
+        app_feedback_report_domain.AppFeedbackReport.require_valid_entry_point_exploration(
+        exploration_id=self.entry_point.exploration_id,
+        story_id=self.entry_point.story_id,
+        expected_story_id=self.entry_point.story_id,
+)
+
         )
+    
+
 
     # TODO(#13059): Here we use MyPy ignore because after we fully type the
     # codebase we plan to get rid of the tests that intentionally test wrong

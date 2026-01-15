@@ -25,7 +25,7 @@ from core import feconf, utils
 
 # TODO(#14537): Refactor this file and remove imports marked
 # with 'invalid-import-from'.
-from core.domain import exp_services  # pylint: disable=invalid-import-from
+
 from core.domain import (
     app_feedback_report_constants,
     story_domain,
@@ -1410,13 +1410,18 @@ class EntryPoint:
 
     @classmethod
     def require_valid_entry_point_exploration(
-        cls, exploration_id: Optional[str], story_id: Optional[str]
+        cls,
+        exploration_id: Optional[str],
+        story_id: Optional[str],
+        expected_story_id: Optional[str],
     ) -> None:
         """Checks whether the exploration id is a valid one.
 
         Args:
-            exploration_id: str. The exploraiton ID to validate.
+            exploration_id: str. The exploration ID to validate.
             story_id: str. The ID of the story that has this exploration.
+            expected_story_id: str. The ID of the story that actually contains
+                the exploration.
 
         Raises:
             ValidationError. The exploration ID is not a valid ID.
@@ -1426,15 +1431,14 @@ class EntryPoint:
                 'Exploration id should be a string, received: %r'
                 % (exploration_id)
             )
-        expected_story_id = exp_services.get_story_id_linked_to_exploration(
-            exploration_id
-        )
+
         if expected_story_id != story_id:
             raise utils.ValidationError(
                 'Exploration with id %s is not part of story with id of %s, '
                 'should be found in story with id of %s'
                 % (exploration_id, story_id, expected_story_id)
             )
+
 
 
 class NavigationDrawerEntryPointDict(TypedDict):
@@ -1543,7 +1547,9 @@ class LessonPlayerEntryPoint(EntryPoint):
             )
         story_domain.Story.require_valid_story_id(self.story_id)
         self.require_valid_entry_point_exploration(
-            self.exploration_id, self.story_id
+        self.exploration_id,
+        self.story_id,
+        None
         )
 
 
