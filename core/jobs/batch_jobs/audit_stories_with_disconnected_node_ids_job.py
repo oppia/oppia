@@ -38,6 +38,7 @@ if MYPY:  # pragma: no cover
     [models.Names.TOPIC, models.Names.STORY]
 )
 
+
 class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
     """Class to audit stories with disconnected node ids."""
 
@@ -58,9 +59,10 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
             | "Find story ids with disconnected nodes"
             >> beam.ParDo(CheckDisconnectedNodeIds())
         )
-        
+
         return stories_with_disconnected_node_pCollection
-        
+
+
 class CheckDisconnectedNodeIds(beam.DoFn):
     """DoFn to check for disconnected node_ids in stories."""
 
@@ -79,7 +81,7 @@ class CheckDisconnectedNodeIds(beam.DoFn):
             for dest_id in node['destination_node_ids']:
                 if dest_id is not None:
                     all_destination_ids.add(dest_id)
-        
+
         if (num_nodes - 1) > len(all_destination_ids):
             yield job_run_result.JobRunResult.as_stdout(
                 f'Story ID: {story_id} has disconnected nodes.'

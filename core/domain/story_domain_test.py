@@ -2392,7 +2392,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
-            'destination_node_ids': ['node_4','node_3'],
+            'destination_node_ids': ['node_4', 'node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',

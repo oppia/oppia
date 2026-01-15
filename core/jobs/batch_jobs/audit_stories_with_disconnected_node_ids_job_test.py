@@ -35,26 +35,27 @@ if MYPY:
 
 datastore_services = models.Registry.import_datastore_services()
 
+
 class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
     """Test for AuditStoriesWithDisconnectedNodeIdsJob."""
 
-    JOB_CLASS:Type[
+    JOB_CLASS: Type[
         audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
     ] = audit_stories_with_disconnected_node_ids_job.AuditStoriesWithDisconnectedNodeIdsJob
 
-    TOPIC_ID_1:Final = 'topic_id_1'
-    STORY_ID_1:Final = 'story_id_1'
-    STORY_ID_2:Final = 'story_id_2'
-    STORY_ID_3:Final = 'story_id_3'
-    EXP_ID_1:Final = 'exp_id_1'
-    EXP_ID_2:Final = 'exp_id_2'
-    EXP_ID_3:Final = 'exp_id_3'
-    EXP_ID_4:Final = 'exp_id_4'
+    TOPIC_ID_1: Final = 'topic_id_1'
+    STORY_ID_1: Final = 'story_id_1'
+    STORY_ID_2: Final = 'story_id_2'
+    STORY_ID_3: Final = 'story_id_3'
+    EXP_ID_1: Final = 'exp_id_1'
+    EXP_ID_2: Final = 'exp_id_2'
+    EXP_ID_3: Final = 'exp_id_3'
+    EXP_ID_4: Final = 'exp_id_4'
 
     def test_empty_storage(self) -> None:
         """Tests that the job runs successfully on an empty datastore."""
         self.assert_job_output_is_empty()
-    
+
     def test_stories_with_no_nodes_at_all(self) -> None:
             """Tests that the job reports stories that have an empty nodes list."""
             story_1 = self.create_model(
@@ -77,8 +78,8 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
                     f'Story ID: {self.STORY_ID_1} has no nodes.'
                 )
             ])
-    
-    def test_stories_with_disconnected_node_ids(self) ->None:
+
+    def test_stories_with_disconnected_node_ids(self) -> None:
         story_1 = self.create_model(
             story_models.StoryModel,
             id=self.STORY_ID_1,
@@ -137,9 +138,9 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
                     f'Story ID: {self.STORY_ID_1} has disconnected nodes.'
                 )
             ])
-    
-    def test_stories_with_all_connected_node_ids(self) ->None:
-        story_1= self.create_model(
+
+    def test_stories_with_all_connected_node_ids(self) -> None:
+        story_1 = self.create_model(
             story_models.StoryModel,
             id=self.STORY_ID_1,
             title='Story Title 1',
@@ -197,8 +198,9 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
                     f'SUCCESS: {self.STORY_ID_1} has no disconnected nodes.'
                 )
             ])
-    def test_stories_with_all_the_three_cases(self) ->None:
-            story_1= self.create_model(
+
+    def test_stories_with_all_the_three_cases(self) -> None:
+            story_1 = self.create_model(
                 story_models.StoryModel,
                 id=self.STORY_ID_1,
                 title='Story Title 1',
@@ -318,7 +320,7 @@ class AuditStoriesWithDisconnectedNodeIdsJobTest(job_test_utils.JobTestBase):
                 story_contents_schema_version=feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                 url_fragment='story-one-fragment',
             )
-            self.put_multi([story_1,story_2,story_3])
+            self.put_multi([story_1, story_2, story_3])
 
             self.assert_job_output_is([
                 job_run_result.JobRunResult.as_stdout(
