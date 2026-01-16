@@ -1067,7 +1067,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
     )
     
-        def to_domain_object(self) -> user_domain.UserEmailPreferences:
+    def to_domain_object(self) -> user_domain.UserEmailPreferences:
         """Returns the domain object representation of this model."""
         return user_domain.UserEmailPreferences(
             user_id=self.id,
@@ -1079,7 +1079,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         def update_from_domain_object(
         self, domain_object: user_domain.UserEmailPreferences
     ) -> None:
-        """Updates this model from the given domain object."""
+         """Updates this model from the given domain object."""
         self.site_updates = domain_object.site_updates
         self.editor_role_notifications = (
             domain_object.editor_role_notifications
