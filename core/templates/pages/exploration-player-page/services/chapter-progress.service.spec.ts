@@ -60,20 +60,6 @@ describe('ChapterProgressService', () => {
     expect(chapterProgressService.getCompletedChaptersCount()).toBe(5);
   }));
 
-  it('should updateFunction should handel API errors', fakeAsync(() => {
-    learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
-      Promise.reject(new Error('API Failed'))
-    );
-
-    let errorCaught = false;
-    chapterProgressService.updateCompletedChaptersCount().catch(() => {
-      errorCaught = true;
-    });
-    tick();
-
-    expect(errorCaught).toBe(true);
-  }));
-
   it('should check for first time chapter completion', fakeAsync(() => {
     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
       Promise.resolve({completedChaptersCount: 5})
@@ -86,6 +72,39 @@ describe('ChapterProgressService', () => {
     );
   }));
 
+  it('should emit the new count via completedChaptersCount$ when update is called', fakeAsync(() => {
+  let receivedValue: number = -1;
+
+  learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
+    Promise.resolve({ completedChaptersCount: 10 })
+  );
+
+  chapterProgressService.completedChaptersCount$.subscribe((count) => {
+    receivedValue = count;
+  });
+
+  chapterProgressService.updateCompletedChaptersCount();
+
+  tick();
+
+  expect(receivedValue).toBe(10);
+  expect(chapterProgressService.getCompletedChaptersCount()).toBe(10);
+  }));
+
+  it('should set the completed chapters count', () => {
+    chapterProgressService.setCompletedChaptersCount(15);
+
+    expect(chapterProgressService.getCompletedChaptersCount()).toBe(15);
+  });
+
+  it('should set whether a chapter is completed for the first time', () => {
+  chapterProgressService.setChapterCompletedForTheFirstTime(true);
+  expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(true);
+
+  chapterProgressService.setChapterCompletedForTheFirstTime(false);
+  expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(false);
+  });
+
   it('should return the completed chapters count', fakeAsync(() => {
     learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
       Promise.resolve({completedChaptersCount: 3})
@@ -96,3 +115,4 @@ describe('ChapterProgressService', () => {
     expect(chapterProgressService.getCompletedChaptersCount()).toBe(3);
   }));
 });
+

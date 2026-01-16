@@ -153,7 +153,7 @@ export class TutorCardComponent {
   username!: string | null;
   _viewHasLoadedOnce: boolean = false;
   completedChaptersCount: number = 0;
-  shouldShowProgressBar: boolean = false;
+
   constructor(
     private audioBarStatusService: AudioBarStatusService,
     private audioPlayerService: AudioPlayerService,
@@ -208,7 +208,7 @@ export class TutorCardComponent {
     }
   }
 
-  async ngOnInit(): Promise<void> {
+  ngOnInit(): void {
     this.inStoryMode = this.explorationModeService.isInStoryChapterMode();
     this._editorPreviewMode =
       this.pageContextService.isInExplorationEditorPage();
@@ -226,22 +226,9 @@ export class TutorCardComponent {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-    try {
-      await this.chapterProgressService.updateCompletedChaptersCount(true);
-      this.completedChaptersCount =
-        this.chapterProgressService.getCompletedChaptersCount();
-    } catch (error) {
-      if (error.status === 401) {
-        console.error('User is logged out setting default chapters count');
-        this.completedChaptersCount = 0;
-      } else {
-        console.error('Error loading the chapter count', error);
-        this.completedChaptersCount = 0;
-      }
-    }
-    this.shouldShowProgressBar =
-      this.setNextMilestoneAndCheckIfProgressBarIsShown();
-
+      this.chapterProgressService.completedChaptersCount$.subscribe((count:number) => {
+        this.completedChaptersCount = count;
+      })
     this.directiveSubscriptions.add(
       this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(() => {
         this.waitingForOppiaFeedback = false;
@@ -260,7 +247,6 @@ export class TutorCardComponent {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
-    this.shouldShowProgressBar = false;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

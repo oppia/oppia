@@ -22,41 +22,48 @@
 
 import {Injectable} from '@angular/core';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
+import { BehaviorSubject,Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChapterProgressService {
-  completedChaptersCount!: number;
+  completedChaptersCountSubject = new BehaviorSubject<number>(0)
+  completedChaptersCount$: Observable<number> = this.completedChaptersCountSubject.asObservable();
   chapterIsCompletedForTheFirstTime: boolean = false;
 
+
   constructor(
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
   ) {}
 
-  async updateCompletedChaptersCount(
+  updateCompletedChaptersCount(
     checkForFirstTimeCompletion: boolean = false
-  ): Promise<void> {
-    try {
-      const data =
-        await this.learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync();
-      const newCount = data.completedChaptersCount;
-      if (checkForFirstTimeCompletion) {
-        this.chapterIsCompletedForTheFirstTime = true;
-      }
-      this.completedChaptersCount = newCount;
-    } catch (error) {
-      console.error('Error while updating chapter complete count', error);
-      throw error;
-    }
+  ): void {
+    console.log("This is called to update ")
+    this.learnerDashboardBackendApiService
+      .fetchLearnerCompletedChaptersCountDataAsync()
+      .then(data => {
+        const newCount = data.completedChaptersCount;
+
+        if (checkForFirstTimeCompletion) {
+          if (newCount !== this.completedChaptersCountSubject.getValue()) {
+            this.chapterIsCompletedForTheFirstTime = true;
+          }
+        }
+
+        this.completedChaptersCountSubject.next(newCount);
+        console.log("Updated completed chapters count to:", this.completedChaptersCountSubject.getValue());
+      });
   }
 
   getCompletedChaptersCount(): number {
-    return this.completedChaptersCount;
+    
+    return this.completedChaptersCountSubject.getValue();
   }
 
   setCompletedChaptersCount(count: number): void {
-    this.completedChaptersCount = count;
+    this.completedChaptersCountSubject.next(count);
   }
 
   getChapterCompletedForTheFirstTime(): boolean {
