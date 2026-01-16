@@ -566,7 +566,7 @@ class UserGroupDict(TypedDict):
     
 class UserEmailPreferences:
     """Domain object for a user's email preferences."""
-        def __init__(
+    def __init__(
         self,
         user_id: str,
         site_updates: Optional[bool],
@@ -579,8 +579,8 @@ class UserEmailPreferences:
         self.editor_role_notifications = editor_role_notifications
         self.feedback_message_notifications = feedback_message_notifications
         self.subscription_notifications = subscription_notifications
-          
-        def validate(self) -> None:
+
+    def validate(self) -> None:
         """Validates the properties of this UserEmailPreferences object."""
         if not isinstance(self.user_id, str):
             raise utils.ValidationError('user_id must be a string.')
@@ -589,6 +589,7 @@ class UserEmailPreferences:
 
         if self.site_updates is not None and not isinstance(
             self.site_updates, bool
+            
         ):
             raise utils.ValidationError(
                 'site_updates must be a boolean or None.'
@@ -608,12 +609,6 @@ class UserEmailPreferences:
             raise utils.ValidationError(
                 'subscription_notifications must be a boolean.'
             )
-
-
-
-
-    
-
 
 class UserGroup:
     """A domain representation for user group."""
