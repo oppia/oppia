@@ -290,9 +290,9 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       const getPriority = (statusLabel: string) => {
         if (statusLabel === this.SUGGESTION_LABELS.rejected.text) {
           return 0;
-        } else if (statusLabel === this.SUGGESTION_LABELS.accepted.text) {
-          return 1;
         } else if (statusLabel === this.SUGGESTION_LABELS.review.text) {
+          return 1;
+        } else if (statusLabel === this.SUGGESTION_LABELS.accepted.text) {
           return 2;
         }
         return 3;

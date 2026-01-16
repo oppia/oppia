@@ -2853,11 +2853,11 @@ describe('Contributions and review component', () => {
       expect(summaryList[0].id).toBe('suggestion_2');
       expect(summaryList[0].labelText).toBe('Revisions Requested');
 
-      expect(summaryList[1].id).toBe('suggestion_3');
-      expect(summaryList[1].labelText).toBe('Accepted');
+      expect(summaryList[1].id).toBe('suggestion_1');
+      expect(summaryList[1].labelText).toBe('Awaiting review');
 
-      expect(summaryList[2].id).toBe('suggestion_1');
-      expect(summaryList[2].labelText).toBe('Awaiting review');
+      expect(summaryList[2].id).toBe('suggestion_3');
+      expect(summaryList[2].labelText).toBe('Accepted');
     }));
   });
 });
