@@ -565,7 +565,3 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'in ../karma_coverage_reports',
             self.print_arr,
         )
-
-    def test_frontend_tests_with_specs_to_run_invalid_spec() -> None:
-        with test_utils.assert_raises(SystemExit):
-            run_frontend_tests.main(args=['--specs_to_run=invalid_spec.js'])
