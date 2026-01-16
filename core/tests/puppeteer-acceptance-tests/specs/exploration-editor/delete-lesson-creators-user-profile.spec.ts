@@ -43,9 +43,7 @@ describe('Lesson Creator Profile Deletion', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it('should handle exploration ownership correctly after account deletion', async function () {
-    // 1. Setup Explorations as expEditor1.
-
-    // Exploration A: Published + Shared with expEditor2.
+    // 1. Setup Exploration A: Published + Shared with expEditor2.
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
     const positiveNumbersExpId = await expEditor1.getExplorationId();
@@ -53,34 +51,70 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.updateCardContent('Introduction to positive numbers');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
-    await expEditor1.publishExplorationWithMetadata(
+    await expEditor1.publishExplorationWithMetadataRobust(
       'Positive Numbers',
       'To teach positive numbers',
       'Mathematics'
     );
 
-    // Handle mobile-specific UI: Toggle the navbar menu if the viewport is at mobile width.
-    if (await expEditor1.isViewportAtMobileWidth()) {
-      await expEditor1.page.waitForSelector(
-        '.oppia-navbar-mobile-tabs-toggle',
-        {visible: true, timeout: 20000}
-      );
-      await expEditor1.clickOnElementWithSelector(
-        '.oppia-navbar-mobile-tabs-toggle'
-      );
+    // FIX: Close the publish modal.
+    const closeButton = await expEditor1.page.$(
+      'button.e2e-test-share-publish-close'
+    );
+    if (closeButton) {
+      const isVisible = await closeButton.boundingBox();
+      if (isVisible) {
+        await expEditor1.clickOnElementWithSelector(
+          'button.e2e-test-share-publish-close'
+        );
+        await expEditor1.page.waitForSelector(
+          'button.e2e-test-share-publish-close',
+          {hidden: true}
+        );
+      }
     }
 
-    // Navigate to Settings tab and handle viewport scrolling for roles.
-    await expEditor1.clickOnElementWithSelector(
-      'a.e2e-test-exploration-settings-tab'
-    );
-    await expEditor1.page.waitForSelector('.oppia-edit-roles-btn-container', {
-      visible: true,
-      timeout: 20000,
-    });
+    // Handle mobile-specific UI: Toggle the navbar menu only when necessary.
+    if (expEditor1.isViewportAtMobileWidth()) {
+      await expEditor1.page.waitForTimeout(2000);
+      // If 'Settings' tab is already visible we don't need to open mobile menu.
+      const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
+      const mobileToggleSelector = '.oppia-navbar-mobile-tabs-toggle';
+      const isSettingsVisible = await expEditor1.page
+        .$eval(
+          settingsTabSelector,
+          elem => !!(elem && (elem as HTMLElement).offsetParent)
+        )
+        .catch(() => false);
+      if (!isSettingsVisible) {
+        // Try clicking the standard mobile toggle if present.
+        const mobileToggle = await expEditor1.page.$(mobileToggleSelector);
+        if (mobileToggle) {
+          await expEditor1.page.waitForSelector(mobileToggleSelector, {
+            visible: true,
+            timeout: 5000,
+          });
+          await expEditor1.clickOnElementWithSelector(mobileToggleSelector);
+        } else {
+          // Fallback: try an editor-specific toggle.
+          const editorToggleSelector =
+            '.e2e-test-exploration-editor-mobile-tabs-toggle';
+          const editorToggle = await expEditor1.page.$(editorToggleSelector);
+          if (editorToggle) {
+            await expEditor1.page.waitForSelector(editorToggleSelector, {
+              visible: true,
+              timeout: 5000,
+            });
+            await expEditor1.clickOnElementWithSelector(editorToggleSelector);
+          }
+        }
+      }
+    }
 
-    // Ensure the role username input is visible and centered.
-    // This avoids "Element not clickable" errors caused by sticky UI overlaps.
+    // 2. Roles Assignment. Ensure Settings is open and Roles form is visible.
+    await expEditor1.ensureRolesFormIsOpen();
+
+    // Ensure input is centered.
     await expEditor1.page.waitForSelector('.e2e-test-role-username', {
       visible: true,
     });
@@ -91,50 +125,41 @@ describe('Lesson Creator Profile Deletion', function () {
       }
     });
 
-    await expEditor1.assignUserToManagerRole('expEditor2');
+    await expEditor1.assignUserToManagerRoleAfterFormOpen('expEditor2');
 
-    // Exploration B: Published.
+    // 3. Setup Exploration B (Published) and Exploration C (Draft).
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
     const negativeNumbersExpId = await expEditor1.getExplorationId();
-
-    await expEditor1.updateCardContent('Introduction to negative numbers');
+    await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
-    await expEditor1.publishExplorationWithMetadata(
+    await expEditor1.publishExplorationWithMetadataRobust(
       'Negative Numbers',
-      'To teach negative numbers',
+      'Math',
       'Mathematics'
     );
 
-    // Exploration C: Draft only.
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
     const wholeNumbersExpId = await expEditor1.getExplorationId();
-
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
 
-    // 2. The Account Deletion.
+    // 4. The Account Deletion.
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
     showMessage('Account deleted for expEditor1.');
 
-    // 3. Verification as expEditor2.
-
-    // A: Check Draft -> 404 error page.
+    // 5. Verification as expEditor2.
     await expEditor2.navigateToExplorationEditorPageById(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
-
-    // B: Check Published -> Still live.
     await expEditor2.navigateToExplorationEditorPageById(negativeNumbersExpId);
     await expEditor2.expectExplorationToBePublished();
-
-    // C: Check Shared -> expEditor2 still Manager.
     await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
     await expEditor2.expectUserToBeExplorationManager();
-  }, 600000); // 10-minute timeout for heavy test workflow.
+  }, 600000);
 
   afterAll(async function () {
     await UserFactory.closeAllBrowsers();

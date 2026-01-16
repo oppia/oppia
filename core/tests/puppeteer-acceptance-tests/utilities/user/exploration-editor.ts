@@ -2763,6 +2763,145 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Robust publish helper which preserves the original behavior of
+   * `publishExplorationWithMetadata` (unchanged) and adds a mobile-robust
+   * implementation that only affects invocations of the new function.
+   */
+  async publishExplorationWithMetadataRobust(
+    title: string,
+    goal: string,
+    category: string,
+    tags?: string
+  ): Promise<string> {
+    // For desktop, reuse the original function to avoid duplicating logic.
+    if (!this.isViewportAtMobileWidth()) {
+      return await this.publishExplorationWithMetadata(
+        title,
+        goal,
+        category,
+        tags
+      );
+    }
+
+    // Mobile-specific robust implementation (kept separate from the original
+    // function so we do not change existing behavior).
+    const publishExplorationMobile = async () => {
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
+      const element = await this.page.$(mobileNavbarOptions);
+      if (!element) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        // Allow a short time for the mobile nav animation to finish.
+        await this.page.waitForTimeout(300);
+      }
+
+      // Click the mobile changes dropdown with a fallback.
+      try {
+        await this.page.waitForSelector(mobileChangesDropdownSelector, {
+          visible: true,
+          timeout: 5000,
+        });
+        try {
+          await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
+        } catch (err) {
+          showMessage(
+            'Click on mobile changes dropdown failed, attempting in-page click fallback.'
+          );
+          await this.page.evaluate(() => {
+            const el = document.querySelector(
+              'div.e2e-test-mobile-changes-dropdown'
+            ) as HTMLElement | null;
+            if (el) {
+              el.scrollIntoView({block: 'center', inline: 'center'});
+              ['mousedown', 'mouseup', 'click'].forEach(type => {
+                const ev = new MouseEvent(type, {
+                  bubbles: true,
+                  cancelable: true,
+                  view: window,
+                });
+                el.dispatchEvent(ev);
+              });
+            }
+          });
+        }
+      } catch (e) {
+        showMessage(
+          'Mobile changes dropdown did not appear; attempting alternate selector #discardButtonPopup.'
+        );
+        const alt = await this.page.$('#discardButtonPopup');
+        if (alt) {
+          await this.clickOnElement(alt);
+        } else {
+          throw new Error('Mobile changes dropdown not found.');
+        }
+      }
+
+      await this.page.waitForSelector(mobilePublishButtonSelector, {
+        visible: true,
+        timeout: 10000,
+      });
+      await this.clickOnElementWithSelector(mobilePublishButtonSelector);
+    };
+
+    const fillExplorationMetadataDetails = async () => {
+      await this.clickOnElementWithSelector(explorationTitleInput);
+      await this.typeInInputField(explorationTitleInput, title);
+      await this.clickOnElementWithSelector(explorationGoalInput);
+      await this.typeInInputField(explorationGoalInput, goal);
+      await this.clickOnElementWithSelector(explorationCategoryDropdown);
+      await this.clickOnElementWithText(category);
+      if (tags) {
+        await this.typeInInputField(tagsField, tags);
+      }
+    };
+
+    const confirmPublish = async (): Promise<string> => {
+      await this.clickOnElementWithSelector(saveExplorationChangesButton);
+      await this.waitForPageToFullyLoad();
+      await this.page.waitForSelector(explorationConfirmPublishButton, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(explorationConfirmPublishButton);
+      await this.page.waitForSelector(explorationIdElement);
+      const explorationIdUrl = await this.page.$eval(
+        explorationIdElement,
+        element => (element as HTMLElement).innerText
+      );
+      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
+      await this.waitForElementToStabilize(closePublishedPopUpButton);
+      await this.clickOnElementWithSelector(closePublishedPopUpButton);
+      await this.expectElementToBeVisible(closePublishedPopUpButton, false);
+
+      if (!explorationId) {
+        throw new Error('Failed to get exploration ID.');
+      }
+      return explorationId;
+    };
+
+    await publishExplorationMobile();
+    await fillExplorationMetadataDetails();
+
+    try {
+      return await confirmPublish();
+    } catch (error) {
+      showMessage(
+        'Failed to publish the exploration (robust flow).\n' + error.stack
+      );
+      const errorSavingExplorationElement = await this.page.$(
+        errorSavingExplorationModal
+      );
+      if (errorSavingExplorationElement) {
+        await this.clickOnElementWithSelector(errorSavingExplorationModal);
+        await this.page.waitForNavigation({
+          waitUntil: ['load', 'networkidle0'],
+        });
+      }
+      await publishExplorationMobile();
+      return await confirmPublish();
+    }
+  }
+
+  /**
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
@@ -3446,6 +3585,68 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Ensures the Roles form is open in the Settings tab.
+   * This does not modify any prebuilt functions; it uses existing helpers
+   * and adds resilient fallbacks for mobile/constrained viewports.
+   */
+  async ensureRolesFormIsOpen(): Promise<void> {
+    const rolesHeaderSelector = '.e2e-test-roles-header';
+    const usernameSelector = '.e2e-test-role-username';
+
+    // Ensure Settings tab is visible and Roles section is expanded (on mobile).
+    await this.navigateToSettingsTab();
+    if (this.isViewportAtMobileWidth()) {
+      await this.expandSettingsTabSection('Roles');
+    }
+
+    await this.page.waitForSelector(rolesHeaderSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+
+    // The edit button opens the roles form via Angular handler. Try a normal
+    // click first, then fallback to dispatching low-level mouse events if the
+    // username input does not appear.
+    await this.page.waitForSelector(editRolesButtonSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOnElementWithSelector(editRoleButton);
+
+    try {
+      await this.page.waitForSelector(usernameSelector, {
+        visible: true,
+        timeout: 3000,
+      });
+      return;
+    } catch (e) {
+      showMessage(
+        'Edit roles click did not open the form; performing in-page click fallback.'
+      );
+      await this.page.evaluate(() => {
+        const el = document.querySelector(
+          '.e2e-test-edit-roles'
+        ) as HTMLElement | null;
+        if (el) {
+          el.scrollIntoView({block: 'center', inline: 'center'});
+          ['mousedown', 'mouseup', 'click'].forEach(type => {
+            const ev = new MouseEvent(type, {
+              bubbles: true,
+              cancelable: true,
+              view: window,
+            });
+            el.dispatchEvent(ev);
+          });
+        }
+      });
+      await this.page.waitForSelector(usernameSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    }
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3466,6 +3667,32 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as manager role.`);
+  }
+
+  /**
+   * Assigns a role of manager to any guest user assuming the Roles form is
+   * already open and the username input is visible. This avoids re-clicking the
+   * edit button when it may be unreliable in constrained viewports.
+   */
+  async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
+    const usernameSelector = '.e2e-test-role-username';
+    await this.page.waitForSelector(usernameSelector, {
+      visible: true,
+      timeout: 5000,
+    });
+    await this.clickOnElementWithSelector(addUsernameInputBox);
+    await this.typeInInputField(addUsernameInputBox, username);
+    await this.clickOnElementWithSelector(addRoleDropdown);
+    const [managerOption] = await this.page.$x(
+      "//mat-option[contains(., 'Manager (can edit permissions)')]"
+    );
+    await managerOption.click();
+    await this.page.waitForSelector(tagFilterDropdownSelector, {hidden: true});
+    await this.clickOnElementWithSelector(saveRoleButton);
+    await this.page.waitForSelector(saveRoleButton, {hidden: true});
+    showMessage(
+      `${username} has been added as manager role (after form open).`
+    );
   }
 
   /**
