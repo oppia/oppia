@@ -18,7 +18,7 @@
       <div class="lesson-card-title-container mt-1 e2e-test-lesson-title">
         <p class="e2e-test-lesson-card-title lesson-card-title mb-0"> {{ title }} </p>
       </div>
-      <p class="lesson-card-topic mb-0"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
+      <p class="lesson-card-topic mb-0" *ngIf="lessonTopic"> {{ 'I18N_LEARNER_DASHBOARD_CARD_TOPIC' | translate: {cardTopic: lessonTopic} }} </p>
       <p class="lesson-card-desc mb-0"> {{ desc.charAt(0).toUpperCase() + desc.slice(1) }} </p>
     </div>
     <div class="align-items-center d-flex justify-content-between mt-2">
