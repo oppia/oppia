@@ -332,12 +332,16 @@ class LearnerDashboardExplorationsProgressHandler(
                 else:
                     visited_cards_count = 0
                     assert self.user_id is not None
-                    last_state = learner_progress_services.get_last_played_state_name(
-                        self.user_id, exp_id
+                    last_state = (
+                        learner_progress_services.get_last_played_state_name(
+                            self.user_id, exp_id
+                        )
                     )
 
                     if last_state is not None and last_state in state_bfs_order:
-                        visited_cards_count = state_bfs_order.index(last_state) + 1
+                        visited_cards_count = (
+                            state_bfs_order.index(last_state) + 1
+                        )
 
                 progress_percent = (
                     int((visited_cards_count * 100) / total_cards_count)
