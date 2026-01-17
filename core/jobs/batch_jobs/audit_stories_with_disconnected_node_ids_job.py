@@ -27,9 +27,9 @@ from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
-from typing import List, Optional , Tuple , TypedDict
 
 import apache_beam as beam
+from typing import List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -39,7 +39,10 @@ if MYPY:  # pragma: no cover
     [models.Names.TOPIC, models.Names.STORY]
 )
 
+
 class StoryNodeDict(TypedDict):
+    """Class defining the node object."""
+
     id: str
     title: str
     description: str
@@ -58,10 +61,14 @@ class StoryNodeDict(TypedDict):
     first_publication_date_msecs: Optional[float]
     unpublishing_reason: Optional[str]
 
+
 class StoryContentsDict(TypedDict):
+    """Class defining the StoryContent Dict."""
+
     nodes: List[StoryNodeDict]
     initial_node_id: str
     next_node_id: str
+
 
 class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
     """Class to audit stories with disconnected node ids."""
@@ -77,23 +84,25 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
             >> beam.Map(lambda story: (story.id, story.story_contents))
         )
 
-        # 2. Pass that PCollection into your DoFn
-        stories_with_disconnected_node_pCollection = (
+        stories_with_disconnected_node = (
             all_stories_info_pcoll
-            | "Find story ids with disconnected nodes"
+            | 'Find story ids with disconnected nodes'
             >> beam.ParDo(CheckDisconnectedNodeIds())
         )
 
-        return stories_with_disconnected_node_pCollection
+        return stories_with_disconnected_node
+
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
 # assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
 # cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
-class CheckDisconnectedNodeIds(beam.DoFn): # type: ignore[misc]
+class CheckDisconnectedNodeIds(beam.DoFn):  # type: ignore[misc]
     """DoFn to check for disconnected node_ids in stories."""
 
-    def process(self, element:Tuple[str, StoryContentsDict ]):
+    def process(
+        self, element: Tuple[str, StoryContentsDict]
+    ) -> Iterable[job_run_result.JobRunResult]:
         story_id, story_contents = element
 
         nodes = story_contents['nodes']

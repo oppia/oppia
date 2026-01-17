@@ -165,23 +165,28 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
 
     def test_migrate_story_contents(self) -> None:
         changelist = [
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_2,
-                'title': 'Title 2'
-            }),
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': (
-                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-                'node_id': self.NODE_ID_2,
-                'old_value': None,
-                'new_value': self.EXP_ID_2
-            })
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_ADD_STORY_NODE,
+                    'node_id': self.NODE_ID_2,
+                    'title': 'Title 2',
+                }
+            ),
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': self.NODE_ID_2,
+                    'old_value': None,
+                    'new_value': self.EXP_ID_2,
+                }
+            ),
         ]
         story_services.update_story(
-            self.USER_ID, self.story_id, changelist,
-            'Added node.')
+            self.USER_ID, self.story_id, changelist, 'Added node.'
+        )
         story_id = self.story_id
         story_model = story_models.StoryModel.get(story_id)
         versioned_story_contents: story_domain.VersionedStoryContentsDict = {

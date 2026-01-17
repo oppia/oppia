@@ -1941,8 +1941,7 @@ class Story:
 
     @classmethod
     def _convert_story_contents_v5_dict_to_v6_dict(
-        cls,
-        story_contents_dict: StoryContentsDict
+        cls, story_contents_dict: StoryContentsDict
     ) -> StoryContentsDict:
         """Converts v5 Story Contents schema to the modern v6 schema.
         v6 schema fixes story node's destination_node_ids and relinks disconnected nodes.
