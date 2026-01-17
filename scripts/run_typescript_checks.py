@@ -47,6 +47,7 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/components/interaction-display/interaction-display.component.ts',
     'core/templates/components/language-banner/language-banner.component.spec.ts',
     'core/templates/components/oppia-angular-root.component.spec.ts',
+    'core/templates/components/oppia-angular-root.component.ts',
     'core/templates/components/question-directives/question-editor/question-editor.component.spec.ts',
     'core/templates/components/question-directives/question-editor/question-editor.component.ts',
     'core/templates/components/question-directives/questions-list/questions-list.component.spec.ts',
