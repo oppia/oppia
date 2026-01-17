@@ -93,6 +93,84 @@
   </div>
 </mat-card>
 
+<mat-card class="oppia-page-card oppia-long-text-card">
+  <h3>Autogenerate Voiceovers for Exploration</h3>
+
+  <p>
+    Regenerates the voiceovers for an exploration’s content in the selected language-accent pair.
+  </p>
+  <div class="exploration-data-request-container" *ngIf="!isExplorationDataResponseContainerShown">
+    <div class="exploration-data-request-input-container">
+      <span class="exploration-id-label">Exploration ID: </span>
+
+      <input class="exploration-id-input" [(ngModel)]="explorationIDForVoiceoverRegeneration" type="text">
+
+      <button class="btn btn-primary exploration-data-request-button"
+              *ngIf="!explorationDataResponseForVoiceoverRegeneration"
+              (click)="fetchExplorationDataForVoiceoverRegeneration()"
+              [disabled]="explorationIDForVoiceoverRegeneration?.length === 0">
+        <span *ngIf="!explorationDataForVoiceoverRegenerationIsLoading">
+          Get Data
+        </span>
+        <mat-spinner color="accent" class="mx-auto" [diameter]="25" *ngIf="explorationDataForVoiceoverRegenerationIsLoading"></mat-spinner>
+      </button>
+
+      <button class="btn btn-primary" *ngIf="explorationDataResponseForVoiceoverRegeneration">Reset</button>
+    </div>
+  </div>
+
+  <div class="exploration-data-response-row-container" *ngIf="isExplorationDataResponseContainerShown">
+    <span class="exploration-id-label">Exploration ID: </span>
+    <span>{{explorationIDForVoiceoverRegeneration}}</span>
+    <button class="btn btn-secondary exploration-data-close-button" (click)="closeExpDataResponseContainer()">Close</button>
+  </div>
+
+  <div class="exploration-data-response-container" *ngIf="isExplorationDataResponseContainerShown && !explorationDataResponseForVoiceoverRegeneration">
+
+    <div class="exploration-data-response-row-container">
+      <span class="exploration-title-label">Title:</span>
+      <span>{{explorationTitleForVoiceoverRegeneration}}</span>
+    </div>
+
+    <div class="exploration-data-response-row-container">
+      <span class="language-accent-code-label">Language Accent Code:</span>
+      <div>
+        <mat-form-field>
+          <mat-label>Language Accent pair</mat-label>
+          <mat-select [formControl]="languageAccentControl"
+                      (selectionChange)="updateLanguageAccentForVoiceoverRegenerationChoice($event.value)"
+                      class="e2e-test-language-accent-for-voiceover-regeneration-selector">
+            <mat-option *ngFor="let choice of autogeneratableLanguageAccentCodes"
+                        [value]="choice">
+              {{languageAccentCodesToDescriptionsMasterList[choice]}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div>
+      <p>
+        <i>
+          <strong>Note:</strong> This process incurs a cost. Assuming this exploration contains 10,000 characters in English, the total cost of regenerating voiceovers is approximately $0.16 USD.
+        </i>
+      </p>
+    </div>
+
+    <div>
+      <button class="btn btn-primary generate-voiceover-button"
+              (click)="generateVoiceoversForExploration()"
+              [disabled]="!selectedLanguageAccentForExplorationVoiceoverRegeneration">
+              Generate
+      </button>
+    </div>
+  </div>
+  <div *ngIf="explorationDataResponseForVoiceoverRegeneration && explorationIDForVoiceoverRegeneration.length > 0"
+       class="exploration-data-response-message-container">
+    <p>{{explorationDataResponseForVoiceoverRegeneration}}</p>
+  </div>
+</mat-card>
+
 <mat-card class="oppia-page-card oppia-long-text-card automatic-voiceover-regeneration-record-card">
   <h3>Automatic voiceover updates</h3>
 
@@ -140,11 +218,11 @@
 
   </div>
 
-  <div *ngIf="fetchingrenegenratedVoiceoverData">
+  <div *ngIf="fetchingRegeneratedVoiceoverData">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   </div>
 
-  <div *ngIf="!fetchingrenegenratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
+  <div *ngIf="!fetchingRegeneratedVoiceoverData && !cloudTaskRunList.length && !regenerationRecordsErrorMessage">
     <p class="info-text">
       <i>No records found for the selected date range.</i>
     </p>
@@ -197,9 +275,52 @@
   </div>
 </mat-card>
 
+<div class="information-toast" *ngIf="toastMessage.length > 0">
+  <p>
+    {{toastMessage}}
+  </p>
+</div>
+
 <style>
-  .task-run-data {
-    white-space: pre-wrap;
+  .generate-voiceover-button {
+    color: #fff;
+    float: right;
+  }
+  .exploration-id-label, .exploration-title-label,  .language-accent-code-label {
+    font-weight: bold;
+    width: 30%;
+  }
+  .exploration-data-request-button {
+    margin-left: 10px;
+    width: 10%;
+  }
+  .exploration-data-request-input-container, .exploration-data-response-row-container {
+    align-items: center;
+    display: flex;
+    margin-bottom: 5px;
+  }
+  .exploration-data-close-button {
+    margin-left: 50%;
+  }
+  .exploration-data-response-message-container {
+    color: #f00;
+  }
+  .information-toast {
+    background-color: #4caf50;
+    border-radius: 8px;
+    bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+    margin: 20px;
+    padding: 12px 16px;
+    position: fixed;
+    right: 20px;
+    transition: opacity 0.8s ease;
+    width: 300px;
+    z-index: 9999;
+  }
+  .information-toast.fade-out {
+    opacity: 0;
   }
   .error-icon {
     color: red;

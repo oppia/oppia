@@ -2577,6 +2577,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL: Final = 'author@example.com'
+    REVIEWER_EMAIL: Final = 'reviewer@example.com'
 
     # Needs to be 12 characters long.
     SKILL_ID: Final = 'skill1234567'
@@ -2587,8 +2588,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         super().setUp()
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
         self.save_new_skill(
             self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION
@@ -2994,6 +2997,56 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             },
             csrf_token=csrf_token,
         )
+        self.logout()
+
+    def test_update_question_suggestion_with_misconception_changes(
+        self,
+    ) -> None:
+        self.login(self.AUTHOR_EMAIL)
+        suggestions = self.get_json(
+            '%s?author_id=%s'
+            % (feconf.SUGGESTION_LIST_URL_PREFIX, self.author_id)
+        )['suggestions']
+        suggestion_id = suggestions[0]['suggestion_id']
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        assert isinstance(suggestion, suggestion_registry.SuggestionAddQuestion)
+        self.logout()
+
+        self.login(self.REVIEWER_EMAIL)
+        # Give reviewer permission to review questions (if not already done in setUp, ensuring it here)
+        user_services.allow_user_to_review_question(self.reviewer_id)
+
+        new_inapplicable_ids = ['skillid12345-2']
+        question_dict = suggestion.change_cmd.question_dict
+        question_state_data = question_dict['question_state_data']
+        next_content_id_index = question_dict['next_content_id_index']
+
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s/%s'
+            % (feconf.UPDATE_QUESTION_SUGGESTION_URL_PREFIX, suggestion_id),
+            {
+                'skill_difficulty': 0.3,
+                'question_state_data': question_state_data,
+                'next_content_id_index': next_content_id_index,
+                'inapplicable_skill_misconception_ids': new_inapplicable_ids,
+            },
+            csrf_token=csrf_token,
+        )
+
+        updated_suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_id
+        )
+        assert isinstance(
+            updated_suggestion, suggestion_registry.SuggestionAddQuestion
+        )
+        self.assertEqual(
+            updated_suggestion.change_cmd.question_dict[
+                'inapplicable_skill_misconception_ids'
+            ],
+            new_inapplicable_ids,
+        )
+
         self.logout()
 
 
