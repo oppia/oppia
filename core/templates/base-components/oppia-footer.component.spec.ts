@@ -34,9 +34,9 @@ import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-bac
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {OppiaFooterComponent} from './oppia-footer.component';
-import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
 
@@ -55,7 +55,9 @@ class MockRouter {
 }
 
 class MockNgbModal {
-  open = jasmine.createSpy('open').and.returnValue({componentInstance: {}});
+  open(): {componentInstance: Object} {
+    return {componentInstance: {}};
+  }
 }
 
 describe('OppiaFooterComponent', () => {
@@ -63,9 +65,9 @@ describe('OppiaFooterComponent', () => {
   let fixture: ComponentFixture<OppiaFooterComponent>;
   let mailingListBackendApiService: MailingListBackendApiService;
   let alertsService: AlertsService;
-  let mockWindowRef: MockWindowRef;
-  let ngbModal: MockNgbModal;
   let siteAnalyticsService: SiteAnalyticsService;
+  let mockWindowRef: MockWindowRef;
+  let ngbModal: NgbModal;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -95,8 +97,8 @@ describe('OppiaFooterComponent', () => {
     alertsService = TestBed.inject(AlertsService);
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
-    ngbModal = TestBed.inject(NgbModal);
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    ngbModal = TestBed.inject(NgbModal);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -124,7 +126,7 @@ describe('OppiaFooterComponent', () => {
   });
 
   it('should return false when email address is null', () => {
-    component.emailAddress = null;
+    (component as unknown as {emailAddress: null}).emailAddress = null;
     expect(component.validateEmailAddress()).toBeFalse();
   });
 
@@ -167,8 +169,9 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
 
-    const input: HTMLInputElement =
-      fixture.nativeElement.querySelector('input');
+    const input = fixture.nativeElement.querySelector(
+      'input'
+    ) as HTMLInputElement;
     input.value = 'anotherEmail@example.com';
     input.dispatchEvent(new Event('input'));
     tick();
@@ -191,7 +194,7 @@ describe('OppiaFooterComponent', () => {
 
   it('should subscribe with null name when name is not provided', fakeAsync(() => {
     component.emailAddress = 'valid@example.com';
-    component.name = null;
+    (component as unknown as {name: null}).name = null;
     spyOn(alertsService, 'addInfoMessage');
     spyOn(
       mailingListBackendApiService,
@@ -223,6 +226,9 @@ describe('OppiaFooterComponent', () => {
       mailingListBackendApiService,
       'subscribeUserToMailingList'
     ).and.returnValue(Promise.resolve(true));
+    spyOn(ngbModal, 'open').and.returnValue({
+      componentInstance: {},
+    } as NgbModalRef);
 
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeFalse();
@@ -299,7 +305,7 @@ describe('OppiaFooterComponent', () => {
     expect(component.emailDuplicated).toBeFalse();
   }));
 
-  it('should show newsletter warning if user tries to subscribe to newsletter with already used email address', fakeAsync(() => {
+  it('should show newsletter warning if email is already used', fakeAsync(() => {
     component.emailAddress = 'validEmail@example.com';
     component.name = 'validName';
     spyOn(
@@ -325,23 +331,30 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
   }));
+
   it('should register About footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.onAboutLinkClick();
+    component.navigateToAboutPage();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/about');
   });
 
   it('should register Teach footer link click event', () => {
     spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    expect(mockWindowRef.nativeWindow.location.href).toBe('');
 
-    component.onTeachLinkClick();
+    component.navigateToTeachPage();
 
     expect(
       siteAnalyticsService.registerClickFooterButtonEvent
     ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+
+    expect(mockWindowRef.nativeWindow.location.href).toBe('/teach');
   });
 });

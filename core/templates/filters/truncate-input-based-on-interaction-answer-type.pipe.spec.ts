@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Unit Test for TruncateInputBasedOnInteractionAnswerType
- *  Pipe for Oppia.
+ * Pipe for Oppia.
  */
 
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from './truncate-input-based-on-interaction-answer-type.pipe';
@@ -42,8 +42,11 @@ describe('Testing TruncateInputBasedOnInteractionAnswerTypePipe', () => {
       'Hey o...'
     );
     expect(pipe.transform(data, 'CodeRepl', 8)).toBe('Hey o...');
+
     expect(() => {
-      pipe.transform(data, 'ImageClickInput', 8);
-    }).toThrowError('Unknown interaction answer type');
+      pipe.transform(data, 'ItemSelectionInput', 8);
+    }).toThrowError(
+      'Unknown interaction answer type: SetOfTranslatableHtmlContentIds'
+    );
   });
 });

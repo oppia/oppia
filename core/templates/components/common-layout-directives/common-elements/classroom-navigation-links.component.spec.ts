@@ -35,10 +35,11 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 describe('ClassroomNavigationLinksComponent', () => {
   let component: ClassroomNavigationLinksComponent;
   let fixture: ComponentFixture<ClassroomNavigationLinksComponent>;
-  let classroomBackendApiService: ClassroomBackendApiService;
-  let assetsBackendApiService: AssetsBackendApiService;
+  let classroomBackendApiService: jasmine.SpyObj<ClassroomBackendApiService>;
+  let assetsBackendApiService: jasmine.SpyObj<AssetsBackendApiService>;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let siteAnalyticsService: SiteAnalyticsService;
+  let windowRef: WindowRef;
 
   const dummyClassroomSummaries = [
     {
@@ -60,10 +61,10 @@ describe('ClassroomNavigationLinksComponent', () => {
       thumbnail_bg_color: 'transparent',
     },
     {
-      classroom_id: 'histroy',
-      name: 'histroy',
+      classroom_id: 'history',
+      name: 'history',
       url_fragment: 'history',
-      teaser_text: 'Learn histroy',
+      teaser_text: 'Learn history',
       is_published: true,
       thumbnail_filename: 'thumbnail.svg',
       thumbnail_bg_color: 'transparent',
@@ -96,7 +97,9 @@ describe('ClassroomNavigationLinksComponent', () => {
           provide: WindowRef,
           useValue: {
             nativeWindow: {
-              location: {pathname: '/learn'},
+              location: {
+                pathname: '/learn',
+              } as unknown as Location,
               gtag: jasmine.createSpy('gtag'),
             },
           },
@@ -104,9 +107,14 @@ describe('ClassroomNavigationLinksComponent', () => {
       ],
     }).compileComponents();
 
-    classroomBackendApiService = TestBed.inject(ClassroomBackendApiService);
-    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    classroomBackendApiService = TestBed.inject(
+      ClassroomBackendApiService
+    ) as jasmine.SpyObj<ClassroomBackendApiService>;
+    assetsBackendApiService = TestBed.inject(
+      AssetsBackendApiService
+    ) as jasmine.SpyObj<AssetsBackendApiService>;
     siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   beforeEach(() => {
@@ -126,7 +134,6 @@ describe('ClassroomNavigationLinksComponent', () => {
     component.ngOnInit();
     tick();
 
-    // It should store all public classrooms.
     expect(component.classroomSummaries.length).toEqual(3);
     expect(component.isLoading).toBeFalse();
   }));
@@ -193,8 +200,9 @@ describe('ClassroomNavigationLinksComponent', () => {
   });
 
   it('should not load classroom summaries if currentUrl is signup', fakeAsync(() => {
-    const windowRef = TestBed.inject(WindowRef) as WindowRef;
-    windowRef.nativeWindow.location.pathname = '/signup';
+    (
+      windowRef.nativeWindow.location as unknown as {pathname: string}
+    ).pathname = '/signup';
 
     component.ngOnInit();
     tick();

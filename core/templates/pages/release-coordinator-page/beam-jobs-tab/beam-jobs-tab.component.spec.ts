@@ -25,6 +25,7 @@ import {
   TestBed,
   tick,
   waitForAsync,
+  discardPeriodicTasks,
 } from '@angular/core/testing';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -61,6 +62,7 @@ describe('Beam Jobs Tab Component', () => {
   let fixture: ComponentFixture<BeamJobsTabComponent>;
   let component: BeamJobsTabComponent;
   let loader: HarnessLoader;
+  let rootLoader: HarnessLoader;
 
   let backendApiService: ReleaseCoordinatorBackendApiService;
 
@@ -118,7 +120,7 @@ describe('Beam Jobs Tab Component', () => {
         },
       ],
     });
-    // NOTE: This allows tests to compile the DOM of each dialog component.
+
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
         entryComponents: [
@@ -136,9 +138,9 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture = TestBed.createComponent(BeamJobsTabComponent);
     component = fixture.componentInstance;
-    // NOTE: This must use .documentRootLoader(), otherwise the DOM elements
-    // within the dialog components won't be found.
-    loader = TestbedHarnessEnvironment.documentRootLoader(fixture);
+
+    loader = TestbedHarnessEnvironment.loader(fixture);
+    rootLoader = TestbedHarnessEnvironment.documentRootLoader(fixture);
   }));
 
   it(
@@ -196,33 +198,36 @@ describe('Beam Jobs Tab Component', () => {
     })
   );
 
-  it('should update the table when the job name input changes', async () => {
+  it('should update the table when the job name input changes', fakeAsync(async () => {
     const input = await loader.getHarness(MatInputHarness);
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const table = await loader.getHarness(MatTableHarness);
 
     await input.setValue('Fo');
+    tick(500);
     fixture.detectChanges();
 
     expect(await autocomplete.getOptions()).toHaveSize(1);
     expect(await table.getRows()).toHaveSize(1);
 
     await input.setValue('Fob');
+    tick(500);
     fixture.detectChanges();
 
     expect(await autocomplete.getOptions()).toHaveSize(0);
     expect(await table.getRows()).toHaveSize(0);
 
     await input.setValue('Ba');
+    tick(500);
     fixture.detectChanges();
 
     expect(await autocomplete.getOptions()).toHaveSize(2);
     expect(await table.getRows()).toHaveSize(2);
 
-    component.ngOnDestroy();
-  });
+    discardPeriodicTasks();
+  }));
 
-  it('should deselect a job after changing the input', async () => {
+  it('should deselect a job after changing the input', fakeAsync(async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -230,19 +235,21 @@ describe('Beam Jobs Tab Component', () => {
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
+    tick(500);
     fixture.detectChanges();
 
     expect(component.selectedJob).toEqual(fooJob);
 
     await input.setValue('FooJo');
+    tick(500);
     fixture.detectChanges();
 
     expect(component.selectedJob).toBeUndefined();
 
-    component.ngOnDestroy();
-  });
+    discardPeriodicTasks();
+  }));
 
-  it('should add a new job after starting a new job run', async () => {
+  it('should add a new job after starting a new job run', fakeAsync(async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -261,6 +268,7 @@ describe('Beam Jobs Tab Component', () => {
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
+    tick(500);
     fixture.detectChanges();
 
     expect(component.beamJobRuns.value).not.toContain(newPendingFooJob);
@@ -271,25 +279,28 @@ describe('Beam Jobs Tab Component', () => {
       })
     );
     await startNewButton.click();
+    fixture.detectChanges();
+    tick();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect(await rootLoader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
 
-    const confirmButton = await loader.getHarness(
+    const confirmButton = await rootLoader.getHarness(
       MatButtonHarness.with({
         text: 'Start New Job',
       })
     );
     await confirmButton.click();
-    await fixture.whenStable();
+    fixture.detectChanges();
+    tick();
 
     expect(startNewJobSpy).toHaveBeenCalledWith(fooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect(await rootLoader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).toContain(newPendingFooJob);
 
-    component.ngOnDestroy();
-  });
+    discardPeriodicTasks();
+  }));
 
-  it('should cancel the job and update its status', async () => {
+  it('should cancel the job and update its status', fakeAsync(async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -308,6 +319,7 @@ describe('Beam Jobs Tab Component', () => {
 
     await input.setValue('FooJob');
     await autocomplete.selectOption({text: 'FooJob'});
+    tick(500);
     fixture.detectChanges();
 
     expect(component.beamJobRuns.value).toContain(runningFooJob);
@@ -319,26 +331,29 @@ describe('Beam Jobs Tab Component', () => {
       })
     );
     await cancelButton.click();
+    fixture.detectChanges();
+    tick();
 
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
+    expect(await rootLoader.getAllHarnesses(MatDialogHarness)).toHaveSize(1);
 
-    const confirmButton = await loader.getHarness(
+    const confirmButton = await rootLoader.getHarness(
       MatButtonHarness.with({
         text: 'Cancel this Job',
       })
     );
     await confirmButton.click();
-    await fixture.whenStable();
+    fixture.detectChanges();
+    tick();
 
     expect(cancelBeamJobRunSpy).toHaveBeenCalledWith(runningFooJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect(await rootLoader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
     expect(component.beamJobRuns.value).not.toContain(runningFooJob);
     expect(component.beamJobRuns.value).toContain(cancellingFooJob);
 
-    component.ngOnDestroy();
-  });
+    discardPeriodicTasks();
+  }));
 
-  it('should show the job output', async () => {
+  it('should show the job output', fakeAsync(async () => {
     const autocomplete = await loader.getHarness(MatAutocompleteHarness);
     const input = await loader.getHarness(MatInputHarness);
 
@@ -349,6 +364,7 @@ describe('Beam Jobs Tab Component', () => {
 
     await input.setValue('BarJob');
     await autocomplete.selectOption({text: 'BarJob'});
+    tick(500);
     fixture.detectChanges();
 
     const viewOutputButton = await loader.getHarness(
@@ -357,17 +373,21 @@ describe('Beam Jobs Tab Component', () => {
       })
     );
     await viewOutputButton.click();
+    fixture.detectChanges();
+    tick();
 
-    const dialog = await loader.getHarness(MatDialogHarness);
+    const dialog = await rootLoader.getHarness(MatDialogHarness);
     const dialogHost = await dialog.host();
     expect(await dialogHost.text()).toContain('Lorem Ipsum');
     await dialog.close();
+    fixture.detectChanges();
+    tick();
 
     expect(getBeamJobRunOutputSpy).toHaveBeenCalledWith(doneBarJob);
-    expect(await loader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
+    expect(await rootLoader.getAllHarnesses(MatDialogHarness)).toHaveSize(0);
 
-    component.ngOnDestroy();
-  });
+    discardPeriodicTasks();
+  }));
 
   it('should refresh the beam job runs every 15 seconds', fakeAsync(() => {
     const getBeamJobRunsSpy = spyOn(
@@ -377,16 +397,14 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture.detectChanges();
 
-    // The first time is called by ngOnInit().
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
     fixture.detectChanges();
 
-    // The second time is called out by our interval refresh timer.
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(2);
 
-    component.ngOnDestroy();
+    discardPeriodicTasks();
   }));
 
   it('should not refresh beam jobs if all jobs are terminal', fakeAsync(() => {
@@ -397,15 +415,13 @@ describe('Beam Jobs Tab Component', () => {
 
     fixture.detectChanges();
 
-    // The first time is called by ngOnInit().
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
     tick(BeamJobsTabComponent.BEAM_JOB_RUNS_REFRESH_INTERVAL_MSECS);
     fixture.detectChanges();
 
-    // The second time should not be called out, because all jobs are terminal.
     expect(getBeamJobRunsSpy).toHaveBeenCalledTimes(1);
 
-    component.ngOnDestroy();
+    discardPeriodicTasks();
   }));
 });

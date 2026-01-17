@@ -21,6 +21,7 @@
  */
 
 import {Component, ElementRef, Input, OnDestroy, OnInit} from '@angular/core';
+import {SafeResourceUrl} from '@angular/platform-browser';
 import {AppConstants} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {ImageClickAnswer} from 'interactions/answer-defs';
@@ -51,8 +52,8 @@ interface RectangleRegion extends ImagePoint {
 }
 
 interface ImagePoint {
-  left: number;
-  top: number;
+  left: number | null;
+  top: number | null;
 }
 
 @Component({
@@ -61,28 +62,29 @@ interface ImagePoint {
   styleUrls: [],
 })
 export class InteractiveImageClickInput implements OnInit, OnDestroy {
-  @Input() imageAndRegionsWithValue: string;
-  @Input() highlightRegionsOnHoverWithValue: string;
-  @Input() lastAnswer: ImageClickAnswer;
-  imageAndRegions: ImageWithRegions;
+  @Input() imageAndRegionsWithValue!: string;
+  @Input() highlightRegionsOnHoverWithValue!: string;
+  @Input() lastAnswer!: ImageClickAnswer | null;
+  imageAndRegions!: ImageWithRegions;
   highlightRegionsOnHover: boolean = false;
   componentSubscriptions = new Subscription();
   currentlyHoveredRegions: string[] = [];
-  filepath: string;
-  imageUrl: string;
-  mouseX: number;
-  mouseY: number;
-  interactionIsActive: boolean;
-  loadingIndicatorUrl: string;
-  isLoadingIndicatorShown: boolean;
-  isTryAgainShown: boolean;
-  dimensions: ImageDimensions;
-  imageContainerStyle: {height: string; width?: string};
-  loadingIndicatorStyle: {height: string; width?: string};
-  allRegions: LabeledRegion[];
+  filepath!: string;
+  imageUrl!: string | SafeResourceUrl;
+  mouseX!: number;
+  mouseY!: number;
+  interactionIsActive!: boolean;
+  loadingIndicatorUrl!: string;
+  isLoadingIndicatorShown: boolean = false;
+  isTryAgainShown: boolean = false;
+  dimensions!: ImageDimensions;
+  imageContainerStyle!: {height: string; width?: string};
+  loadingIndicatorStyle!: {height: string; width?: string};
+  allRegions!: LabeledRegion[];
   dotCursorCoordinateX: number = 0;
   dotCursorCoordinateY: number = 0;
   usingMobileDevice: boolean = false;
+
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private pageContextService: PageContextService,
@@ -98,14 +100,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     private svgSanitizerService: SvgSanitizerService
   ) {}
 
-  private _getAttrs() {
+  private _getAttrs(): Record<string, string> {
     return {
       imageAndRegionsWithValue: this.imageAndRegionsWithValue,
       highlightRegionsOnHoverWithValue: this.highlightRegionsOnHoverWithValue,
     };
   }
 
-  private _isMouseInsideRegion(regionArea): boolean {
+  private _isMouseInsideRegion(regionArea: number[][]): boolean {
     return (
       this.mouseX >= regionArea[0][0] &&
       this.mouseX <= regionArea[1][0] &&
@@ -147,7 +149,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
     };
     if (this.imagePreloaderService.inExplorationPlayer()) {
       this.isLoadingIndicatorShown = true;
-      // For aligning the gif to the center of it's container.
       const loadingIndicatorSize = this.dimensions.height < 124 ? 24 : 120;
       this.imageContainerStyle = {
         height: this.dimensions.height + 'px',
@@ -158,10 +159,6 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
       };
       this.loadImage();
     } else {
-      // This is the case when user is in exploration editor or in
-      // preview mode. We don't have loading indicator or try again for
-      // showing images in the exploration editor or in preview mode. So
-      // we directly assign the url to the imageUrl.
       if (
         this.pageContextService.getImageSaveDestination() ===
           AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE &&
@@ -170,20 +167,23 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         const base64Url = this.imageLocalStorageService.getRawImageData(
           this.filepath
         );
-        const mimeType = base64Url.split(';')[0];
-        if (mimeType === AppConstants.SVG_MIME_TYPE) {
-          this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
-            base64Url
-          ) as string;
-        } else {
-          this.imageUrl = base64Url;
+
+        if (base64Url) {
+          const mimeType = base64Url.split(';')[0];
+          if (mimeType === AppConstants.SVG_MIME_TYPE) {
+            this.imageUrl = this.svgSanitizerService.getTrustedSvgResourceUrl(
+              base64Url
+            ) as SafeResourceUrl;
+          } else {
+            this.imageUrl = base64Url;
+          }
         }
       } else {
         this.imageUrl = this.assetsBackendApiService.getImageUrlForPreview(
           this.pageContextService.getEntityType(),
           this.pageContextService.getEntityId(),
           encodeURIComponent(this.filepath)
-        );
+        ) as string | SafeResourceUrl;
       }
     }
 
@@ -193,13 +193,7 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
     this.currentlyHoveredRegions = [];
     this.allRegions = this.imageAndRegions.labeledRegions;
-    if (!this.interactionIsActive) {
-      /**
-       * The following lines highlight the learner's last answer for
-       * this card. This need only be done at the beginning as if he
-       * submits an answer, based on newCardAvailable, the image
-       * is made inactive, so his last selection would be highlighted.
-       */
+    if (!this.interactionIsActive && this.lastAnswer) {
       this.mouseX = this.lastAnswer.clickPosition[0];
       this.mouseY = this.lastAnswer.clickPosition[1];
       this.updateCurrentlyHoveredRegions();
@@ -211,10 +205,10 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
 
   loadImage(): void {
     this.imagePreloaderService.getImageUrlAsync(this.filepath).then(
-      (objectUrl: string) => {
+      (objectUrl: string | SafeResourceUrl | null) => {
         this.isTryAgainShown = false;
         this.isLoadingIndicatorShown = false;
-        this.imageUrl = objectUrl;
+        this.imageUrl = objectUrl as string | SafeResourceUrl;
       },
       () => {
         this.isTryAgainShown = true;
@@ -236,23 +230,25 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   getRegionDimensions(index: number): RectangleRegion {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
-    );
+    ) as NodeListOf<HTMLImageElement>;
     const image = images[0];
     const labeledRegion = this.imageAndRegions.labeledRegions[index];
     const regionArea = labeledRegion.region.area;
+    const parentElement = image.parentElement as HTMLElement;
+
     const leftDelta =
       image.getBoundingClientRect().left -
-      image.parentElement.getBoundingClientRect().left;
+      parentElement.getBoundingClientRect().left;
     const topDelta =
       image.getBoundingClientRect().top -
-      image.parentElement.getBoundingClientRect().top;
-    const returnValue = {
+      parentElement.getBoundingClientRect().top;
+
+    return {
       left: regionArea[0][0] * image.width + leftDelta,
       top: regionArea[0][1] * image.height + topDelta,
       width: (regionArea[1][0] - regionArea[0][0]) * image.width,
       height: (regionArea[1][1] - regionArea[0][1]) * image.height,
     };
-    return returnValue;
   }
 
   getRegionDisplay(label: string): 'none' | 'inline' {
@@ -275,22 +271,23 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   getDotLocation(): ImagePoint {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
-    );
-    const image: HTMLImageElement = images[0];
-    var dotLocation = {
+    ) as NodeListOf<HTMLImageElement>;
+    const image = images[0];
+    const dotLocation: ImagePoint = {
       left: null,
       top: null,
     };
     if (this.lastAnswer) {
+      const parentElement = image.parentElement as HTMLElement;
       dotLocation.left =
         this.lastAnswer.clickPosition[0] * image.width +
         image.getBoundingClientRect().left -
-        image.parentElement.getBoundingClientRect().left -
+        parentElement.getBoundingClientRect().left -
         5;
       dotLocation.top =
         this.lastAnswer.clickPosition[1] * image.height +
         image.getBoundingClientRect().top -
-        image.parentElement.getBoundingClientRect().top -
+        parentElement.getBoundingClientRect().top -
         5;
     }
     return dotLocation;
@@ -299,10 +296,11 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
   updateDotPosition(event: MouseEvent | KeyboardEvent): void {
     const images = this.el.nativeElement.querySelectorAll(
       '.oppia-image-click-img'
-    );
-    const image: HTMLImageElement = images[0];
+    ) as NodeListOf<HTMLImageElement>;
+    const image = images[0];
     const imageRect = image.getBoundingClientRect();
     const imageStyles = window.getComputedStyle(image);
+
     if (this.usingMobileDevice && event instanceof MouseEvent) {
       this.mouseX =
         (event.clientX - image.getBoundingClientRect().left) / image.width;
@@ -310,9 +308,14 @@ export class InteractiveImageClickInput implements OnInit, OnDestroy {
         (event.clientY - image.getBoundingClientRect().top) / image.height;
       return;
     }
+
     const dot = document.querySelector(
       '.oppia-select-image-region-cursor'
     ) as HTMLDivElement;
+
+    if (!dot) {
+      return;
+    }
 
     if (event instanceof MouseEvent) {
       this.dotCursorCoordinateX =

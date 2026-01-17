@@ -36,10 +36,43 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
-import {Interaction} from 'domain/exploration/interaction.model';
+import {
+  Interaction,
+  InteractionBackendDict,
+} from 'domain/exploration/interaction.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
+
+interface ExplorationBackendDict {
+  init_state_name: string;
+  param_changes: unknown[];
+  param_specs: Record<string, unknown>;
+  states: StateObjectsBackendDict;
+  title: string;
+  language_code: string;
+  objective: string;
+  next_content_id_index: number;
+}
+
+interface ReadOnlyExplorationBackendResponse {
+  can_edit: boolean;
+  exploration: ExplorationBackendDict;
+  exploration_id: string;
+  is_logged_in: boolean;
+  session_id: string;
+  version: number;
+  preferred_audio_language_code: string;
+  preferred_language_codes: string[];
+  auto_tts_enabled: boolean;
+  record_playthrough_probability: number;
+  draft_change_list_id: number;
+  has_viewed_lesson_info_modal_once: boolean;
+  furthest_reached_checkpoint_exp_version: number;
+  furthest_reached_checkpoint_state_name: string;
+  most_recently_reached_checkpoint_state_name: string;
+  most_recently_reached_checkpoint_exp_version: number;
+  displayable_language_codes: string[];
+}
 
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
@@ -63,7 +96,7 @@ class MockCheckpointCelebrationUtilityService {
     return '';
   }
 
-  setIsOnCheckpointedState(isOnCheckpointedState: boolean) {
+  setIsOnCheckpointedState(isOnCheckpointedState: boolean): void {
     this.isOnCheckpointedState = isOnCheckpointedState;
   }
 
@@ -71,12 +104,12 @@ class MockCheckpointCelebrationUtilityService {
     return this.isOnCheckpointedState;
   }
 
-  openLessonInformationModal() {
+  openLessonInformationModal(): void {
     this.openLessonInformationModalEmitter.emit();
   }
 }
 
-const dummyExplorationBackendDict = {
+const dummyExplorationBackendDict: ExplorationBackendDict = {
   init_state_name: 'Introduction',
   param_changes: [],
   param_specs: {},
@@ -92,7 +125,10 @@ const dummyExplorationBackendDict = {
         confirmed_unclassified_answers: [],
         customization_args: {
           buttonText: {
-            value: 'Continue',
+            value: {
+              content_id: 'content_id',
+              unicode_str: 'Continue',
+            },
           },
         },
         default_outcome: {
@@ -115,6 +151,7 @@ const dummyExplorationBackendDict = {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: true,
+      inapplicable_skill_misconception_ids: [],
     },
     'End State': {
       classifier_model_id: null,
@@ -139,6 +176,7 @@ const dummyExplorationBackendDict = {
       param_changes: [],
       solicit_answer_details: false,
       card_is_checkpoint: false,
+      inapplicable_skill_misconception_ids: [],
     },
   },
   title: 'Dummy Title',
@@ -147,26 +185,9 @@ const dummyExplorationBackendDict = {
   next_content_id_index: 4,
 };
 
-const dummyExplorationMetadata = {
-  title: 'Dummy Title',
-  category: 'Dummy Category',
-  objective: 'Dummy Objective',
-  language_code: 'en',
-  tags: [],
-  blurb: 'Dummy Blurb',
-  author_notes: 'Dummy Author Notes',
-  states_schema_version: 50,
-  init_state_name: 'Introduction',
-  param_specs: {},
-  param_changes: [],
-  auto_tts_enabled: false,
-  edits_allowed: true,
-};
-
-const dummyExplorationBackendResponse = {
+const dummyExplorationBackendResponse: ReadOnlyExplorationBackendResponse = {
   can_edit: true,
   exploration: dummyExplorationBackendDict,
-  exploration_metadata: dummyExplorationMetadata,
   exploration_id: '0',
   is_logged_in: true,
   session_id: 'dummy_session_id',
@@ -245,66 +266,70 @@ describe('Checkpoint celebration modal component', function () {
     fixture = TestBed.createComponent(CheckpointCelebrationModalComponent);
     component = fixture.componentInstance;
 
+    const interactionBackendDict: InteractionBackendDict = {
+      id: 'TextInput',
+      answer_groups: [
+        {
+          outcome: {
+            dest: 'State',
+            dest_if_really_stuck: null,
+            feedback: {
+              html: '',
+              content_id: 'This is a new feedback text',
+            },
+            refresher_exploration_id: 'test',
+            missing_prerequisite_skill_id: 'test_skill_id',
+            labelled_as_correct: true,
+            param_changes: [],
+          },
+          rule_specs: [],
+          training_data: [],
+          tagged_skill_misconception_id: '',
+        },
+      ],
+      default_outcome: {
+        dest: 'Hola',
+        dest_if_really_stuck: null,
+        feedback: {
+          content_id: '',
+          html: '',
+        },
+        labelled_as_correct: true,
+        param_changes: [],
+        refresher_exploration_id: 'test',
+        missing_prerequisite_skill_id: 'test_skill_id',
+      },
+      confirmed_unclassified_answers: [],
+      customization_args: {
+        rows: {
+          value: 1,
+        },
+        placeholder: {
+          value: {
+            content_id: 'content_id',
+            unicode_str: 'placeholder',
+          },
+        },
+        catchMisspellings: {
+          value: false,
+        },
+      },
+      hints: [],
+      solution: {
+        answer_is_exclusive: true,
+        correct_answer: 'test_answer',
+        explanation: {
+          content_id: '2',
+          html: 'test_explanation1',
+        },
+      },
+    };
+
     dummyStateCard = StateCard.createNewCard(
       'State 2',
       '<p>Content</p>',
       '<interaction></interaction>',
-      Interaction.createFromBackendDict({
-        id: 'TextInput',
-        answer_groups: [
-          {
-            outcome: {
-              dest: 'State',
-              dest_if_really_stuck: null,
-              feedback: {
-                html: '',
-                content_id: 'This is a new feedback text',
-              },
-              refresher_exploration_id: 'test',
-              missing_prerequisite_skill_id: 'test_skill_id',
-              labelled_as_correct: true,
-              param_changes: [],
-            },
-            rule_specs: [],
-            training_data: [],
-            tagged_skill_misconception_id: '',
-          },
-        ],
-        default_outcome: {
-          dest: 'Hola',
-          dest_if_really_stuck: null,
-          feedback: {
-            content_id: '',
-            html: '',
-          },
-          labelled_as_correct: true,
-          param_changes: [],
-          refresher_exploration_id: 'test',
-          missing_prerequisite_skill_id: 'test_skill_id',
-        },
-        confirmed_unclassified_answers: [],
-        customization_args: {
-          rows: {
-            value: true,
-          },
-          placeholder: {
-            value: 1,
-          },
-          catchMisspellings: {
-            value: false,
-          },
-        },
-        hints: [],
-        solution: {
-          answer_is_exclusive: true,
-          correct_answer: 'test_answer',
-          explanation: {
-            content_id: '2',
-            html: 'test_explanation1',
-          },
-        },
-      }),
-      RecordedVoiceovers.createEmpty(),
+      Interaction.createFromBackendDict(interactionBackendDict),
       'content'
     );
   });
@@ -318,7 +343,11 @@ describe('Checkpoint celebration modal component', function () {
     spyOn(
       readOnlyExplorationBackendApiService,
       'fetchExplorationAsync'
-    ).and.returnValue(Promise.resolve(dummyExplorationBackendResponse));
+    ).and.returnValue(
+      Promise.resolve(
+        dummyExplorationBackendResponse as unknown as ReadOnlyExplorationBackendResponse
+      )
+    );
     spyOn(
       checkpointCelebrationUtilityService,
       'getStateListForCheckpointMessages'
@@ -413,7 +442,7 @@ describe('Checkpoint celebration modal component', function () {
   }));
 
   it('should execute callback when window resize emitter emits', () => {
-    expect(component.shouldDisplayFullScaleMessage).toEqual(true);
+    component.shouldDisplayFullScaleMessage = true;
 
     component.subscribeToWindowResizeEmitter();
     mockResizeEmitter.emit();
@@ -491,8 +520,8 @@ describe('Checkpoint celebration modal component', function () {
     component.currentStateName = 'Introduction';
     component.hasViewedLessonInfoOnce = true;
     component.shouldDisplayFullScaleMessage = false;
-    component.translatedCurrentCheckpointMessage = null;
-    component.translatedCurrentCheckpointMessageTitle = null;
+    component.translatedCurrentCheckpointMessage = '';
+    component.translatedCurrentCheckpointMessageTitle = '';
 
     component.checkIfCheckpointMessageIsToBeTriggered('NewStateName');
 
@@ -577,9 +606,7 @@ describe('Checkpoint celebration modal component', function () {
     const expectedDelays = [2.2, 2.5, 2.8, 3.1, 3.4];
 
     component.checkpointNodeFadeInDelays.forEach((delay, index) => {
-      expect(delay)
-        .withContext(`fade-in delay for checkpoint ${index}`)
-        .toBeCloseTo(expectedDelays[index]);
+      expect(delay).toBeCloseTo(expectedDelays[index]);
     });
   });
 
@@ -612,8 +639,10 @@ describe('Checkpoint celebration modal component', function () {
   }));
 
   it('should dismiss message', fakeAsync(() => {
-    let mockSetTimeout = setTimeout(() => {});
-    component.autoMessageDismissalTimeout = mockSetTimeout;
+    const mockSetTimeout = setTimeout(() => {});
+
+    component.autoMessageDismissalTimeout =
+      mockSetTimeout as unknown as NodeJS.Timeout;
     component.messageModalIsShown = true;
     component.messageModalIsDismissed = false;
     component.checkpointNodesAreVisible = true;
@@ -646,20 +675,13 @@ describe('Checkpoint celebration modal component', function () {
   it('should reset timer', () => {
     component.checkpointTimerTemplateRef = {
       nativeElement: {
-        // This throws "Type
-        // '{ strokeDasharray: string; strokeDashoffset: string; }' is missing
-        // the following properties from type 'CSSStyleDeclaration':
-        // accentColor, alignContent, alignItems, alignSelf, and 457 more.".
-        // We need to suppress this error because only these values are
-        // needed for testing and providing a value for every single property is
-        // unnecessary.
-        // @ts-expect-error
         style: {
           strokeDashoffset: '',
           transitionDuration: '',
-        },
+        } as unknown as CSSStyleDeclaration,
       },
-    };
+    } as unknown as import('@angular/core').ElementRef;
+
     const rtlSpy = spyOn(
       i18nLanguageCodeService,
       'isLanguageRTL'

@@ -18,9 +18,14 @@
 
 import {NgZone, SimpleChanges} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import CodeMirror from '@types/codemirror';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CodemirrorMergeviewComponent} from './codemirror-mergeview.component';
+
+declare global {
+  interface Window {
+    CodeMirror: unknown;
+  }
+}
 
 describe('Oppia CodeMirror Component', () => {
   let component: CodemirrorMergeviewComponent;
@@ -30,6 +35,7 @@ describe('Oppia CodeMirror Component', () => {
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [CodemirrorMergeviewComponent],
+      providers: [WindowRef],
     }).compileComponents();
   }));
 
@@ -49,17 +55,17 @@ describe('Oppia CodeMirror Component', () => {
   });
 
   it('should call merge view', () => {
-    let codeMirrorInstance = component.codeMirrorInstance;
-    expect(codeMirrorInstance).toBe(undefined);
+    expect(component.codeMirrorInstance).toBeUndefined();
     const originalCodeMirror = window.CodeMirror;
     let mergeViewCalled = false;
-    const mockMergeView = (element: HTMLElement): void => {
-      mergeViewCalled = true;
+    const mockCodeMirror = {
+      MergeView: (element: HTMLElement): void => {
+        mergeViewCalled = true;
+      },
     };
-    const mockCodeMirror: typeof CodeMirror = {
-      MergeView: mockMergeView,
-    } as typeof CodeMirror;
-    window.CodeMirror = mockCodeMirror;
+
+    (window as unknown as {CodeMirror: unknown}).CodeMirror = mockCodeMirror;
+
     component.ngAfterViewInit();
     expect(mergeViewCalled).toBe(true);
     window.CodeMirror = originalCodeMirror;
@@ -91,7 +97,8 @@ describe('Oppia CodeMirror Component', () => {
         isFirstChange: () => false,
       },
     };
-    component.leftValue = undefined;
+
+    (component as unknown as {leftValue: undefined}).leftValue = undefined;
     expect(() => component.ngOnChanges(changes)).toThrowError(
       'Left pane value is not defined.'
     );
@@ -103,7 +110,8 @@ describe('Oppia CodeMirror Component', () => {
         isFirstChange: () => false,
       },
     };
-    component.rightValue = undefined;
+
+    (component as unknown as {rightValue: undefined}).rightValue = undefined;
     expect(() => component.ngOnChanges(changes)).toThrowError(
       'Right pane value is not defined.'
     );

@@ -81,7 +81,7 @@ interface AnswerResponseData {
   refresherExplorationId: string | null;
   missingPrerequisiteSkillId: string | null;
   remainOnCurrentCard: boolean;
-  taggedSkillMisconceptionId: string;
+  taggedSkillMisconceptionId: string | null;
   wasOldStateInitial: boolean;
   isFirstHit: boolean;
   isFinalQuestion: boolean;
@@ -104,7 +104,6 @@ export class ConversationFlowService {
   nextStateCard!: StateCard;
   displayedCard!: StateCard;
 
-  // The following variables are used to track the state of the answer submission process.
   answerIsCorrect = false;
   answerIsBeingProcessed: boolean = false;
   hasInteractedAtLeastOnce: boolean = false;
@@ -119,13 +118,12 @@ export class ConversationFlowService {
   hasFullyLoaded: boolean = false;
   _nextFocusLabel!: string;
 
-  // TODO(#22780): Remove these variable and related code.
   redirectToRefresherExplorationConfirmed!: boolean;
   isRefresherExploration!: boolean;
   parentExplorationIds: string[] = [];
 
-  private _playerStateChangeEventEmitter: EventEmitter<string> =
-    new EventEmitter<string>();
+  private _playerStateChangeEventEmitter: EventEmitter<string | null> =
+    new EventEmitter<string | null>();
 
   private _oppiaFeedbackAvailableEventEmitter: EventEmitter<void> =
     new EventEmitter();
@@ -190,30 +188,6 @@ export class ConversationFlowService {
     return !card.isInteractionInline();
   }
 
-  /**
-   * Triggers the stuck learner logic, based on either a delayed timer
-   * (e.g., 150 seconds of inactivity) or immediately if not delayed.
-   *
-   * This method is responsible for determining whether the "Continue"
-   * button should be shown to help the learner move forward if they are stuck.
-   *
-   * --- Trigger Conditions ---
-   * • When a new card is opened:
-   *    – Starts a 150-second timer.
-   *    – If hints are available but not fully consumed, and the learner
-   *      hasn't answered the question, the "Continue" button is shown
-   *      after the timeout.
-   *
-   * • After all hints are consumed:
-   *    – Timer is reset and restarted for 150 seconds.
-   *    – If the question remains unanswered after timeout, the
-   *      "Continue" button is shown.
-   *
-   * @param {boolean} isDelayed - Whether to wait before performing
-   *   the stuck check (typically true for inactivity-based triggers).
-   * @param {() => void} onShowContinueToReviseButton - Callback to display
-   *   the "Continue" button when the learner is deemed stuck.
-   */
   triggerIfLearnerStuckAction(
     isDelayed: boolean,
     onShowContinueToReviseButton: () => void
@@ -232,46 +206,16 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Moves the displayed card forward by one position in the previously seen cards.
-   *
-   * This method should only be used when navigating through cards the user
-   * has already seen, not for progressing to new or unseen cards.
-   *
-   * Retrieves the current displayed card index from the player position service,
-   * increments it by one, and updates the displayed card accordingly.
-   */
   moveForwardByOneCard(): void {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     this._validateIndexAndChangeCard(displayedCardIndex + 1);
   }
 
-  /**
-   * Moves the displayed card backward by one position in the previously seen cards.
-   *
-   * This method should only be used when navigating through cards the user
-   * has already seen, not for progressing to new or unseen cards.
-   *
-   * Retrieves the current displayed card index from the player position service,
-   * decrements it by one, and updates the displayed card accordingly.
-   */
   moveBackByOneCard(): void {
     let displayedCardIndex = this.playerPositionService.getDisplayedCardIndex();
     this._validateIndexAndChangeCard(displayedCardIndex - 1);
   }
 
-  /**
-   * Navigates to the currently displayed card and performs necessary
-   * state updates such as checkpoint tracking, focus management, and
-   * audio playback.
-   *
-   * This method:
-   * - Records the most recently reached checkpoint if the current card
-   *   is a checkpoint and hasn't been visited yet.
-   * - Emits events to update card position and trigger audio playback.
-   * - Sets the focus to the appropriate content element based on
-   *   whether it's the last card or not.
-   */
   navigateToDisplayedCard(): void {
     let isIframed = this.urlService.isIframed();
     let index = this.playerPositionService.getDisplayedCardIndex();
@@ -343,18 +287,6 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Submits the learner's answer to the current card.
-   *
-   * This method handles:
-   * - Preventing duplicate or too-rapid submissions.
-   * - Initializing learner answer info collection (if enabled).
-   * - Passing the answer to the current engine service.
-   * - Handling feedback or continuation based on the response.
-   *
-   * @param {string} answer - The answer provided by the learner.
-   * @param {InteractionRulesService} interactionRulesService - The rules service used to evaluate the answer.
-   */
   submitAnswer(
     answer: string,
     interactionRulesService: InteractionRulesService
@@ -363,7 +295,6 @@ export class ConversationFlowService {
     let explorationId = this.pageContextService.getExplorationId();
     this.displayedCard.updateCurrentAnswer(null);
 
-    // Safety check to prevent double submissions from occurring.
     if (this._shouldBlockSubmission(this.displayedCard)) {
       return;
     }
@@ -406,19 +337,23 @@ export class ConversationFlowService {
       answer,
       interactionRulesService,
       (
-        nextCard: StateCard,
+        nextCard: StateCard | null,
         refreshInteraction: boolean,
         feedbackHtml: string,
         refresherExplorationId: string | null,
-        missingPrerequisiteSkillId: string,
+        missingPrerequisiteSkillId: string | null,
         remainOnCurrentCard: boolean,
-        taggedSkillMisconceptionId: string,
-        wasOldStateInitial: boolean,
-        isFirstHit: boolean,
+        taggedSkillMisconceptionId: string | null,
+        wasOldStateInitial: boolean | null,
+        isFirstHit: boolean | null,
         isFinalQuestion: boolean,
         nextCardIfReallyStuck: StateCard | null,
         focusLabel: string
       ) => {
+        if (!nextCard) {
+          this.answerIsBeingProcessed = false;
+          return;
+        }
         this._handleAnswerResponse({
           displayedCard,
           editorPreviewMode,
@@ -429,8 +364,8 @@ export class ConversationFlowService {
           missingPrerequisiteSkillId,
           remainOnCurrentCard,
           taggedSkillMisconceptionId,
-          wasOldStateInitial,
-          isFirstHit,
+          wasOldStateInitial: wasOldStateInitial ?? false,
+          isFirstHit: isFirstHit ?? false,
           isFinalQuestion,
           nextCardIfReallyStuck,
           focusLabel,
@@ -462,8 +397,6 @@ export class ConversationFlowService {
     let interaction = this.displayedCard.getInteraction();
 
     if (!interaction.id) {
-      // An editor might also try to view preview tab without adding
-      // interaction to concept card.
       return false;
     }
 
@@ -477,14 +410,6 @@ export class ConversationFlowService {
     return this.pendingCardWasSeenBefore && !this.getAnswerIsCorrect();
   }
 
-  /**
-   * Initializes the player view for an exploration or question session.
-   * Sets up the initial card, triggers checkpoint navigation (if required),
-   * manages language selection for iframed embeds, and scroll/focus handling.
-   *
-   * @param {StateCard} initialCard - The first state card to display in the exploration.
-   * @param {string} focusLabel - The focus label for accessibility (used to set screen reader focus).
-   */
   initializeDirectiveComponents(
     initialCard: StateCard,
     focusLabel: string
@@ -499,16 +424,12 @@ export class ConversationFlowService {
       this.onPlayerStateChange.emit(initialCard.getStateName());
     }
 
-    // We do not store checkpoints progress for iframes hence we do not
-    // need to consider redirecting the user to the most recently
-    // reached checkpoint on exploration initial load in that case.
     if (
       !isIframed &&
       !isInEditorPreviewMode &&
       !this.explorationModeService.isInQuestionPlayerMode() &&
       !this.explorationModeService.isInDiagnosticTestPlayerMode()
     ) {
-      // Navigate the learner to the most recently reached checkpoint state.
       this._navigateToMostRecentlyReachedCheckpoint();
     }
     this.hasFullyLoaded = true;
@@ -516,9 +437,6 @@ export class ConversationFlowService {
     this.focusManagerService.setFocusIfOnDesktop(focusLabel);
     this.loaderService.hideLoadingScreen();
 
-    // If the exploration is embedded, use the url language code
-    // as site language. If the url language code is not supported
-    // as site language, English is used as default.
     let langCodes = AppConstants.SUPPORTED_SITE_LANGUAGES.map(language => {
       return language.id;
     }) as string[];
@@ -533,23 +451,11 @@ export class ConversationFlowService {
     this.cardAnimationService.adjustPageHeight();
     this.windowRef.nativeWindow.scrollTo(0, 0);
 
-    // The timeout is needed in order to give the recipient of the
-    // broadcast sufficient time to load.
     setTimeout(() => {
       this.playerPositionService.onNewCardOpened.emit(initialCard);
     });
   }
 
-  /**
-   * Displays the next card to the learner.
-   * Handles various cases like:
-   * - Redirecting after concept cards.
-   * - Showing result after question session ends.
-   * - Looping back to exploration after session-based redirection.
-   * - Showing concept card if needed.
-   * - Revisiting previous cards if 'Learn Again' is triggered.
-   * - Proceeding to the next pending card otherwise.
-   */
   showUpcomingCard(): void {
     let currentIndex = this.playerPositionService.getDisplayedCardIndex();
     let conceptCardIsBeingShown =
@@ -590,7 +496,7 @@ export class ConversationFlowService {
           conceptCard.getExplanation().html,
           '',
           new Interaction([], [], {}, null, [], null, null),
-          ''
+          'concept_card'
         )
       );
       return;
@@ -606,15 +512,15 @@ export class ConversationFlowService {
         return;
       }
     }
-    /* This is for the following situation:
-        if A->B->C is the arrangement of cards and C redirected to A,
-        then after this, B and C are visited cards and hence
-        pendingCardWasSeenBefore would be true during both these
-        transitions and as answerIsCorrect is set to false below,
-        Continue would briefly change to Learn Again (after it is
-        clicked) during these transitions which is not required.
-        Also, if the 'if' check is not there, Learn Again button would
-        briefly switched to Continue before going to next card. */
+    // This is for the following situation:
+    // If A->B->C is the arrangement of cards and C redirected to A,
+    // then after this, B and C are visited cards and hence
+    // pendingCardWasSeenBefore would be true during both these
+    // transitions and as answerIsCorrect is set to false below,
+    // Continue would briefly change to Learn Again (after it is
+    // clicked) during these transitions which is not required.
+    // Also, if the 'if' check is not there, Learn Again button would
+    // briefly switched to Continue before going to next card.
     if (this.getAnswerIsCorrect()) {
       this.pendingCardWasSeenBefore = false;
     }
@@ -649,7 +555,7 @@ export class ConversationFlowService {
 
   /**
    * Updates the card layout based on whether supplemental cards are non-empty
-   * and screen size allows for two-card display.     *
+   * and screen size allows for two-card display.
    */
   _updateCardLayout(): void {
     const totalNumCards = this.playerTranscriptService.getNumCards();
@@ -717,13 +623,13 @@ export class ConversationFlowService {
    * not in the exploration editor preview mode.
    *
    * @param {string} refresherExpId - The ID of the refresher exploration
-   *   the learner is navigating to.
+   * the learner is navigating to.
    */
   private _recordLeaveForRefresherExp(refresherExpId: string): void {
     let editorPreviewMode = this.pageContextService.isInExplorationEditorPage();
     if (!editorPreviewMode) {
       this.statsReportingService.recordLeaveForRefresherExp(
-        this.playerPositionService.getCurrentStateName(),
+        this.playerPositionService.getCurrentStateName() as string,
         refresherExpId
       );
     }
@@ -742,13 +648,13 @@ export class ConversationFlowService {
    * - Optionally prompts for redirection to a refresher exploration
    *
    * @param {string | null} feedbackHtml - HTML string containing feedback to show to the learner.
-   *     If null, no feedback is shown.
+   * If null, no feedback is shown.
    * @param {string | null} missingPrerequisiteSkillId - The ID of a prerequisite skill the learner
-   *     needs to revisit. If provided, triggers concept card loading.
+   * needs to revisit. If provided, triggers concept card loading.
    * @param {boolean} refreshInteraction - Whether the interaction should be visually refreshed
-   *     (e.g., to give a new randomized version of the same interaction).
+   * (e.g., to give a new randomized version of the same interaction).
    * @param {string | null} refresherExplorationId - If provided, prompts the learner to redirect to
-   *     a refresher exploration. Otherwise, no redirection is offered.
+   * a refresher exploration. Otherwise, no redirection is offered.
    */
   private _giveFeedbackAndStayOnCurrentCard(
     feedbackHtml: string,
@@ -776,8 +682,6 @@ export class ConversationFlowService {
         });
     }
     if (refreshInteraction) {
-      // Replace the previous interaction with another of the
-      // same type.
       this.playerTranscriptService.updateLatestInteractionHtml(
         this.displayedCard.getInteractionHtml() +
           this.explorationEngineService.getRandomSuffix()
@@ -787,8 +691,6 @@ export class ConversationFlowService {
     this.redirectToRefresherExplorationConfirmed = false;
 
     if (refresherExplorationId) {
-      // TODO(bhenning): Add tests to verify the event is
-      // properly recorded.
       const confirmRedirection = () => {
         this.redirectToRefresherExplorationConfirmed = true;
         this._recordLeaveForRefresherExp(refresherExplorationId);
@@ -806,36 +708,15 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Changes the currently displayed card to the specified index.
-   *
-   * This method records the navigation action, updates the displayed card index,
-   * notifies the state editor (if in editor mode), and sets the corresponding
-   * question based on the index.
-   *
-   * @param index - The index of the card to be displayed.
-   */
   private _changeCard(index: number): void {
     this.playerPositionService.recordNavigationButtonClick();
     this.playerPositionService.setDisplayedCardIndex(index);
     this.stateEditorService.onUpdateActiveStateIfInEditor.emit(
-      this.playerPositionService.getCurrentStateName()
+      this.playerPositionService.getCurrentStateName() as string
     );
     this.playerPositionService.changeCurrentQuestion(index);
   }
 
-  /**
-   * Navigates the learner to the most recently reached checkpoint in
-   * the exploration. It:
-   * - Loads the latest exploration states.
-   * - Determines the most recently reached checkpoint (either from local service or backend).
-   * - Reconstructs the path to that checkpoint.
-   * - Adds the corresponding cards to the transcript.
-   * - Updates checkpoint progress.
-   * - Moves the learner to the appropriate card in the UI.
-   *
-   * Used when the learner resumes an in-progress exploration with checkpoints.
-   */
   private _navigateToMostRecentlyReachedCheckpoint(): void {
     let states: StateObjectsBackendDict;
     let pidInUrl = this.urlService.getPidFromUrl();
@@ -862,12 +743,10 @@ export class ConversationFlowService {
         let indexToRedirectTo = 0;
 
         for (let i = 0; i < prevSessionStatesProgress.length; i++) {
-          // Set state name of a previously completed state.
           let stateName = prevSessionStatesProgress[i];
           let stateData =
             this.explorationEngineService.getStateFromStateName(stateName);
 
-          // Skip the card if it has already been added to transcript.
           if (
             !this.playerTranscriptService.hasEncounteredStateBefore(stateName)
           ) {
@@ -894,8 +773,6 @@ export class ConversationFlowService {
           indexToRedirectTo += 1;
         }
 
-        // Remove the last card from progress as it is not completed
-        // yet and is only most recently reached.
         prevSessionStatesProgress.pop();
         this.playerTranscriptService.setPrevSessionStatesProgress(
           prevSessionStatesProgress
@@ -906,45 +783,25 @@ export class ConversationFlowService {
             let alertInfoElement = document.querySelector(
               '.oppia-exploration-checkpoints-message'
             );
-
-            // Remove the alert message after 6 sec.
             if (alertInfoElement) {
               alertInfoElement.remove();
             }
           }, ExplorationPlayerConstants.ALERT_MESSAGE_TIMEOUT);
         }
 
-        // Move to most recently reached checkpoint card.
         this._changeCard(indexToRedirectTo);
         this.playerPositionService.onLoadedMostRecentCheckpoint.next();
       });
   }
 
-  /**
-   * Handles the transition to a new card in the exploration after an answer
-   * has been submitted. Depending on whether it's the final question or not,
-   * and whether feedback is available, it:
-   * - Displays the feedback if present.
-   * - Emits help card and card availability events.
-   * - Scrolls to bottom or focuses continue button.
-   * - Marks the current card as completed.
-   * - Either moves to a new card or shows the pending card.
-   *
-   * @param {string | null} feedbackHtml - The feedback HTML to display, if any.
-   * @param {boolean} isFinalQuestion - Whether the current question is the last one.
-   */
   private _moveToNewCard(
     feedbackHtml: string | null,
     isFinalQuestion: boolean
   ): void {
-    // There is a new card. If there is no feedback, move on
-    // immediately. Otherwise, give the learner a chance to read
-    // the feedback, and display a 'Continue' button.
     this.pendingCardWasSeenBefore = false;
     this.displayedCard.markAsCompleted();
     if (isFinalQuestion) {
       if (this.explorationModeService.isInQuestionPlayerMode()) {
-        // We will redirect to the results page here.
         this.questionSessionCompleted = true;
       }
       this.moveToExploration = true;
@@ -970,7 +827,7 @@ export class ConversationFlowService {
     if (feedbackHtml) {
       if (
         this.playerTranscriptService.hasEncounteredStateBefore(
-          nextCard.getStateName()
+          nextCard.getStateName() as string
         )
       ) {
         this.pendingCardWasSeenBefore = true;
@@ -988,22 +845,13 @@ export class ConversationFlowService {
       this.focusManagerService.setFocusIfOnDesktop(this._nextFocusLabel);
       this.cardAnimationService.scrollToBottom();
     } else {
-      this.playerTranscriptService.addNewResponse(feedbackHtml);
-      // If there is no feedback, it immediately moves on
-      // to next card. Therefore this.answerIsCorrect needs
-      // to be set to false before it proceeds to next card.
+      this.playerTranscriptService.addNewResponse(feedbackHtml as string);
       this.answerIsCorrect = false;
       this.showPendingCard();
     }
     this.currentInteractionService.clearPresubmitHooks();
   }
 
-  /**
-   * Adds a new card to the transcript and updates the UI layout.
-   * If the previously displayed card is terminal, handles terminal card logic.
-   *
-   * @param newCard - The new card object to be added to the transcript.
-   */
   private _addNewCard(newCard: StateCard): void {
     this.playerTranscriptService.addNewCard(newCard);
     const numberOfCards = this.playerTranscriptService.getNumCards();
@@ -1021,12 +869,6 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Handles logic to be executed when the displayed card is a terminal card.
-   * Determines recommendation strategy based on parent explorations and story mode.
-   *
-   * @param displayedCard - The terminal card currently displayed to the user.
-   */
   private _handleTerminalCard(displayedCard: StateCard): void {
     this.setIsRefresherExploration(false);
     const parentExplorationIds =
@@ -1043,7 +885,7 @@ export class ConversationFlowService {
     } else {
       recommendedExplorationIds =
         this.explorationEngineService.getAuthorRecommendedExpIdsByStateName(
-          displayedCard.getStateName()
+          displayedCard.getStateName() as string
         );
       includeAutogeneratedRecommendations = true;
     }
@@ -1061,11 +903,6 @@ export class ConversationFlowService {
     this._shouldShowProgressClearanceMessage();
   }
 
-  /**
-   * Handles terminal card logic specific to story chapter mode.
-   * Fetches the next chapter, sets recommendations, and records chapter completion.
-   * Redirects to review tests if ready.
-   */
   private _handleStoryModeTerminalCard(): void {
     const topicUrlFragment = this.urlService.getUrlParams().topic_url_fragment;
     const classroomUrlFragment =
@@ -1130,12 +967,6 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Fetches and displays recommended exploration summaries.
-   *
-   * @param includeAutogeneratedRecommendations - Whether to include auto-generated recommendations.
-   * @param recommendedExplorationIds - The list of exploration IDs to recommend.
-   */
   private _fetchAndDisplayRecommendations(
     includeAutogeneratedRecommendations: boolean,
     recommendedExplorationIds: string[]
@@ -1143,17 +974,12 @@ export class ConversationFlowService {
     this.explorationRecommendationsService.getRecommendedSummaryDicts(
       recommendedExplorationIds,
       includeAutogeneratedRecommendations,
-      /* istanbul ignore next */
       summaries => {
         this.recommendedExplorationSummaries = summaries;
       }
     );
   }
 
-  /**
-   * Displays a one-time message to the user that progress can be cleared.
-   * Automatically removes the message after a timeout.
-   */
   private _shouldShowProgressClearanceMessage(): void {
     if (!this.showProgressClearanceMessage) {
       this.showProgressClearanceMessage = true;
@@ -1161,7 +987,6 @@ export class ConversationFlowService {
         const el = document.querySelector(
           '.oppia-exploration-checkpoints-message'
         );
-        /* istanbul ignore if */
         if (el) {
           el.remove();
         }
@@ -1169,12 +994,6 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Checks if the current content language differs from the exploration's
-   * original language. If so, triggers the display of available translations.
-   *
-   * @private
-   */
   private _shouldDisplayTranslation(): void {
     const explorationLanguage = this._getLanguageCode();
     const selectedLanguage =
@@ -1186,34 +1005,6 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Handles the response after submitting an answer, including:
-   * - Updating state card
-   * - Emitting analytics and state transitions
-   * - Triggering voiceovers and feedback
-   * - Advancing to the next card or staying on the current one
-   *
-   * @param {{
-   *   displayedCard: StateCard,
-   *   editorPreviewMode: boolean,
-   *   nextCard: StateCard,
-   *   refreshInteraction: boolean,
-   *   feedbackHtml: string,
-   *   refresherExplorationId: string | null,
-   *   missingPrerequisiteSkillId: string,
-   *   remainOnCurrentCard: boolean,
-   *   taggedSkillMisconceptionId: string,
-   *   wasOldStateInitial: boolean,
-   *   isFirstHit: boolean,
-   *   isFinalQuestion: boolean,
-   *   nextCardIfReallyStuck: StateCard | null,
-   *   focusLabel: string,
-   *   timeAtServerCall: number,
-   *   currentEngineService
-   * }} responseData - The full answer response context.
-   *
-   * @private
-   */
   private _handleAnswerResponse({
     displayedCard,
     editorPreviewMode,
@@ -1239,7 +1030,8 @@ export class ConversationFlowService {
       !editorPreviewMode &&
       !this.explorationModeService.isPresentingIsolatedQuestions()
     ) {
-      const oldStateName = this.playerPositionService.getCurrentStateName();
+      const oldStateName =
+        this.playerPositionService.getCurrentStateName() as string;
       const completedChaptersCount =
         this.chapterProgressService.getCompletedChaptersCount();
 
@@ -1247,11 +1039,11 @@ export class ConversationFlowService {
         let lastAnswer = displayedCard.getLastAnswer();
         this.statsReportingService.recordStateTransition(
           oldStateName,
-          nextCard.getStateName(),
+          nextCard.getStateName() as string,
           lastAnswer,
           this.learnerParamsService.getAllParams(),
           isFirstHit,
-          String(completedChaptersCount && completedChaptersCount + 1),
+          String((completedChaptersCount ?? 0) + 1),
           String(this.playerTranscriptService.getNumCards()),
           currentEngineService.getLanguageCode()
         );
@@ -1260,7 +1052,7 @@ export class ConversationFlowService {
 
       if (nextCard.isTerminal()) {
         this.statsReportingService.recordStateCompleted(
-          nextCard.getStateName()
+          nextCard.getStateName() as string
         );
       }
 
@@ -1311,17 +1103,6 @@ export class ConversationFlowService {
     }, millisecsLeftToWait);
   }
 
-  /**
-   * Calculates the appropriate delay before transitioning to the next card,
-   * ensuring a minimum load time unless the interaction is supplemental
-   * or part of a diagnostic test.
-   *
-   * @param {StateCard} displayedCard - The current displayed card.
-   * @param {number} timeAtServerCall - Timestamp when server call was made.
-   * @returns {number} Time in milliseconds to delay.
-   *
-   * @private
-   */
   private _calculateDelayForNextCard(
     displayedCard: StateCard,
     timeAtServerCall: number
@@ -1339,24 +1120,12 @@ export class ConversationFlowService {
     );
   }
 
-  /**
-   * Initializes the learner answer info service, if applicable, to collect
-   * more details from the learner for analytics or clarification.
-   *
-   * @param {boolean} isPreviewMode - Whether the app is in preview/editor mode.
-   * @param {string} explorationId - The ID of the current exploration.
-   * @param {string} answer - The learner's submitted answer.
-   * @param {InteractionRulesService} interactionRulesService - Rules for validating interactions.
-   *
-   * @private
-   */
   private _shouldInitLearnerAnswerInfo(
     isPreviewMode: boolean,
     explorationId: string,
     answer: string,
     interactionRulesService: InteractionRulesService
   ): void {
-    /* istanbul ignore if */
     if (
       isPreviewMode ||
       this.explorationModeService.isPresentingIsolatedQuestions() ||
@@ -1373,14 +1142,6 @@ export class ConversationFlowService {
     );
   }
 
-  /**
-   * Updates the state and internal services when a learner submits an answer.
-   * Includes incrementing attempt counters and marking the submission as in-progress.
-   *
-   * @param {string} answer - The learner's answer.
-   *
-   * @private
-   */
   private _updateAnswerSubmissionState(answer: string): void {
     this.numberAttemptsService.submitAttempt();
     this.answerIsBeingProcessed = true;
@@ -1435,7 +1196,7 @@ export class ConversationFlowService {
    * attempts, the solution is revealed (if available).
    *
    * @param {() => void} onShowContinueToReviseButton - Callback to show
-   *   the "Continue to revise" button.
+   * the "Continue to revise" button.
    */
   private _performStuckCheck(onShowContinueToReviseButton: () => void): void {
     const numberOfIncorrectSubmissions =
@@ -1456,16 +1217,9 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Returns the currently displayed state card based on the
-   * learner's current position in the transcript.
-   *
-   * @returns {StateCard} The currently displayed exploration card.
-   */
   private _getCurrentCard(): StateCard {
     let index = this.playerPositionService.getDisplayedCardIndex();
-    let displayedCard = this.playerTranscriptService.getCard(index);
-    return displayedCard;
+    return this.playerTranscriptService.getCard(index);
   }
 
   /**
@@ -1482,15 +1236,6 @@ export class ConversationFlowService {
     this.conceptCardManagerService.recordWrongAnswer();
   }
 
-  /**
-   * Emits a help card to be displayed to the user.
-   *
-   * This method notifies the system that a help card is available,
-   * providing its HTML content and whether it includes a "Continue" button.
-   *
-   * @param helpCardHtml - The HTML content of the help card.
-   * @param hasContinueButton - Whether the help card includes a continue button.
-   */
   private _emitHelpCard(
     helpCardHtml: string,
     hasContinueButton: boolean
@@ -1501,20 +1246,12 @@ export class ConversationFlowService {
     });
   }
 
-  /**
-   * Sets the active voiceover for the given feedback HTML, if a matching content ID is found.
-   * Also sets the active component name to 'feedback' and triggers autoplay for the audio.
-   *
-   * @param {string} feedbackHtml - The HTML content of the feedback to match against interaction content IDs.
-   * @returns {void}
-   */
   private _setActiveVoiceover(feedbackHtml: string): void {
     let interaction = this.displayedCard.getInteraction();
 
     let feedbackContentId =
       interaction.getContentIdForMatchingHtml(feedbackHtml);
 
-    /* istanbul ignore if */
     if (feedbackContentId) {
       this.voiceoverPlayerService.setActiveVoiceover(feedbackContentId);
     }
@@ -1525,17 +1262,6 @@ export class ConversationFlowService {
     this.audioPlayerService.onAutoplayAudio.emit();
   }
 
-  /**
-   * Validates the given index before changing to the corresponding card.
-   *
-   * Ensures that the target index is within the bounds of the player transcript.
-   * If valid, it proceeds to change the card. Otherwise, it throws an error.
-   *
-   * This method is used to safely navigate through previously seen cards only.
-   *
-   * @param index - The index of the card to validate and display.
-   * @throws Will throw an error if the index is out of bounds.
-   */
   private _validateIndexAndChangeCard(index: number): void {
     let transcriptLength = this.playerTranscriptService.getNumCards();
     if (index >= 0 && index < transcriptLength) {
@@ -1545,192 +1271,89 @@ export class ConversationFlowService {
     }
   }
 
-  /**
-   * Checks if the user has confirmed redirection to a refresher exploration.
-   *
-   * @returns {boolean} True if the user has confirmed redirection, false otherwise.
-   */
   getRedirectToRefresherExplorationConfirmed(): boolean {
     return this.redirectToRefresherExplorationConfirmed;
   }
 
-  /**
-   * Sets whether the user has confirmed redirection to a refresher exploration.
-   *
-   * @param {boolean} confirmed - True if the user has confirmed redirection, false otherwise.
-   */
   setRedirectToRefresherExplorationConfirmed(confirmed: boolean): void {
     this.redirectToRefresherExplorationConfirmed = confirmed;
   }
 
-  /**
-   * Checks if the current exploration is a refresher exploration.
-   *
-   * @returns {boolean} True if the current exploration is a refresher exploration, false otherwise.
-   */
   getIsRefresherExploration(): boolean {
     return this.isRefresherExploration;
   }
 
-  /**
-   * Sets whether the current exploration is a refresher exploration.
-   *
-   * @param {boolean} isRefresher - True if the current exploration is a refresher exploration, false otherwise.
-   */
   setIsRefresherExploration(isRefresher: boolean): void {
     this.isRefresherExploration = isRefresher;
   }
 
-  /**
-   * Sets the parent exploration IDs for the current exploration.
-   *
-   * @param {string[]} parentExplorationIds - An array of parent exploration IDs.
-   */
   setParentExplorationIds(parentExplorationIds: string[]): void {
     this.parentExplorationIds = [...parentExplorationIds];
   }
 
-  /**
-   * Retrieves the parent exploration IDs for the current exploration.
-   *
-   * @returns {string[]} An array of parent exploration IDs.
-   */
   getParentExplorationIds(): string[] {
     return this.parentExplorationIds;
   }
 
-  /**
-   * Retrieves the next card to be displayed if the user is stuck.
-   * This card will be shown when the user is unable to progress further.
-   *
-   * @returns {StateCard | null} The next card if stuck, or null if none is set.
-   */
   getNextCardIfStuck(): StateCard | null {
     return this.nextCardIfStuck;
   }
 
-  /**
-   * Sets the next card to be displayed if the user is stuck.
-   * This card will be shown when the user is unable to progress further.
-   *
-   * @param {StateCard | null} card - The card to set as the next card if stuck.
-   */
   setNextCardIfStuck(card: StateCard | null): void {
     this.nextCardIfStuck = card;
   }
 
-  /**
-   * Sets the solution for the current state.
-   *
-   * @param {Solution | null} solution - The solution to set for the current state.
-   */
   setSolutionForState(solution: Solution | null): void {
     this.solutionForState = solution;
   }
 
-  /**
-   * Retrieves the solution for the current state.
-   *
-   * @returns {Solution | null} The solution for the current state, or null if none is set.
-   */
   getSolutionForState(): Solution | null {
     return this.solutionForState;
   }
 
-  /**
-   * Retrieves the next state card to be displayed.
-   *
-   * @returns {StateCard | null} The next state card, or null if none is set.
-   */
   getNextStateCard(): StateCard {
     return this.nextStateCard;
   }
 
-  /**
-   * Sets the next state card to be displayed.
-   *
-   * @param {StateCard | null} card - The next state card to set, or null if none.
-   */
   setNextStateCard(card: StateCard): void {
     this.nextStateCard = card;
   }
-  /**
-   * Returns whether the answer is marked as correct.
-   * @returns {boolean} `true` if the answer is correct, otherwise `false`.
-   */
   getAnswerIsCorrect(): boolean {
     return this.answerIsCorrect;
   }
 
-  /**
-   * Sets whether the answer is correct.
-   * @param {boolean} isCorrect - `true` if the answer is correct, otherwise `false`.
-   */
   setAnswerIsCorrect(isCorrect: boolean): void {
     this.answerIsCorrect = isCorrect;
   }
 
-  /**
-   * Returns whether the answer is currently being processed.
-   * @returns {boolean} `true` if the answer is being processed, otherwise `false`.
-   */
   getAnswerIsBeingProcessed(): boolean {
     return this.answerIsBeingProcessed;
   }
 
-  /**
-   * Sets whether the answer is currently being processed.
-   * @param {boolean} isBeingProcessed - `true` if the answer is being processed, otherwise `false`.
-   */
   setAnswerIsBeingProcessed(isBeingProcessed: boolean): void {
     this.answerIsBeingProcessed = isBeingProcessed;
   }
 
-  /**
-   * Returns whether the user has interacted at least once.
-   * @returns {boolean} `true` if the user has interacted at least once, otherwise `false`.
-   */
   getHasInteractedAtLeastOnce(): boolean {
     return this.hasInteractedAtLeastOnce;
   }
 
-  /**
-   * Sets whether the learner has interacted with the exploration at least once.
-   *
-   * @param {boolean} hasInteracted - True if the learner has interacted, false otherwise.
-   */
   setHasInteractedAtLeastOnce(hasInteracted: boolean): void {
     this.hasInteractedAtLeastOnce = hasInteracted;
   }
 
-  /**
-   * Returns whether the exploration has actually started.
-   * @returns {boolean} True if the exploration has started, false otherwise.
-   */
   getExplorationActuallyStarted(): boolean {
     return this.explorationActuallyStarted;
   }
 
-  /**
-   * Sets the flag indicating whether the exploration has actually started.
-   * @param {boolean} hasStarted - True if the exploration has started, false otherwise.
-   */
   setExplorationActuallyStarted(hasStarted: boolean): void {
     this.explorationActuallyStarted = hasStarted;
   }
 
-  /**
-   * Returns whether to show the progress clearance message.
-   * @returns {boolean} True if the message should be shown, false otherwise.
-   */
   getShowProgressClearanceMessage(): boolean {
     return this.showProgressClearanceMessage;
   }
 
-  /**
-   * Sets whether to show the progress clearance message.
-   * @param {boolean} showMessage - True to show the message, false otherwise.
-   */
   setShowProgressClearanceMessage(showMessage: boolean): void {
     this.showProgressClearanceMessage = showMessage;
   }
@@ -1809,7 +1432,7 @@ export class ConversationFlowService {
     return this.isLoggedIn;
   }
 
-  get onPlayerStateChange(): EventEmitter<string> {
+  get onPlayerStateChange(): EventEmitter<string | null> {
     return this._playerStateChangeEventEmitter;
   }
 

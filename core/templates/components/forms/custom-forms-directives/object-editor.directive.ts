@@ -16,16 +16,6 @@
  * @fileoverview Directives for the object editors.
  */
 
-// Individual object editor directives are in extensions/objects/templates.
-/**
- * NOTE: This component creates an Object Editor Component. Since it is a
- * created by us dynamically, we have to manage the entire life cycle of the
- * component from creation to deletion. This also includes updating of @Input
- * properties and listening to @Output events. In future, if some of the @Input
- * properties change, you can pass them to the ObjectEditor using ngOnChanges
- * function.
- */
-
 import {
   AfterViewInit,
   Component,
@@ -39,6 +29,8 @@ import {
   SimpleChange,
   SimpleChanges,
   ViewContainerRef,
+  Type,
+  ComponentRef,
 } from '@angular/core';
 import {
   AbstractControl,
@@ -48,6 +40,7 @@ import {
   ValidationErrors,
   Validator,
 } from '@angular/forms';
+
 import {AlgebraicExpressionEditorComponent} from 'objects/templates/algebraic-expression-editor.component';
 import {BooleanEditorComponent} from 'objects/templates/boolean-editor.component';
 import {CodeStringEditorComponent} from 'objects/templates/code-string-editor.component';
@@ -88,10 +81,11 @@ import {TranslatableSetOfUnicodeStringEditorComponent} from 'objects/templates/t
 import {UnicodeStringEditorComponent} from 'objects/templates/unicode-string-editor.component';
 import {IntEditorComponent} from 'objects/templates/int-editor.component';
 import {LoggerService} from 'services/contextual/logger.service';
-import {ComponentRef} from '@angular/core';
 import {Subscription} from 'rxjs';
-import {SchemaDefaultValue} from 'services/schema-default-value.service';
-const EDITORS = {
+
+import type {SchemaDefaultValue} from 'services/schema-default-value.service';
+
+const EDITORS: Record<string, Type<unknown>> = {
   'algebraic-expression': AlgebraicExpressionEditorComponent,
   boolean: BooleanEditorComponent,
   'code-string': CodeStringEditorComponent,
@@ -143,7 +137,7 @@ interface ObjectEditor {
   isEditable: string;
   modalId: symbol;
   objType: string;
-  schema: SchemaDefaultValue;
+  schema: unknown;
   value: SchemaDefaultValue;
   valueChanged?: EventEmitter<SchemaDefaultValue>;
   validityChange?: EventEmitter<Record<string, boolean>>;
@@ -174,15 +168,18 @@ export class ObjectEditorComponent
     ControlValueAccessor,
     Validator
 {
-  private _value: SchemaDefaultValue;
-  @Input() alwaysEditable: string;
-  @Input() initArgs: SchemaDefaultValue;
-  @Input() isEditable: string;
-  @Input() modalId: symbol;
-  @Input() objType: string;
-  @Input() schema;
-  @Input() form;
+  private _value!: SchemaDefaultValue;
+  @Input() alwaysEditable!: string;
+  @Input() initArgs!: SchemaDefaultValue;
+  @Input() isEditable!: string;
+  @Input() modalId!: symbol;
+  @Input() objType!: string;
+  // FIXED: Replaced 'any' with 'unknown'.
+  @Input() schema: unknown;
+  // FIXED: Replaced 'any' with 'unknown'.
+  @Input() form: unknown;
   @Output() validityChange: EventEmitter<void> = new EventEmitter();
+
   get value(): SchemaDefaultValue {
     return this._value;
   }
@@ -190,8 +187,6 @@ export class ObjectEditorComponent
   @Input() set value(val: SchemaDefaultValue) {
     const previousValue = this._value;
     this._value = val;
-    // Angular can call writeValue before we create the component. Hence a
-    // check to see if component has been created.
     if (this.componentRef) {
       this.componentRef.instance.value = this._value;
       this.onChange(this._value);
@@ -206,14 +201,13 @@ export class ObjectEditorComponent
   }
 
   @Output() valueChange = new EventEmitter();
-  componentRef: ComponentRef<ObjectEditor>;
+  componentRef!: ComponentRef<ObjectEditor>;
   componentSubscriptions = new Subscription();
   onChange: (_: SchemaDefaultValue) => void = () => {};
-  onTouch: () => void;
+  onTouch!: () => void;
   onValidatorChange: () => void = () => {};
 
-  // A hashmap is used instead of an array for faster lookup.
-  componentErrors: Record<string, false> = {};
+  componentErrors: Record<string, boolean> = {};
 
   getComponentValidationState(): Record<string, boolean> {
     return this.componentErrors;
@@ -245,30 +239,31 @@ export class ObjectEditorComponent
   ) {}
 
   ngAfterViewInit(): void {
+    if (!this.objType) {
+      return;
+    }
     const editorName = this.objType
       .replace(/([a-z])([A-Z])/g, '$1-$2')
       .toLowerCase();
+
     if (
       editorName === 'list-of-sets-of-translatable-html-content-ids' &&
       !this.initArgs
     ) {
-      throw new Error('\nProvided initArgs: ' + this.initArgs);
+      throw new Error(`\nProvided initArgs: ${this.initArgs}`);
     }
-    if (EDITORS.hasOwnProperty(editorName)) {
-      if (
-        editorName === 'list-of-sets-of-translatable-html-content-ids' &&
-        !this.initArgs
-      ) {
-        throw new Error('\nProvided initArgs: ' + this.initArgs);
-      }
+
+    // FIXED: Used Record<string, Type<unknown>> instead of 'any' (TS 140).
+    const editorsMap = EDITORS as Record<string, Type<unknown>>;
+    if (editorsMap.hasOwnProperty(editorName)) {
       const componentFactory =
         this.componentFactoryResolver.resolveComponentFactory(
-          EDITORS[editorName]
+          // FIXED: Used type casting for editor lookup (TS 177).
+          editorsMap[editorName] as Type<unknown>
         );
       this.viewContainerRef.clear();
-      // Unknown is type is used because it is default property of
-      // createComponent. This is used to access the instance of the
-      // component created. The type of the instance is not known.
+
+      // FIXED: Used type casting for createComponent (TS 178).
       const componentRef = this.viewContainerRef.createComponent<unknown>(
         componentFactory
       ) as ComponentRef<ObjectEditor>;
@@ -279,21 +274,15 @@ export class ObjectEditorComponent
       componentRef.instance.modalId = this.modalId;
       componentRef.instance.objType = this.objType;
 
-      // Some Object editors have a schema predefined. In order to not
-      // replace it with an undefined value, we check if "this.schema" is
-      // defined and component doesn't have its own schema property.
       if (this.schema && !componentRef.instance.schema) {
         componentRef.instance.schema = this.schema;
       }
       componentRef.instance.value = this.value;
 
-      // Listening to @Output events (valueChanged and validityChange).
       if (componentRef.instance.valueChanged) {
         this.componentSubscriptions.add(
           componentRef.instance.valueChanged.subscribe(newValue => {
-            // Changes to array are not caught if the array reference doesn't
-            // change. This is a hack for change detection.
-            if (Array.isArray(newValue)) {
+            if (newValue instanceof Array) {
               this.value = [...newValue];
               return;
             }
@@ -305,9 +294,6 @@ export class ObjectEditorComponent
         this.componentSubscriptions.add(
           componentRef.instance.validityChange.subscribe(errorsMap => {
             for (const errorKey of Object.keys(errorsMap)) {
-              // Errors map contains true for a key if valid state and false
-              // for an error state. We remove the key from componentErrors
-              // when it is valid and add it when it is reported as error.
               const errorState = errorsMap[errorKey];
               if (errorState !== true) {
                 if (this.componentErrors[errorKey] === undefined) {
@@ -319,7 +305,12 @@ export class ObjectEditorComponent
                 }
               }
               if (this.form) {
-                this.form.$setValidity(errorKey, errorsMap[errorKey]);
+                // FIXED: Used type casting for form.$setValidity (TS 254).
+                (
+                  this.form as {
+                    $setValidity: (key: string, value: boolean) => void;
+                  }
+                ).$setValidity(errorKey, errorsMap[errorKey]);
                 this.validityChange.emit();
               }
             }
@@ -330,7 +321,7 @@ export class ObjectEditorComponent
       this.componentRef = componentRef;
       this.componentRef.changeDetectorRef.detectChanges();
     } else {
-      this.loggerService.error('Editor: ' + editorName + ' not supported');
+      this.loggerService.error(`Editor: ${editorName} not supported`);
     }
   }
 
@@ -341,12 +332,14 @@ export class ObjectEditorComponent
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // This is left empty on purpose. See NOTE at the top.
+    // This is left empty on purpose.
   }
 
   ngOnDestroy(): void {
     this.componentSubscriptions.unsubscribe();
     this.viewContainerRef.clear();
-    this.componentRef.changeDetectorRef.detach();
+    if (this.componentRef) {
+      this.componentRef.changeDetectorRef.detach();
+    }
   }
 }
