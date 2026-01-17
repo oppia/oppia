@@ -27,6 +27,7 @@ from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
+from typing import List, Optional , Tuple , TypedDict
 
 import apache_beam as beam
 
@@ -38,6 +39,29 @@ if MYPY:  # pragma: no cover
     [models.Names.TOPIC, models.Names.STORY]
 )
 
+class StoryNodeDict(TypedDict):
+    id: str
+    title: str
+    description: str
+    thumbnail_filename: str
+    thumbnail_bg_color: str
+    thumbnail_size_in_bytes: int
+    destination_node_ids: List[str]
+    acquired_skill_ids: List[str]
+    prerequisite_skill_ids: List[str]
+    outline: str
+    outline_is_finalized: bool
+    exploration_id: str
+    status: str
+    planned_publication_date_msecs: Optional[float]
+    last_modified_msecs: Optional[float]
+    first_publication_date_msecs: Optional[float]
+    unpublishing_reason: Optional[str]
+
+class StoryContentsDict(TypedDict):
+    nodes: List[StoryNodeDict]
+    initial_node_id: str
+    next_node_id: str
 
 class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
     """Class to audit stories with disconnected node ids."""
@@ -62,11 +86,14 @@ class AuditStoriesWithDisconnectedNodeIdsJob(base_jobs.JobBase):
 
         return stories_with_disconnected_node_pCollection
 
-
-class CheckDisconnectedNodeIds(beam.DoFn):
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that DoFn class is of type Any. Thus to avoid MyPy's error (Class
+# cannot subclass 'DoFn' (has type 'Any')), we added an ignore here.
+class CheckDisconnectedNodeIds(beam.DoFn): # type: ignore[misc]
     """DoFn to check for disconnected node_ids in stories."""
 
-    def process(self, element):
+    def process(self, element:Tuple[str, StoryContentsDict ]):
         story_id, story_contents = element
 
         nodes = story_contents['nodes']
