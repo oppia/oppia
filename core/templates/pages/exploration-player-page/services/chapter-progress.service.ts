@@ -22,25 +22,24 @@
 
 import {Injectable} from '@angular/core';
 import {LearnerDashboardBackendApiService} from 'domain/learner_dashboard/learner-dashboard-backend-api.service';
-import { BehaviorSubject,Observable } from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChapterProgressService {
-  completedChaptersCountSubject = new BehaviorSubject<number>(0)
-  completedChaptersCount$: Observable<number> = this.completedChaptersCountSubject.asObservable();
+  completedChaptersCountSubject = new BehaviorSubject<number>(0);
+  completedChaptersCount$: Observable<number> =
+    this.completedChaptersCountSubject.asObservable();
   chapterIsCompletedForTheFirstTime: boolean = false;
 
-
   constructor(
-    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService,
+    private learnerDashboardBackendApiService: LearnerDashboardBackendApiService
   ) {}
 
   updateCompletedChaptersCount(
     checkForFirstTimeCompletion: boolean = false
   ): void {
-    console.log("This is called to update ")
     this.learnerDashboardBackendApiService
       .fetchLearnerCompletedChaptersCountDataAsync()
       .then(data => {
@@ -53,12 +52,10 @@ export class ChapterProgressService {
         }
 
         this.completedChaptersCountSubject.next(newCount);
-        console.log("Updated completed chapters count to:", this.completedChaptersCountSubject.getValue());
       });
   }
 
   getCompletedChaptersCount(): number {
-    
     return this.completedChaptersCountSubject.getValue();
   }
 

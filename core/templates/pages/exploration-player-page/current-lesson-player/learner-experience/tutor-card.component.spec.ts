@@ -584,7 +584,6 @@ describe('Tutor card component', () => {
     ).toHaveBeenCalled();
   });
 
-
   it('should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone', fakeAsync(() => {
     componentInstance.completedChaptersCount = 55;
     spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
@@ -600,7 +599,7 @@ describe('Tutor card component', () => {
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
     ).toBe(false);
   }));
-    it('should correctly show milestone progress bar', () => {
+  it('should correctly show milestone progress bar', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
     componentInstance.completedChaptersCount = 2;

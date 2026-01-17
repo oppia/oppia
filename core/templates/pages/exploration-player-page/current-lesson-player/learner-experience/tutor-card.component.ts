@@ -226,9 +226,11 @@ export class TutorCardComponent {
       this.urlInterpolationService.getStaticCopyrightedImageUrl(
         '/avatar/oppia_avatar_100px.svg'
       );
-      this.chapterProgressService.completedChaptersCount$.subscribe((count:number) => {
+    this.chapterProgressService.completedChaptersCount$.subscribe(
+      (count: number) => {
         this.completedChaptersCount = count;
-      })
+      }
+    );
     this.directiveSubscriptions.add(
       this.conversationFlowService.onOppiaFeedbackAvailable.subscribe(() => {
         this.waitingForOppiaFeedback = false;

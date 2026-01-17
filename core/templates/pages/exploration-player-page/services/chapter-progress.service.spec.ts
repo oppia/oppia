@@ -73,22 +73,22 @@ describe('ChapterProgressService', () => {
   }));
 
   it('should emit the new count via completedChaptersCount$ when update is called', fakeAsync(() => {
-  let receivedValue: number = -1;
+    let receivedValue: number = -1;
 
-  learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
-    Promise.resolve({ completedChaptersCount: 10 })
-  );
+    learnerDashboardBackendApiService.fetchLearnerCompletedChaptersCountDataAsync.and.returnValue(
+      Promise.resolve({completedChaptersCount: 10})
+    );
 
-  chapterProgressService.completedChaptersCount$.subscribe((count) => {
-    receivedValue = count;
-  });
+    chapterProgressService.completedChaptersCount$.subscribe(count => {
+      receivedValue = count;
+    });
 
-  chapterProgressService.updateCompletedChaptersCount();
+    chapterProgressService.updateCompletedChaptersCount();
 
-  tick();
+    tick();
 
-  expect(receivedValue).toBe(10);
-  expect(chapterProgressService.getCompletedChaptersCount()).toBe(10);
+    expect(receivedValue).toBe(10);
+    expect(chapterProgressService.getCompletedChaptersCount()).toBe(10);
   }));
 
   it('should set the completed chapters count', () => {
@@ -98,11 +98,15 @@ describe('ChapterProgressService', () => {
   });
 
   it('should set whether a chapter is completed for the first time', () => {
-  chapterProgressService.setChapterCompletedForTheFirstTime(true);
-  expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(true);
+    chapterProgressService.setChapterCompletedForTheFirstTime(true);
+    expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
+      true
+    );
 
-  chapterProgressService.setChapterCompletedForTheFirstTime(false);
-  expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(false);
+    chapterProgressService.setChapterCompletedForTheFirstTime(false);
+    expect(chapterProgressService.getChapterCompletedForTheFirstTime()).toBe(
+      false
+    );
   });
 
   it('should return the completed chapters count', fakeAsync(() => {
@@ -115,4 +119,3 @@ describe('ChapterProgressService', () => {
     expect(chapterProgressService.getCompletedChaptersCount()).toBe(3);
   }));
 });
-
