@@ -736,3 +736,18 @@ oppia-library-page .oppia-exp-summary-tiles-container {
     max-width: 96vw;
   }
 }
+
+/* Fix */
+.e2e-test-exp-summary-tile,
+.e2e-test-collection-summary-tile {
+  display: flex;
+  flex-direction: column;
+}
+
+.e2e-test-exp-summary-tile .title,
+.e2e-test-collection-summary-tile .title {
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+  text-align: left;
+}
