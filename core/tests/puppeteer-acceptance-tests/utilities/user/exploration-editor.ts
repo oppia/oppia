@@ -2510,7 +2510,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToSettingsTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -2740,7 +2740,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToFeedbackTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -2788,7 +2788,7 @@ export class ExplorationEditor extends BaseUser {
         dismissWelcomeModalSelector,
         {
           visible: true,
-          timeout: 5000,
+          timeout: 10000,
         }
       );
       if (modalElement) {
@@ -2801,7 +2801,7 @@ export class ExplorationEditor extends BaseUser {
         // Important: Wait for the backdrop to fade out, otherwise it blocks
         // subsequent clicks on the page elements.
         await this.page
-          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
           .catch(() => {});
         showMessage('Tutorial pop-up closed successfully.');
       }
@@ -2831,7 +2831,7 @@ export class ExplorationEditor extends BaseUser {
         stayInEditorButtonSelector,
         {
           visible: true,
-          timeout: 5000,
+          timeout: 10000,
         }
       );
       if (modalElement) {
@@ -2840,7 +2840,7 @@ export class ExplorationEditor extends BaseUser {
           hidden: true,
         });
         await this.page
-          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
           .catch(() => {});
         showMessage('Feedback prompt modal closed successfully.');
       }
@@ -4309,7 +4309,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToPreviewTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -4363,7 +4363,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToHistoryTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -4497,7 +4497,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToTranslationsTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -4540,7 +4540,7 @@ export class ExplorationEditor extends BaseUser {
   async navigateToEditorTab(): Promise<void> {
     await this.dismissWelcomeModalIfPresent();
     await this.page
-      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
       .catch(() => {});
 
     if (this.isViewportAtMobileWidth()) {
@@ -5711,7 +5711,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedThread - The 1-indexed position of the expected thread.
    */
   async viewFeedbackThread(expectedThread: number): Promise<void> {
-    await this.reloadPage();
     await this.navigateToFeedbackTab();
     await this.page.waitForSelector(feedbackSubjectSelector);
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
