@@ -41,10 +41,12 @@ import '../static/multiple_choice_input.css';
 })
 export class InteractiveMultipleChoiceInputComponent implements OnInit {
   COMPONENT_NAME_RULE_INPUT!: string;
-  @Input() choicesWithValue: string;
-  @Input() showChoicesInShuffledOrderWithValue: string;
-  choices: ChoiceWithIndex[];
-  answer;
+
+  @Input() choicesWithValue!: string;
+  @Input() showChoicesInShuffledOrderWithValue!: string;
+  choices!: ChoiceWithIndex[];
+
+  answer: number | null = null;
   displayedCard!: StateCard;
   errorMessageI18nKey: string = '';
   recordedVoiceovers!: RecordedVoiceovers;
@@ -57,7 +59,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     private multipleChoiceInputOrderedChoicesService: MultipleChoiceInputOrderedChoicesService
   ) {}
 
-  private getAttrs() {
+  private getAttrs(): Record<string, string> {
     return {
       choicesWithValue: this.choicesWithValue,
       showChoicesInShuffledOrderWithValue:
@@ -71,12 +73,12 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
 
   private shuffleChoices(choices: ChoiceWithIndex[]): void {
     for (
-      var currentIndex = choices.length - 1;
+      let currentIndex = choices.length - 1;
       currentIndex >= 0;
       currentIndex--
     ) {
-      var temporaryValue = null;
-      var randomIndex = null;
+      let temporaryValue = null;
+      let randomIndex = null;
       randomIndex = Math.floor(Math.random() * (currentIndex + 1));
       temporaryValue = choices[currentIndex];
       choices[currentIndex] = choices[randomIndex];
@@ -126,7 +128,7 @@ export class InteractiveMultipleChoiceInputComponent implements OnInit {
     }
     this.errorMessageI18nKey = '';
     // Deselect previously selected option.
-    var selectedElement = document.querySelector(
+    const selectedElement = document.querySelector(
       'button.multiple-choice-option.selected'
     );
     if (selectedElement) {

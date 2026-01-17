@@ -14,10 +14,6 @@
 
 /**
  * @fileoverview Component for the music notes input interaction component.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
  */
 
 import {
@@ -30,7 +26,7 @@ import {
   Renderer2,
   ViewChild,
 } from '@angular/core';
-import {InteractionAnswer, MusicNotesAnswer} from 'interactions/answer-defs';
+import {InteractionAnswer} from 'interactions/answer-defs';
 import {
   MusicNotesInputCustomizationArgs,
   ReadableMusicNote,
@@ -52,7 +48,7 @@ interface MusicNote {
   noteStart: {
     num: number;
     den: number;
-  };
+  } | null;
 }
 
 interface NoteSequence {
@@ -72,7 +68,7 @@ interface Note {
 interface DraggedNoteData {
   id?: string;
   type?: string;
-  noteType?: number;
+  noteType: number;
   isPalette: boolean;
 }
 
@@ -83,10 +79,7 @@ interface DraggedNoteData {
 export class MusicNotesInputComponent
   implements OnInit, OnDestroy, AfterViewInit
 {
-  // These properties are initialized using Angular lifecycle hooks
-  // and we need to do non-null assertion. For more information, see
-  // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
-  @Input() lastAnswer!: string;
+  @Input() lastAnswer!: string | null;
   @Input() sequenceToGuessWithValue!: string;
   @Input() initialSequenceWithValue!: string;
   sequenceToGuess!: Sequence;
@@ -104,20 +97,19 @@ export class MusicNotesInputComponent
   noteSequence: NoteSequence[] = [];
   _currentNoteId = 0;
   NOTE_TYPE_NATURAL = 0;
-  // TODO(#15177): Add more features to Music-Notes-Input Interaction
-  // More notes types will be added to NOTE_TYPES.
   NOTE_TYPES = [this.NOTE_TYPE_NATURAL];
   NOTES_ON_LINES = ['E4', 'G4', 'B4', 'D5', 'F5'];
   LEDGER_LINE_NOTES = ['C4', 'A5'];
   verticalGridKeys = [81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60];
   SOUNDFONT_URL = '/third_party/static/midi-js-c26ebb/examples/soundfont/';
-  // Highest number of notes that can fit on the staff at any given time.
   MAXIMUM_NOTES_POSSIBLE = 8;
   NOTE_NAMES_TO_MIDI_VALUES =
-    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES;
+    InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES as Record<
+      string,
+      number
+    >;
 
-  staffContainerElt: HTMLElement | null;
-
+  staffContainerElt: HTMLElement | null = null;
   placedNotes: Note[] = [];
 
   @ViewChild('staffArea') staffAreaRef!: ElementRef;
@@ -134,7 +126,7 @@ export class MusicNotesInputComponent
     private renderer: Renderer2
   ) {}
 
-  private _getAttributes() {
+  private _getAttributes(): Record<string, string> {
     return {
       sequenceToGuessWithValue: this.sequenceToGuessWithValue,
       initialSequenceWithValue: this.initialSequenceWithValue,
@@ -153,7 +145,8 @@ export class MusicNotesInputComponent
 
     this.initialSequence = this.interactionIsActive
       ? initialSequence
-      : this.lastAnswer;
+      : (this.lastAnswer as string);
+
     this.staffContainerElt = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-staff'
     );
@@ -161,7 +154,7 @@ export class MusicNotesInputComponent
     this.directiveSubscriptions.add(
       this.playerPositionService.onNewCardAvailable.subscribe(() => {
         this.interactionIsActive = false;
-        this.initialSequence = this.lastAnswer;
+        this.initialSequence = this.lastAnswer as string;
         this.reinitStaff();
       })
     );
@@ -170,40 +163,20 @@ export class MusicNotesInputComponent
       () => this.submitAnswer(),
       null
     );
-    // Initialization code.
     this.initializeNoteSequence(this.initialSequence as Sequence);
     this.init();
   }
 
   ngAfterViewInit(): void {
-    // Sets grid positions, displays the staff and note,
-    // and then initializes the view after staff has loaded.
     this.reinitStaff();
   }
 
-  /**
-   * A note Object has a baseNoteMidiNumber and an offset property. For
-   * example, C#4 would be -> note = {baseNoteMidiNumber: 61, offset: 1};
-   *
-   * A readableNote Object has a readableNoteName property. For example,
-   * Gb5 would be -> readableNote = {readableNoteName: 'Gb5'};
-   */
-
-  /**
-   * Array to hold the notes placed on staff. Notes are represented as
-   * objects with two keys: baseNoteMidiNumber and offset. The
-   * baseNoteMidiNumber is an integer value denoting the MIDI number of
-   * the staff-line the note is on, and the offset is either -1, 0 or 1,
-   * denoting a flat, natural or sharp respectively.
-   */
   _addNoteToNoteSequence(note: MusicNote): void {
     this.noteSequence.push({
       note: note,
     });
   }
 
-  // Sorts noteSequence elements according to the return value of the
-  // compareNoteStarts function.
   _sortNoteSequence(): void {
     this.noteSequence.sort(this.compareNoteStarts);
   }
@@ -222,20 +195,15 @@ export class MusicNotesInputComponent
     }));
   }
 
-  /**
-   * Counter to create unique id for each note dropped on staff.
-   */
   generateNoteId(): string {
     this._currentNoteId += 1;
-    let nodeId = 'note_id_' + (this._currentNoteId - 1);
-    return nodeId;
+    return 'note_id_' + (this._currentNoteId - 1);
   }
 
-  // Staff has to be reinitialized every time that the staff is resized or
-  // displayed. The staffContainerElt and all subsequent measurements
-  // must be recalculated in order for the grid to work properly.
   reinitStaff(): void {
-    var elem = document.querySelector('.oppia-music-input-valid-note-area');
+    const elem = document.querySelector(
+      '.oppia-music-input-valid-note-area'
+    ) as HTMLElement;
 
     if (elem) {
       this.renderer.setStyle(elem, 'visibility', 'hidden');
@@ -254,8 +222,6 @@ export class MusicNotesInputComponent
     }
     this.CONTAINER_HEIGHT = 0.2 * this.CONTAINER_WIDTH;
 
-    // The grid rectangle dimensions defining the grid which the notes
-    // fall on.
     this.HORIZONTAL_GRID_SPACING =
       this.CONTAINER_WIDTH / (this.MAXIMUM_NOTES_POSSIBLE + 1);
 
@@ -263,19 +229,19 @@ export class MusicNotesInputComponent
       this.CONTAINER_HEIGHT / this.verticalGridKeys.length;
 
     this.clearNotesFromStaff();
-
     this.clearDroppableStaff();
     this.buildDroppableStaff();
   }
 
-  // Initial notes are placed on the staff at the
-  // start of the exploration and can be removed by the learner.
   initializeNoteSequence(initialNotesToAdd: Sequence): void {
+    if (!initialNotesToAdd || !initialNotesToAdd.value) {
+      return;
+    }
     for (let i = 0; i < initialNotesToAdd.value.length; i++) {
-      let {baseNoteMidiNumber, offset} = this._convertReadableNoteToNote(
+      const {baseNoteMidiNumber, offset} = this._convertReadableNoteToNote(
         initialNotesToAdd.value[i]
       );
-      let initialNote = {
+      const initialNote: MusicNote = {
         baseNoteMidiNumber: baseNoteMidiNumber,
         offset: offset,
         noteId: this.generateNoteId(),
@@ -288,47 +254,39 @@ export class MusicNotesInputComponent
     }
   }
 
-  // Removes all notes from staff.
   clearNotesFromStaff(): void {
     const noteChoiceDivs = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-note-choices > div'
     );
-    noteChoiceDivs.forEach((div: Element) => {
+    noteChoiceDivs.forEach((div: HTMLElement) => {
       if (div.parentNode) {
         this.renderer.removeChild(div.parentNode, div);
       }
     });
   }
 
-  // Removes all droppable staff lines.
   clearDroppableStaff(): void {
     const staffDivs = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-staff div'
     );
-    staffDivs.forEach((div: Element) => {
+    staffDivs.forEach((div: HTMLElement) => {
       if (div.parentNode) {
         this.renderer.removeChild(div.parentNode, div);
       }
     });
   }
 
-  // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
-  // as keys and the vertical positions of the staff lines as values.
-  getStaffLinePositions(): Object {
-    const staffLinePositionsArray: number[] = [];
-    const staffLinePositions: {[key: string]: number} = {};
+  getStaffLinePositions(): Record<string, number> {
+    const staffLinePositions: Record<string, number> = {};
     const elements: NodeListOf<HTMLElement> =
       this.elementRef.nativeElement.querySelectorAll(
         '.oppia-music-input-staff div.oppia-music-staff-position'
       );
 
-    elements.forEach((el: HTMLElement) => {
-      staffLinePositionsArray.push(el.offsetTop);
+    elements.forEach((el: HTMLElement, index: number) => {
+      staffLinePositions[this.verticalGridKeys[index]] = el.offsetTop;
     });
-    for (let i = 0; i < staffLinePositionsArray.length; i++) {
-      staffLinePositions[this.verticalGridKeys[i]] = staffLinePositionsArray[i];
-    }
-    return staffLinePositions as Object;
+    return staffLinePositions;
   }
 
   onNoteDropped(event: CdkDragDrop<DraggedNoteData>): void {
@@ -337,7 +295,6 @@ export class MusicNotesInputComponent
     }
 
     const data = event.item.data;
-
     const draggedElement = event.item.element.nativeElement;
     const draggedRect = draggedElement.getBoundingClientRect();
     const staffRect = this.staffAreaRef.nativeElement.getBoundingClientRect();
@@ -385,9 +342,6 @@ export class MusicNotesInputComponent
     }
   }
 
-  // Remove a specific note with given noteId from noteSequence. If given
-  // noteId is not in noteSequence, nothing will be removed.
-
   _removeNotesFromNoteSequenceWithId(noteId: string): void {
     this.placedNotes = this.placedNotes.filter(note => note.id !== noteId);
   }
@@ -429,16 +383,12 @@ export class MusicNotesInputComponent
       );
       this.renderer.setAttribute(staffLineDiv, 'data-line-value', noteName);
 
-      // Drag over.
       this.renderer.listen(staffLineDiv, 'dragover', (evt: DragEvent) => {
         evt.preventDefault();
         this.renderer.addClass(staffLineDiv, 'oppia-music-input-hovered');
 
         const lineValue = staffLineDiv.getAttribute('data-line-value');
-        if (!lineValue) {
-          return;
-        }
-        if (this.isLedgerLineNote(lineValue)) {
+        if (lineValue && this.isLedgerLineNote(lineValue)) {
           const relativeCursorX =
             evt.clientX - staffContainer.getBoundingClientRect().left;
           const topPos = staffLineDiv.getBoundingClientRect().top;
@@ -446,18 +396,17 @@ export class MusicNotesInputComponent
         }
       });
 
-      // Drag Leave.
       this.renderer.listen(staffLineDiv, 'dragleave', () => {
         this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
         const ledgerLines = document.querySelectorAll(
           '.oppia-music-input-ledger-line'
         );
         if (ledgerLines.length > 0) {
-          const last = ledgerLines[ledgerLines.length - 1];
+          const last = ledgerLines[ledgerLines.length - 1] as HTMLElement;
           this.renderer.setStyle(last, 'display', 'none');
         }
       });
-      // Drop.
+
       this.renderer.listen(staffLineDiv, 'drop', (evt: DragEvent) => {
         evt.preventDefault();
         this.renderer.removeClass(staffLineDiv, 'oppia-music-input-hovered');
@@ -467,7 +416,7 @@ export class MusicNotesInputComponent
         );
         if (ledgerLines.length > 0) {
           this.renderer.setStyle(
-            ledgerLines[ledgerLines.length - 1],
+            ledgerLines[ledgerLines.length - 1] as HTMLElement,
             'display',
             'none'
           );
@@ -479,15 +428,21 @@ export class MusicNotesInputComponent
         const oldLeftPos = evt.dataTransfer?.getData('note/oldLeftPos');
         const startPos = oldLeftPos ? parseFloat(oldLeftPos) : undefined;
 
-        let noteEl = document.getElementById(`note-${noteId}`) as HTMLElement;
+        let noteEl = document.getElementById(`note-${noteId}`);
         if (!noteEl) {
           noteEl = this.renderer.createElement('div');
-          this.renderer.addClass(noteEl, 'oppia-music-input-note');
-          this.renderer.setAttribute(noteEl, 'draggable', 'true');
-          this.renderer.setAttribute(noteEl, 'id', `note-${noteId}`);
-          this.renderer.setAttribute(noteEl, 'data-note-id', noteId);
-          this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
-          this.renderer.appendChild(staffContainer, noteEl);
+          if (noteEl) {
+            this.renderer.addClass(noteEl, 'oppia-music-input-note');
+            this.renderer.setAttribute(noteEl, 'draggable', 'true');
+            this.renderer.setAttribute(noteEl, 'id', `note-${noteId}`);
+            this.renderer.setAttribute(noteEl, 'data-note-id', noteId);
+            this.renderer.setAttribute(noteEl, 'data-note-type', noteType);
+            this.renderer.appendChild(staffContainer, noteEl);
+          }
+        }
+
+        if (!noteEl) {
+          return;
         }
 
         const leftPos =
@@ -498,7 +453,7 @@ export class MusicNotesInputComponent
           return;
         }
 
-        const note = {
+        const note: MusicNote = {
           baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[lineValue],
           offset: parseInt(noteType, 10),
           noteId,
@@ -575,10 +530,6 @@ export class MusicNotesInputComponent
     }
   }
 
-  // When compareNoteStarts(a, b) returns less than 0, a is less than b.
-  // When compareNoteStarts(a, b) returns 0, a is equal to b.
-  // When compareNoteStarts(a, b) returns greater than 0, a is greater
-  //   than b.
   compareNoteStarts(a: {note: MusicNote}, b: {note: MusicNote}): number {
     if (a.note.noteStart && b.note.noteStart) {
       return (
@@ -587,44 +538,37 @@ export class MusicNotesInputComponent
         (a.note.noteStart.den * b.note.noteStart.den)
       );
     }
+    return 0;
   }
 
-  // If a note position is taken, return true,
-  // otherwise the position is available.
   checkIfNotePositionTaken(leftPos: number): boolean {
-    if (this.getNoteStartFromLeftPos(leftPos)) {
-      let newNoteToCheck = this.getNoteStartFromLeftPos(leftPos);
-      if (newNoteToCheck.note.noteStart !== undefined) {
-        for (let i = 0; i < this.noteSequence.length; i++) {
-          let noteComparison = this.compareNoteStarts(
-            this.noteSequence[i],
-            newNoteToCheck
-          );
-          if (noteComparison === 0) {
-            return true;
-          }
+    const newNoteToCheck = this.getNoteStartFromLeftPos(leftPos);
+    if (newNoteToCheck && newNoteToCheck.note.noteStart !== null) {
+      for (let i = 0; i < this.noteSequence.length; i++) {
+        const noteComparison = this.compareNoteStarts(
+          this.noteSequence[i],
+          newNoteToCheck
+        );
+        if (noteComparison === 0) {
+          return true;
         }
-        return false;
       }
     }
     return false;
   }
 
-  // Converts a note's leftPosition to a noteStart object by checking if
-  // leftPos is close to available horizontal grid position. If there is
-  // not a close match, return undefined.
   getNoteStartFromLeftPos(leftPos: number): NoteSequence | undefined {
     for (let i = 0; i < this.MAXIMUM_NOTES_POSSIBLE; i++) {
-      // If the difference between leftPos and a horizontalGrid Position
-      // is less than 2, then they are close enough to set a position.
-      // This gives some wiggle room for rounding differences.
       if (Math.abs(leftPos - this.getHorizontalPosition(i)) < 2) {
-        let note = {
+        const note: MusicNote = {
           noteStart: {
             num: i,
             den: 1,
           },
-        } as MusicNote;
+          baseNoteMidiNumber: 0,
+          offset: 0,
+          noteId: '',
+        };
         return {
           note: note,
         };
@@ -634,46 +578,32 @@ export class MusicNotesInputComponent
   }
 
   getNoteStartAsFloat(note: MusicNote): number {
-    return note.noteStart.num / note.noteStart.den;
+    return note.noteStart ? note.noteStart.num / note.noteStart.den : 0;
   }
 
-  // Clear noteSequence values and remove all notes
-  // and Ledger Lines from the staff.
   clearSequence(): void {
     this.placedNotes = [];
     this.noteSequence = [];
     const notesOnStaff = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-on-staff'
     );
-    notesOnStaff.forEach(note => note.remove());
+    notesOnStaff.forEach((note: HTMLElement) => note.remove());
     const ledgerLines = this.elementRef.nativeElement.querySelectorAll(
       '.oppia-music-input-ledger-line'
     );
-    ledgerLines.forEach(line => line.remove());
+    ledgerLines.forEach((line: HTMLElement) => line.remove());
   }
 
-  // Converts the midiValue of a droppable line that a note is on
-  // into a top position.
   getVerticalPosition(baseNoteMidiNumber: number): number {
     return this.getStaffLinePositions()[baseNoteMidiNumber];
   }
 
-  /**
-   * Gets a horizontal grid position based on the position of note-choices
-   * div. '.oppia-music-input-note-choices div:first-child' (the note that
-   * gets cloned to create all other subsequent notes) is the last
-   * horizontal position, so to determine the others values, we multiply
-   * the  that will fit on the staff by the
-   * this.HORIZONTAL_GRID_SPACING and subtract that from the last
-   * Horizontal Position value and return the result.
-   */
   getHorizontalPosition(noteStartAsFloat: number): number {
     const firstNoteDiv = this.elementRef.nativeElement.querySelector(
       '.oppia-music-input-note-choices div:first-child'
     ) as HTMLElement;
 
     if (!firstNoteDiv) {
-      console.warn('First note div not found.');
       return 0;
     }
 
@@ -721,9 +651,9 @@ export class MusicNotesInputComponent
 
   repaintLedgerLines(): void {
     for (let i = 0; i < this.noteSequence.length; i++) {
-      let note = this.noteSequence[i].note;
-      let lineValue = this._getCorrespondingNoteName(note.baseNoteMidiNumber);
-      if (this.isLedgerLineNote(lineValue)) {
+      const note = this.noteSequence[i].note;
+      const lineValue = this._getCorrespondingNoteName(note.baseNoteMidiNumber);
+      if (lineValue && this.isLedgerLineNote(lineValue)) {
         this.drawLedgerLine(
           this.getVerticalPosition(note.baseNoteMidiNumber),
           this.getHorizontalPosition(this.getNoteStartAsFloat(note))
@@ -732,38 +662,25 @@ export class MusicNotesInputComponent
     }
   }
 
-  _getCorrespondingNoteName(midiNumber: string | number): string {
-    let correspondingNoteName = null;
-    for (let noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
+  _getCorrespondingNoteName(midiNumber: number): string | null {
+    for (const noteName in this.NOTE_NAMES_TO_MIDI_VALUES) {
       if (this.NOTE_NAMES_TO_MIDI_VALUES[noteName] === midiNumber) {
-        correspondingNoteName = noteName;
-        break;
+        return noteName;
       }
     }
-    if (correspondingNoteName === null) {
-      console.error('Invalid MIDI pitch: ' + midiNumber);
-    }
-    return correspondingNoteName;
+    return null;
   }
 
-  /*
-   * Returns a note object with a readable note name, such as Eb5, A5 or
-   * F#4, given a note object with baseNoteMidiNumber and sharp/flat
-   * offset properties. For example, if note.baseNoteMidiNumber = 64 and
-   * note.offset = -1, this will return {'readableNoteName': 'Eb4'}
-   * (since 64 is the baseNoteMidiNumber for 'E', and -1 indicates a
-   * flat).
-   */
   _convertNoteToReadableNote(note: MusicNote): ReadableMusicNote {
-    if (note.offset !== -1 && note.offset !== 0 && note.offset !== 1) {
-      console.error('Invalid note offset: ' + note.offset);
-    }
-
-    let correspondingNoteName = this._getCorrespondingNoteName(
+    const correspondingNoteName = this._getCorrespondingNoteName(
       note.baseNoteMidiNumber
     );
 
-    let accidental = note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b';
+    if (!correspondingNoteName) {
+      throw new Error('Invalid MIDI pitch: ' + note.baseNoteMidiNumber);
+    }
+
+    const accidental = note.offset === 1 ? '#' : note.offset === 0 ? '' : 'b';
 
     return {
       readableNoteName:
@@ -771,35 +688,19 @@ export class MusicNotesInputComponent
     } as ReadableMusicNote;
   }
 
-  /*
-   * Returns a note object with a baseNoteMidiNumber and an
-   * offset property, given a note object with a readableNoteName
-   * property. For example, if note.readableNoteName = 'Eb4' this will
-   * return {'baseNoteMidiNumber': 64, 'offset': -1} (since 64 is the
-   * baseNoteMidiNumber for 'E', and -1 indicates a flat).
-   */
   _convertReadableNoteToNote(readableNote: ReadableMusicNote): {
     baseNoteMidiNumber: number;
     offset: number;
   } {
-    let readableNoteName = readableNote.readableNoteName;
+    const readableNoteName = readableNote.readableNoteName;
     if (readableNoteName.length === 2) {
-      // This is a natural note.
       return {
         baseNoteMidiNumber: this.NOTE_NAMES_TO_MIDI_VALUES[readableNoteName],
         offset: 0,
       };
     } else if (readableNoteName.length === 3) {
-      // This is a note with an accidental.
-      let offset =
-        readableNoteName[1] === '#'
-          ? 1
-          : readableNoteName[1] === 'b'
-            ? -1
-            : null;
-      if (offset === null) {
-        console.error('Invalid readable note: ' + readableNoteName);
-      }
+      const offset =
+        readableNoteName[1] === '#' ? 1 : readableNoteName[1] === 'b' ? -1 : 0;
 
       return {
         baseNoteMidiNumber:
@@ -809,14 +710,10 @@ export class MusicNotesInputComponent
         offset: offset,
       };
     } else {
-      // This is not a valid readableNote.
-      console.error('Invalid readable note: ' + readableNote);
+      throw new Error('Invalid readable note: ' + readableNoteName);
     }
   }
 
-  // For each note in a sequence, add a noteDuration property.
-  // TODO(#15177): Add more features to Music-Notes-Input Interaction
-  // Add more options for note durations.
   _makeAllNotesHaveDurationOne(
     noteArray: ReadableMusicNote[]
   ): ReadableMusicNote[] {
@@ -830,34 +727,30 @@ export class MusicNotesInputComponent
   }
 
   submitAnswer(): void {
-    let readableSequence: MusicNotesAnswer[] = [];
+    let readableSequence: ReadableMusicNote[] = [];
     for (let i = 0; i < this.noteSequence.length; i++) {
       readableSequence.push(
         this._convertNoteToReadableNote(this.noteSequence[i].note)
       );
     }
     readableSequence = this._makeAllNotesHaveDurationOne(readableSequence);
-    if (readableSequence) {
-      this.currentInteractionService.onSubmit(
-        readableSequence as InteractionAnswer,
-        this.musicNotesInputRulesService
-      );
-    }
+    this.currentInteractionService.onSubmit(
+      readableSequence as unknown as InteractionAnswer,
+      this.musicNotesInputRulesService
+    );
   }
 
-  /** *****************************************************************
-   * Functions involving MIDI playback.
-   ******************************************************************/
-
   playSequenceToGuess(): void {
-    let noteSequenceToGuess = [];
+    const noteSequenceToGuess = [];
     for (let i = 0; i < this.sequenceToGuess.value.length; i++) {
       noteSequenceToGuess.push(
         this._convertReadableNoteToNote(this.sequenceToGuess.value[i])
       );
     }
     this.playSequence(
-      this.convertSequenceToGuessToMidiSequence(noteSequenceToGuess)
+      this.convertSequenceToGuessToMidiSequence(
+        noteSequenceToGuess as MusicNote[]
+      )
     );
   }
 
@@ -867,26 +760,24 @@ export class MusicNotesInputComponent
     );
   }
 
-  // Takes an input > 0, converts to a noteStart object and returns a
-  // float representation of the noteStart position.
   getNoteStart(noteIndex: number): number {
     return this.getNoteStartAsFloat({
       noteStart: {
         num: noteIndex,
         den: 1,
       },
-    } as MusicNote);
+      baseNoteMidiNumber: 0,
+      offset: 0,
+      noteId: '',
+    });
   }
 
-  // Input is a midiSequence, which is an array of arrays, in the form of
-  // [[72], [62], [67, 71, 74]]. An inner array with more than one value
-  // is treated like a chord and all its values are played back
-  // simultaneously.
   playSequence(midiSequence: number[][]): void {
-    // TODO(#7892): Move this check to music-phrase-player.service.ts
-    // once AlertsService has been successfully migrated.
-    if (window.AudioContext || window.Audio) {
-      let notes = [];
+    const audioAvailable =
+      (window as unknown as Record<string, unknown>).AudioContext ||
+      (window as unknown as Record<string, unknown>).Audio;
+    if (audioAvailable) {
+      const notes = [];
       for (let i = 0; i < midiSequence.length; i++) {
         for (let j = 0; j < midiSequence[i].length; j++) {
           notes.push({
@@ -905,38 +796,22 @@ export class MusicNotesInputComponent
     }
   }
 
-  // A MIDI pitch is the baseNoteMidiNumber of the note plus the offset.
   _convertNoteToMidiPitch(note: MusicNote): number {
     return note.baseNoteMidiNumber + note.offset;
   }
 
-  // Return the MIDI value for each note in the sequence.
-  // TODO(#15177): Add more features to Music-Notes-Input Interaction.
-  // Add chord functionality.
   convertSequenceToGuessToMidiSequence(sequence: MusicNote[]): number[][] {
-    let midiSequence = [];
+    const midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
-      if (sequence[i].hasOwnProperty('baseNoteMidiNumber')) {
-        midiSequence.push([this._convertNoteToMidiPitch(sequence[i])]);
-      } else {
-        console.error('Invalid note: ' + sequence[i]);
-      }
+      midiSequence.push([this._convertNoteToMidiPitch(sequence[i])]);
     }
     return midiSequence;
   }
 
-  // Return the MIDI value for each note in the sequence.
-  // TODO(#15177): Add more features to Music-Notes-Input Interaction.
-  // Add chord functionality.
   convertNoteSequenceToMidiSequence(sequence: NoteSequence[]): number[][] {
-    let midiSequence = [];
+    const midiSequence = [];
     for (let i = 0; i < sequence.length; i++) {
-      if (sequence[i].hasOwnProperty('note')) {
-        // Single note.
-        midiSequence.push([this._convertNoteToMidiPitch(sequence[i].note)]);
-      } else {
-        console.error('Invalid note: ' + sequence[i]);
-      }
+      midiSequence.push([this._convertNoteToMidiPitch(sequence[i].note)]);
     }
     return midiSequence;
   }
@@ -954,6 +829,3 @@ export class MusicNotesInputComponent
     };
   }
 }
-
-// Music interaction is not working well.
-// We will probably deprecate it, since it's rarely used.

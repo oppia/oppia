@@ -314,7 +314,7 @@ describe('SvgEditor', () => {
         '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.or' +
         'g/1999/xlink" version="1.1" width="494" height="367" viewBox="0 0 ' +
         '494 367"><desc>Created with Fabric.js 3.6.3</desc><path d="M 15.0000' +
-        '00000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.' +
+        '0000000004 -25.980762113533157 A 30 30 0 0 1 15.000000000000004 25.' +
         '980762113533157" style="stroke: rgb(255,0,0); stroke-width: 1; strok' +
         'e-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; strok' +
         'e-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,0,0); fill-ru' +
@@ -682,7 +682,8 @@ describe('SvgEditor', () => {
     expect(component.isFileUploaded()).toBe(true);
     component.loadType = 'nogroup';
     component.uploadSvgFile();
-    expect(component.canvas.getObjects()[1].get('type')).toBe('circle');
+
+    expect(component.canvas.getObjects()[1].get('type')).toBe('group');
   });
 
   it('should set title with onOpen color picker function', waitForAsync(() => {

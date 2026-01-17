@@ -21,6 +21,12 @@ import INTERACTION_SPECS from 'interactions/interaction_specs.json';
 import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 
+interface InteractionSpecs {
+  [interactionId: string]: {
+    answer_type: string;
+  };
+}
+
 @Pipe({
   name: 'truncateInputBasedOnInteractionAnswerTypePipe',
 })
@@ -34,33 +40,24 @@ export class TruncateInputBasedOnInteractionAnswerTypePipe
     interactionId: string,
     length: number
   ): string {
-    let answerType = INTERACTION_SPECS[interactionId].answer_type;
+    const answerType = (INTERACTION_SPECS as unknown as InteractionSpecs)[
+      interactionId
+    ].answer_type;
     let actualInputToTruncate = '';
-    let inputUpdate;
+    let inputUpdate: Record<string, unknown>;
 
-    // TODO(#15858): Update InteractionAnswer type and remove if block
-    // code in truncate-input-based-on-interaction-answer-type.pipe.ts file.
-
-    // As input variable can be of 19 types and
-    // there properties are also different
-    // we need to fix all InteractionAnswer properties.
-    // we can do this in later stage.
-    // For now i am using the if block logic to do the task.
-    // by doing so we don't need to change this in whole codebase.
-    if (typeof input !== 'object') {
+    if (typeof input !== 'object' || input === null) {
       inputUpdate = {
         code: input,
       };
     } else {
-      inputUpdate = input;
+      inputUpdate = input as unknown as Record<string, unknown>;
     }
 
-    if (answerType === 'NormalizedString') {
-      actualInputToTruncate = inputUpdate.code;
-    } else if (answerType === 'CodeEvaluation') {
-      actualInputToTruncate = inputUpdate.code;
+    if (answerType === 'NormalizedString' || answerType === 'CodeEvaluation') {
+      actualInputToTruncate = inputUpdate.code as string;
     } else {
-      throw new Error('Unknown interaction answer type');
+      throw new Error(`Unknown interaction answer type: ${answerType}`);
     }
 
     return this.truncatePipe.transform(actualInputToTruncate, length);

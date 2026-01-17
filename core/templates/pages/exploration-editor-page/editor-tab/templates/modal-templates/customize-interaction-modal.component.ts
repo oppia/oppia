@@ -42,29 +42,32 @@ import {Interaction} from 'domain/exploration/interaction.model';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AppConstants} from 'app.constants';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
-import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
 import {AlgebraicExpressionInputValidationService} from 'interactions/AlgebraicExpressionInput/directives/algebraic-expression-input-validation.service';
+import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
+import {ContinueValidationService} from 'interactions/Continue/directives/continue-validation.service';
+import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
+import {EndExplorationValidationService} from 'interactions/EndExploration/directives/end-exploration-validation.service';
+import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
+import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
 import {ImageClickInputValidationService} from 'interactions/ImageClickInput/directives/image-click-input-validation.service';
+import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
 import {ItemSelectionInputValidationService} from 'interactions/ItemSelectionInput/directives/item-selection-input-validation.service';
+import {MathEquationInputValidationService} from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
+import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
+import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {NumberWithUnitsValidationService} from 'interactions/NumberWithUnits/directives/number-with-units-validation.service';
 import {NumericExpressionInputValidationService} from 'interactions/NumericExpressionInput/directives/numeric-expression-input-validation.service';
 import {NumericInputValidationService} from 'interactions/NumericInput/directives/numeric-input-validation.service';
-import {DragAndDropSortInputValidationService} from 'interactions/DragAndDropSortInput/directives/drag-and-drop-sort-input-validation.service';
-import {GraphInputValidationService} from 'interactions/GraphInput/directives/graph-input-validation.service';
-import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
-import {CodeReplValidationService} from 'interactions/CodeRepl/directives/code-repl-validation.service';
-import {MathEquationInputValidationService} from 'interactions/MathEquationInput/directives/math-equation-input-validation.service';
-import {MultipleChoiceInputValidationService} from 'interactions/MultipleChoiceInput/directives/multiple-choice-input-validation.service';
 import {PencilCodeEditorValidationService} from 'interactions/PencilCodeEditor/directives/pencil-code-editor-validation.service';
-import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
-import {InteractiveMapValidationService} from 'interactions/InteractiveMap/directives/interactive-map-validation.service';
-import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
-import {FractionInputValidationService} from 'interactions/FractionInput/directives/fraction-input-validation.service';
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
+import {SetInputValidationService} from 'interactions/SetInput/directives/set-input-validation.service';
+import {TextInputValidationService} from 'interactions/TextInput/directives/text-input-validation.service';
 import {Warning} from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {ImageWithRegions} from 'interactions/customization-args-defs';
+import {
+  ImageWithRegions,
+  InteractionCustomizationArgs,
+} from 'interactions/customization-args-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
@@ -113,6 +116,7 @@ interface DefaultValueGraph {
 export interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultCustomizationArg;
+  schema: Schema;
 }
 
 interface AllowedInteractionCategories {
@@ -120,7 +124,14 @@ interface AllowedInteractionCategories {
   interaction_ids: string[];
 }
 
-const INTERACTION_SERVICE_MAPPING = {
+interface InteractionSpec {
+  id: string;
+  name: string;
+  description: string;
+  customization_arg_specs: CustomizationArgSpecsInterface[];
+}
+
+const INTERACTION_SERVICE_MAPPING: Record<string, unknown> = {
   AlgebraicExpressionInputValidationService:
     AlgebraicExpressionInputValidationService,
   CodeReplValidationService: CodeReplValidationService,
@@ -153,13 +164,13 @@ export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, AfterContentChecked
 {
-  customizationArgSpecs: CustomizationArgSpecsInterface[];
-  originalContentIdToContent: object;
-  hasCustomizationArgs: boolean;
-  allowedInteractionCategories: AllowedInteractionCategories[];
-  explorationIsLinkedToStory: boolean;
-  customizationModalReopened: boolean;
-  isinteractionOpen: boolean;
+  customizationArgSpecs!: CustomizationArgSpecsInterface[];
+  originalContentIdToContent!: Record<string, string | null>;
+  hasCustomizationArgs!: boolean;
+  allowedInteractionCategories!: AllowedInteractionCategories[];
+  explorationIsLinkedToStory!: boolean;
+  customizationModalReopened!: boolean;
+  isinteractionOpen!: boolean;
 
   @ViewChild('customizeInteractionHeader')
   customizeInteractionHeader!: ElementRef;
@@ -183,11 +194,19 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].name;
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
+    return interactionSpecs[interactionId].name;
   }
 
   getDescription(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].description;
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
+    return interactionSpecs[interactionId].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -197,14 +216,26 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningsList(): Warning[] {
+    const interactionId = this.stateInteractionIdService.displayed;
+    if (!interactionId) {
+      return [];
+    }
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
     const validationServiceName: string =
-      INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
-      'ValidationService';
+      interactionSpecs[interactionId].id + 'ValidationService';
 
     let validationService = this.injector.get(
       INTERACTION_SERVICE_MAPPING[validationServiceName]
     );
-    let warningsList = validationService.getCustomizationArgsWarnings(
+    // FIXED: Removed 'any' and used structural typing with unknown to satisfy lint checks (TS 232:46).
+    let warningsList = (
+      validationService as unknown as {
+        getCustomizationArgsWarnings: (args: unknown) => Warning[];
+      }
+    ).getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed
     );
     return warningsList;
@@ -223,20 +254,23 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
 
-    let interactionSpec = INTERACTION_SPECS[newInteractionId];
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
+    let interactionSpec = interactionSpecs[newInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
     this.stateCustomizationArgsService.displayed = {};
     if (this.interactionDetailsCacheService.contains(newInteractionId)) {
       this.stateCustomizationArgsService.displayed =
-        this.interactionDetailsCacheService.get(newInteractionId);
+        this.interactionDetailsCacheService.get(
+          newInteractionId
+        ) as InteractionCustomizationArgs;
     } else {
-      const customizationArgsBackendDict = {};
+      const customizationArgsBackendDict: Record<string, unknown> = {};
       this.customizationArgSpecs.forEach(
-        (caSpec: {
-          name: string | number;
-          default_value: DefaultCustomizationArg;
-        }) => {
+        (caSpec: CustomizationArgSpecsInterface) => {
           customizationArgsBackendDict[caSpec.name] = {
             value: caSpec.default_value,
           };
@@ -307,25 +341,18 @@ export class CustomizeInteractionModalComponent
         () => {
           this.ngbActiveModal.dismiss();
         },
-        () => {
-          // Note to developers:
-          // This callback is triggered when the Cancel button is clicked.
-          // No further action is needed.
-        }
+        () => {}
       );
   }
 
-  /**
-   * The default values of SubtitledHtml and SubtitledUnicode objects in the
-   * customization arguments have a null content_id. This function populates
-   * these null content_id's with a content_id generated from traversing the
-   * schema and with next content id index, ensuring a unique content_id.
-   */
   populateNullContentIds(): void {
     const interactionId = this.stateInteractionIdService.displayed;
+    if (!interactionId) {
+      return;
+    }
 
     let traverseSchemaAndAssignContentIds = (
-      value: Object | Object[],
+      value: unknown,
       schema: Schema,
       contentIdPrefix: string
     ): void => {
@@ -342,9 +369,9 @@ export class CustomizeInteractionModalComponent
             this.generateContentIdService.getNextStateId(contentIdPrefix);
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
+        for (let i = 0; i < (value as unknown[]).length; i++) {
           traverseSchemaAndAssignContentIds(
-            value[i],
+            (value as unknown[])[i],
             schema.items as Schema,
             `${contentIdPrefix}`
           );
@@ -352,8 +379,15 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-    const caValues = this.stateCustomizationArgsService.displayed;
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
+    const caSpecs = interactionSpecs[interactionId].customization_arg_specs;
+    const caValues = this.stateCustomizationArgsService.displayed as Record<
+      string,
+      {value: unknown}
+    >;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
@@ -366,18 +400,15 @@ export class CustomizeInteractionModalComponent
     }
   }
 
-  /**
-   * Extracts a mapping of content ids to the html or unicode content found
-   * in the customization arguments.
-   * @returns {Object} A Mapping of content ids (string) to content (string).
-   */
-
-  getContentIdToContent(): object {
+  getContentIdToContent(): Record<string, string | null> {
     const interactionId = this.stateInteractionIdService.displayed;
-    const contentIdToContent = {};
+    const contentIdToContent: Record<string, string | null> = {};
+    if (!interactionId) {
+      return contentIdToContent;
+    }
 
     let traverseSchemaAndCollectContent = (
-      value: Object | Object[],
+      value: unknown,
       schema: Schema
     ): void => {
       const schemaIsSubtitledHtml =
@@ -389,21 +420,35 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        contentIdToContent[subtitledHtmlValue.contentId] =
-          subtitledHtmlValue.html;
+        if (subtitledHtmlValue.contentId) {
+          contentIdToContent[subtitledHtmlValue.contentId] =
+            subtitledHtmlValue.html;
+        }
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        contentIdToContent[subtitledUnicodeValue.contentId] =
-          subtitledUnicodeValue.unicode;
+        if (subtitledUnicodeValue.contentId) {
+          contentIdToContent[subtitledUnicodeValue.contentId] =
+            subtitledUnicodeValue.unicode;
+        }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
-          traverseSchemaAndCollectContent(value[i], schema.items as Schema);
+        for (let i = 0; i < (value as unknown[]).length; i++) {
+          traverseSchemaAndCollectContent(
+            (value as unknown[])[i],
+            schema.items as Schema
+          );
         }
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
-    const caValues = this.stateCustomizationArgsService.displayed;
+    const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+      string,
+      InteractionSpec
+    >;
+    const caSpecs = interactionSpecs[interactionId].customization_arg_specs;
+    const caValues = this.stateCustomizationArgsService.displayed as Record<
+      string,
+      {value: unknown}
+    >;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
@@ -447,7 +492,6 @@ export class CustomizeInteractionModalComponent
     this.originalContentIdToContent = {};
     if (this.stateInteractionIdService.savedMemento) {
       this.originalContentIdToContent = this.getContentIdToContent();
-      // Above called with this.stateCustomizationArgsService.displayed.
     }
     this.explorationIsLinkedToStory =
       this.pageContextService.isExplorationLinkedToStory();
@@ -456,41 +500,28 @@ export class CustomizeInteractionModalComponent
     if (this.stateEditorService.isInQuestionMode()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
         [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       );
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
         [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       );
     } else {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
         [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
-      );
-    }
-
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-      );
-    } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-      );
-    } else {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       );
     }
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
+      const interactionSpecs = INTERACTION_SPECS as unknown as Record<
+        string,
+        InteractionSpec
+      >;
       let interactionSpec =
-        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
+        interactionSpecs[this.stateInteractionIdService.savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       this.stateInteractionIdService.displayed = cloneDeep(
@@ -498,16 +529,17 @@ export class CustomizeInteractionModalComponent
       );
       this.stateCustomizationArgsService.displayed = cloneDeep(
         this.stateCustomizationArgsService.savedMemento
-      );
+      ) as InteractionCustomizationArgs;
 
-      // Ensure that StateCustomizationArgsService.displayed is
-      // fully populated.
       for (let i = 0; i < this.customizationArgSpecs.length; i++) {
         let argName = this.customizationArgSpecs[i].name;
         if (
-          !this.stateCustomizationArgsService.savedMemento.hasOwnProperty(
-            argName
-          )
+          !(
+            this.stateCustomizationArgsService.savedMemento as Record<
+              string,
+              unknown
+            >
+          ).hasOwnProperty(argName)
         ) {
           throw new Error(
             `Interaction is missing customization argument ${argName}`
@@ -516,9 +548,10 @@ export class CustomizeInteractionModalComponent
       }
 
       this.stateCustomizationArgsService.onSchemaBasedFormsShown.emit();
-      this.hasCustomizationArgs =
+      this.hasCustomizationArgs = !!(
         this.stateCustomizationArgsService.displayed &&
-        Object.keys(this.stateCustomizationArgsService.displayed).length > 0;
+        Object.keys(this.stateCustomizationArgsService.displayed).length > 0
+      );
     }
   }
 }

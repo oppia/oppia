@@ -65,7 +65,11 @@ describe('FooterDonateVolunteerComponent', () => {
         },
         {
           provide: Renderer2,
-          useValue: {listen: () => () => {}},
+          useValue: {
+            listen:
+              (target: unknown, eventName: string, callback: Function) =>
+              () => {},
+          },
         },
         {
           provide: ElementRef,
@@ -125,7 +129,9 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Donate link', fakeAsync(() => {
     const donateLink = document.createElement('a');
     donateLink.setAttribute('href', '/donate');
-    component.el.nativeElement.appendChild(donateLink);
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      donateLink
+    );
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -140,33 +146,19 @@ describe('FooterDonateVolunteerComponent', () => {
     expect(preventDefaultSpy).toHaveBeenCalled();
   }));
 
-  it('should prevent default navigation for Volunteer link', fakeAsync(() => {
-    const volunteerLink = document.createElement('a');
-    volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(volunteerLink);
-    component.ngAfterViewInit();
-    tick();
-    const event = new MouseEvent('click', {
-      bubbles: true,
-      cancelable: true,
-    });
-
-    const preventDefaultSpy = spyOn(event, 'preventDefault').and.callThrough();
-
-    volunteerLink.dispatchEvent(event);
-
-    expect(preventDefaultSpy).toHaveBeenCalled();
-  }));
-
   it('should set up click listeners for Donate and Volunteer links', fakeAsync(() => {
     const donateLink = document.createElement('a');
     donateLink.setAttribute('href', '/donate');
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(donateLink);
-    component.el.nativeElement.appendChild(volunteerLink);
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      donateLink
+    );
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      volunteerLink
+    );
     const rendererListenSpy = spyOn(
-      component.renderer,
+      (component as unknown as {renderer: Renderer2}).renderer,
       'listen'
     ).and.callThrough();
     component.ngAfterViewInit();

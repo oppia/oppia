@@ -39,6 +39,39 @@ import {CurrentInteractionService} from 'pages/exploration-player-page/services/
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {CodeReplRulesService} from './code-repl-rules.service';
 
+interface CodeReplAnswer {
+  code: string;
+  output: string;
+  evaluation: string;
+  error: string;
+}
+
+interface Skulpt {
+  configure: (config: {
+    output: (out: string) => void;
+    read: (name: string) => string;
+    timeoutMsg: () => void;
+    execLimit: number;
+  }) => void;
+  builtinFiles: {
+    files: Record<string, string>;
+  };
+  misceval: {
+    asyncToPromise: (action: () => unknown) => Promise<void>;
+  };
+  importMainWithBody: (
+    name: string,
+    dump: boolean,
+    code: string,
+    retain: boolean
+  ) => unknown;
+  builtin: {
+    TimeLimitError: new () => object;
+  };
+}
+
+declare var Sk: Skulpt;
+
 @Component({
   selector: 'oppia-interactive-code-repl',
   templateUrl: './code-repl-interaction.component.html',
@@ -47,23 +80,24 @@ import {CodeReplRulesService} from './code-repl-rules.service';
 export class InteractiveCodeReplComponent
   implements OnInit, AfterViewInit, OnDestroy
 {
-  @Input() lastAnswer;
-  @Input() languageWithValue;
-  @Input() placeholderWithValue;
-  @Input() preCodeWithValue;
-  @Input() postCodeWithValue;
-  @ViewChild(CodemirrorComponent) codeMirrorComponent: CodemirrorComponent;
+  @Input() lastAnswer!: CodeReplAnswer;
+  @Input() languageWithValue!: string;
+  @Input() placeholderWithValue!: string;
+  @Input() preCodeWithValue!: string;
+  @Input() postCodeWithValue!: string;
+  @ViewChild(CodemirrorComponent) codeMirrorComponent!: CodemirrorComponent;
+
   componentSubscriptions = new Subscription();
   hasLoaded: boolean = true;
-  code: string;
-  evaluation: string;
-  fullError: string;
-  output: string;
-  interactionIsActive: boolean;
-  language: string;
-  placeholder: string;
-  preCode: string;
-  postCode: string;
+  code!: string;
+  evaluation!: string;
+  fullError!: string;
+  output!: string;
+  interactionIsActive!: boolean;
+  language!: string;
+  placeholder!: string;
+  preCode!: string;
+  postCode!: string;
 
   editorOptions = {
     lineNumbers: true,
@@ -72,7 +106,8 @@ export class InteractiveCodeReplComponent
     mode: 'python',
     extraKeys: {
       Tab: (cm: CodeMirror.Editor): void => {
-        var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+        const indentUnit = cm.getOption('indentUnit') as number;
+        var spaces = Array(indentUnit + 1).join(' ');
         cm.replaceSelection(spaces);
         // Move the cursor to the end of the selection.
         var endSelectionPos = cm.getDoc().getCursor('head');
@@ -142,16 +177,11 @@ export class InteractiveCodeReplComponent
 
     // Configure Skulpt.
     Sk.configure({
-      output: out => {
-        // This output function is called continuously throughout the
-        // runtime of the script.
+      output: (out: string) => {
         this.output += out;
       },
-      read: name => {
-        // This function is called when a builtin module is imported.
+      read: (name: string) => {
         if (Sk.builtinFiles.files[name] === undefined) {
-          // If corresponding module is not present then,
-          // removal of this block also results in failure of import.
           throw new Error('module ' + name + ' not found');
         }
         return Sk.builtinFiles.files[name];
@@ -170,7 +200,9 @@ export class InteractiveCodeReplComponent
 
   ngAfterViewInit(): void {
     const runAfterTimeout = () => {
-      this.initMarkers(this.codeMirrorComponent.codeMirror);
+      if (this.codeMirrorComponent && this.codeMirrorComponent.codeMirror) {
+        this.initMarkers(this.codeMirrorComponent.codeMirror);
+      }
       this.hasLoaded = true;
       this.changeDetectionRef.detectChanges();
     };
@@ -185,7 +217,7 @@ export class InteractiveCodeReplComponent
     });
   }
 
-  private submitAnswer() {
+  private submitAnswer(): void {
     this.runAndSubmitCode(this.code);
   }
 
@@ -203,7 +235,7 @@ export class InteractiveCodeReplComponent
     // Evaluate the program asynchronously using Skulpt.
     Sk.misceval
       .asyncToPromise(() => {
-        Sk.importMainWithBody('<stdin>', false, codeInput, true);
+        return Sk.importMainWithBody('<stdin>', false, codeInput, true);
       })
       .then(
         () => {
@@ -215,7 +247,7 @@ export class InteractiveCodeReplComponent
             onFinishRunCallback('', '');
           }
         },
-        err => {
+        (err: unknown) => {
           if (!(err instanceof Sk.builtin.TimeLimitError)) {
             this.evaluation = '';
             this.fullError = String(err);
@@ -228,17 +260,15 @@ export class InteractiveCodeReplComponent
       );
   }
 
-  private initMarkers(editor) {
+  private initMarkers(editor: CodeMirror.Editor): void {
     var doc = editor.getDoc();
 
-    // The -1 here is because prepended code ends with a newline.
     var preCodeNumLines = this.preCode.split('\n').length - 1;
     var postCodeNumLines = this.postCode.split('\n').length;
     var fullCodeNumLines = this.code.split('\n').length;
     var userCodeNumLines =
       fullCodeNumLines - preCodeNumLines - postCodeNumLines;
 
-    // Mark pre- and post- code as uneditable, and give it some styling.
     var markOptions = {
       atomic: false,
       readOnly: true,
@@ -293,8 +323,6 @@ export class InteractiveCodeReplComponent
   sendResponse(evaluation: string, err: string): void {
     this.currentInteractionService.onSubmit(
       {
-        // Replace tabs with 2 spaces.
-        // TODO(#12712): (1) CodeRepl interaction.
         code: this.code.replace(/\t/g, '  ') || '',
         output: this.output,
         evaluation: this.evaluation,

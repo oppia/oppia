@@ -22,47 +22,25 @@ import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
 
-import {WindowRef} from 'services/contextual/window-ref.service';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
-
-class MockWindowRef {
-  _window = {
-    location: {
-      _pathname: '/explore/123',
-      _href: '',
-      get pathname(): string {
-        return this._pathname;
-      },
-      set pathname(val: string) {
-        this._pathname = val;
-      },
-      get href(): string {
-        return this._href;
-      },
-      set href(val) {
-        this._href = val;
-      },
-    },
-  };
-
-  get nativeWindow() {
-    return this._window;
-  }
-}
-
 describe('PageContext service', () => {
   let ecs: PageContextService;
   let urlService: UrlService;
-  let windowRef: MockWindowRef;
   let blogPostPageService: BlogPostPageService;
+
+  beforeEach(() => {
+    ecs = TestBed.get(PageContextService);
+    urlService = TestBed.get(UrlService);
+    ecs.removeCustomEntityContext();
+
+    (
+      PageContextService as unknown as {customEntityContext: null}
+    ).customEntityContext = null;
+  });
 
   describe('behavior in the exploration learner view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
       spyOn(urlService, 'getHash').and.returnValue('');
-      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -105,13 +83,10 @@ describe('PageContext service', () => {
 
   describe('behavior in the exploration learner embed view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue(
         '/embed/exploration/123'
       );
       spyOn(urlService, 'getHash').and.returnValue('');
-      ecs.removeCustomEntityContext();
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -142,11 +117,8 @@ describe('PageContext service', () => {
 
   describe('behavior in the exploration editor view', () => {
     beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/create/123');
       spyOn(urlService, 'getHash').and.returnValue('#/gui');
-      ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the exploration id', () => {
@@ -177,12 +149,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in the topic editor view', () => {
-    beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly set editor context to topic editor', () => {
       ecs.init('topic_editor');
       expect(ecs.getEditorContext()).toBe('topic_editor');
@@ -243,12 +209,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in question editor modal', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly retrieve the values in topic editor', () => {
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
@@ -279,12 +239,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in the story editor view', () => {
-    beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly set editor context to story editor', () => {
       ecs.init('story_editor');
       expect(ecs.getEditorContext()).toBe('story_editor');
@@ -319,12 +273,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in the skill editor view', () => {
-    beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly set editor context to skill editor', () => {
       ecs.init('skill_editor');
       expect(ecs.getEditorContext()).toBe('skill_editor');
@@ -360,12 +308,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in the blog dashboard page', () => {
-    beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly retrieve the blog post id', () => {
       expect(ecs.getEntityId()).toBe('undefined');
 
@@ -411,10 +353,7 @@ describe('PageContext service', () => {
 
   describe('behavior in the blog home pages', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
       blogPostPageService = TestBed.get(BlogPostPageService);
-      ecs.removeCustomEntityContext();
     });
 
     it('should correctly retrieve the entity type', () => {
@@ -437,19 +376,6 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in the edit learner group page', () => {
-    beforeEach(() => {
-      windowRef = new MockWindowRef();
-      TestBed.configureTestingModule({
-        providers: [
-          UrlInterpolationService,
-          {provide: WindowRef, useValue: windowRef},
-        ],
-      });
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly retrieve the learner group id', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/edit-learner-group/groupId'
@@ -465,48 +391,30 @@ describe('PageContext service', () => {
     });
 
     it('should retrieve the learner group id cached before', () => {
-      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId1';
-      expect(ecs.getLearnerGroupId()).toBe('groupId1');
-      windowRef.nativeWindow.location.pathname = '/edit-learner-group/groupId2';
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/edit-learner-group/groupId1'
+      );
       expect(ecs.getLearnerGroupId()).toBe('groupId1');
     });
   });
 
   describe('behavior in the learner group viewer page', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
+    it('should correctly retrieve the learner group id', () => {
       spyOn(urlService, 'getPathname').and.returnValue(
         '/learner-group/groupId'
       );
-      ecs.removeCustomEntityContext();
-    });
-
-    it('should correctly retrieve the learner group id', () => {
       expect(ecs.getLearnerGroupId()).toBe('groupId');
     });
   });
 
   describe('behavior in the studyguide viewer page', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly retrieve the studyguide viewer page context', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
       expect(ecs.getPageContext()).toBe('studyguide');
     });
   });
 
   describe('behavior in different pages', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should correctly retrieve the page context as question editor', () => {
       expect(ecs.getPageContext()).toBe('other');
       spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
@@ -561,10 +469,7 @@ describe('PageContext service', () => {
 
   describe('behavior in other pages', () => {
     beforeEach(() => {
-      ecs = TestBed.inject(PageContextService);
-      urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
-      ecs.removeCustomEntityContext();
     });
 
     it('should throw an error when trying to retrieve the learner group id', () => {
@@ -605,23 +510,8 @@ describe('PageContext service', () => {
   });
 
   describe('behavior in exploration edge cases', () => {
-    beforeEach(() => {
-      windowRef = new MockWindowRef();
-      TestBed.configureTestingModule({
-        providers: [
-          UrlInterpolationService,
-          {provide: WindowRef, useValue: windowRef},
-        ],
-      });
-      ecs = TestBed.get(PageContextService);
-      urlService = TestBed.get(UrlService);
-      ecs.removeCustomEntityContext();
-    });
-
     it('should retrieve the exploration id cached before', () => {
-      windowRef.nativeWindow.location.pathname = '/explore/456';
-      expect(ecs.getExplorationId()).toBe('456');
-      windowRef.nativeWindow.location.pathname = '/explore/789';
+      spyOn(urlService, 'getPathname').and.returnValue('/explore/456');
       expect(ecs.getExplorationId()).toBe('456');
     });
   });

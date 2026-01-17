@@ -20,7 +20,7 @@ import {
   ComponentFixture,
   fakeAsync,
   TestBed,
-  async,
+  waitForAsync,
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
@@ -45,7 +45,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   let fixture: ComponentFixture<ExplorationEmbedButtonModalComponent>;
   let siteAnalyticsService: SiteAnalyticsService;
   let ngbActiveModal: NgbActiveModal;
-  beforeEach(async(() => {
+
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ExplorationEmbedButtonModalComponent],
       providers: [
@@ -64,8 +65,8 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ExplorationEmbedButtonModalComponent);
     component = fixture.componentInstance;
-    siteAnalyticsService = TestBed.get(SiteAnalyticsService);
-    ngbActiveModal = TestBed.get(NgbActiveModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
     component.explorationId = '3f6cD869';
     component.serverName = 'https://oppia.org';
     fixture.detectChanges();
@@ -82,7 +83,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
 
   it('should dismiss the modal when clicked on cancel', fakeAsync(() => {
     const dismissSpy = spyOn(ngbActiveModal, 'dismiss').and.callThrough();
-    let closeButtonDE = fixture.debugElement.query(
+    const closeButtonDE = fixture.debugElement.query(
       By.css('.modal-footer .btn.btn-secondary')
     );
     closeButtonDE.nativeElement.click();
@@ -93,20 +94,13 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   it('should select the embed url', fakeAsync(() => {
     const removeAllRanges = jasmine.createSpy('removeAllRanges');
     const addRange = jasmine.createSpy('addRange');
-    // This throws "Argument of type '{ removeAllRanges:
-    // jasmine.Spy<jasmine.Func>; addRange: jasmine.Spy<jasmine.Func>; }'
-    // is not assignable to parameter of type 'Selection'." This is because
-    // the type of the actual 'getSelection' function doesn't match the type
-    // of function we've mocked it to. We need to suppress this error because
-    // we need to mock 'getSelection' function to our function for testing
-    // purposes.
-    // @ts-expect-error
+
     spyOn(window, 'getSelection').and.returnValue({
       removeAllRanges: removeAllRanges,
       addRange: addRange,
-    });
+    } as unknown as Selection);
 
-    let embedUrlDiv = fixture.debugElement.query(
+    const embedUrlDiv = fixture.debugElement.query(
       By.css('.oppia-embed-modal-code')
     );
     embedUrlDiv.nativeElement.click();
@@ -116,16 +110,11 @@ describe('ExplorationEmbedButtonModalComponent', () => {
   }));
 
   it('should throw Error if codeDiv is null', () => {
-    let event = {
-      type: 'click',
+    const event = {
       currentTarget: null,
-    };
+    } as unknown as MouseEvent;
+
     expect(() => {
-      // This throws "Argument of type '{ type: string; currentTarget:
-      // () => any; }' is not assignable to parameter of type 'MouseEvent'."
-      // We need to suppress this error because we need to test selectText
-      // function.
-      // @ts-expect-error
       component.selectText(event);
     }).toThrowError('No CodeDiv was found!');
   });
@@ -135,7 +124,7 @@ describe('ExplorationEmbedButtonModalComponent', () => {
     const addRange = jasmine.createSpy('addRange');
     spyOn(window, 'getSelection').and.returnValue(null);
 
-    let embedUrlDiv = fixture.debugElement.query(
+    const embedUrlDiv = fixture.debugElement.query(
       By.css('.oppia-embed-modal-code')
     );
     embedUrlDiv.nativeElement.click();

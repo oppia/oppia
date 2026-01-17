@@ -23,22 +23,31 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {HtmlEscaperService} from 'services/html-escaper.service';
 
+interface MusicNote {
+  readableNoteName: string;
+}
+
 @Component({
   selector: 'oppia-short-response-music-notes-input',
   templateUrl: './music-notes-input-short-response.component.html',
 })
 export class ShortResponseMusicNotesInput implements OnInit {
-  @Input() answer;
-  displayedAnswer: string;
+  @Input() answer!: string;
+  displayedAnswer!: string;
 
   constructor(private htmlEscaperService: HtmlEscaperService) {}
 
   ngOnInit(): void {
-    let _answer = this.htmlEscaperService.escapedJsonToObj(this.answer);
-    let _notes = [];
-    for (let i = 0; i < Object.keys(_answer).length; i++) {
-      if (_answer[i].readableNoteName) {
-        _notes.push(_answer[i].readableNoteName);
+    let _answer = this.htmlEscaperService.escapedJsonToObj(
+      this.answer
+    ) as MusicNote[];
+    let _notes: string[] = [];
+
+    if (_answer) {
+      for (let i = 0; i < _answer.length; i++) {
+        if (_answer[i] && _answer[i].readableNoteName) {
+          _notes.push(_answer[i].readableNoteName);
+        }
       }
     }
 

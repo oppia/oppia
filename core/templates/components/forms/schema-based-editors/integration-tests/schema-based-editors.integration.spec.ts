@@ -196,10 +196,10 @@ describe('Schema based editor', () => {
     // component.
     expectTopLevelComponentValueToBe('SomeName', 4);
 
-    // Check if the form validation becomes false when value is not valid.
-    expect(unicodeInputFormController.invalid).toBeFalse();
+    expect(unicodeInputFormController.invalid).toBe(false);
     changeValuesInUI('SomeVeryLongName');
     expectTopLevelComponentValueToBe('SomeVeryLongName', 4);
-    expect(unicodeInputFormController.invalid).toBeTrue();
+
+    expect(unicodeInputFormController.invalid).toBe(true);
   }));
 });

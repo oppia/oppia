@@ -62,7 +62,6 @@ import {
 } from './ck-editor-4-widgets.initializer';
 
 interface UiConfig {
-  (): UiConfig;
   rte_component_config_id: string;
   hide_complex_extensions: boolean;
   startupFocusEnabled?: boolean;
@@ -98,7 +97,6 @@ export class CkEditor4RteComponent
   windowIsNarrow = false;
   componentsThatRequireInternet: string[] = [];
   subscriptions: Subscription;
-  // A RegExp for matching rich text components.
   componentRe = /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g;
 
   configError: string | null = null;
@@ -117,7 +115,7 @@ export class CkEditor4RteComponent
     private renderer: Renderer2
   ) {
     this.rteHelperService =
-      OppiaAngularRootComponent.rteHelperService as RteHelperService;
+      OppiaAngularRootComponent.rteHelperService as unknown as RteHelperService;
     this.subscriptions = new Subscription();
   }
 
@@ -146,7 +144,6 @@ export class CkEditor4RteComponent
       return;
     }
 
-    // Get component list from AppConstants.
     const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = (
       AppConstants.RTE_COMPONENT_CONFIGS as Record<string, readonly string[]>
@@ -178,47 +175,37 @@ export class CkEditor4RteComponent
     const {names: enabledComponents} = this.getEnabledComponents();
     let validContent = content;
 
-    // Find all RTE components in the pasted content.
     const componentMatches = Array.from(content.matchAll(this.componentRe));
 
     for (const match of componentMatches) {
-      const componentParts = match[3]; // E.g., "collapsible" or "ckeditor-collapsible".
+      const componentParts = match[3];
 
-      // Extract the actual component name (remove 'ckeditor-' prefix if present)
       let componentName = componentParts;
       if (componentName.startsWith('ckeditor-')) {
         componentName = componentName.substring('ckeditor-'.length);
       }
 
-      // Check if this component is enabled in the current editor.
       if (!enabledComponents.includes(componentName)) {
         if (!invalidComponents.includes(componentName)) {
           invalidComponents.push(componentName);
         }
-        // Remove the invalid component from validContent.
         validContent = validContent.replace(match[0], '');
       }
     }
 
-    // Remove empty oppia-rte-component-container divs that might be left after
-    // component removal.
     validContent = validContent.replace(
       /<div[^>]*class="[^"]*oppia-rte-component-container[^"]*"[^>]*>\s*<\/div>/g,
       ''
     );
 
-    // Also handle cases where the div might have other attributes or the class
-    // might be in different positions.
     validContent = validContent.replace(
       /<div[^>]*oppia-rte-component-container[^>]*>\s*<\/div>/g,
       ''
     );
 
-    // Clean up any empty paragraphs or extra whitespace left after removing components.
     validContent = validContent.replace(/<p>\s*<\/p>/g, '');
     validContent = validContent.replace(/<div>\s*<\/div>/g, '');
 
-    // Clean up invisible characters and whitespace.
     validContent = validContent
       .replace(/&nbsp;/g, ' ')
       .replace(/&zwsp;/g, '')
@@ -231,22 +218,16 @@ export class CkEditor4RteComponent
       .replace(/\s+/g, ' ')
       .trim();
 
-    // Clean up any empty tags that might be left after cleaning invisible characters.
     validContent = validContent
       .replace(/<p>\s*<\/p>/g, '')
       .replace(/<div>\s*<\/div>/g, '')
       .replace(/<span>\s*<\/span>/g, '')
       .trim();
 
-    // Check if there's meaningful content left after cleaning
-    // Remove any remaining HTML tags to check for actual text content.
-    // See https://stackoverflow.com/a/63875063
-    let tempDiv = document.createElement('div');
-    // eslint-disable-next-line oppia/no-inner-html
-    tempDiv.innerHTML = validContent;
-    let textOnlyContent = tempDiv.textContent?.trim() ?? '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(validContent, 'text/html');
+    let textOnlyContent = doc.body.textContent?.trim() ?? '';
 
-    // Remove all kinds of whitespace characters and HTML entities that aren't visible content.
     textOnlyContent = textOnlyContent
       .replace(/&nbsp;/g, ' ')
       .replace(/&zwsp;/g, '')
@@ -260,8 +241,6 @@ export class CkEditor4RteComponent
       .trim();
 
     const hasMeaningfulContent = textOnlyContent.length > 0;
-
-    // Only return hasValidContent as true if there are invalid components AND meaningful valid content.
     const hasValidContent =
       invalidComponents.length > 0 && hasMeaningfulContent;
 
@@ -276,9 +255,8 @@ export class CkEditor4RteComponent
   private showPasteError(invalidComponents: string[]): void {
     const componentList = invalidComponents.join(', ');
     this.pasteError = `The following component${invalidComponents.length > 1 ? 's are' : ' is'} not supported in this editor: ${componentList}. Please do not add ${invalidComponents.length > 1 ? 'them' : 'it'} here.`;
-    this.showPasteConfirmation = false; // Ensure confirmation dialog is not shown
-    this.pendingPasteValidContent = null; // Clear any pending valid content
-    // Log the error for debugging.
+    this.showPasteConfirmation = false;
+    this.pendingPasteValidContent = null;
     console.warn(
       'Paste blocked due to invalid Rich-text editor components:',
       invalidComponents
@@ -292,7 +270,7 @@ export class CkEditor4RteComponent
     const componentList = invalidComponents.join(', ');
     this.pasteError = `The pasted content contains unsupported component${invalidComponents.length > 1 ? 's' : ''}: ${componentList}. Would you like to paste only the valid content?`;
     this.pendingPasteValidContent = validContent;
-    this.showPasteConfirmation = true; // Show confirmation dialog.
+    this.showPasteConfirmation = true;
     console.warn(
       'Paste contains invalid components, asking user for confirmation:',
       invalidComponents
@@ -306,7 +284,6 @@ export class CkEditor4RteComponent
     this.pendingPasteValidContent = null;
   }
 
-  // Public method to get the current paste error (for template usage)
   getPasteError(): string | null {
     return this.pasteError;
   }
@@ -315,18 +292,15 @@ export class CkEditor4RteComponent
     return this.showPasteConfirmation;
   }
 
-  // Public method to manually dismiss the paste error.
   dismissPasteError(): void {
     this.clearPasteError();
   }
 
   confirmSelectivePaste(): void {
     if (this.pendingPasteValidContent && this.ck) {
-      // Insert the valid content at the current cursor position.
       this.ck.insertHtml(this.pendingPasteValidContent);
       this.clearPasteError();
 
-      // Force Angular change detection.
       setTimeout(() => {
         this.elementRef.nativeElement.dispatchEvent(new Event('change'));
       }, 0);
@@ -335,7 +309,6 @@ export class CkEditor4RteComponent
 
   rejectSelectivePaste(): void {
     this.clearPasteError();
-    // Focus back to the editor.
     if (this.ck) {
       setTimeout(() => {
         this.ck.focus();
@@ -347,36 +320,15 @@ export class CkEditor4RteComponent
     if (this.configError) {
       return;
     }
-    // Ckeditor 'change' event gets triggered when a user types. In the
-    // change listener, value is set and it triggers the ngOnChanges
-    // lifecycle hook. This cannot be avoided so we check if the currentValue
-    // is the same as the detected change passed to ngOnChanges. If so, return.
     if (this.currentValue === changes.value?.currentValue) {
       return;
     }
-    // If ngOnChanges is called first, it means that the input 'value' to
-    // this component has changed without a user manually typing something.
-    // In such cases, call ck.setData() to update ckeditor with the latest
-    // input value. This can happen, for example, if there exists a list of
-    // ck-editor-4-rte components on a page, and the list is reordered or
-    // certain elements are deleted, then the values passed to the individual
-    // components may change without re-rendering each of the components,
-    // in such cases, it is sufficient to update the ckeditor instance manually
-    // with the latest value.
 
-    // Angular lifecycle methods on NgModel write null to the value property.
-    // Initializing this properly won't work as Angular will overwrite the
-    // value after it has been initialized.
-    // Since string methods are used on value variable, so it can't be null or
-    // undefined. When we move to reactive forms, this won't be a problem.
-    // TODO(#15458): Change the ternary statement to "let value = this.value".
     let value = this.value ? this.value : '';
-    // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<oppia-noninteractive-/g,
       '<oppia-noninteractive-ckeditor-'
     );
-    // Refer to the note at the top of the file for the reason behind replace.
     value = value.replace(
       /<\/oppia-noninteractive-/g,
       '</oppia-noninteractive-ckeditor-'
@@ -387,17 +339,6 @@ export class CkEditor4RteComponent
     }
   }
 
-  /**
-   * Creates a CKEditor configuration.
-   * @param config CKEditor config to add to
-   * @param uiConfig Parameters to add to CKEditor config
-   * @param pluginNames Comma separated list of plugin names
-   * @param buttonNames Array of button names for RTE components
-   * @param extraAllowedContentRules Additional allowed content rules for
-   * CKEDITOR.editor.filter
-   * @param sharedSpaces IDs of the page elements that will store the editor
-   * UI elements
-   */
   private _createCKEditorConfig(
     uiConfig: UiConfig,
     pluginNames: string,
@@ -405,7 +346,6 @@ export class CkEditor4RteComponent
     extraAllowedContentRules: string,
     sharedSpaces: CKEDITOR.sharedSpace
   ): CKEDITOR.config {
-    // Language configs use default language when undefined.
     const ckConfig: RteConfig = {
       extraPlugins: 'pre,sharedspace,' + pluginNames,
       startupFocus: true,
@@ -478,11 +418,6 @@ export class CkEditor4RteComponent
     return ckConfig;
   }
 
-  /**
-   * Before data is loaded into CKEditor, we need to wrap every rte
-   * component in a span (inline) or div (block).
-   * For block elements, we add an overlay div as well.
-   */
   wrapComponents(html: string): string {
     if (html === undefined) {
       return html;
@@ -490,8 +425,6 @@ export class CkEditor4RteComponent
     return html.replace(
       this.componentRe,
       (match: string, p1: string, p2: string, p3: string) => {
-        // Here we remove the 'ckeditor' part of the string p3 to get the name
-        // of the RTE Component.
         let rteComponentName = p3.split('-')[1] || p3;
 
         if (this.rteHelperService.isInlineComponent(rteComponentName)) {
@@ -510,7 +443,6 @@ export class CkEditor4RteComponent
     );
   }
 
-  // Determine which components should be displayed based on the UI configuration.
   private getEnabledComponents(): {
     names: string[];
     icons: string[];
@@ -531,7 +463,6 @@ export class CkEditor4RteComponent
       return result;
     }
 
-    // Get component list from AppConstants.
     const rteComponents = this.uiConfig.rte_component_config_id;
     const componentList = (
       AppConstants.RTE_COMPONENT_CONFIGS as Record<string, readonly string[]>
@@ -541,9 +472,7 @@ export class CkEditor4RteComponent
       return result;
     }
 
-    // Filter components based on the defined list and other criteria.
     _RICH_TEXT_COMPONENTS.forEach((componentDefn: RteComponentSpecs) => {
-      // Check if component is in the specified component list.
       const isInComponentList = componentList.includes(componentDefn.id);
 
       const hideComplexExtensionFlag =
@@ -584,29 +513,15 @@ export class CkEditor4RteComponent
       this.renderer.listen(element, 'click', resize);
     });
 
-    /**
-     * Create rules to allow all the rich text components and
-     * their wrappers and overlays.
-     * See format of filtering rules here:
-     * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
-     */
-    // Allow the component tags with any attributes and classes.
     var componentRule =
       names
         .map(name => {
           return 'oppia-noninteractive-ckeditor-' + name;
         })
         .join(' ') + '(*)[*];';
-    // Allow the inline component wrapper, which is a
-    // span with a "type" attribute.
     var inlineWrapperRule = ' span[type];';
-    // Allow the block component wrapper, which is a div
-    // with a "type" attribute and a CSS class.
     var blockWrapperRule = ' div(oppia-rte-component-container)[type];';
-    // Allow the transparent block component overlay, which is
-    // a div with a CSS class.
     var blockOverlayRule = ' div(oppia-rte-component-overlay);';
-    // Put all the rules together.
     var extraAllowedContentRules =
       componentRule + inlineWrapperRule + blockWrapperRule + blockOverlayRule;
     var pluginNames = names
@@ -623,17 +538,13 @@ export class CkEditor4RteComponent
     }
     buttonNames.pop();
 
-    // Enable format headers in CKE editor for blog post editor rte.
     this.headersEnabled = this.pageContextService.isInBlogPostEditorPage();
 
-    // Add external plugins.
     CKEDITOR.plugins.addExternal(
       'sharedspace',
       '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',
       'plugin.js'
     );
-    // Pre plugin is not available for 4.12.1 version of CKEditor. This is
-    // a self created plugin (other plugins are provided by CKEditor).
     CKEDITOR.plugins.addExternal(
       'pre',
       '/extensions/ckeditor_plugins/pre/',
@@ -656,30 +567,26 @@ export class CkEditor4RteComponent
       ckConfig.rte_component_config_id = this.uiConfig.rte_component_config_id;
     }
 
-    // Initialize CKEditor.
     var ck = CKEDITOR.inline(
       this.elementRef.nativeElement.children[0].children[1] as HTMLElement,
       ckConfig
     );
 
-    // Hide the editor until it is fully loaded after `instanceReady`
-    // is fired. This sets the style for `ck-editor-4-rte`.
     this.elementRef.nativeElement.setAttribute('style', 'display: None');
-    // Show the loading text.
     let loadingDiv = document.createElement('div');
     loadingDiv.innerText = 'Loading...';
-    // This div is placed as a child of `schema-based-editor`.
-    this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
+    if (this.elementRef.nativeElement.parentElement) {
+      this.elementRef.nativeElement.parentElement.appendChild(loadingDiv);
+    }
 
     ck.on('instanceReady', () => {
-      // Show the editor now that it is fully loaded.
       (this.elementRef.nativeElement as HTMLElement).setAttribute(
         'style',
         'display: block'
       );
-      // Remove the loading text.
-      this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
-      // Set the css and icons for each toolbar button.
+      if (this.elementRef.nativeElement.parentElement) {
+        this.elementRef.nativeElement.parentElement.removeChild(loadingDiv);
+      }
       names.forEach((name, index) => {
         var icon = icons[index];
         var button = this.elementRef.nativeElement.querySelector(
@@ -763,46 +670,40 @@ export class CkEditor4RteComponent
       ck.setData(this.wrapComponents(this.value));
     });
 
-    // Add paste event listener to validate pasted content.
-    ck.on('paste', event => {
-      const pastedData = event.data.dataValue || '';
-      const validation = this.validatePastedContent(pastedData);
+    ck.on(
+      'paste',
+      (event: CKEDITOR.eventInfo & {data: {dataValue: string}}) => {
+        const pastedData = event.data.dataValue || '';
+        const validation = this.validatePastedContent(pastedData);
 
-      if (!validation.isValid) {
-        // Always prevent the default paste operation.
-        event.cancel();
+        if (!validation.isValid) {
+          event.cancel();
 
-        if (validation.hasValidContent) {
-          // Show confirmation dialog for selective paste.
-          this.showPasteConfirmationBox(
-            validation.invalidComponents,
-            validation.validContent
-          );
+          if (validation.hasValidContent) {
+            this.showPasteConfirmationBox(
+              validation.invalidComponents,
+              validation.validContent
+            );
+          } else {
+            this.showPasteError(validation.invalidComponents);
+          }
+
+          setTimeout(() => {
+            this.elementRef.nativeElement.dispatchEvent(new Event('change'));
+          }, 0);
+
+          setTimeout(() => {
+            ck.focus();
+          }, 100);
         } else {
-          // Only invalid content, show error message without confirmation buttons.
-          this.showPasteError(validation.invalidComponents);
+          this.clearPasteError();
         }
-
-        // Force Angular change detection to update the UI.
-        setTimeout(() => {
-          this.elementRef.nativeElement.dispatchEvent(new Event('change'));
-        }, 0);
-
-        // Focus back to the editor.
-        setTimeout(() => {
-          ck.focus();
-        }, 100);
-      } else {
-        // Clear any existing paste errors on successful paste.
-        this.clearPasteError();
       }
-    });
+    );
 
-    // Angular rendering of components confuses CKEditor's undo system, so
-    // we hide all of that stuff away from CKEditor.
     ck.on(
       'getSnapshot',
-      event => {
+      (event: CKEDITOR.eventInfo & {data: string}) => {
         if (event.data === undefined) {
           return;
         }
@@ -823,7 +724,6 @@ export class CkEditor4RteComponent
         return;
       }
 
-      // Clear paste errors when user types or makes changes.
       this.clearPasteError();
 
       const parser = new DOMParser();
@@ -867,12 +767,10 @@ export class CkEditor4RteComponent
         .map(node => serializer.serializeToString(node))
         .join('');
       this.value = html;
-      // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
         /<oppia-noninteractive-ckeditor-/g,
         '<oppia-noninteractive-'
       );
-      // Refer to the note at the top of the file for the reason behind replace.
       html = html.replace(
         /<\/oppia-noninteractive-ckeditor-/g,
         '</oppia-noninteractive-'
@@ -889,14 +787,13 @@ export class CkEditor4RteComponent
     if (this.configError) {
       return;
     }
-    // Add disabled cursor pointer to the icons.
     this.componentsThatRequireInternet.forEach(name => {
       let buttons = this.elementRef.nativeElement.getElementsByClassName(
         'cke_button__oppia' + name
       );
       for (let i = 0; i < buttons.length; i++) {
-        buttons[i].style.backgroundColor = '#cccccc';
-        buttons[i].style.pointerEvents = 'none';
+        (buttons[i] as HTMLElement).style.backgroundColor = '#cccccc';
+        (buttons[i] as HTMLElement).style.pointerEvents = 'none';
       }
     });
   }
@@ -910,14 +807,16 @@ export class CkEditor4RteComponent
         'cke_button__oppia' + name
       );
       for (let i = 0; i < buttons.length; i++) {
-        buttons[i].style.backgroundColor = '';
-        buttons[i].style.pointerEvents = '';
+        (buttons[i] as HTMLElement).style.backgroundColor = '';
+        (buttons[i] as HTMLElement).style.pointerEvents = '';
       }
     });
   }
 
   ngOnDestroy(): void {
-    this.ck.destroy();
+    if (this.ck) {
+      this.ck.destroy();
+    }
     this.subscriptions.unsubscribe();
   }
 }
