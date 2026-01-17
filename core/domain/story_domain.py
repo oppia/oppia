@@ -1953,14 +1953,13 @@ class Story:
         Returns:
             dict. The converted story_contents_dict.
         """
-        local_story_dict = copy.deepcopy(story_contents_dict)
         next_node_id = None
         for node in reversed(story_contents_dict['nodes']):
             if next_node_id:
                 node['destination_node_ids'] = [next_node_id]
             next_node_id = node['id']
 
-        return local_story_dict
+        return story_contents_dict
 
     @classmethod
     def update_story_contents_from_model(
