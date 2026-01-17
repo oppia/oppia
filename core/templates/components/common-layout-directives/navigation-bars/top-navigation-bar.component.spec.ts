@@ -27,6 +27,7 @@ import {
 } from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {CookieModule, CookieService} from 'ngx-cookie';
 import {DeviceInfoService} from 'services/contextual/device-info.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -42,11 +43,9 @@ import {UserInfo} from 'domain/user/user-info.model';
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {I18nService} from 'i18n/i18n.service';
-import {CookieService, CookieModule} from 'ngx-cookie';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-backend-api.service';
-import {AppConstants} from 'app.constants';
-import {NavbarAndFooterGATrackingPages} from 'app.constants';
+import {AppConstants, NavbarAndFooterGATrackingPages} from 'app.constants';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {UrlService} from 'services/contextual/url.service';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
@@ -590,6 +589,11 @@ describe('TopNavigationBarComponent', () => {
       isSuperAdmin: () => false,
       isBlogAdmin: () => false,
       isBlogPostEditor: () => false,
+      isTranslationAdmin: () => false,
+      isTranslationCoordinator: () => false,
+      isQuestionAdmin: () => false,
+      isQuestionCoordinator: () => false,
+      isReleaseCoordinator: () => false,
       isLoggedIn: () => true,
       getUsername: () => null,
     };
