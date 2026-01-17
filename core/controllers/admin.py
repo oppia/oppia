@@ -1340,12 +1340,15 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            initial_dummy_opportunites_generation = (
-                skill_services.does_skill_with_description_exist(
-                    'Dummy Skill 1'
-                )
-                is False
+            # Check if our specific dummy entities exist by their hardcoded IDs.
+            # Using strict=False to return None if they don't exist.
+            # This makes the generator self-contained and independent of other
+            # dummy generators that might create skills with similar descriptions
+            # but different IDs.
+            existing_skill = skill_fetchers.get_skill_by_id(
+                skill_id, strict=False
             )
+            initial_dummy_opportunites_generation = existing_skill is None
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
