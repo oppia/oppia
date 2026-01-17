@@ -43,6 +43,9 @@ export interface LearnerExplorationSummaryBackendDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
+  total_cards_count?: number;
+  visited_cards_count?: number;
+  progress_percent?: number;
 }
 
 export class LearnerExplorationSummary {
@@ -62,7 +65,10 @@ export class LearnerExplorationSummary {
     public lastUpdatedMsec: number,
     public createdOnMsec: number,
     public ratings: ExplorationRatings,
-    public humanReadableContributorsSummary: HumanReadableContributorsSummary
+    public humanReadableContributorsSummary: HumanReadableContributorsSummary,
+    public totalCardsCount?: number,
+    public visitedCardsCount?: number,
+    public progressPercent?: number
   ) {}
 
   static createFromBackendDict(
@@ -84,7 +90,10 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.last_updated_msec,
       expSummaryBacknedDict.created_on_msec,
       expSummaryBacknedDict.ratings,
-      expSummaryBacknedDict.human_readable_contributors_summary
+      expSummaryBacknedDict.human_readable_contributors_summary,
+      expSummaryBacknedDict.total_cards_count,
+      expSummaryBacknedDict.visited_cards_count,
+      expSummaryBacknedDict.progress_percent
     );
   }
 }

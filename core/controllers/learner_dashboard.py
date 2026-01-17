@@ -19,14 +19,17 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
+    exp_domain,
+    exp_fetchers,
     learner_progress_services,
     story_fetchers,
     subscription_services,
     summary_services,
     user_services,
 )
+from core.storage.user import gae_models as user_models
 
-from typing import Dict, Optional, TypedDict
+from typing import Dict, List, Optional, Set, TypedDict
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -257,19 +260,119 @@ class LearnerDashboardExplorationsProgressHandler(
             learner_progress_services.get_exploration_progress(self.user_id)
         )
 
-        completed_exp_summary_dicts = (
+        def _get_state_bfs_order(current_exp: exp_domain.Exploration) -> List[str]:
+            """Get BFS order of states in exploration."""
+            queue: List[str] = [current_exp.init_state_name]
+            visited: Set[str] = set()
+            ordered_states: List[str] = []
+
+            while queue:
+                state_name = queue.pop(0)
+                if state_name in visited:
+                    continue
+                visited.add(state_name)
+                ordered_states.append(state_name)
+
+                state = current_exp.states[state_name]
+                interaction = state.interaction
+                destinations: List[str] = []
+
+                for answer_group in interaction.answer_groups:
+                    if answer_group.outcome.dest is not None:
+                        destinations.append(answer_group.outcome.dest)
+
+                if (
+                    interaction.default_outcome is not None
+                    and interaction.default_outcome.dest is not None
+                ):
+                    destinations.append(interaction.default_outcome.dest)
+
+                for dest in destinations:
+                    if dest not in visited:
+                        queue.append(dest)
+
+            # Include any unvisited states (disconnected states)
+            for state_name in current_exp.states:
+                if state_name not in visited:
+                    ordered_states.append(state_name)
+
+            return ordered_states
+
+        def _annotate_with_card_progress(
+            summary_dicts: list[Dict[str, str]], completed: bool = False
+        ) -> list[Dict[str, str]]:
+            """Annotate summaries with card-based progress."""
+            enriched: list[Dict[str, str]] = []
+            for summary_dict in summary_dicts:
+                exp_id = summary_dict.get('id')
+                if exp_id is None:
+                    enriched.append(summary_dict)
+                    continue
+
+                try:
+                    current_exp = exp_fetchers.get_exploration_by_id(
+                        exp_id, strict=True
+                    )
+                except Exception:
+                    enriched.append(summary_dict)
+                    continue
+
+                state_bfs_order = _get_state_bfs_order(current_exp)
+                total_cards_count = len(state_bfs_order)
+
+                if completed:
+                    visited_cards_count = total_cards_count
+                else:
+                    visited_cards_count = 0
+                    last_playthrough_model = (
+                        user_models.ExpUserLastPlaythroughModel.get(
+                            self.user_id, exp_id
+                        )
+                    )
+
+                    if (
+                        last_playthrough_model is not None
+                        and last_playthrough_model.last_played_state_name
+                        is not None
+                    ):
+                        last_state = (
+                            last_playthrough_model.last_played_state_name
+                        )
+
+                        if last_state in state_bfs_order:
+                            visited_cards_count = (
+                                state_bfs_order.index(last_state) + 1
+                            )
+
+                progress_percent = (
+                    int((visited_cards_count * 100) / total_cards_count)
+                    if total_cards_count > 0
+                    else 0
+                )
+
+                summary_dict = {
+                    **summary_dict,
+                    'total_cards_count': total_cards_count,
+                    'visited_cards_count': visited_cards_count,
+                    'progress_percent': progress_percent,
+                }
+                enriched.append(summary_dict)
+            return enriched
+
+        completed_exp_summary_dicts = _annotate_with_card_progress(
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.completed_exp_summaries
-            )
+            ),
+            completed=True,
         )
 
-        incomplete_exp_summary_dicts = (
+        incomplete_exp_summary_dicts = _annotate_with_card_progress(
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.incomplete_exp_summaries
             )
         )
 
-        exploration_playlist_summary_dicts = (
+        exploration_playlist_summary_dicts = _annotate_with_card_progress(
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.exploration_playlist_summaries
             )
