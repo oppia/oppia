@@ -19,17 +19,20 @@ from __future__ import annotations
 import datetime
 
 from core import feature_flag_list, feconf
+from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
+    exp_fetchers,
     feature_flag_services,
     opportunity_services,
     taskqueue_services,
+    translation_fetchers,
     voiceover_cloud_task_services,
     voiceover_regeneration_services,
     voiceover_services,
 )
 
-from typing import Dict, TypedDict
+from typing import Dict, List, Optional, TypedDict
 
 
 class VoiceoverAdminDataHandler(
@@ -346,4 +349,138 @@ class VoiceoverRegenerationRequestToCloudTaskHandler(
                 exploration_id
             )
         )
+        self.render_json(self.values)
+
+
+class ExplorationDataForVoiceoverRegenerationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Fetches exploration data required for regenerating automatic
+    voiceovers for a given exploration.
+    """
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}}
+    }
+    HANDLER_ARGS_SCHEMAS = {'GET': {}}
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def get(self, exploration_id: str) -> None:
+        """Fetches exploration data required for regenerating automatic
+        voiceovers for a given exploration.
+        """
+        exploration = exp_fetchers.get_exploration_by_id(
+            exploration_id, strict=False
+        )
+
+        language_accent_codes_mapping = (
+            voiceover_services.get_all_language_accent_codes_for_voiceovers()
+        )
+
+        is_exploration_curated = (
+            opportunity_services.is_exploration_available_for_contribution(
+                exploration_id
+            )
+        )
+
+        response_data: Dict[str, Optional[str | Dict[str, str | List[str]]]] = (
+            {}
+        )
+
+        if exploration is None:
+            response_data['exploration_data'] = None
+            response_data['response_message'] = (
+                'Exploration with the given id does not exist.'
+            )
+        elif not is_exploration_curated:
+            response_data['exploration_data'] = None
+            response_data['response_message'] = (
+                'The Exploration is not linked to any published story, '
+                'hence not available for voiceover regeneration.'
+            )
+        else:
+            # The final else branch handles the case where the exploration
+            # exists and it is linked to a published story.
+
+            # A list of language codes for the exploration that contain
+            # available content, including English and any translated languages.
+            exploration_language_codes = []
+            exploration_language_codes.append(constants.DEFAULT_LANGUAGE_CODE)
+
+            autogeneratable_language_accent_codes = []
+
+            entity_translations = (
+                translation_fetchers.get_all_entity_translations_for_entity(
+                    feconf.TranslatableEntityType.EXPLORATION,
+                    exploration_id,
+                    exploration.version,
+                )
+            )
+            for entity_translation in entity_translations:
+                exploration_language_codes.append(
+                    entity_translation.language_code
+                )
+
+            for language_code in exploration_language_codes:
+                language_accent_codes_to_autogeneration_support = (
+                    language_accent_codes_mapping.get(language_code, {})
+                )
+
+                for (
+                    accent_code,
+                    is_autogeneration_enabled,
+                ) in language_accent_codes_to_autogeneration_support.items():
+                    if is_autogeneration_enabled is False:
+                        continue
+
+                    autogeneratable_language_accent_codes.append(accent_code)
+
+            response_data['exploration_data'] = {
+                'exploration_title': exploration.title,
+                'autogeneratable_language_accent_codes': (
+                    autogeneratable_language_accent_codes
+                ),
+            }
+            response_data['response_message'] = None
+
+        self.values.update(response_data)
+        self.render_json(self.values)
+
+
+class RegenerateVoiceoversForExplorationHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Regenerates the automatic voiceover for the specified exploration in the
+    selected language and accent."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS = {
+        'exploration_id': {'schema': {'type': 'basestring'}},
+        'language_accent_code': {'schema': {'type': 'basestring'}},
+    }
+    HANDLER_ARGS_SCHEMAS = {'POST': {}}
+
+    @acl_decorators.can_access_voiceover_admin_page
+    def post(self, exploration_id: str, language_accent_code: str) -> None:
+        """Regenerates the automatic voiceover for the specified exploration in
+        the selected language and accent.
+        """
+
+        if opportunity_services.is_exploration_available_for_contribution(
+            exploration_id
+        ) and feature_flag_services.is_feature_flag_enabled(
+            feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS.value,
+            None,
+        ):
+            taskqueue_services.defer(
+                feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+                    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT'
+                ],
+                taskqueue_services.QUEUE_NAME_VOICEOVER_REGENERATION,
+                exploration_id,
+                language_accent_code,
+                self.user_id,
+                datetime.datetime.utcnow().isoformat(),
+            )
         self.render_json(self.values)
