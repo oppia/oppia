@@ -532,6 +532,8 @@ def get_last_played_state_name(
     if last_playthrough_information_model is None:
         return None
 
+    # Here we use cast because the model's last_played_state_name field
+    # is not typed in the storage layer, but we know it returns Optional[str].
     return cast(
         Optional[str], last_playthrough_information_model.last_played_state_name
     )
