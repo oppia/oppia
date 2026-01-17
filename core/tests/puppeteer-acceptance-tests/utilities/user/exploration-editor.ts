@@ -16,17 +16,17 @@
  * @fileoverview Utility functions for the Exploration Editor page.
  */
 
-import puppeteer, { ElementHandle } from 'puppeteer';
-import { BaseUser } from '../common/puppeteer-utils';
+import puppeteer, {ElementHandle} from 'puppeteer';
+import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
-import { showMessage } from '../common/show-message';
-import { error } from 'console';
+import {showMessage} from '../common/show-message';
+import {error} from 'console';
 import fs from 'fs';
 import path from 'path';
 
-import { GraphViz } from '../common/interactions/graph-viz';
-import { PencilCode } from '../common/interactions/pencil-code';
-import { ImageAreaSelection } from '../common/interactions/image-area-selection';
+import {GraphViz} from '../common/interactions/graph-viz';
+import {PencilCode} from '../common/interactions/pencil-code';
+import {ImageAreaSelection} from '../common/interactions/image-area-selection';
 
 const creatorDashboardPage = testConstants.URLs.CreatorDashboard;
 const baseUrl = testConstants.URLs.BaseURL;
@@ -558,12 +558,12 @@ export class ExplorationEditor extends BaseUser {
         return (
           (submitButton as HTMLButtonElement)?.disabled ||
           document.querySelector(formErrorContainer)?.textContent?.trim() !==
-          null ||
+            null ||
           currentValue1 !== value1 ||
           currentValue2 !== value2
         );
       },
-      { timeout: 10000 },
+      {timeout: 10000},
       submitAnswerButton,
       formErrorContainer,
       previousConversationToggleSelector,
@@ -605,7 +605,7 @@ export class ExplorationEditor extends BaseUser {
     if (!found) {
       throw new Error(`Option ${option} not found.`);
     }
-    await this.page.waitForNetworkIdle({ idleTime: 1000 });
+    await this.page.waitForNetworkIdle({idleTime: 1000});
     await this.clickOnSubmitAnswerButton();
   }
 
@@ -981,13 +981,13 @@ export class ExplorationEditor extends BaseUser {
    */
   async customizeDragAndDropSortInteraction(options: string[]): Promise<void> {
     for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, { visible: true });
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
       await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
     const responseInputs = await this.page.$$(stateContentInputField);
     for (let i = 0; i < options.length; i++) {
-      await responseInputs[i].click({ clickCount: 3 });
+      await responseInputs[i].click({clickCount: 3});
       await responseInputs[i].type(`${options[i]}`);
     }
 
@@ -1320,7 +1320,7 @@ export class ExplorationEditor extends BaseUser {
     const inputElements = await customizationBox.$$('input');
 
     // Placeholder text.
-    await inputElements[0].click({ clickCount: 3 });
+    await inputElements[0].click({clickCount: 3});
     await inputElements[0].type(placeholderText);
     await this.page.waitForFunction(
       (element: Element, value: string) => {
@@ -1516,7 +1516,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Add options.
     for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, { visible: true });
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
       await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
@@ -1554,7 +1554,7 @@ export class ExplorationEditor extends BaseUser {
 
     // Update placeholder text.
     if (placeHolderText) {
-      await inputElements[0].click({ clickCount: 3 });
+      await inputElements[0].click({clickCount: 3});
       await inputElements[0].type(placeHolderText);
       await this.expectElementValueToBe(inputElements[0], placeHolderText);
     }
@@ -2198,7 +2198,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     const responseBox = await this.page.waitForSelector(
       responseModalBodySelector,
-      { visible: true }
+      {visible: true}
     );
 
     if (!responseBox) {
@@ -2271,7 +2271,7 @@ export class ExplorationEditor extends BaseUser {
   async updateRuleInResponseModalTo(rule: string): Promise<void> {
     const responseBox = await this.page.waitForSelector(
       responseModalBodySelector,
-      { visible: true }
+      {visible: true}
     );
 
     if (!responseBox) {
@@ -2314,7 +2314,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.updateRuleInResponseModalTo(rule);
 
-    await this.page.waitForSelector(responseModalBodySelector, { visible: true });
+    await this.page.waitForSelector(responseModalBodySelector, {visible: true});
 
     const responseBox = await this.page.$(responseModalBodySelector);
 
@@ -2508,6 +2508,11 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2533,10 +2538,6 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(permissionSettingsDropdown);
       await this.clickOnElementWithSelector(feedbackSettingsDropdown);
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
       });
@@ -2565,7 +2566,7 @@ export class ExplorationEditor extends BaseUser {
     if (!this.isViewportAtMobileWidth()) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-        'Reason: Sections are already expanded on desktop.'
+          'Reason: Sections are already expanded on desktop.'
       );
       return;
     }
@@ -2579,7 +2580,7 @@ export class ExplorationEditor extends BaseUser {
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
         `Skipped: Expanding ${section} section on desktop.\n` +
-        'Reason: Section is already expanded on desktop.'
+          'Reason: Section is already expanded on desktop.'
       );
       return;
     }
@@ -2737,6 +2738,11 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
       if (!mobileNavbarElement) {
@@ -2746,10 +2752,6 @@ export class ExplorationEditor extends BaseUser {
       await this.page.waitForSelector(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       // We click the anchor tag directly inside the tab to be more precise.
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
@@ -2770,7 +2772,7 @@ export class ExplorationEditor extends BaseUser {
     if (!match) {
       throw new Error(
         'Exploration ID not found in the URL.' +
-        `Ensure you are on the exploration editor page. Found URL: ${url}`
+          `Ensure you are on the exploration editor page. Found URL: ${url}`
       );
     }
     return match[1];
@@ -2799,8 +2801,8 @@ export class ExplorationEditor extends BaseUser {
         // Important: Wait for the backdrop to fade out, otherwise it blocks
         // subsequent clicks on the page elements.
         await this.page
-          .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-          .catch(() => { });
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+          .catch(() => {});
         showMessage('Tutorial pop-up closed successfully.');
       }
     } catch (error) {
@@ -2838,8 +2840,8 @@ export class ExplorationEditor extends BaseUser {
           hidden: true,
         });
         await this.page
-          .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-          .catch(() => { });
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+          .catch(() => {});
         showMessage('Feedback prompt modal closed successfully.');
       }
     } catch (error) {
@@ -2905,7 +2907,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clearAllTextFrom(stateContentInputField);
     await this.typeInInputField(stateContentInputField, `${content}`);
     await this.clickOnElementWithSelector(saveContentButton);
-    await this.page.waitForSelector(stateContentInputField, { hidden: true });
+    await this.page.waitForSelector(stateContentInputField, {hidden: true});
 
     // TODO(#23019): Currently, the content automatically changes spaces in the
     // card content. So, skipping the post-check. Once the issue is resolved,
@@ -3017,7 +3019,7 @@ export class ExplorationEditor extends BaseUser {
     );
 
     for (let i = 0; i < options.length - 1; i++) {
-      await this.page.waitForSelector(addResponseOptionButton, { visible: true });
+      await this.page.waitForSelector(addResponseOptionButton, {visible: true});
       await this.clickOnElementWithSelector(addResponseOptionButton);
     }
 
@@ -3091,7 +3093,7 @@ export class ExplorationEditor extends BaseUser {
    * Function to close the interaction's response modal.
    */
   async closeInteractionResponseModal(): Promise<void> {
-    await this.page.waitForSelector(closeResponseModalButton, { visible: true });
+    await this.page.waitForSelector(closeResponseModalButton, {visible: true});
     await this.page.click(closeResponseModalButton);
     await this.page.waitForSelector(closeResponseModalButton, {
       hidden: true,
@@ -3121,7 +3123,7 @@ export class ExplorationEditor extends BaseUser {
     await this.uploadFile(imageToUpload);
     await this.clickOnElementWithSelector(useTheUploadImageButton);
     await this.waitForPageToFullyLoad();
-    await this.page.waitForSelector('.btn-danger', { visible: true });
+    await this.page.waitForSelector('.btn-danger', {visible: true});
 
     const imageRegionHepler = new ImageAreaSelection(this.page);
     await imageRegionHepler.selectArea(5, 50, 90, 45);
@@ -3471,7 +3473,7 @@ export class ExplorationEditor extends BaseUser {
       hidden: true,
     });
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, { hidden: true });
+    await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as manager role.`);
   }
 
@@ -3489,7 +3491,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithText(collaboratorRoleOption);
     await this.waitForElementToStabilize(saveRoleButton);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, { hidden: true });
+    await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as collaboratorRole.`);
   }
 
@@ -3509,7 +3511,7 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(addRoleDropdown);
     await this.clickOnElementWithText(playtesterRoleOption);
     await this.clickOnElementWithSelector(saveRoleButton);
-    await this.page.waitForSelector(saveRoleButton, { hidden: true });
+    await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(`${username} has been added as playtester.`);
   }
 
@@ -3587,7 +3589,7 @@ export class ExplorationEditor extends BaseUser {
 
       await this.page.waitForSelector(
         `${mobileSaveChangesButtonSelector}:not([disabled])`,
-        { visible: true }
+        {visible: true}
       );
       await this.clickOnElementWithSelector(mobileSaveChangesButtonSelector);
     } else {
@@ -3602,7 +3604,7 @@ export class ExplorationEditor extends BaseUser {
       await this.typeInInputField(commitMessageSelector, commitMessage);
     }
     await this.clickOnElementWithSelector(saveDraftButton);
-    await this.page.waitForSelector(saveDraftButton, { hidden: true });
+    await this.page.waitForSelector(saveDraftButton, {hidden: true});
 
     // Toast message confirms that the draft has been saved.
     await this.page.waitForSelector(toastMessage, {
@@ -3632,7 +3634,7 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(publishExplorationButtonSelector);
     }
     await this.clickOnElementWithSelector(explorationConfirmPublishButton);
-    await this.page.waitForSelector(closePublishedPopUpButton, { visible: true });
+    await this.page.waitForSelector(closePublishedPopUpButton, {visible: true});
 
     const explorationUrlAfterPublished = await this.page.url();
     let explorationId = explorationUrlAfterPublished
@@ -3670,7 +3672,7 @@ export class ExplorationEditor extends BaseUser {
     });
     await Promise.all([
       this.clickOnElementWithSelector(confirmDiscardButton),
-      this.page.waitForNavigation({ waitUntil: 'networkidle0' }),
+      this.page.waitForNavigation({waitUntil: 'networkidle0'}),
     ]);
     await this.waitForStaticAssetsToLoad();
     await this.expectElementToBeVisible(confirmDiscardButton, false);
@@ -3751,7 +3753,7 @@ export class ExplorationEditor extends BaseUser {
         // resize button.
         const blockingModal = await this.page.$('div.modal-content');
         if (blockingModal) {
-          await this.page.waitForSelector('div.modal-content', { hidden: true });
+          await this.page.waitForSelector('div.modal-content', {hidden: true});
         }
         await this.page.waitForSelector(mobileStateGraphResizeButton, {
           visible: true,
@@ -3799,7 +3801,7 @@ export class ExplorationEditor extends BaseUser {
       );
     }
     await this.clickOnElement(nodeBackground);
-    await this.waitForNetworkIdle({ idleTime: 1000 });
+    await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName
@@ -3911,9 +3913,9 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.page.waitForSelector(stateSolutionTab, { visible: true });
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOnElementWithSelector(addSolutionButton);
-    await this.page.waitForSelector(solutionSelector, { visible: true });
+    await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.typeInInputField(solutionSelector, answer);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
     await this.clickOnElementWithSelector(submitAnswerButton);
@@ -3938,7 +3940,7 @@ export class ExplorationEditor extends BaseUser {
    * @param explanation - Updated solution explanation for the state card.
    */
   async updateSolutionExplanation(explanation: string): Promise<void> {
-    await this.page.waitForSelector(stateSolutionTab, { visible: true });
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOnElementWithSelector(stateSolutionTab);
     await this.clickOnElementWithSelector(editStateSolutionExplanationSelector);
     await this.typeInInputField(stateContentInputField, explanation);
@@ -3959,7 +3961,7 @@ export class ExplorationEditor extends BaseUser {
     explaination: string,
     isSolutionNumericInput: boolean = true
   ): Promise<void> {
-    await this.page.waitForSelector(stateSolutionTab, { visible: true });
+    await this.page.waitForSelector(stateSolutionTab, {visible: true});
     await this.clickOnElementWithSelector(stateSolutionTab);
     await this.clickOnElementWithSelector(editSolutionDivSelector);
 
@@ -3967,7 +3969,7 @@ export class ExplorationEditor extends BaseUser {
     const solutionSelector = isSolutionNumericInput
       ? solutionInputNumeric
       : solutionInputTextArea;
-    await this.page.waitForSelector(solutionSelector, { visible: true });
+    await this.page.waitForSelector(solutionSelector, {visible: true});
     await this.clearAllTextFrom(solutionSelector);
     await this.typeInInputField(solutionSelector, solution);
     await this.page.waitForSelector(`${submitAnswerButton}:not([disabled])`);
@@ -4305,6 +4307,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
@@ -4340,10 +4347,6 @@ export class ExplorationEditor extends BaseUser {
       );
       await previewButton?.click();
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       await this.page.waitForSelector(previewTabButton, {
         visible: true,
       });
@@ -4358,15 +4361,16 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
       await this.clickOnElementWithSelector(mobileHistoryTabButton);
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       await this.clickOnElementWithSelector(historyTabButton);
     }
 
@@ -4491,6 +4495,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -4516,10 +4525,6 @@ export class ExplorationEditor extends BaseUser {
         await this.page.click(dropdownToggleIcon);
       }
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       await this.page.waitForSelector(translationTabButton, {
         visible: true,
       });
@@ -4533,6 +4538,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the editor tab.
    */
   async navigateToEditorTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 2000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -4558,10 +4568,6 @@ export class ExplorationEditor extends BaseUser {
         await this.page.click(dropdownToggleIcon);
       }
     } else {
-      await this.dismissWelcomeModalIfPresent();
-      await this.page
-        .waitForSelector('.modal-backdrop', { hidden: true, timeout: 2000 })
-        .catch(() => { });
       await this.page.waitForSelector(`${mainTabButton}`, {
         visible: true,
       });
@@ -4599,7 +4605,7 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       throw new Error(
         `Card content ${matchCase ? 'did not' : 'did'} match expected content.\n` +
-        `Original Error: ${error.stack}`
+          `Original Error: ${error.stack}`
       );
     }
   }
@@ -4610,7 +4616,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async continueToNextCard(skipVerification: boolean = false): Promise<void> {
     try {
-      await this.page.waitForSelector(nextCardButton, { timeout: 7000 });
+      await this.page.waitForSelector(nextCardButton, {timeout: 7000});
       await this.clickOnElementWithSelector(nextCardButton);
     } catch (error) {
       if (error instanceof puppeteer.errors.TimeoutError) {
@@ -4973,9 +4979,9 @@ export class ExplorationEditor extends BaseUser {
     if (process.env.MOBILE === 'true') {
       return;
     }
-    await this.page.waitForSelector('nav-options', { visible: true });
+    await this.page.waitForSelector('nav-options', {visible: true});
     await this.clickOnElementWithSelector(feedbackPopupSelector);
-    await this.page.waitForSelector(feedbackTextarea, { visible: true });
+    await this.page.waitForSelector(feedbackTextarea, {visible: true});
     await this.typeInInputField(feedbackTextarea, feedback);
 
     // If stayAnonymous is true, clicking on the "stay anonymous" checkbox.
@@ -4988,7 +4994,7 @@ export class ExplorationEditor extends BaseUser {
     try {
       await this.page.waitForFunction(
         'document.querySelector(".oppia-feedback-popup-container") !== null',
-        { timeout: 5000 }
+        {timeout: 5000}
       );
       showMessage('Feedback submitted successfully');
     } catch (error) {
@@ -5095,7 +5101,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.page.waitForSelector(
       `div.e2e-test-translation-${languageCode}`,
-      { visible: true }
+      {visible: true}
     );
 
     const translationElementText = await this.page.evaluate(languageCode => {
@@ -5407,7 +5413,7 @@ export class ExplorationEditor extends BaseUser {
     await this.page.waitForTimeout(1000);
     await this.page.mouse.down();
     await this.page.waitForTimeout(1000);
-    await this.page.mouse.move(endX, endY, { steps: 10 });
+    await this.page.mouse.move(endX, endY, {steps: 10});
     await this.page.waitForTimeout(1000);
     await this.page.mouse.up();
     await this.page.waitForTimeout(1000);
@@ -5423,7 +5429,7 @@ export class ExplorationEditor extends BaseUser {
   ): Promise<void> {
     await this.clickOnAddSolutionButton();
 
-    await this.page.waitForSelector(dragAndDropItemSelector, { visible: true });
+    await this.page.waitForSelector(dragAndDropItemSelector, {visible: true});
     const solutionModal = await this.getSolutionModal();
 
     for (let i = 0; i < sortedOptions.length - 1; i++) {
@@ -5480,7 +5486,7 @@ export class ExplorationEditor extends BaseUser {
   }
 
   async submitDragAndDropSortAnswer(answerItems: string[]): Promise<void> {
-    await this.page.waitForSelector(dragAndDropItemSelector, { visible: true });
+    await this.page.waitForSelector(dragAndDropItemSelector, {visible: true});
 
     for (let i = 0; i < answerItems.length - 1; i++) {
       const option = answerItems[i];
@@ -6653,7 +6659,7 @@ export class ExplorationEditor extends BaseUser {
     // modal appears after previous dismissWelcomeModal call).
     await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
-    await this.page.waitForSelector(stateEditSelector, { visible: true });
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
@@ -6741,7 +6747,7 @@ export class ExplorationEditor extends BaseUser {
     // modal appears after previous dismissWelcomeModal call).
     await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
-    await this.page.waitForSelector(stateEditSelector, { visible: true });
+    await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
 
     // Add Bold text.
@@ -6977,7 +6983,7 @@ export class ExplorationEditor extends BaseUser {
     if (this.isViewportAtMobileWidth()) {
       showMessage(
         'Skipping node warning sign check on mobile viewport,' +
-        'as nodes are not visible on mobile viewport.'
+          'as nodes are not visible on mobile viewport.'
       );
       return;
     }
