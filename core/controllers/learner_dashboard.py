@@ -27,10 +27,8 @@ from core.domain import (
     summary_services,
     user_services,
 )
-from core.storage.user import gae_models as user_models
 
-from typing import Dict, List, Optional, Set, TypedDict, Union, cast
-from typing_extensions import NotRequired
+from typing import Any, Dict, List, Optional, Set, TypedDict
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -306,35 +304,15 @@ class LearnerDashboardExplorationsProgressHandler(
                 summary_services.DisplayableExplorationSummaryDict
             ],
             completed: bool = False,
-        ) -> List[
-            Dict[
-                str,
-                Union[
-                    str,
-                    int,
-                    float,
-                    bool,
-                    Dict[str, int],
-                    Dict[str, Dict[str, int]],
-                    List[str],
-                ],
-            ]
-        ]:
+            # Here we use type Any because the summary dict combines
+            # heterogeneous value types (strings, numbers, booleans, nested
+            # dicts/lists) and we extend it with numeric progress fields.
+        ) -> List[Dict[str, Any]]:
             """Annotate summaries with card-based progress."""
-            enriched: List[
-                Dict[
-                    str,
-                    Union[
-                        str,
-                        int,
-                        float,
-                        bool,
-                        Dict[str, int],
-                        Dict[str, Dict[str, int]],
-                        List[str],
-                    ],
-                ]
-            ] = []
+            # Here we use type Any because the aggregated summary collection
+            # carries the same heterogeneous value types as the input summary
+            # dicts and we add numeric progress fields.
+            enriched: List[Dict[str, Any]] = []
             for summary_dict in summary_dicts:
                 exp_id = summary_dict['id']
 
@@ -343,9 +321,7 @@ class LearnerDashboardExplorationsProgressHandler(
                         exp_id, strict=True
                     )
                 except Exception:
-                    # Here ignore is used because TypedDict cannot be
-                    # appended to a Dict with Union values directly.
-                    enriched.append(summary_dict)  # type: ignore[arg-type]
+                    enriched.append(dict(summary_dict))
                     continue
 
                 state_bfs_order = _get_state_bfs_order(current_exp)
@@ -356,25 +332,12 @@ class LearnerDashboardExplorationsProgressHandler(
                 else:
                     visited_cards_count = 0
                     assert self.user_id is not None
-                    last_playthrough_model = (
-                        user_models.ExpUserLastPlaythroughModel.get(
-                            self.user_id, exp_id
-                        )
+                    last_state = learner_progress_services.get_last_played_state_name(
+                        self.user_id, exp_id
                     )
 
-                    if (
-                        last_playthrough_model is not None
-                        and last_playthrough_model.last_played_state_name
-                        is not None
-                    ):
-                        last_state = (
-                            last_playthrough_model.last_played_state_name
-                        )
-
-                        if last_state in state_bfs_order:
-                            visited_cards_count = (
-                                state_bfs_order.index(last_state) + 1
-                            )
+                    if last_state is not None and last_state in state_bfs_order:
+                        visited_cards_count = state_bfs_order.index(last_state) + 1
 
                 progress_percent = (
                     int((visited_cards_count * 100) / total_cards_count)
@@ -384,18 +347,9 @@ class LearnerDashboardExplorationsProgressHandler(
 
                 # Here we create a new dict with extended fields.
                 # The spread operator copies all fields from summary_dict.
-                enriched_summary: Dict[
-                    str,
-                    Union[
-                        str,
-                        int,
-                        float,
-                        bool,
-                        Dict[str, int],
-                        Dict[str, Dict[str, int]],
-                        List[str],
-                    ],
-                ] = {
+                # Here we use type Any because we copy the original summary
+                # dict (heterogeneous types) and add numeric progress fields.
+                enriched_summary: Dict[str, Any] = {
                     'id': summary_dict['id'],
                     'title': summary_dict['title'],
                     'activity_type': summary_dict['activity_type'],
