@@ -2507,6 +2507,11 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2732,6 +2737,11 @@ export class ExplorationEditor extends BaseUser {
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
       if (!mobileNavbarElement) {
@@ -2772,14 +2782,27 @@ export class ExplorationEditor extends BaseUser {
    */
   async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
     try {
-      await this.page.waitForSelector(dismissWelcomeModalSelector, {
-        visible: true,
-        // If we know the modal should appear, we can wait longer.
-        timeout: failIfMissing ? 20000 : 5000,
-      });
-      await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
-      showMessage('Tutorial pop-up closed successfully.');
+      const modalElement = await this.page.waitForSelector(
+        dismissWelcomeModalSelector,
+        {
+          visible: true,
+          timeout: 10000,
+        }
+      );
+      if (modalElement) {
+        // We use click() directly here to avoid being blocked by the backdrop
+        // while trying to close the modal itself.
+        await modalElement.click();
+        await this.page.waitForSelector(dismissWelcomeModalSelector, {
+          hidden: true,
+        });
+        // Important: Wait for the backdrop to fade out, otherwise it blocks
+        // subsequent clicks on the page elements.
+        await this.page
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+          .catch(() => {});
+        showMessage('Tutorial pop-up closed successfully.');
+      }
     } catch (error) {
       if (!failIfMissing) {
         showMessage(
@@ -2804,6 +2827,34 @@ export class ExplorationEditor extends BaseUser {
     // case where the modal is not present (via try/catch), so we just
     // delegate to it.
     await this.dismissWelcomeModal();
+    await this.dismissFeedbackPromptModalIfPresent();
+  }
+
+  /**
+   * Function to dismiss the feedback prompt modal if it is present.
+   */
+  async dismissFeedbackPromptModalIfPresent(): Promise<void> {
+    try {
+      const modalElement = await this.page.waitForSelector(
+        stayInEditorButtonSelector,
+        {
+          visible: true,
+          timeout: 10000,
+        }
+      );
+      if (modalElement) {
+        await modalElement.click();
+        await this.page.waitForSelector(stayInEditorButtonSelector, {
+          hidden: true,
+        });
+        await this.page
+          .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+          .catch(() => {});
+        showMessage('Feedback prompt modal closed successfully.');
+      }
+    } catch (error) {
+      // Modal didn't appear or already dismissed.
+    }
   }
 
   /**
@@ -4270,6 +4321,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the preview tab.
    */
   async navigateToPreviewTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       await this.waitForPageToFullyLoad();
       const element = await this.page.$(mobileNavbarOptions);
@@ -4319,6 +4375,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the history tab.
    */
   async navigateToHistoryTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.expectElementToBeVisible(mobileHistoryTabButton);
@@ -4448,6 +4509,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the translations tab.
    */
   async navigateToTranslationsTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -4486,6 +4552,11 @@ export class ExplorationEditor extends BaseUser {
    * Function to navigate to the editor tab.
    */
   async navigateToEditorTab(): Promise<void> {
+    await this.dismissWelcomeModalIfPresent();
+    await this.page
+      .waitForSelector('.modal-backdrop', {hidden: true, timeout: 10000})
+      .catch(() => {});
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarOptions);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -5657,8 +5728,7 @@ export class ExplorationEditor extends BaseUser {
    * @param {number} expectedThread - The 1-indexed position of the expected thread.
    */
   async viewFeedbackThread(expectedThread: number): Promise<void> {
-    // Reloading to make sure the feedback threads are updated.
-    await this.reloadPage();
+    await this.navigateToFeedbackTab();
     await this.page.waitForSelector(feedbackSubjectSelector);
     const feedbackSubjects = await this.page.$$(feedbackSubjectSelector);
 
