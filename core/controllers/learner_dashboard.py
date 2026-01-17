@@ -29,7 +29,8 @@ from core.domain import (
 )
 from core.storage.user import gae_models as user_models
 
-from typing import Dict, List, Optional, Set, TypedDict
+from typing import Dict, List, Optional, Set, TypedDict, Union, cast
+from typing_extensions import NotRequired
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -260,7 +261,9 @@ class LearnerDashboardExplorationsProgressHandler(
             learner_progress_services.get_exploration_progress(self.user_id)
         )
 
-        def _get_state_bfs_order(current_exp: exp_domain.Exploration) -> List[str]:
+        def _get_state_bfs_order(
+            current_exp: exp_domain.Exploration,
+        ) -> List[str]:
             """Get BFS order of states in exploration."""
             queue: List[str] = [current_exp.init_state_name]
             visited: Set[str] = set()
@@ -299,22 +302,50 @@ class LearnerDashboardExplorationsProgressHandler(
             return ordered_states
 
         def _annotate_with_card_progress(
-            summary_dicts: list[Dict[str, str]], completed: bool = False
-        ) -> list[Dict[str, str]]:
+            summary_dicts: List[
+                summary_services.DisplayableExplorationSummaryDict
+            ],
+            completed: bool = False,
+        ) -> List[
+            Dict[
+                str,
+                Union[
+                    str,
+                    int,
+                    float,
+                    bool,
+                    Dict[str, int],
+                    Dict[str, Dict[str, int]],
+                    List[str],
+                ],
+            ]
+        ]:
             """Annotate summaries with card-based progress."""
-            enriched: list[Dict[str, str]] = []
+            enriched: List[
+                Dict[
+                    str,
+                    Union[
+                        str,
+                        int,
+                        float,
+                        bool,
+                        Dict[str, int],
+                        Dict[str, Dict[str, int]],
+                        List[str],
+                    ],
+                ]
+            ] = []
             for summary_dict in summary_dicts:
-                exp_id = summary_dict.get('id')
-                if exp_id is None:
-                    enriched.append(summary_dict)
-                    continue
+                exp_id = summary_dict['id']
 
                 try:
                     current_exp = exp_fetchers.get_exploration_by_id(
                         exp_id, strict=True
                     )
                 except Exception:
-                    enriched.append(summary_dict)
+                    # Here ignore is used because TypedDict cannot be
+                    # appended to a Dict with Union values directly.
+                    enriched.append(summary_dict)  # type: ignore[arg-type]
                     continue
 
                 state_bfs_order = _get_state_bfs_order(current_exp)
@@ -324,6 +355,7 @@ class LearnerDashboardExplorationsProgressHandler(
                     visited_cards_count = total_cards_count
                 else:
                     visited_cards_count = 0
+                    assert self.user_id is not None
                     last_playthrough_model = (
                         user_models.ExpUserLastPlaythroughModel.get(
                             self.user_id, exp_id
@@ -350,13 +382,43 @@ class LearnerDashboardExplorationsProgressHandler(
                     else 0
                 )
 
-                summary_dict = {
-                    **summary_dict,
+                # Here we create a new dict with extended fields.
+                # The spread operator copies all fields from summary_dict.
+                enriched_summary: Dict[
+                    str,
+                    Union[
+                        str,
+                        int,
+                        float,
+                        bool,
+                        Dict[str, int],
+                        Dict[str, Dict[str, int]],
+                        List[str],
+                    ],
+                ] = {
+                    'id': summary_dict['id'],
+                    'title': summary_dict['title'],
+                    'activity_type': summary_dict['activity_type'],
+                    'category': summary_dict['category'],
+                    'created_on_msec': summary_dict['created_on_msec'],
+                    'objective': summary_dict['objective'],
+                    'language_code': summary_dict['language_code'],
+                    'last_updated_msec': summary_dict['last_updated_msec'],
+                    'human_readable_contributors_summary': (
+                        summary_dict['human_readable_contributors_summary']
+                    ),
+                    'status': summary_dict['status'],
+                    'ratings': summary_dict['ratings'],
+                    'community_owned': summary_dict['community_owned'],
+                    'tags': summary_dict['tags'],
+                    'thumbnail_icon_url': summary_dict['thumbnail_icon_url'],
+                    'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
+                    'num_views': summary_dict['num_views'],
                     'total_cards_count': total_cards_count,
                     'visited_cards_count': visited_cards_count,
                     'progress_percent': progress_percent,
                 }
-                enriched.append(summary_dict)
+                enriched.append(enriched_summary)
             return enriched
 
         completed_exp_summary_dicts = _annotate_with_card_progress(

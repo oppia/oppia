@@ -218,7 +218,7 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    // Use backend-provided progress percentage if available
+    // Use backend-provided progress percentage if available.
     this.progress =
       explorationModel.progressPercent !== undefined
         ? explorationModel.progressPercent
