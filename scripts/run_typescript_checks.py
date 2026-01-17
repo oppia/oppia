@@ -103,7 +103,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/contributor-dashboard-page/services/contribution-and-review.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/services/question-suggestion-backend-api.service.spec.ts',
     'core/templates/pages/contributor-dashboard-page/services/translate-text-backend-api.service.spec.ts',
-    'core/templates/pages/contributor-dashboard-page/services/translate-text.service.ts',
     'core/templates/pages/creator-dashboard-page/modal-templates/upload-activity-modal.component.spec.ts',
     'core/templates/pages/diagnostic-test-player-page/diagnostic-test-player.component.spec.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/exploration-editor-tab.component.spec.ts',
