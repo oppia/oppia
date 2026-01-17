@@ -29,7 +29,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import story_models
 
-(story_models) = models.Registry.import_models([models.Names.STORY])
+(story_models,) = models.Registry.import_models([models.Names.STORY])
 
 datastore_services = models.Registry.import_datastore_services()
 
