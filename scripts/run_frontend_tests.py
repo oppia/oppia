@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pragma: no cover
+# Pragma: no cover
 
 """This script runs unit tests for frontend JavaScript code (using Karma)."""
 
