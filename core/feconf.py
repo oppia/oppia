@@ -500,6 +500,9 @@ ES_LOCALHOST_PORT = 9200
 ES_CLOUD_ID = None
 ES_USERNAME = None
 
+ES_DISK_WATERMARK_LOW = 85
+ES_DISK_WATERMARK_HIGH = 95
+
 # NOTE TO RELEASE COORDINATORS: Replace this with the correct Redis Host and
 # Port when switching to prod server. Keep this in sync with redis.conf in the
 # root folder. Specifically, REDISPORT should always be the same as the port in
@@ -540,7 +543,7 @@ DATAFLOW_STAGING_LOCATION = 'gs://todo/todo'
 DATAFLOW_TEMP_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-temp/'
 DATAFLOW_STAGING_LOCATION_TEMPLATE = 'gs://%s-beam-jobs-staging/'
 
-OPPIA_VERSION = '3.4.8'
+OPPIA_VERSION = '3.4.9'
 OPPIA_PYTHON_PACKAGE_PATH = './build/oppia_beam_job-%s.tar.gz' % OPPIA_VERSION
 
 # Committer id for system actions. The username for the system committer
@@ -1076,6 +1079,10 @@ REGENERATE_AUTOMATIC_VOICEOVER_HANDLER_URL = (
 REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
     '/regenerate_voiceover_on_exp_update/<exploration_id>/'
     '<exploration_version>/<exploration_title>'
+)
+REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
+    '/regenerate_voiceovers_for_exploration/'
+    '<exploration_id>/<language_accent_code>'
 )
 
 # Event types.
@@ -1737,6 +1744,16 @@ class TranslatedContentDict(TypedDict):
     content_format: str
 
 
+class VoiceoverRegenerationState(enum.Enum):
+    """Represents the possible states of voiceover regeneration status for
+    exploration content.
+    """
+
+    GENERATING = 'GENERATING'
+    SUCCEEDED = 'SUCCEEDED'
+    FAILED = 'FAILED'
+
+
 class VoiceoverType(enum.Enum):
     """Represents all possible voicever types."""
 
@@ -1775,9 +1792,12 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'remove_user_from_rights_models'
     ),
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': (
-        'regenerate_voiceovers_for_updated_exploration'
+        'regenerate_voiceovers_on_exploration_update'
     ),
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
-        'regenerate_voiceovers_on_exploration_curation'
+        'regenerate_voiceovers_on_exploration_added_to_topic'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT': (
+        'regenerate_voiceovers_of_exploration_for_given_language_accent'
     ),
 }

@@ -273,7 +273,7 @@
 }
 
 .oppia-top-navigation-bar .language-icon {
-  font-size: 20px;
+  font-size: 18px;
   vertical-align: text-bottom;
 }
 
@@ -531,6 +531,9 @@
 .oppia-navbar-impactreport-submenu-tab-content {
   margin-left: -15px;
   width: 150px;
+}
+.btn.dropdown-toggle.oppia-navbar-button.e2e-mobile-test-login.sinin {
+  border: 2px solid transparent;
 }
 
 @media screen and (max-width : 1212px) {
