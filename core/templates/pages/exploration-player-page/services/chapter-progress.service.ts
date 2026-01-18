@@ -46,12 +46,12 @@ export class ChapterProgressService {
         const newCount = data.completedChaptersCount;
 
         if (checkForFirstTimeCompletion) {
-          if (newCount !== this.completedChaptersCountSubject.getValue()) {
+          if (newCount !== this.getCompletedChaptersCount()) {
             this.chapterIsCompletedForTheFirstTime = true;
           }
         }
 
-        this.completedChaptersCountSubject.next(newCount);
+        this.setCompletedChaptersCount(newCount);
       });
   }
 
