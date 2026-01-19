@@ -98,35 +98,14 @@ describe('Exploration Creator', function () {
       await explorationEditor.discardCurrentChanges();
       await explorationEditor.expectCardContentToBe('Old content');
 
-      // Rename first card to "First" -> Create "Second" + Continue -> Create "Final" + EndExploration
-
-      await explorationEditor.clickOnElementWithSelector(
-        '.e2e-test-state-name-container'
-      );
-
-      await explorationEditor.page.evaluate(() => {
-        const input = document.querySelector(
-          '.e2e-test-state-name-input'
-        ) as HTMLInputElement;
-        if (input) {
-          input.value = '';
-          input.focus();
-        }
-      });
-
-      await explorationEditor.page.keyboard.type('First');
-      await explorationEditor.clickOnElementWithSelector(
-        'button.e2e-test-state-name-submit'
-      );
-
+      // Rename first card, create new card
+      await explorationEditor.updateStateName('First');
       await explorationEditor.waitForPageToFullyLoad();
 
       await explorationEditor.saveExplorationDraft('Renamed initial card');
 
-      await explorationEditor.expectTextContentToContain(
-        '.e2e-test-state-name-container',
-        'First'
-      );
+      await explorationEditor.expectStateNameToBe('First');
+      await explorationEditor.expectExplorationGraphToContainCard('First');
 
       await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
 
@@ -161,8 +140,6 @@ describe('Exploration Creator', function () {
       await explorationEditor.expectExplorationGraphToContainCard('Second');
       await explorationEditor.expectExplorationGraphToContainCard('Final');
 
-      // Settings -> set initial card to Second -> Preview
-
       await explorationEditor.navigateToSettingsTab();
       await explorationEditor.selectFirstCard('Second');
 
@@ -175,8 +152,7 @@ describe('Exploration Creator', function () {
         'This is the second card.'
       );
 
-      // Editor -> remove First -> save draft -> verify removed
-
+      // Remove first card and verify it
       await explorationEditor.navigateToEditorTab();
 
       await explorationEditor.waitForPageToFullyLoad();
@@ -187,21 +163,13 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.waitForPageToFullyLoad();
 
-      await explorationEditor.page.waitForFunction(
-        (name: string) => {
-          const labels = document.querySelectorAll('.e2e-test-node-label');
-          const cardNames = Array.from(labels).map(l => l.textContent?.trim());
-          return !cardNames.includes(name);
-        },
-        {},
-        'First'
-      );
+      await explorationEditor.expectExplorationGraphToNotContainCard('First');
     },
     10 * 60 * 1000
   );
 
   it(
-    'should show save recommendation modal after 50 updateCardContent calls',
+    'should show save recommendation modal after 50 unsaved changes',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
@@ -215,56 +183,27 @@ describe('Exploration Creator', function () {
         await explorationEditor.updateCardContent(`Content ${i}`);
       }
 
-      await explorationEditor.page.waitForSelector(
-        '.e2e-test-save-prompt-modal',
-        {
-          visible: true,
-          timeout: 60000,
-        }
-      );
+      await explorationEditor.expectSaveRecommendationModalToBeVisible();
 
-      await explorationEditor.clickOnElementWithSelector(
-        'button.e2e-test-recommendation-prompt-save-button'
-      );
+      await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
+
+      await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
     },
     50 * 60 * 1000
   );
 
   it(
-    'should show warning when there are 50 unsaved changes',
+    'should generate warning message if card height limit is exceeded',
     async function () {
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
 
-      await explorationEditor.updateCardContent('Welcome to the exploration!');
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-      await explorationEditor.saveExplorationDraft();
+      await explorationEditor.updateStateName('1 - Intro');
+      await explorationEditor.waitForPageToFullyLoad();
+      await explorationEditor.saveExplorationDraft('Renamed initial card');
 
-      await explorationEditor.clickOnElementWithSelector(
-        '.e2e-test-state-name-container'
-      );
-
-      await explorationEditor.page.evaluate(() => {
-        const input = document.querySelector(
-          '.e2e-test-state-name-input'
-        ) as HTMLInputElement;
-        if (input) {
-          input.value = '';
-          input.focus();
-        }
-      });
-
-      await explorationEditor.page.keyboard.type('1 - Intro');
-      await explorationEditor.page.keyboard.press('Enter');
-
-      await explorationEditor.saveExplorationDraft();
-
-      await explorationEditor.expectTextContentToContain(
-        '.e2e-test-state-name-container',
-        '1 - Intro'
-      );
-
+      await explorationEditor.expectStateNameToBe('1 - Intro');
       await explorationEditor.expectExplorationGraphToContainCard('1 - Intro');
 
       const questionText = 'What is the capital of France?';
@@ -287,10 +226,7 @@ describe('Exploration Creator', function () {
 
       await explorationEditor.updateCardContent(longContent);
 
-      await explorationEditor.expectTextContentToContain(
-        '.e2e-test-card-height-limit-warning',
-        'This card is quite long'
-      );
+      await explorationEditor.expectCardHeightLimitWarningToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
