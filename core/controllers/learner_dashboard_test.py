@@ -1014,3 +1014,50 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             'progress_percent', response['incomplete_explorations_list'][0]
         )
         self.logout()
+
+    def test_last_state_not_in_bfs_order(self) -> None:
+        """Test when last_state is not in the BFS order."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete with a state that doesn't exist in BFS.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, 'nonexistent_state', 1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        self.assertEqual(len(response['incomplete_explorations_list']), 1)
+        # Progress should be 0 since last_state is not in BFS order.
+        self.assertEqual(
+            response['incomplete_explorations_list'][0]['progress_percent'], 0
+        )
+        self.logout()
+
+    def test_exploration_with_answer_groups(self) -> None:
+        """Test BFS traversal with answer groups."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        state_name = 'Introduction'
+        version = 1
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, state_name, version
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        self.assertEqual(len(response['incomplete_explorations_list']), 1)
+        exp_summary = response['incomplete_explorations_list'][0]
+        # Verify card progress fields exist.
+        self.assertIn('visited_cards_count', exp_summary)
+        self.assertIn('total_cards_count', exp_summary)
+        self.assertGreater(exp_summary['total_cards_count'], 0)
+        self.logout()
