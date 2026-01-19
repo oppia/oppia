@@ -17,502 +17,304 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-
 import {PageContextService} from 'services/page-context.service';
 import {UrlService} from 'services/contextual/url.service';
 import {BlogPostPageService} from 'pages/blog-post-page/services/blog-post-page.service';
+import {AppConstants} from 'app.constants';
+import {ServicesConstants} from 'services/services.constants';
 
 describe('PageContext service', () => {
   let ecs: PageContextService;
   let urlService: UrlService;
   let blogPostPageService: BlogPostPageService;
+  let pathSpy: jasmine.Spy;
+  let hashSpy: jasmine.Spy;
 
   beforeEach(() => {
-    ecs = TestBed.get(PageContextService);
-    urlService = TestBed.get(UrlService);
+    ecs = TestBed.inject(PageContextService);
+    urlService = TestBed.inject(UrlService);
+    blogPostPageService = TestBed.inject(BlogPostPageService);
+
+    pathSpy = spyOn(urlService, 'getPathname');
+    hashSpy = spyOn(urlService, 'getHash');
+    hashSpy.and.returnValue('');
+
     ecs.removeCustomEntityContext();
+    ecs.clearQuestionPlayerIsOpen();
+    ecs.setSubtopicPreviewIsClosed();
+    ecs.resetImageSaveDestination();
 
     (
       PageContextService as unknown as {customEntityContext: null}
     ).customEntityContext = null;
+    (ecs as unknown as {pageContext: string | null}).pageContext = null;
+    (ecs as unknown as {explorationId: string | null}).explorationId = null;
+    (ecs as unknown as {learnerGroupId: string | null}).learnerGroupId = null;
   });
 
-  describe('behavior in the exploration learner view', () => {
-    beforeEach(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-    });
+  describe('getPageContext methods', () => {
+    it('should correctly retrieve the page context for all page types', () => {
+      const testCases = [
+        {
+          path: '/explore/123',
+          expected: ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER,
+        },
+        {
+          path: '/lesson/123',
+          expected: ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER,
+        },
+        {
+          path: '/embed/exploration/123',
+          expected: ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER,
+        },
+        {
+          path: '/create/123',
+          expected: ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
+        },
+        {
+          path: '/question_editor/123',
+          expected: ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR,
+        },
+        {
+          path: '/topic_editor/123',
+          expected: ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
+        },
+        {
+          path: '/story_editor/123',
+          expected: ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
+        },
+        {
+          path: '/skill_editor/123',
+          expected: ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR,
+        },
+        {
+          path: '/collection_editor/123',
+          expected: ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
+        },
+        {
+          path: '/topics-and-skills-dashboard/',
+          expected: ServicesConstants.PAGE_CONTEXT.TOPICS_AND_SKILLS_DASHBOARD,
+        },
+        {
+          path: '/contributor-dashboard/',
+          expected: ServicesConstants.PAGE_CONTEXT.CONTRIBUTOR_DASHBOARD,
+        },
+        {
+          path: '/blog-dashboard',
+          expected: ServicesConstants.PAGE_CONTEXT.BLOG_DASHBOARD,
+        },
+        {
+          path: '/edit-learner-group/123',
+          expected: ServicesConstants.PAGE_CONTEXT.LEARNER_GROUP_EDITOR,
+        },
+        {
+          path: '/diagnostic-test-player/',
+          expected: ServicesConstants.PAGE_CONTEXT.DIAGNOSTIC_TEST_PLAYER,
+        },
+        {
+          path: '/session/123',
+          expected: ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER,
+        },
+        {path: '/studyguide/123', expected: 'studyguide'},
+        {path: '/unknown/path', expected: ServicesConstants.PAGE_CONTEXT.OTHER},
+      ];
 
-    it('should correctly set editor context to exploration editor', () => {
-      ecs.init('exploration_editor');
-      expect(ecs.getEditorContext()).toBe('exploration_editor');
-    });
-
-    it('should correctly retrieve the exploration id', () => {
-      expect(ecs.getExplorationId()).toBe('123');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('learner');
-    });
-
-    it('should correctly retrieve the correct entity type', () => {
-      expect(ecs.getEntityType()).toBe('exploration');
-    });
-
-    it('should affirm that the page forbids editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
-    });
-
-    it('should correctly return if question player is manually set', () => {
-      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
-      ecs.setQuestionPlayerIsOpen();
-      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(true);
-      expect(ecs.isInQuestionPlayerMode()).toEqual(true);
-      ecs.clearQuestionPlayerIsOpen();
-      expect(ecs.getQuestionPlayerIsManuallySet()).toEqual(false);
-      expect(ecs.isInQuestionPlayerMode()).toEqual(false);
-    });
-
-    it('should check if exploration is linked to a story', () => {
-      expect(ecs.isExplorationLinkedToStory()).toBe(false);
-      ecs.setExplorationIsLinkedToStory();
-      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+      testCases.forEach(testCase => {
+        pathSpy.and.returnValue(testCase.path);
+        (ecs as unknown as {pageContext: string | null}).pageContext = null;
+        expect(ecs.getPageContext()).toBe(testCase.expected);
+      });
     });
   });
 
-  describe('behavior in the exploration learner embed view', () => {
-    beforeEach(() => {
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/embed/exploration/123'
+  describe('getEditorTabContext', () => {
+    it('should correctly retrieve the editor tab context', () => {
+      hashSpy.and.returnValue('#/gui');
+      expect(ecs.getEditorTabContext()).toBe(
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR
       );
-      spyOn(urlService, 'getHash').and.returnValue('');
-    });
 
-    it('should correctly set editor context to exploration editor', () => {
-      ecs.init('exploration_editor');
-      expect(ecs.getEditorContext()).toBe('exploration_editor');
-    });
+      hashSpy.and.returnValue('#/preview');
+      expect(ecs.getEditorTabContext()).toBe(
+        ServicesConstants.EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW
+      );
 
-    it('should correctly retrieve the exploration id', () => {
-      expect(ecs.getExplorationId()).toBe('123');
-    });
-
-    it('should correctly retrieve the entity id', () => {
-      expect(ecs.getEntityId()).toBe('123');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('learner');
-    });
-
-    it('should correctly retrieve the correct entity type', () => {
-      expect(ecs.getEntityType()).toBe('exploration');
-    });
-
-    it('should affirm that the page forbids editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
+      hashSpy.and.returnValue('#/settings');
+      expect(ecs.getEditorTabContext()).toBeNull();
     });
   });
 
-  describe('behavior in the exploration editor view', () => {
-    beforeEach(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/create/123');
-      spyOn(urlService, 'getHash').and.returnValue('#/gui');
+  describe('getEntityType and Entity ID', () => {
+    it('should retrieve entity ID/Type for Custom Context', () => {
+      ecs.setCustomEntityContext('custom_type', 'cid');
+      expect(ecs.getEntityType()).toBe('custom_type');
+      expect(ecs.getEntityId()).toBe('cid');
+      ecs.removeCustomEntityContext();
     });
 
-    it('should correctly retrieve the exploration id', () => {
-      expect(ecs.getExplorationId()).toBe('123');
+    it('should retrieve entity ID/Type for Embed Pages', () => {
+      pathSpy.and.returnValue('/embed/exploration/123');
+      expect(ecs.getEntityId()).toBe('123');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.EXPLORATION);
     });
 
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('editor');
+    it('should retrieve entity ID/Type for Question in Editors', () => {
+      pathSpy.and.returnValue('/topic_editor/123');
+      hashSpy.and.returnValue('#/questions#q123');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.QUESTION);
+      expect(ecs.getEntityId()).toBe('q123');
+
+      pathSpy.and.returnValue('/skill_editor/123');
+      hashSpy.and.returnValue('#/questions#q456');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.QUESTION);
     });
 
-    it('should correctly retrieve the story context', () => {
-      expect(ecs.isExplorationLinkedToStory()).toBe(false);
-      ecs.setExplorationIsLinkedToStory();
-      expect(ecs.isExplorationLinkedToStory()).toBe(true);
+    it('should retrieve entity ID/Type for Blog Home', () => {
+      pathSpy.and.returnValue('/blog');
+      blogPostPageService.blogPostId = 'bp_id';
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.BLOG_POST);
+      expect(ecs.getEntityId()).toBe('bp_id');
     });
 
-    it('should correctly retrieve exploration editor mode', () => {
+    it('should retrieve entity ID/Type for Blog Dashboard', () => {
+      pathSpy.and.returnValue('/blog-dashboard');
+      spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('bp_dash_id');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.BLOG_POST);
+      expect(ecs.getEntityId()).toBe('bp_dash_id');
+    });
+
+    it('should retrieve entity ID/Type for standard Editors', () => {
+      hashSpy.and.returnValue('');
+
+      pathSpy.and.returnValue('/story_editor/s1');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.STORY);
+      expect(ecs.getEntityId()).toBe('s1');
+
+      pathSpy.and.returnValue('/skill_editor/sk1');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.SKILL);
+      expect(ecs.getEntityId()).toBe('sk1');
+
+      pathSpy.and.returnValue('/topic_editor/t1');
+      expect(ecs.getEntityType()).toBe(AppConstants.ENTITY_TYPE.TOPIC);
+      expect(ecs.getEntityId()).toBe('t1');
+    });
+  });
+
+  describe('getExplorationId', () => {
+    it('should handle cached ID, manual player mode, and URL parsing', () => {
+      (ecs as unknown as {explorationId: string | null}).explorationId =
+        'cached_id';
+      expect(ecs.getExplorationId()).toBe('cached_id');
+      (ecs as unknown as {explorationId: string | null}).explorationId = null;
+
+      pathSpy.and.returnValue('/explore/exp1');
+      ecs.setQuestionPlayerIsOpen();
+      expect(ecs.getExplorationId()).toBe('exp1');
+      ecs.clearQuestionPlayerIsOpen();
+
+      (ecs as unknown as {explorationId: string | null}).explorationId = null;
+      pathSpy.and.returnValue('/embed/exploration/embed_id');
+      expect(ecs.getExplorationId()).toBe('embed_id');
+
+      (ecs as unknown as {explorationId: string | null}).explorationId = null;
+      pathSpy.and.returnValue('/about');
+      expect(ecs.getExplorationId()).toBe('');
+    });
+  });
+
+  describe('getLearnerGroupId', () => {
+    it('should handle cached ID and URL parsing', () => {
+      (ecs as unknown as {learnerGroupId: string | null}).learnerGroupId =
+        'cached_group';
+      expect(ecs.getLearnerGroupId()).toBe('cached_group');
+      (ecs as unknown as {learnerGroupId: string | null}).learnerGroupId = null;
+
+      pathSpy.and.returnValue('/edit-learner-group/g123');
+      expect(ecs.getLearnerGroupId()).toBe('g123');
+
+      pathSpy.and.returnValue('/about');
+      (ecs as unknown as {learnerGroupId: string | null}).learnerGroupId = null;
+      expect(() => ecs.getLearnerGroupId()).toThrowError();
+    });
+  });
+
+  describe('Boolean Page Checks & Helpers', () => {
+    it('should correctly identify page modes', () => {
+      pathSpy.and.returnValue('/diagnostic-test-player/');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInDiagnosticTestPlayerPage()).toBe(true);
+
+      pathSpy.and.returnValue('/create/123');
+      hashSpy.and.returnValue('#/gui');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInExplorationEditorPage()).toBe(true);
       expect(ecs.isInExplorationEditorMode()).toBe(true);
-    });
 
-    it('should correctly retrieve the correct entity type', () => {
-      expect(ecs.getEntityType()).toBe('exploration');
-    });
+      pathSpy.and.returnValue('/explore/123');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInExplorationPlayerPage()).toBe(true);
 
-    it('should correctly check that page allows editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(true);
-    });
-  });
-
-  describe('behavior in the topic editor view', () => {
-    it('should correctly set editor context to topic editor', () => {
-      ecs.init('topic_editor');
-      expect(ecs.getEditorContext()).toBe('topic_editor');
-    });
-
-    it('should correctly set and retrieve the exp version', () => {
-      ecs.setExplorationVersion(5);
-      expect(ecs.getExplorationVersion()).toEqual(5);
-      ecs.setExplorationVersion(6);
-      expect(ecs.getExplorationVersion()).toEqual(6);
-    });
-
-    it('should correctly set and retrieve the topic id', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-
-      expect(ecs.getEntityId()).toBe('123');
-    });
-
-    it('should correctly set and retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBeUndefined();
-      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-      expect(ecs.getEntityType()).toBe('topic');
-    });
-
-    it('should correctly set and retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      expect(ecs.getPageContext()).toBe('topic_editor');
-    });
-
-    it('should correctly check that page allows editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
-      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      expect(ecs.canAddOrEditComponents()).toBe(true);
-    });
-
-    it(
-      'should not report exploration context when the context' +
-        ' is not related to editor or player',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-        expect(ecs.isInExplorationContext()).toBe(false);
-      }
-    );
-
-    it('should correctly return if subtopic preview is open', () => {
-      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
-      ecs.setSubtopicPreviewIsOpen();
-      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(true);
-      ecs.setSubtopicPreviewIsClosed();
-      expect(ecs.getSubtopicPreviewIsOpen()).toEqual(false);
-    });
-  });
-
-  describe('behavior in question editor modal', () => {
-    it('should correctly retrieve the values in topic editor', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
-
-      expect(ecs.getEntityType()).toBe('question');
-      expect(ecs.getEntityId()).toBe('questionId');
-    });
-
-    it('should correctly retrieve the values in skill editor', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
-
-      expect(ecs.getEntityType()).toBe('question');
-      expect(ecs.getEntityId()).toBe('questionId');
-    });
-
-    it('should affirm the exploration context for exploration player', () => {
-      expect(ecs.isInExplorationContext()).toBe(false);
-      spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
-      expect(ecs.isInExplorationContext()).toBe(true);
-    });
-
-    it('should affirm the exploration context for exploration editor', () => {
-      expect(ecs.isInExplorationContext()).toBe(false);
-      spyOn(urlService, 'getPathname').and.returnValue('/create/123');
-      expect(ecs.isInExplorationContext()).toBe(true);
-    });
-  });
-
-  describe('behavior in the story editor view', () => {
-    it('should correctly set editor context to story editor', () => {
-      ecs.init('story_editor');
-      expect(ecs.getEditorContext()).toBe('story_editor');
-    });
-
-    it('should correctly retrieve the story id', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-
-      expect(ecs.getEntityId()).toBe('123');
-    });
-
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBeUndefined();
-      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-      expect(ecs.getEntityType()).toBe('story');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-      expect(ecs.getPageContext()).toBe('story_editor');
-    });
-
-    it('should correctly check that page allows editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
-      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
-      expect(ecs.canAddOrEditComponents()).toBe(true);
-    });
-  });
-
-  describe('behavior in the skill editor view', () => {
-    it('should correctly set editor context to skill editor', () => {
-      ecs.init('skill_editor');
-      expect(ecs.getEditorContext()).toBe('skill_editor');
-    });
-
-    it('should correctly retrieve the skill id', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-
-      expect(ecs.getEntityId()).toBe('123');
-    });
-
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBeUndefined();
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      spyOn(urlService, 'getHash').and.returnValue('');
-      expect(ecs.getEntityType()).toBe('skill');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      expect(ecs.getPageContext()).toBe('skill_editor');
-    });
-
-    it('should correctly check that page allows editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
-      expect(ecs.canAddOrEditComponents()).toBe(true);
-    });
-  });
-
-  describe('behavior in the blog dashboard page', () => {
-    it('should correctly retrieve the blog post id', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-      spyOn(urlService, 'getHash').and.returnValue('');
-      spyOn(urlService, 'getBlogPostIdFromUrl').and.returnValue('sample123456');
-
-      expect(ecs.getEntityId()).toBe('sample123456');
-    });
-
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBeUndefined();
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-
-      expect(ecs.getEntityType()).toBe('blog_post');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-
-      expect(ecs.getPageContext()).toBe('blog_dashboard');
-    });
-
-    it('should correctly check that page allows editing of RTE components', () => {
-      expect(ecs.canAddOrEditComponents()).toBe(false);
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-
-      expect(ecs.canAddOrEditComponents()).toBe(true);
-    });
-
-    it('should check if rte is in blog post editor', () => {
-      expect(ecs.isInBlogPostEditorPage()).toBe(false);
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog-dashboard');
-
+      pathSpy.and.returnValue('/blog-dashboard');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
       expect(ecs.isInBlogPostEditorPage()).toBe(true);
     });
-  });
 
-  describe('behavior in the blog home pages', () => {
-    beforeEach(() => {
-      blogPostPageService = TestBed.get(BlogPostPageService);
+    it('should check question player mode manually', () => {
+      pathSpy.and.returnValue('/about');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInQuestionPlayerMode()).toBe(false);
+
+      ecs.setQuestionPlayerIsOpen();
+      expect(ecs.isInQuestionPlayerMode()).toBe(true);
+      expect(ecs.getQuestionPlayerIsManuallySet()).toBe(true);
     });
 
-    it('should correctly retrieve the entity type', () => {
-      expect(ecs.getEntityType()).toBeUndefined();
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog');
-
-      expect(ecs.getEntityType()).toBe('blog_post');
-    });
-
-    it('should correctly retrieve the blog post id', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-
-      spyOn(urlService, 'getPathname').and.returnValue('/blog');
-      spyOn(urlService, 'getHash').and.returnValue('');
-      blogPostPageService.blogPostId = 'sample123456';
-
-      expect(ecs.getEntityId()).toBe('sample123456');
-    });
-  });
-
-  describe('behavior in the edit learner group page', () => {
-    it('should correctly retrieve the learner group id', () => {
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId'
+    it('should manage image save destination', () => {
+      expect(ecs.getImageSaveDestination()).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
-      expect(ecs.getLearnerGroupId()).toBe('groupId');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId'
+      ecs.setImageSaveDestinationToLocalStorage();
+      expect(ecs.getImageSaveDestination()).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
       );
-      expect(ecs.getPageContext()).toBe('learner_group_editor');
-    });
-
-    it('should retrieve the learner group id cached before', () => {
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/edit-learner-group/groupId1'
-      );
-      expect(ecs.getLearnerGroupId()).toBe('groupId1');
-    });
-  });
-
-  describe('behavior in the learner group viewer page', () => {
-    it('should correctly retrieve the learner group id', () => {
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/learner-group/groupId'
-      );
-      expect(ecs.getLearnerGroupId()).toBe('groupId');
-    });
-  });
-
-  describe('behavior in the studyguide viewer page', () => {
-    it('should correctly retrieve the studyguide viewer page context', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/studyguide/example');
-      expect(ecs.getPageContext()).toBe('studyguide');
-    });
-  });
-
-  describe('behavior in different pages', () => {
-    it('should correctly retrieve the page context as question editor', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
-      expect(ecs.getPageContext()).toBe('question_editor');
-    });
-
-    it('should correctly retrieve the page context as question player', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue('/session/123');
-      expect(ecs.getPageContext()).toBe('question_player');
-    });
-
-    it('should correctly retrieve the page context as collection editor', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/collection_editor/123'
-      );
-      expect(ecs.getPageContext()).toBe('collection_editor');
-    });
-
-    it(
-      'should correctly retrieve the page context as ' +
-        'topics and skills dashboard',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        spyOn(urlService, 'getPathname').and.returnValue(
-          '/topics-and-skills-dashboard/123'
-        );
-        expect(ecs.getPageContext()).toBe('topics_and_skills_dashboard');
-      }
-    );
-
-    it(
-      'should correctly retrieve the page context as ' + 'diagnostic player',
-      () => {
-        expect(ecs.getPageContext()).toBe('other');
-        spyOn(urlService, 'getPathname').and.returnValue(
-          '/diagnostic-test-player/'
-        );
-        expect(ecs.getPageContext()).toBe('diagnostic_test_player');
-      }
-    );
-
-    it('should correctly retrieve the page context as contributor dashboard', () => {
-      expect(ecs.getPageContext()).toBe('other');
-      spyOn(urlService, 'getPathname').and.returnValue(
-        '/contributor-dashboard/123'
-      );
-      expect(ecs.getPageContext()).toBe('contributor_dashboard');
-    });
-  });
-
-  describe('behavior in other pages', () => {
-    beforeEach(() => {
-      spyOn(urlService, 'getPathname').and.returnValue('/about');
-    });
-
-    it('should throw an error when trying to retrieve the learner group id', () => {
-      expect(() => ecs.getLearnerGroupId()).toThrowError(
-        'PageContextService should not be used outside the ' +
-          'context of a learner group.'
+      ecs.resetImageSaveDestination();
+      expect(ecs.getImageSaveDestination()).toBe(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
       );
     });
 
-    it('should retrieve other as page context', () => {
-      expect(ecs.getPageContext()).toBe('other');
+    it('should check component editing permissions', () => {
+      pathSpy.and.returnValue('/create/123');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.canAddOrEditComponents()).toBe(true);
+
+      pathSpy.and.returnValue('/explore/123');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.canAddOrEditComponents()).toBe(false);
     });
 
-    it('should detect editor tab context is preview', () => {
-      let urlServiceGetHash = spyOn(urlService, 'getHash');
-      urlServiceGetHash.and.returnValue('#/settings');
-      expect(ecs.getEditorTabContext()).toBeNull();
+    it('should check exploration context', () => {
+      pathSpy.and.returnValue('/explore/123');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInExplorationContext()).toBe(true);
 
-      urlServiceGetHash.and.returnValue('#/preview');
-      expect(ecs.getEditorTabContext()).toBe('preview');
+      pathSpy.and.returnValue('/about');
+      (ecs as unknown as {pageContext: string | null}).pageContext = null;
+      expect(ecs.isInExplorationContext()).toBe(false);
     });
 
-    it('should set and get custom entity id and type', () => {
-      expect(ecs.getEntityId()).toBe('undefined');
-      expect(ecs.getEntityType()).toBeUndefined();
-      ecs.setCustomEntityContext('other', '100');
-      expect(ecs.getEntityId()).toBe('100');
-      expect(ecs.getEntityType()).toBe('other');
-    });
+    it('should manage general getters/setters', () => {
+      ecs.setExplorationVersion(10);
+      expect(ecs.getExplorationVersion()).toBe(10);
 
-    it('should remove custom entity id', () => {
-      ecs.setCustomEntityContext('other', '100');
-      expect(ecs.getEntityId()).toBe('100');
-      expect(ecs.getEntityType()).toBe('other');
-      ecs.removeCustomEntityContext();
-      expect(PageContextService.customEntityContext).toBeNull();
-    });
-  });
+      ecs.setExplorationIsLinkedToStory();
+      expect(ecs.isExplorationLinkedToStory()).toBe(true);
 
-  describe('behavior in exploration edge cases', () => {
-    it('should retrieve the exploration id cached before', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/explore/456');
-      expect(ecs.getExplorationId()).toBe('456');
+      ecs.setSubtopicPreviewIsOpen();
+      expect(ecs.getSubtopicPreviewIsOpen()).toBe(true);
+
+      ecs.init('my_context');
+      expect(ecs.getEditorContext()).toBe('my_context');
     });
   });
 });

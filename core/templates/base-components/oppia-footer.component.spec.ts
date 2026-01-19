@@ -16,7 +16,7 @@
  * @fileoverview Tests for the Oppia Footer Component.
  */
 
-import {NO_ERRORS_SCHEMA} from '@angular/core';
+import {NO_ERRORS_SCHEMA, Pipe, PipeTransform} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -27,8 +27,7 @@ import {
 } from '@angular/core/testing';
 import {Router} from '@angular/router';
 
-import {AppConstants} from 'app.constants';
-import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {AppConstants, NavbarAndFooterGATrackingPages} from 'app.constants';
 import {MailingListBackendApiService} from 'domain/mailing-list/mailing-list-backend-api.service';
 import {AlertsService} from 'services/alerts.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -37,6 +36,14 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForSubscribingModalComponent} from './thanks-for-subscribing-modal.component';
 import {FormsModule} from '@angular/forms';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+
+@Pipe({name: 'translate'})
+class MockTranslatePipe implements PipeTransform {
+  transform(value: string): string {
+    return value;
+  }
+}
 
 class MockWindowRef {
   nativeWindow = {
@@ -58,6 +65,10 @@ class MockNgbModal {
   }
 }
 
+class MockSiteAnalyticsService {
+  registerClickFooterButtonEvent(page: string): void {}
+}
+
 describe('OppiaFooterComponent', () => {
   let component: OppiaFooterComponent;
   let fixture: ComponentFixture<OppiaFooterComponent>;
@@ -65,6 +76,7 @@ describe('OppiaFooterComponent', () => {
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
   let ngbModal: NgbModal;
+  let siteAnalyticsService: SiteAnalyticsService;
 
   beforeEach(waitForAsync(() => {
     mockWindowRef = new MockWindowRef();
@@ -84,6 +96,10 @@ describe('OppiaFooterComponent', () => {
           provide: NgbModal,
           useClass: MockNgbModal,
         },
+        {
+          provide: SiteAnalyticsService,
+          useClass: MockSiteAnalyticsService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -95,6 +111,7 @@ describe('OppiaFooterComponent', () => {
     mailingListBackendApiService = TestBed.inject(MailingListBackendApiService);
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
+    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
   });
 
   it('should get the siteFeedbackFormURL', () => {
@@ -327,4 +344,20 @@ describe('OppiaFooterComponent', () => {
     expect(component.subscriptionProcessing).toBeFalse();
     expect(component.emailDuplicated).toBeTrue();
   }));
+
+  it('should register analytics event when about link is clicked', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    component.onAboutLinkClick();
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.ABOUT);
+  });
+
+  it('should register analytics event when teach link is clicked', () => {
+    spyOn(siteAnalyticsService, 'registerClickFooterButtonEvent');
+    component.onTeachLinkClick();
+    expect(
+      siteAnalyticsService.registerClickFooterButtonEvent
+    ).toHaveBeenCalledWith(NavbarAndFooterGATrackingPages.TEACH);
+  });
 });

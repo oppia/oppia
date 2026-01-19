@@ -416,4 +416,38 @@ describe('State Interaction component', () => {
       component.throwError(undefined);
     }).toThrowError('Expected stateData to be defined but received undefined');
   });
+
+  it('should update answer choices when interactionId is present', () => {
+    component.interactionId = 'MultipleChoiceInput';
+
+    stateCustomizationArgsService.savedMemento = {
+      choices: {value: ['Option A', 'Option B']},
+    } as unknown;
+
+    spyOn(stateEditorService.onUpdateAnswerChoices, 'emit');
+
+    (component as unknown)._updateAnswerChoices();
+
+    expect(stateEditorService.onUpdateAnswerChoices.emit).toHaveBeenCalled();
+  });
+
+  it('should remove interaction details from cache when deleting interaction', fakeAsync(() => {
+    mockNgbModal.modal = 'delete_interaction';
+    stateInteractionIdService.savedMemento = 'Interaction_Id_Here';
+
+    spyOn(mockNgbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        result: Promise.resolve('success'),
+      } as NgbModalRef;
+    });
+
+    spyOn(interactionDetailsCacheService, 'removeDetails');
+
+    component.deleteInteraction();
+    tick();
+
+    expect(interactionDetailsCacheService.removeDetails).toHaveBeenCalledWith(
+      'Interaction_Id_Here'
+    );
+  }));
 });

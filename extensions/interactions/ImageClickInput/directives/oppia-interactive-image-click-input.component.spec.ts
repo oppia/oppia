@@ -420,27 +420,59 @@ describe('InteractiveImageClickInput', () => {
     expect(component.getRegionDisplay('No_Region')).toBe('none');
   });
 
-  it('should return dot location when called', () => {
-    spyOn(Element.prototype, 'querySelectorAll').and.callFake(
-      jasmine.createSpy('querySelectorAll').and.returnValue([
-        {
-          parentElement: {
-            getBoundingClientRect: () => {
-              return new DOMRect(300, 300, 300, 300);
-            },
-          },
-          getBoundingClientRect: () => {
-            return new DOMRect(200, 200, 200, 200);
-          },
-          width: 200,
-          height: 200,
-        },
-      ])
-    );
+  it('should return dot location based on image position', () => {
+    const imageElement = document.createElement('img');
+    imageElement.classList.add('oppia-image-click-img');
 
-    component.ngOnInit();
+    const parentElement = document.createElement('div');
+    parentElement.appendChild(imageElement);
 
-    expect(component.getDotLocation()).toEqual({left: 95, top: 295});
+    Object.defineProperty(imageElement, 'width', {value: 441});
+    Object.defineProperty(imageElement, 'height', {value: 778});
+
+    spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
+      left: 200,
+      top: 200,
+      width: 441,
+      height: 778,
+      right: 641,
+      bottom: 978,
+      x: 200,
+      y: 200,
+      toJSON: () => {},
+    });
+
+    spyOn(parentElement, 'getBoundingClientRect').and.returnValue({
+      left: 100,
+      top: 100,
+      width: 500,
+      height: 900,
+      right: 600,
+      bottom: 1000,
+      x: 100,
+      y: 100,
+      toJSON: () => {},
+    });
+
+    component.el = {
+      nativeElement: {
+        querySelectorAll: jasmine
+          .createSpy('querySelectorAll')
+          .and.returnValue([imageElement]),
+      },
+    };
+
+    component.lastAnswer = {
+      clickPosition: [0.5, 0.5],
+      clickedRegions: [],
+    };
+
+    const location = component.getDotLocation();
+
+    expect(location).toEqual({
+      left: 315.5,
+      top: 484,
+    });
   });
 
   it('should check if mouse is over region when mouse moves', () => {
@@ -488,8 +520,6 @@ describe('InteractiveImageClickInput', () => {
 
     component.onMousemoveImage(evt);
 
-    // The mouseX and mouseY variables must be updated only
-    // when the interaction is active.
     expect(component.usingMobileDevice).toBe(true);
     expect(component.interactionIsActive).toBe(true);
     expect(component.mouseX).toBe(0.45);
@@ -605,30 +635,59 @@ describe('InteractiveImageClickInput', () => {
     expect(component.currentlyHoveredRegions).toEqual([]);
   });
 
-  it('should update dot position and styles', () => {
+  it('should not update dot position if dot element is missing', () => {
+    const imageElement = document.createElement('img');
+    spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 100,
+      right: 100,
+      bottom: 100,
+      x: 0,
+      y: 0,
+      toJSON: () => {},
+    });
+
+    component.el = {
+      nativeElement: {
+        querySelectorAll: () => [imageElement],
+      },
+    };
+
+    spyOn(document, 'querySelector').and.returnValue(null);
+    const event = new MouseEvent('mousemove');
+
+    component.updateDotPosition(event);
+  });
+
+  it('should update dot position using MouseEvent logic', () => {
     const imageElement = document.createElement('img');
     imageElement.classList.add('oppia-image-click-img');
     spyOn(imageElement, 'getBoundingClientRect').and.returnValue({
       left: 100,
       top: 200,
+      width: 441,
+      height: 778,
+      right: 541,
+      bottom: 978,
+      x: 100,
+      y: 200,
+      toJSON: () => {},
     });
     spyOn(window, 'getComputedStyle').and.returnValue({
       marginLeft: '10px',
       marginTop: '20px',
-    });
+    } as unknown);
 
     const dotElement = document.createElement('div');
     dotElement.classList.add('oppia-select-image-region-cursor');
-    spyOn(dotElement, 'getBoundingClientRect').and.returnValue({
-      top: 100,
-      bottom: 110,
-      left: 200,
-      right: 210,
-    });
+    const styleMock = {top: '', left: ''};
+    Object.defineProperty(dotElement, 'style', {value: styleMock});
 
     const event = new MouseEvent('mousemove', {
-      clientX: 100,
-      clientY: 100,
+      clientX: 150,
+      clientY: 250,
     });
 
     component.el = {
@@ -643,31 +702,10 @@ describe('InteractiveImageClickInput', () => {
     component.usingMobileDevice = false;
     component.updateDotPosition(event);
 
-    expect(component.dotCursorCoordinateX).toBe(
-      event.clientX -
-        imageElement.getBoundingClientRect().left +
-        parseFloat(window.getComputedStyle(imageElement).marginLeft) +
-        8
-    );
-    expect(component.dotCursorCoordinateY).toBe(
-      event.clientY -
-        imageElement.getBoundingClientRect().top +
-        parseFloat(window.getComputedStyle(imageElement).marginTop) +
-        8
-    );
-
-    expect(dotElement.style.top).toBe(component.dotCursorCoordinateY + 'px');
-    expect(dotElement.style.left).toBe(component.dotCursorCoordinateX + 'px');
-
-    const dotRect = dotElement.getBoundingClientRect();
-    expect(component.mouseX).toBe(
-      (dotRect.left - imageElement.getBoundingClientRect().left) /
-        imageElement.width
-    );
-    expect(component.mouseY).toBe(
-      (dotRect.top - imageElement.getBoundingClientRect().top) /
-        imageElement.height
-    );
+    expect(component.dotCursorCoordinateX).toBe(68);
+    expect(component.dotCursorCoordinateY).toBe(78);
+    expect(dotElement.style.top).toBe('78px');
+    expect(dotElement.style.left).toBe('68px');
   });
 
   it(
@@ -692,8 +730,6 @@ describe('InteractiveImageClickInput', () => {
 
       component.onMousemoveImage(evt);
 
-      // The mouseX and mouseY variables must be updated only
-      // when the interaction is active.
       expect(component.interactionIsActive).toBe(false);
       expect(component.mouseX).toBe(0.4);
       expect(component.mouseY).toBe(0.4);

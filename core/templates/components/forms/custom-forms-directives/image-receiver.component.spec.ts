@@ -172,6 +172,12 @@ describe('ImageReceiverComponent', () => {
     expect(formatString).toBe('Is in .jpeg format');
   });
 
+  it('should return correct format string when there are multiple allowed formats', () => {
+    component.allowedImageFormats = ['jpg', 'png'];
+    const formatString = component.getAllowedImageFormatsString();
+    expect(formatString).toBe('Is in .jpg or .png format');
+  });
+
   it('should emit fileChanged event if validation passes', () => {
     const validFile = new File(['content'], 'image.jpg', {type: 'image/jpg'});
 
@@ -335,5 +341,85 @@ describe('ImageReceiverComponent', () => {
     spyOn(component.fileChanged, 'emit');
     component.handleFile();
     expect(component.fileChanged.emit).toHaveBeenCalledWith(validFile);
+  });
+
+  it('should validate and reject files that are too large in MBs', () => {
+    component.allowedImageFormats = ['jpeg', 'jpg'];
+    component.maxImageSizeInKB = 2048;
+
+    const largeFile = new File([''], 'huge-image.jpg', {type: 'image/jpeg'});
+    Object.defineProperty(largeFile, 'size', {value: 3 * 1024 * 1024});
+
+    const errorMessage = component.validateUploadedFile(
+      largeFile,
+      'huge-image.jpg'
+    );
+    expect(errorMessage).toContain('The maximum allowed file size is');
+    expect(errorMessage).toContain('MB given');
+  });
+
+  it('should validate and reject invalid file formats not in allowed list', () => {
+    component.allowedImageFormats = ['unknown_format'];
+    const invalidFile = new File(['foo'], 'test.png', {type: 'image/png'});
+
+    const errorMessage = component.validateUploadedFile(
+      invalidFile,
+      'test.png'
+    );
+    expect(errorMessage).toContain(
+      'unknown_format is not in the list of allowed image formats'
+    );
+  });
+
+  it('should validate mismatch between extension and file type', () => {
+    component.allowedImageFormats = ['jpeg', 'jpg'];
+    const mismatchedFile = new File(['foo'], 'test.png', {type: 'image/jpeg'});
+
+    const errorMessage = component.validateUploadedFile(
+      mismatchedFile,
+      'test.png'
+    );
+    expect(errorMessage).toContain(
+      'This image format does not match the filename extension'
+    );
+  });
+
+  it('should return null when validation passes completely', () => {
+    component.allowedImageFormats = ['jpeg', 'jpg'];
+    component.maxImageSizeInKB = 5000;
+    const validFile = new File(['foo'], 'test.jpg', {type: 'image/jpeg'});
+
+    const result = component.validateUploadedFile(validFile, 'test.jpg');
+    expect(result).toBeNull();
+  });
+
+  it('should return error if file object is null', () => {
+    const errorMessage = component.validateUploadedFile(
+      null as unknown as File,
+      'test.jpg'
+    );
+    expect(errorMessage).toBe('This file is not recognized as an image');
+  });
+
+  it('should return error if file size is 0', () => {
+    const emptyFile = new File([], 'empty.jpg', {type: 'image/jpeg'});
+    Object.defineProperty(emptyFile, 'size', {value: 0});
+
+    const errorMessage = component.validateUploadedFile(emptyFile, 'empty.jpg');
+    expect(errorMessage).toBe('This file is not recognized as an image');
+  });
+
+  it('should return error if file type is not an image', () => {
+    const textFile = new File(['content'], 'test.txt', {type: 'text/plain'});
+    const errorMessage = component.validateUploadedFile(textFile, 'test.txt');
+    expect(errorMessage).toBe('This file is not recognized as an image');
+  });
+
+  it('should return error if valid image type is not in the allowed list', () => {
+    component.allowedImageFormats = ['gif'];
+    const jpegFile = new File(['content'], 'test.jpg', {type: 'image/jpeg'});
+
+    const errorMessage = component.validateUploadedFile(jpegFile, 'test.jpg');
+    expect(errorMessage).toBe('This image format is not supported');
   });
 });

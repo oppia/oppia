@@ -577,4 +577,19 @@ describe('Customize Interaction Modal Component', () => {
       'Interaction is missing customization argument placeholder'
     );
   });
+
+  it('should return empty warnings list if interaction ID is not displayed', () => {
+    stateInteractionIdService.displayed = null;
+    expect(component.getCustomizationArgsWarningsList()).toEqual([]);
+  });
+
+  it('should return early when populating null content ids if interaction ID is not displayed', () => {
+    stateInteractionIdService.displayed = null;
+    component.populateNullContentIds();
+  });
+
+  it('should return empty content map if interaction ID is not displayed', () => {
+    stateInteractionIdService.displayed = null;
+    expect(component.getContentIdToContent()).toEqual({});
+  });
 });
