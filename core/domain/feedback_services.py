@@ -411,7 +411,11 @@ def create_messages(
         suggestion_models_to_update
     )
 
-    server_can_send_emails = True
+    server_can_send_emails = (
+        platform_parameter_services.get_platform_parameter_value(
+            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+        )
+    )
     # TODO(#12079): Figure out a better way to avoid sending feedback
     # thread emails for contributor dashboard suggestions.
     message_changed = (
