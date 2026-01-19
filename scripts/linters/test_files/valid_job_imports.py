@@ -75,10 +75,6 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
     missing_translation_images_repair_jobs,
 )
 
-from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
-    audit_invalid_feedback_messages_jobs,
-)
-
 
 class FakeClass:
     """This is a fake docstring for valid syntax purposes."""

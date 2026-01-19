@@ -412,7 +412,6 @@
         "core.platform.speech_synthesis.dev_mode_speech_synthesis_services_test",
         "core.jobs.batch_jobs.audit_topics_with_hanging_stories_job_test",
         "conftest_test",
-        "core.jobs.batch_jobs.audit_invalid_feedback_messages_jobs_test",
         "core.jobs.batch_jobs.remove_hanging_story_references_job_test"
     ]
 }
