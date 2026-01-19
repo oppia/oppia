@@ -2756,9 +2756,11 @@ export class LoggedOutUser extends BaseUser {
     const href = await this.page.$eval(emailLinkSelector, el =>
       el.getAttribute('href')
     );
-    if (href !== 'mailto:admin@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href "${href}" instead of "mailto:admin@oppia.org"`
+        `Email link has href "${href}" instead of "https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org"`
       );
     }
   }
@@ -2775,9 +2777,11 @@ export class LoggedOutUser extends BaseUser {
       el => el.getAttribute('href'),
       emailLinks[1]
     );
-    if (href !== 'mailto:press@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href ${href} instead of mailto:press@oppia.org`
+        `Email link has href ${href} instead of "https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org"`
       );
     }
   }

@@ -1365,3 +1365,292 @@ class AutomaticVoiceoverRegenerationIntegrationTests(
             )
         )
         self.assertEqual(len(entity_voiceovers), 0)
+
+
+class ExplorationDataForVoiceoverRegenerationHandlerTests(
+    test_utils.GenericTestBase
+):
+    """Test to validate exploration data for voiceover regeneration handler."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.AUTHOR_EMAIL = 'author@example.com'
+        self.AUTHOR_EMAIL_2 = 'author2@example.com'
+        self.REVIEWER_EMAIL = 'reviewer@example.com'
+
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.AUTHOR_EMAIL_2, 'author2')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+
+        self.voiceover_admin_id = self.get_user_id_from_email(
+            self.VOICEOVER_ADMIN_EMAIL
+        )
+        self.voiceover_admin = user_services.get_user_actions_info(
+            self.voiceover_admin_id
+        )
+
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.admin = user_services.get_user_actions_info(self.admin_id)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.get_user_actions_info(self.owner_id)
+
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+
+        self.curated_exp_id = 'W50hotX4h_Up'
+        curated_exp_title = 'Curated Exploration'
+
+        self._create_and_publish_exploration(
+            self.curated_exp_id, curated_exp_title
+        )
+
+        self.non_curated_exp_id = 'W50hotX4h_00'
+        non_curated_exp_title = 'Non-Curated Exploration'
+
+        self.TOPIC_ID_1 = 'topic_id_1'
+        self.STORY_ID_1 = 'story_id_1'
+
+        # Creating an exploration and assigning roles.
+        self._create_and_publish_exploration(
+            self.non_curated_exp_id, non_curated_exp_title
+        )
+        rights_manager.assign_role_for_exploration(
+            self.voiceover_admin,
+            self.curated_exp_id,
+            self.voiceover_admin_id,
+            rights_domain.ROLE_VOICE_ARTIST,
+        )
+        rights_manager.assign_role_for_exploration(
+            self.admin,
+            self.curated_exp_id,
+            self.author_id,
+            rights_domain.ROLE_EDITOR,
+        )
+        self._add_exploration_to_published_topic()
+
+    def _create_and_publish_exploration(
+        self, exploration_id: str, title: str
+    ) -> None:
+        """Creates and publishes a new exploration."""
+        self.exploration = self.save_new_valid_exploration(
+            exploration_id,
+            self.owner_id,
+            title=title,
+            category=constants.constants.ALL_CATEGORIES[0],
+            end_state_name='End State',
+        )
+        rights_manager.publish_exploration(self.owner, self.exploration.id)
+        exp_services.update_exploration(
+            self.owner_id,
+            exploration_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'Introduction',
+                        'new_value': {
+                            'content_id': 'content_0',
+                            'html': '<p>This is the first card of the exploration.</p>',
+                        },
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                        'state_name': 'End State',
+                        'new_value': {
+                            'content_id': 'content_3',
+                            'html': '<p>This is the last card of the exploration.</p>',
+                        },
+                    }
+                ),
+            ],
+            'Changes content.',
+        )
+
+    def _add_exploration_to_published_topic(self) -> None:
+        """Adds the exploration to a published topic i.e., making it curated."""
+        topic = topic_domain.Topic.create_default_topic(
+            self.TOPIC_ID_1, 'topic1', 'abbrev', 'description', 'fragm'
+        )
+        topic.thumbnail_filename = 'thumbnail.svg'
+        topic.thumbnail_bg_color = '#C6DCDA'
+        topic.subtopics = [
+            topic_domain.Subtopic(
+                1,
+                'Title',
+                ['skill_id_1'],
+                'image.svg',
+                constants.constants.ALLOWED_THUMBNAIL_BG_COLORS['subtopic'][0],
+                21131,
+                'dummy-subtopic-url',
+            )
+        ]
+        topic.next_subtopic_id = 2
+        topic.skill_ids_for_diagnostic_test = ['skill_id_1']
+
+        topic_services.save_new_topic(self.owner_id, topic)
+        topic_services.publish_topic(self.TOPIC_ID_1, self.admin_id)
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID_1,
+            'A story',
+            'Description',
+            self.TOPIC_ID_1,
+            'story-two',
+        )
+        story_services.save_new_story(self.owner_id, story)
+        topic_services.add_canonical_story(
+            self.owner_id, self.TOPIC_ID_1, self.STORY_ID_1
+        )
+
+        topic_services.publish_story(
+            self.TOPIC_ID_1, self.STORY_ID_1, self.admin_id
+        )
+
+        story_services.update_story(
+            self.owner_id,
+            self.STORY_ID_1,
+            [
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'add_story_node',
+                        'node_id': 'node_1',
+                        'title': 'Node1',
+                    }
+                ),
+                story_domain.StoryChange(
+                    {
+                        'cmd': 'update_story_node_property',
+                        'property_name': 'exploration_id',
+                        'node_id': 'node_1',
+                        'old_value': None,
+                        'new_value': self.curated_exp_id,
+                    }
+                ),
+            ],
+            'Changes.',
+        )
+
+    def test_invalid_exp_id_should_return_correct_error_response(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '/exploration_voiceovers_data/%s' % 'invalid_exp_id',
+        )
+
+        self.assertIsNone(json_response['exploration_data'])
+        self.assertEqual(
+            json_response['response_message'],
+            'Exploration with the given id does not exist.',
+        )
+        self.logout()
+
+    def test_non_curated_exp_should_return_correct_error_response(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        json_response = self.get_json(
+            '/exploration_voiceovers_data/%s' % self.non_curated_exp_id,
+        )
+
+        self.assertIsNone(json_response['exploration_data'])
+        self.assertEqual(
+            json_response['response_message'],
+            'The Exploration is not linked to any published story, hence not available for voiceover regeneration.',
+        )
+        self.logout()
+
+    def test_curated_exp_should_return_exploration_data(self) -> None:
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+
+        exp_services.update_exploration(
+            self.owner_id,
+            self.curated_exp_id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_TRANSLATION,
+                        'content_id': 'content_0',
+                        'language_code': 'hi',
+                        'translation': translation_domain.TranslatedContent(
+                            'यह पहला कार्ड है',
+                            translation_domain.TranslatableContentFormat.HTML,
+                            False,
+                        ).to_dict(),
+                    }
+                )
+            ],
+            'Added translations',
+            False,
+        )
+
+        # Adding language accent support for Oppia's voiceovers.
+        language_codes_mapping: Dict[str, Dict[str, bool]] = {
+            'en': {'en-US': True, 'en-IN': False},
+            'hi': {'hi-IN': True},
+        }
+        voiceover_services.save_language_accent_support(
+            language_codes_mapping=language_codes_mapping
+        )
+        json_response = self.get_json(
+            '/exploration_voiceovers_data/%s' % self.curated_exp_id,
+        )
+
+        self.assertEqual(
+            json_response['exploration_data'],
+            {
+                'exploration_title': 'Curated Exploration',
+                'autogeneratable_language_accent_codes': ['en-US', 'hi-IN'],
+            },
+        )
+        self.assertIsNone(json_response['response_message'])
+        self.logout()
+
+
+class RegenerateVoiceoversForExplorationHandlerTests(
+    test_utils.GenericTestBase
+):
+    def mock_defer(
+        self,
+        _function_id: str,
+        _queue_id: str,
+        _exploration_id: str,
+        _language_accent_code: str,
+        _user_id: str,
+        _datetime_str: str,
+    ) -> None:
+        pass
+
+    @test_utils.enable_feature_flags(
+        [feature_flag_list.FeatureNames.ENABLE_BACKGROUND_VOICEOVER_SYNTHESIS]
+    )
+    def test_regenerate_voiceovers_for_exploration(self) -> None:
+        self.signup(self.VOICEOVER_ADMIN_EMAIL, self.VOICEOVER_ADMIN_USERNAME)
+        self.set_voiceover_admin([self.VOICEOVER_ADMIN_USERNAME])
+        self.login(self.VOICEOVER_ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        exploration_id = 'exploration_id'
+        language_accent_code = 'en-US'
+        handler_url = '/regenerate_voiceovers_for_exploration/%s/%s' % (
+            exploration_id,
+            language_accent_code,
+        )
+
+        with (
+            self.swap(
+                opportunity_services,
+                'is_exploration_available_for_contribution',
+                lambda _: True,
+            ),
+            self.swap(taskqueue_services, 'defer', self.mock_defer),
+        ):
+            self.post_json(handler_url, {}, csrf_token=csrf_token)
