@@ -1011,7 +1011,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['incomplete_explorations_list']), 1)
         # Verify progress_percent is calculated.
         self.assertIn(
-            'progress_percent',
-            response['incomplete_explorations_list'][0]
+            'progress_percent', response['incomplete_explorations_list'][0]
         )
         self.logout()
