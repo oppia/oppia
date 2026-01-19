@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2025 The Oppia Authors. All Rights Reserved.
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,17 +32,11 @@ if MYPY:  # pragma: no cover
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
-class AuditNonExistentThreadsMessagesJob(base_jobs.JobBase):
-    """Audit job that reports feedback messages with non-existent threads."""
+class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
+    DATASTORE_UPDATES_ALLOWED = False
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Runs the audit job.
-
-        Returns:
-            PCollection[JobRunResult]. One result per invalid message plus a
-            stats entry with the total count.
-        """
-        thread_ids = (
+    def _get_thread_ids(self):
+        return (
             self.pipeline
             | 'Get GeneralFeedbackThreadModels'
             >> ndb_io.GetModels(
@@ -53,19 +47,16 @@ class AuditNonExistentThreadsMessagesJob(base_jobs.JobBase):
             | 'Extract thread ids' >> beam.Map(lambda model: model.id)
         )
 
-        message_models = (
+    def _get_invalid_messages(self, thread_ids):
+        return (
             self.pipeline
-            | 'Get GeneralFeedbackMessageModels'
+            | 'Get Messages'
             >> ndb_io.GetModels(
                 feedback_models.GeneralFeedbackMessageModel.get_all(
                     include_deleted=False
                 )
             )
-        )
-
-        invalid_messages = (
-            message_models
-            | 'Filter messages with non-existent threads'
+            | 'Filter invalid messages'
             >> beam.Filter(
                 lambda msg, valid_thread_ids: (
                     msg.thread_id not in valid_thread_ids
@@ -73,6 +64,40 @@ class AuditNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 beam.pvalue.AsList(thread_ids),
             )
         )
+
+    def _get_invalid_user_threads(self, thread_ids):
+        return (
+            self.pipeline
+            | 'Get User Threads'
+            >> ndb_io.GetModels(
+                feedback_models.GeneralFeedbackThreadUserModel.get_all(
+                    include_deleted=False
+                )
+            )
+            | 'Filter invalid user threads'
+            >> beam.Filter(
+                lambda user_thread, valid_thread_ids: (
+                    user_thread.thread_id not in valid_thread_ids
+                ),
+                beam.pvalue.AsList(thread_ids),
+            )
+        )
+
+
+class AuditNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
+    """Audit job that reports feedback messages with non-existent threads."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Runs the audit job.
+
+        Returns:
+            PCollection[JobRunResult]. One result per invalid message plus a
+            stats entry with the total count.
+        """
+        thread_ids = self._get_thread_ids()
+        invalid_messages = self._get_invalid_messages(thread_ids)
 
         invalid_message_logs = (
             invalid_messages
@@ -107,63 +132,16 @@ class AuditNonExistentThreadsMessagesJob(base_jobs.JobBase):
         ) | 'Flatten audit outputs' >> beam.Flatten()
 
 
-class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
+class RemoveNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
     """Beam job that removes feedback messages with non-existent threads."""
+
+    DATASTORE_UPDATES_ALLOWED = True
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Runs the beam job."""
-        thread_ids = (
-            self.pipeline
-            | 'Get GeneralFeedbackThreadModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadModel.get_all(
-                    include_deleted=False
-                )
-            )
-            | 'Extract thread ids' >> beam.Map(lambda model: model.id)
-        )
-
-        message_models = (
-            self.pipeline
-            | 'Get GeneralFeedbackMessageModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackMessageModel.get_all(
-                    include_deleted=False
-                )
-            )
-        )
-
-        user_thread_models = (
-            self.pipeline
-            | 'Get GeneralFeedbackThreadUserModel'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadUserModel.get_all(
-                    include_deleted=False
-                )
-            )
-        )
-
-        invalid_messages = (
-            message_models
-            | 'Filter messages with non-existent threads'
-            >> beam.Filter(
-                lambda msg, valid_thread_ids: (
-                    msg.thread_id not in valid_thread_ids
-                ),
-                beam.pvalue.AsList(thread_ids),
-            )
-        )
-
-        invalid_user_threads = (
-            user_thread_models
-            | 'Filter user threads with non-existent threads'
-            >> beam.Filter(
-                lambda user_threads, valid_thread_ids: (
-                    user_threads.thread_id not in valid_thread_ids
-                ),
-                beam.pvalue.AsList(thread_ids),
-            )
-        )
+        thread_ids = self._get_thread_ids()
+        invalid_messages = self._get_invalid_messages(thread_ids)
+        invalid_user_threads = self._get_invalid_user_threads(thread_ids)
 
         deleted_message_logs = (
             invalid_messages
