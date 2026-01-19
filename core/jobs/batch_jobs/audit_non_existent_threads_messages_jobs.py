@@ -33,9 +33,12 @@ if MYPY:  # pragma: no cover
 
 
 class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
+    """Base class for non-existent threads messages jobs."""
+
     DATASTORE_UPDATES_ALLOWED = False
 
     def _get_thread_ids(self):
+        """Returns a PCollection of thread ids."""
         return (
             self.pipeline
             | 'Get GeneralFeedbackThreadModels'
@@ -48,6 +51,7 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
         )
 
     def _get_invalid_messages(self, thread_ids):
+        """Returns a PCollection of invalid messages."""
         return (
             self.pipeline
             | 'Get Messages'
@@ -66,6 +70,7 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
         )
 
     def _get_invalid_user_threads(self, thread_ids):
+        """Returns a PCollection of invalid user threads."""
         return (
             self.pipeline
             | 'Get User Threads'
