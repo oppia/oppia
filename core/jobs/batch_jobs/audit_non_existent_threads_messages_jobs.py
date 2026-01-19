@@ -37,7 +37,7 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = False
 
-    def _get_thread_ids(self):
+    def _get_thread_ids(self) -> beam.PCollection[str]:
         """Returns a PCollection of thread ids."""
         return (
             self.pipeline
@@ -50,7 +50,9 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
             | 'Extract thread ids' >> beam.Map(lambda model: model.id)
         )
 
-    def _get_invalid_messages(self, thread_ids):
+    def _get_invalid_messages(
+        self, thread_ids
+    ) -> beam.PCollection[feedback_models.GeneralFeedbackMessageModel]:
         """Returns a PCollection of invalid messages."""
         return (
             self.pipeline
@@ -69,7 +71,9 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
-    def _get_invalid_user_threads(self, thread_ids):
+    def _get_invalid_user_threads(
+        self, thread_ids
+    ) -> beam.PCollection[feedback_models.GeneralFeedbackThreadUserModel]:
         """Returns a PCollection of invalid user threads."""
         return (
             self.pipeline
