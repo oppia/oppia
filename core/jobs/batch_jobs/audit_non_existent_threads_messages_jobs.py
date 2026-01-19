@@ -51,7 +51,8 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
         )
 
     def _get_invalid_messages(
-        self, thread_ids
+        self,
+        thread_ids: beam.PCollection[str],
     ) -> beam.PCollection[feedback_models.GeneralFeedbackMessageModel]:
         """Returns a PCollection of invalid messages."""
         return (
@@ -72,7 +73,8 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
         )
 
     def _get_invalid_user_threads(
-        self, thread_ids
+        self,
+        thread_ids: beam.PCollection[str],
     ) -> beam.PCollection[feedback_models.GeneralFeedbackThreadUserModel]:
         """Returns a PCollection of invalid user threads."""
         return (
