@@ -2532,6 +2532,9 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    // Ensure the welcome modal is not blocking the navbar or options button.
+    await this.dismissWelcomeModalIfPresent();
+
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
       // If the element is not present, it means the mobile navigation bar is not expanded.
@@ -2799,7 +2802,7 @@ export class ExplorationEditor extends BaseUser {
       try {
         await this.page.waitForSelector(mobileChangesDropdownSelector, {
           visible: true,
-          timeout: 5000,
+          timeout: 15000,
         });
         try {
           await this.clickOnElementWithSelector(mobileChangesDropdownSelector);

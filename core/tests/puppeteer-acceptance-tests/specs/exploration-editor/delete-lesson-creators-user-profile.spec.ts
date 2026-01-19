@@ -57,7 +57,7 @@ describe('Lesson Creator Profile Deletion', function () {
       'Mathematics'
     );
 
-    // FIX: Close the publish modal.
+    // Close the publish modal after successful publication.
     const closeButton = await expEditor1.page.$(
       'button.e2e-test-share-publish-close'
     );
@@ -74,10 +74,10 @@ describe('Lesson Creator Profile Deletion', function () {
       }
     }
 
-    // Handle mobile-specific UI: Toggle the navbar menu only when necessary.
+    // For mobile viewports, ensure the Settings tab is visible before navigating to it.
     if (expEditor1.isViewportAtMobileWidth()) {
       await expEditor1.page.waitForTimeout(2000);
-      // If 'Settings' tab is already visible we don't need to open mobile menu.
+      // If Settings tab is already visible, skip opening the mobile menu.
       const settingsTabSelector = 'a.e2e-test-exploration-settings-tab';
       const mobileToggleSelector = '.oppia-navbar-mobile-tabs-toggle';
       const isSettingsVisible = await expEditor1.page
@@ -87,7 +87,7 @@ describe('Lesson Creator Profile Deletion', function () {
         )
         .catch(() => false);
       if (!isSettingsVisible) {
-        // Try clicking the standard mobile toggle if present.
+        // Attempt to click the standard mobile menu toggle.
         const mobileToggle = await expEditor1.page.$(mobileToggleSelector);
         if (mobileToggle) {
           await expEditor1.page.waitForSelector(mobileToggleSelector, {
@@ -96,7 +96,7 @@ describe('Lesson Creator Profile Deletion', function () {
           });
           await expEditor1.clickOnElementWithSelector(mobileToggleSelector);
         } else {
-          // Fallback: try an editor-specific toggle.
+          // Fallback: attempt editor-specific mobile menu toggle.
           const editorToggleSelector =
             '.e2e-test-exploration-editor-mobile-tabs-toggle';
           const editorToggle = await expEditor1.page.$(editorToggleSelector);
@@ -114,7 +114,7 @@ describe('Lesson Creator Profile Deletion', function () {
     // 2. Roles Assignment. Ensure Settings is open and Roles form is visible.
     await expEditor1.ensureRolesFormIsOpen();
 
-    // Ensure input is centered.
+    // Scroll the role username input into view for better visibility on mobile.
     await expEditor1.page.waitForSelector('.e2e-test-role-username', {
       visible: true,
     });
@@ -133,6 +133,8 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
+    // Allow page to fully settle before publishing second exploration.
+    await expEditor1.page.waitForTimeout(1000);
     await expEditor1.publishExplorationWithMetadataRobust(
       'Negative Numbers',
       'This exploration teaches students about negative numbers and their applications.',
@@ -145,13 +147,13 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.updateCardContent('Draft that will be deleted.');
     await expEditor1.saveExplorationDraft();
 
-    // 4. The Account Deletion.
+    // 4. Account Deletion.
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
     showMessage('Account deleted for expEditor1.');
 
-    // 5. Verification as expEditor2.
+    // 5. Verify ownership and access permissions as expEditor2.
     await expEditor2.navigateToExplorationEditorPageById(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
     await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
