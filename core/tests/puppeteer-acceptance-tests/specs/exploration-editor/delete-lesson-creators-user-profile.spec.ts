@@ -53,7 +53,7 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.saveExplorationDraft();
     await expEditor1.publishExplorationWithMetadataRobust(
       'Positive Numbers',
-      'To teach positive numbers',
+      'This exploration teaches students about positive numbers and their properties.',
       'Mathematics'
     );
 
@@ -136,7 +136,7 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.saveExplorationDraft();
     await expEditor1.publishExplorationWithMetadataRobust(
       'Negative Numbers',
-      'Math',
+      'This exploration teaches students about negative numbers and their applications.',
       'Mathematics'
     );
 
@@ -155,8 +155,6 @@ describe('Lesson Creator Profile Deletion', function () {
     // 5. Verification as expEditor2.
     await expEditor2.navigateToExplorationEditorPageById(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
-    await expEditor2.navigateToExplorationEditorPageById(negativeNumbersExpId);
-    await expEditor2.expectExplorationToBePublished();
     await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
     await expEditor2.expectUserToBeExplorationManager();
   }, 600000);

@@ -2840,18 +2840,89 @@ export class ExplorationEditor extends BaseUser {
         visible: true,
         timeout: 10000,
       });
-      await this.clickOnElementWithSelector(mobilePublishButtonSelector);
+
+      // For mobile viewports with sticky footers, we need to scroll the button
+      // into view and then scroll down a bit more to ensure the footer doesn't
+      // occlude it.
+      await this.page.evaluate(() => {
+        const button = document.querySelector(
+          'button.e2e-test-mobile-publish-button'
+        ) as HTMLElement | null;
+        if (button) {
+          button.scrollIntoView({block: 'end', inline: 'center'});
+        }
+      });
+
+      // Wait a moment for the scroll to complete and any layout shifts to settle
+      await this.page.waitForTimeout(300);
+
+      // Now click the button using direct JavaScript dispatch to bypass
+      // clickability checks, since we've already handled scrolling
+      await this.page.evaluate(() => {
+        const button = document.querySelector(
+          'button.e2e-test-mobile-publish-button'
+        ) as HTMLElement | null;
+        if (button) {
+          button.click();
+        }
+      });
     };
 
     const fillExplorationMetadataDetails = async () => {
+      // Fill title
       await this.clickOnElementWithSelector(explorationTitleInput);
       await this.typeInInputField(explorationTitleInput, title);
+      // Trigger validation by blurring the field
+      await this.page.evaluate(() => {
+        const titleInput = document.querySelector(
+          'input.e2e-test-exploration-title-input-modal'
+        ) as HTMLElement | null;
+        if (titleInput) {
+          titleInput.dispatchEvent(new Event('blur'));
+        }
+      });
+      await this.page.waitForTimeout(200);
+
+      // Fill goal - note: goal must be at least 15 characters
       await this.clickOnElementWithSelector(explorationGoalInput);
+      // Clear any existing text first
+      await this.page.evaluate(() => {
+        const goalInput = document.querySelector(
+          'input.e2e-test-exploration-objective-input-modal'
+        ) as HTMLInputElement | null;
+        if (goalInput) {
+          goalInput.value = '';
+        }
+      });
       await this.typeInInputField(explorationGoalInput, goal);
+      // Trigger validation by blurring the field
+      await this.page.evaluate(() => {
+        const goalInput = document.querySelector(
+          'input.e2e-test-exploration-objective-input-modal'
+        ) as HTMLElement | null;
+        if (goalInput) {
+          goalInput.dispatchEvent(new Event('blur'));
+        }
+      });
+      await this.page.waitForTimeout(200);
+
+      // Select category
       await this.clickOnElementWithSelector(explorationCategoryDropdown);
       await this.clickOnElementWithText(category);
+      await this.page.waitForTimeout(200);
+
+      // Add tags if provided
       if (tags) {
         await this.typeInInputField(tagsField, tags);
+        await this.page.evaluate(() => {
+          const tagsInput = document.querySelector(
+            'input[placeholder*="Add a new tag"]'
+          ) as HTMLElement | null;
+          if (tagsInput) {
+            tagsInput.dispatchEvent(new Event('blur'));
+          }
+        });
+        await this.page.waitForTimeout(200);
       }
     };
 
