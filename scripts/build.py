@@ -36,7 +36,6 @@ from scripts import (
 )
 
 import rcssmin
-import yaml
 from typing import (
     Deque,
     Dict,
