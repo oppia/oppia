@@ -84,8 +84,6 @@ describe('Exploration Creator', function () {
   it(
     'should save/discard drafts, set initial card, and validate cards list',
     async function () {
-      // Create exploration and discard a draft
-
       await explorationEditor.navigateToCreatorDashboardPage();
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
@@ -98,7 +96,6 @@ describe('Exploration Creator', function () {
       await explorationEditor.discardCurrentChanges();
       await explorationEditor.expectCardContentToBe('Old content');
 
-      // Rename first card, create new card
       await explorationEditor.updateStateName('First');
       await explorationEditor.waitForPageToFullyLoad();
 
@@ -152,7 +149,6 @@ describe('Exploration Creator', function () {
         'This is the second card.'
       );
 
-      // Remove first card and verify it
       await explorationEditor.navigateToEditorTab();
 
       await explorationEditor.waitForPageToFullyLoad();
