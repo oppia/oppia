@@ -130,7 +130,6 @@ describe('Lesson Creator Profile Deletion', function () {
     // 3. Setup Exploration B (Published) and Exploration C (Draft).
     await expEditor1.navigateToCreatorDashboardPage();
     await expEditor1.navigateToExplorationEditorFromCreatorDashboard();
-    const negativeNumbersExpId = await expEditor1.getExplorationId();
     await expEditor1.updateCardContent('Negative Numbers Intro');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();

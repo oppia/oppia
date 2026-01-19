@@ -2853,11 +2853,11 @@ export class ExplorationEditor extends BaseUser {
         }
       });
 
-      // Wait a moment for the scroll to complete and any layout shifts to settle
+      // Wait a moment for the scroll to complete and any layout shifts to settle.
       await this.page.waitForTimeout(300);
 
-      // Now click the button using direct JavaScript dispatch to bypass
-      // clickability checks, since we've already handled scrolling
+      // Now click the button using direct JavaScript dispatch to bypass clickability
+      // checks, since we've already handled scrolling.
       await this.page.evaluate(() => {
         const button = document.querySelector(
           'button.e2e-test-mobile-publish-button'
@@ -2869,10 +2869,10 @@ export class ExplorationEditor extends BaseUser {
     };
 
     const fillExplorationMetadataDetails = async () => {
-      // Fill title
+      // Fill title.
       await this.clickOnElementWithSelector(explorationTitleInput);
       await this.typeInInputField(explorationTitleInput, title);
-      // Trigger validation by blurring the field
+      // Trigger validation by blurring the field.
       await this.page.evaluate(() => {
         const titleInput = document.querySelector(
           'input.e2e-test-exploration-title-input-modal'
@@ -2883,9 +2883,9 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.page.waitForTimeout(200);
 
-      // Fill goal - note: goal must be at least 15 characters
+      // Fill goal - note: goal must be at least 15 characters.
       await this.clickOnElementWithSelector(explorationGoalInput);
-      // Clear any existing text first
+      // Clear any existing text first.
       await this.page.evaluate(() => {
         const goalInput = document.querySelector(
           'input.e2e-test-exploration-objective-input-modal'
@@ -2895,7 +2895,7 @@ export class ExplorationEditor extends BaseUser {
         }
       });
       await this.typeInInputField(explorationGoalInput, goal);
-      // Trigger validation by blurring the field
+      // Trigger validation by blurring the field.
       await this.page.evaluate(() => {
         const goalInput = document.querySelector(
           'input.e2e-test-exploration-objective-input-modal'
@@ -2906,12 +2906,12 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.page.waitForTimeout(200);
 
-      // Select category
+      // Select category.
       await this.clickOnElementWithSelector(explorationCategoryDropdown);
       await this.clickOnElementWithText(category);
       await this.page.waitForTimeout(200);
 
-      // Add tags if provided
+      // Add tags if provided.
       if (tags) {
         await this.typeInInputField(tagsField, tags);
         await this.page.evaluate(() => {
