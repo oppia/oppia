@@ -36,6 +36,8 @@ module.exports = merge(common, {
     warningsFilter: [
       /export '.*' was not found in/,
       /export .* was not found in/,
+      /Critical dependency: the request of a dependency is an expression/,
+      /System.import\(\) is deprecated/,
     ],
   },
 });
