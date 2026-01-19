@@ -45,6 +45,7 @@
   .oppia-learner-dash-goals-checkbox {
     font-size: 16px;
     gap: 0 12px;
+    min-width: 0;
     overflow: hidden;
   }
 
@@ -62,9 +63,11 @@
     box-sizing: border-box;
     display: grid;
     gap: 0 4px;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto;
     height: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
     padding-top: 12px;
     width: 100%;
   }
