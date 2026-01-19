@@ -673,61 +673,38 @@ def setup_mathjax_for_dev() -> None:
     source_mathjax_dir = os.path.join('node_modules', 'mathjax')
     target_mathjax_dir = os.path.join('third_party', 'mathjax')
 
-    # Skip if already exists in third_party.
-    if os.path.isdir(target_mathjax_dir):
+    print('Copying MathJax from node_modules to third_party directory')
+    try:
+        shutil.copytree(source_mathjax_dir, target_mathjax_dir)
+        print('MathJax copied successfully to %s' % target_mathjax_dir)
+    except FileExistsError:
+        # Target already exists, no need to copy.
         print('MathJax already exists at %s' % target_mathjax_dir)
-        return
-
-    if not os.path.isdir(source_mathjax_dir):
+    except FileNotFoundError as e:
         raise Exception(
             'MathJax not found in node_modules. '
             'Please run: npm install or yarn install'
-        )
-
-    print('Copying MathJax from node_modules to third_party directory')
-    shutil.copytree(source_mathjax_dir, target_mathjax_dir)
-    print('MathJax copied successfully to %s' % target_mathjax_dir)
-
-
-def copy_mathjax_to_build() -> None:
-    """Copies MathJax from third_party/mathjax to build/third_party/mathjax
-    for production deployment.
-
-    Note: MathJax 2.x cannot be bundled by webpack (only MathJax 3+ supports
-    bundling). We serve it from a consistent location (/third_party/mathjax)
-    in both dev and prod to avoid serving from node_modules. This is temporary
-    until we migrate to MathJax 3.
-    """
+        ) from e
     print('Copying MathJax to build directory')
     source_mathjax_dir = os.path.join('third_party', 'mathjax')
     target_mathjax_dir = os.path.join('build', 'third_party', 'mathjax')
 
-    if not os.path.isdir(source_mathjax_dir):
+    # Remove existing directory if it exists.
+    try:
+        shutil.rmtree(target_mathjax_dir)
+    except FileNotFoundError:
+        # Target doesn't exist, nothing to remove.
+        pass
+
+    # Copy MathJax directory.
+    try:
+        shutil.copytree(source_mathjax_dir, target_mathjax_dir)
+        print('MathJax copied successfully to %s' % target_mathjax_dir)
+    except FileNotFoundError as e:
         raise Exception(
             'MathJax not found in third_party/mathjax. '
             'Please run: python -m scripts.setup or python -m scripts.build'
-        )
-
-    # Remove existing directory if it exists.
-    if os.path.isdir(target_mathjax_dir):
-        shutil.rmtree(target_mathjax_dir)
-
-    # Copy MathJax directory.
-    shutil.copytree(source_mathjax_dir, target_mathjax_dir)
-    print('MathJax copied successfully to %s' % target_mathjax_dir)
-
-
-def build_using_ng() -> None:
-    """Execute angular build process. This runs the angular compiler and
-    generates an ahead of time compiled bundle. This bundle can be found in the
-    dist/oppia-angular-prod folder.
-    """
-    print('Building using angular cli')
-    managed_ng_build_process = servers.managed_ng_build(
-        use_prod_env=True, watch_mode=False
-    )
-    with managed_ng_build_process as p:
-        p.wait()
+        ) from e
     assert (
         get_file_count('dist/oppia-angular-prod') > 0
     ), 'angular generated bundle should be non-empty'
