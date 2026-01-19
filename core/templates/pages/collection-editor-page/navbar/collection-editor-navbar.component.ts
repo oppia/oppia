@@ -192,7 +192,7 @@ export class CollectionEditorNavbarComponent {
     this.collectionRightsBackendApiService
       .setCollectionPrivateAsync(
         this.collectionId,
-        this.collection.getVersion()
+        this.collection.getVersion() as number
       )
       .then(() => {
         this.collectionRights.setPrivate();
