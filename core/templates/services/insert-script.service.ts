@@ -70,9 +70,11 @@ export class InsertScriptService {
           scriptElement.async = true;
           break;
         case KNOWN_SCRIPTS.MATHJAX: {
-          // Serve MathJax from node_modules in dev, from build directory in prod.
+          // Serve MathJax from third_party in dev, from build in prod.
+          // MathJax is copied to third_party/mathjax during setup to avoid
+          // serving directly from node_modules.
           const mathJaxBasePath = AppConstants.DEV_MODE
-            ? '/node_modules/mathjax/'
+            ? '/third_party/mathjax/'
             : '/build/third_party/mathjax/';
           scriptElement.src = `${mathJaxBasePath}MathJax.js?config=default`;
           break;

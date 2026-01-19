@@ -36,6 +36,7 @@ from scripts import (
 )
 
 import rcssmin
+import yaml
 from typing import (
     Deque,
     Dict,
@@ -662,18 +663,50 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
     )
 
 
-def copy_mathjax_to_build() -> None:
-    """Copies MathJax from node_modules to build/third_party/mathjax for
-    production use.
+def setup_mathjax_for_dev() -> None:
+    """Copies MathJax from node_modules to third_party/mathjax for both
+    development and production use. This avoids serving directly from
+    node_modules.
+
+    This is called during initial setup and ensures MathJax is available
+    at a consistent path in both dev and prod environments.
     """
-    print('Copying MathJax from node_modules to build directory')
     source_mathjax_dir = os.path.join('node_modules', 'mathjax')
-    target_mathjax_dir = os.path.join('build', 'third_party', 'mathjax')
+    target_mathjax_dir = os.path.join('third_party', 'mathjax')
+
+    # Skip if already exists in third_party.
+    if os.path.isdir(target_mathjax_dir):
+        print('MathJax already exists at %s' % target_mathjax_dir)
+        return
 
     if not os.path.isdir(source_mathjax_dir):
         raise Exception(
             'MathJax not found in node_modules. '
             'Please run: npm install or yarn install'
+        )
+
+    print('Copying MathJax from node_modules to third_party directory')
+    shutil.copytree(source_mathjax_dir, target_mathjax_dir)
+    print('MathJax copied successfully to %s' % target_mathjax_dir)
+
+
+def copy_mathjax_to_build() -> None:
+    """Copies MathJax from third_party/mathjax to build/third_party/mathjax
+    for production deployment.
+
+    Note: MathJax 2.x cannot be bundled by webpack (only MathJax 3+ supports
+    bundling). We serve it from a consistent location (/third_party/mathjax)
+    in both dev and prod to avoid serving from node_modules. This is temporary
+    until we migrate to MathJax 3.
+    """
+    print('Copying MathJax to build directory')
+    source_mathjax_dir = os.path.join('third_party', 'mathjax')
+    target_mathjax_dir = os.path.join('build', 'third_party', 'mathjax')
+
+    if not os.path.isdir(source_mathjax_dir):
+        raise Exception(
+            'MathJax not found in third_party/mathjax. '
+            'Please run: python -m scripts.setup or python -m scripts.build'
         )
 
     # Remove existing directory if it exists.
@@ -1475,6 +1508,9 @@ def main(args: Optional[Sequence[str]] = None) -> None:
 
     # Clean up the existing generated folders.
     clean()
+
+    # Setup MathJax in third_party for both dev and prod use.
+    setup_mathjax_for_dev()
 
     # Regenerate /third_party/generated from scratch.
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)

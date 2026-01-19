@@ -142,7 +142,7 @@ describe('InsertScriptService', () => {
     );
 
     const expectedPath = AppConstants.DEV_MODE
-      ? '/node_modules/mathjax/MathJax.js?config=default'
+      ? '/third_party/mathjax/MathJax.js?config=default'
       : '/build/third_party/mathjax/MathJax.js?config=default';
 
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
