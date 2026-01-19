@@ -946,3 +946,72 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.OWNER_USERNAME,
         )
         self.logout()
+
+    def test_handles_invalid_exploration_in_progress_list(self) -> None:
+        """Test that invalid explorations are gracefully handled."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        state_name = 'state_name'
+        version = 1
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, state_name, version
+        )
+
+        # Add non-existent exploration to progress.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, 'NONEXISTENT_EXP', state_name, version
+        )
+
+        # Should handle gracefully without crashing.
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        self.assertIsNotNone(response['incomplete_explorations_list'])
+        self.logout()
+
+    def test_progress_with_no_last_played_state(self) -> None:
+        """Test exploration progress when no last state has been played."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        # Exploration in playlist with no last played state.
+        self.assertEqual(len(response['exploration_playlist']), 1)
+        self.logout()
+
+    def test_progress_with_disconnected_states(self) -> None:
+        """Test BFS handling with disconnected states."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        state_name = 'state_name'
+        version = 1
+
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, state_name, version
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        self.assertEqual(len(response['incomplete_explorations_list']), 1)
+        # Verify progress_percent is calculated.
+        self.assertIn(
+            'progress_percent',
+            response['incomplete_explorations_list'][0]
+        )
+        self.logout()
