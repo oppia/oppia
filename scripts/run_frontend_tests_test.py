@@ -289,7 +289,8 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
                     ],
                     [b'file1.js', b'file2.ts', b'file3.py'],
                 ),
-                'branch2': ([], []),
+                'branch2': ([], [b'file1.js', b'file2.ts']),
+                'branch3': ([], []),
             }
 
         def mock_get_staged_acmrt_files() -> List[bytes]:
@@ -565,3 +566,165 @@ class RunFrontendTestsTests(test_utils.GenericTestBase):
             'in ../karma_coverage_reports',
             self.print_arr,
         )
+
+    def test_get_file_spec_with_non_ts_js_file(self) -> None:
+        def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
+            return True
+
+        with self.swap(os.path, 'exists', mock_exists):
+            file_path = 'some_file.txt'
+            result = run_frontend_tests.get_file_spec(file_path)
+            self.assertIsNone(result)
+
+            file_path = 'another_file.md'
+            result = run_frontend_tests.get_file_spec(file_path)
+            self.assertIsNone(result)
+
+    def test_main_run_on_changed_files_in_branch_with_no_spec_files(
+        self,
+    ) -> None:
+        git_refs = [
+            git_changes_utils.GitRef(
+                'local_ref', 'local_sha1', 'remote_ref', 'remote_sha1'
+            )
+        ]
+
+        def mock_get_remote_name() -> str:
+            return 'remote'
+
+        def mock_get_refs() -> list[git_changes_utils.GitRef]:
+            return git_refs
+
+        def mock_get_changed_files(
+            _refs: list[str], _remote_name: str
+        ) -> dict[str, tuple[list[bytes], list[bytes]]]:
+            return {'branch1': ([], [b'file1.js', b'file2.ts'])}
+
+        def mock_get_staged_acmrt_files() -> list[bytes]:
+            return [b'file1.js', b'file2.ts']
+
+        def mock_get_file_spec(_file_path: str) -> None:
+            return None
+
+        with self.swap(
+            git_changes_utils,
+            'get_local_git_repository_remote_name',
+            mock_get_remote_name,
+        ), self.swap(git_changes_utils, 'get_refs', mock_get_refs), self.swap(
+            git_changes_utils, 'get_changed_files', mock_get_changed_files
+        ), self.swap(
+            git_changes_utils,
+            'get_staged_acmrt_files',
+            mock_get_staged_acmrt_files,
+        ), self.swap(
+            run_frontend_tests, 'get_file_spec', mock_get_file_spec
+        ), self.swap_success_Popen, self.print_swap, self.swap(
+            build, 'main', lambda args: None
+        ), self.swap(
+            install_third_party_libs, 'main', lambda: None
+        ), self.swap_check_frontend_coverage, self.assertRaisesRegex(
+            SystemExit, '0'
+        ):
+
+            run_frontend_tests.main(
+                args=['--run_on_changed_files_in_branch', '--allow_no_spec']
+            )
+
+        printed: list[str] = []
+        for msg in self.print_arr:
+            if isinstance(msg, bytes):
+                printed.append(msg.decode('utf-8').strip())
+            else:
+                printed.append(str(msg).strip())
+
+        self.assertIn('No valid specs found to run.', printed)
+
+    def test_stdout_line_with_web_server_logs_skipped(self) -> None:
+        class MockFile:
+            def __init__(self) -> None:
+                self.lines = [
+                    b'[web-server]: some log\n',
+                    b'Executed tests. Trying to get the Angular injector..\n',
+                    b'',
+                ]
+                self.index = 0
+
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
+                if self.index < len(self.lines):
+                    line = self.lines[self.index]
+                    self.index += 1
+                    return line
+                return b''
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.stdout = MockFile()
+                self.returncode = 0
+
+            def poll(self) -> int:  # pylint: disable=missing-docstring
+                return 0
+
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                return None
+
+        def mock_popen(
+            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        ) -> MockTask:
+            return MockTask()
+
+        self.cmd_token_list = []
+
+        with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
+            run_frontend_tests.main(args=[])
+
+        printed_lines: list[str] = []
+        printed_lines += [
+            line for line in self.print_arr if isinstance(line, str)
+        ]
+
+        assert any(
+            'Executed tests. Trying to get the Angular injector..' in line
+            for line in printed_lines
+        )
+
+        assert not any('[web-server]:' in line for line in printed_lines)
+
+    def test_angular_injector_message_not_printed(self) -> None:
+        class MockFile:
+            def __init__(self) -> None:
+                self.lines = [b'Test line 1\n', b'Test line 2\n']
+                self.index = 0
+
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
+                if self.index < len(self.lines):
+                    line = self.lines[self.index]
+                    self.index += 1
+                    return line
+                return b''
+
+        class MockTask:
+            def __init__(self) -> None:
+                self.stdout = MockFile()
+                self.returncode = 0
+
+            def poll(self) -> int:  # pylint: disable=missing-docstring
+                return 0
+
+            def wait(self) -> None:  # pylint: disable=missing-docstring
+                return None
+
+        def mock_popen(
+            cmd: list[str], stdout: int  # pylint: disable=unused-argument
+        ) -> MockTask:
+            return MockTask()
+
+        with self.swap(subprocess, 'Popen', mock_popen), self.print_swap:
+            run_frontend_tests.main(args=[])
+
+        angular_msg = (
+            'If you run into the error "Trying to get the Angular '
+            'injector", please see https://github.com/oppia/oppia/wiki/'
+            'Frontend-unit-tests-guide#how-to-handle-common-errors'
+            ' for details on how to fix it.'
+        )
+        self.assertNotIn(angular_msg, self.print_arr)
