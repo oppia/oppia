@@ -63,7 +63,6 @@ export class InteractionDisplayComponent implements AfterViewInit, OnChanges {
       if (dom.body.firstElementChild) {
         const tagName = dom.body.firstElementChild.tagName;
 
-        // FIXED: Replaced 'any' with Record<string, Type<unknown>> (TS 65:66).
         const interactionMapping = TAG_TO_INTERACTION_MAPPING as Record<
           string,
           Type<unknown>
@@ -85,7 +84,6 @@ export class InteractionDisplayComponent implements AfterViewInit, OnChanges {
 
             if (/[\])}[{(]/g.test(attribute.name)) {
               if (this.parentScope) {
-                // FIXED: Replaced 'any' with Record<string, unknown> (TS 83:55).
                 attributeValue = (this.parentScope as Record<string, unknown>)[
                   attributeNameInCamelCase
                 ];
@@ -99,7 +97,6 @@ export class InteractionDisplayComponent implements AfterViewInit, OnChanges {
               );
             }
 
-            // FIXED: Replaced 'any' with Record<string, unknown> (TS 96:39).
             (componentRef.instance as Record<string, unknown>)[
               attributeNameInCamelCase
             ] = attributeValue;
