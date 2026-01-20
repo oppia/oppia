@@ -2844,6 +2844,22 @@ describe('Contributions and review component', () => {
             chapter_title: 'Chapter',
           },
         },
+        suggestion_4: {
+          suggestion: {
+            suggestion_id: 'suggestion_4',
+            status: 'accepted',
+            change_cmd: {
+              content_html: 'Content 4',
+              translation_html: 'Translation 4',
+            },
+            exploration_content_html: null,
+          },
+          details: {
+            topic_name: 'Topic',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
       } as unknown as Record<string, SuggestionDetails>;
 
       const summaryList = component.getTranslationContributionsSummary(
@@ -2858,6 +2874,9 @@ describe('Contributions and review component', () => {
 
       expect(summaryList[2].id).toBe('suggestion_3');
       expect(summaryList[2].labelText).toBe('Accepted');
+
+      expect(summaryList[3].id).toBe('suggestion_4');
+      expect(summaryList[3].labelText).toBe('Obsolete');
     }));
   });
 });
