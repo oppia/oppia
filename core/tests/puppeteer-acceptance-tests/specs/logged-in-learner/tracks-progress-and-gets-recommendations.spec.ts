@@ -141,12 +141,16 @@ describe('Logged-In Learner', function () {
   );
 
   it('should be able to add a goal and see it in Current Goals with Learn Something New section', async function () {
-    // Navigate to learner dashboard and go to Goals section.
+    // Navigate to learner dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.navigateToGoalsSection();
 
     // Add "Algebra I" topic as a goal.
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Verify goal was added successfully.
+    await loggedInLearner.expectToastMessage(
+      "Successfully added to your 'Current Goals' list."
+    );
 
     // Verify "Algebra I" topic is visible in "Current Goals" section.
     await loggedInLearner.expectCurrentGoalsInRedesignedDashboardToContain(
@@ -164,12 +168,16 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see Continue where you left off section after playing lesson halfway', async function () {
-    // Navigate to learner dashboard and go to Goals section.
+    // Navigate to learner dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.navigateToGoalsSection();
 
     // Add "Algebra I" topic as a goal.
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Verify goal was added successfully.
+    await loggedInLearner.expectToastMessage(
+      "Successfully added to your 'Current Goals' list."
+    );
 
     // Navigate to Home section.
     await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
@@ -204,12 +212,16 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see progress after completing first chapter', async function () {
-    // Navigate to learner dashboard and go to Goals section.
+    // Navigate to learner dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.navigateToGoalsSection();
 
     // Add "Algebra I" topic as a goal.
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Verify goal was added successfully.
+    await loggedInLearner.expectToastMessage(
+      "Successfully added to your 'Current Goals' list."
+    );
 
     // Navigate to Home section.
     await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
@@ -265,12 +277,16 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see 100% progress after completing all chapters', async function () {
-    // Navigate to learner dashboard and go to Goals section.
+    // Navigate to learner dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
-    await loggedInLearner.navigateToGoalsSection();
 
     // Add "Algebra I" topic as a goal.
     await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Verify goal was added successfully.
+    await loggedInLearner.expectToastMessage(
+      "Successfully added to your 'Current Goals' list."
+    );
 
     // Navigate to Home section.
     await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();

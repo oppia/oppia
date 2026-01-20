@@ -239,7 +239,8 @@ const addNewGoalButtonSelector = '.e2e-test-add-new-goal-button';
 const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
-const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const learnSomethingNewSectionSelector =
+  '.e2e-test-learner-dash-home-tab .e2e-test-learner-dash-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
