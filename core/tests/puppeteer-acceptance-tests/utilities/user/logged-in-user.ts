@@ -643,7 +643,7 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector('.e2e-test-home-section');
     await this.waitForPageToFullyLoad();
     // Main dashboard section visible check.
-    await this.page.waitForSelector('.e2e-test-learner-dash-section', {
+    await this.page.waitForSelector('.e2e-test-learner-dash-home-tab', {
       timeout: 60000,
     });
   }

@@ -164,8 +164,15 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see Continue where you left off section after playing lesson halfway', async function () {
-    // Navigate to learner dashboard.
+    // Navigate to learner dashboard and go to Goals section.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.navigateToGoalsSection();
+
+    // Add "Algebra I" topic as a goal.
+    await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Navigate to Home section.
+    await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
 
     // Select "Test Chapter 1" lesson from learner dashboard.
     await loggedInLearner.playLessonFromDashboardInRedesignedDashboard(
@@ -197,7 +204,25 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see progress after completing first chapter', async function () {
-    // Navigate to learner dashboard.
+    // Navigate to learner dashboard and go to Goals section.
+    await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.navigateToGoalsSection();
+
+    // Add "Algebra I" topic as a goal.
+    await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Navigate to Home section.
+    await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
+
+    // Select "Test Chapter 1" lesson from learner dashboard.
+    await loggedInLearner.playLessonFromDashboardInRedesignedDashboard(
+      'Test Chapter 1'
+    );
+
+    // Play lesson halfway (continue to next card to make progress).
+    await loggedInLearner.continueToNextCard();
+
+    // Navigate back to Learner Dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Resume "Test Chapter 1" lesson from Continue where you left off section.
@@ -240,7 +265,24 @@ describe('Logged-In Learner', function () {
   }, 600000);
 
   it('should be able to see 100% progress after completing all chapters', async function () {
-    // Navigate to learner dashboard.
+    // Navigate to learner dashboard and go to Goals section.
+    await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
+    await loggedInLearner.navigateToGoalsSection();
+
+    // Add "Algebra I" topic as a goal.
+    await loggedInLearner.addGoalInRedesignedLearnerDashboard('Algebra I');
+
+    // Navigate to Home section.
+    await loggedInLearner.navigateToHomeSectionInRedesignedDashboard();
+
+    // Select "Test Chapter 1" lesson and complete it.
+    await loggedInLearner.playLessonFromDashboardInRedesignedDashboard(
+      'Test Chapter 1'
+    );
+    await loggedInLearner.continueToNextCard();
+    await loggedInLearner.continueToNextCard();
+
+    // Navigate back to Learner Dashboard.
     await loggedInLearner.navigateToLearnerDashboardUsingProfileDropdown();
 
     // Select "Test Chapter 2" lesson from Learn Something New section.
