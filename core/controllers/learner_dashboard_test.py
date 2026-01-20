@@ -1087,9 +1087,11 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         assert branch_state.interaction.default_outcome is not None
         branch_state.interaction.default_outcome.dest = 'End'
 
+        # Add answer group with a valid rule to exercise answer_group traversal.
+        rule_spec = state_domain.RuleSpec('Equals', {'x': {'contentId': 'rule_input_Equals', 'normalizedStrSet': ['test']}})
         answer_group = state_domain.AnswerGroup(
             intro_state.interaction.default_outcome,
-            [],
+            [rule_spec],
             [],
             None,
         )
