@@ -1061,3 +1061,27 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertIn('total_cards_count', exp_summary)
         self.assertGreater(exp_summary['total_cards_count'], 0)
         self.logout()
+
+    def test_completed_exploration_progress(self) -> None:
+        """Test that completed explorations show full progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        self.assertEqual(len(response['completed_explorations_list']), 1)
+        exp_summary = response['completed_explorations_list'][0]
+
+        # Completed exploration should have visited_cards_count = total_cards_count.
+        self.assertEqual(
+            exp_summary['visited_cards_count'], exp_summary['total_cards_count']
+        )
+        self.assertEqual(exp_summary['progress_percent'], 100)
