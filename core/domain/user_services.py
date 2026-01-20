@@ -844,17 +844,45 @@ def _save_user_contribution_rights(
     _update_reviewer_counts_in_community_contribution_stats(
         user_contribution_rights
     )
-    user_models.UserContributionRightsModel(
-        id=user_contribution_rights.id,
-        can_review_translation_for_language_codes=(
+    # Get existing model if it exists, otherwise create a new one.
+    user_contribution_rights_model = (
+        user_models.UserContributionRightsModel.get_by_id(
+            user_contribution_rights.id
+        )
+    )
+    if user_contribution_rights_model is not None:
+        # Update existing model.
+        user_contribution_rights_model.can_review_translation_for_language_codes = (
             user_contribution_rights.can_review_translation_for_language_codes
-        ),
-        can_review_voiceover_for_language_codes=(
+        )
+        user_contribution_rights_model.can_review_voiceover_for_language_codes = (
             user_contribution_rights.can_review_voiceover_for_language_codes
-        ),
-        can_review_questions=(user_contribution_rights.can_review_questions),
-        can_submit_questions=(user_contribution_rights.can_submit_questions),
-    ).put()
+        )
+        user_contribution_rights_model.can_review_questions = (
+            user_contribution_rights.can_review_questions
+        )
+        user_contribution_rights_model.can_submit_questions = (
+            user_contribution_rights.can_submit_questions
+        )
+    else:
+        # Create new model.
+        user_contribution_rights_model = user_models.UserContributionRightsModel(
+            id=user_contribution_rights.id,
+            can_review_translation_for_language_codes=(
+                user_contribution_rights.can_review_translation_for_language_codes
+            ),
+            can_review_voiceover_for_language_codes=(
+                user_contribution_rights.can_review_voiceover_for_language_codes
+            ),
+            can_review_questions=(
+                user_contribution_rights.can_review_questions
+            ),
+            can_submit_questions=(
+                user_contribution_rights.can_submit_questions
+            ),
+        )
+    user_contribution_rights_model.update_timestamps()
+    user_contribution_rights_model.put()
 
 
 def _update_user_contribution_rights(

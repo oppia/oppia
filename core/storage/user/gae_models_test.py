@@ -22,7 +22,7 @@ import datetime
 import types
 
 from core import feconf, utils
-from core.domain import exp_domain, exp_services
+from core.domain import exp_domain, exp_services, user_services
 from core.platform import models
 from core.tests import test_utils
 
@@ -3541,6 +3541,57 @@ class UserContributionRightsModelTests(test_utils.GenericTestBase):
         # Check if passing a non-existent user_id does not fail.
         user_models.UserContributionRightsModel.apply_deletion_policy(
             'fake_user_id'
+        )
+
+    def test_timestamps_preserved_when_updating_existing_model(self) -> None:
+        """Test that created_on is preserved when updating an existing model.
+
+        This test verifies that updating UserContributionRightsModel through
+        public API functions correctly preserves created_on when updating
+        existing records.
+        """
+        # Create initial contribution rights using a public API function.
+        # allow_user_to_review_question calls _save_user_contribution_rights internally.
+        created_time = datetime.datetime(2026, 1, 15, 5, 0, 0)
+        with self.mock_datetime_utcnow(created_time):
+            user_services.allow_user_to_review_question(self.USER_ID_1)
+
+        # Verify timestamps are set correctly on creation.
+        saved_model = user_models.UserContributionRightsModel.get_by_id(
+            self.USER_ID_1
+        )
+        assert saved_model is not None
+        self.assertEqual(saved_model.created_on, created_time)
+        self.assertEqual(saved_model.last_updated, created_time)
+        original_created_on = saved_model.created_on
+        original_last_updated = saved_model.last_updated
+
+        # Simulate time passing and update using another public API function.
+        # allow_user_to_review_translation_in_language also calls
+        # _save_user_contribution_rights internally.
+        updated_time = created_time + datetime.timedelta(minutes=5)
+        with self.mock_datetime_utcnow(updated_time):
+            user_services.allow_user_to_review_translation_in_language(
+                self.USER_ID_1, 'hi'
+            )
+
+        # Verify that created_on is preserved and last_updated is updated.
+        updated_model = user_models.UserContributionRightsModel.get_by_id(
+            self.USER_ID_1
+        )
+        assert updated_model is not None
+        self.assertEqual(
+            updated_model.created_on,
+            original_created_on,
+            msg='created_on should be preserved when updating existing model',
+        )
+        self.assertEqual(updated_model.last_updated, updated_time)
+        self.assertNotEqual(updated_model.last_updated, original_last_updated)
+        # created_on and last_updated should be different after an update.
+        self.assertNotEqual(
+            updated_model.created_on,
+            updated_model.last_updated,
+            msg='created_on and last_updated should differ after an update',
         )
 
 
