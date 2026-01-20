@@ -1863,7 +1863,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
-  -webkit-user-select: none;
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                revert : none;
 }
 
 .oppia-save-state-item-button {
@@ -4183,4 +4183,14 @@ mat-tooltip-component .mat-tooltip.oppia-mat-tooltip-list {
 
 .hidden-element {
   outline: 0;
+}
+
+@media (pointer: coarse) {
+  .form-control,
+  .mat-input-element,
+  .oppia-interaction-input,
+  .conversation-skin-inline-interaction input,
+  .conversation-skin-inline-interaction textarea {
+    font-size: 16px !important;
+  }
 }
