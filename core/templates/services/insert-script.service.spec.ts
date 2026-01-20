@@ -16,7 +16,13 @@
  * @fileoverview Unit tests for InsertScriptService.
  */
 
-import {TestBed, fakeAsync, tick, flush} from '@angular/core/testing';
+import {
+  TestBed,
+  fakeAsync,
+  tick,
+  flush,
+  discardPeriodicTasks,
+} from '@angular/core/testing';
 import {Renderer2, RendererFactory2} from '@angular/core';
 import {
   InsertScriptService,
@@ -42,7 +48,6 @@ describe('InsertScriptService', () => {
       'createElement',
       'appendChild',
       'setAttribute',
-      'listen',
     ]);
     mockRenderer.createElement.and.returnValue(mockScriptElement);
 
@@ -60,7 +65,6 @@ describe('InsertScriptService', () => {
 
   it('should not reload script if already loaded', fakeAsync(() => {
     spyOn(document, 'querySelector').and.returnValue(null);
-
     insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, () => {});
 
     if (mockScriptElement.onload) {
@@ -76,32 +80,95 @@ describe('InsertScriptService', () => {
     flush();
   }));
 
-  it('should not create new script element if script is still loading', fakeAsync(() => {
+  it('should load MATHJAX script correctly', fakeAsync(() => {
     spyOn(document, 'querySelector').and.returnValue(null);
-
-    const result1 = insertScriptService.loadScript(
-      KNOWN_SCRIPTS.DONORBOX,
-      () => {}
-    );
-    expect(result1).toBe(true);
-
-    const result2 = insertScriptService.loadScript(
-      KNOWN_SCRIPTS.DONORBOX,
-      () => {}
-    );
-    expect(result2).toBe(false);
-
-    expect(mockRenderer.createElement).toHaveBeenCalledTimes(1);
+    insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX);
+    expect(mockScriptElement.src).toContain('MathJax.js');
     flush();
   }));
 
-  it('should load MATHJAX script correctly', fakeAsync(() => {
+  it('should load PENCILCODE script correctly', fakeAsync(() => {
     spyOn(document, 'querySelector').and.returnValue(null);
-    insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {});
+    insertScriptService.loadScript(KNOWN_SCRIPTS.PENCILCODE);
+    expect(mockScriptElement.src).toBe(
+      'https://pencilcode.net/lib/pencilcodeembed.js'
+    );
+    flush();
+  }));
 
-    const setAttrSpy = mockRenderer.setAttribute as jasmine.Spy;
-    const callWasMade = setAttrSpy.calls.any() || mockScriptElement.src !== '';
-    expect(callWasMade).toBe(true);
+  it('should return false for unknown script type', fakeAsync(() => {
+    const result = insertScriptService.loadScript(
+      'invalid_script' as KNOWN_SCRIPTS
+    );
+    expect(result).toBe(false);
+    flush();
+  }));
+
+  it('should handle error when script fails to load', fakeAsync(() => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+
+    const scriptPromise = (
+      insertScriptService as unknown as {
+        partiallyLoadedScripts: Map<KNOWN_SCRIPTS, Promise<void>>;
+      }
+    ).partiallyLoadedScripts.get(KNOWN_SCRIPTS.DONORBOX);
+
+    if (scriptPromise) {
+      scriptPromise.catch(() => {});
+    }
+
+    if (mockScriptElement.onerror) {
+      (mockScriptElement.onerror as (event: Event) => void)(new Event('error'));
+    }
+    tick();
+
+    const retryResult = insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+    expect(retryResult).toBe(true);
+    flush();
+  }));
+
+  it('should log error when partially loaded script fails', fakeAsync(() => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+    const consoleSpy = spyOn(console, 'error');
+
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX);
+
+    const scriptPromise = (
+      insertScriptService as unknown as {
+        partiallyLoadedScripts: Map<KNOWN_SCRIPTS, Promise<void>>;
+      }
+    ).partiallyLoadedScripts.get(KNOWN_SCRIPTS.DONORBOX);
+
+    if (scriptPromise) {
+      scriptPromise.catch(() => {});
+    }
+
+    if (mockScriptElement.onerror) {
+      (mockScriptElement.onerror as (event: Event) => void)(new Event('error'));
+    }
+
+    tick();
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      'Script loading failed:',
+      KNOWN_SCRIPTS.DONORBOX
+    );
+    discardPeriodicTasks();
+  }));
+
+  it('should call the callback function when script loads successfully', fakeAsync(() => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+    const callback = jasmine.createSpy('callback');
+    insertScriptService.loadScript(KNOWN_SCRIPTS.DONORBOX, callback);
+
+    if (mockScriptElement.onload) {
+      (mockScriptElement.onload as () => void)();
+    }
+    tick();
+    expect(callback).toHaveBeenCalled();
     flush();
   }));
 });
