@@ -24,6 +24,7 @@ from core.domain import (
     feedback_services,
     subscription_services,
     suggestion_services,
+    suggestion_models,
     user_services,
 )
 
@@ -163,12 +164,21 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
         exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
-        suggestion_summary: Optional[SuggestionSummaryDict] = None
+        # Skip deprecated suggestions - they should not be displayed in threads
+        # Deprecated or legacy suggestion models may still exist in production data.
+        # We intentionally skip unsupported suggestions instead of raising an
+        # exception so that valid feedback threads can still be returned.
+        if suggestion and suggestion.status == suggestion_models.STATUS_DEPRECATED:
+            suggestion = None
 
         if suggestion and suggestion.change_cmd is not None:
-            suggestion_author_setting = user_services.get_user_settings(
-                author_ids[0], strict=True
-            )
+            # Get suggestion author settings directly from suggestion.author_id
+            suggestion_author_setting = None
+            if suggestion.author_id:
+                suggestion_author_setting = user_services.get_user_settings(
+                    suggestion.author_id, strict=False
+                )
+
             exploration = exp_fetchers.get_exploration_by_id(exploration_id)
             current_content_html = exploration.states[
                 suggestion.change_cmd.state_name
@@ -176,33 +186,31 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
 
             new_value = suggestion.change_cmd.new_value
             if isinstance(new_value, dict):
-                # Here we use type Any because suggestion.change_cmd.new_value is defined
-                # as a Union[str, dict] and the dict structure is dynamic depending on
-                # the suggestion type, so more specific typing is not possible here.
-                # Here we use cast because we have already verified at runtime that
-                # new_value is a dict, but mypy cannot infer this automatically.
                 new_value_dict = cast(Dict[str, Any], new_value)
                 suggestion_html = str(new_value_dict.get('html', ''))
             else:
                 suggestion_html = ''
 
-            suggestion_summary = {
+            suggestion_summary: SuggestionSummaryDict = {
                 'suggestion_html': suggestion_html,
                 'current_content_html': current_content_html,
                 'description': suggestion_thread.subject,
-                'author_username': suggestion_author_setting.username,
+                'author_username': (
+                    suggestion_author_setting.username 
+                    if suggestion_author_setting is not None 
+                    else None
+                ),
                 'created_on_msecs': utils.get_time_in_millisecs(
                     messages[0].created_on
+                    if messages
+                    else utils.get_current_time_in_utc()
                 ),
             }
 
-            # NOTE:
-            # Deprecated or legacy suggestion models may still exist in production data.
-            # We intentionally skip unsupported suggestions instead of raising an
-            # exception so that valid feedback threads can still be returned.
-
-            if suggestion_summary is not None:
-                message_summary_list.append(suggestion_summary)
+            message_summary_list.append(suggestion_summary)
+            
+            # Only pop if suggestion author matches first message author
+            if messages and messages[0].author_id == suggestion.author_id:
                 messages.pop(0)
                 authors_settings.pop(0)
         for m, author_settings in zip(messages, authors_settings):
