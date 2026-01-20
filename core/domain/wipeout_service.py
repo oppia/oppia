@@ -612,6 +612,13 @@ def delete_user(
             subtopic_models.SubtopicPageCommitLogEntryModel,
             'subtopic_page_id',
         )
+        _pseudonymize_activity_models_without_associated_rights_models(
+            pending_deletion_request,
+            models.Names.SUBTOPIC,
+            subtopic_models.StudyGuideSnapshotMetadataModel,
+            subtopic_models.StudyGuideCommitLogEntryModel,
+            'study_guide_id',
+        )
         _pseudonymize_activity_models_with_associated_rights_models(
             pending_deletion_request,
             models.Names.EXPLORATION,
