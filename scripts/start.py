@@ -15,6 +15,8 @@
 """This script starts up a development server running Oppia. It installs any
 missing third-party dependencies and starts up a local GAE development
 server.
+This script is for development purposes only and should NOT be used in
+production environments.
 """
 
 from __future__ import annotations
