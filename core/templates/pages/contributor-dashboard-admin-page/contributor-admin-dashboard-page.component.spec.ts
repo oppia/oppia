@@ -292,16 +292,12 @@ describe('Contributor dashboard Admin page', () => {
       getUserInfoSpy = spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(questionAdminUserInfo)
       );
-
-      fixture.detectChanges();
-
-      component.ngOnInit();
     });
 
     it('should display a warning when fetchCommunityStats returns an error', fakeAsync(() => {
       alertsServiceAddWarningSpy = spyOn(alertsService, 'addWarning');
-      component.ngOnInit();
       fixture.detectChanges();
+      component.ngOnInit();
       tick();
       expect(alertsServiceAddWarningSpy).toHaveBeenCalledTimes(1);
     }));

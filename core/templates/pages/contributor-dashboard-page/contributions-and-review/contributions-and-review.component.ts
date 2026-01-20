@@ -189,7 +189,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       color: '#8ed274',
     },
     rejected: {
-      text: 'Obsolete',
+      text: 'Revisions Requested',
       color: '#e76c8c',
     },
   };
