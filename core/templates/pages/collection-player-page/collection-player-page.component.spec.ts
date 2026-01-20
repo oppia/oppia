@@ -45,7 +45,10 @@ import {
   CollectionPlayerPageComponent,
   IconParametersArray,
 } from './collection-player-page.component';
-import {CollectionNodeBackendDict} from 'domain/collection/collection-node.model';
+import {
+  CollectionNode,
+  CollectionNodeBackendDict,
+} from 'domain/collection/collection-node.model';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {PageTitleService} from 'services/page-title.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
@@ -507,6 +510,34 @@ describe('Collection player page component', () => {
     })
   );
 
+  it('should generate path parameters when collection node count is six', fakeAsync(() => {
+    sampleCollectionBackendObject.nodes = [
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+      collectionNodeBackendObject,
+    ];
+    sampleCollection = Collection.create(sampleCollectionBackendObject);
+    spyOn(
+      readOnlyCollectionBackendApiService,
+      'loadCollectionAsync'
+    ).and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfoForCollectionCreator)
+    );
+
+    // Loading collections.
+    component.ngOnInit();
+    tick();
+    component.generatePathParameters();
+
+    expect(component.pathSvgParameters).toBe(
+      'M250 80  C 470 100, 470 280, 250 300 S 30 500, 250 520, 470 720, 250 740, '
+    );
+  }));
+
   it('should return static image url given image path', () => {
     let urlInterpolationSpy = spyOn(
       urlInterpolationService,
@@ -517,6 +548,18 @@ describe('Collection player page component', () => {
 
     expect(urlInterpolationSpy).toHaveBeenCalledWith('/imagepath');
     expect(url).toBe('imageUrl');
+  });
+
+  it('should return static copyrighted image url given image path', () => {
+    let urlInterpolationSpy = spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('copyrightedImageUrl');
+
+    let url = component.getStaticCopyrightedImageUrl('/imagepath');
+
+    expect(urlInterpolationSpy).toHaveBeenCalledWith('/imagepath');
+    expect(url).toBe('copyrightedImageUrl');
   });
 
   it('should toggle preview card when calling ' + "'togglePreviewCard'", () => {
@@ -670,4 +713,164 @@ describe('Collection player page component', () => {
       expect(component.explorationCardIsShown).toBe(false);
     })
   );
+
+  it('should throw error when next exploration id is null', () => {
+    component.collection = sampleCollection;
+    component.collectionPlaythrough = CollectionPlaythrough.create('exp_id', [
+      'exp_id0',
+    ]);
+    spyOn(
+      component.collectionPlaythrough,
+      'getNextExplorationId'
+    ).and.returnValue(null);
+
+    expect(() => {
+      component.getNextRecommendedCollectionNodes();
+    }).toThrowError('Next exploration ID cannot be null');
+  });
+
+  it('should throw error if exploration summary is missing for first node', () => {
+    component.collection = sampleCollection;
+    spyOn(component.collection, 'getCollectionNodes').and.returnValue([
+      {
+        getExplorationSummaryObject: () => null,
+      } as unknown as CollectionNode,
+    ]);
+    expect(() => {
+      component.generatePathIconParameters();
+    }).toThrowError('Exploration summary missing for first node');
+  });
+
+  it('should throw error if exploration summary is missing for subsequent node', () => {
+    let mockNode1 = {
+      getExplorationSummaryObject: () => ({
+        thumbnail_icon_url: '/subjects/Algebra.svg',
+        thumbnail_bg_color: '#cc4b00',
+      }),
+    } as unknown as CollectionNode;
+    let mockNode2 = {
+      getExplorationSummaryObject: () => null,
+    } as unknown as CollectionNode;
+
+    component.collection = sampleCollection;
+    spyOn(component.collection, 'getCollectionNodes').and.returnValue([
+      mockNode1,
+      mockNode2,
+    ]);
+    spyOn(component.collection, 'getCollectionNodeCount').and.returnValue(2);
+
+    expect(() => {
+      component.generatePathIconParameters();
+    }).toThrowError('Exploration summary missing for node 1');
+  });
+
+  it('should not update collection summary if fetch summary return null', fakeAsync(() => {
+    (
+      collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
+    ).and.returnValue(Promise.resolve(null));
+
+    component.fetchSummaryAsync('collectionId');
+    tick();
+
+    expect(component.collectionSummary).toBeNull();
+  }));
+
+  it('should update collection summary when fetch returns valid summaries', fakeAsync(() => {
+    (
+      collectionPlayerBackendApiService.fetchCollectionSummariesAsync as jasmine.Spy
+    ).and.returnValue(
+      Promise.resolve({
+        is_admin: false,
+        is_topic_manager: false,
+        summaries: ['summary1', 'summary2'],
+        user_email: 'tester@example.com',
+        username: false,
+      })
+    );
+
+    component.fetchSummaryAsync('collectionId');
+    tick();
+
+    expect(component.collectionSummary).toBe('summary1');
+  }));
+
+  it('should not call generatePathParameters when collection is null', () => {
+    spyOn(component, 'generatePathParameters');
+
+    component.updateCollection(null as unknown as Collection);
+
+    expect(component.generatePathParameters).not.toHaveBeenCalled();
+  });
+
+  it('should not call generatePathParameters when collection has 0 nodes', () => {
+    spyOn(component, 'generatePathParameters');
+    const emptyCollectionBackendObject: CollectionBackendDict = {
+      id: 'collectionId',
+      title: 'title',
+      objective: 'objective',
+      category: 'category',
+      version: 1,
+      nodes: [],
+      language_code: null,
+      schema_version: null,
+      tags: null,
+      playthrough_dict: {
+        next_exploration_id: 'expId',
+        completed_exploration_ids: [],
+      },
+    };
+    const emptyCollection = Collection.create(emptyCollectionBackendObject);
+
+    component.updateCollection(emptyCollection);
+
+    expect(component.generatePathParameters).not.toHaveBeenCalled();
+  });
+
+  it('should return true when exploration is in completed list', fakeAsync(() => {
+    spyOn(
+      readOnlyCollectionBackendApiService,
+      'loadCollectionAsync'
+    ).and.resolveTo(sampleCollection);
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(userInfoForCollectionCreator)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    let res = component.isCompletedExploration('expId2');
+
+    expect(res).toBe(true);
+  }));
+
+  it('should not scroll when element is not found', () => {
+    spyOn(document, 'getElementById').and.returnValue(null);
+
+    component.scrollToLocation('non-existent-element');
+
+    expect(component.elementToScrollTo).toBe('non-existent-element');
+  });
+
+  it('should scroll when element is found', () => {
+    const mockElement = {
+      scrollIntoView: jasmine.createSpy('scrollIntoView'),
+    };
+    spyOn(document, 'getElementById').and.returnValue(
+      mockElement as unknown as HTMLElement
+    );
+
+    component.scrollToLocation('existing-element');
+
+    expect(component.elementToScrollTo).toBe('existing-element');
+    expect(mockElement.scrollIntoView).toHaveBeenCalledWith({
+      behavior: 'smooth',
+    });
+  });
+
+  it('should return empty string for getExplorationTitlePosition when no conditions match', () => {
+    let result = component.getExplorationTitlePosition(5);
+    expect(result).toBe('40px');
+    result = component.getExplorationTitlePosition(7);
+    expect(result).toBe('-55px');
+  });
 });

@@ -174,7 +174,7 @@ export class ContributionsAndReview implements OnInit, OnDestroy {
       }>;
     };
   };
-  private isCommitting = false;
+  isCommitting = false;
 
   opportunities: ExplorationOpportunitySummary[] = [];
 

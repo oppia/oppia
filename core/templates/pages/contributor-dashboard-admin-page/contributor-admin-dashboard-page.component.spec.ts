@@ -620,6 +620,48 @@ describe('Contributor dashboard Admin page', () => {
     );
 
     it(
+      'should not affect dropdown when clicked away on question' +
+        ' submitter tab',
+      fakeAsync(() => {
+        spyOn(component, 'checkMobileView').and.returnValue(false);
+        const fakeClickAwayEvent = new MouseEvent('click');
+        Object.defineProperty(fakeClickAwayEvent, 'target', {
+          value: document.createElement('div'),
+        });
+
+        component.toggleLanguageDropdown();
+        component.ngOnInit();
+        tick();
+        component.activeTab = component.TAB_NAME_QUESTION_SUBMITTER;
+        component.onDocumentClick(fakeClickAwayEvent);
+        fixture.detectChanges();
+
+        expect(component.languageDropdownShown).toBe(true);
+      })
+    );
+
+    it(
+      'should not affect dropdown when clicked away on question' +
+        ' reviewer tab',
+      fakeAsync(() => {
+        spyOn(component, 'checkMobileView').and.returnValue(false);
+        const fakeClickAwayEvent = new MouseEvent('click');
+        Object.defineProperty(fakeClickAwayEvent, 'target', {
+          value: document.createElement('div'),
+        });
+
+        component.toggleLanguageDropdown();
+        component.ngOnInit();
+        tick();
+        component.activeTab = component.TAB_NAME_QUESTION_REVIEWER;
+        component.onDocumentClick(fakeClickAwayEvent);
+        fixture.detectChanges();
+
+        expect(component.languageDropdownShown).toBe(true);
+      })
+    );
+
+    it(
       'should open question role editor modal when on question' +
         ' submitter tab',
       fakeAsync(() => {

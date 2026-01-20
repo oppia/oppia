@@ -246,4 +246,23 @@ describe('TranslateTextService', () => {
     stateContent.translation = 'newTranslation';
     expect(stateContent.translation).toBe('newTranslation');
   });
+
+  describe('suggestTranslatedText', () => {
+    it('should call error callback when active context is missing', fakeAsync(() => {
+      let errorMessage = '';
+      translateTextService.suggestTranslatedText(
+        'translation',
+        'en',
+        [],
+        'html',
+        () => {},
+        (reason: string) => {
+          errorMessage = reason;
+        }
+      );
+      flushMicrotasks();
+
+      expect(errorMessage).toBe('Missing active context');
+    }));
+  });
 });

@@ -266,12 +266,11 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
   getExplorationTitlePosition(index: number): string {
     if (index % 2 === 0) {
       return '-13px';
-    } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+    } else if ((index + 1) % 4 !== 0) {
       return '40px';
-    } else if ((index + 1) % 4 === 0) {
+    } else {
       return '-55px';
     }
-    return '';
   }
 
   scrollToLocation(el: string): void {

@@ -119,6 +119,42 @@ describe('ContributorDashboardAdminPageComponent', () => {
     expect(component.isNewUiEnabled).toBeTrue();
   }));
 
+  it('should not set translation admin flag when user is not translation admin', fakeAsync(() => {
+    const nonTranslationAdminUserInfo = {
+      ...userInfo,
+      isTranslationAdmin: () => false,
+    } as UserInfo;
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(nonTranslationAdminUserInfo)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.UserIsTranslationAdmin).toBe(false);
+  }));
+
+  it('should not set question categories when user is neither question admin nor coordinator', fakeAsync(() => {
+    const nonQuestionUserInfo = {
+      ...userInfo,
+      isQuestionAdmin: () => false,
+      isQuestionCoordinator: () => false,
+      isTranslationAdmin: () => true,
+    } as UserInfo;
+
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(nonQuestionUserInfo)
+    );
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.CD_USER_RIGHTS_CATEGORIES).toEqual({
+      REVIEW_TRANSLATION: 'translation',
+    });
+  }));
+
   describe('on clicking add rights button ', () => {
     it('should successfully update the rights of the user', fakeAsync(() => {
       const contributorDashboardAdminBackendApiServiceSpy = spyOn(
@@ -191,6 +227,19 @@ describe('ContributorDashboardAdminPageComponent', () => {
           ' to review translation in language code en'
       );
     }));
+
+    it('should throw error when category is null', fakeAsync(() => {
+      const addContributionRightsAction = {
+        category: null,
+        isValid: () => true,
+        languageCode: 'en',
+        username: 'user1',
+      };
+
+      expect(() => {
+        component.submitAddContributionRightsForm(addContributionRightsAction);
+      }).toThrowError('Category cannot be null');
+    }));
   });
 
   describe('in the add contribution rights section ', () => {
@@ -247,6 +296,21 @@ describe('ContributorDashboardAdminPageComponent', () => {
         component.ngOnInit();
         // Setting username to be empty.
         component.formData.addContributionReviewer.username = '';
+
+        const result = component.formData.addContributionReviewer.isValid();
+
+        expect(result).toBe(false);
+      })
+    );
+
+    it(
+      'should return false if category is translation but ' +
+        'languageCode is null when updating user rights',
+      fakeAsync(() => {
+        component.ngOnInit();
+        component.formData.addContributionReviewer.category = 'translation';
+        component.formData.addContributionReviewer.username = 'user1';
+        component.formData.addContributionReviewer.languageCode = null;
 
         const result = component.formData.addContributionReviewer.isValid();
 
@@ -397,6 +461,117 @@ describe('ContributorDashboardAdminPageComponent', () => {
         'Server error: Invalid username: random'
       );
     }));
+
+    it('should throw error when category is null for role filter', fakeAsync(() => {
+      const viewContributionReviewersAction = {
+        category: null,
+        filterCriterion: 'role',
+        isValid: () => true,
+        languageCode: 'en',
+        username: 'user1',
+      };
+
+      expect(() => {
+        component.submitViewContributorUsersForm(
+          viewContributionReviewersAction
+        );
+      }).toThrowError('Category cannot be null');
+    }));
+
+    it(
+      'should only populate REVIEW_TRANSLATION result when ' +
+        'user does not have REVIEW_QUESTION category',
+      fakeAsync(() => {
+        const translationOnlyUserInfo = {
+          ...userInfo,
+          isTranslationAdmin: () => true,
+          isQuestionAdmin: () => false,
+          isQuestionCoordinator: () => false,
+        } as UserInfo;
+        spyOn(userService, 'getUserInfoAsync').and.returnValue(
+          Promise.resolve(translationOnlyUserInfo)
+        );
+        spyOn(
+          contributorDashboardAdminBackendApiService,
+          'contributionReviewerRightsAsync'
+        ).and.returnValue(
+          Promise.resolve({
+            can_review_questions: true,
+            can_review_translation_for_language_codes: ['en'],
+            can_review_voiceover_for_language_codes: [],
+            can_submit_questions: true,
+          })
+        );
+
+        component.ngOnInit();
+        tick();
+
+        component.submitViewContributorUsersForm({
+          category: 'category',
+          filterCriterion: 'username',
+          isValid: () => true,
+          languageCode: 'en',
+          username: 'user1',
+        });
+        tick();
+
+        expect(
+          component.contributionReviewersResult.REVIEW_TRANSLATION
+        ).toBeDefined();
+        expect(
+          component.contributionReviewersResult.REVIEW_QUESTION
+        ).toBeUndefined();
+      })
+    );
+
+    it(
+      'should not populate REVIEW_TRANSLATION result when ' +
+        'user does not have REVIEW_TRANSLATION category',
+      fakeAsync(() => {
+        const questionOnlyUserInfo = {
+          ...userInfo,
+          isTranslationAdmin: () => false,
+          isQuestionAdmin: () => true,
+          isQuestionCoordinator: () => true,
+        } as UserInfo;
+        spyOn(userService, 'getUserInfoAsync').and.returnValue(
+          Promise.resolve(questionOnlyUserInfo)
+        );
+        spyOn(
+          contributorDashboardAdminBackendApiService,
+          'contributionReviewerRightsAsync'
+        ).and.returnValue(
+          Promise.resolve({
+            can_review_questions: true,
+            can_review_translation_for_language_codes: ['en'],
+            can_review_voiceover_for_language_codes: [],
+            can_submit_questions: true,
+          })
+        );
+
+        component.ngOnInit();
+        tick();
+
+        component.submitViewContributorUsersForm({
+          category: 'category',
+          filterCriterion: 'username',
+          isValid: () => true,
+          languageCode: 'en',
+          username: 'user1',
+        });
+        tick();
+
+        expect(
+          component.contributionReviewersResult.REVIEW_TRANSLATION
+        ).toBeUndefined();
+        expect(component.contributionReviewersResult.REVIEW_QUESTION).toBe(
+          true
+        );
+        expect(component.contributionReviewersResult.SUBMIT_QUESTION).toBe(
+          true
+        );
+      })
+    );
   });
 
   describe('on clicking remove rights button ', () => {
@@ -476,6 +651,22 @@ describe('ContributorDashboardAdminPageComponent', () => {
       expect(component.statusMessage).toBe(
         'Server error: Invalid username: random'
       );
+    }));
+
+    it('should throw error when category is null', fakeAsync(() => {
+      const removeContributionRightsAction = {
+        category: null,
+        isValid: () => true,
+        languageCode: 'en',
+        method: 'all',
+        username: 'user1',
+      };
+
+      expect(() => {
+        component.submitRemoveContributionRightsForm(
+          removeContributionRightsAction
+        );
+      }).toThrowError('Category cannot be null');
     }));
   });
 
@@ -636,6 +827,49 @@ describe('ContributorDashboardAdminPageComponent', () => {
           expect(result).toBe(true);
         })
       );
+
+      it(
+        'should return false if there are validation errors ' +
+          'when fetching user rights with filter criterion as ' +
+          'username but username is empty',
+        fakeAsync(() => {
+          component.ngOnInit();
+
+          // Note that username is filter criterion here.
+          component.formData.viewContributionReviewers.filterCriterion =
+            'username';
+          // Setting username to empty.
+          component.formData.viewContributionReviewers.username = '';
+
+          const result = component.formData.viewContributionReviewers.isValid();
+
+          expect(result).toBe(false);
+        })
+      );
+
+      it('should return false when filter criterion is neither role nor username', fakeAsync(() => {
+        component.ngOnInit();
+
+        // Setting filter criterion to an unknown value.
+        component.formData.viewContributionReviewers.filterCriterion =
+          'unknown';
+
+        const result = component.formData.viewContributionReviewers.isValid();
+
+        expect(result).toBe(false);
+      }));
+
+      it('should return false when category is translation but languageCode is null', fakeAsync(() => {
+        component.ngOnInit();
+
+        component.formData.viewContributionReviewers.filterCriterion = 'role';
+        component.formData.viewContributionReviewers.category = 'translation';
+        component.formData.viewContributionReviewers.languageCode = null;
+
+        const result = component.formData.viewContributionReviewers.isValid();
+
+        expect(result).toBe(false);
+      }));
     });
 
     describe('in the view translation contribution stats section ', () => {
@@ -735,6 +969,41 @@ describe('ContributorDashboardAdminPageComponent', () => {
           // Setting category to be null.
           component.formData.removeContributionReviewer.category = null;
           component.formData.removeContributionReviewer.username = 'user1';
+          component.formData.removeContributionReviewer.method = 'specific';
+
+          const result =
+            component.formData.removeContributionReviewer.isValid();
+
+          expect(result).toBe(false);
+        })
+      );
+
+      it(
+        'should return false if username is empty ' +
+          'when removing user rights',
+        fakeAsync(() => {
+          component.ngOnInit();
+          component.formData.removeContributionReviewer.category =
+            'translation';
+          component.formData.removeContributionReviewer.username = '';
+          component.formData.removeContributionReviewer.method = 'specific';
+
+          const result =
+            component.formData.removeContributionReviewer.isValid();
+
+          expect(result).toBe(false);
+        })
+      );
+
+      it(
+        'should return false if category is translation but ' +
+          'languageCode is null when removing user rights',
+        fakeAsync(() => {
+          component.ngOnInit();
+          component.formData.removeContributionReviewer.category =
+            'translation';
+          component.formData.removeContributionReviewer.username = 'user1';
+          component.formData.removeContributionReviewer.languageCode = null;
           component.formData.removeContributionReviewer.method = 'specific';
 
           const result =
