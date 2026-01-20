@@ -297,7 +297,6 @@ describe('Contributor dashboard Admin page', () => {
     it('should display a warning when fetchCommunityStats returns an error', fakeAsync(() => {
       alertsServiceAddWarningSpy = spyOn(alertsService, 'addWarning');
       fixture.detectChanges();
-      component.ngOnInit();
       tick();
       expect(alertsServiceAddWarningSpy).toHaveBeenCalledTimes(1);
     }));
