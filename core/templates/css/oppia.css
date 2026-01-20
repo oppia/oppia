@@ -1863,7 +1863,7 @@ pre.oppia-pre-wrapped-text {
 .oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                revert : none;
+  -webkit-user-select: none;
 }
 
 .oppia-save-state-item-button {
