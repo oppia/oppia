@@ -342,3 +342,74 @@ class FeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['description'], suggestion_thread.subject
         )
         self.logout()
+
+    def test_deprecated_suggestions_are_not_shown_in_thread(self) -> None:
+        """Test that deprecated suggestions are filtered out from thread messages."""
+        self.login(self.EDITOR_EMAIL)
+
+        # Create a new thread with a suggestion
+        response_dict = self.get_json(
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID_1)
+        )
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
+
+        new_content = state_domain.SubtitledHtml(
+            'content', '<p>deprecated suggestion content</p>'
+        ).to_dict()
+        change_cmd: Dict[str, Union[str, state_domain.SubtitledHtmlDict]] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'Welcome!',
+            'new_value': new_content,
+        }
+
+        # Create a suggestion
+        suggestion_models.GeneralSuggestionModel.create(
+            feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.EXP_ID_1,
+            1,
+            suggestion_models.STATUS_IN_REVIEW,
+            self.editor_id,
+            None,
+            change_cmd,
+            'score category',
+            thread_id,
+            None,
+        )
+
+        # Verify suggestion is initially shown
+        thread_url = '%s/%s' % (
+            feconf.FEEDBACK_UPDATES_THREAD_DATA_URL,
+            thread_id,
+        )
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list']
+        
+        # Should have the suggestion in the message summary
+        self.assertEqual(len(messages_summary), 1)
+        self.assertEqual(
+            messages_summary[0]['suggestion_html'], 
+            '<p>deprecated suggestion content</p>'
+        )
+
+        # Now mark the suggestion as deprecated
+        suggestion_model = suggestion_models.GeneralSuggestionModel.get(
+            thread_id
+        )
+        suggestion_model.status = suggestion_models.STATUS_DEPRECATED
+        suggestion_model.update_timestamps()
+        suggestion_model.put()
+
+        # Fetch the thread again
+        response_dict = self.get_json(thread_url)
+        messages_summary = response_dict['message_summary_list']
+
+        # The deprecated suggestion should NOT be in the message summary
+        # Only the original thread message should remain
+        self.assertEqual(len(messages_summary), 1)
+        # Verify it's the original message, not the suggestion
+        self.assertIn('text', messages_summary[0])
+        self.assertFalse(messages_summary[0].get('suggestion_html'))
+
+        self.logout()
