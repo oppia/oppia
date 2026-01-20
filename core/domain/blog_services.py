@@ -1036,7 +1036,8 @@ def create_blog_author_details_model(user_id: str) -> None:
 def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id. If
     blogAuthorDetailsModel is not present, a new model with default values is
-    created.
+    created. If the user account has been deleted and no BlogAuthorDetailsModel
+    exists, returns a placeholder BlogAuthorDetails object.
 
     Args:
         user_id: str. The user id of the blog author.
@@ -1050,6 +1051,15 @@ def get_blog_author_details(user_id: str) -> blog_domain.BlogAuthorDetails:
     author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
     if author_model is None:
+        user_settings = user_services.get_user_settings(user_id, strict=False)
+        if user_settings is None:
+            return blog_domain.BlogAuthorDetails(
+                'deleted_author_%s' % user_id,
+                user_id,
+                'Account Deleted',
+                '',
+                datetime.datetime.utcnow(),
+            )
         create_blog_author_details_model(user_id)
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
