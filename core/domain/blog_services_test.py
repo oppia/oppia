@@ -1001,6 +1001,28 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
                 author_details.id, 'deleted_author_%s' % self.user_id
             )
 
+    def test_create_blog_author_details_model_raises_when_user_missing(
+        self,
+    ) -> None:
+        """Ensures create_blog_author_details_model raises if user details
+        cannot be fetched (simulates strict=True failure).
+        """
+
+        def _mock_get_user_settings(
+            unused_user_id: str, **_kwargs: Any
+        ) -> None:
+            return None
+
+        get_user_settings_swap = self.swap(
+            user_services, 'get_user_settings', _mock_get_user_settings
+        )
+
+        with get_user_settings_swap:
+            with self.assertRaisesRegex(
+                Exception, 'Unable to fetch user details for the given user'
+            ):
+                blog_services.create_blog_author_details_model(self.user_id)
+
     def test_update_blog_author_details(self) -> None:
         new_author_name = 'new author name'
         new_author_bio = 'new blog author bio'
