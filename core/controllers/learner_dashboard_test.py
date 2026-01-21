@@ -1074,6 +1074,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
                 'EndExploration' if state_name == 'End' else 'TextInput',
                 content_id_generator,
             )
+            if state_name == 'End':
+                current_state.update_interaction_default_outcome(None)
 
         intro_state = exploration.states['Intro']
         intro_state.content.html = ''
@@ -1088,7 +1090,15 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         branch_state.interaction.default_outcome.dest = 'End'
 
         # Add answer group with a valid rule to exercise answer_group traversal.
-        rule_spec = state_domain.RuleSpec('Equals', {'x': {'contentId': 'rule_input_Equals', 'normalizedStrSet': ['test']}})
+        rule_spec = state_domain.RuleSpec(
+            'Equals',
+            {
+                'x': {
+                    'contentId': 'rule_input_Equals',
+                    'normalizedStrSet': ['test'],
+                }
+            },
+        )
         answer_group = state_domain.AnswerGroup(
             intro_state.interaction.default_outcome,
             [rule_spec],
