@@ -18,16 +18,19 @@
 
 from __future__ import annotations
 
-from core.domain import exp_domain, exp_fetchers, state_domain
+from core.domain import (
+    exp_domain,
+    exp_fetchers,
+    state_domain,
+    translation_domain,
+)
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-
 from typing import Any, Dict, List, Set, Union
-from core.domain import translation_domain
 
 MYPY = False
 if MYPY:  # pragma: no cover
