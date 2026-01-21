@@ -72,7 +72,7 @@ class ActionUnitTests(test_utils.GenericTestBase):
             action_dict['customization_arg_specs'],
             [
                 {
-                    'name': 'state_name',
+                    'namxe': 'state_name',
                     'description': 'State name',
                     'schema': {
                         'type': 'unicode',
