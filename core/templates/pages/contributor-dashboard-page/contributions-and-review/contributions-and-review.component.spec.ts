@@ -2793,5 +2793,90 @@ describe('Contributions and review component', () => {
 
       expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
     });
+
+    it('should sort translation contributions by status', fakeAsync(() => {
+      const suggestionIdToSuggestions = {
+        suggestion_1: {
+          suggestion: {
+            suggestion_id: 'suggestion_1',
+            status: 'review',
+            change_cmd: {
+              content_html: 'Content 1',
+              translation_html: 'Translation 1',
+            },
+            exploration_content_html: 'Content 1',
+          },
+          details: {
+            topic_name: 'Topic',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+        suggestion_2: {
+          suggestion: {
+            suggestion_id: 'suggestion_2',
+            status: 'rejected',
+            change_cmd: {
+              content_html: 'Content 2',
+              translation_html: 'Translation 2',
+            },
+            exploration_content_html: 'Content 2',
+          },
+          details: {
+            topic_name: 'Topic',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+        suggestion_3: {
+          suggestion: {
+            suggestion_id: 'suggestion_3',
+            status: 'accepted',
+            change_cmd: {
+              content_html: 'Content 3',
+              translation_html: 'Translation 3',
+            },
+            exploration_content_html: 'Content 3',
+          },
+          details: {
+            topic_name: 'Topic',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+        suggestion_4: {
+          suggestion: {
+            suggestion_id: 'suggestion_4',
+            status: 'accepted',
+            change_cmd: {
+              content_html: 'Content 4',
+              translation_html: 'Translation 4',
+            },
+            exploration_content_html: null,
+          },
+          details: {
+            topic_name: 'Topic',
+            story_title: 'Story',
+            chapter_title: 'Chapter',
+          },
+        },
+      } as unknown as Record<string, SuggestionDetails>;
+
+      const summaryList = component.getTranslationContributionsSummary(
+        suggestionIdToSuggestions
+      );
+
+      expect(summaryList[0].id).toBe('suggestion_2');
+      expect(summaryList[0].labelText).toBe('Revisions Requested');
+
+      expect(summaryList[1].id).toBe('suggestion_1');
+      expect(summaryList[1].labelText).toBe('Awaiting review');
+
+      expect(summaryList[2].id).toBe('suggestion_3');
+      expect(summaryList[2].labelText).toBe('Accepted');
+
+      expect(summaryList[3].id).toBe('suggestion_4');
+      expect(summaryList[3].labelText).toBe('Obsolete');
+    }));
   });
 });
