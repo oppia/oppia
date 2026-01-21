@@ -32,7 +32,6 @@ from scripts import (
     common,
     install_python_dev_dependencies,
     install_third_party_libs,
-    npm_static_assets,
     servers,
 )
 
