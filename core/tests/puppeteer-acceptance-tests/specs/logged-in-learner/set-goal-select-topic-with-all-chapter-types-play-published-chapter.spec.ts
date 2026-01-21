@@ -12,7 +12,7 @@ const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 
 describe('Logged-In Learner', function () {
-  let curriculumAdmin: CurriculumAdmin & TopicManager & ExplorationEditor;
+  let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
   let loggedInLearner1: LoggedInUser & LoggedOutUser;
   let loggedInLearner2: LoggedInUser & LoggedOutUser;
@@ -88,11 +88,9 @@ describe('Logged-In Learner', function () {
     await curriculumAdmin.saveStoryDraft();
     await curriculumAdmin.publishStoryDraft();
 
-    await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
-    await curriculumAdmin.openTopicEditor('Place Values');
-    await curriculumAdmin.openStoryEditor("Jamie's Adventures in the Arcade");
-
-    await UserFactory.closeBrowserForUser(curriculumAdmin);
+    // await curriculumAdmin.navigateToTopicAndSkillsDashboardPage();
+    // await curriculumAdmin.openTopicEditor('Place Values');
+    // await curriculumAdmin.openStoryEditor("Jamie's Adventures in the Arcade");
 
     loggedInLearner1 = await UserFactory.createNewUser(
       'loggedInLearner1',
