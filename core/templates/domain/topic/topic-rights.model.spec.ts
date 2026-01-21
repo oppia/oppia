@@ -54,6 +54,7 @@ describe('Topic rights model', () => {
         published: false,
         can_edit_topic: true,
         can_publish_topic: false,
+        can_edit_question: false,
       };
 
       var exampleTopicRights = TopicRights.createFromBackendDict(
