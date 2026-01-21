@@ -3698,6 +3698,9 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
+    // Ensure we're on the editor tab where the graph is visible.
+    await this.navigateToEditorTab();
+
     let elements;
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
