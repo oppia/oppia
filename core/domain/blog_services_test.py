@@ -1008,6 +1008,10 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         cannot be fetched (simulates strict=True failure).
         """
 
+        # Here we use type Any because this mock replaces the real
+        # get_user_settings function, which accepts flexible keyword
+        # arguments (like 'strict') whose types vary and are not relevant
+        # to the test.
         def _mock_get_user_settings(
             unused_user_id: str, **_kwargs: Any
         ) -> None:
