@@ -25,7 +25,9 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
+
 from typing import Any, Dict, List, Set, Union
+from core.domain import translation_domain
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -201,8 +203,6 @@ class FixExplorationsWithDuplicateContentIdsJob(base_jobs.JobBase):
 
         if not duplicate_content_ids:
             return None
-
-        from core.domain import translation_domain
 
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
