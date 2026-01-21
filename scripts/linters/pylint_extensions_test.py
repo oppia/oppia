@@ -258,7 +258,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
 
-    def test_add_message_triggered_when_comment_after_bracket_not_followed_by_separator(
+    def test_comment_after_parenthesis_spans_multiple_line_without_break(
         self,
     ) -> None:
         node = astroid.scoped_nodes.Module(name='test', doc='Custom test')
