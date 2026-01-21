@@ -2468,6 +2468,7 @@ def update_question_suggestion(
     skill_difficulty: float,
     question_state_data: state_domain.StateDict,
     next_content_id_index: int,
+    inapplicable_skill_misconception_ids: Optional[List[str]] = None,
 ) -> Optional[suggestion_registry.BaseSuggestion]:
     """Updates skill_difficulty and question_state_data of a suggestion with
     the given suggestion_id.
@@ -2478,6 +2479,8 @@ def update_question_suggestion(
         question_state_data: obj. Details of the question.
         next_content_id_index: int. The next content Id index for the question's
             content.
+        inapplicable_skill_misconception_ids: list(str)|None. The list of
+            inapplicable skill misconception ids for the question.
 
     Returns:
         Suggestion|None. The corresponding suggestion, or None if no suggestion
@@ -2493,6 +2496,10 @@ def update_question_suggestion(
             'Expected SuggestionAddQuestion suggestion but found: %s.'
             % type(suggestion).__name__
         )
+
+    if inapplicable_skill_misconception_ids is None:
+        inapplicable_skill_misconception_ids = []
+
     question_dict = suggestion.change_cmd.question_dict
     new_change_obj = (
         question_domain.CreateNewFullySpecifiedQuestionSuggestionCmd(
@@ -2506,10 +2513,9 @@ def update_question_suggestion(
                     ),
                     'linked_skill_ids': question_dict['linked_skill_ids'],
                     'inapplicable_skill_misconception_ids': (
-                        suggestion.change_cmd.question_dict[
-                            'inapplicable_skill_misconception_ids'
-                        ]
+                        inapplicable_skill_misconception_ids
                     ),
+                    'version': question_dict['version'],
                     'next_content_id_index': next_content_id_index,
                 },
                 'skill_id': suggestion.change_cmd.skill_id,
