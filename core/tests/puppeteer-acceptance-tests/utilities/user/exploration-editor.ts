@@ -2532,6 +2532,15 @@ export class ExplorationEditor extends BaseUser {
    * in the setting tab for mobile view port.)
    */
   async navigateToSettingsTab(): Promise<void> {
+    // Ensure the editor is fully loaded before attempting to navigate.
+    // Wait for the editor content to be rendered (editor tabs visible).
+    await this.page.waitForSelector('.oppia-editor-tab-set', {
+      visible: true,
+      timeout: 10000,
+    });
+    // Give the page a moment to fully settle after rendering.
+    await this.page.waitForTimeout(500);
+
     // Ensure the welcome modal is not blocking the navbar or options button.
     await this.dismissWelcomeModalIfPresent();
 
@@ -2869,6 +2878,10 @@ export class ExplorationEditor extends BaseUser {
           button.click();
         }
       });
+
+      // Allow time for the publish action to complete and the page to settle.
+      // This ensures the backend has processed the publish before the next action.
+      await this.page.waitForTimeout(1500);
     };
 
     const fillExplorationMetadataDetails = async () => {
@@ -3669,6 +3682,8 @@ export class ExplorationEditor extends BaseUser {
 
     // Ensure Settings tab is visible and Roles section is expanded (on mobile).
     await this.navigateToSettingsTab();
+    // Give the Settings tab time to render before proceeding.
+    await this.page.waitForTimeout(500);
     if (this.isViewportAtMobileWidth()) {
       await this.expandSettingsTabSection('Roles');
     }
