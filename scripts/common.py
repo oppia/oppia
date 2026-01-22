@@ -220,9 +220,11 @@ PORTS_USED_BY_OPPIA_PROCESSES_IN_LOCAL_E2E_TESTING: Final = [
     ELASTICSEARCH_SERVER_PORT,
 ]
 
-
 def is_windows_os() -> bool:
-    """Check if the running system is Windows."""
+    """Returns True if the current operating system is Windows.
+
+    This helper function is used to handle OS-specific behavior in Oppia.
+    """
     return OS_NAME == 'Windows'
 
 
