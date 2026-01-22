@@ -373,6 +373,15 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 number_of_content_ids = len(content_ids_to_content_values)
                 number_of_characters = 0
 
+                logging.info(
+                    'Voiceover synthesis log: content_ids_to_content_values: %s.',
+                    content_ids_to_content_values,
+                )
+                logging.info(
+                    'Voiceover synthesis log: number_of_content_ids: %s.',
+                    number_of_content_ids,
+                )
+
                 for (
                     content_id,
                     content_html,
