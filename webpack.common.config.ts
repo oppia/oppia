@@ -19,11 +19,11 @@
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WebpackRTLPlugin = require('webpack-rtl-plugin');
 var path = require('path');
 var webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
 var analyticsConstants = require('./assets/analytics-constants.json');
+const postcssRTLCSS = require('postcss-rtlcss');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [/<\[[\s\S]*?\]>/],
@@ -119,18 +119,6 @@ module.exports = {
       filename: '[name].[contenthash].css',
       chunkFilename: '[id].[contenthash].css',
       ignoreOrder: false,
-      insert: function (linkTag) {
-        if (localStorage.getItem('direction') === 'rtl') {
-          linkTag.href = linkTag.href.replace('.css', '.rtl.css');
-        }
-        document.head.appendChild(linkTag);
-      },
-    }),
-    // This generates the RTL version for all CSS bundles.
-    new WebpackRTLPlugin({
-      minify: {
-        zindex: false,
-      },
     }),
   ],
   module: {
@@ -194,6 +182,14 @@ module.exports = {
               url: false,
             },
           },
+          {
+            loader : 'postcss-loader',
+            options : {
+              postcssOptions : {
+                plugins : [postcssRTLCSS()]
+              }
+            }
+          }
         ],
       },
     ],
