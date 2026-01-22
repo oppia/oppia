@@ -303,7 +303,7 @@ def compute_voiceover_related_change(
                 # English content was modified, so all associated
                 # voiceovers must be marked as needing update.
                 if (
-                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
                     and entity_voiceovers.language_accent_code
                     not in language_accent_codes
                 ):
@@ -330,7 +330,7 @@ def compute_voiceover_related_change(
                 # English content was modified, so all associated
                 # voiceovers must be removed.
                 if (
-                    language_code != constants.DEFAULT_LANGUAGE_CODE
+                    language_code != constants.constants.DEFAULT_LANGUAGE_CODE
                     and entity_voiceovers.language_accent_code
                     not in language_accent_codes
                 ):
