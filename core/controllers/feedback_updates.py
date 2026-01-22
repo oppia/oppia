@@ -24,9 +24,10 @@ from core.domain import (
     feedback_services,
     subscription_services,
     suggestion_services,
-    suggestion_models,
     user_services,
 )
+
+from core.storage.suggestion import gae_models as suggestion_models
 
 from typing import Any, Dict, List, Optional, TypedDict, Union, cast
 
