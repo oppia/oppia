@@ -139,6 +139,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         state_dict['interaction']['id'] = 'NumberWithUnits'
         state_dict['interaction']['answer_groups'] = [
             {
+                'outcome': state_dict['interaction']['default_outcome'],
                 'rule_specs': [
                     {
                         'rule_type': 'IsEquivalentTo',
@@ -156,7 +157,9 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
                             }
                         },
                     }
-                ]
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
             }
         ]
         return state_dict
