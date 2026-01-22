@@ -104,8 +104,10 @@ jobs:
         uses: ./.github/actions/install-chrome
       - name: Install ffmpeg for wdio videos
         run: |
+          sudo rm -f /etc/apt/sources.list.d/azure-cli.list
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update
-          sudo apt install ffmpeg
+          sudo apt install -y ffmpeg
       - name: Generate modified suite name for artifacts
         id: generate_suite_name_for_artifacts
         # Replace slashes in the filename with hyphens.
@@ -266,14 +268,14 @@ jobs:
 
       # Upload other essential files.
       - name: Upload generated test to angular module mapping
-        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test.outcome == 'failure' || steps.mobile-test.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: generated-test-to-angular-module-mapping-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
           path: /home/runner/work/oppia/oppia/core/tests/test-modules-mappings/acceptance/${{ steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME }}.txt
 
       - name: Upload webpack bundles
-        if: ${{ failure() && (steps.desktop-test-attempt-1.outcome == 'failure' || steps.mobile-test-attempt-1.outcome == 'failure') }}
+        if: ${{ failure() && (steps.desktop-test.outcome == 'failure' || steps.mobile-test.outcome == 'failure') }}
         uses: actions/upload-artifact@v4
         with:
           name: webpack-bundles-${{steps.generate_suite_name_for_artifacts.outputs.MODIFIED_SUITE_NAME}}
@@ -421,10 +423,12 @@ jobs:
           token: ${{ steps.generate_token.outputs.token }}
           repository: oppia/release-scripts
           event-type: develop-commit
-          client-payload: '{
-            "version": "${{ env.VERSION }}",
-            "app_name": "oppiatestserver",
-            "maintenance_mode": false,
-            "sha": "${{ github.sha }}",
-            "repo_owner": "${{ github.repository_owner }}"
-          }'
+          client-payload: >-
+            {
+              "version": "${{ env.VERSION }}",
+              "app_name": "oppiatestserver",
+              "maintenance_mode": false,
+              "sha": "${{ github.sha }}",
+              "repo_owner": "${{ github.repository_owner }}"
+            }
+              
