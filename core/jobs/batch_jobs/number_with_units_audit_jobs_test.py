@@ -24,7 +24,7 @@ from core.jobs.batch_jobs import number_with_units_audit_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
-from typing import Dict, Final, List, Type
+from typing import Dict, Final, List, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -130,8 +130,9 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         )
 
     def _create_state_with_units(
-        self, units: List[Dict[str, object]]
+        self, units: List[Dict[str, Union[str, int]]]
     ) -> state_domain.StateDict:
+        """Creates a NumberWithUnits state dict with the provided units."""
         state_dict = state_domain.State.create_default_state(
             'state', 'content_0', 'default_outcome_1', is_initial_state=True
         ).to_dict()

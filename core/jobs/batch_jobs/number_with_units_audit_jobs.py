@@ -22,10 +22,11 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Dict, Iterable, List
+from typing import Iterable, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from core.domain import state_domain
     from mypy_imports import exp_models, question_models
 
 exp_models, question_models = models.Registry.import_models(
@@ -74,7 +75,7 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
 
         sorted_units = (
             unique_units
-            | 'Sort units' >> beam.Map(lambda unit_set: sorted(unit_set))
+            | 'Sort units' >> beam.Map(sorted)
             | 'Filter empty unit lists'
             >> beam.Filter(lambda unit_list: len(unit_list) > 0)
         )
@@ -86,6 +87,7 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
     def _extract_units_from_exploration(
         self, model: exp_models.ExplorationModel
     ) -> Iterable[str]:
+        """Extracts NumberWithUnits unit strings from an exploration."""
         for state_dict in model.states.values():
             for unit in self._extract_units_from_state_dict(state_dict):
                 yield unit
@@ -93,13 +95,15 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
     def _extract_units_from_question(
         self, model: question_models.QuestionModel
     ) -> Iterable[str]:
+        """Extracts NumberWithUnits unit strings from a question."""
         state_dict = model.question_state_data
         for unit in self._extract_units_from_state_dict(state_dict):
             yield unit
 
     def _extract_units_from_state_dict(
-        self, state_dict: Dict[str, object]
+        self, state_dict: state_domain.StateDict
     ) -> List[str]:
+        """Extracts NumberWithUnits unit strings from a state dict."""
         interaction_dict = state_dict.get('interaction')
         if not isinstance(interaction_dict, dict):
             return []
