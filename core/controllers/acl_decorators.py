@@ -3044,10 +3044,12 @@ def can_edit_question(
                         if skill_id in skill_ids:
                             return handler(self, question_id, **kwargs)
             raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this question.'
+                '%s does not have enough rights to edit the question.'
+                % self.user_id
             )
         raise self.UnauthorizedUserException(
-            'You do not have credentials to edit this question.'
+            '%s does not have enough rights to edit the question.'
+            % self.user_id
         )
 
     return test_can_edit
@@ -3185,23 +3187,17 @@ def can_delete_question(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.get_user_actions_info(self.user_id)
-
-        if (
-            role_services.ACTION_DELETE_ANY_QUESTION
-            in user_actions_info.actions
-        ):
+        if role_services.ACTION_DELETE_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         if (
             role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC
-            in user_actions_info.actions
+            in self.user.actions
         ):
-            return can_edit_topic(handler)(self, question_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to delete the'
-                ' question.' % self.user_id
-            )
+            return can_edit_question(handler)(self, question_id, **kwargs)
+        raise self.UnauthorizedUserException(
+            '%s does not have enough rights to delete the question.'
+            % self.user_id
+        )
 
     return test_can_delete_question
 

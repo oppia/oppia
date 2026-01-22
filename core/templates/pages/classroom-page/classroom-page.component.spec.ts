@@ -177,6 +177,7 @@ describe('Classroom Page Component', () => {
         topic_model_created_on: 20160101,
         topic_model_last_updated: 20160110,
         can_edit_topic: true,
+        can_edit_question: false,
         is_published: true,
         url_fragment: 'some-url-fragment',
         classroom: 'math',

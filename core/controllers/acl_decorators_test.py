@@ -6917,24 +6917,47 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         self.assertEqual(response['question_id'], self.question_id)
         self.logout()
 
-    def test_topic_manager_of_different_topic_cannot_edit_question(
-        self,
-    ) -> None:
+    def test_topic_manager_cannot_edit_question_that_dont_manage(self) -> None:
         self.login(self.user_a_email)
+        user_id_a = self.get_user_id_from_email(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401,
             )
+        error_msg = (
+            '%s does not have enough rights to edit the question.' % user_id_a
+        )
+        self.assertEqual(response['error'], error_msg)
+        self.logout()
+
+    def test_topic_manager_cant_edit_question_from_deleted_topic(self) -> None:
+        topic_services.delete_topic(self.owner_id, 'other_topic')
+        self.login(self.user_a_email)
+        user_id_a = self.get_user_id_from_email(self.user_a_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_edit_question/%s' % self.question_id,
+                expected_status_int=401,
+            )
+        error_msg = (
+            '%s does not have enough rights to edit the question.' % user_id_a
+        )
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
     def test_any_user_cannot_edit_question(self) -> None:
         self.login(self.user_b_email)
+        user_id_b = self.get_user_id_from_email(self.user_b_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_edit_question/%s' % self.question_id,
                 expected_status_int=401,
             )
+        error_msg = (
+            '%s does not have enough rights to edit the question.' % user_id_b
+        )
+        self.assertEqual(response['error'], error_msg)
         self.logout()
 
 
@@ -7087,7 +7110,6 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(self.topic_id, self.admin_id)
-        self.set_topic_managers([self.user_a], self.topic_id)
         self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
 
         self.mock_testapp = webtest.TestApp(

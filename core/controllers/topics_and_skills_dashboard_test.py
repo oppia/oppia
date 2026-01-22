@@ -131,10 +131,12 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'], skill_id
         )
-        self.assertEqual(json_response['can_delete_topic'], True)
-        self.assertEqual(json_response['can_create_topic'], True)
-        self.assertEqual(json_response['can_delete_skill'], True)
-        self.assertEqual(json_response['can_create_skill'], True)
+        self.assertEqual(len(json_response['all_classroom_names']), 1)
+        self.assertEqual(json_response['all_classroom_names'], ['math'])
+        self.assertEqual(json_response['can_delete_topic'], False)
+        self.assertEqual(json_response['can_create_topic'], False)
+        self.assertEqual(json_response['can_delete_skill'], False)
+        self.assertEqual(json_response['can_create_skill'], False)
         self.logout()
 
         # Check that topic managers can access the topics and skills
