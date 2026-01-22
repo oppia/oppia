@@ -136,10 +136,12 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         state_dict = state_domain.State.create_default_state(
             'state', 'content_0', 'default_outcome_1', is_initial_state=True
         ).to_dict()
+        default_outcome = state_dict['interaction']['default_outcome']
+        assert default_outcome is not None
         state_dict['interaction']['id'] = 'NumberWithUnits'
         state_dict['interaction']['answer_groups'] = [
             {
-                'outcome': state_dict['interaction']['default_outcome'],
+                'outcome': default_outcome,
                 'rule_specs': [
                     {
                         'rule_type': 'IsEquivalentTo',
