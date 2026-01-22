@@ -183,13 +183,13 @@ module.exports = {
             },
           },
           {
-            loader : 'postcss-loader',
-            options : {
-              postcssOptions : {
-                plugins : [postcssRTLCSS()]
-              }
-            }
-          }
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [postcssRTLCSS()],
+              },
+            },
+          },
         ],
       },
     ],
