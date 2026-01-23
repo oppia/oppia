@@ -171,13 +171,17 @@ describe('Training Modal Component', () => {
       spyOn(responsesService, 'getAnswerGroups').and.returnValue([
         {},
       ] as AnswerGroup[]);
+      spyOn(responsesService, 'getDefaultOutcome').and.returnValue(null);
       spyOn(responsesService, 'save').and.callFake(
         (
           answerGroups: AnswerGroup[],
-          getDefaultOutcome: () => Outcome,
-          save: (arg1: string, arg2: string) => void
+          defaultOutcome: Outcome | null,
+          callback: (
+            newAnswerGroups: AnswerGroup[],
+            newDefaultOutcome: Outcome | null
+          ) => void
         ) => {
-          save('', '');
+          callback(answerGroups, defaultOutcome);
         }
       );
 
