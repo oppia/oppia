@@ -29,7 +29,6 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {ExplorationFeaturesService} from 'services/exploration-features.service';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Outcome} from 'domain/exploration/outcome.model';
-import {SiteAnalyticsService} from 'services/site-analytics.service';
 import {StateCardIsCheckpointService} from 'components/state-editor/state-editor-properties-services/state-card-is-checkpoint.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {Solution} from 'domain/exploration/solution.model';
@@ -84,7 +83,6 @@ describe('Exploration editor tab component', () => {
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
   let routerService: RouterService;
-  let _siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
@@ -226,7 +224,6 @@ describe('Exploration editor tab component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
     routerService = TestBed.inject(RouterService);
-    _siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
