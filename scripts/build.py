@@ -648,7 +648,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
 
     dependency_filepaths = get_dependencies_filepaths()
 
-
     common.ensure_directory_exists(os.path.dirname(third_party_css_filepath))
     with open(
         third_party_css_filepath, 'w+', encoding='utf-8'
@@ -661,25 +660,6 @@ def build_third_party_libs(third_party_directory_path: str) -> None:
             dependency_filepaths['fonts'], webfonts_dir
         )
     )
-
-    # Copy fonts from npm packages that require static-asset handling.
-    for npm_lib in npm_static_assets.NPM_STATIC_ASSET_CONFIGS:
-        fonts_dir = npm_lib.get('fonts_dir')
-        if fonts_dir:
-            if not os.path.exists(fonts_dir):
-                raise Exception(
-                    '%s fonts directory not found at %s. Run "python -m '
-                    'scripts.install_third_party_libs" to install all '
-                    'dependencies.' % (npm_lib['name'], fonts_dir)
-                )
-            font_files = []
-            for font_file in os.listdir(fonts_dir):
-                font_file_path = os.path.join(fonts_dir, font_file)
-                if os.path.isfile(font_file_path):
-                    font_files.append(font_file_path)
-            _execute_tasks(
-                _generate_copy_tasks_for_fonts(font_files, webfonts_dir)
-            )
 
 
 def build_using_ng() -> None:
