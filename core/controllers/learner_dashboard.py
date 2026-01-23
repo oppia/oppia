@@ -329,25 +329,49 @@ class LearnerDashboardExplorationsProgressHandler(
 
                 if completed:
                     visited_cards_count = total_cards_count
+                    progress_percent = 100
                 else:
                     visited_cards_count = 0
+                    progress_percent = 0
                     assert self.user_id is not None
-                    last_state = (
-                        learner_progress_services.get_last_played_state_name(
-                            self.user_id, exp_id
-                        )
+                    exp_user_data = exp_fetchers.get_exploration_user_data(
+                        self.user_id, exp_id
                     )
 
-                    if last_state is not None and last_state in state_bfs_order:
-                        visited_cards_count = (
-                            state_bfs_order.index(last_state) + 1
+                    # Use checkpoint-based progress if available
+                    if exp_user_data is not None:
+                        furthest_state_name = (
+                            exp_user_data.furthest_reached_checkpoint_state_name
                         )
-
-                progress_percent = (
-                    int((visited_cards_count * 100) / total_cards_count)
-                    if total_cards_count > 0
-                    else 0
-                )
+                        if furthest_state_name is not None:
+                            checkpoints_in_order = (
+                                user_services.get_checkpoints_in_order(
+                                    current_exp.init_state_name,
+                                    current_exp.states,
+                                )
+                            )
+                            if (
+                                checkpoints_in_order
+                                and furthest_state_name in checkpoints_in_order
+                            ):
+                                total_checkpoints = len(checkpoints_in_order)
+                                furthest_index = checkpoints_in_order.index(
+                                    furthest_state_name
+                                )
+                                raw_progress = int(
+                                    round(
+                                        ((furthest_index + 1) * 100)
+                                        / total_checkpoints
+                                    )
+                                )
+                                # Keep incomplete explorations below 100%
+                                progress_percent = min(max(raw_progress, 1), 99)
+                                visited_cards_count = (
+                                    state_bfs_order.index(furthest_state_name)
+                                    + 1
+                                    if furthest_state_name in state_bfs_order
+                                    else 0
+                                )
 
                 # Here we create a new dict with extended fields.
                 # The spread operator copies all fields from summary_dict.
@@ -392,7 +416,7 @@ class LearnerDashboardExplorationsProgressHandler(
             )
         )
 
-        # Add checkpoint progress data to incomplete explorations for
+        # Add checkpoint metadata to incomplete explorations for
         # checkpoint-based progress display.
         for exp_summary_dict in incomplete_exp_summary_dicts:
             exp_user_data = exp_fetchers.get_exploration_user_data(
@@ -405,47 +429,12 @@ class LearnerDashboardExplorationsProgressHandler(
                 exp_summary_dict[
                     'most_recently_reached_checkpoint_exp_version'
                 ] = exp_user_data.most_recently_reached_checkpoint_exp_version
-                exp_summary_dict[
-                    'furthest_reached_checkpoint_state_name'
-                ] = exp_user_data.furthest_reached_checkpoint_state_name
-                exp_summary_dict[
-                    'furthest_reached_checkpoint_exp_version'
-                ] = exp_user_data.furthest_reached_checkpoint_exp_version
-
-                # Compute checkpoint progress percentage based on the
-                # furthest reached checkpoint and total checkpoints in the
-                # latest exploration version. This mirrors curated lessons
-                # behavior but uses checkpoints instead of chapters.
-                exploration = exp_fetchers.get_exploration_by_id(
-                    exp_summary_dict['id'], strict=False
+                exp_summary_dict['furthest_reached_checkpoint_state_name'] = (
+                    exp_user_data.furthest_reached_checkpoint_state_name
                 )
-                if (
-                    exploration is not None
-                    and exp_user_data.furthest_reached_checkpoint_state_name
-                ):
-                    checkpoints_in_order = user_services.get_checkpoints_in_order(  # pylint: disable=line-too-long
-                        exploration.init_state_name, exploration.states
-                    )
-                    total_checkpoints = len(checkpoints_in_order)
-                    if total_checkpoints > 0:
-                        furthest_state_name = (
-                            exp_user_data.furthest_reached_checkpoint_state_name
-                        )
-                        if furthest_state_name in checkpoints_in_order:
-                            furthest_index = (
-                                checkpoints_in_order.index(furthest_state_name)
-                                + 1
-                            )
-                            raw_progress = int(
-                                round(
-                                    (furthest_index * 100)
-                                    / total_checkpoints
-                                )
-                            )
-                            # Keep incomplete explorations below 100%.
-                            exp_summary_dict['checkpoint_progress_percentage'] = min(  # pylint: disable=line-too-long
-                                max(raw_progress, 1), 99
-                            )
+                exp_summary_dict['furthest_reached_checkpoint_exp_version'] = (
+                    exp_user_data.furthest_reached_checkpoint_exp_version
+                )
 
         exploration_playlist_summary_dicts = _annotate_with_card_progress(
             summary_services.get_displayable_exp_summary_dicts(
