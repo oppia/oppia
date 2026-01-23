@@ -398,6 +398,49 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 
+  it('should use 100 for completed community lesson when progressPercent is undefined', fakeAsync(() => {
+    component.isCommunityLessonComplete = true;
+    component.story =
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration);
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(100);
+    expect(component.lessonTopic).toEqual('Community Lesson');
+  }));
+
+  it('should return 10 for calculateCheckpointBasedProgress when checkpoint is present', fakeAsync(() => {
+    const explorationWithCheckpoint = {
+      ...sampleExploration,
+      furthest_reached_checkpoint_state_name: 'Checkpoint1',
+    };
+    component.story = LearnerExplorationSummary.createFromBackendDict(
+      explorationWithCheckpoint
+    );
+
+    fixture.detectChanges();
+    tick();
+
+    const progress = component.calculateCheckpointBasedProgress(
+      component.story
+    );
+    expect(progress).toEqual(10);
+  }));
+
+  it('should return 0 for calculateCheckpointBasedProgress when no checkpoint is present', fakeAsync(() => {
+    component.story =
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration);
+
+    fixture.detectChanges();
+    tick();
+
+    const progress = component.calculateCheckpointBasedProgress(
+      component.story
+    );
+    expect(progress).toEqual(0);
+  }));
+
   it('should set story to complete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(100);
 

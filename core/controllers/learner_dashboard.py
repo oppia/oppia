@@ -338,7 +338,7 @@ class LearnerDashboardExplorationsProgressHandler(
                         self.user_id, exp_id
                     )
 
-                    # Use checkpoint based progress when available
+                    # Use checkpoint based progress when available.
                     if exp_user_data is not None:
                         furthest_state_name = (
                             exp_user_data.furthest_reached_checkpoint_state_name
@@ -364,7 +364,7 @@ class LearnerDashboardExplorationsProgressHandler(
                                         / total_checkpoints
                                     )
                                 )
-                                # Clamp incomplete explorations below 100 percent
+                                # Clamp incomplete explorations below 100 percent.
                                 progress_percent = min(max(raw_progress, 1), 99)
                                 visited_cards_count = (
                                     state_bfs_order.index(furthest_state_name)

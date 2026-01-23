@@ -118,7 +118,8 @@ export class LearnerExplorationSummary {
     summary.mostRecentlyReachedCheckpointStateName =
       expSummaryBacknedDict.most_recently_reached_checkpoint_state_name ?? null;
     summary.mostRecentlyReachedCheckpointExpVersion =
-      expSummaryBacknedDict.most_recently_reached_checkpoint_exp_version ?? null;
+      expSummaryBacknedDict.most_recently_reached_checkpoint_exp_version ??
+      null;
     summary.furthestReachedCheckpointStateName =
       expSummaryBacknedDict.furthest_reached_checkpoint_state_name ?? null;
     summary.furthestReachedCheckpointExpVersion =

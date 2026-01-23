@@ -19,12 +19,14 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    exp_services,
     learner_progress_services,
     story_domain,
     story_services,
     subscription_services,
     topic_domain,
     topic_services,
+    user_services,
 )
 from core.tests import test_utils
 
@@ -927,6 +929,95 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(len(response['exploration_playlist']), 1)
         self.assertEqual(
             response['exploration_playlist'][0]['id'], self.EXP_ID_1
+        )
+        self.logout()
+
+    def test_incomplete_explorations_show_checkpoint_progress(self) -> None:
+        """Test that incomplete explorations with checkpoints show progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration with multiple checkpoints.
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        # Add checkpoints in order
+        exp_services.add_checkpoint(
+            self.owner_id,
+            self.EXP_ID_1,
+            'State A',
+            1,
+        )
+        exp_services.add_checkpoint(
+            self.owner_id,
+            self.EXP_ID_1,
+            'State B',
+            1,
+        )
+        exp_services.add_checkpoint(
+            self.owner_id,
+            self.EXP_ID_1,
+            'State C',
+            1,
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Test case 1: User reached first checkpoint (33% progress)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id,
+            self.EXP_ID_1,
+            'State A',
+            1,
+        )
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id,
+            self.EXP_ID_1,
+            'State A',
+            1,
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        incomplete_list = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_list), 1)
+        
+        exp_summary = incomplete_list[0]
+        self.assertEqual(exp_summary['id'], self.EXP_ID_1)
+        self.assertEqual(
+            exp_summary['furthest_reached_checkpoint_state_name'],
+            'State A'
+        )
+        self.assertEqual(
+            exp_summary['most_recently_reached_checkpoint_state_name'],
+            'State A'
+        )
+        # Progress should reflect checkpoint progress (33%, clamped to 1%)
+        self.assertIn('progress_percent', exp_summary)
+        
+        # Test case 2: User progresses to second checkpoint (66% progress)
+        user_services.update_learner_checkpoint_progress(
+            self.viewer_id,
+            self.EXP_ID_1,
+            'State B',
+            1,
+        )
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id,
+            self.EXP_ID_1,
+            'State B',
+            1,
+        )
+
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
+        incomplete_list = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_list), 1)
+        
+        exp_summary = incomplete_list[0]
+        self.assertEqual(
+            exp_summary['furthest_reached_checkpoint_state_name'],
+            'State B'
+        )
+        self.assertEqual(
+            exp_summary['most_recently_reached_checkpoint_state_name'],
+            'State B'
         )
         self.logout()
 
