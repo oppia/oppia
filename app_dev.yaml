@@ -23,6 +23,10 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
+- url: /node_modules/mathjax
+  static_dir: node_modules/mathjax
+  secure: always
+  expiration: "90d"
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
@@ -40,6 +44,10 @@ handlers:
 # /dist is the build output folder for angular.
 - url: /dist
   static_dir: dist/
+  secure: always
+  expiration: "0"
+- url: /node_modules
+  static_dir: node_modules
   secure: always
   expiration: "0"
 - url: /assets/audio
