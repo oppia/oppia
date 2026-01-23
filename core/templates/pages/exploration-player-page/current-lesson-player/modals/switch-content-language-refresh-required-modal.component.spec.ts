@@ -68,8 +68,8 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
       SwitchContentLanguageRefreshRequiredModalComponent
     );
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.get(NgbActiveModal);
-    windowRef = TestBed.get(WindowRef);
+    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    windowRef = TestBed.inject(WindowRef);
   });
 
   it('should dismiss modal', () => {

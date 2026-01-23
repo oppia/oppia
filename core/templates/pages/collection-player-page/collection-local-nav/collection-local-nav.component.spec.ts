@@ -43,8 +43,8 @@ describe('CollectionLocalNavComponent', () => {
       imports: [HttpClientTestingModule],
     }).compileComponents();
 
-    rocbs = TestBed.get(ReadOnlyCollectionBackendApiService);
-    urlService = TestBed.get(UrlService);
+    rocbs = TestBed.inject(ReadOnlyCollectionBackendApiService);
+    urlService = TestBed.inject(UrlService);
 
     spyOnProperty(rocbs, 'onCollectionLoad').and.returnValue(
       mockCollectionLoadEventEmitter
