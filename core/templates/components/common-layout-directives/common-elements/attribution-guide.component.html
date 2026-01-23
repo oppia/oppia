@@ -1,7 +1,6 @@
 <div class="oppia-attribution-guide">
   <div class="oppia-cc-icon oppia-transition-200" *ngIf="!deviceUsedIsMobile && !iframed">
     <div class="oppia-neutral-element e2e-test-neutral-element"></div>
-
     <a class="oppia-attribution-image-link" rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
       <img alt="Creative Commons License" class="oppia-creative-commons-image" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png">
     </a><br>
@@ -36,49 +35,48 @@
     <div>
       <div class="attribution-mask" (click)="hideAttributionModal()"></div>
       <div class="attribution-modal">
-        <button (click)="hideAttributionModal()" type="button" class="close my-2 mx-1" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+        <button (click)="hideAttributionModal()" type="button" class="btn-close my-3 mx-1" aria-label="Close">
         </button>
         <div class="container pt-4">
-          <div class="font-weight-bold">
+          <div class="fw-bold">
             <span [innerHTML]="'I18N_ATTRIBUTION_TITLE' | translate" tabindex="0"></span>
           </div>
           <div class="attribution-html-section" tabindex="0">
-            <div class="font-weight-bold">
+            <div class="fw-bold">
               <span [innerHTML]="'I18N_ATTRIBUTION_HTML_TITLE' | translate"></span>
             </div>
             <ol class="attribute-instructions">
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_HTML_STEP_TWO' | translate: { linkText: '<u>Oppia</u> // <u>CC BY SA 4.0</u>' }"></span></li>
             </ol>
-            <div data-trigger="manual"
-                 data-toggle="tooltip"
-                 data-title="Copied!"
-                 data-placement="bottom"
-                 data-offset="0 20"
-                 class="attribution-html-code text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+            <div data-bs-trigger="manual"
+                 data-bs-toggle="tooltip"
+                 data-bs-title="Copied!"
+                 data-bs-placement="bottom"
+                 data-bs-offset="0 20"
+                 class="attribution-html-code font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               &lt;a href="{{getPageUrl()}}"&gt;Oppia&lt;/a&gt; // &lt;a href="https://creativecommons.org/licenses/by-sa/4.0"&gt;CC BY SA 4.0&lt;/a&gt;
             </div>
-            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
+            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-html-code')">COPY</button>
           </div>
           <div class="attribution-print-section" tabindex="0">
-            <div class="font-weight-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
+            <div class="fw-bold"><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_TITLE' | translate"></span></div>
             <ol class="attribute-instructions">
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_ONE' | translate"></span></li>
               <li><span [innerHTML]="'I18N_ATTRIBUTION_PRINT_STEP_TWO' | translate: { link: printAttributionLink }"></span></li>
             </ol>
-            <div data-trigger="manual"
-                 data-toggle="tooltip"
-                 data-title="Copied!"
-                 data-placement="bottom"
-                 data-offset="0 20"
-                 class="attribution-print-text text-monospace text-nowrap border border-secondary p-1 overflow-auto">
+            <div data-bs-trigger="manual"
+                 data-bs-toggle="tooltip"
+                 data-bs-title="Copied!"
+                 data-bs-placement="bottom"
+                 data-bs-offset="0 20"
+                 class="attribution-print-text font-monospace text-nowrap border border-secondary p-1 overflow-auto">
               "{{getExplorationTitle()}}" by {{getAuthors()}}. Oppia. {{getPageUrl()}}
             </div>
-            <button mat-flat-button class="attribution-copy-button float-right mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
+            <button mat-flat-button class="attribution-copy-button float-end mt-2" (click)="copyAttribution('attribution-print-text')">COPY</button>
           </div>
           <div class="sharing-section">
-            <div class="font-weight-bold"><span [innerHTML]="'I18N_SHARE_LESSON' | translate"></span></div>
+            <div class="fw-bold"><span [innerHTML]="'I18N_SHARE_LESSON' | translate"></span></div>
             <sharing-links [layoutType]="'row center'"
                            [layoutAlignType]="'end'"
                            [shareType]="'exploration'"

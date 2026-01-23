@@ -46,7 +46,7 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
   instructionMessage!: string;
   skillIdToRubricsObject!: Record<string, Rubric[]>;
   skill!: Skill;
-  linkedSkillsWithDifficulty: SkillDifficulty[] = [];
+  @Input() linkedSkillsWithDifficulty: SkillDifficulty[] = [];
 
   constructor(
     private alertsService: AlertsService,
@@ -93,13 +93,18 @@ export class QuestionsOpportunitiesSelectDifficultyModalComponent
             };
             reader.readAsDataURL(file.data);
           });
-          this.linkedSkillsWithDifficulty = [
-            SkillDifficulty.create(
-              this.skillId,
-              this.skill.getDescription(),
-              AppConstants.DEFAULT_SKILL_DIFFICULTY
-            ),
-          ];
+          if (
+            !this.linkedSkillsWithDifficulty ||
+            this.linkedSkillsWithDifficulty.length === 0
+          ) {
+            this.linkedSkillsWithDifficulty = [
+              SkillDifficulty.create(
+                this.skillId,
+                this.skill.getDescription(),
+                AppConstants.DEFAULT_SKILL_DIFFICULTY
+              ),
+            ];
+          }
           this.skillIdToRubricsObject = {};
           this.skillIdToRubricsObject[this.skillId] = this.skill.getRubrics();
         });

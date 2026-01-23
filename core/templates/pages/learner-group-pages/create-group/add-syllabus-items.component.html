@@ -23,8 +23,8 @@
   </div>
   <div class="learner-group-syllabus-filters-container">
     <div class="oppia-same-row-container oppia-search-box-container">
-      <form class="search-bar-float-left oppia-search-bar-form" role="search">
-        <div class="form-group">
+      <form class="search-bar-float-start oppia-search-bar-form" role="search">
+        <div class="mb-3">
           <div class="input-group">
             <input type="text"
                    class="form-control oppia-search-bar-text-input protractor-test-search-input"
@@ -41,7 +41,7 @@
     </div>
 
     <div class="oppia-same-row-container oppia-search-filter">
-      <div ngbDropdown class="search-bar-float-left oppia-search-bar-type-selector dropdown" autoClose="outside">
+      <div ngbDropdown class="search-bar-float-start oppia-search-bar-type-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'type')"
                 type="button"
@@ -56,15 +56,15 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('types', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-type-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('types', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-type-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('types', item.id)" *ngIf="last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-type-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.types.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-type-selection-symbol">&#xE876;</i>
               </a>
             </li>
           </ng-container>
@@ -73,7 +73,7 @@
     </div>
 
     <div class="oppia-same-row-container oppia-search-filter">
-      <div ngbDropdown class="search-bar-float-left oppia-search-bar-category-selector dropdown" autoClose="outside">
+      <div ngbDropdown class="search-bar-float-start oppia-search-bar-category-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'category')"
                 type="button"
@@ -88,15 +88,15 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('categories', item.id)" *ngIf="last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.categories.selection === item.id" class="material-icons md-18 float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
             </li>
           </ng-container>
@@ -105,7 +105,7 @@
     </div>
 
     <div class="oppia-same-row-container oppia-search-filter">
-      <div ngbDropdown class="search-bar-float-left oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
+      <div ngbDropdown class="search-bar-float-start oppia-search-bar-language-selector protractor-test-search-bar-language-selector dropdown" autoClose="outside">
         <button ngbDropdownToggle
                 (click)="openSubmenu($event, 'language')"
                 type="button"
@@ -119,16 +119,16 @@
             <li ngbDropdownItem>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="!first && !last" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="first" class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
               <a (click)="toggleSelection('languageCodes', item.id)" *ngIf="last"
                  class="dropdown-item">
                 <span class="protractor-test-deselected">{{ item.text | translate }}</span>
-                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
+                <i *ngIf="selectionDetails.languageCodes.selection === item.id" class="material-icons md-18  float-end oppia-search-bar-category-selection-symbol">&#xE876;</i>
               </a>
             </li>
           </ng-container>

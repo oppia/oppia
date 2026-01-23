@@ -92,7 +92,7 @@
     Cancel
   </button>
   <!-- Do not show this button if an interaction is already selected. -->
-  <button class="btn btn-secondary float-left"
+  <button class="btn btn-secondary float-start"
           (click)="returnToInteractionSelector()"
           *ngIf="!isinteractionOpen && !stateInteractionIdService.savedMemento && hasCustomizationArgs">
     Change Interaction

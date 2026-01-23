@@ -268,7 +268,11 @@ BAD_PATTERNS_PYTHON_REGEXP: List[BadPatternRegexpDict] = [
             'class SampleModel(datastore_services.Model):\n'
             '    ...\n'
         ),
-        'excluded_files': (),
+        'excluded_files': (
+            # The conftest.py file needs to reference 'google.cloud.ndb' module
+            # paths directly in mock.patch() calls for pytest fixtures.
+            'conftest.py',
+        ),
         'excluded_dirs': ('core/platform',),
     },
     {

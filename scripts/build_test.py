@@ -25,12 +25,10 @@ import io
 import os
 import pathlib
 import re
-import subprocess
 import sys
 import tempfile
 import threading
 
-from core import feconf, utils
 from core.tests import test_utils
 
 from typing import ContextManager, Deque, Dict, Iterator, List, Tuple, Union
@@ -40,6 +38,7 @@ from . import (
     common,
     install_python_dev_dependencies,
     install_third_party_libs,
+    npm_static_assets,
     scripts_test_utils,
     servers,
 )
@@ -114,7 +113,7 @@ class BuildTests(test_utils.GenericTestBase):
         for js_filepath in dependency_filepaths['js']:
             if counter == js_file_count:
                 break
-            with utils.open_file(js_filepath, 'r') as js_file:
+            with open(js_filepath, 'r', encoding='utf-8') as js_file:
                 # Assert that each line is copied over to file_stream object.
                 for line in js_file:
                     self.assertIn(line, third_party_js_stream.getvalue())
@@ -287,7 +286,9 @@ class BuildTests(test_utils.GenericTestBase):
         minified_html_file_stream = io.StringIO()
 
         # Assert that base.html has white spaces and has original filepaths.
-        with utils.open_file(base_html_source_path, 'r') as source_base_file:
+        with open(
+            base_html_source_path, 'r', encoding='utf-8'
+        ) as source_base_file:
             source_base_file_content = source_base_file.read()
             self.assertRegex(
                 source_base_file_content,
@@ -297,7 +298,9 @@ class BuildTests(test_utils.GenericTestBase):
             )
 
         # Build base.html file.
-        with utils.open_file(base_html_source_path, 'r') as source_base_file:
+        with open(
+            base_html_source_path, 'r', encoding='utf-8'
+        ) as source_base_file:
             build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
@@ -512,17 +515,17 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Set constant to provide everything to frontend.
         with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND', ('*',)):
-            with self.swap(build, 'HASHES_JSON_FILEPATH', hashes_path):
+            with self.swap(common, 'HASHES_JSON_FILEPATH', hashes_path):
                 hashes = {'path/file.js': '123456'}
                 build.save_hashes_to_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
+                with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                     self.assertEqual(
                         hashes_file.read(), '{"/path/file.js": "123456"}\n'
                     )
 
                 hashes = {'file.js': '123456', 'file.min.js': '654321'}
                 build.save_hashes_to_file(hashes)
-                with utils.open_file(hashes_path, 'r') as hashes_file:
+                with open(hashes_path, 'r', encoding='utf-8') as hashes_file:
                     self.assertEqual(
                         ast.literal_eval(hashes_file.read()),
                         {'/file.min.js': '654321', '/file.js': '123456'},
@@ -700,8 +703,8 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', temp_file_name)
-        with utils.open_file(
-            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w'
+        with open(
+            '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w', encoding='utf-8'
         ) as tmp:
             tmp.write('Some content.')
 
@@ -836,24 +839,23 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
-            with self.swap(feconf, 'OPPIA_IS_DOCKERIZED', True):
-                tmp.write('Some content in mock_app_dev.yaml\n')
-                tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "firebase:9099"\n')
-                tmp.write('version: default')
+        with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
+            tmp.write('Some content in mock_app_dev.yaml\n')
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
+            tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
             with env_vars_to_remove_from_deployed_app_yaml_swap:
                 build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(
@@ -886,23 +888,16 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_dev_yaml_temp_file, 'name', mock_dev_yaml_filepath)
-        # TODO(#18260): Change this when we permanently move to
-        # the Dockerized Setup.
-        firebase_host = (
-            'firebase' if feconf.OPPIA_IS_DOCKERIZED else 'localhost'
-        )
-        with utils.open_file(mock_dev_yaml_filepath, 'w') as tmp:
+        with open(mock_dev_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Some content in mock_app_dev.yaml\n')
-            tmp.write(
-                '  FIREBASE_AUTH_EMULATOR_HOST: "%s:9099"\n' % firebase_host
-            )
+            tmp.write('  FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099"\n')
             tmp.write('version: default')
 
         app_yaml_temp_file = tempfile.NamedTemporaryFile()
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(app_yaml_temp_file, 'name', mock_yaml_filepath)
-        with utils.open_file(mock_yaml_filepath, 'w') as tmp:
+        with open(mock_yaml_filepath, 'w', encoding='utf-8') as tmp:
             tmp.write('Initial content in mock_app.yaml')
 
         with app_dev_yaml_filepath_swap, app_yaml_filepath_swap:
@@ -914,7 +909,7 @@ class BuildTests(test_utils.GenericTestBase):
                 ):
                     build.generate_app_yaml(deploy_mode=True)
 
-        with utils.open_file(mock_yaml_filepath, 'r') as yaml_file:
+        with open(mock_yaml_filepath, 'r', encoding='utf-8') as yaml_file:
             content = yaml_file.read()
 
         self.assertEqual(content, 'Initial content in mock_app.yaml')
@@ -930,7 +925,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Here MyPy assumes that the 'name' attribute is read-only. In order to
         # silence the MyPy complaints `setattr` is used to set the attribute.
         setattr(temp_file, 'name', 'some_file.txt')
-        with utils.open_file('some_file.txt', 'w') as tmp:
+        with open('some_file.txt', 'w', encoding='utf-8') as tmp:
             tmp.write('Some content.')
         self.assertTrue(os.path.isfile('some_file.txt'))
 
@@ -980,6 +975,230 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_file(
             'core/tests/data/third_party/css/third_party.min.css'
         )
+
+    def test_npm_static_asset_configs_css_added_to_filepaths(self) -> None:
+        """Test that CSS from NPM_STATIC_ASSET_CONFIGS is added to dependency
+        filepaths.
+        """
+        mock_npm_configs = [
+            {
+                'name': 'TestLib1',
+                'css_paths': ['test/path/lib1.css'],
+            },
+            {
+                'name': 'TestLib2',
+                'css_paths': ['test/path/lib2.css'],
+            },
+        ]
+
+        def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
+            return {'css': ['existing.css'], 'js': [], 'fonts': []}
+
+        def mock_exists(path: str) -> bool:
+            return path in ['test/path/lib1.css', 'test/path/lib2.css']
+
+        get_deps_swap = self.swap(
+            build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
+        )
+        npm_configs_swap = self.swap(
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
+        )
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            css_file = os.path.join(temp_dir, 'css', 'third_party.css')
+            os.makedirs(os.path.dirname(css_file))
+
+            ensure_dir_swap = self.swap(
+                common, 'ensure_directory_exists', lambda _: None
+            )
+            execute_tasks_swap = self.swap(
+                build, '_execute_tasks', lambda _: None
+            )
+            join_files_called: Dict[str, List[str]] = {'css_paths': []}
+
+            def mock_join_files(
+                css_paths: List[str], unused_stream: io.TextIOWrapper
+            ) -> None:
+                join_files_called['css_paths'] = css_paths
+
+            join_files_swap = self.swap(build, '_join_files', mock_join_files)
+
+            with get_deps_swap, npm_configs_swap, exists_swap:
+                with ensure_dir_swap, execute_tasks_swap, join_files_swap:
+                    build.build_third_party_libs(temp_dir)
+
+            self.assertIn('existing.css', join_files_called['css_paths'])
+            self.assertIn('test/path/lib1.css', join_files_called['css_paths'])
+            self.assertIn('test/path/lib2.css', join_files_called['css_paths'])
+
+    def test_npm_static_asset_configs_missing_css_raises_exception(
+        self,
+    ) -> None:
+        """Test that missing CSS from NPM_STATIC_ASSET_CONFIGS raises
+        exception.
+        """
+        mock_npm_configs = [
+            {
+                'name': 'MissingLib',
+                'css_paths': ['nonexistent/lib.css'],
+            },
+        ]
+
+        def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
+            return {'css': [], 'js': [], 'fonts': []}
+
+        def mock_exists(path: str) -> bool:  # pylint: disable=unused-argument
+            return False
+
+        get_deps_swap = self.swap(
+            build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
+        )
+        npm_configs_swap = self.swap(
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
+        )
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            with get_deps_swap, npm_configs_swap, exists_swap:
+                with self.assertRaisesRegex(
+                    Exception,
+                    r'MissingLib CSS not found at nonexistent/lib.css\. '
+                    r'Run "python -m scripts\.install_third_party_libs" to '
+                    r'install all dependencies\.',
+                ):
+                    build.build_third_party_libs(temp_dir)
+
+    def test_npm_static_asset_configs_fonts_copied_correctly(self) -> None:
+        """Test that fonts from NPM_STATIC_ASSET_CONFIGS are copied correctly."""
+        mock_npm_configs = [
+            {
+                'name': 'TestLib',
+                'fonts_dir': 'test/fonts',
+            },
+        ]
+
+        def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
+            return {'css': [], 'js': [], 'fonts': []}
+
+        def mock_exists(path: str) -> bool:
+            return path == 'test/fonts'
+
+        def mock_listdir(path: str) -> List[str]:
+            if path == 'test/fonts':
+                return ['font1.woff', 'font2.woff', 'readme.txt']
+            return []
+
+        def mock_isfile(path: str) -> bool:
+            return path in [
+                'test/fonts/font1.woff',
+                'test/fonts/font2.woff',
+                'test/fonts/readme.txt',
+            ]
+
+        get_deps_swap = self.swap(
+            build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
+        )
+        npm_configs_swap = self.swap(
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
+        )
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        listdir_swap = self.swap(os, 'listdir', mock_listdir)
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+
+        execute_tasks_calls: Dict[str, List[str]] = {'font_files': []}
+
+        def mock_execute_tasks(unused_tasks: Deque[threading.Thread]) -> None:
+            pass
+
+        def mock_generate_copy_tasks(
+            font_files: List[str], unused_target: str
+        ) -> Deque[threading.Thread]:
+            execute_tasks_calls['font_files'] = font_files
+            return collections.deque()
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+
+            def mock_ensure_directory_exists(dirpath: str) -> None:
+                os.makedirs(dirpath, exist_ok=True)
+
+            ensure_dir_swap = self.swap(
+                common, 'ensure_directory_exists', mock_ensure_directory_exists
+            )
+            execute_tasks_swap = self.swap(
+                build, '_execute_tasks', mock_execute_tasks
+            )
+            copy_tasks_swap = self.swap(
+                build,
+                '_generate_copy_tasks_for_fonts',
+                mock_generate_copy_tasks,
+            )
+
+            with get_deps_swap, npm_configs_swap, exists_swap:
+                with listdir_swap, isfile_swap, ensure_dir_swap:
+                    with execute_tasks_swap, copy_tasks_swap:
+                        build.build_third_party_libs(temp_dir)
+
+            self.assertEqual(len(execute_tasks_calls['font_files']), 3)
+            self.assertIn(
+                'test/fonts/font1.woff', execute_tasks_calls['font_files']
+            )
+            self.assertIn(
+                'test/fonts/font2.woff', execute_tasks_calls['font_files']
+            )
+            self.assertIn(
+                'test/fonts/readme.txt', execute_tasks_calls['font_files']
+            )
+
+    def test_npm_static_asset_configs_missing_fonts_raises_exception(
+        self,
+    ) -> None:
+        """Test that missing fonts directory from NPM_STATIC_ASSET_CONFIGS
+        raises exception.
+        """
+        mock_npm_configs = [
+            {
+                'name': 'MissingFontsLib',
+                'fonts_dir': 'nonexistent/fonts',
+            },
+        ]
+
+        def mock_get_dependencies_filepaths() -> Dict[str, List[str]]:
+            return {'css': [], 'js': [], 'fonts': []}
+
+        def mock_exists(unused_path: str) -> bool:
+            return False
+
+        get_deps_swap = self.swap(
+            build, 'get_dependencies_filepaths', mock_get_dependencies_filepaths
+        )
+        npm_configs_swap = self.swap(
+            npm_static_assets, 'NPM_STATIC_ASSET_CONFIGS', mock_npm_configs
+        )
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+
+            def mock_ensure_directory_exists(dirpath: str) -> None:
+                os.makedirs(dirpath, exist_ok=True)
+
+            ensure_dir_swap = self.swap(
+                common, 'ensure_directory_exists', mock_ensure_directory_exists
+            )
+            execute_tasks_swap = self.swap(
+                build, '_execute_tasks', lambda _: None
+            )
+
+            with get_deps_swap, npm_configs_swap, exists_swap:
+                with ensure_dir_swap, execute_tasks_swap:
+                    with self.assertRaisesRegex(
+                        Exception,
+                        r'MissingFontsLib fonts directory not found at '
+                        r'nonexistent/fonts\. Run "python -m '
+                        r'scripts\.install_third_party_libs" to install all '
+                        r'dependencies\.',
+                    ):
+                        build.build_third_party_libs(temp_dir)
 
     def test_clean(self) -> None:
         check_function_calls = {
@@ -1389,7 +1608,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
+                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
             )
         )
         self.exit_stack.enter_context(
@@ -1397,53 +1616,6 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(sys, 'exit', lambda _: None, called=False)
-        )
-
-        build.build_js_files(True)
-
-    def test_build_js_files_in_dev_mode_with_exception_raised(self) -> None:
-        return_code = 2
-        self.exit_stack.enter_context(
-            self.swap_to_always_raise(
-                servers,
-                'managed_webpack_compiler',
-                error=subprocess.CalledProcessError(return_code, []),
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                build,
-                'main',
-                lambda *_, **__: None,
-                expected_kwargs=[{'args': []}],
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                sys,
-                'exit',
-                lambda _: None,
-                expected_args=[
-                    # When the code under test runs, the first sys.exit call halts
-                    # execution. However, when this test runs, sys.exit is mocked
-                    # and so does not interrupt the execution flow. Therefore we
-                    # call sys.exit with the error code from the webpack compilation
-                    # process (2) 5 times (the maximum number of attempts allowed to
-                    # compile webpack) and then exit with code 1 after giving up
-                    # trying to compile webpack.
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (return_code,),
-                    (1,),
-                ],
-            )
         )
 
         build.build_js_files(True)
@@ -1498,7 +1670,7 @@ class E2EAndAcceptanceBuildTests(test_utils.GenericTestBase):
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
-                common, 'run_ng_compilation', lambda: None, expected_args=[()]
+                servers, 'run_ng_compilation', lambda: None, expected_args=[()]
             )
         )
         self.exit_stack.enter_context(

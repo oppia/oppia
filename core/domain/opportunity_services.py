@@ -435,7 +435,7 @@ def update_translation_opportunity_with_accepted_suggestion(
 
     Args:
         exploration_id: str. The ID of the exploration.
-        language_code: str. The langauge code of the accepted translation
+        language_code: str. The language code of the accepted translation
             suggestion.
     """
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(

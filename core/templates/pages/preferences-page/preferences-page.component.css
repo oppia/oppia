@@ -147,9 +147,9 @@ a.export-btn:active {
   }
 }
 .oppia-save-button {
-  background-color: #01645c;
+  background-color: #01645c !important;
   border-radius: 4px;
-  color: #fff;
+  color: #fff !important;
   font-family: "Roboto", Arial, sans-serif;
   font-size: 14px;
   font-weight: 700;

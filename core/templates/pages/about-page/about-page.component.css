@@ -1034,7 +1034,7 @@
 }
 
 .about-page .oppia-about-cta-section .carousel-indicators {
-  bottom: -72px;
+  bottom: -50px;
   gap: 0;
 }
 
@@ -1188,7 +1188,7 @@
     border-top: 4px solid #00645c;
     padding: 0;
   }
-  .about-page .oppia-cta-accordion > .card .card-header {
+  .about-page .oppia-cta-accordion > .accordion-item .accordion-header {
     background-color: #fff;
     border-bottom: 4px solid #eee;
     display: flex;

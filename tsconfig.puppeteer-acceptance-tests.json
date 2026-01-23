@@ -22,7 +22,8 @@
     ],
     "lib": [
       "ES2017",
-      "DOM"
+      "DOM",
+      "DOM.Iterable"
     ]
   },
   "include": [

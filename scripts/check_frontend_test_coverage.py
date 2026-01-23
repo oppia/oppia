@@ -23,8 +23,6 @@ import os
 import re
 import sys
 
-from core import utils
-
 from typing import List, Optional
 
 _PARSER = argparse.ArgumentParser(
@@ -140,7 +138,7 @@ def get_stanzas_from_lcov_file() -> List[LcovStanzaRelevantLines]:
     Returns:
         list(LcovStanzaRelevantLines). A list with all stanzas.
     """
-    f = utils.open_file(LCOV_FILE_PATH, 'r')
+    f = open(LCOV_FILE_PATH, 'r', encoding='utf-8')
     lcov_items_list = f.read().split('end_of_record')
     stanzas_list = []
 

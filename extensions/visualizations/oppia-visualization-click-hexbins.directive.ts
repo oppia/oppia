@@ -64,20 +64,20 @@ export type Hexbin = HexbinBin<ClickOnImageAnswer>;
   templateUrl: './oppia-visualization-click-hexbins.directive.html',
 })
 export class OppiaVisualizationClickHexbinsComponent implements OnInit {
-  @Input() data: ClickOnImageAnswer[];
-  @Input() interactionArgs: InteractionArgs;
+  @Input() data!: ClickOnImageAnswer[];
+  @Input() interactionArgs!: InteractionArgs;
 
-  tooltipTarget: Hexbin = null;
+  tooltipTarget: Hexbin | null = null;
 
-  imagePath: string;
-  imageSize: ImageDimensions;
-  imageUrl: string;
-  wrapperWidth: number;
-  wrapperHeight: number;
-  hexbins: HexbinBin<ClickOnImageAnswer>[];
-  hexagon: string;
-  hexagonMesh: string;
-  colorScale: ScaleLinear<RGBColor, RGBColor>;
+  imagePath!: string;
+  imageSize!: ImageDimensions;
+  imageUrl!: string;
+  wrapperWidth!: number;
+  wrapperHeight!: number;
+  hexbins!: HexbinBin<ClickOnImageAnswer>[];
+  hexagon!: string;
+  hexagonMesh!: string;
+  colorScale!: ScaleLinear<RGBColor, RGBColor>;
 
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
@@ -87,15 +87,13 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
 
   getTooltipStyle(): object {
     return {
-      left: this.tooltipTarget.x + 'px',
-      top: this.tooltipTarget.y + 'px',
+      left: (this.tooltipTarget?.x || 0) + 'px',
+      top: (this.tooltipTarget?.y || 0) + 'px',
     };
   }
 
   showTooltip(bin: Hexbin): void {
-    if (this.tooltipTarget && bin.length > 0) {
-      this.tooltipTarget = bin;
-    }
+    this.tooltipTarget = bin;
   }
 
   hideTooltip(bin: Hexbin): void {
@@ -105,14 +103,18 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
   }
 
   getFillColor(b: Hexbin): RGBColor {
-    return this.colorScale(this.getNumClicks(b));
+    const color = this.colorScale(this.getNumClicks(b));
+    return color || rgb(255, 255, 255, 0.25);
   }
 
-  isTooltipVisible(): void {
-    this.tooltipTarget !== null;
+  isTooltipVisible(): boolean {
+    return this.tooltipTarget !== null;
   }
 
   getTooltipNumClicks(): number {
+    if (this.tooltipTarget === null) {
+      return 0;
+    }
     return this.getNumClicks(this.tooltipTarget);
   }
 
@@ -148,9 +150,11 @@ export class OppiaVisualizationClickHexbinsComponent implements OnInit {
       .size([wrapperWidth, wrapperHeight])
       .radius(16);
 
+    // Per d3-hexbin documentation: only non-empty bins are returned; empty
+    // bins without points are not included in the returned array.
     this.hexbins = hexbinGenerator(this.data);
     this.colorScale = scaleLinear<RGBColor>()
-      .domain([0, max(this.hexbins, this.getNumClicks)])
+      .domain([0, max(this.hexbins, this.getNumClicks) || 0])
       .range([rgb(255, 255, 255, 0.25), rgb(255, 255, 255, 0.75)]);
     this.imageUrl = imageUrl;
     this.wrapperWidth = wrapperWidth;

@@ -55,6 +55,8 @@ jobs:
             success
             failure
             action_required
+            cancelled
+            timed_out
       - name: Verify Manual Approval Requirement
         if: ${{ steps.wait_for_completion_of_workflow.outputs.run-conclusion == 'action_required' }}
         run: |

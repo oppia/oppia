@@ -27,7 +27,6 @@ import argparse
 import os
 import re
 
-from core import utils
 from scripts import common
 
 from typing import Final, List, Optional
@@ -74,10 +73,10 @@ def apply_changes_based_on_config(
     Raises:
         Exception. Line(s) in config file are not matching with the regex.
     """
-    with utils.open_file(config_filepath, 'r') as config_file:
+    with open(config_filepath, 'r', encoding='utf-8') as config_file:
         config_lines = config_file.read().splitlines()
 
-    with utils.open_file(local_filepath, 'r') as local_file:
+    with open(local_filepath, 'r', encoding='utf-8') as local_file:
         local_lines = local_file.read().splitlines()
 
     local_filename = os.path.basename(local_filepath)
@@ -111,7 +110,7 @@ def apply_changes_based_on_config(
     for index, config_line in enumerate(config_lines):
         local_lines[local_line_numbers[index]] = config_line
 
-    with utils.open_file(local_filepath, 'w') as writable_local_file:
+    with open(local_filepath, 'w', encoding='utf-8') as writable_local_file:
         writable_local_file.write('%s\n' % '\n'.join(local_lines))
 
 
@@ -127,10 +126,12 @@ def update_app_yaml(
     Raises:
         Exception. No OPPIA_SITE_URL key found.
     """
-    with utils.open_file(feconf_config_path, 'r') as feconf_config_file:
+    with open(feconf_config_path, 'r', encoding='utf-8') as feconf_config_file:
         feconf_config_contents = feconf_config_file.read()
 
-    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+    with open(
+        release_app_dev_yaml_path, 'r', encoding='utf-8'
+    ) as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
     oppia_site_url_searched_key = re.search(
@@ -149,7 +150,9 @@ def update_app_yaml(
         app_yaml_contents,
     )
 
-    with utils.open_file(release_app_dev_yaml_path, 'w') as app_yaml_file:
+    with open(
+        release_app_dev_yaml_path, 'w', encoding='utf-8'
+    ) as app_yaml_file:
         app_yaml_file.write(edited_app_yaml_contents)
 
 
@@ -170,14 +173,16 @@ def verify_config_files(
         Exception. Access-Control-Allow-Origin not updated to specific origin
             before deployment.
     """
-    feconf_contents = utils.open_file(release_feconf_path, 'r').read()
+    feconf_contents = open(release_feconf_path, 'r', encoding='utf-8').read()
     if (
         'REDISHOST' not in feconf_contents
         or 'REDISHOST = \'localhost\'' in feconf_contents
     ):
         raise Exception('REDISHOST must be updated before deployment.')
 
-    with utils.open_file(release_app_dev_yaml_path, 'r') as app_yaml_file:
+    with open(
+        release_app_dev_yaml_path, 'r', encoding='utf-8'
+    ) as app_yaml_file:
         app_yaml_contents = app_yaml_file.read()
 
     if 'Access-Control-Allow-Origin: \"*\"' in app_yaml_contents:
@@ -202,7 +207,9 @@ def update_analytics_constants_based_on_config(
         Exception. No SITE_NAME_FOR_ANALYTICS key found.
         Exception. No CAN_SEND_ANALYTICS_EVENTS key found.
     """
-    with utils.open_file(analytics_constants_config_path, 'r') as config_file:
+    with open(
+        analytics_constants_config_path, 'r', encoding='utf-8'
+    ) as config_file:
         config_file_contents = config_file.read()
     ga_analytics_searched_key = re.search(
         r'"GA_ANALYTICS_ID": "(.*)"', config_file_contents
