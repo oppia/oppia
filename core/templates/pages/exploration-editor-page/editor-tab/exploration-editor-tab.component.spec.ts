@@ -973,7 +973,7 @@ describe('Exploration editor tab component', () => {
 
   it('should start tutorial if in tutorial mode on page load', () => {
     const state = new State(
-      'stateName',
+      'First State',
       'id',
       'some',
       SubtitledHtml.createDefault('', 'content'),
@@ -983,9 +983,15 @@ describe('Exploration editor tab component', () => {
       true,
       null
     );
-    component.stateName = 'stateName';
-    stateEditorService.setActiveStateName('stateName');
-    spyOn(explorationStatesService, 'getState').and.returnValues(state);
+    component.stateName = 'First State';
+    stateEditorService.setActiveStateName('First State');
+    spyOn(explorationStatesService, 'getState').and.returnValue(state);
+    spyOn(explorationStatesService, 'getStateContentMemento').and.returnValue(
+      SubtitledHtml.createDefault('', 'content')
+    );
+    spyOn(explorationStatesService, 'getStatePropertyMemento').and.returnValue(
+      SubtitledHtml.createDefault('', 'content')
+    );
     spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
     spyOn(component, 'startTutorial');
     editabilityService.onStartTutorial();

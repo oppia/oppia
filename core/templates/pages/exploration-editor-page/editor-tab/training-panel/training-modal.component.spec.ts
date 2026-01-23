@@ -152,18 +152,6 @@ describe('Training Modal Component', () => {
     'should click on confirm button when ' +
       'answerGroupIndex is greater than Response',
     () => {
-      component.classification = {
-        answerGroupIndex: 2,
-        newOutcome: new Outcome(
-          'dest',
-          null,
-          SubtitledHtml.createDefault('', 'feedback'),
-          true,
-          [],
-          null,
-          null
-        ),
-      };
       component.unhandledAnswer = 'string';
 
       spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
@@ -186,6 +174,18 @@ describe('Training Modal Component', () => {
       );
 
       component.ngOnInit();
+      component.classification = {
+        answerGroupIndex: 2,
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
+      };
       component.onConfirm();
 
       expect(responsesService.save).toHaveBeenCalled();
