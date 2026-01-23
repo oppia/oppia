@@ -120,7 +120,7 @@ export interface CustomizationArgSpecsInterface {
   description?: string;
 }
 
-interface AllowedInteractionCategories {
+export interface AllowedInteractionCategories {
   name: string;
   interaction_ids: string[];
 }
@@ -505,18 +505,18 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateEditorService.isInQuestionMode()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [] as any[],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as any
+        [] as AllowedInteractionCategories[],
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       ) as AllowedInteractionCategories[];
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [] as any[],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as any
+        [] as AllowedInteractionCategories[],
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       ) as AllowedInteractionCategories[];
     } else {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [] as any[],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES as any
+        [] as AllowedInteractionCategories[],
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
       ) as AllowedInteractionCategories[];
     }
 

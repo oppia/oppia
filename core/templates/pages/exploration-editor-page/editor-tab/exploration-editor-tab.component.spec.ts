@@ -963,7 +963,9 @@ describe('Exploration editor tab component', () => {
       stateEditorService.updateStateEditorDirectiveInitialised();
       spyOn(component, 'initStateEditor').and.stub();
 
-      mockRefreshStateEditorEventEmitter!.emit();
+      if (mockRefreshStateEditorEventEmitter) {
+        mockRefreshStateEditorEventEmitter.emit();
+      }
       tick();
       component.initStateEditor();
       tick();
@@ -991,7 +993,9 @@ describe('Exploration editor tab component', () => {
     editabilityService.onStartTutorial();
 
     component.initStateEditor();
-    mockRefreshStateEditorEventEmitter!.emit();
+    if (mockRefreshStateEditorEventEmitter) {
+      mockRefreshStateEditorEventEmitter.emit();
+    }
 
     expect(component.startTutorial).toHaveBeenCalled();
   });

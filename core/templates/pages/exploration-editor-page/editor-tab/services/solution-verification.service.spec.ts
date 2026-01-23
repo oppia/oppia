@@ -155,11 +155,14 @@ describe('Solution Verification Service', () => {
     explorationStatesService.saveSolution('First State', solution.explanation);
 
     const firstState = explorationStatesService.getState('First State');
+    if (!firstState.interaction.solution) {
+      throw new Error('Solution should exist');
+    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution!.correctAnswer
+        firstState.interaction.solution.correctAnswer
       )
     ).toBe(true);
   });
@@ -181,11 +184,14 @@ describe('Solution Verification Service', () => {
     explorationStatesService.saveSolution('First State', solution2.explanation);
 
     const firstState = explorationStatesService.getState('First State');
+    if (!firstState.interaction.solution) {
+      throw new Error('Solution should exist');
+    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution!.correctAnswer
+        firstState.interaction.solution.correctAnswer
       )
     ).toBe(false);
   });
@@ -229,11 +235,14 @@ describe('Solution Verification Service', () => {
     explorationStatesService.saveSolution('First State', solution.explanation);
 
     const firstState = explorationStatesService.getState('First State');
+    if (!firstState.interaction.solution) {
+      throw new Error('Solution should exist');
+    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution!.correctAnswer
+        firstState.interaction.solution.correctAnswer
       )
     ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);
   });

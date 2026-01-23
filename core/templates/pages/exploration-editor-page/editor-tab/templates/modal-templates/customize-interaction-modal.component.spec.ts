@@ -37,7 +37,10 @@ import {
   NgbModule,
 } from '@ng-bootstrap/ng-bootstrap';
 import {StateInteractionIdService} from 'components/state-editor/state-editor-properties-services/state-interaction-id.service';
-import {CustomizeInteractionModalComponent} from './customize-interaction-modal.component';
+import {
+  CustomizeInteractionModalComponent,
+  AllowedInteractionCategories,
+} from './customize-interaction-modal.component';
 import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -421,9 +424,9 @@ describe('Customize Interaction Modal Component', () => {
 
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [] as any[],
-          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as any
-        ) as any[]
+          [] as AllowedInteractionCategories[],
+          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+        ) as AllowedInteractionCategories[]
       );
       expect(component.customizationModalReopened).toBeTruthy();
     })
@@ -449,9 +452,9 @@ describe('Customize Interaction Modal Component', () => {
 
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [] as any[],
-          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as any
-        ) as any[]
+          [] as AllowedInteractionCategories[],
+          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+        ) as AllowedInteractionCategories[]
       );
       expect(component.customizationModalReopened).toBeTruthy();
     })
@@ -475,9 +478,9 @@ describe('Customize Interaction Modal Component', () => {
       expect(component.isinteractionOpen).toBeTruthy();
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [] as any[],
-          AppConstants.ALLOWED_INTERACTION_CATEGORIES as any
-        ) as any[]
+          [] as AllowedInteractionCategories[],
+          AppConstants.ALLOWED_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+        ) as AllowedInteractionCategories[]
       );
     })
   );
