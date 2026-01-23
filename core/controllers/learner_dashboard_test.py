@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
-    exp_services,
     learner_progress_services,
     story_domain,
     story_services,
