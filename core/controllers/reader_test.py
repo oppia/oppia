@@ -3580,6 +3580,56 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_checkpoint_reached_marks_exploration_as_incomplete(self) -> None:
+        """Test that reaching a checkpoint adds exploration to incomplete list."""
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        # Load demo exploration.
+        exp_id = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login(self.VIEWER_EMAIL)
+        viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        # Verify exploration is not in incomplete list initially.
+        incomplete_exp_ids = (
+            learner_progress_services.get_all_incomplete_exp_ids(viewer_id)
+        )
+        self.assertEqual(incomplete_exp_ids, [])
+
+        # Viewer opens exploration.
+        self.get_json('%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+
+        # First checkpoint reached.
+        csrf_token = self.get_new_csrf_token()
+        self.put_json(
+            '/explorehandler/checkpoint_reached/%s' % exp_id,
+            {
+                'most_recently_reached_checkpoint_exp_version': 1,
+                'most_recently_reached_checkpoint_state_name': 'Welcome!',
+            },
+            csrf_token=csrf_token,
+        )
+
+        # Verify checkpoint progress was saved.
+        exp_user_data = exp_fetchers.get_exploration_user_data(
+            viewer_id, exp_id
+        )
+        assert exp_user_data is not None
+        self.assertEqual(
+            exp_user_data.most_recently_reached_checkpoint_state_name,
+            'Welcome!',
+        )
+
+        # Verify exploration is now in incomplete list (In Progress section).
+        incomplete_exp_ids = (
+            learner_progress_services.get_all_incomplete_exp_ids(viewer_id)
+        )
+        self.assertEqual(incomplete_exp_ids, [exp_id])
+
+        self.logout()
+
 
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""

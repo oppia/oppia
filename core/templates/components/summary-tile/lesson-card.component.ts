@@ -230,6 +230,16 @@ export class LessonCardComponent implements OnInit {
     this.lessonTopic = 'Community Lesson';
   }
 
+  calculateCheckpointBasedProgress(
+    explorationModel: LearnerExplorationSummary
+  ): number {
+    // Deprecated: kept for safety; backend now supplies percentage.
+    if (explorationModel.furthestReachedCheckpointStateName) {
+      return 10;
+    }
+    return 0;
+  }
+
   getStorySummaryThumbnailUrl(filename: string, id: string): string {
     return this.assetsBackendApiService.getThumbnailUrlForPreview(
       AppConstants.ENTITY_TYPE.STORY,

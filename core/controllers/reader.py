@@ -2274,6 +2274,15 @@ class CheckpointReachedEventHandler(
                 most_recently_reached_checkpoint_state_name,
                 most_recently_reached_checkpoint_exp_version,
             )
+            # Mark exploration as incomplete so it appears in the
+            # "In Progress / Continue Where You Left Off" section
+            # for both curated and community lessons.
+            learner_progress_services.mark_exploration_as_incomplete(
+                self.user_id,
+                exploration_id,
+                most_recently_reached_checkpoint_state_name,
+                most_recently_reached_checkpoint_exp_version,
+            )
 
         self.render_json(self.values)
 

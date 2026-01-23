@@ -49,6 +49,12 @@ export interface LearnerExplorationSummaryBackendDict {
 }
 
 export class LearnerExplorationSummary {
+  mostRecentlyReachedCheckpointStateName: string | null;
+  mostRecentlyReachedCheckpointExpVersion: number | null;
+  furthestReachedCheckpointStateName: string | null;
+  furthestReachedCheckpointExpVersion: number | null;
+  checkpointProgressPercentage: number | null;
+
   constructor(
     public category: string,
     public communityOwned: boolean,
