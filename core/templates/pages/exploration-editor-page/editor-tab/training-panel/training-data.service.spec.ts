@@ -42,14 +42,14 @@ class MockNgbModal {
 class MockResponsesService {
   AnswerGroupArray = [
     new AnswerGroup(
-      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
-      null,
+      [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
+      Outcome.createNew('State', 'feedback_1', '', []),
       ['trainingData 1'],
       null
     ),
     new AnswerGroup(
-      [new Rule('TextInput', null, null), new Rule('TextInput', null, null)],
-      null,
+      [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
+      Outcome.createNew('State', 'feedback_1', '', []),
       ['trainingData 1', 'trainingData 2'],
       null
     ),
@@ -68,11 +68,11 @@ class MockResponsesService {
     item2: string,
     item3: (arg0: string) => void
   ) {
-    item3(null);
+    item3('');
   }
 
   save(item1: string, item2: string, item3: (arg0: string) => void) {
-    item3(null);
+    item3('');
   }
 
   updateConfirmedUnclassifiedAnswers(item1: string) {}
@@ -221,30 +221,24 @@ describe('Training Data Service', () => {
           'State',
           'id',
           'some',
-          null,
+          SubtitledHtml.createDefault('', 'content'),
           new Interaction(
             [
               new AnswerGroup(
-                [
-                  new Rule('TextInput', null, null),
-                  new Rule('TextInput', null, null),
-                ],
-                null,
+                [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
+                Outcome.createNew('State', 'feedback_1', '', []),
                 ['trainingData 1'],
                 null
               ),
               new AnswerGroup(
-                [
-                  new Rule('TextInput', null, null),
-                  new Rule('TextInput', null, null),
-                ],
-                null,
+                [new Rule('TextInput', {}, {}), new Rule('TextInput', {}, {})],
+                Outcome.createNew('State', 'feedback_1', '', []),
                 ['trainingData 1'],
                 null
               ),
             ],
             [],
-            null,
+            {},
             new Outcome(
               'Hola',
               null,
@@ -258,8 +252,8 @@ describe('Training Data Service', () => {
             'id',
             null
           ),
-          null,
-          null,
+          [],
+          true,
           true,
           null
         )

@@ -63,7 +63,7 @@ class MockStateCustomizationArgsService {
     numberOfTerms: {
       value: 0,
     },
-    hasOwnProperty(argName) {
+    hasOwnProperty(argName: string) {
       return true;
     },
   };
@@ -80,7 +80,7 @@ class MockStateCustomizationArgsService {
     numberOfTerms: {
       value: 0,
     },
-    hasOwnProperty(argName) {
+    hasOwnProperty(argName: string) {
       return true;
     },
   };
@@ -275,7 +275,7 @@ describe('Customize Interaction Modal Component', () => {
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(true);
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBeFalsy();
   });
 
   it('should open save intreaction when user click on it', () => {
@@ -293,11 +293,11 @@ describe('Customize Interaction Modal Component', () => {
     component.onChangeInteractionId('RatioExpressionInput');
 
     expect(component.hasCustomizationArgs).toBe(false);
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBeFalsy();
   });
 
   it('should close modal when user click close', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.resolve(),
       } as NgbModalRef;
@@ -311,7 +311,7 @@ describe('Customize Interaction Modal Component', () => {
   }));
 
   it('should stay in modal if user click cancel', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
       return {
         result: Promise.reject(),
       } as NgbModalRef;
@@ -327,11 +327,11 @@ describe('Customize Interaction Modal Component', () => {
   it('should display interaction content', () => {
     component.isinteractionOpen = false;
 
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.isinteractionOpen).toBeFalsy();
 
     component.returnToInteractionSelector();
 
-    expect(component.isinteractionOpen).toBeTrue();
+    expect(component.isinteractionOpen).toBeTruthy();
   });
 
   it('should open save intreaction when user click on it', () => {
@@ -351,8 +351,8 @@ describe('Customize Interaction Modal Component', () => {
     component.customizeInteractionHeader = mockCustomizeInteractionHeaderRef;
     component.onChangeInteractionId('RatioExpressionInput');
 
-    expect(component.hasCustomizationArgs).toBeFalse();
-    expect(component.isinteractionOpen).toBeFalse();
+    expect(component.hasCustomizationArgs).toBeFalsy();
+    expect(component.isinteractionOpen).toBeFalsy();
   });
 
   it('should show proper warning message on popover', fakeAsync(() => {
@@ -378,7 +378,7 @@ describe('Customize Interaction Modal Component', () => {
     );
 
     component.hasCustomizationArgs = true;
-    stateInteractionIdService.displayed = undefined;
+    stateInteractionIdService.displayed = '';
     tick();
 
     expect(component.getSaveInteractionButtonTooltip()).toBe(
@@ -421,11 +421,11 @@ describe('Customize Interaction Modal Component', () => {
 
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-        )
+          [] as any[],
+          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as any
+        ) as any[]
       );
-      expect(component.customizationModalReopened).toBeTrue();
+      expect(component.customizationModalReopened).toBeTruthy();
     })
   );
 
@@ -449,11 +449,11 @@ describe('Customize Interaction Modal Component', () => {
 
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-        )
+          [] as any[],
+          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as any
+        ) as any[]
       );
-      expect(component.customizationModalReopened).toBeTrue();
+      expect(component.customizationModalReopened).toBeTruthy();
     })
   );
 
@@ -472,12 +472,12 @@ describe('Customize Interaction Modal Component', () => {
       component.ngOnInit();
       tick();
 
-      expect(component.isinteractionOpen).toBeTrue();
+      expect(component.isinteractionOpen).toBeTruthy();
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
-          [],
-          AppConstants.ALLOWED_INTERACTION_CATEGORIES
-        )
+          [] as any[],
+          AppConstants.ALLOWED_INTERACTION_CATEGORIES as any
+        ) as any[]
       );
     })
   );

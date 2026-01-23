@@ -55,17 +55,17 @@ import {AlertsService} from 'services/alerts.service';
   templateUrl: './exploration-editor-tab.component.html',
 })
 export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
-  @Input() explorationIsLinkedToStory: boolean;
+  @Input() explorationIsLinkedToStory: boolean = false;
 
   directiveSubscriptions = new Subscription();
-  misconceptionsBySkill: MisconceptionSkillMap;
-  TabName: string;
-  interactionIsShown: boolean;
+  misconceptionsBySkill: MisconceptionSkillMap = {};
+  TabName: string = '';
+  interactionIsShown: boolean = false;
   _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
   _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
-  tutorialInProgress: boolean;
-  explorationId: string;
-  stateName: string;
+  tutorialInProgress: boolean = false;
+  explorationId: string = '';
+  stateName: string | null = null;
   index: number = 0;
   validationErrorIsShown: boolean = false;
   joyRideSteps: string[] = [
@@ -144,17 +144,26 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         value => {
           // This code make the joyride visible over navbar
           // by overriding the properties of joyride-step__holder class.
-          document.querySelector<HTMLElement>(
+          const joyrideStepHolder = document.querySelector<HTMLElement>(
             '.joyride-step__holder'
-          ).style.zIndex = '1020';
+          );
+          if (joyrideStepHolder) {
+            joyrideStepHolder.style.zIndex = '1020';
+          }
 
-          document.querySelector<HTMLElement>(
+          const joyrideStepCounter = document.querySelector<HTMLElement>(
             '.joyride-step__counter'
-          ).tabIndex = 0;
+          );
+          if (joyrideStepCounter) {
+            joyrideStepCounter.tabIndex = 0;
+          }
 
-          document
-            .querySelector<HTMLElement>('.e2e-test-joyride-title')
-            .focus();
+          const joyrideTitle = document.querySelector<HTMLElement>(
+            '.e2e-test-joyride-title'
+          );
+          if (joyrideTitle) {
+            joyrideTitle.focus();
+          }
 
           if (value.number === 1) {
             this.smoothScrollTo(0, 1000);
@@ -163,13 +172,19 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
           if (value.number === 2) {
             this.smoothScrollTo(0, 1000);
 
-            document.querySelector<HTMLElement>(
+            const joyrideStepCounter2 = document.querySelector<HTMLElement>(
               '.joyride-step__counter'
-            ).tabIndex = 0;
+            );
+            if (joyrideStepCounter2) {
+              joyrideStepCounter2.tabIndex = 0;
+            }
 
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
+            const joyrideTitle2 = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            if (joyrideTitle2) {
+              joyrideTitle2.focus();
+            }
           }
 
           if (value.number === 4) {
@@ -182,13 +197,19 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
 
-            document.querySelector<HTMLElement>(
+            const joyrideStepCounter3 = document.querySelector<HTMLElement>(
               '.joyride-step__counter'
-            ).tabIndex = 0;
+            );
+            if (joyrideStepCounter3) {
+              joyrideStepCounter3.tabIndex = 0;
+            }
 
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
+            const joyrideTitle3 = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            if (joyrideTitle3) {
+              joyrideTitle3.focus();
+            }
           }
 
           if (value.number === 5) {
@@ -205,13 +226,19 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
               this.smoothScrollTo(element.offsetTop - 200, 1000);
             }
 
-            document.querySelector<HTMLElement>(
+            const joyrideStepCounter4 = document.querySelector<HTMLElement>(
               '.joyride-step__counter'
-            ).tabIndex = 0;
+            );
+            if (joyrideStepCounter4) {
+              joyrideStepCounter4.tabIndex = 0;
+            }
 
-            document
-              .querySelector<HTMLElement>('.e2e-test-joyride-title')
-              .focus();
+            const joyrideTitle4 = document.querySelector<HTMLElement>(
+              '.e2e-test-joyride-title'
+            );
+            if (joyrideTitle4) {
+              joyrideTitle4.focus();
+            }
           }
         },
         () => {},
@@ -252,16 +279,22 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionData(displayedValue: InteractionData): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
+    const interactionId = displayedValue.interactionId;
+    if (interactionId === null) {
+      return;
+    }
     this.explorationStatesService.saveInteractionId(
-      this.stateEditorService.getActiveStateName(),
-      cloneDeep(displayedValue.interactionId)
+      stateName,
+      cloneDeep(interactionId)
     );
-    this.stateEditorService.setInteractionId(
-      cloneDeep(displayedValue.interactionId)
-    );
+    this.stateEditorService.setInteractionId(cloneDeep(interactionId));
 
     this.explorationStatesService.saveInteractionCustomizationArgs(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue.customizationArgs)
     );
     this.stateEditorService.setInteractionCustomizationArgs(
@@ -270,8 +303,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionAnswerGroups(newAnswerGroups: AnswerGroup[]): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveInteractionAnswerGroups(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(newAnswerGroups)
     );
 
@@ -282,8 +319,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveInteractionDefaultOutcome(newOutcome: Outcome): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveInteractionDefaultOutcome(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(newOutcome)
     );
 
@@ -296,8 +337,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolution(displayedValue: Solution | SubtitledHtml): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveSolution(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue) as SubtitledHtml
     );
 
@@ -307,8 +352,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveHints(displayedValue: Hint[]): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveHints(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue)
     );
 
@@ -316,8 +365,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveSolicitAnswerDetails(displayedValue: boolean): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveSolicitAnswerDetails(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue)
     );
 
@@ -333,9 +386,13 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   onChangeCardIsCheckpoint(): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     let displayedValue = this.stateCardIsCheckpointService.displayed;
     this.explorationStatesService.saveCardIsCheckpoint(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue)
     );
     this.stateEditorService.setCardIsCheckpoint(cloneDeep(displayedValue));
@@ -366,7 +423,7 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   addState(newStateName: string): void {
-    this.explorationStatesService.addState(newStateName, null);
+    this.explorationStatesService.addState(newStateName, () => {});
   }
 
   refreshWarnings(): void {
@@ -374,9 +431,17 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   getLastEditedVersionNumberInCaseOfError(): number {
-    return this.versionHistoryService.fetchedStateVersionNumbers[
-      this.versionHistoryService.getCurrentPositionInStateVersionHistoryList()
-    ];
+    const position =
+      this.versionHistoryService.getCurrentPositionInStateVersionHistoryList();
+    if (position === null) {
+      return 0;
+    }
+    const versionNumber =
+      this.versionHistoryService.fetchedStateVersionNumbers[position];
+    if (versionNumber === undefined || versionNumber === null) {
+      return 0;
+    }
+    return versionNumber;
   }
 
   populateMisconceptionsForState(skillId: string): void {
@@ -403,6 +468,9 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     );
     this.stateEditorService.setInQuestionMode(false);
 
+    if (this.stateName === null) {
+      return;
+    }
     let stateData = this.explorationStatesService.getState(this.stateName);
     if (stateData && stateData.linkedSkillId) {
       this.populateMisconceptionsForState(stateData.linkedSkillId);
@@ -441,12 +509,18 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
         ''
       );
 
-      if (this.versionHistoryService.getLatestVersionOfExploration() !== null) {
+      const latestVersion =
+        this.versionHistoryService.getLatestVersionOfExploration();
+      if (latestVersion !== null) {
+        const stateName = stateData.name;
+        if (stateName === null) {
+          return;
+        }
         this.versionHistoryBackendApiService
           .fetchStateVersionHistoryAsync(
             this.pageContextService.getExplorationId(),
-            stateData.name,
-            this.versionHistoryService.getLatestVersionOfExploration()
+            stateName,
+            latestVersion
           )
           .then(response => {
             if (response !== null) {
@@ -490,8 +564,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveStateContent(displayedValue: SubtitledHtml): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveStateContent(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue)
     );
     // Show the interaction when the text content is saved, even if no
@@ -500,8 +578,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
   }
 
   saveLinkedSkillId(displayedValue: string): void {
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveLinkedSkillId(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       cloneDeep(displayedValue)
     );
 
@@ -518,8 +600,12 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
     this.stateEditorService.setInapplicableSkillMisconceptionIds(
       cloneDeep(displayedValue)
     );
+    const stateName = this.stateEditorService.getActiveStateName();
+    if (!stateName) {
+      return;
+    }
     this.explorationStatesService.saveInapplicableSkillMisconceptionIds(
-      this.stateEditorService.getActiveStateName(),
+      stateName,
       displayedValue
     );
   }

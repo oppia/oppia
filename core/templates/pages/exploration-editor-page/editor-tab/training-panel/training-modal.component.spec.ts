@@ -27,6 +27,7 @@ import {ExplorationStatesService} from 'pages/exploration-editor-page/services/e
 import {ResponsesService} from '../services/responses.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Outcome} from 'domain/exploration/outcome.model';
+import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {TrainingDataService} from './training-data.service';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
@@ -48,9 +49,9 @@ class MockStateInteractionIdService {
 }
 
 class MockExplorationStatesService {
-  saveInteractionAnswerGroups(item1, item2) {}
+  saveInteractionAnswerGroups(item1: string, item2: AnswerGroup[]) {}
 
-  saveInteractionDefaultOutcome(item1, item2) {}
+  saveInteractionDefaultOutcome(item1: string, item2: Outcome) {}
 
   getState() {
     return {
@@ -153,7 +154,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 2,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 
@@ -163,8 +172,12 @@ describe('Training Modal Component', () => {
         {},
       ] as AnswerGroup[]);
       spyOn(responsesService, 'save').and.callFake(
-        (answerGroups, getDefaultOutcome, save) => {
-          save(null, null);
+        (
+          answerGroups: AnswerGroup[],
+          getDefaultOutcome: () => Outcome,
+          save: (arg1: string, arg2: string) => void
+        ) => {
+          save('', '');
         }
       );
 
@@ -182,7 +195,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 
@@ -200,7 +221,15 @@ describe('Training Modal Component', () => {
     () => {
       component.classification = {
         answerGroupIndex: 1,
-        newOutcome: new Outcome('dest', null, null, true, [], null, null),
+        newOutcome: new Outcome(
+          'dest',
+          null,
+          SubtitledHtml.createDefault('', 'feedback'),
+          true,
+          [],
+          null,
+          null
+        ),
       };
       component.unhandledAnswer = 'string';
 

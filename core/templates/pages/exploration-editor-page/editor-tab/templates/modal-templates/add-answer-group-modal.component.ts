@@ -193,12 +193,13 @@ export class AddAnswerGroupModalComponent
     this.isEditable = this.editabilityService.isEditable();
     this.questionModeEnabled = this.stateEditorService.isInQuestionMode();
 
-    this.tmpRule = Rule.createNew(null, {}, {});
+    this.tmpRule = Rule.createNew('', {}, {});
     var feedbackContentId = this.generateContentIdService.getNextStateId(
       AppConstants.COMPONENT_NAME_FEEDBACK
     );
+    const destStateName = this.questionModeEnabled ? '' : this.stateName;
     this.tmpOutcome = Outcome.createNew(
-      this.questionModeEnabled ? null : this.stateName,
+      destStateName,
       feedbackContentId,
       '',
       []

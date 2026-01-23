@@ -64,7 +64,10 @@ import {FractionInputValidationService} from 'interactions/FractionInput/directi
 import {RatioExpressionInputValidationService} from 'interactions/RatioExpressionInput/directives/ratio-expression-input-validation.service';
 import {Warning} from 'interactions/base-interaction-validation.service';
 import cloneDeep from 'lodash/cloneDeep';
-import {ImageWithRegions} from 'interactions/customization-args-defs';
+import {
+  ImageWithRegions,
+  InteractionCustomizationArgs,
+} from 'interactions/customization-args-defs';
 import {GenerateContentIdService} from 'services/generate-content-id.service';
 import {FocusManagerService} from 'services/stateful/focus-manager.service';
 
@@ -113,6 +116,8 @@ interface DefaultValueGraph {
 export interface CustomizationArgSpecsInterface {
   name: string;
   default_value: DefaultCustomizationArg;
+  schema?: Schema;
+  description?: string;
 }
 
 interface AllowedInteractionCategories {
@@ -153,13 +158,13 @@ export class CustomizeInteractionModalComponent
   extends ConfirmOrCancelModal
   implements OnInit, AfterContentChecked
 {
-  customizationArgSpecs: CustomizationArgSpecsInterface[];
-  originalContentIdToContent: object;
-  hasCustomizationArgs: boolean;
-  allowedInteractionCategories: AllowedInteractionCategories[];
-  explorationIsLinkedToStory: boolean;
-  customizationModalReopened: boolean;
-  isinteractionOpen: boolean;
+  customizationArgSpecs: CustomizationArgSpecsInterface[] = [];
+  originalContentIdToContent: object = {};
+  hasCustomizationArgs: boolean = false;
+  allowedInteractionCategories: AllowedInteractionCategories[] = [];
+  explorationIsLinkedToStory: boolean = false;
+  customizationModalReopened: boolean = false;
+  isinteractionOpen: boolean = false;
 
   @ViewChild('customizeInteractionHeader')
   customizeInteractionHeader!: ElementRef;
@@ -183,11 +188,14 @@ export class CustomizeInteractionModalComponent
   }
 
   getTitle(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].name;
+    return (INTERACTION_SPECS as Record<string, {name: string}>)[interactionId]
+      .name;
   }
 
   getDescription(interactionId: string): string {
-    return INTERACTION_SPECS[interactionId].description;
+    return (INTERACTION_SPECS as Record<string, {description: string}>)[
+      interactionId
+    ].description;
   }
 
   getSchemaCallback(schema: Schema): () => Schema {
@@ -197,12 +205,18 @@ export class CustomizeInteractionModalComponent
   }
 
   getCustomizationArgsWarningsList(): Warning[] {
+    const interactionId = this.stateInteractionIdService.displayed;
+    if (!interactionId) {
+      return [];
+    }
     const validationServiceName: string =
-      INTERACTION_SPECS[this.stateInteractionIdService.displayed].id +
+      (INTERACTION_SPECS as Record<string, {id: string}>)[interactionId].id +
       'ValidationService';
 
     let validationService = this.injector.get(
-      INTERACTION_SERVICE_MAPPING[validationServiceName]
+      (INTERACTION_SERVICE_MAPPING as Record<string, unknown>)[
+        validationServiceName
+      ]
     );
     let warningsList = validationService.getCustomizationArgsWarnings(
       this.stateCustomizationArgsService.displayed
@@ -223,21 +237,29 @@ export class CustomizeInteractionModalComponent
     this.isinteractionOpen = false;
     this.editorFirstTimeEventsService.registerFirstSelectInteractionTypeEvent();
 
-    let interactionSpec = INTERACTION_SPECS[newInteractionId];
+    let interactionSpec = (
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        {customization_arg_specs: CustomizationArgSpecsInterface[]}
+      >
+    )[newInteractionId];
     this.customizationArgSpecs = interactionSpec.customization_arg_specs;
     this.stateInteractionIdService.displayed = newInteractionId;
-    this.stateCustomizationArgsService.displayed = {};
+    this.stateCustomizationArgsService.displayed =
+      {} as InteractionCustomizationArgs;
     if (this.interactionDetailsCacheService.contains(newInteractionId)) {
       this.stateCustomizationArgsService.displayed =
-        this.interactionDetailsCacheService.get(newInteractionId);
+        this.interactionDetailsCacheService.get(
+          newInteractionId
+        ) as InteractionCustomizationArgs;
     } else {
-      const customizationArgsBackendDict = {};
+      const customizationArgsBackendDict: Record<string, {value: unknown}> = {};
       this.customizationArgSpecs.forEach(
         (caSpec: {
           name: string | number;
           default_value: DefaultCustomizationArg;
         }) => {
-          customizationArgsBackendDict[caSpec.name] = {
+          customizationArgsBackendDict[String(caSpec.name)] = {
             value: caSpec.default_value,
           };
         }
@@ -247,7 +269,7 @@ export class CustomizeInteractionModalComponent
         Interaction.convertFromCustomizationArgsBackendDict(
           newInteractionId,
           customizationArgsBackendDict
-        );
+        ) as InteractionCustomizationArgs;
     }
 
     if (
@@ -342,9 +364,9 @@ export class CustomizeInteractionModalComponent
             this.generateContentIdService.getNextStateId(contentIdPrefix);
         }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
+        for (let i = 0; i < (value as unknown[]).length; i++) {
           traverseSchemaAndAssignContentIds(
-            value[i],
+            (value as unknown[])[i] as Object,
             schema.items as Schema,
             `${contentIdPrefix}`
           );
@@ -352,16 +374,24 @@ export class CustomizeInteractionModalComponent
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    const caSpecs = (
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        {customization_arg_specs: CustomizationArgSpecsInterface[]}
+      >
+    )[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
-        traverseSchemaAndAssignContentIds(
-          caValues[name].value,
-          caSpec.schema,
-          `${AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`
-        );
+        if (caSpec.schema) {
+          traverseSchemaAndAssignContentIds(
+            (caValues as Record<string, {value: unknown}>)[name]
+              .value as Object,
+            caSpec.schema,
+            `${AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS}_${name}`
+          );
+        }
       }
     }
   }
@@ -389,25 +419,45 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        contentIdToContent[subtitledHtmlValue.contentId] =
-          subtitledHtmlValue.html;
+        if (subtitledHtmlValue.contentId !== null) {
+          (contentIdToContent as Record<string, string>)[
+            subtitledHtmlValue.contentId
+          ] = subtitledHtmlValue.html;
+        }
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        contentIdToContent[subtitledUnicodeValue.contentId] =
-          subtitledUnicodeValue.unicode;
+        if (subtitledUnicodeValue.contentId !== null) {
+          (contentIdToContent as Record<string, string>)[
+            subtitledUnicodeValue.contentId
+          ] = subtitledUnicodeValue.unicode;
+        }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
-        for (let i = 0; i < (value as Object[]).length; i++) {
-          traverseSchemaAndCollectContent(value[i], schema.items as Schema);
+        for (let i = 0; i < (value as unknown[]).length; i++) {
+          traverseSchemaAndCollectContent(
+            (value as unknown[])[i] as Object,
+            schema.items as Schema
+          );
         }
       }
     };
 
-    const caSpecs = INTERACTION_SPECS[interactionId].customization_arg_specs;
+    const caSpecs = (
+      INTERACTION_SPECS as unknown as Record<
+        string,
+        {customization_arg_specs: CustomizationArgSpecsInterface[]}
+      >
+    )[interactionId].customization_arg_specs;
     const caValues = this.stateCustomizationArgsService.displayed;
     for (const caSpec of caSpecs) {
       const name = caSpec.name;
       if (caValues.hasOwnProperty(name)) {
-        traverseSchemaAndCollectContent(caValues[name].value, caSpec.schema);
+        if (caSpec.schema) {
+          traverseSchemaAndCollectContent(
+            (caValues as Record<string, {value: unknown}>)[name]
+              .value as Object,
+            caSpec.schema
+          );
+        }
       }
     }
 
@@ -455,42 +505,33 @@ export class CustomizeInteractionModalComponent
 
     if (this.stateEditorService.isInQuestionMode()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-      );
+        [] as any[],
+        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as any
+      ) as AllowedInteractionCategories[];
     } else if (this.pageContextService.isExplorationLinkedToStory()) {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-      );
+        [] as any[],
+        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as any
+      ) as AllowedInteractionCategories[];
     } else {
       this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
-      );
-    }
-
-    if (this.stateEditorService.isInQuestionMode()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES
-      );
-    } else if (this.pageContextService.isExplorationLinkedToStory()) {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES
-      );
-    } else {
-      this.allowedInteractionCategories = Array.prototype.concat.apply(
-        [],
-        AppConstants.ALLOWED_INTERACTION_CATEGORIES
-      );
+        [] as any[],
+        AppConstants.ALLOWED_INTERACTION_CATEGORIES as any
+      ) as AllowedInteractionCategories[];
     }
 
     if (this.stateInteractionIdService.savedMemento) {
       this.customizationModalReopened = true;
-      let interactionSpec =
-        INTERACTION_SPECS[this.stateInteractionIdService.savedMemento];
+      const savedMemento = this.stateInteractionIdService.savedMemento;
+      if (savedMemento === null) {
+        return;
+      }
+      let interactionSpec = (
+        INTERACTION_SPECS as unknown as Record<
+          string,
+          {customization_arg_specs: CustomizationArgSpecsInterface[]}
+        >
+      )[savedMemento];
       this.customizationArgSpecs = interactionSpec.customization_arg_specs;
 
       this.stateInteractionIdService.displayed = cloneDeep(
