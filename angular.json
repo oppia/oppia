@@ -30,19 +30,23 @@
                 "glob": "**/*",
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@fortawesome/fontawesome-free/webfonts",
+                "output": "assets/webfonts"
               }
             ],
             "styles": [
-              "node_modules/bootstrap/dist/css/bootstrap.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css",
-              "node_modules/@fortawesome/fontawesome-free/css/fontawesome.css",
-              "node_modules/@fortawesome/fontawesome-free/css/brands.css",
-              "node_modules/@fortawesome/fontawesome-free/css/regular.css",
-              "node_modules/@fortawesome/fontawesome-free/css/solid.css"
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+            ]
           },
           "configurations": {
             "production": {
