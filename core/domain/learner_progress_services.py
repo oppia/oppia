@@ -43,7 +43,7 @@ from core.domain import (
 )
 from core.platform import models
 
-from typing import Dict, List, Optional, Tuple, TypedDict, cast
+from typing import Dict, List, Optional, Tuple, TypedDict
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -510,33 +510,6 @@ def mark_exploration_as_incomplete(
 
         _save_last_playthrough_information(last_playthrough_information)
         _save_incomplete_activities(incomplete_activities)
-
-
-def get_last_played_state_name(
-    user_id: str, exploration_id: str
-) -> Optional[str]:
-    """Returns the last played state name for a user's exploration.
-
-    Args:
-        user_id: str. The ID of the user.
-        exploration_id: str. The ID of the exploration.
-
-    Returns:
-        str | None. The last played state name if present.
-    """
-
-    last_playthrough_information_model = (
-        user_models.ExpUserLastPlaythroughModel.get(user_id, exploration_id)
-    )
-
-    if last_playthrough_information_model is None:
-        return None
-
-    # Here we use cast because the model's last_played_state_name field
-    # is not typed in the storage layer, but we know it returns Optional[str].
-    return cast(
-        Optional[str], last_playthrough_information_model.last_played_state_name
-    )
 
 
 def record_story_started(user_id: str, story_id: str) -> None:
