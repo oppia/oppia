@@ -84,7 +84,7 @@ describe('Exploration editor tab component', () => {
   let explorationStatesService: ExplorationStatesService;
   let explorationWarningsService: ExplorationWarningsService;
   let routerService: RouterService;
-  let siteAnalyticsService: SiteAnalyticsService;
+  let _siteAnalyticsService: SiteAnalyticsService;
   let stateEditorRefreshService: StateEditorRefreshService;
   let stateCardIsCheckpointService: StateCardIsCheckpointService;
   let stateEditorService: StateEditorService;
@@ -226,7 +226,7 @@ describe('Exploration editor tab component', () => {
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
     routerService = TestBed.inject(RouterService);
-    siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
+    _siteAnalyticsService = TestBed.inject(SiteAnalyticsService);
     stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
     userExplorationPermissionsService = TestBed.inject(
       UserExplorationPermissionsService
