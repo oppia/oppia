@@ -22,7 +22,7 @@
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "core/templates/Polyfills.ts",
-            "tsConfig": "tsconfig.json",
+            "tsConfig": "tsconfig.build.json",
             "assets": [
               "src/favicon.ico",
               "src/assets",
