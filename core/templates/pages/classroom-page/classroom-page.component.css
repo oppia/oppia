@@ -135,7 +135,7 @@
 
 .oppia-classroom-page-container .classroom-top .classroom-admin-banner {
   align-items: center;
-  background-color: #015f9c ;
+  background-color: #015f9c;
   color: white;
   display: flex;
   justify-content: center;
@@ -162,6 +162,11 @@
   width: 686px;
 }
 
+.breadcrumbs-container .classroom-information-container .classroom-text-container {
+  flex-grow: 1;
+  min-width: 0;
+}
+
 .breadcrumbs-container .classroom-information-container {
   align-items: start;
   display: flex;
@@ -185,24 +190,33 @@
 
 .breadcrumbs-container .classroom-information-container .classroom-text-container span {
   color: #00645c;
+  display: block;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 22.6045px;
   font-style: normal;
   font-weight: 400;
   line-height: 28px;
   margin: 0;
+  max-width: 600px;
+  overflow: hidden;
   padding-right: 10px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
   color: #00645c;
+  display: block;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
   font-size: 54px;
   font-style: normal;
   font-weight: 400;
   line-height: 68px;
+  margin: 0;
+  max-width: 520px;
+  overflow: hidden;
   padding-right: 10px;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -265,6 +279,10 @@
   font-weight: 400;
   letter-spacing: -0.02em;
   text-align: center;
+}
+
+.breadcrumbs-container .classroom-information-container .classroom-thumbnail-container {
+  flex-shrink: 0;
 }
 
 .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
@@ -346,18 +364,23 @@
     font-size: 18px;
     font-style: normal;
     line-height: 22px;
+    max-width: 160px;
+    overflow: hidden;
     padding-right: 0;
-    white-space: pre-wrap;
-    
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
+
   .breadcrumbs-container .classroom-information-container .classroom-text-container h1 {
     font-size: 28px;
     letter-spacing: -0.02em;
     line-height: 36px;
     margin-top: 10px;
+    max-width: 200px;
+    overflow: hidden;
     padding-right: 0;
-    white-space: pre-wrap;
-
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .breadcrumbs-container .classroom-information-container .classroom-thumbnail-container .classroom-thumbnail {
@@ -378,7 +401,7 @@
   .oppia-classroom-search-container {
     height: 220px;
   }
-  
+
   .oppia-classroom-search-container .search-box-text-container {
     align-items: center;
   }
@@ -386,5 +409,4 @@
   .oppia-classroom-search-container .oppia-classrooms-search-section .search-box-text-container {
     align-items: center;
   }
-
 }
