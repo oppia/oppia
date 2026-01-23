@@ -211,10 +211,6 @@ describe('Training Data Service', () => {
   it('should get all potential outcomes of an interaction', () => {
     // First the answer group's outcome is listed, then the default.
 
-    // This throws "Argument of type 'null' is not assignable to parameter of
-    // type 'Outcome'." We need to suppress this error because of the need to
-    // test validations. This throws an error because the outcome is null.
-    // @ts-ignore
     expect(
       trainingDataService.getAllPotentialOutcomes(
         new State(
@@ -259,8 +255,8 @@ describe('Training Data Service', () => {
         )
       )
     ).toEqual([
-      null,
-      null,
+      Outcome.createNew('State', 'feedback_1', '', []),
+      Outcome.createNew('State', 'feedback_1', '', []),
       new Outcome(
         'Hola',
         null,

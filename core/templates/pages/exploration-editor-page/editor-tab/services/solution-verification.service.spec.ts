@@ -151,18 +151,11 @@ describe('Solution Verification Service', () => {
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
-    const solution = Solution.createNew(false, 'abc', 'nothing', 'solution');
-    explorationStatesService.saveSolution('First State', solution.explanation);
-
-    const firstState = explorationStatesService.getState('First State');
-    if (!firstState.interaction.solution) {
-      throw new Error('Solution should exist');
-    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution.correctAnswer
+        'abc'
       )
     ).toBe(true);
   });
@@ -180,18 +173,11 @@ describe('Solution Verification Service', () => {
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
-    const solution2 = Solution.createNew(false, 'xyz', 'nothing', 'solution');
-    explorationStatesService.saveSolution('First State', solution2.explanation);
-
-    const firstState = explorationStatesService.getState('First State');
-    if (!firstState.interaction.solution) {
-      throw new Error('Solution should exist');
-    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution.correctAnswer
+        'xyz'
       )
     ).toBe(false);
   });
@@ -231,18 +217,11 @@ describe('Solution Verification Service', () => {
     );
 
     stateInteractionIdService.savedMemento = 'TextInput';
-    const solution = Solution.createNew(false, 'abc', 'nothing', 'solution');
-    explorationStatesService.saveSolution('First State', solution.explanation);
-
-    const firstState = explorationStatesService.getState('First State');
-    if (!firstState.interaction.solution) {
-      throw new Error('Solution should exist');
-    }
     expect(
       solutionVerificationService.verifySolution(
         'First State',
         state.interaction,
-        firstState.interaction.solution.correctAnswer
+        'abc'
       )
     ).toBe(state.interaction.answerGroups[0].outcome.labelledAsCorrect);
   });

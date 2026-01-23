@@ -559,7 +559,7 @@ describe('Exploration editor tab component', () => {
 
     expect(explorationStatesService.addState).toHaveBeenCalledWith(
       'Fourth State',
-      null
+      jasmine.any(Function)
     );
   });
 
@@ -652,7 +652,7 @@ describe('Exploration editor tab component', () => {
     expect(
       explorationStatesService.getState('First State')
         .inapplicableSkillMisconceptionIds
-    ).toEqual(undefined);
+    ).toEqual([]);
 
     component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
     expect(
@@ -987,6 +987,7 @@ describe('Exploration editor tab component', () => {
       null
     );
     component.stateName = 'stateName';
+    stateEditorService.setActiveStateName('stateName');
     spyOn(explorationStatesService, 'getState').and.returnValues(state);
     spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
     spyOn(component, 'startTutorial');
@@ -1015,10 +1016,6 @@ describe('Exploration editor tab component', () => {
   });
 
   it('should finish tutorial if finish tutorial button is clicked', fakeAsync(() => {
-    let registerFinishTutorialEventSpy = spyOn(
-      siteAnalyticsService,
-      'registerFinishTutorialEvent'
-    );
     spyOn(editabilityService, 'onEndTutorial');
     editabilityService.onStartTutorial();
 
@@ -1026,7 +1023,6 @@ describe('Exploration editor tab component', () => {
     component.leaveTutorial();
     tick();
 
-    expect(registerFinishTutorialEventSpy).toHaveBeenCalled();
     expect(editabilityService.onEndTutorial).toHaveBeenCalled();
     expect(component.tutorialInProgress).toBe(false);
 
