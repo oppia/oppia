@@ -46,6 +46,11 @@ export interface LearnerExplorationSummaryBackendDict {
   total_cards_count?: number;
   visited_cards_count?: number;
   progress_percent?: number;
+  most_recently_reached_checkpoint_state_name?: string | null;
+  most_recently_reached_checkpoint_exp_version?: number | null;
+  furthest_reached_checkpoint_state_name?: string | null;
+  furthest_reached_checkpoint_exp_version?: number | null;
+  checkpoint_progress_percentage?: number | null;
 }
 
 export class LearnerExplorationSummary {
@@ -75,12 +80,20 @@ export class LearnerExplorationSummary {
     public totalCardsCount?: number,
     public visitedCardsCount?: number,
     public progressPercent?: number
-  ) {}
+  ) {
+    // Initialize checkpoint fields to null by default; they are populated below
+    // in createFromBackendDict when present on the payload.
+    this.mostRecentlyReachedCheckpointStateName = null;
+    this.mostRecentlyReachedCheckpointExpVersion = null;
+    this.furthestReachedCheckpointStateName = null;
+    this.furthestReachedCheckpointExpVersion = null;
+    this.checkpointProgressPercentage = null;
+  }
 
   static createFromBackendDict(
     expSummaryBacknedDict: LearnerExplorationSummaryBackendDict
   ): LearnerExplorationSummary {
-    return new LearnerExplorationSummary(
+    const summary = new LearnerExplorationSummary(
       expSummaryBacknedDict.category,
       expSummaryBacknedDict.community_owned,
       expSummaryBacknedDict.id,
@@ -101,5 +114,18 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.visited_cards_count,
       expSummaryBacknedDict.progress_percent
     );
+
+    summary.mostRecentlyReachedCheckpointStateName =
+      expSummaryBacknedDict.most_recently_reached_checkpoint_state_name ?? null;
+    summary.mostRecentlyReachedCheckpointExpVersion =
+      expSummaryBacknedDict.most_recently_reached_checkpoint_exp_version ?? null;
+    summary.furthestReachedCheckpointStateName =
+      expSummaryBacknedDict.furthest_reached_checkpoint_state_name ?? null;
+    summary.furthestReachedCheckpointExpVersion =
+      expSummaryBacknedDict.furthest_reached_checkpoint_exp_version ?? null;
+    summary.checkpointProgressPercentage =
+      expSummaryBacknedDict.checkpoint_progress_percentage ?? null;
+
+    return summary;
   }
 }

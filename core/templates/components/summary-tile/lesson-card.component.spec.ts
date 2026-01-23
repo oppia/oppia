@@ -80,6 +80,11 @@ describe('LessonCardComponent', () => {
     title: 'Test Title',
   };
 
+  const sampleExplorationWithProgress = {
+    ...sampleExploration,
+    progress_percent: 50,
+  };
+
   const sampleNode = {
     id: 'node_1',
     thumbnail_filename: 'image.png',
@@ -378,6 +383,18 @@ describe('LessonCardComponent', () => {
     expect(component.title).toEqual(sampleExploration.title);
 
     expect(component.progress).toEqual(0);
+    expect(component.lessonTopic).toEqual('Community Lesson');
+  }));
+
+  it('should use backend progressPercent for community lesson', fakeAsync(() => {
+    component.story = LearnerExplorationSummary.createFromBackendDict(
+      sampleExplorationWithProgress
+    );
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(50);
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 
