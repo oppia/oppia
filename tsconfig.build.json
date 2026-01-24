@@ -4,6 +4,7 @@
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "src/main.ts",
+    "core/templates/Polyfills.ts"
   ],
     "include": ["typings"],
     "exclude": [
