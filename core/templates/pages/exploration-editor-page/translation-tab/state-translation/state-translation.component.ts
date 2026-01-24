@@ -34,27 +34,29 @@ import {
   AnswerChoice,
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
-import {RouterService} from 'pages/exploration-editor-page/services/router.service';
-import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
-import {TranslationStatusService} from '../services/translation-status.service';
-import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
-import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
-import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
-import INTERACTION_SPECS from 'interactions/interaction_specs.json';
-import {Outcome} from 'domain/exploration/outcome.model';
-import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
-import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
-import {WrapTextWithEllipsisPipe} from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
-import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
-import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {BaseTranslatableObject} from 'interactions/rule-input-defs';
-import {Hint} from 'domain/exploration/hint-object.model';
-import {Solution} from 'domain/exploration/solution.model';
-import {EntityTranslationsService} from 'services/entity-translations.services';
-import {TranslatedContent} from 'domain/exploration/translated-content.model';
-import {TranslationLanguageService} from '../services/translation-language.service';
-import {PlatformFeatureService} from 'services/platform-feature.service';
+import { ExplorationLanguageCodeService } from 'pages/exploration-editor-page/services/exploration-language-code.service';
+import { AnswerGroup } from 'domain/exploration/answer-group.model';
+import { Hint } from 'domain/exploration/hint-object.model';
+import { Solution } from 'domain/exploration/solution.model';
+import { Outcome } from 'domain/exploration/outcome.model';
+import { TranslatedContent } from 'domain/exploration/translated-content.model';
+import { BaseTranslatableObject } from 'interactions/rule-input-defs';
+import { ExplorationHtmlFormatterService } from 'services/exploration-html-formatter.service';
+import { ExplorationStatesService } from 'pages/exploration-editor-page/services/exploration-states.service';
+import { RouterService } from 'pages/exploration-editor-page/services/router.service';
+import { EntityTranslationsService } from 'services/entity-translations.services';
+import { TranslationLanguageService } from '../services/translation-language.service';
+import { TranslationStatusService } from '../services/translation-status.service';
+import { TranslationTabActiveContentIdService } from '../services/translation-tab-active-content-id.service';
+import { TranslationTabActiveModeService } from '../services/translation-tab-active-mode.service';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { ConvertToPlainTextPipe } from 'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { WrapTextWithEllipsisPipe } from 'filters/string-utility-filters/wrap-text-with-ellipsis.pipe';
+import { ParameterizeRuleDescriptionPipe } from 'filters/parameterize-rule-description.pipe';
+import { PlatformFeatureService } from 'services/platform-feature.service';
+
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
 @Component({
   selector: 'oppia-state-translation',
@@ -126,6 +128,49 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
+  }
+
+  isOriginalLanguageActive(): boolean {
+    return (
+      this.translationLanguageService.getActiveLanguageCode() ===
+      this.explorationLanguageCodeService.displayed
+    );
+  }
+
+  isTranslationAvailable(contentId: string): boolean {
+    const langCode = this.translationLanguageService.getActiveLanguageCode();
+    const entityTranslations =
+      this.entityTranslationsService.languageCodeToLatestEntityTranslations[
+      langCode
+      ];
+    if (entityTranslations) {
+      const translation = entityTranslations.getWrittenTranslation(contentId);
+      return !!(translation && translation.translation);
+    }
+    return false;
+  }
+
+  isContentPresent(subtitled: SubtitledHtml | SubtitledUnicode): boolean {
+    if (!subtitled) {
+      return false;
+    }
+    const content =
+      subtitled instanceof SubtitledHtml ? subtitled.html : subtitled.unicode;
+    if (!content) {
+      return false;
+    }
+    if (subtitled instanceof SubtitledHtml) {
+      const text = this.ConvertToPlainTextPipe.transform(content);
+      return !!text && text.trim().length > 0;
+    }
+    return content.trim().length > 0;
+  }
+
+  isCardVisible(subtitled: SubtitledHtml | SubtitledUnicode): boolean {
+    if (!this.isVoiceoverModeActive()) {
+      return true;
+    }
+    return this.isContentPresent(subtitled);
   }
 
   getRequiredHtml(subtitledHtml: SubtitledHtml): string {
@@ -309,7 +354,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     let summary = '';
     let hasFeedback = defaultOutcome.hasNonemptyFeedback();
 
-    if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+    if (this.isVoiceoverModeActive()) {
+      summary = '';
+    } else if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
       summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
     } else if (answerGroupCount > 0) {
       summary = 'All other answers';
@@ -323,10 +370,14 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
       );
     }
-    summary = '[' + summary + '] ';
+    // Note: The summary already has brackets and trailing space at this point
+    // from the if-else block above.
+
+    summary = '[' + summary + ']';
+
 
     if (hasFeedback) {
-      summary += this.ConvertToPlainTextPipe.transform(
+      summary += ' ' + this.ConvertToPlainTextPipe.transform(
         defaultOutcome.feedback.html
       );
     }
@@ -344,7 +395,9 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     let outcome = answerGroup.outcome;
     let hasFeedback = outcome.hasNonemptyFeedback();
 
-    if (answerGroup.rules) {
+    if (this.isVoiceoverModeActive()) {
+      summary = '[]';
+    } else if (answerGroup.rules) {
       let firstRule = this.ConvertToPlainTextPipe.transform(
         this.parameterizeRuleDescriptionPipe.transform(
           answerGroup.rules[0],
@@ -352,7 +405,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
           answerChoices
         )
       );
-      summary = 'Answer ' + firstRule;
+      summary = firstRule;
 
       if (hasFeedback && shortenRule) {
         summary = this.wrapTextWithEllipsisPipe.transform(
@@ -360,13 +413,13 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
           AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT
         );
       }
-      summary = '[' + summary + '] ';
+      summary = '[' + summary + ']';
     }
 
     if (hasFeedback) {
-      summary += shortenRule
+      summary += ' ' + (shortenRule
         ? this.truncatePipe.transform(outcome.feedback.html, 30)
-        : this.ConvertToPlainTextPipe.transform(outcome.feedback.html);
+        : this.ConvertToPlainTextPipe.transform(outcome.feedback.html));
     }
     return summary;
   }
@@ -534,7 +587,13 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         contentId
       );
 
-    return {'border-left': '3px solid ' + color};
+    if (this.isVoiceoverModeActive() && !this.isOriginalLanguageActive()) {
+      if (!this.isTranslationAvailable(contentId)) {
+        color = '#808080';
+      }
+    }
+
+    return { 'border-left': '3px solid ' + color };
   }
 
   getSubtitledContentSummary(
