@@ -33,7 +33,7 @@ import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only
 import {Rule} from 'domain/exploration/rule.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
-import {SubtitledUnicode} from 'domain/exploration/subtitled-unicode.model.ts';
+import {SubtitledUnicode } from 'domain/exploration/subtitled-unicode.model';
 import {EntityTranslation} from 'domain/translation/entity-translation.model';
 import {ParameterizeRuleDescriptionPipe} from 'filters/parameterize-rule-description.pipe';
 import {ConvertToPlainTextPipe} from 'filters/string-utility-filters/convert-to-plain-text.pipe';
@@ -52,11 +52,15 @@ import {ExternalSaveService} from 'services/external-save.service';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {TranslationTabActiveContentIdService} from '../services/translation-tab-active-content-id.service';
 import {TranslationTabActiveModeService} from '../services/translation-tab-active-mode.service';
+import {TranslationStatusService } from '../services/translation-status.service';
 import {StateTranslationComponent} from './state-translation.component';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import { TruncatePipe } from 'filters/string-utility-filters/truncate.pipe';
+import { FormatRtePreviewPipe } from 'filters/format-rte-preview.pipe';
+import { PlatformFeatureService } from 'services/platform-feature.service';
 
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
@@ -99,11 +103,49 @@ class MockConvertToPlainTextPipe {
   }
 }
 
+class MockExplorationLanguageCodeService {
+  onExplorationPropertyChanged = new EventEmitter();
+  get displayed() {
+    return 'en';
+  }
+  init(value: any) { }
+  saveDisplayedValue() { }
+  restoreFromMemento() { }
+}
+
+class MockTranslationStatusService {
+  getActiveStateComponentStatusColor(tabId) {
+    return '#D14836';
+  }
+  getActiveStateComponentNeedsUpdateStatus(tabId) {
+    return false;
+  }
+  getActiveStateContentIdNeedsUpdateStatus(contentId) {
+    return false;
+  }
+  getActiveStateContentIdStatusColor(contentId) {
+    return '#D14836';
+  }
+  refresh() { }
+}
+
+@Pipe({ name: 'formatRtePreview' })
+class MockFormatRtePreviewPipe {
+  transform(value: string): string {
+    return value;
+  }
+}
+
+class MockPlatformFeatureService {
+  // Add any methods that are used in the component if needed
+}
+
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let translationLanguageService: TranslationLanguageService;
@@ -246,10 +288,13 @@ describe('State translation component', () => {
         MockTruncatePipe,
         MockConvertToPlainTextPipe,
         MockWrapTextWithEllipsisPipe,
+        MockFormatRtePreviewPipe
       ],
       providers: [
         WrapTextWithEllipsisPipe,
         ConvertToPlainTextPipe,
+        {provide: TruncatePipe, useClass: MockTruncatePipe },
+        {provide: FormatRtePreviewPipe, useClass: MockFormatRtePreviewPipe },
         AngularNameService,
         {provide: PageContextService, useClass: MockPageContextService},
         ContinueValidationService,
@@ -267,6 +312,10 @@ describe('State translation component', () => {
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
+        ExplorationHtmlFormatterService,
+        RouterService,
+        EntityTranslationsService,
+        { provide: PlatformFeatureService, useClass: MockPlatformFeatureService },
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -276,8 +325,12 @@ describe('State translation component', () => {
           useClass: MockParameterizeRuleDescriptionPipe,
         },
         {
-          provide: WrapTextWithEllipsisPipe,
-          useClass: MockWrapTextWithEllipsisPipe,
+          provide: ExplorationLanguageCodeService,
+          useClass: MockExplorationLanguageCodeService,
+        },
+        {
+          provide: TranslationStatusService,
+          useClass: MockTranslationStatusService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -290,6 +343,9 @@ describe('State translation component', () => {
 
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -309,7 +365,6 @@ describe('State translation component', () => {
         language_code: 'hi',
         translations: {},
       });
-
     spyOnProperty(
       stateEditorService,
       'onRefreshStateTranslation'
@@ -318,13 +373,14 @@ describe('State translation component', () => {
       'Introduction'
     );
     ckEditorCopyContentService.copyModeActive = true;
-    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      'en'
-    );
     spyOn(
       translationTabActiveModeService,
       'isVoiceoverModeActive'
     ).and.returnValue(true);
+    spyOn(
+      translationTabActiveModeService,
+      'isTranslationModeActive'
+    ).and.returnValue(false);
 
     explorationStatesService.init(explorationState1, false);
     component.isTranslationTabBusy = false;
@@ -335,7 +391,9 @@ describe('State translation component', () => {
   });
 
   afterEach(() => {
-    component.ngOnDestroy();
+    if (component) {
+      component.ngOnDestroy();
+    }
   });
 
   describe(
@@ -377,11 +435,11 @@ describe('State translation component', () => {
 
       it('should broadcast copy to ck editor when clicking on content', () => {
         spyOn(ckEditorCopyContentService, 'broadcastCopy').and.callFake(
-          () => {}
+           () => { }
         );
 
         let mockEvent = {
-          stopPropagation: () => {},
+          stopPropagation: () => { },
           target: {},
         } as Event;
         component.onContentClick(mockEvent);
@@ -406,7 +464,7 @@ describe('State translation component', () => {
         expect(component.tabNeedUpdatesStatus('content')).toBe(false);
         expect(component.contentIdNeedUpdates('content_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('content_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #808080',
         });
       });
 
@@ -429,7 +487,7 @@ describe('State translation component', () => {
           expect(component.contentIdNeedUpdates('ca_placeholder')).toBe(false);
           expect(component.contentIdStatusColorStyle('ca_placeholder')).toEqual(
             {
-              'border-left': '3px solid #D14836',
+              'border-left': '3px solid #808080',
             }
           );
         }
@@ -450,7 +508,7 @@ describe('State translation component', () => {
         expect(component.tabNeedUpdatesStatus('feedback')).toBe(false);
         expect(component.contentIdNeedUpdates('feedback_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('feedback_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #808080',
         });
       });
 
@@ -469,7 +527,7 @@ describe('State translation component', () => {
         expect(component.tabNeedUpdatesStatus('hint')).toBe(false);
         expect(component.contentIdNeedUpdates('hint_1')).toBe(false);
         expect(component.contentIdStatusColorStyle('hint_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #808080',
         });
       });
 
@@ -488,7 +546,7 @@ describe('State translation component', () => {
         expect(component.tabNeedUpdatesStatus('solution')).toBe(false);
         expect(component.contentIdNeedUpdates('solution')).toBe(false);
         expect(component.contentIdStatusColorStyle('solution_1')).toEqual({
-          'border-left': '3px solid #D14836',
+          'border-left': '3px solid #808080',
         });
       });
 
@@ -604,6 +662,9 @@ describe('State translation component', () => {
       });
 
       it('should get subtitled html data translation', () => {
+        spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+          'en'
+        );
         let subtitledObject = SubtitledHtml.createFromBackendDict({
           content_id: 'content_1',
           html: 'This is the html',
@@ -617,6 +678,9 @@ describe('State translation component', () => {
       });
 
       it('should get subtitled Unicode data translation', () => {
+        spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
+          'en'
+        );
         let subtitledObject = SubtitledUnicode.createFromBackendDict({
           content_id: 'content_1',
           unicode_str: 'This is the unicode',
@@ -626,6 +690,59 @@ describe('State translation component', () => {
         );
         expect(component.getSubtitledContentSummary(subtitledObject)).toBe(
           'This is the unicode'
+        );
+      });
+
+      it('should return null when html translation is missing in non-original language', () => {
+        spyOnProperty(
+          explorationLanguageCodeService,
+          'displayed',
+          'get'
+        ).and.returnValue('en');
+        // Change language to Hindi ('hi'), which is different from original ('en').
+        translationLanguageService.setActiveLanguageCode('hi');
+
+        let subtitledObject = SubtitledHtml.createFromBackendDict({
+          content_id: 'content_1',
+          html: 'Original Content',
+        });
+
+        // The entityTranslationsService was initialized with 'hi' but empty translations in beforeEach.
+        // So getWrittenTranslation will return null.
+        expect(component.getRequiredHtml(subtitledObject)).toBeNull();
+      });
+
+      it('should return null when unicode translation is missing in non-original language', () => {
+        spyOnProperty(
+          explorationLanguageCodeService,
+          'displayed',
+          'get'
+        ).and.returnValue('en');
+        translationLanguageService.setActiveLanguageCode('hi');
+
+        let subtitledObject = SubtitledUnicode.createFromBackendDict({
+          content_id: 'content_1',
+          unicode_str: 'Original Unicode',
+        });
+
+        expect(component.getRequiredUnicode(subtitledObject)).toBeNull();
+      });
+
+      it('should return original html content if language matches exploration language', () => {
+        spyOnProperty(
+          explorationLanguageCodeService,
+          'displayed',
+          'get'
+        ).and.returnValue('en');
+        translationLanguageService.setActiveLanguageCode('en');
+
+        let subtitledObject = SubtitledHtml.createFromBackendDict({
+          content_id: 'content_1',
+          html: 'Original Content',
+        });
+
+        expect(component.getRequiredHtml(subtitledObject)).toBe(
+          'Original Content'
         );
       });
 
@@ -717,6 +834,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
 
   let explorationState1 = {
     Introduction: {
@@ -873,6 +991,10 @@ describe('State translation component', () => {
         TranslationLanguageService,
         TranslationTabActiveContentIdService,
         TranslationTabActiveModeService,
+         {
+          provide: ExplorationLanguageCodeService,
+          useClass: MockExplorationLanguageCodeService,
+        },
         {
           provide: NgbModal,
           useClass: MockNgbModal,
@@ -904,6 +1026,9 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService.init(explorationState1, false);
 
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
@@ -924,13 +1049,14 @@ describe('State translation component', () => {
       'Introduction'
     );
     ckEditorCopyContentService.copyModeActive = true;
-    spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue(
-      'en'
-    );
     spyOn(
       translationTabActiveModeService,
       'isVoiceoverModeActive'
     ).and.returnValue(false);
+    spyOn(
+      translationTabActiveModeService,
+      'isTranslationModeActive'
+    ).and.returnValue(true);
 
     explorationStatesService.init(explorationState1, false);
     spyOnProperty(
@@ -1487,7 +1613,7 @@ describe('State translation component', () => {
   });
 
   it('should correctly navigate to the given state', () => {
-    spyOn(routerService, 'navigateToMainTab').and.callFake(() => {});
+    spyOn(routerService, 'navigateToMainTab').and.callFake(() => { });
 
     component.navigateToState('new_state');
 
@@ -1507,12 +1633,12 @@ describe('State translation component', () => {
     expect(htmlData).toBe('<p>HTML data</p>');
   });
 
-  it('should return original html when translation not available', () => {
+  it('should return null when translation not available', () => {
     const htmlData = component.getRequiredHtml(
       new SubtitledHtml('<p>HTML data</p>', 'content_0')
     );
 
-    expect(htmlData).toBe('<p>HTML data</p>');
+    expect(htmlData).toBeNull();
   });
 
   it('should return unicode when translation tab is active', () => {
@@ -1541,7 +1667,7 @@ describe('State translation component', () => {
     expect(htmlData).toBe('Translated HTML');
   });
 
-  it('should return unicode when translation is empty in voiceover mode', () => {
+   it('should return null when translation is empty in voiceover mode', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_0: new TranslatedContent('Translated unicode', 'unicode', true),
@@ -1551,10 +1677,10 @@ describe('State translation component', () => {
       unicode_str: 'This is the unicode',
     });
     const unicodeData = component.getRequiredUnicode(subtitledObject);
-    expect(unicodeData).toBe('This is the unicode');
+    expect(unicodeData).toBeNull();
   });
 
-  it('should return translation html when translation no available', () => {
+ it('should return null when translation no available', () => {
     entityTranslationsService.languageCodeToLatestEntityTranslations.en =
       new EntityTranslation('entityId', 'entityType', 'entityVersion', 'hi', {
         content_1: new TranslatedContent('Translated HTML', 'html', true),
@@ -1564,7 +1690,7 @@ describe('State translation component', () => {
       new SubtitledHtml('<p>HTML data</p>', 'content_0')
     );
 
-    expect(htmlData).toBe('<p>HTML data</p>');
+    expect(htmlData).toBeNull();
   });
 
   it('should return translated unicode in voiceover mode when translation exist', () => {
