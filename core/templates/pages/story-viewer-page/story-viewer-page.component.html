@@ -21,7 +21,10 @@
 
         <div *ngIf="showChapters()" class="d-md-block oppia-story-viewer-card-container">
           <a *ngFor="let node of storyPlaythroughObject.getStoryNodes();let last = isLast;let index = index"
-             [href]="getExplorationUrl(node)" tabindex="0">
+             [href]="getChapterExplorationUrl(node)"
+             [class.oppia-chapter-coming-soon]="isChapterDisplayedAsComingSoon(node)"
+             [attr.title]="isChapterDisplayedAsComingSoon(node) ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null"
+             tabindex="0">
 
             <div>
               <div class="fx-row">
@@ -42,15 +45,18 @@
                   <img class="oppia-lesson-icon-completed e2e-test-lesson-icon-completed"
                        [src]="getStaticImageUrl('/general/collection_paw.svg')"
                        *ngIf="node.isCompleted()">
-                  <div *ngIf="!node.isCompleted() && (node.getId() === storyPlaythroughObject.getNextPendingNodeId())"
+                  <div *ngIf="!node.isCompleted() && !isChapterDisplayedAsComingSoon(node) && (node.getId() === storyPlaythroughObject.getNextPendingNodeId())"
                        class="oppia-lesson-icon-uncompleted e2e-test-lesson-icon-uncompleted">
                   </div>
-                  <div *ngIf="!node.isCompleted() && (node.getId() !== storyPlaythroughObject.getNextPendingNodeId())"
+                  <div *ngIf="!node.isCompleted() && !isChapterDisplayedAsComingSoon(node) && (node.getId() !== storyPlaythroughObject.getNextPendingNodeId())"
                        class="oppia-lesson-icon-uncompleted oppia-lesson-icon-unavailable e2e-test-lesson-icon-uncompleted">
+                  </div>
+                  <div *ngIf="isChapterDisplayedAsComingSoon(node)"
+                       class="oppia-lesson-icon-uncompleted oppia-lesson-icon-coming-soon e2e-test-lesson-icon-coming-soon">
                   </div>
                 </div>
 
-                <div class="oppia-story-viewer-card">
+                <div class="oppia-story-viewer-card" [class.oppia-story-viewer-card-coming-soon]="isChapterDisplayedAsComingSoon(node)">
                   <span class="oppia-chapter-title e2e-test-chapter-title" aria-live="assertive">
                     <span [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTER' | translate"></span>
                     <span *ngIf="!isHackyStoryNodeTitleTranslationDisplayed(index)">
@@ -58,6 +64,9 @@
                     </span>
                     <span *ngIf="isHackyStoryNodeTitleTranslationDisplayed(index)">
                       {{index + 1}}: {{ storyNodesTitleTranslationKeys[index] | translate }}
+                    </span>
+                    <span *ngIf="isChapterDisplayedAsComingSoon(node)" class="oppia-coming-soon-label">
+                      ({{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }})
                     </span>
                   </span>
 
