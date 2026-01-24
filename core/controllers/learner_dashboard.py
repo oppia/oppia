@@ -263,6 +263,13 @@ class LearnerDashboardExplorationsProgressHandler(
                 learner_progress.completed_exp_summaries
             )
         )
+        # Always add progress_percent = 100 for completed explorations.
+        completed_with_progress: List[Dict[str, Any]] = []
+        for exp_summary in completed_exp_summary_dicts:
+            # Here we use type Any because progress_percent is not part of the base TypedDict.
+            summary_with_progress: Dict[str, Any] = dict(exp_summary)
+            summary_with_progress['progress_percent'] = 100
+            completed_with_progress.append(summary_with_progress)
 
         incomplete_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
@@ -282,6 +289,7 @@ class LearnerDashboardExplorationsProgressHandler(
             exp_user_data = exp_fetchers.get_exploration_user_data(
                 self.user_id, progress_dict['id']
             )
+            checkpoints_in_order = []
             if exp_user_data is not None:
                 progress_dict['most_recently_reached_checkpoint_state_name'] = (
                     exp_user_data.most_recently_reached_checkpoint_state_name
@@ -300,36 +308,38 @@ class LearnerDashboardExplorationsProgressHandler(
                 furthest_state_name = (
                     exp_user_data.furthest_reached_checkpoint_state_name
                 )
-                if furthest_state_name is not None:
-                    try:
-                        current_exp = exp_fetchers.get_exploration_by_id(
-                            progress_dict['id'], strict=True
+                try:
+                    current_exp = exp_fetchers.get_exploration_by_id(
+                        progress_dict['id'], strict=True
+                    )
+                    checkpoints_in_order = (
+                        user_services.get_checkpoints_in_order(
+                            current_exp.init_state_name, current_exp.states
                         )
-                        checkpoints_in_order = (
-                            user_services.get_checkpoints_in_order(
-                                current_exp.init_state_name,
-                                current_exp.states,
-                            )
-                        )
-                        if (
-                            checkpoints_in_order
-                            and furthest_state_name in checkpoints_in_order
-                        ):
-                            total_checkpoints = len(checkpoints_in_order)
-                            furthest_index = checkpoints_in_order.index(
-                                furthest_state_name
-                            )
-                            raw_progress = int(
-                                round(
-                                    ((furthest_index + 1) * 100)
-                                    / total_checkpoints
-                                )
-                            )
-                            progress_dict['progress_percent'] = min(
-                                max(raw_progress, 1), 99
-                            )
-                    except Exception:
-                        pass
+                    )
+                except Exception:
+                    checkpoints_in_order = []
+
+                if (
+                    checkpoints_in_order
+                    and furthest_state_name in checkpoints_in_order
+                ):
+                    total_checkpoints = len(checkpoints_in_order)
+                    furthest_index = checkpoints_in_order.index(
+                        furthest_state_name
+                    )
+                    raw_progress = int(
+                        round(((furthest_index + 1) * 100) / total_checkpoints)
+                    )
+                    progress_dict['progress_percent'] = min(
+                        max(raw_progress, 1), 99
+                    )
+                else:
+                    # No checkpoints, so progress is 0.
+                    progress_dict['progress_percent'] = 0
+            else:
+                # No user data, so also no checkpoints, progress is 0.
+                progress_dict['progress_percent'] = 0
             incomplete_with_progress.append(progress_dict)
 
         exploration_playlist_summary_dicts = (
@@ -360,7 +370,7 @@ class LearnerDashboardExplorationsProgressHandler(
 
         self.values.update(
             {
-                'completed_explorations_list': completed_exp_summary_dicts,
+                'completed_explorations_list': completed_with_progress,
                 'incomplete_explorations_list': incomplete_with_progress,
                 'exploration_playlist': exploration_playlist_summary_dicts,
                 'number_of_nonexistent_explorations': (
