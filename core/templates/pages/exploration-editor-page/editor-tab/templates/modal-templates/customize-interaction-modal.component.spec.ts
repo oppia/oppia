@@ -41,6 +41,7 @@ import {
   CustomizeInteractionModalComponent,
   AllowedInteractionCategories,
 } from './customize-interaction-modal.component';
+import {ConfirmLeaveModalComponent} from 'pages/exploration-editor-page/modal-templates/confirm-leave-modal.component';
 import {InteractionDetailsCacheService} from 'pages/exploration-editor-page/editor-tab/services/interaction-details-cache.service';
 import {StateCustomizationArgsService} from 'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import {StateEditorService} from 'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -300,11 +301,16 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should close modal when user click close', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
-      return {
-        result: Promise.resolve(),
-      } as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.callFake(
+      (
+        dlg: typeof ConfirmLeaveModalComponent,
+        opt?: {backdrop?: string | boolean; size?: string}
+      ) => {
+        return {
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      }
+    );
     spyOn(ngbActiveModal, 'dismiss');
 
     component.cancelWithConfirm();
@@ -314,11 +320,16 @@ describe('Customize Interaction Modal Component', () => {
   }));
 
   it('should stay in modal if user click cancel', fakeAsync(() => {
-    spyOn(ngbModal, 'open').and.callFake((dlg: unknown, opt: unknown) => {
-      return {
-        result: Promise.reject(),
-      } as NgbModalRef;
-    });
+    spyOn(ngbModal, 'open').and.callFake(
+      (
+        dlg: typeof ConfirmLeaveModalComponent,
+        opt?: {backdrop?: string | boolean; size?: string}
+      ) => {
+        return {
+          result: Promise.reject(),
+        } as NgbModalRef;
+      }
+    );
     spyOn(ngbActiveModal, 'dismiss');
 
     component.cancelWithConfirm();
@@ -425,7 +436,9 @@ describe('Customize Interaction Modal Component', () => {
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
           [] as AllowedInteractionCategories[],
-          AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+          [
+            ...AppConstants.ALLOWED_QUESTION_INTERACTION_CATEGORIES,
+          ] as AllowedInteractionCategories[]
         ) as AllowedInteractionCategories[]
       );
       expect(component.customizationModalReopened).toBeTruthy();
@@ -453,7 +466,9 @@ describe('Customize Interaction Modal Component', () => {
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
           [] as AllowedInteractionCategories[],
-          AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+          [
+            ...AppConstants.ALLOWED_EXPLORATION_IN_STORY_INTERACTION_CATEGORIES,
+          ] as AllowedInteractionCategories[]
         ) as AllowedInteractionCategories[]
       );
       expect(component.customizationModalReopened).toBeTruthy();
@@ -479,7 +494,9 @@ describe('Customize Interaction Modal Component', () => {
       expect(component.allowedInteractionCategories).toEqual(
         Array.prototype.concat.apply(
           [] as AllowedInteractionCategories[],
-          AppConstants.ALLOWED_INTERACTION_CATEGORIES as unknown as AllowedInteractionCategories[]
+          [
+            ...AppConstants.ALLOWED_INTERACTION_CATEGORIES,
+          ] as AllowedInteractionCategories[]
         ) as AllowedInteractionCategories[]
       );
     })

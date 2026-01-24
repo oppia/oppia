@@ -34,7 +34,10 @@ describe('Solution Verification Service', () => {
   let stateCustomizationArgsService: StateCustomizationArgsService;
   let solutionVerificationService: SolutionVerificationService;
   let stateEditorService: StateEditorService;
-  let mockInteractionState: Record<string, unknown>;
+  let mockInteractionState: Record<
+    string,
+    {display_mode: string; is_terminal: boolean}
+  >;
 
   beforeEach(() => {
     mockInteractionState = {

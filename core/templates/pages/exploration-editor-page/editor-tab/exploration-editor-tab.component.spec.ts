@@ -133,7 +133,10 @@ describe('Exploration editor tab component', () => {
       gtag: (
         value1: string,
         value2: string,
-        value3: Record<string, unknown>
+        value3: Record<
+          string,
+          string | number | boolean | string[] | null | undefined
+        >
       ) => {},
       navigator: {
         onLine: true,
