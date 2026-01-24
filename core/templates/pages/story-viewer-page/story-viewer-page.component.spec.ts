@@ -294,7 +294,7 @@ describe('Story Viewer Page component', () => {
 
     component.ngOnInit();
 
-    expect(component.showChapters()).toBeFalse();
+    expect(component.showChapters()).toBe(false);
   });
 
   it('should throw error if story url fragment is not present', () => {
@@ -393,7 +393,7 @@ describe('Story Viewer Page component', () => {
       'node_2'
     );
 
-    expect(component.showChapters()).toBeTrue();
+    expect(component.showChapters()).toBe(true);
   });
 
   it('should sign in correctly', fakeAsync(() => {
@@ -551,6 +551,7 @@ describe('Story Viewer Page component', () => {
       completed: true,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
+      status: 'not_started',
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
@@ -589,6 +590,7 @@ describe('Story Viewer Page component', () => {
       completed: false,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
+      status: 'not_started',
     };
 
     var storyPlaythroughBackendObject = {
