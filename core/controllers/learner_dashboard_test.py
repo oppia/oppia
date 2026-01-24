@@ -33,9 +33,7 @@ from typing import Final
 
 
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
-    """Test for redirecting the old learner dashboard page URL
-    to the new one.
-    """
+    """Test for redirecting the old learner dashboard page URL to the new one."""
 
     def test_old_learner_dashboard_page_url(self) -> None:
         """Test to validate that the old learner dashboard page url redirects
