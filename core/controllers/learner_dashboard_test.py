@@ -987,13 +987,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.assertEqual(exp_summary['progress_percent'], 25)
 
             # User reaches second checkpoint.
+
             user_services.update_learner_checkpoint_progress(
-                self.viewer_id,
-                self.EXP_ID_1,
-                'Checkpoint1',
-                1,
-            )
-            learner_progress_services.mark_exploration_as_incomplete(
                 self.viewer_id,
                 self.EXP_ID_1,
                 'Checkpoint1',
