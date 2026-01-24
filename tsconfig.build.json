@@ -6,7 +6,9 @@
     "src/main.ts",
     "core/templates/Polyfills.ts"
   ],
-    "include": ["typings"],
+    "include": ["typings",
+    "pages/lightweight-oppia-root/app.module"
+  ],
     "exclude": [
         "core/tests",
         "**/*.spec.ts",
