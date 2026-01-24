@@ -116,28 +116,28 @@ describe('ClassroomNavigationLinksComponent', () => {
   });
 
   it('should set component properties on initialization', fakeAsync(() => {
-    classroomBackendApiService.getAllClassroomsSummaryAsync.and.returnValue(
-      Promise.resolve(dummyClassroomSummaries)
-    );
+    (
+      classroomBackendApiService.getAllClassroomsSummaryAsync as jasmine.Spy
+    ).and.returnValue(Promise.resolve(dummyClassroomSummaries));
 
     expect(component.classroomSummaries.length).toEqual(0);
-    expect(component.isLoading).toBeTrue();
+    expect(component.isLoading).toBe(true);
 
     component.ngOnInit();
     tick();
 
     // It should store all public classrooms.
     expect(component.classroomSummaries.length).toEqual(3);
-    expect(component.isLoading).toBeFalse();
+    expect(component.isLoading).toBe(false);
   }));
 
   it('should get classroom thumbnail', () => {
     const classroomId = 'math';
     const thumbnailFilename = 'thumbnail.svg';
 
-    assetsBackendApiService.getThumbnailUrlForPreview.and.returnValue(
-      '/thumbnail/thumbnail.svg'
-    );
+    (
+      assetsBackendApiService.getThumbnailUrlForPreview as jasmine.Spy
+    ).and.returnValue('/thumbnail/thumbnail.svg');
 
     const result = component.getClassroomThumbnail(
       classroomId,
@@ -175,7 +175,7 @@ describe('ClassroomNavigationLinksComponent', () => {
     const result =
       component.isHackyClassroomNameTranslationDisplayed(classroomName);
 
-    expect(result).toBeTrue();
+    expect(result).toBe(true);
     expect(
       i18nLanguageCodeService.isClassroomnNameTranslationAvailable
     ).toHaveBeenCalledWith(classroomName);
@@ -204,7 +204,7 @@ describe('ClassroomNavigationLinksComponent', () => {
       classroomBackendApiService.getAllClassroomsSummaryAsync
     ).not.toHaveBeenCalled();
     expect(component.classroomSummaries).toEqual([]);
-    expect(component.isLoading).toBeTrue();
+    expect(component.isLoading).toBe(true);
   }));
 
   it('should return the correct number of classrooms from getClassroomCount', () => {

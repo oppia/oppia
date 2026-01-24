@@ -36,11 +36,9 @@ import {UrlInterpolationService} from 'domain/utilities/url-interpolation.servic
 import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 import {StateCard} from 'domain/state_card/state-card.model';
-import {RecordedVoiceovers} from 'domain/exploration/recorded-voiceovers.model';
 import {Interaction} from 'domain/exploration/interaction.model';
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ExplorationModeService} from 'pages/exploration-player-page/services/exploration-mode.service';
-
 class MockCheckpointCelebrationUtilityService {
   isOnCheckpointedState = false;
   openLessonInformationModalEmitter = new EventEmitter<void>();
@@ -304,7 +302,6 @@ describe('Checkpoint celebration modal component', function () {
           },
         },
       }),
-      RecordedVoiceovers.createEmpty(),
       'content'
     );
   });
@@ -646,20 +643,12 @@ describe('Checkpoint celebration modal component', function () {
   it('should reset timer', () => {
     component.checkpointTimerTemplateRef = {
       nativeElement: {
-        // This throws "Type
-        // '{ strokeDasharray: string; strokeDashoffset: string; }' is missing
-        // the following properties from type 'CSSStyleDeclaration':
-        // accentColor, alignContent, alignItems, alignSelf, and 457 more.".
-        // We need to suppress this error because only these values are
-        // needed for testing and providing a value for every single property is
-        // unnecessary.
-        // @ts-expect-error
         style: {
           strokeDashoffset: '',
           transitionDuration: '',
         },
       },
-    };
+    } as unknown as HTMLElement;
     const rtlSpy = spyOn(
       i18nLanguageCodeService,
       'isLanguageRTL'

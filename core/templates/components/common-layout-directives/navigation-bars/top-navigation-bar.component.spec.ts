@@ -475,11 +475,6 @@ describe('TopNavigationBarComponent', () => {
       .and.returnValues(
         [
           {
-            // This throws "Type '{ innerText: string; }' is not assignable to
-            // type 'Element'.". We need to suppress this error because if i18n
-            // has not run, then the tabs will not have text content and so
-            // their innerText.length value will be 0.
-            // @ts-expect-error
             innerText: '',
           },
         ],
@@ -547,13 +542,6 @@ describe('TopNavigationBarComponent', () => {
     spyOn(wds, 'isWindowNarrow').and.returnValues(false, true);
     spyOn(document, 'querySelector')
       .withArgs('div.collapse.navbar-collapse')
-      // This throws "Type '{ clientWidth: number; }' is missing the following
-      // properties from type 'Element': assignedSlot, attributes, classList,
-      // className, and 122 more.". We need to suppress this error because
-      // typescript expects around 120 more properties than just one
-      // (clientWidth). We need only one 'clientWidth' for
-      // testing purposes.
-      // @ts-expect-error
       .and.returnValue({
         clientHeight: 61,
       });
@@ -904,14 +892,14 @@ describe('TopNavigationBarComponent', () => {
     () => {
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeFalse();
+      ).toBe(false);
 
       mockPlatformFeatureService.status.ShowFeedbackUpdatesInProfilePicDropdownMenu.isEnabled =
         true;
 
       expect(
         component.isShowFeedbackUpdatesInProfilepicDropdownFeatureFlagEnable()
-      ).toBeTrue();
+      ).toBe(true);
     }
   );
 
@@ -927,21 +915,21 @@ describe('TopNavigationBarComponent', () => {
     tick();
 
     expect(learnerGroupSpy).not.toHaveBeenCalled();
-    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBeFalse();
+    expect(component.LEARNER_GROUPS_FEATURE_IS_ENABLED).toBe(false);
   }));
 
   it('should hide menu icon when page contains a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/blog/post123');
     component.PAGES_WITH_BACK_STATE = ['/blog/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeFalse();
+    expect(component.menuIconIsShown).toBe(false);
   });
 
   it('should show menu icon when page does not contain a back button', () => {
     spyOn(urlService, 'getPathname').and.returnValue('/classroom/math');
     component.PAGES_WITH_BACK_STATE = ['/blog/', '/learner-dashboard/'];
     component.ngOnInit();
-    expect(component.menuIconIsShown).toBeTrue();
+    expect(component.menuIconIsShown).toBe(true);
   });
 
   it('should set classroomSummariesLength from DOM data attribute', () => {

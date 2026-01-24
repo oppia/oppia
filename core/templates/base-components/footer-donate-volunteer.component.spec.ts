@@ -125,7 +125,9 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Donate link', fakeAsync(() => {
     const donateLink = document.createElement('a');
     donateLink.setAttribute('href', '/donate');
-    component.el.nativeElement.appendChild(donateLink);
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      donateLink
+    );
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -143,7 +145,9 @@ describe('FooterDonateVolunteerComponent', () => {
   it('should prevent default navigation for Volunteer link', fakeAsync(() => {
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(volunteerLink);
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      volunteerLink
+    );
     component.ngAfterViewInit();
     tick();
     const event = new MouseEvent('click', {
@@ -163,10 +167,14 @@ describe('FooterDonateVolunteerComponent', () => {
     donateLink.setAttribute('href', '/donate');
     const volunteerLink = document.createElement('a');
     volunteerLink.setAttribute('href', '/volunteer');
-    component.el.nativeElement.appendChild(donateLink);
-    component.el.nativeElement.appendChild(volunteerLink);
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      donateLink
+    );
+    (component as unknown as {el: ElementRef}).el.nativeElement.appendChild(
+      volunteerLink
+    );
     const rendererListenSpy = spyOn(
-      component.renderer,
+      (component as unknown as {renderer: Renderer2}).renderer,
       'listen'
     ).and.callThrough();
     component.ngAfterViewInit();

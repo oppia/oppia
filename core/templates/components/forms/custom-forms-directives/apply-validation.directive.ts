@@ -22,6 +22,7 @@ import {
   Validator,
   AbstractControl,
   ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import {UnderscoresToCamelCasePipe} from 'filters/string-utility-filters/underscores-to-camel-case.pipe';
 import {Validator as OppiaValidator} from 'interactions/TextInput/directives/text-input-validation.service';
@@ -39,8 +40,9 @@ import {SchemaValidators} from '../validators/schema-validators';
   ],
 })
 export class ApplyValidationDirective implements Validator {
-  @Input() validators: OppiaValidator[];
+  @Input() validators!: OppiaValidator[];
   underscoresToCamelCasePipe = new UnderscoresToCamelCasePipe();
+
   validate(control: AbstractControl): ValidationErrors | null {
     if (!this.validators || this.validators.length === 0) {
       return null;
@@ -51,15 +53,23 @@ export class ApplyValidationDirective implements Validator {
       const validatorName = this.underscoresToCamelCasePipe.transform(
         validatorSpec.id
       );
-      const filterArgs = {};
+      const filterArgs: Record<string, unknown> = {};
       for (let key in validatorSpec) {
         if (key !== 'id') {
           filterArgs[this.underscoresToCamelCasePipe.transform(key)] =
-            cloneDeep(validatorSpec[key]);
+            cloneDeep(
+              (validatorSpec as unknown as Record<string, unknown>)[key]
+            );
         }
       }
-      if (SchemaValidators[validatorName]) {
-        const error = SchemaValidators[validatorName](filterArgs)(control);
+
+      const validatorsMap = SchemaValidators as unknown as Record<
+        string,
+        (args: Record<string, unknown>) => ValidatorFn
+      >;
+
+      if (validatorsMap[validatorName]) {
+        const error = validatorsMap[validatorName](filterArgs)(control);
         if (error !== null) {
           errorsPresent = true;
           allValidationErrors = {...allValidationErrors, ...error};
