@@ -6836,6 +6836,17 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.mock_testapp = webtest.TestApp(
+            webapp2.WSGIApplication(
+                [
+                    webapp2.Route(
+                        '/mock_edit_question/<question_id>', self.MockHandler
+                    )
+                ],
+                debug=feconf.DEBUG,
+            )
+        )
+
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_skill('skill_1', self.admin_id)
         self.save_new_topic(
@@ -6860,16 +6871,6 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         )
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME], self.topic_id)
         self.set_topic_managers([self.user_a], 'other_topic')
-        self.mock_testapp = webtest.TestApp(
-            webapp2.WSGIApplication(
-                [
-                    webapp2.Route(
-                        '/mock_edit_question/<question_id>', self.MockHandler
-                    )
-                ],
-                debug=feconf.DEBUG,
-            )
-        )
 
     def test_guest_cannot_edit_question(self) -> None:
         with self.swap(self, 'testapp', self.mock_testapp):
