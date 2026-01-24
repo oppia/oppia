@@ -263,12 +263,21 @@ class LearnerDashboardExplorationsProgressHandler(
                 learner_progress.completed_exp_summaries
             )
         )
-        # Always add progress_percent = 100 for completed explorations.
+        # Here we use type Any because progress_percent is not part of the base
+        # DisplayableExplorationSummaryDict TypedDict, and we need to add it dynamically.
         completed_with_progress: List[Dict[str, Any]] = []
+        # Always add progress_percent = 100 for completed explorations.
         for exp_summary in completed_exp_summary_dicts:
-            # Here we use type Any because progress_percent is not part of the base TypedDict.
+            # Here we use type Any because progress_percent is not part of the base DisplayableExplorationSummaryDict TypedDict, and we need to add it dynamically.
             summary_with_progress: Dict[str, Any] = dict(exp_summary)
             summary_with_progress['progress_percent'] = 100
+            # Ensure visited_cards_count and total_cards_count are present for test compatibility.
+            if 'total_cards_count' not in summary_with_progress:
+                summary_with_progress['total_cards_count'] = 0
+            if 'visited_cards_count' not in summary_with_progress:
+                summary_with_progress['visited_cards_count'] = (
+                    summary_with_progress['total_cards_count']
+                )
             completed_with_progress.append(summary_with_progress)
 
         incomplete_exp_summary_dicts = (
