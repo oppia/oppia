@@ -69,9 +69,9 @@ import {
 
 interface InteractionValidationService
   extends BaseInteractionValidationService {
-  getCustomizationArgsWarnings(
+  getCustomizationArgsWarnings: (
     customizationArgs: InteractionCustomizationArgs
-  ): Warning[];
+  ) => Warning[];
 }
 import cloneDeep from 'lodash/cloneDeep';
 import {
@@ -361,6 +361,9 @@ export class CustomizeInteractionModalComponent
    */
   populateNullContentIds(): void {
     const interactionId = this.stateInteractionIdService.displayed;
+    if (!interactionId) {
+      return;
+    }
 
     let traverseSchemaAndAssignContentIds = (
       value: Object | Object[],
@@ -420,6 +423,9 @@ export class CustomizeInteractionModalComponent
 
   getContentIdToContent(): object {
     const interactionId = this.stateInteractionIdService.displayed;
+    if (!interactionId) {
+      return {};
+    }
     const contentIdToContent = {};
 
     let traverseSchemaAndCollectContent = (

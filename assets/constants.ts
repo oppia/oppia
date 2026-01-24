@@ -7776,8 +7776,8 @@ export default {
   ],
   "CONTRIBUTOR_CERTIFICATE_WIDTH": 1493,
   "CONTRIBUTOR_CERTIFICATE_HEIGHT": 1313,
-  "BRANCH_NAME": "",
-  "SHORT_COMMIT_HASH": "",
+  "BRANCH_NAME": "group-6-type-fix",
+  "SHORT_COMMIT_HASH": "fa8034f0b0",
   // Please consult the translation team before adding any entries here.
   // These words improve the quality of automatic voiceovers.
   "LANGUAGE_CODE_TO_MATH_SYMBOL_PRONUNCIATIONS": {
