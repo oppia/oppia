@@ -761,6 +761,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.delete_node(self.NODE_ID_1)
         self.assertIsNone(self.story.story_contents.initial_node_id)
 
+    def test_delete_node_with_three_nodes_must_in_order(self) -> None:
+        self.story.add_node('node_3', 'Node title 3')
+        self.story.story_contents.nodes[0].exploration_id = 'exp 3'
+        self.story.update_node_destination_node_ids(self.NODE_ID_2, ['node_3'])
+        self.story.delete_node(self.NODE_ID_2)
+        self.assertEqual(
+            self.story.story_contents.nodes[0].destination_node_ids, ['node_3']
+        )
+
     def test_get_number_from_node_id(self) -> None:
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10
@@ -2392,7 +2401,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'thumbnail_size_in_bytes': 21131,
             'title': 'Title 2',
             'description': 'Description 2',
-            'destination_node_ids': ['node_4', 'node_3'],
+            'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
@@ -2436,21 +2445,41 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(nodes[0].id, 'node_1')
         self.assertEqual(nodes[1].id, 'node_2')
         self.assertEqual(nodes[2].id, 'node_3')
+        self.assertEqual(nodes[0].destination_node_ids, ['node_2'])
+        self.assertEqual(nodes[1].destination_node_ids, ['node_3'])
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
 
         self.story.rearrange_node_in_story(1, 0)
         self.assertEqual(nodes[0].id, 'node_2')
         self.assertEqual(nodes[1].id, 'node_1')
         self.assertEqual(nodes[2].id, 'node_3')
+        self.assertEqual(nodes[0].destination_node_ids, ['node_1'])
+        self.assertEqual(nodes[1].destination_node_ids, ['node_3'])
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
 
         self.story.rearrange_node_in_story(2, 1)
         self.assertEqual(nodes[0].id, 'node_2')
         self.assertEqual(nodes[1].id, 'node_3')
         self.assertEqual(nodes[2].id, 'node_1')
+        self.assertEqual(nodes[0].destination_node_ids, ['node_3'])
+        self.assertEqual(nodes[1].destination_node_ids, ['node_1'])
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
 
         self.story.rearrange_node_in_story(2, 0)
         self.assertEqual(nodes[0].id, 'node_1')
         self.assertEqual(nodes[1].id, 'node_2')
         self.assertEqual(nodes[2].id, 'node_3')
+        self.assertEqual(nodes[0].destination_node_ids, ['node_2'])
+        self.assertEqual(nodes[1].destination_node_ids, ['node_3'])
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
+
+        self.story.rearrange_node_in_story(0, 2)
+        self.assertEqual(nodes[0].id, 'node_2')
+        self.assertEqual(nodes[1].id, 'node_3')
+        self.assertEqual(nodes[2].id, 'node_1')
+        self.assertEqual(nodes[0].destination_node_ids, ['node_3'])
+        self.assertEqual(nodes[1].destination_node_ids, ['node_1'])
+        self.assertEqual(len(nodes[2].destination_node_ids), 0)
 
     def test_story_contents_export_import(self) -> None:
         """Test that to_dict and from_dict preserve all data within a

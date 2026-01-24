@@ -29,7 +29,7 @@ from urllib import request as urlrequest
 
 from core.tests import test_utils
 
-from typing import BinaryIO, Final, NoReturn, Tuple
+from typing import Any, BinaryIO, Final, NoReturn, Tuple
 
 from . import common, install_dependencies_json_packages
 
@@ -205,6 +205,119 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.check_function_calls, self.expected_check_function_calls
         )
+        self.assertEqual(exists_arr, [False, True])
+
+    def test_download_and_unzip_files_with_existing_target_dir(self) -> None:
+        """Verify that download_and_unzip_files returns early when the target exists.
+
+        This test exercises the early-return path: when the target directory already
+        exists, the function should perform no work and must not call helper
+        functions that would download, extract, remove, or rename files. Other
+        execution paths (e.g. network errors, corrupted zip files, or filesystem
+        errors) can raise exceptions, but those scenarios are intentionally not
+        covered here.
+
+        Raises:
+            AssertionError. Raised if any of the helper functions (download,
+                extract, remove, rename) are called, or if the function does not
+                short-circuit when the target directory exists.
+        """
+
+        def mock_exists(path: str) -> bool:
+            if path == os.path.join('target dir', 'target root'):
+                return True
+            return False
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+
+        self.check_function_calls['url_retrieve_is_called'] = False
+        self.check_function_calls['extractall_is_called'] = False
+        self.check_function_calls['remove_is_called'] = False
+        self.check_function_calls['rename_is_called'] = False
+
+        self.expected_check_function_calls = dict(self.check_function_calls)
+
+        with (
+            exists_swap
+        ), self.url_retrieve_swap, self.remove_swap, self.rename_swap, self.extract_swap:
+            install_dependencies_json_packages.download_and_unzip_files(
+                'source url', 'target dir', 'zip root', 'target root'
+            )
+
+        self.assertEqual(
+            self.check_function_calls, self.expected_check_function_calls
+        )
+
+    def test_download_and_unzip_files_with_exception_and_tmp_unzip_missing(
+        self,
+    ) -> None:
+        """Verify retry behavior when the first unzip attempt fails and TMP_UNZIP_PATH is absent.
+
+        This test covers the retry path: the first call to open the zip raises an
+        exception, and the temporary unzip directory does not exist before the
+        retry. The function should retry once, call the URL-open helper to fetch a
+        local copy, and must not call remove() because there is no temporary file
+        to delete. Other paths (such as repeated failures, BadZipFile, or OS-level
+        errors) are outside the scope of this test.
+
+        Raises:
+            AssertionError. Raised if the retry logic is not executed as expected
+                (for example, if url_open is not called, remove() is called when it
+                should not be, or the zipfile initialization count is not equal to
+                the expected number of attempts).
+        """
+        exists_arr = []
+        self.check_function_calls['url_open_is_called'] = False
+        self.expected_check_function_calls['url_open_is_called'] = True
+        self.expected_check_function_calls['remove_is_called'] = False
+
+        def mock_exists(path: str) -> bool:
+            if path == install_dependencies_json_packages.TMP_UNZIP_PATH:
+                exists_arr.append(True)
+            else:
+                exists_arr.append(False)
+            return False
+
+        zipfile_call_count = {'count': 0}
+
+        # Here we use type Any because this is a mock of zipfile.ZipFile.__init__,
+        # and the actual type of _self is not relevant for the test.
+        def mock_zipfile_init(_self: Any, _path: str, _mode: str) -> None:
+            zipfile_call_count['count'] += 1
+            if zipfile_call_count['count'] == 1:
+                raise Exception('Test unzip failure')
+
+        # Here we use object because this mock function may receive various request-like
+        # objects during testing, and we only need to check that urlopen is called, not
+        # to inspect specific attributes or methods of the request.
+        def mock_url_open(_req: object) -> BinaryIO:
+            self.check_function_calls['url_open_is_called'] = True
+            file_obj = install_dependencies_json_packages.open_file(
+                install_dependencies_json_packages.TMP_UNZIP_PATH, 'rb', None
+            )
+            return file_obj
+
+        def mock_remove(_path: str) -> None:
+            self.check_function_calls['remove_is_called'] = True
+
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        zipfile_swap = self.swap(zipfile.ZipFile, '__init__', mock_zipfile_init)
+        url_open_swap = self.swap(
+            install_dependencies_json_packages, 'url_open', mock_url_open
+        )
+        remove_swap = self.swap(os, 'remove', mock_remove)
+
+        with exists_swap, zipfile_swap, url_open_swap, remove_swap:
+            with self.dir_exists_swap, self.url_retrieve_swap, self.rename_swap, self.unzip_swap:
+                with self.extract_swap:
+                    install_dependencies_json_packages.download_and_unzip_files(
+                        'http://src', 'target dir', 'zip root', 'target root'
+                    )
+
+        self.assertEqual(
+            self.check_function_calls, self.expected_check_function_calls
+        )
+        self.assertEqual(zipfile_call_count['count'], 2)
         self.assertEqual(exists_arr, [False, True])
 
     def test_get_file_contents(self) -> None:
@@ -441,6 +554,77 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         with validate_swap, return_json_swap, download_files_swap:
             with unzip_files_swap:
                 install_dependencies_json_packages.main()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_download_dependencies_with_unsupported_download_format(
+        self,
+    ) -> None:
+        """Tests that no functions are called when downloadFormat is unsupported."""
+        check_function_calls = {
+            'validate_dependencies_is_called': False,
+            'download_files_is_called': False,
+            'download_and_unzip_files_is_called': False,
+        }
+
+        def mock_return_json(
+            _path: str,
+        ) -> install_dependencies_json_packages.DependenciesDict:
+            # Here we use MyPy ignore because we are intentionally testing an unsupported downloadFormat; this is a mock for testing only.
+            return {
+                'frontendDependencies': {
+                    'unsupportedDep': {
+                        'version': '1.0.0',
+                        'downloadFormat': 'tar',  # type: ignore[typeddict-item]
+                        'url': 'https://example.com/dep.tar',
+                        'rootDirPrefix': 'unsupported-',
+                        'targetDirPrefix': 'unsupported-',
+                    },
+                }
+            }
+
+        def mock_validate_dependencies(_path: str) -> None:
+            check_function_calls['validate_dependencies_is_called'] = True
+
+        # Here we use type Any because these are mocks; we do not care about the actual
+        # types of arguments, only that the functions are called.
+        def mock_download_files(*_args: Any, **_kwargs: Any) -> None:
+            check_function_calls['download_files_is_called'] = True
+
+        # Here we use type Any because these are mocks; we do not care about the actual
+        # types of arguments, only that the functions are called.
+        def mock_download_and_unzip_files(*_args: Any, **_kwargs: Any) -> None:
+            check_function_calls['download_and_unzip_files_is_called'] = True
+
+        return_json_swap = self.swap(
+            install_dependencies_json_packages, 'return_json', mock_return_json
+        )
+        validate_swap = self.swap(
+            install_dependencies_json_packages,
+            'validate_dependencies',
+            mock_validate_dependencies,
+        )
+        download_files_swap = self.swap(
+            install_dependencies_json_packages,
+            'download_files',
+            mock_download_files,
+        )
+        unzip_files_swap = self.swap(
+            install_dependencies_json_packages,
+            'download_and_unzip_files',
+            mock_download_and_unzip_files,
+        )
+
+        with (
+            validate_swap
+        ), return_json_swap, download_files_swap, unzip_files_swap:
+            install_dependencies_json_packages.main()
+
+        expected_check_function_calls = {
+            'validate_dependencies_is_called': True,
+            'download_files_is_called': False,
+            'download_and_unzip_files_is_called': False,
+        }
+
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_url_open(self) -> None:

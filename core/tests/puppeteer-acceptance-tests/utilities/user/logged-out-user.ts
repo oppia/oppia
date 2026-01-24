@@ -1718,13 +1718,14 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the About page using the oppia website footer.
    */
   async clickOnAboutLinkInFooter(): Promise<void> {
+    await this.page.waitForSelector(footerAboutLink);
     await this.clickButtonToNavigateToNewPage(footerAboutLink, aboutUrl);
   }
   /**
    * Navigates to the Blog page using the oppia website footer.
    */
   async clickOnBlogLinkInFooter(): Promise<void> {
-    await this.clickButtonToNavigateToNewPage(footerBlogLink, blogUrl);
+    await this.clickAndWaitForNavigation(footerBlogLink, true);
   }
 
   /**
@@ -1765,7 +1766,7 @@ export class LoggedOutUser extends BaseUser {
    * Navigates to the Teach page using the oppia website footer.
    */
   async clickOnForParentsSlashTeachersLinkInFooter(): Promise<void> {
-    await this.page.waitForSelector(footerCreatorGuidelinesLink);
+    await this.page.waitForSelector(footerTeachLink);
     await this.clickButtonToNavigateToNewPage(footerTeachLink, teachUrl);
   }
 
@@ -2755,9 +2756,11 @@ export class LoggedOutUser extends BaseUser {
     const href = await this.page.$eval(emailLinkSelector, el =>
       el.getAttribute('href')
     );
-    if (href !== 'mailto:admin@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href "${href}" instead of "mailto:admin@oppia.org"`
+        `Email link has href "${href}" instead of "https://mail.google.com/mail/?view=cm&fs=1&to=admin@oppia.org"`
       );
     }
   }
@@ -2774,9 +2777,11 @@ export class LoggedOutUser extends BaseUser {
       el => el.getAttribute('href'),
       emailLinks[1]
     );
-    if (href !== 'mailto:press@oppia.org') {
+    if (
+      href !== 'https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org'
+    ) {
       throw new Error(
-        `Email link has href ${href} instead of mailto:press@oppia.org`
+        `Email link has href ${href} instead of "https://mail.google.com/mail/?view=cm&fs=1&to=press@oppia.org"`
       );
     }
   }

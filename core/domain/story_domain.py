@@ -2125,8 +2125,13 @@ class Story:
                     'The node with id %s is the starting node for the story, '
                     'change the starting node before deleting it.' % node_id
                 )
+        delete_node = self.story_contents.nodes[node_index]
+        delete_node_destination_ids = delete_node.destination_node_ids
         for node in self.story_contents.nodes:
             if node_id in node.destination_node_ids:
+                for dest_id in delete_node_destination_ids:
+                    if dest_id not in node.destination_node_ids:
+                        node.destination_node_ids.append(dest_id)
                 node.destination_node_ids.remove(node_id)
         del self.story_contents.nodes[node_index]
 
@@ -2394,8 +2399,30 @@ class Story:
             raise Exception('Expected to_index value to be with-in bounds.')
 
         story_node_to_move = copy.deepcopy(story_content_nodes[from_index])
-        del story_content_nodes[from_index]
+        if from_index == 0:
+            right_neighbour = story_content_nodes[1]
+            self.update_initial_node(right_neighbour.id)
+
+        self.delete_node(story_node_to_move.id)
         story_content_nodes.insert(to_index, story_node_to_move)
+
+        if to_index == 0:
+            # Node is moved to the start of the storyline.
+            self.update_initial_node(story_node_to_move.id)
+        else:
+            left_neighbour = story_content_nodes[to_index - 1]
+            self.update_node_destination_node_ids(
+                left_neighbour.id, [story_node_to_move.id]
+            )
+
+        if to_index == len(story_content_nodes) - 1:
+            # Node is moved to the end of the storyline.
+            self.update_node_destination_node_ids(story_node_to_move.id, [])
+        else:
+            right_neighbour = story_content_nodes[to_index + 1]
+            self.update_node_destination_node_ids(
+                story_node_to_move.id, [right_neighbour.id]
+            )
 
     def update_node_exploration_id(
         self, node_id: str, new_exploration_id: str
