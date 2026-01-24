@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
-    exp_domain,
     exp_fetchers,
     learner_progress_services,
     story_fetchers,
@@ -28,7 +27,7 @@ from core.domain import (
     user_services,
 )
 
-from typing import Any, Dict, List, Optional, Set, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 
 
 class SuggestionSummaryDict(TypedDict):
@@ -259,184 +258,81 @@ class LearnerDashboardExplorationsProgressHandler(
             learner_progress_services.get_exploration_progress(self.user_id)
         )
 
-        def _get_state_bfs_order(
-            current_exp: exp_domain.Exploration,
-        ) -> List[str]:
-            """Get BFS order of states in exploration."""
-            queue: List[str] = [current_exp.init_state_name]
-            visited: Set[str] = set()
-            ordered_states: List[str] = []
-
-            while queue:
-                state_name = queue.pop(0)
-                if state_name in visited:
-                    continue
-                visited.add(state_name)
-                ordered_states.append(state_name)
-
-                state = current_exp.states[state_name]
-                interaction = state.interaction
-                destinations: List[str] = []
-
-                for answer_group in interaction.answer_groups:
-                    if answer_group.outcome.dest is not None:
-                        destinations.append(answer_group.outcome.dest)
-
-                if (
-                    interaction.default_outcome is not None
-                    and interaction.default_outcome.dest is not None
-                ):
-                    destinations.append(interaction.default_outcome.dest)
-
-                for dest in destinations:
-                    if dest not in visited:
-                        queue.append(dest)
-
-            # Include any unvisited states (disconnected states)
-            for state_name in current_exp.states:
-                if state_name not in visited:
-                    ordered_states.append(state_name)
-
-            return ordered_states
-
-        def _annotate_with_card_progress(
-            summary_dicts: List[
-                summary_services.DisplayableExplorationSummaryDict
-            ],
-            completed: bool = False,
-            # Here we use type Any because the summary dict combines
-            # heterogeneous value types (strings, numbers, booleans, nested
-            # dicts/lists) and we extend it with numeric progress fields.
-        ) -> List[Dict[str, Any]]:
-            """Annotate summaries with card-based progress."""
-            # Here we use type Any because the aggregated summary collection
-            # carries the same heterogeneous value types as the input summary
-            # dicts and we add numeric progress fields.
-            enriched: List[Dict[str, Any]] = []
-            for summary_dict in summary_dicts:
-                exp_id = summary_dict['id']
-
-                try:
-                    current_exp = exp_fetchers.get_exploration_by_id(
-                        exp_id, strict=True
-                    )
-                except Exception:
-                    enriched.append(dict(summary_dict))
-                    continue
-
-                state_bfs_order = _get_state_bfs_order(current_exp)
-                total_cards_count = len(state_bfs_order)
-
-                if completed:
-                    visited_cards_count = total_cards_count
-                    progress_percent = 100
-                else:
-                    visited_cards_count = 0
-                    progress_percent = 0
-                    assert self.user_id is not None
-                    exp_user_data = exp_fetchers.get_exploration_user_data(
-                        self.user_id, exp_id
-                    )
-
-                    # Use checkpoint based progress when available.
-                    if exp_user_data is not None:
-                        furthest_state_name = (
-                            exp_user_data.furthest_reached_checkpoint_state_name
-                        )
-                        if furthest_state_name is not None:
-                            checkpoints_in_order = (
-                                user_services.get_checkpoints_in_order(
-                                    current_exp.init_state_name,
-                                    current_exp.states,
-                                )
-                            )
-                            if (
-                                checkpoints_in_order
-                                and furthest_state_name in checkpoints_in_order
-                            ):
-                                total_checkpoints = len(checkpoints_in_order)
-                                furthest_index = checkpoints_in_order.index(
-                                    furthest_state_name
-                                )
-                                raw_progress = int(
-                                    round(
-                                        ((furthest_index + 1) * 100)
-                                        / total_checkpoints
-                                    )
-                                )
-                                # Clamp incomplete explorations below 100 percent.
-                                progress_percent = min(max(raw_progress, 1), 99)
-                                visited_cards_count = (
-                                    state_bfs_order.index(furthest_state_name)
-                                    + 1
-                                    if furthest_state_name in state_bfs_order
-                                    else 0
-                                )
-
-                # Here we create a new dict with extended fields.
-                # The spread operator copies all fields from summary_dict.
-                # Here we use type Any because we copy the original summary
-                # dict (heterogeneous types) and add numeric progress fields.
-                enriched_summary: Dict[str, Any] = {
-                    'id': summary_dict['id'],
-                    'title': summary_dict['title'],
-                    'activity_type': summary_dict['activity_type'],
-                    'category': summary_dict['category'],
-                    'created_on_msec': summary_dict['created_on_msec'],
-                    'objective': summary_dict['objective'],
-                    'language_code': summary_dict['language_code'],
-                    'last_updated_msec': summary_dict['last_updated_msec'],
-                    'human_readable_contributors_summary': (
-                        summary_dict['human_readable_contributors_summary']
-                    ),
-                    'status': summary_dict['status'],
-                    'ratings': summary_dict['ratings'],
-                    'community_owned': summary_dict['community_owned'],
-                    'tags': summary_dict['tags'],
-                    'thumbnail_icon_url': summary_dict['thumbnail_icon_url'],
-                    'thumbnail_bg_color': summary_dict['thumbnail_bg_color'],
-                    'num_views': summary_dict['num_views'],
-                    'total_cards_count': total_cards_count,
-                    'visited_cards_count': visited_cards_count,
-                    'progress_percent': progress_percent,
-                }
-                enriched.append(enriched_summary)
-            return enriched
-
-        completed_exp_summary_dicts = _annotate_with_card_progress(
+        completed_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.completed_exp_summaries
-            ),
-            completed=True,
+            )
         )
 
-        incomplete_exp_summary_dicts = _annotate_with_card_progress(
+        incomplete_exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.incomplete_exp_summaries
             )
         )
 
-        # Add checkpoint metadata to incomplete explorations for
-        # checkpoint-based progress display.
+        # Add checkpoint metadata and progress to incomplete explorations.
+        # Here we use type Any because we're adding checkpoint-specific fields
+        # (progress_percent, furthest_reached_checkpoint_state_name, etc.) that
+        # are not part of the base DisplayableExplorationSummaryDict type.
+        incomplete_with_progress: List[Dict[str, Any]] = []
         for exp_summary_dict in incomplete_exp_summary_dicts:
+            # Here we use type Any because checkpoint fields are
+            # dynamically added to the dict.
+            progress_dict: Dict[str, Any] = dict(exp_summary_dict)
             exp_user_data = exp_fetchers.get_exploration_user_data(
-                self.user_id, exp_summary_dict['id']
+                self.user_id, progress_dict['id']
             )
             if exp_user_data is not None:
-                exp_summary_dict[
+                progress_dict[
                     'most_recently_reached_checkpoint_state_name'
                 ] = exp_user_data.most_recently_reached_checkpoint_state_name
-                exp_summary_dict[
+                progress_dict[
                     'most_recently_reached_checkpoint_exp_version'
                 ] = exp_user_data.most_recently_reached_checkpoint_exp_version
-                exp_summary_dict['furthest_reached_checkpoint_state_name'] = (
+                progress_dict['furthest_reached_checkpoint_state_name'] = (
                     exp_user_data.furthest_reached_checkpoint_state_name
                 )
-                exp_summary_dict['furthest_reached_checkpoint_exp_version'] = (
+                progress_dict['furthest_reached_checkpoint_exp_version'] = (
                     exp_user_data.furthest_reached_checkpoint_exp_version
                 )
 
-        exploration_playlist_summary_dicts = _annotate_with_card_progress(
+                # Calculate checkpoint-based progress.
+                furthest_state_name = (
+                    exp_user_data.furthest_reached_checkpoint_state_name
+                )
+                if furthest_state_name is not None:
+                    try:
+                        current_exp = exp_fetchers.get_exploration_by_id(
+                            progress_dict['id'], strict=True
+                        )
+                        checkpoints_in_order = (
+                            user_services.get_checkpoints_in_order(
+                                current_exp.init_state_name,
+                                current_exp.states,
+                            )
+                        )
+                        if (
+                            checkpoints_in_order
+                            and furthest_state_name in checkpoints_in_order
+                        ):
+                            total_checkpoints = len(checkpoints_in_order)
+                            furthest_index = checkpoints_in_order.index(
+                                furthest_state_name
+                            )
+                            raw_progress = int(
+                                round(
+                                    ((furthest_index + 1) * 100)
+                                    / total_checkpoints
+                                )
+                            )
+                            progress_dict['progress_percent'] = min(
+                                max(raw_progress, 1), 99
+                            )
+                    except Exception:
+                        pass
+            incomplete_with_progress.append(progress_dict)
+
+        exploration_playlist_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts(
                 learner_progress.exploration_playlist_summaries
             )
@@ -465,7 +361,7 @@ class LearnerDashboardExplorationsProgressHandler(
         self.values.update(
             {
                 'completed_explorations_list': completed_exp_summary_dicts,
-                'incomplete_explorations_list': incomplete_exp_summary_dicts,
+                'incomplete_explorations_list': incomplete_with_progress,
                 'exploration_playlist': exploration_playlist_summary_dicts,
                 'number_of_nonexistent_explorations': (
                     number_of_nonexistent_explorations

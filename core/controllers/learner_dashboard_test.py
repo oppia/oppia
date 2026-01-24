@@ -945,7 +945,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         with self.swap(
             user_services,
             'get_checkpoints_in_order',
-            lambda _init, _states: ['Introduction', 'End'],
+            lambda _init, _states: ['Introduction', 'Checkpoint1', 'Checkpoint2', 'End'],
         ):
             # User reached the first checkpoint.
             user_services.update_learner_checkpoint_progress(
@@ -978,11 +978,113 @@ class LearnerDashboardExplorationsProgressHandlerTests(
                 exp_summary['most_recently_reached_checkpoint_state_name'],
                 'Introduction',
             )
-            # Verify progress_percent field is computed (50% for 1/2 checkpoints).
+            # Verify progress_percent field is computed.
+            # For first checkpoint out of 4: (0+1) * 100 divmod 4 = 25%.
             self.assertIn('progress_percent', exp_summary)
-            # Progress should be clamped between 1-99 for incomplete.
-            self.assertGreaterEqual(exp_summary['progress_percent'], 1)
-            self.assertLess(exp_summary['progress_percent'], 100)
+            self.assertEqual(exp_summary['progress_percent'], 25)
+
+            # User reaches second checkpoint.
+            user_services.update_learner_checkpoint_progress(
+                self.viewer_id,
+                self.EXP_ID_1,
+                'Checkpoint1',
+                1,
+            )
+            learner_progress_services.mark_exploration_as_incomplete(
+                self.viewer_id,
+                self.EXP_ID_1,
+                'Checkpoint1',
+                1,
+            )
+
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+            incomplete_list = response['incomplete_explorations_list']
+            self.assertEqual(len(incomplete_list), 1)
+
+            exp_summary = incomplete_list[0]
+            self.assertEqual(
+                exp_summary['furthest_reached_checkpoint_state_name'],
+                'Checkpoint1',
+            )
+            self.assertEqual(
+                exp_summary['most_recently_reached_checkpoint_state_name'],
+                'Checkpoint1',
+            )
+            # For second checkpoint out of 4: (1+1) * 100 divmod 4 = 50%.
+            self.assertEqual(exp_summary['progress_percent'], 50)
+
+        self.logout()
+
+    def test_completed_explorations_show_full_progress(self) -> None:
+        """Test that completed explorations show 100% progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark exploration as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        response = self.get_json(
+            feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+        )
+        completed_list = response['completed_explorations_list']
+        self.assertEqual(len(completed_list), 1)
+
+        exp_summary = completed_list[0]
+        self.assertEqual(exp_summary['id'], self.EXP_ID_1)
+        # Completed explorations always show 100% progress.
+        self.assertEqual(exp_summary['progress_percent'], 100)
+        self.assertEqual(exp_summary['visited_cards_count'], exp_summary['total_cards_count'])
+
+        self.logout()
+
+    def test_incomplete_explorations_without_checkpoints(self) -> None:
+        """Test that incomplete explorations without checkpoints show default progress."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        self.save_new_default_exploration(
+            self.EXP_ID_1, self.owner_id, title=self.EXP_TITLE_1
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete without any checkpoint progress.
+        # This will have exp_user_data but with no checkpoint info.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id,
+            self.EXP_ID_1,
+            'Introduction',
+            1,
+        )
+
+        with self.swap(
+            user_services,
+            'get_checkpoints_in_order',
+            # Empty checkpoints list.
+            lambda _init, _states: [],
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+            incomplete_list = response['incomplete_explorations_list']
+            self.assertEqual(len(incomplete_list), 1)
+
+            exp_summary = incomplete_list[0]
+            self.assertEqual(exp_summary['id'], self.EXP_ID_1)
+            # Without checkpoints, progress_percent should default to 0.
+            self.assertEqual(exp_summary['progress_percent'], 0)
+            # Checkpoint metadata should be None/missing when not set.
+            self.assertIsNone(
+                exp_summary.get('furthest_reached_checkpoint_state_name')
+            )
 
         self.logout()
 
