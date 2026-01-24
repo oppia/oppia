@@ -92,7 +92,6 @@ oppia-story-viewer-page.oppia-login-or-signup-text {
   }
 }
 
-/* Styles for "Coming Soon" chapters (Ready To Publish status). */
 oppia-story-viewer-page .oppia-chapter-coming-soon {
   cursor: not-allowed;
   pointer-events: none;
