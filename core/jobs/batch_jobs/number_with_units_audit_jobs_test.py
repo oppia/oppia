@@ -129,6 +129,138 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             [job_run_result.JobRunResult(stdout=str(['hr', 'km', 'm', 's']))]
         )
 
+    def test_job_deduplicates_units_across_models_with_variations(self) -> None:
+        exp_state_1 = self._create_state_with_units(
+            [
+                {'unit': 'm', 'exponent': 1},
+                {'unit': 's', 'exponent': -1},
+            ]
+        )
+
+        exp_state_2 = state_domain.State.create_default_state(
+            'state', 'content_6', 'default_outcome_7', is_initial_state=True
+        ).to_dict()
+        exp_state_2['interaction']['id'] = 'NumberWithUnits'
+        exp_default_outcome = exp_state_2['interaction']['default_outcome']
+        assert exp_default_outcome is not None
+        exp_state_2['interaction']['answer_groups'] = [
+            {
+                'outcome': exp_default_outcome,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 3,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': [
+                                    {'unit': 'kg', 'exponent': 1},
+                                    {'unit': 'm', 'exponent': 2},
+                                ],
+                            }
+                        },
+                    },
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 4,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': [
+                                    {'unit': 'N', 'exponent': 1},
+                                    {'unit': 's', 'exponent': -2},
+                                ],
+                            }
+                        },
+                    },
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            },
+            {
+                'outcome': exp_default_outcome,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 5,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': [
+                                    {'unit': 'kg', 'exponent': 1},
+                                    {'unit': 'm', 'exponent': 1},
+                                    {'unit': 's', 'exponent': -2},
+                                ],
+                            }
+                        },
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            },
+        ]
+
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration title',
+            category='category',
+            objective='objective',
+            language_code='cs',
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'num_with_units_1': exp_state_1,
+                'num_with_units_2': exp_state_2,
+            },
+            next_content_id_index=8,
+        )
+        exp_model.update_timestamps()
+
+        question_state_1 = self._create_state_with_units(
+            [
+                {'unit': 'kg', 'exponent': 1},
+                {'unit': 'm', 'exponent': 2},
+                {'unit': 's', 'exponent': -2},
+            ]
+        )
+
+        question_model = self.create_model(
+            question_models.QuestionModel,
+            id=self.QUESTION_1_ID,
+            question_state_data=question_state_1,
+            question_state_data_schema_version=48,
+            language_code='en',
+            linked_skill_ids=['skill_id'],
+            version=1,
+            next_content_id_index=2,
+        )
+        question_model.update_timestamps()
+
+        datastore_services.put_multi([exp_model, question_model])
+
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout=str(['N', 'kg', 'm', 's']))]
+        )
+
     def _create_state_with_units(
         self, units: List[Dict[str, Union[str, int]]]
     ) -> state_domain.StateDict:
