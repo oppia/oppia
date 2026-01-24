@@ -110,6 +110,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
   constructor(
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private explorationStatesService: ExplorationStatesService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
@@ -124,13 +125,13 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
     private platformFeatureService: PlatformFeatureService
-  ) {}
+  ) { }
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
-  isOriginalLanguageActive(): boolean {
+ isOriginalLanguageActive(): boolean {
     return (
       this.translationLanguageService.getActiveLanguageCode() ===
       this.explorationLanguageCodeService.displayed
@@ -178,13 +179,20 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return subtitledHtml.html;
     }
 
+    if (
+      this.translationLanguageService.getActiveLanguageCode() ===
+      this.explorationLanguageCodeService.displayed
+    ) {
+      return subtitledHtml.html;
+    }
+
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return subtitledHtml.html;
+      return null;
     }
 
     let translationContent =
@@ -192,7 +200,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
-      return subtitledHtml.html;
+      return null;
     }
 
     return translationContent.translation as string;
@@ -203,13 +211,20 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
       return SubtitledUnicode.unicode;
     }
 
+    if (
+      this.translationLanguageService.getActiveLanguageCode() ===
+      this.explorationLanguageCodeService.displayed
+    ) {
+      return SubtitledUnicode.unicode;
+    }
+
     let langCode = this.translationLanguageService.getActiveLanguageCode();
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return SubtitledUnicode.unicode;
+      return null;
     }
 
     let translationContent =
@@ -217,7 +232,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
-      return SubtitledUnicode.unicode;
+      return null;
     }
 
     return translationContent.translation as string;
