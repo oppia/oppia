@@ -283,9 +283,9 @@ class LearnerDashboardExplorationsProgressHandler(
                 self.user_id, progress_dict['id']
             )
             if exp_user_data is not None:
-                progress_dict[
-                    'most_recently_reached_checkpoint_state_name'
-                ] = exp_user_data.most_recently_reached_checkpoint_state_name
+                progress_dict['most_recently_reached_checkpoint_state_name'] = (
+                    exp_user_data.most_recently_reached_checkpoint_state_name
+                )
                 progress_dict[
                     'most_recently_reached_checkpoint_exp_version'
                 ] = exp_user_data.most_recently_reached_checkpoint_exp_version

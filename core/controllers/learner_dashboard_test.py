@@ -945,7 +945,12 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         with self.swap(
             user_services,
             'get_checkpoints_in_order',
-            lambda _init, _states: ['Introduction', 'Checkpoint1', 'Checkpoint2', 'End'],
+            lambda _init, _states: [
+                'Introduction',
+                'Checkpoint1',
+                'Checkpoint2',
+                'End',
+            ],
         ):
             # User reached the first checkpoint.
             user_services.update_learner_checkpoint_progress(
@@ -1032,9 +1037,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.viewer_id, self.EXP_ID_1
         )
 
-        response = self.get_json(
-            feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
-        )
+        response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         completed_list = response['completed_explorations_list']
         self.assertEqual(len(completed_list), 1)
 
@@ -1042,7 +1045,9 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(exp_summary['id'], self.EXP_ID_1)
         # Completed explorations always show 100% progress.
         self.assertEqual(exp_summary['progress_percent'], 100)
-        self.assertEqual(exp_summary['visited_cards_count'], exp_summary['total_cards_count'])
+        self.assertEqual(
+            exp_summary['visited_cards_count'], exp_summary['total_cards_count']
+        )
 
         self.logout()
 
