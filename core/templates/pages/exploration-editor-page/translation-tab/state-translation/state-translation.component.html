@@ -134,8 +134,9 @@
   </div>
 
   <div *ngIf="!isVoiceoverModeActive()" class="oppia-state-content-header">Original content</div>
-  <div class="translation-state-contents">
-    <div *ngIf="isActive(TAB_ID_CONTENT)" class="translation-state-content e2e-test-content-text">
+ <div class="translation-state-contents">
+    <div *ngIf="isActive(TAB_ID_CONTENT) && isCardVisible(stateContent)"
+      class="translation-state-content e2e-test-content-text">
       <span>
         <span *ngIf="!getRequiredHtml(stateContent)" class="oppia-placeholder" tabindex="0">
           {{ getEmptyContentMessage() }}
@@ -157,7 +158,7 @@
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block mt-0"
             *ngFor="let caContent of interactionCustomizationArgTranslatableContent; index as index"
-            [ngClass]="{'active': activeCustomizationArgContentIndex === index}">
+            [ngClass]="{'active': activeCustomizationArgContentIndex === index}" *ngIf="isCardVisible(caContent.content)">
           <a (click)="changeActiveCustomizationArgContentIndex(index)"
              (keydown.enter)="changeActiveCustomizationArgContentIndex(index)"
              tabindex="0"
@@ -231,7 +232,7 @@
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
           <li class="oppia-rule-block e2e-test-translation-feedback mt-0"
               *ngFor="let answerGroup of stateAnswerGroups; index as index"
-              [ngClass]="{'active': activeAnswerGroupIndex === index}">
+              [ngClass]="{'active': activeAnswerGroupIndex === index}" *ngIf="isCardVisible(answerGroup.outcome.feedback)">
             <a class="oppia-rule-tab e2e-test-feedback-{{ index }} oppia-translation-preview-list"
                tabindex="0"
                (keydown.enter)="changeActiveAnswerGroupIndex(index)"
@@ -273,8 +274,8 @@
 
       <div>
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
-          <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
-              class="oppia-rule-block e2e-test-translation-feedback">
+         <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
+            class="oppia-rule-block e2e-test-translation-feedback" *ngIf="isCardVisible(stateDefaultOutcome.feedback)">
             <a class="oppia-rule-tab oppia-default-rule-tab e2e-test-feedback-{{ stateAnswerGroups.length }} oppia-translation-preview-list"
                (click)="changeActiveAnswerGroupIndex(stateAnswerGroups.length)"
                tabindex="0"
@@ -311,7 +312,7 @@
       <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
         <li class="oppia-rule-block e2e-test-translation-hint mt-0"
             *ngFor="let hint of stateHints; index as index"
-            [ngClass]="{'active': activeHintIndex === index}">
+            [ngClass]="{'active': activeHintIndex === index}" *ngIf="isCardVisible(hint.hintContent)">
           <a (click)="changeActiveHintIndex(index)"
              (keydown.enter)="changeActiveHintIndex(index)"
              tabindex="0"
@@ -344,7 +345,8 @@
       </ul>
     </div>
 
-    <div *ngIf="isActive(TAB_ID_SOLUTION)" class="translation-state-content e2e-test-solution-text">
+    <div *ngIf="isActive(TAB_ID_SOLUTION) && isCardVisible(stateSolution.explanation)"
+      class="translation-state-content e2e-test-solution-text">
       <span *ngIf="!getRequiredHtml(stateSolution.explanation)" class="oppia-placeholder" tabindex="0">
         {{ getEmptyContentMessage() }}
       </span>
