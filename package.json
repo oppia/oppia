@@ -202,7 +202,7 @@
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
-    "skulpt-dist": "git+https://github.com/skulpt/skulpt-dist#7b61d",
+    "skulpt": "1.2.0",
     "stream-browserify": "^3.0.0",
     "ts-morph": "^22.0.0",
     "tslib": "^2.0.0",
