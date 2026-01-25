@@ -2208,6 +2208,9 @@ describe('ImageEditor', () => {
         'Failed to upload image'
       );
 
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
     })
   );
@@ -2245,6 +2248,9 @@ describe('ImageEditor', () => {
       expect(alertsService.addWarning).toHaveBeenCalledWith(
         'Error communicating with server.'
       );
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
     })
   );
@@ -2307,6 +2313,9 @@ describe('ImageEditor', () => {
       req.flush({
         filename: 'img_20210701_185457_qgrrul296o_height_200_width_260.gif',
       });
+      httpTestingController
+        .match(req => req.url.includes('/feature_flags_evaluation_handler'))
+        .forEach(req => req.flush({feature_flag_results: {}}));
       httpTestingController.verify();
 
       tick(100);
