@@ -957,10 +957,8 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             ):
                 blog_services.get_blog_author_details(self.user_id)
 
-    def test_get_blog_author_details_for_deleted_user(self) -> None:
-        """Tests that get_blog_author_details returns placeholder when user
-        account has been deleted and no BlogAuthorDetailsModel exists.
-        """
+    def test_get_blog_author_details_create_fails(self) -> None:
+        """Tests that get_blog_author_details raises an error when user details cannot be fetched."""
 
         def _mock_get_by_author(unused_user_id: str) -> None:
             """Always returns None to simulate missing author details."""
@@ -988,18 +986,10 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         )
 
         with get_by_author_swap, get_user_settings_swap:
-            # When both BlogAuthorDetailsModel and user_settings are None,
-            # return a placeholder BlogAuthorDetails object instead of raising
-            # an exception.
-            author_details = blog_services.get_blog_author_details(self.user_id)
-            self.assertEqual(
-                author_details.displayed_author_name, 'Account Deleted'
-            )
-            self.assertEqual(author_details.author_bio, '')
-            self.assertEqual(author_details.author_id, self.user_id)
-            self.assertEqual(
-                author_details.id, 'deleted_author_%s' % self.user_id
-            )
+            with self.assertRaisesRegex(
+                Exception, 'Unable to fetch user details for the given user'
+            ):
+                blog_services.get_blog_author_details(self.user_id)
 
     def test_create_blog_author_details_model_raises_when_user_missing(
         self,
