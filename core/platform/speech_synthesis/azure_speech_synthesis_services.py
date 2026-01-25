@@ -21,6 +21,7 @@ speech-service/index-text-to-speech.
 
 from __future__ import annotations
 
+import logging
 import re
 import time
 
@@ -409,9 +410,16 @@ def regenerate_speech_from_text(
     for _ in range(get_number_of_retry_attempts_for_voiceover_synthesis()):
         # Adding a delay before retrying the speech synthesis.
         time.sleep(delay_before_retrying_in_sec)
+        logging.info(
+            'Voiceover synthesis log: Retrying speech synthesis after %s seconds delay.',
+            delay_before_retrying_in_sec,
+        )
         speech_synthesis_result = speech_synthesizer.speak_ssml_async(
             ssml_text_for_speech_synthesis
         ).get()
+        logging.info(
+            'Voiceover synthesis log: Speech synthesis attempt completed.'
+        )
 
         binary_audio_data = speech_synthesis_result.audio_data
 

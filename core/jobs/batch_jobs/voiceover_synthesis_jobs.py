@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import logging
-import time
 
 from core import feconf
 from core.domain import (
@@ -57,10 +56,6 @@ if MYPY:  # pragma: no cover
     )
 )
 datastore_services = models.Registry.import_datastore_services()
-
-# Waiting time between requests helps to avoid sudden spike in Azure TTS
-# requests.
-WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS = 3
 
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
@@ -388,10 +383,6 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                 ) in content_ids_to_content_values.items():
 
                     try:
-                        time.sleep(
-                            WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS
-                        )
-
                         voiceover_filename = voiceover_regeneration_services.generate_new_voiceover_filename(
                             content_id, language_accent_code
                         )
