@@ -2533,11 +2533,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToSettingsTab(): Promise<void> {
     // Ensure the editor is fully loaded before attempting to navigate.
-    // Wait for the editor content to be rendered (editor tabs visible).
-    await this.page.waitForSelector('.oppia-editor-tab-set', {
-      visible: true,
-      timeout: 10000,
-    });
+    await this.waitForPageToFullyLoad();
     // Give the page a moment to fully settle after rendering.
     await this.page.waitForTimeout(500);
 
