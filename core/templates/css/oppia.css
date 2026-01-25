@@ -57,22 +57,6 @@
   100% { opacity: 1; }
 }
 
-@-webkit-viewport {
-  width: device-width;
-}
-
-@-moz-viewport {
-  width: device-width;
-}
-
-@-ms-viewport {
-  width: device-width;
-}
-
-@-o-viewport {
-  width: device-width;
-}
-
 @viewport {
   width: device-width;
 }
@@ -322,6 +306,7 @@ html {
 }
 button.btn-close {
   -webkit-appearance: none;
+  appearance: none;
   border: 0;
   cursor: pointer;
   padding: 5px;
@@ -1864,6 +1849,7 @@ pre.oppia-pre-wrapped-text {
   -moz-user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
+  user-select: none;
 }
 
 .oppia-save-state-item-button {
@@ -2572,7 +2558,6 @@ div#ng-curtain {
 }
 .oppia-option-list {
   display: block;
-  vertical-align: initial;
 }
 .oppia-navbar-dropdown-toggle,
 .oppia-navbar-tab {
@@ -3230,6 +3215,7 @@ oppia-noninteractive-link {
   font-size: 0.85em;
   height: 70px;
   -webkit-line-clamp: 3; /* Truncating to 3 lines. */
+  line-clamp: 3;
   line-height: 1.26;
   /* `max-height` is calculated as: 1.26 (line-height) * 3 (lines) / 0.85
   (font-size). An additional (1.26 (line-height) * 0.85 (font-size) * 0.25) is added
@@ -3259,7 +3245,7 @@ oppia-noninteractive-link {
 
 .oppia-activity-summary-tile [section="right-section"],
 .oppia-activity-summary-tile-mobile [section="right-section"] {
-  display: inline-block;
+  display: block;
   float: left;
   height: 80px;
   position: relative;
@@ -3942,6 +3928,7 @@ div.oppia-issues-learner-action {
   justify-content: space-around;
 }
 
+/* TODO: Deprecated typo, use .fx-main-space-between instead */
 .fx-main-pace-between {
   justify-content: space-between;
 }
