@@ -33,7 +33,8 @@ import {WindowRef} from 'services/contextual/window-ref.service';
   templateUrl: './create-new-topic-modal.component.html',
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: string[] = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+  allowedBgColors: readonly string[] =
+    AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
   hostname: string = this.windowRef.nativeWindow.location.hostname;
@@ -68,7 +69,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
       imageName: 'Thumbnail',
       orientation: 'landscape',
       bgColor: this.allowedBgColors[0],
-      allowedBgColors: this.allowedBgColors,
+      allowedBgColors: this.allowedBgColors as string[],
       allowedImageFormats: ['svg'],
       aspectRatio: '4:3',
       previewDescriptionBgColor: '#2F6687',

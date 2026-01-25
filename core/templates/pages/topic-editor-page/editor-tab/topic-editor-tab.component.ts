@@ -209,8 +209,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       filename: this.topic.getThumbnailFilename(),
       previewTitle: this.editableName,
       previewDescriptionBgColor: '#2F6687',
-      previewFooter:
-        this.topic.getCanonicalStoryIds().length + ' Lessons',
+      previewFooter: this.topic.getCanonicalStoryIds().length + ' Lessons',
     };
   }
 
@@ -450,13 +449,18 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     }
 
     this.assetsBackendApiService
-      .postThumbnailFile(imageData.image_data, imageData.filename, entityType, entityId)
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
       .toPromise()
       .then(response => {
         // Update the topic with the new thumbnail filename and background color.
         this.updateTopicThumbnailFilename(response.filename);
         this.updateTopicThumbnailBgColor(imageData.bg_color);
-        
+
         // Update the thumbnail preview URL.
         this.editableThumbnailDataUrl =
           this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(

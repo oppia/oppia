@@ -127,7 +127,7 @@ export class CreateNewSubtopicModalComponent
       imageName: 'Thumbnail',
       orientation: 'landscape',
       bgColor: this.allowedBgColors[0],
-      allowedBgColors: this.allowedBgColors,
+      allowedBgColors: this.allowedBgColors as string[],
       allowedImageFormats: ['svg'],
       aspectRatio: '4:3',
       previewDescriptionBgColor: '#BE563C',
@@ -210,19 +210,19 @@ export class CreateNewSubtopicModalComponent
     if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
       return Boolean(
         this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.sectionHeadingPlaintext &&
-          this.sectionContentHtml &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
+        this.subtopicTitle &&
+        this.sectionHeadingPlaintext &&
+        this.sectionContentHtml &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
       );
     } else {
       return Boolean(
         this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.htmlData &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
+        this.subtopicTitle &&
+        this.htmlData &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
       );
     }
   }

@@ -297,7 +297,12 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     }
 
     this.assetsBackendApiService
-      .postThumbnailFile(imageData.image_data, imageData.filename, entityType, entityId)
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
       .toPromise()
       .then(response => {
         // Update the subtopic with the new thumbnail filename and background color.
