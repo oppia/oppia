@@ -4,10 +4,9 @@
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
     "src/main.ts",
-    "src/index.html",
     "core/templates/Polyfills.ts"
   ],
-    "include": ["typings",],
+    "include": ["typings","src/index.html"],
     "exclude": [
         "core/tests",
         "**/*.spec.ts",
