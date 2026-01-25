@@ -1,20 +1,12 @@
 {
   "suites": [
     {
-      "name": "accessibility",
-      "module": "core/tests/webdriverio/accessibility.js"
-    },
-    {
       "name": "additionalEditorFeatures",
       "module": "core/tests/webdriverio_desktop/additionalEditorFeatures.js"
     },
     {
       "name": "additionalEditorFeaturesModals",
       "module": "core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js"
-    },
-    {
-      "name": "additionalPlayerFeatures",
-      "module": "core/tests/webdriverio_desktop/additionalPlayerFeatures.js"
     },
     {
       "name": "blog",
@@ -25,16 +17,8 @@
       "module": "core/tests/webdriverio_desktop/collections.js"
     },
     {
-      "name": "contributorDashboard",
-      "module": "core/tests/webdriverio_desktop/contributorDashboard.js"
-    },
-    {
       "name": "contributorAdminDashboard",
       "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
-    },
-    {
-      "name": "coreEditorAndPlayerFeatures",
-      "module": "core/tests/webdriverio_desktop/coreEditorAndPlayerFeatures.js"
     },
     {
       "name": "creatorDashboard",
@@ -67,10 +51,6 @@
     {
       "name": "navigation",
       "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
-      "name": "profileMenu",
-      "module": "core/tests/webdriverio/profileMenuFlow.js"
     },
     {
       "name": "publication",

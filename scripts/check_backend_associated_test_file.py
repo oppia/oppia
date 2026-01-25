@@ -51,7 +51,6 @@ FILES_WITHOUT_ASSOCIATED_TEST_FILES = [
     'core/tests/build_sources/extensions/DragAndDropSortInput.py',
     'core/tests/data/failing_tests.py',
     'core/tests/data/image_constants.py',
-    'core/tests/data/unicode_and_str_handler.py',
 ]
 
 

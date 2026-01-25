@@ -38,6 +38,9 @@ export const AdminPageConstants = {
   ADMIN_BANNED_USERS_HANDLER: '/bannedusershandler',
   ADMIN_UPDATE_BLOG_POST_DATA_HANDLER: '/updateblogpostdatahandler',
   ADMIN_REGENERATE_TOPIC_SUMMARIES_URL: '/regenerate_topic_summaries_handler',
+  ADMIN_GENERATE_STUDY_GUIDE_MODELS_URL: '/generate_study_guide_models_handler',
+  ADMIN_DELETE_STUDY_GUIDE_MODELS_URL: '/delete_study_guide_models_handler',
+  ADMIN_VERIFY_STUDY_GUIDE_MODELS_URL: '/verify_study_guide_models_handler',
   AUTOMATIC_VOICEOVER_ADMIN_CONTROL_URL:
     '/automatic_voiceover_admin_control_handler',
 

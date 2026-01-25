@@ -25,10 +25,11 @@ import shutil
 import subprocess
 import sys
 import tarfile
+import types
 
 from core.tests import test_utils
 
-from typing import Final, List, Tuple
+from typing import Final, List, Optional, Tuple, Type
 
 from . import (
     clean,
@@ -74,10 +75,37 @@ class Ret:
     ) -> None:
         self.returncode = returncode
         self.communicate_val = communicate_val
+        self.stdout = None
+        self.args: List[str] = []
 
-    def communicate(self) -> Tuple[bytes, bytes]:
+    def communicate(
+        self,
+        _input: Optional[bytes] = None,  # pylint: disable=unused-argument
+        timeout: Optional[float] = None,  # pylint: disable=unused-argument
+    ) -> Tuple[bytes, bytes]:
         """Return required method."""
         return self.communicate_val
+
+    def kill(self) -> None:
+        """Mock kill method."""
+        pass
+
+    def poll(self) -> int:
+        """Mock poll method."""
+        return self.returncode
+
+    def __enter__(self) -> 'Ret':
+        """Context manager enter."""
+        return self
+
+    def __exit__(
+        self,
+        _exc_type: Optional[Type[BaseException]],
+        _exc_val: Optional[BaseException],
+        _exc_tb: Optional[types.TracebackType],
+    ) -> None:
+        """Context manager exit."""
+        pass
 
 
 class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
@@ -113,7 +141,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call
         )
-        self.Popen_swap = self.swap(subprocess, 'Popen', mock_check_call)
+
+        def mock_popen(*_args: str, **_kwargs: str) -> Ret:
+            return Ret()
+
+        self.Popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.check_call_error_swap = self.swap(
             subprocess, 'check_call', mock_check_call_error
         )

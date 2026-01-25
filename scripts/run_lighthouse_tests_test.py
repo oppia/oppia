@@ -21,6 +21,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 
 from core.constants import constants
 from core.tests import test_utils
@@ -773,3 +774,50 @@ class RunLighthouseTestsTests(test_utils.GenericTestBase):
                                         '--record_screen',
                                     ]
                                 )
+
+    def test_run_lighthouse_puppeteer_script_creates_directory_when_not_exists(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            tmp_working_dir = os.path.join(temp_dir, 'cwd')
+            os.mkdir(tmp_working_dir)
+
+            expected_dir = os.path.join(
+                tmp_working_dir, '..', 'lhci-puppeteer-video'
+            )
+
+            self.assertFalse(os.path.exists(expected_dir))
+
+            class MockProcess:
+                # Here we use object because subprocess.Popen can receive arbitrary
+                # positional and keyword arguments, and their concrete types are not
+                # relevant for this test.
+                def __init__(
+                    self,
+                    *unused_args: object,
+                    **unused_kwargs: object,
+                ) -> None:
+                    self.returncode = 0
+
+                def communicate(  # pylint: disable=missing-docstring
+                    self,
+                ) -> tuple[bytes, bytes]:
+                    return (b'topic:123\n', b'')
+
+            with (
+                self.swap(os, 'getcwd', lambda: tmp_working_dir),
+                self.swap(subprocess, 'Popen', MockProcess),
+                self.swap(
+                    run_lighthouse_tests,
+                    'get_entity',
+                    lambda line: ('topic', '123') if 'topic' in line else None,
+                ),
+                self.swap(common, 'NODE_BIN_PATH', '/usr/bin/node'),
+                self.print_swap,
+            ):
+                entities = run_lighthouse_tests.run_lighthouse_puppeteer_script(
+                    record=True
+                )
+
+            self.assertTrue(os.path.isdir(expected_dir))
+            self.assertEqual(entities, {'topic': '123'})

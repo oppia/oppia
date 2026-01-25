@@ -36,7 +36,7 @@
     <div *ngIf="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
     </div>
     <div class="oppia-base-container e2e-test-base-container"
-         [ngClass]="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+         [ngClass]="{'oppia-sidebar-menu-open e2e-test-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
          (swipeleft)="closeSidebarOnSwipe()">
       <div class="oppia-content-container e2e-test-content-container">
         <div id="wrapper">

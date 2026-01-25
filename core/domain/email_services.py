@@ -118,14 +118,6 @@ def send_mail(
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        raise Exception('This app cannot send emails to users.')
-
     if not _is_email_valid(recipient_email):
         raise ValueError(
             'Malformed recipient email address: %s' % recipient_email

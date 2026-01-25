@@ -41,10 +41,6 @@
   }
 </style>
 
-<!--
-  We do not track by index here, because if we do, then the select2 dropdown
-  will not update when elements are swapped or deleted.
--->
 <div *ngIf="isParamChangesEditorOpen && editabilityService.isEditableOutsideTutorialMode()">
   <div cdkDropList
        (cdkDropListDropped)="drop($event)"

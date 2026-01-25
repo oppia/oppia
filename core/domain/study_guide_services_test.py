@@ -588,3 +588,181 @@ class StudyGuideServicesUnitTests(test_utils.GenericTestBase):
             'nonexistent_topic_id', 999
         )
         self.assertFalse(result)
+
+    def test_generate_study_guide_models(self) -> None:
+        topic_id_1 = 'topic_id_1'
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(1, self.admin_id, topic_id_1)
+        topic_1 = self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+        existence = study_guide_services.does_study_guide_model_exist(
+            topic_id_1, 1
+        )
+        self.assertFalse(existence)
+        study_guide_services.generate_study_guide_models(
+            topic_id_1, topic_1.subtopics
+        )
+        existence = study_guide_services.does_study_guide_model_exist(
+            topic_id_1, 1
+        )
+        self.assertTrue(existence)
+
+    def test_delete_study_guide_models(self) -> None:
+        topic_id_1 = 'topic_id_1'
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_subtopic(1, self.admin_id, topic_id_1)
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        topic_1 = self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+        existence = study_guide_services.does_study_guide_model_exist(
+            topic_id_1, 1
+        )
+        self.assertTrue(existence)
+        study_guide_services.delete_study_guide_models(
+            topic_id_1, topic_1.subtopics
+        )
+        existence = study_guide_services.does_study_guide_model_exist(
+            topic_id_1, 1
+        )
+        self.assertFalse(existence)
+
+    def test_verify_study_guide_models_for_valid_model(self) -> None:
+        topic_id_1 = 'topic_id_1'
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        topic_1 = self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+        issues = study_guide_services.verify_study_guide_models(
+            topic_id_1, topic_1.subtopics
+        )
+        self.assertEqual(issues, [])
+
+    def test_verify_study_guide_models_for_invalid_model(self) -> None:
+        topic_id_1 = 'topic_id_1'
+        subtopic_1 = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title 1', 'url-frag-one'
+        )
+        subtopic_1.skill_ids = ['skill_id_1']
+        subtopic_1.url_fragment = 'sub-one-frag'
+        study_guide = self.save_new_study_guide(1, self.admin_id, topic_id_1)
+        study_guide_changes = [
+            study_guide_domain.StudyGuideChange(
+                {
+                    'cmd': study_guide_domain.CMD_UPDATE_STUDY_GUIDE_PROPERTY,
+                    'subtopic_id': 1,
+                    'property_name': 'sections',
+                    'new_value': [
+                        {
+                            'heading': {
+                                'content_id': 'section_heading_0',
+                                'unicode_str': 'hello',
+                            },
+                            'content': {
+                                'content_id': 'section_content_1',
+                                'html': 'How are ya?',
+                            },
+                        }
+                    ],
+                    'old_value': [
+                        {
+                            'heading': {
+                                'content_id': 'section_heading_0',
+                                'unicode_str': 'Android Study Guide',
+                            },
+                            'content': {
+                                'content_id': 'section_content_1',
+                                'html': '<p>Android Study Guide Content</p>',
+                            },
+                        }
+                    ],
+                }
+            )
+        ]
+        study_guide_services.save_study_guide(
+            self.admin_id,
+            study_guide,
+            'Updated study guide',
+            study_guide_changes,
+        )
+        study_guide_id = study_guide_domain.StudyGuide.get_study_guide_id(
+            topic_id_1, 1
+        )
+
+        # Making the study guide model invalid by deleting the required
+        # snapshot models.
+        subtopic_models.StudyGuideSnapshotContentModel.get(
+            '%s-1' % study_guide_id
+        ).delete()
+        subtopic_models.StudyGuideSnapshotMetadataModel.get(
+            '%s-1' % study_guide_id
+        ).delete()
+        subtopic_models.StudyGuideCommitLogEntryModel.get(
+            'studyguide-%s-1' % study_guide_id
+        ).delete()
+        topic_1 = self.save_new_topic(
+            topic_id_1,
+            self.admin_id,
+            name='Topic 1',
+            abbreviated_name='T1',
+            url_fragment='url-frag-one',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic_1],
+            next_subtopic_id=2,
+        )
+        issues = study_guide_services.verify_study_guide_models(
+            topic_id_1, topic_1.subtopics
+        )
+        expected_issues = [
+            'Missing snapshot content models: topic_id_1-1-1',
+            'Missing snapshot metadata models: topic_id_1-1-1',
+            'Missing commit log entry models: studyguide-topic_id_1-1-1',
+        ]
+        self.assertEqual(issues, expected_issues)
