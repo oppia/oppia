@@ -210,19 +210,19 @@ export class CreateNewSubtopicModalComponent
     if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
       return Boolean(
         this.editableThumbnailFilename &&
-        this.subtopicTitle &&
-        this.sectionHeadingPlaintext &&
-        this.sectionContentHtml &&
-        this.editableUrlFragment &&
-        this.isUrlFragmentValid()
+          this.subtopicTitle &&
+          this.sectionHeadingPlaintext &&
+          this.sectionContentHtml &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
       );
     } else {
       return Boolean(
         this.editableThumbnailFilename &&
-        this.subtopicTitle &&
-        this.htmlData &&
-        this.editableUrlFragment &&
-        this.isUrlFragmentValid()
+          this.subtopicTitle &&
+          this.htmlData &&
+          this.editableUrlFragment &&
+          this.isUrlFragmentValid()
       );
     }
   }
