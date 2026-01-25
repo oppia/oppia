@@ -33,6 +33,10 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {
+  ImageUploaderParameters,
+  ImageUploaderData,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -70,6 +74,8 @@ export class CreateNewSubtopicModalComponent
   generatedUrlPrefix!: string;
   studyGuideSectionCharacterLimit: number =
     AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
+  imageUploaderParameters!: ImageUploaderParameters;
+  uploadedImageData: ImageUploaderData | null = null;
 
   constructor(
     private ngbActiveModal: NgbActiveModal,
@@ -113,6 +119,19 @@ export class CreateNewSubtopicModalComponent
     this.errorMsg = null;
     this.subtopicUrlFragmentExists = false;
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment} /${this.topic.getUrlFragment()}/studyguide`;
+
+    // Initialize image uploader parameters for subtopic thumbnail.
+    this.imageUploaderParameters = {
+      disabled: false,
+      maxImageSizeInKB: 1024,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: this.allowedBgColors[0],
+      allowedBgColors: this.allowedBgColors,
+      allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+      aspectRatio: '4:3',
+      previewDescriptionBgColor: '#BE563C',
+    };
   }
 
   getSchema(): object {
@@ -154,10 +173,24 @@ export class CreateNewSubtopicModalComponent
 
   updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
     this.editableThumbnailFilename = newThumbnailFilename;
+    // Update the preview title when subtopic title changes.
+    if (this.imageUploaderParameters) {
+      this.imageUploaderParameters.previewTitle = this.subtopicTitle;
+    }
   }
 
   updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
     this.editableThumbnailBgColor = newThumbnailBgColor;
+  }
+
+  handleImageSave(imageData: ImageUploaderData): void {
+    this.uploadedImageData = imageData;
+    this.editableThumbnailFilename = imageData.filename;
+    this.editableThumbnailBgColor = imageData.bg_color;
+    // Update the preview title when subtopic title changes.
+    if (this.imageUploaderParameters) {
+      this.imageUploaderParameters.previewTitle = this.subtopicTitle;
+    }
   }
 
   resetErrorMsg(): void {

@@ -20,18 +20,20 @@ import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
+import {
+  ImageUploaderParameters,
+  ImageUploaderData,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
 import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Component({
   selector: 'oppia-create-new-topic-modal',
   templateUrl: './create-new-topic-modal.component.html',
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+  allowedBgColors: string[] = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
   hostname: string = this.windowRef.nativeWindow.location.hostname;
@@ -47,11 +49,11 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   generatedUrlPrefix = `${this.hostname}/learn/staging`;
+  imageUploaderParameters!: ImageUploaderParameters;
+  uploadedImageData: ImageUploaderData | null = null;
 
   constructor(
-    private pageContextService: PageContextService,
     private ngbActiveModal: NgbActiveModal,
-    private imageLocalStorageService: ImageLocalStorageService,
     private windowRef: WindowRef,
     private topicEditorStateService: TopicEditorStateService
   ) {
@@ -59,11 +61,35 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   }
 
   ngOnInit(): void {
-    this.pageContextService.setImageSaveDestinationToLocalStorage();
+    // Initialize image uploader parameters for the topic thumbnail.
+    this.imageUploaderParameters = {
+      disabled: false,
+      maxImageSizeInKB: 1024,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: this.allowedBgColors[0],
+      allowedBgColors: this.allowedBgColors,
+      allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+      aspectRatio: '4:3',
+      previewDescriptionBgColor: '#2F6687',
+    };
+  }
+
+  handleImageSave(imageData: ImageUploaderData): void {
+    this.uploadedImageData = imageData;
+    // Update the preview title when topic name changes.
+    this.imageUploaderParameters.previewTitle = this.newlyCreatedTopic.name;
+  }
+
+  getImageData(): ImageUploaderData | null {
+    return this.uploadedImageData;
   }
 
   save(): void {
-    this.ngbActiveModal.close(this.newlyCreatedTopic);
+    this.ngbActiveModal.close({
+      topic: this.newlyCreatedTopic,
+      imageData: this.uploadedImageData,
+    });
   }
 
   cancel(): void {
@@ -72,8 +98,7 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   isValid(): boolean {
     return Boolean(
-      this.newlyCreatedTopic.isValid() &&
-        this.imageLocalStorageService.getStoredImagesData().length > 0
+      this.newlyCreatedTopic.isValid() && this.uploadedImageData !== null
     );
   }
 

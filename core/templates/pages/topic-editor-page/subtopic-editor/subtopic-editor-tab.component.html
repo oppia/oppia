@@ -116,16 +116,9 @@
             <p>
               <strong>Thumbnail Image*</strong>
             </p>
-            <oppia-thumbnail-uploader [filename]="subtopic?.getThumbnailFilename()"
-                                      [useLocalStorage]="false"
-                                      (updateFilename)="updateSubtopicThumbnailFilename($event)"
-                                      [bgColor]="subtopic?.getThumbnailBgColor()"
-                                      (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
-                                      [allowedBgColors]="allowedBgColors"
-                                      [aspectRatio]="'4:3'"
-                                      [previewTitle]="editableTitle"
-                                      previewDescriptionBgColor="#BE563C">
-            </oppia-thumbnail-uploader>
+            <oppia-image-uploader [imageUploaderParameters]="imageUploaderParameters"
+                                  (imageSave)="handleThumbnailImageSave($event)">
+            </oppia-image-uploader>
           </div>
         </div>
         <div *ngIf="editableThumbnailFilename && subtopicEditorCardIsShown">

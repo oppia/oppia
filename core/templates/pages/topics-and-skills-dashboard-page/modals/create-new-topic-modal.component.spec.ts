@@ -22,9 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
@@ -32,9 +30,7 @@ import {By} from '@angular/platform-browser';
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
   let componentInstance: CreateNewTopicModalComponent;
-  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
-  let imageLocalStorageService: ImageLocalStorageService;
   let topicEditorStateService: TopicEditorStateService;
 
   class MockWindowRef {
@@ -51,7 +47,6 @@ describe('Create new topic modal', () => {
       declarations: [CreateNewTopicModalComponent, UrlFragmentEditorComponent],
       providers: [
         NgbActiveModal,
-        ImageLocalStorageService,
         TopicEditorStateService,
         {
           provide: WindowRef,
@@ -65,9 +60,7 @@ describe('Create new topic modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewTopicModalComponent);
     componentInstance = fixture.componentInstance;
-    pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
   });
 
@@ -76,17 +69,23 @@ describe('Create new topic modal', () => {
   });
 
   it('should intialize', () => {
-    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
     componentInstance.ngOnInit();
-    expect(
-      pageContextService.setImageSaveDestinationToLocalStorage
-    ).toHaveBeenCalled();
+    expect(componentInstance.imageUploaderParameters).toBeDefined();
+    expect(componentInstance.uploadedImageData).toBeNull();
   });
 
   it('should save new topic', () => {
     spyOn(ngbActiveModal, 'close');
+    componentInstance.uploadedImageData = {
+      filename: 'test.svg',
+      image_data: new Blob(),
+      bg_color: '#000000',
+    };
     componentInstance.save();
-    expect(ngbActiveModal.close).toHaveBeenCalled();
+    expect(ngbActiveModal.close).toHaveBeenCalledWith({
+      topic: componentInstance.newlyCreatedTopic,
+      imageData: componentInstance.uploadedImageData,
+    });
   });
 
   it('should cancel', () => {
@@ -97,13 +96,32 @@ describe('Create new topic modal', () => {
 
   it('should validate newly created topic', () => {
     spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
-    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
-      {
-        filename: '',
-        imageBlob: null,
-      },
-    ]);
+    componentInstance.uploadedImageData = {
+      filename: 'test.svg',
+      image_data: new Blob(),
+      bg_color: '#000000',
+    };
     expect(componentInstance.isValid()).toBeTrue();
+  });
+
+  it('should not be valid without uploaded image', () => {
+    spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
+    componentInstance.uploadedImageData = null;
+    expect(componentInstance.isValid()).toBeFalse();
+  });
+
+  it('should handle image save', () => {
+    const mockImageData = {
+      filename: 'test.svg',
+      image_data: new Blob(),
+      bg_color: '#000000',
+    };
+    componentInstance.newlyCreatedTopic.name = 'Test Topic';
+    componentInstance.handleImageSave(mockImageData);
+    expect(componentInstance.uploadedImageData).toEqual(mockImageData);
+    expect(componentInstance.imageUploaderParameters.previewTitle).toBe(
+      'Test Topic'
+    );
   });
 
   it('should update topic url framgent', () => {

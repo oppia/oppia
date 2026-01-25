@@ -39,6 +39,13 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import {
+  ImageUploaderParameters,
+  ImageUploaderData,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
+import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -88,6 +95,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     };
   };
   generatedUrlPrefix: string;
+  imageUploaderParameters!: ImageUploaderParameters;
 
   constructor(
     private questionBackendApiService: QuestionBackendApiService,
@@ -99,7 +107,10 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
     private platformFeatureService: PlatformFeatureService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private assetsBackendApiService: AssetsBackendApiService,
+    private pageContextService: PageContextService,
+    private imageUploadHelperService: ImageUploadHelperService
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -166,6 +177,21 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         this.subtopicValidationService.isUrlFragmentValid(
           this.editableUrlFragment
         );
+
+      // Initialize image uploader parameters for subtopic thumbnail.
+      this.imageUploaderParameters = {
+        disabled: false,
+        maxImageSizeInKB: 1024,
+        imageName: 'Thumbnail',
+        orientation: 'landscape',
+        bgColor: this.subtopic.getThumbnailBgColor() || this.allowedBgColors[0],
+        allowedBgColors: this.allowedBgColors,
+        allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+        aspectRatio: '4:3',
+        filename: this.subtopic.getThumbnailFilename(),
+        previewTitle: this.editableTitle,
+        previewDescriptionBgColor: '#BE563C',
+      };
     }
   }
 
@@ -259,6 +285,28 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       newThumbnailBgColor
     );
     this.editableThumbnailBgColor = newThumbnailBgColor;
+  }
+
+  handleThumbnailImageSave(imageData: ImageUploaderData): void {
+    // Upload the image to the backend.
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+
+    if (!entityType || !entityId) {
+      throw new Error('Entity type and ID are required for image upload');
+    }
+
+    this.assetsBackendApiService
+      .postThumbnailFile(imageData.image_data, imageData.filename, entityType, entityId)
+      .toPromise()
+      .then(response => {
+        // Update the subtopic with the new thumbnail filename and background color.
+        this.updateSubtopicThumbnailFilename(response.filename);
+        this.updateSubtopicThumbnailBgColor(imageData.bg_color);
+      })
+      .catch(error => {
+        throw new Error('Failed to upload subtopic thumbnail: ' + error);
+      });
   }
 
   resetErrorMsg(): void {

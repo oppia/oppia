@@ -45,6 +45,11 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import {
+  ImageUploaderParameters,
+  ImageUploaderData,
+} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 @Component({
   selector: 'oppia-topic-editor-tab',
@@ -102,6 +107,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   classroomName: string | null = null;
   curriculumAdminUsernames: string[] = [];
   generatedUrlPrefix: string;
+  imageUploaderParameters!: ImageUploaderParameters;
 
   constructor(
     private pageContextService: PageContextService,
@@ -118,7 +124,8 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     private undoRedoService: UndoRedoService,
     private urlInterpolationService: UrlInterpolationService,
     private windowDimensionsService: WindowDimensionsService,
-    private windowRef: WindowRef
+    private windowRef: WindowRef,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   directiveSubscriptions = new Subscription();
@@ -188,6 +195,23 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
         this.pageContextService.getEntityId()
       );
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}`;
+
+    // Initialize image uploader parameters for topic thumbnail.
+    this.imageUploaderParameters = {
+      disabled: !this.topicRights.canEditTopic(),
+      maxImageSizeInKB: 1024,
+      imageName: 'Thumbnail',
+      orientation: 'landscape',
+      bgColor: this.topic.getThumbnailBgColor() || this.allowedBgColors[0],
+      allowedBgColors: this.allowedBgColors,
+      allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+      aspectRatio: '4:3',
+      filename: this.topic.getThumbnailFilename(),
+      previewTitle: this.editableName,
+      previewDescriptionBgColor: '#2F6687',
+      previewFooter:
+        this.topic.getCanonicalStoryIds().length + ' Lessons',
+    };
   }
 
   getEligibleSkillSummariesForDiagnosticTest(): ShortSkillSummary[] {
@@ -414,6 +438,36 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       this.topic,
       newThumbnailBgColor
     );
+  }
+
+  handleThumbnailImageSave(imageData: ImageUploaderData): void {
+    // Upload the image to the backend.
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+
+    if (!entityType || !entityId) {
+      throw new Error('Entity type and ID are required for image upload');
+    }
+
+    this.assetsBackendApiService
+      .postThumbnailFile(imageData.image_data, imageData.filename, entityType, entityId)
+      .toPromise()
+      .then(response => {
+        // Update the topic with the new thumbnail filename and background color.
+        this.updateTopicThumbnailFilename(response.filename);
+        this.updateTopicThumbnailBgColor(imageData.bg_color);
+        
+        // Update the thumbnail preview URL.
+        this.editableThumbnailDataUrl =
+          this.imageUploadHelperService.getTrustedResourceUrlForThumbnailFilename(
+            response.filename,
+            entityType,
+            entityId
+          );
+      })
+      .catch(error => {
+        throw new Error('Failed to upload thumbnail: ' + error);
+      });
   }
 
   updateTopicDescription(newDescription: string): void {
