@@ -73,8 +73,8 @@ export class ImageUploaderComponent implements OnInit {
   ngOnInit(): void {
     this.placeholderImageUrl = this.urlInterpolationService.getStaticImageUrl(
       this.isImageInPortraitMode()
-        ? '/icons/story-image-icon.png'
-        : '/icons/story-image-icon-landscape.png'
+        ? '/icons/story-image-icon.svg'
+        : '/icons/story-image-icon-landscape.svg'
     );
 
     if (this.imageUploaderParameters.filename) {

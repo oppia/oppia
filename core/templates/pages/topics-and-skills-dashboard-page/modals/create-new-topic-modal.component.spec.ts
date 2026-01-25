@@ -111,6 +111,7 @@ describe('Create new topic modal', () => {
   });
 
   it('should handle image save', () => {
+    componentInstance.ngOnInit();
     const mockImageData = {
       filename: 'test.svg',
       image_data: new Blob(),

@@ -135,8 +135,8 @@ describe('Topic creation service', () => {
         imageData: mockImageData,
       }),
     } as NgbModalRef);
+    topicCreationService.createNewTopic();
     expect(() => {
-      topicCreationService.createNewTopic();
       tick();
     }).toThrowError('Topic fields cannot be empty');
     expect(ngbModal.open).toHaveBeenCalled();
@@ -153,8 +153,8 @@ describe('Topic creation service', () => {
         imageData: null,
       }),
     } as NgbModalRef);
+    topicCreationService.createNewTopic();
     expect(() => {
-      topicCreationService.createNewTopic();
       tick();
     }).toThrowError('Image data is required');
   }));
