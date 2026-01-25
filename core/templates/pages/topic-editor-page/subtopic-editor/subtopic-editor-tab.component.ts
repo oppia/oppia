@@ -186,7 +186,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
         orientation: 'landscape',
         bgColor: this.subtopic.getThumbnailBgColor() || this.allowedBgColors[0],
         allowedBgColors: this.allowedBgColors,
-        allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+        allowedImageFormats: ['svg'],
         aspectRatio: '4:3',
         filename: this.subtopic.getThumbnailFilename(),
         previewTitle: this.editableTitle,

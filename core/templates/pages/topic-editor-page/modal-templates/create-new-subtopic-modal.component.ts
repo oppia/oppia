@@ -128,7 +128,7 @@ export class CreateNewSubtopicModalComponent
       orientation: 'landscape',
       bgColor: this.allowedBgColors[0],
       allowedBgColors: this.allowedBgColors,
-      allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+      allowedImageFormats: ['svg'],
       aspectRatio: '4:3',
       previewDescriptionBgColor: '#BE563C',
     };

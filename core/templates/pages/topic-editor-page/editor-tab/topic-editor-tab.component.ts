@@ -204,7 +204,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       orientation: 'landscape',
       bgColor: this.topic.getThumbnailBgColor() || this.allowedBgColors[0],
       allowedBgColors: this.allowedBgColors,
-      allowedImageFormats: ['svg', 'png', 'jpeg', 'jpg'],
+      allowedImageFormats: ['svg'],
       aspectRatio: '4:3',
       filename: this.topic.getThumbnailFilename(),
       previewTitle: this.editableName,
