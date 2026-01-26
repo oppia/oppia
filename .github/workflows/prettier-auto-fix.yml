@@ -25,14 +25,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          elif [ -f yarn.lock ]; then
-            yarn install --frozen-lockfile
-          else
-            npm install
-          fi
+        run: npm install
 
       - name: Run Prettier on target files
         run: |
