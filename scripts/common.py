@@ -227,9 +227,11 @@ def is_windows_os() -> bool:
     """
     return OS_NAME == 'Windows'
 
-
 def is_mac_os() -> bool:
-    """Check if the running system is MacOS."""
+    """Returns True if the current operating system is macOS.
+
+    This helper function is used to handle macOS-specific behavior in Oppia.
+    """
     return OS_NAME == 'Darwin'
 
 
