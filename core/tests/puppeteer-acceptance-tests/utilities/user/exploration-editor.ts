@@ -3626,7 +3626,6 @@ export class ExplorationEditor extends BaseUser {
     }
     await this.page.waitForSelector(confirmDiscardButton, {
       visible: true,
-      timeout: 60000,
     });
     await Promise.all([
       this.clickOnElementWithSelector(confirmDiscardButton),
