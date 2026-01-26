@@ -16,26 +16,26 @@
  * @fileoverview Component for the creator dashboard.
  */
 
-import { Component, Renderer2 } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { CreatorDashboardBackendApiService } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { CreatorDashboardConstants } from './creator-dashboard-page.constants';
-import { RatingComputationService } from 'components/ratings/rating-computation/rating-computation.service';
-import { UrlInterpolationService } from 'domain/utilities/url-interpolation.service';
-import { LoaderService } from 'services/loader.service';
-import { UserService } from 'services/user.service';
-import { DateTimeFormatService } from 'services/date-time-format.service';
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { ExplorationCreationService } from 'components/entity-creation-services/exploration-creation.service';
-import { forkJoin } from 'rxjs';
-import { WindowRef } from 'services/contextual/window-ref.service';
-import { CreatorDashboardData } from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
-import { ProfileSummary } from 'domain/user/profile-summary.model';
-import { CreatorExplorationSummary } from 'domain/summary/creator-exploration-summary.model';
-import { CollectionSummary } from 'domain/collection/collection-summary.model';
-import { ExplorationRatings } from 'domain/summary/learner-exploration-summary.model';
-import { CreatorDashboardStats } from 'domain/creator_dashboard/creator-dashboard-stats.model';
-import { WindowDimensionsService } from 'services/contextual/window-dimensions.service';
+import {Component, Renderer2} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {CreatorDashboardBackendApiService} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import {CreatorDashboardConstants} from './creator-dashboard-page.constants';
+import {RatingComputationService} from 'components/ratings/rating-computation/rating-computation.service';
+import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
+import {LoaderService} from 'services/loader.service';
+import {UserService} from 'services/user.service';
+import {DateTimeFormatService} from 'services/date-time-format.service';
+import {ThreadStatusDisplayService} from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import {ExplorationCreationService} from 'components/entity-creation-services/exploration-creation.service';
+import {forkJoin} from 'rxjs';
+import {WindowRef} from 'services/contextual/window-ref.service';
+import {CreatorDashboardData} from 'domain/creator_dashboard/creator-dashboard-backend-api.service';
+import {ProfileSummary} from 'domain/user/profile-summary.model';
+import {CreatorExplorationSummary} from 'domain/summary/creator-exploration-summary.model';
+import {CollectionSummary} from 'domain/collection/collection-summary.model';
+import {ExplorationRatings} from 'domain/summary/learner-exploration-summary.model';
+import {CreatorDashboardStats} from 'domain/creator_dashboard/creator-dashboard-stats.model';
+import {WindowDimensionsService} from 'services/contextual/window-dimensions.service';
 
 @Component({
   selector: 'oppia-creator-dashboard-page',
@@ -102,10 +102,10 @@ export class CreatorDashboardPageComponent {
   pageIndex: number = 0;
   pageSize: number = 10;
 
-  topExplorationBars: Array<{ label: string; value: number; widthPct: number }> =
+  topExplorationBars: Array<{label: string; value: number; widthPct: number}> =
     [];
-  histogram: Array<{ label: string; count: number; heightPct: number }> = [];
-  trendPoints: Array<{ x: number; y: number; label: string; value: number }> = [];
+  histogram: Array<{label: string; count: number; heightPct: number}> = [];
+  trendPoints: Array<{x: number; y: number; label: string; value: number}> = [];
   trendPolylinePoints: string = '';
 
   outcomesDistribution: Array<{
@@ -113,7 +113,7 @@ export class CreatorDashboardPageComponent {
     count: number;
     heightPct: number;
   }> = [];
-  ratingsBreakdown: Array<{ stars: number; count: number }> = [];
+  ratingsBreakdown: Array<{stars: number; count: number}> = [];
   contentEffectiveness: Array<{
     type: string;
     engagement: number;
@@ -121,7 +121,7 @@ export class CreatorDashboardPageComponent {
     avgScore?: number;
     delta?: number;
   }> = [];
-  recentComments: Array<{ author: string; text: string; ago: string }> = [];
+  recentComments: Array<{author: string; text: string; ago: string}> = [];
   peakActivityTime: string = '';
   avgTimeSpentMinutes?: number;
   Math = Math;
@@ -159,7 +159,7 @@ export class CreatorDashboardPageComponent {
     private threadStatusDisplayService: ThreadStatusDisplayService,
     private explorationCreationService: ExplorationCreationService,
     private windowRef: WindowRef
-  ) { }
+  ) {}
 
   EXP_PUBLISH_TEXTS = {
     defaultText:
@@ -196,7 +196,7 @@ export class CreatorDashboardPageComponent {
     this.myExplorationsView = newViewType;
     this.creatorDashboardBackendApiService
       .postExplorationViewAsync(newViewType)
-      .then(() => { });
+      .then(() => {});
   }
 
   checkMobileView(): boolean {
@@ -470,7 +470,7 @@ export class CreatorDashboardPageComponent {
       null,
       2
     );
-    const blob = new Blob([data], { type: 'application/json' });
+    const blob = new Blob([data], {type: 'application/json'});
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -486,7 +486,7 @@ export class CreatorDashboardPageComponent {
       total_open_feedback: 7,
       total_subscribers: 1234,
       creator_completion_rate: 62,
-      weekly_series: Array.from({ length: 12 }, (_, i) => ({
+      weekly_series: Array.from({length: 12}, (_, i) => ({
         date: `Week ${i + 1}`,
         num_ratings: 0,
         average_ratings: null,
@@ -566,12 +566,12 @@ export class CreatorDashboardPageComponent {
       label: string;
       count: number;
     }> = [
-        { min: 0, max: 20, label: '0–20%', count: 0 },
-        { min: 21, max: 40, label: '21–40%', count: 0 },
-        { min: 41, max: 60, label: '41–60%', count: 0 },
-        { min: 61, max: 80, label: '61–80%', count: 0 },
-        { min: 81, max: 100, label: '81–100%', count: 0 },
-      ];
+      {min: 0, max: 20, label: '0–20%', count: 0},
+      {min: 21, max: 40, label: '21–40%', count: 0},
+      {min: 41, max: 60, label: '41–60%', count: 0},
+      {min: 61, max: 80, label: '61–80%', count: 0},
+      {min: 81, max: 100, label: '81–100%', count: 0},
+    ];
     for (const e of this.reportExplorations) {
       const cr =
         e.completion_rate != null
@@ -596,18 +596,18 @@ export class CreatorDashboardPageComponent {
 
     const totalRatings = this.reportSummary.num_ratings || 1;
     this.ratingsBreakdown = [
-      { stars: 5, count: Math.round(totalRatings * 0.35) },
-      { stars: 4, count: Math.round(totalRatings * 0.3) },
-      { stars: 3, count: Math.round(totalRatings * 0.2) },
-      { stars: 2, count: Math.round(totalRatings * 0.1) },
-      { stars: 1, count: Math.round(totalRatings * 0.05) },
+      {stars: 5, count: Math.round(totalRatings * 0.35)},
+      {stars: 4, count: Math.round(totalRatings * 0.3)},
+      {stars: 3, count: Math.round(totalRatings * 0.2)},
+      {stars: 2, count: Math.round(totalRatings * 0.1)},
+      {stars: 1, count: Math.round(totalRatings * 0.05)},
     ];
 
     const totalPlays = this.reportExplorations.reduce(
       (s, e) => s + (e.plays || 0),
       0
     );
-    const groups: { [k: string]: string[] } = {
+    const groups: {[k: string]: string[]} = {
       'Video Lessons': ['e1', 'e4'],
       'Interactive Quiz': ['e2'],
       'Audio Content': ['e3'],
@@ -643,12 +643,12 @@ export class CreatorDashboardPageComponent {
         text: 'Quiz was engaging and fun.',
         ago: '3 days ago',
       },
-      { author: 'LearnerC', text: 'Could use more examples.', ago: '5 days ago' },
+      {author: 'LearnerC', text: 'Could use more examples.', ago: '5 days ago'},
     ];
   }
 
   private computeChartsFromWeekly(
-    weekly: Array<{ date: string; total_plays: number }>
+    weekly: Array<{date: string; total_plays: number}>
   ): void {
     const playsList = (this.reportExplorations || []).map(e => ({
       label: e.title || 'Untitled',
@@ -668,14 +668,14 @@ export class CreatorDashboardPageComponent {
       label: string;
       count: number;
     }> = [
-        { min: 0, max: 10, label: '0–10', count: 0 },
-        { min: 11, max: 50, label: '11–50', count: 0 },
-        { min: 51, max: 100, label: '51–100', count: 0 },
-        { min: 101, max: 500, label: '101–500', count: 0 },
-        { min: 501, max: 1000, label: '501–1K', count: 0 },
-        { min: 1001, max: 5000, label: '1K–5K', count: 0 },
-        { min: 5001, max: null, label: '5K+', count: 0 },
-      ];
+      {min: 0, max: 10, label: '0–10', count: 0},
+      {min: 11, max: 50, label: '11–50', count: 0},
+      {min: 51, max: 100, label: '51–100', count: 0},
+      {min: 101, max: 500, label: '101–500', count: 0},
+      {min: 501, max: 1000, label: '501–1K', count: 0},
+      {min: 1001, max: 5000, label: '1K–5K', count: 0},
+      {min: 5001, max: null, label: '5K+', count: 0},
+    ];
     for (const e of playsList) {
       for (const b of buckets) {
         if (
@@ -699,7 +699,7 @@ export class CreatorDashboardPageComponent {
     const pad = 20;
     const series = weekly
       .slice(-12)
-      .map(wi => ({ label: wi.date, value: wi.total_plays }));
+      .map(wi => ({label: wi.date, value: wi.total_plays}));
     const vals = series.map(s => s.value);
     const maxY = Math.max(1, ...vals);
     const stepX = (w - pad * 2) / Math.max(1, series.length - 1);
@@ -707,7 +707,7 @@ export class CreatorDashboardPageComponent {
       const x = pad + i * stepX;
       const v = s.value ?? 0;
       const y = h - pad - Math.round((v / maxY) * (h - pad * 2));
-      return { x, y, label: s.label, value: v };
+      return {x, y, label: s.label, value: v};
     });
     this.trendPolylinePoints = this.trendPoints
       .map(p => p.x + ',' + p.y)
