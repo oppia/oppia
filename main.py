@@ -208,6 +208,12 @@ URLS = [
         '/<firebase_path:__/auth(?:/.*)?>', firebase.FirebaseProxyPage
     ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
+    get_redirect_route(
+        r'%s/can_access_story_viewer_page/<classroom_url_fragment>'
+        r'/<topic_url_fragment>/<story_url_fragment>'
+        % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
+        access_validators.StoryViewerPageAccessValidationHandler,
+    ),
     get_redirect_route(r'/splash', SplashRedirectPage),
     get_redirect_route(
         r'/internetconnectivityhandler', InternetConnectivityHandler
@@ -1439,10 +1445,10 @@ URLS.extend(
         get_redirect_route(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
         ),
-        get_redirect_route(
-            r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-            oppia_root.OppiaRootPage,
-        ),
+        # get_redirect_route(
+        #     r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        #     oppia_root.OppiaRootPage,
+        # ),
         get_redirect_route(
             r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage
         ),

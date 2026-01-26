@@ -23,6 +23,8 @@ import {
   ViewChild,
   OnDestroy,
 } from '@angular/core';
+import {Location} from '@angular/common';
+import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -42,6 +44,7 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
 
 import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
@@ -85,6 +88,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   storyNodesTitleTranslationKeys: string[] = [];
   storyNodesDescTranslationKeys: string[] = [];
+
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -96,7 +100,10 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
     private alertsService: AlertsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private accessValidationBackendApiService: AccessValidationBackendApiService,
+    private router: Router,
+    private location: Location
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -213,6 +220,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       throw new Error('Story url fragment is null');
     }
     this.storyUrlFragment = storyUrlFragment;
+
     this.loaderService.showLoadingScreen('Loading');
     this.storyViewerBackendApiService
       .fetchStoryDataAsync(
@@ -231,11 +239,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
             storyDataDict.getMetaTagContent()
           );
           this.storyTitle = storyDataDict.title;
-
-          // The onLangChange event is initially fired before the story is
-          // loaded. Hence the first setpageTitle() call needs to made
-          // manually, and the onLangChange subscription is added after
-          // the story is loaded.
           this.setPageTitle();
           this.subscribeToOnLangChange();
           this.storyTitleTranslationKey =
@@ -279,9 +282,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
         }
       );
 
-    // The pathIconParameters is an array containing the co-ordinates,
-    // background color and icon url for the icons generated on the
-    // path.
     this.pathIconParameters = [];
   }
 
