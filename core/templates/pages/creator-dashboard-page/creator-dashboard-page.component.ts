@@ -354,7 +354,7 @@ export class CreatorDashboardPageComponent {
   }
 
   async initStatsReport(): Promise<void> {
-    const forceMock = true;
+    const forceMock = false;
     try {
       const report =
         await this.creatorDashboardBackendApiService.fetchCreatorStatsReportAsync();

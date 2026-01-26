@@ -352,6 +352,25 @@ describe('Creator Dashboard Page Component', () => {
           ),
         } as CreatorDashboardData)
       );
+
+      spyOn(
+        creatorDashboardBackendApiService,
+        'fetchCreatorStatsReportAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          summary: {
+            num_ratings: 0,
+            average_ratings: 0,
+            total_plays: 0,
+            total_open_feedback: 0,
+            total_subscribers: 0,
+            creator_completion_rate: 0,
+            weekly_series: [],
+          },
+          explorations: [],
+        })
+      );
+
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(userInfo as UserInfo)
       );

@@ -18,6 +18,7 @@ activities.
 
 from __future__ import annotations
 
+import io
 import logging
 
 from core import feconf, utils
@@ -31,6 +32,7 @@ from core.domain import (
     exp_services,
     feedback_services,
     role_services,
+    stats_services,
     subscription_services,
     suggestion_services,
     summary_services,
@@ -386,6 +388,236 @@ class CreatorDashboardHandler(
         )
         user_services.save_user_settings(user_settings)
         self.render_json({})
+
+
+class CreatorStatsReportHandler(
+    base.BaseHandler[Dict[str, str], Dict[str, str]]
+):
+    """Provides consolidated stats report JSON for the creator."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_creator_dashboard
+    def get(self) -> None:
+        assert self.user_id is not None
+
+        def _round_avg(rating: float) -> float:
+            return round(rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
+
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(self.user_id)
+        )
+
+        exploration_ids = [s.id for s in subscribed_exploration_summaries]
+        exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts(
+            subscribed_exploration_summaries
+        )
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics_multi(exploration_ids)
+        )
+
+        dashboard_stats = user_services.get_dashboard_stats(self.user_id)
+        summary = {
+            'num_ratings': dashboard_stats['num_ratings'],
+            'average_ratings': dashboard_stats['average_ratings'],
+            'total_plays': dashboard_stats['total_plays'],
+            'total_open_feedback': feedback_services.get_total_open_threads(
+                feedback_thread_analytics
+            ),
+        }
+        weekly_stats = user_services.get_weekly_dashboard_stats(self.user_id)
+        weekly_series = []
+        for item in weekly_stats:
+            for dt, stats in item.items():
+                weekly_series.append(
+                    {
+                        'date': dt,
+                        'num_ratings': stats.get('num_ratings', 0),
+                        'average_ratings': stats.get('average_ratings'),
+                        'total_plays': stats.get('total_plays', 0),
+                    }
+                )
+        summary['weekly_series'] = weekly_series
+        avg_summary_val = summary.get('average_ratings')
+        if isinstance(avg_summary_val, (int, float)):
+            summary['average_ratings'] = _round_avg(float(avg_summary_val))
+
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
+            self.user_id
+        )
+        summary['total_subscribers'] = len(subscriber_ids)
+
+        total_starts = 0
+        total_completions = 0
+        for exp_id in exploration_ids:
+            exp_obj = exp_fetchers.get_exploration_by_id(exp_id)
+            exp_stats = stats_services.get_exploration_stats(
+                exp_id, exp_obj.version
+            )
+            total_starts += exp_stats.num_starts
+            total_completions += exp_stats.num_completions
+        summary['creator_completion_rate'] = (
+            round((total_completions / total_starts) * 100, 2)
+            if total_starts > 0
+            else None
+        )
+
+        explorations = []
+        for ind, exploration in enumerate(exp_summary_dicts):
+            feedback_analytics_dict = feedback_thread_analytics[ind].to_dict()
+            avg_val = (
+                exploration['ratings'].get('scaled_average_rating')
+                if exploration.get('ratings')
+                else None
+            )
+            avg_rounded = (
+                _round_avg(float(avg_val))
+                if isinstance(avg_val, (int, float))
+                else None
+            )
+            exp_obj = exp_fetchers.get_exploration_by_id(exploration['id'])
+            exp_stats = stats_services.get_exploration_stats(
+                exploration['id'], exp_obj.version
+            )
+            exp_starts = exp_stats.num_starts
+            exp_completions = exp_stats.num_completions
+            exp_completion_rate = (
+                round((exp_completions / exp_starts) * 100, 2)
+                if exp_starts > 0
+                else None
+            )
+            explorations.append(
+                {
+                    'id': exploration['id'],
+                    'title': exploration['title'],
+                    'num_open_threads': feedback_analytics_dict[
+                        'num_open_threads'
+                    ],
+                    'average_rating': avg_rounded,
+                    'plays': exploration['num_views'],
+                    'num_starts': exp_starts,
+                    'num_completions': exp_completions,
+                    'completion_rate': exp_completion_rate,
+                    'last_updated_msec': exploration['last_updated_msec'],
+                }
+            )
+
+        self.render_json({'summary': summary, 'explorations': explorations})
+
+
+class CreatorStatsCsvHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
+    """Provides consolidated stats report CSV for the creator."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
+    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+
+    @acl_decorators.can_access_creator_dashboard
+    def get(self) -> None:
+        assert self.user_id is not None
+
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(self.user_id)
+        )
+
+        exploration_ids = [s.id for s in subscribed_exploration_summaries]
+        exp_summary_dicts = summary_services.get_displayable_exp_summary_dicts(
+            subscribed_exploration_summaries
+        )
+        feedback_thread_analytics = (
+            feedback_services.get_thread_analytics_multi(exploration_ids)
+        )
+        dashboard_stats = user_services.get_dashboard_stats(self.user_id)
+        subscriber_ids = subscription_services.get_all_subscribers_of_creator(
+            self.user_id
+        )
+
+        total_starts = 0
+        total_completions = 0
+        for exp_id in exploration_ids:
+            exp_obj = exp_fetchers.get_exploration_by_id(exp_id)
+            exp_stats = stats_services.get_exploration_stats(
+                exp_id, exp_obj.version
+            )
+            total_starts += exp_stats.num_starts
+            total_completions += exp_stats.num_completions
+        completion_rate = (
+            round((total_completions / total_starts) * 100, 2)
+            if total_starts > 0
+            else ''
+        )
+
+        lines = []
+        header = [
+            'Total Plays',
+            'Average Ratings',
+            'Total Open Feedback',
+            'Total Subscribers',
+            'Average Completion Rate (%)',
+        ]
+        lines.append(','.join(header))
+        lines.append(
+            ','.join(
+                [
+                    str(dashboard_stats['total_plays']),
+                    str(dashboard_stats['average_ratings'] or ''),
+                    str(
+                        feedback_services.get_total_open_threads(
+                            feedback_thread_analytics
+                        )
+                    ),
+                    str(len(subscriber_ids)),
+                    str(completion_rate),
+                ]
+            )
+        )
+        lines.append(
+            'Exploration ID,Title,Open Threads,Average Rating,Plays,Starts,Completions,Completion Rate (%),Last Updated'
+        )
+        for ind, exp in enumerate(exp_summary_dicts):
+            feedback_analytics_dict = feedback_thread_analytics[ind].to_dict()
+            avg = exp['ratings'] and exp['ratings'].get('scaled_average_rating')
+            avg_str = (
+                str(round(avg, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION))
+                if isinstance(avg, (int, float))
+                else 'N/A'
+            )
+            title = (exp['title'] or 'Untitled').replace('"', '""')
+            last_updated = utils.get_human_readable_time_string(
+                exp['last_updated_msec']
+            )
+            exp_obj = exp_fetchers.get_exploration_by_id(exp['id'])
+            exp_stats = stats_services.get_exploration_stats(
+                exp['id'], exp_obj.version
+            )
+            exp_starts = exp_stats.num_starts
+            exp_completions = exp_stats.num_completions
+            exp_completion_rate = (
+                round((exp_completions / exp_starts) * 100, 2)
+                if exp_starts > 0
+                else ''
+            )
+            lines.append(
+                ','.join(
+                    [
+                        exp['id'],
+                        '"' + title + '"',
+                        str(feedback_analytics_dict['num_open_threads']),
+                        avg_str,
+                        str(exp['num_views']),
+                        str(exp_starts),
+                        str(exp_completions),
+                        str(exp_completion_rate),
+                        '"' + last_updated + '"',
+                    ]
+                )
+            )
+
+        data = '\n'.join(lines)
+        file = io.BytesIO(data.encode('utf-8'))
+        self.render_downloadable_file(file, 'creator_stats.csv', 'text/csv')
 
 
 class NewExplorationHandlerNormalizedPayloadDict(TypedDict):

@@ -369,7 +369,6 @@
       <em>There are no collections to display.</em>
     </div>
 
-    </ul>
   </div>
 
   <div *ngIf="activeTab === 'statsReport'" class="stats-report-tab-container p-4">
@@ -434,7 +433,7 @@
           <select (change)="setFilter($event.target.value)" class="form-control form-control-sm w-auto ml-2">
             <option value="all">All</option>
             <option value="high_rating">High Rating (>=4)</option>
-            <option value="low_rating">Low Rating (<=2)< /option>
+            <option value="low_rating">Low Rating (<=2)</option>
             <option value="has_open_threads">Has Open Threads</option>
             <option value="recently_updated">Updated in 30 days</option>
             <option value="high_plays">High Plays (>=1000)</option>
@@ -512,7 +511,7 @@
                   <span class="text-truncate mr-2" [title]="b.label">{{ b.label }}</span>
                   <span class="font-weight-bold">{{ b.value }}</span>
                 </div>
-                <div class="progress" style="height: 8px;">
+                <div class="progress plays-progress-bar">
                   <div class="progress-bar" role="progressbar" [style.width.%]="b.widthPct" aria-valuenow="b.widthPct"
                     aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
@@ -523,7 +522,7 @@
         <div class="col-md-6 mb-4">
           <mat-card class="oppia-mat-card p-3 h-100">
             <h4 class="h6 mb-3 border-bottom pb-2">Engagement Trends (Last 12 Weeks)</h4>
-            <div class="d-flex justify-content-center align-items-center" style="height: 160px;">
+            <div class="d-flex justify-content-center align-items-center trend-chart-container">
               <svg viewBox="0 0 320 140" width="100%" height="100%">
                 <polyline [attr.points]="trendPolylinePoints" fill="none" stroke="#00645c" stroke-width="2"></polyline>
                 <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="4" fill="#00645c">
@@ -538,13 +537,13 @@
         <div class="col-md-6 mb-4">
           <mat-card class="oppia-mat-card p-3 h-100">
             <h4 class="h6 mb-3 border-bottom pb-2">Learning Outcomes Distribution</h4>
-            <div class="d-flex align-items-end chart-grid" style="height: 180px; gap: 10px;">
+            <div class="d-flex align-items-end chart-grid outcomes-chart-grid">
               <div *ngFor="let h of outcomesDistribution"
                 class="flex-grow-1 d-flex flex-column align-items-center h-100 justify-content-end"
                 [attr.title]="h.label + ': ' + h.count">
                 <div class="badge badge-light mb-1 small">{{ h.count }}</div>
                 <div class="bg-success rounded-top w-100" [style.height.%]="h.heightPct"></div>
-                <div class="small text-muted mt-2 text-center" style="font-size: 9px; min-height: 24px;">{{ h.label }}
+                <div class="small text-muted mt-2 text-center outcomes-label">{{ h.label }}
                 </div>
               </div>
             </div>
@@ -553,13 +552,13 @@
         <div class="col-md-6 mb-4">
           <mat-card class="oppia-mat-card p-3 h-100">
             <h4 class="h6 mb-3 border-bottom pb-2">Histogram: Plays Distribution</h4>
-            <div class="d-flex align-items-end chart-grid" style="height: 180px; gap: 10px;">
+            <div class="d-flex align-items-end chart-grid histogram-chart-grid">
               <div *ngFor="let h of histogram"
                 class="flex-grow-1 d-flex flex-column align-items-center h-100 justify-content-end"
                 [attr.title]="h.label + ': ' + h.count">
                 <div class="badge badge-light mb-1 small">{{ h.count }}</div>
                 <div class="bg-primary rounded-top w-100" [style.height.%]="h.heightPct"></div>
-                <div class="small text-muted mt-2 text-center" style="font-size: 9px; min-height: 24px;">{{ h.label }}
+                <div class="small text-muted mt-2 text-center histogram-label">{{ h.label }}
                 </div>
               </div>
             </div>
@@ -599,19 +598,19 @@
           <h4 class="h6 mb-4 border-bottom pb-2 font-weight-bold">Ratings & Feedback</h4>
           <div class="mb-4">
             <div *ngFor="let r of ratingsBreakdown" class="d-flex align-items-center mb-2">
-              <div class="small font-weight-bold mr-2" style="width: 30px;">{{ r.stars }}★</div>
-              <div class="progress flex-grow-1" style="height: 10px;">
+              <div class="small font-weight-bold mr-2 rating-star-label">{{ r.stars }}★</div>
+              <div class="progress flex-grow-1 rating-progress-bar">
                 <div class="progress-bar bg-warning" role="progressbar"
                   [style.width.%]="(r.count || 0) > 0 ? Math.min(100, Math.round((r.count / (reportSummary?.num_ratings || 1)) * 100)) : 0">
                 </div>
               </div>
-              <div class="small text-muted ml-2" style="width: 30px; text-align: right;">{{ r.count }}</div>
+              <div class="small text-muted ml-2 rating-count">{{ r.count }}</div>
             </div>
           </div>
           <h5 class="small font-weight-bold mb-3 uppercase text-muted">Recent Comments</h5>
           <div class="comments-list">
-            <div *ngFor="let c of recentComments" class="mb-3 p-2 bg-white rounded border-left border-primary"
-              style="border-left-width: 3px !important;">
+            <div *ngFor="let c of recentComments"
+              class="mb-3 p-2 bg-white rounded border-left border-primary recent-comment-item">
               <div class="d-flex justify-content-between mb-1">
                 <span class="small font-weight-bold">{{ c.author }}</span>
                 <span class="small text-muted">{{ c.ago }}</span>
@@ -717,8 +716,8 @@
   }
 
   .uppercase {
-    text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
   .italic {
@@ -726,8 +725,8 @@
   }
 
   .row-metrics .h5 {
-    font-weight: 600;
     color: #1a202c;
+    font-weight: 600;
   }
 
   .row-metrics .col-4 {
