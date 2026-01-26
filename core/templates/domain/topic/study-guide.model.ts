@@ -86,9 +86,14 @@ export class StudyGuide {
   static createFromBackendDict(
     studyGuideBackendDict: StudyGuideBackendDict
   ): StudyGuide {
-    let sections = studyGuideBackendDict.sections.map(section =>
-      StudyGuideSection.createFromBackendDict(section)
-    );
+    let sections = studyGuideBackendDict.sections.map(section => {
+      let sectionObj = StudyGuideSection.createFromBackendDict(section);
+      sectionObj.content.html = sectionObj.content.html.replace(
+        /<p>(\s|&nbsp;|\u00A0)*<\/p>/g,
+        ''
+      );
+      return sectionObj;
+    });
     return new StudyGuide(
       studyGuideBackendDict.id,
       studyGuideBackendDict.topic_id,
