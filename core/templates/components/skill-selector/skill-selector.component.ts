@@ -89,13 +89,18 @@ export class SkillSelectorComponent implements OnInit {
       });
   }
 
-  checkIfEmpty(skills: Object[]): boolean {
-    return skills.length === 0;
+  checkIfEmpty(skills: ShortSkillSummary[]): boolean {
+    return (
+      this.searchInSubtopicSkills(skills, this.skillFilterText).length === 0
+    );
   }
 
   checkTopicIsNotEmpty(topicName: string): boolean {
-    for (let key in this.currCategorizedSkills[topicName]) {
-      if (Object.keys(this.currCategorizedSkills[topicName][key]).length) {
+    for (let subtopicName in this.currCategorizedSkills[topicName]) {
+      let skills = this.currCategorizedSkills[topicName][subtopicName];
+      if (
+        this.searchInSubtopicSkills(skills, this.skillFilterText).length > 0
+      ) {
         return true;
       }
     }
