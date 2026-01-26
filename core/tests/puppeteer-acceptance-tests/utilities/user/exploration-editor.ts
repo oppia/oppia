@@ -231,7 +231,9 @@ const setAsCheckpointButton = '.e2e-test-checkpoint-selection-checkbox';
 const tagsField = '.e2e-test-chip-list-tags';
 const saveUploadedAudioButton = '.e2e-test-save-uploaded-audio-button';
 const feedBackButtonTab = '.e2e-test-feedback-tab';
+const statsButtonTab = '.e2e-test-stats-tab';
 const mobileFeedbackTabButton = '.e2e-test-mobile-feedback-button';
+const mobileStatsTabButton = '.e2e-test-mobile-stats-button';
 const explorationSummaryTileTitleSelector = '.e2e-test-exp-summary-tile-title';
 const feedbackSubjectSelector = '.e2e-test-exploration-feedback-subject';
 const feedbackSelector = '.e2e-test-exploration-feedback';
@@ -250,6 +252,10 @@ const explorationFeedbackCardActiveSelector =
   '.e2e-test-exploration-feedback-card-active';
 const explorationFeedbackTabContentSelector =
   '.e2e-test-exploration-feedback-card';
+const explorationStatsTabContentSelector = '.e2e-test-exploration-stats-card';
+const explorationStateStatsModalSelector = '.e2e-test-state-stats-modal-body';
+const explorationStateStatsEnterCountSelector =
+  '.e2e-test-state-stats-card-entered-here-count';
 
 const editRolesButtonSelector = '.oppia-edit-roles-btn-container';
 const stateContentEditorSelector =
@@ -2751,6 +2757,116 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Navigate to stats tab.
+   */
+  async navigateToStatsTab(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      if (!mobileNavbarElement) {
+        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+      }
+      await this.clickOnElementWithSelector(mobileNavbarDropdown);
+      await this.page.waitForSelector(mobileNavbarPane);
+      await this.clickOnElementWithSelector(mobileStatsTabButton);
+    } else {
+      await this.clickOnElementWithSelector(statsButtonTab);
+      await this.waitForNetworkIdle();
+    }
+
+    showMessage('Landed on Stats Tab');
+    await this.page.waitForSelector(explorationStatsTabContentSelector, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Function to click on a specific card in the exploration visualization graph.
+   * @param {string} cardName - The name of the card to navigate to.
+   */
+  async clickStateCard(cardName: string): Promise<void> {
+    // Get all state node groups (not just labels) since we need to click the
+    // background rect to trigger the click handler.
+    const stateNodeGroupSelector = '.e2e-test-node';
+    await this.page.waitForSelector(stateNodeGroupSelector);
+    const elements = await this.page.$$(stateNodeGroupSelector);
+
+    const cardNames = await Promise.all(
+      elements.map(element =>
+        element.$eval(
+          '.e2e-test-node-label',
+          node => node.textContent?.trim() ?? ''
+        )
+      )
+    );
+    showMessage(`${cardNames.length} cards found: ${cardNames.join(', ')}.`);
+
+    const cardIndex = cardNames.indexOf(cardName);
+    if (cardIndex === -1) {
+      throw new Error(`Card name ${cardName} not found in the graph.`);
+    }
+
+    let nodeGroup: ElementHandle<Element> | null = null;
+    const hasDuplicateCards = elements.length > new Set(cardNames).size;
+    if (this.isViewportAtMobileWidth() && hasDuplicateCards) {
+      nodeGroup = elements[cardIndex + elements.length / 2];
+    } else {
+      nodeGroup = elements[cardIndex];
+    }
+
+    if (!nodeGroup) {
+      throw new Error(`Could not find card button for card: ${cardName}`);
+    }
+
+    // Click on the node background rect which has the click handler.
+    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
+    if (!nodeBackground) {
+      throw new Error(
+        `Could not find clickable background for card: ${cardName}`
+      );
+    }
+    showMessage(`Found element to click for ${cardName}.`);
+    await this.clickOnElement(nodeBackground);
+    await this.waitForNetworkIdle({idleTime: 1000});
+  }
+
+  /**
+   * From the stats tab, open the modal showing the stats of the specified card.
+   */
+  async openCardStats(cardName: string): Promise<void> {
+    await this.clickStateCard(cardName);
+    showMessage(`Waiting for stats modal of card ${cardName} to appear...`);
+    await this.page.waitForSelector(explorationStateStatsModalSelector, {
+      visible: true,
+    });
+    showMessage(`Stats modal of card ${cardName} is now open.`);
+  }
+
+  /**
+   * Function to check how many times a card has been entered.
+   * Requires the card stats modal to be open.
+   */
+  async expectCardEnteredTimesToBe(count: number): Promise<void> {
+    showMessage(`Checking that card entered count is ${count}...`);
+    await this.expectTextContentToContain(
+      explorationStateStatsEnterCountSelector,
+      `Card entered: ${count} times.`
+    );
+    showMessage(`Confirmed that card entered count is ${count}.`);
+  }
+
+  /**
+   * Close the currently-opened state stats modal.
+   */
+  async closeCardStats(): Promise<void> {
+    await this.clickOnElementWithSelector(closeModalButtonSelector);
+    showMessage('Waiting for stats modal to close...');
+    await this.page.waitForSelector(explorationStateStatsModalSelector, {
+      visible: false,
+    });
+    showMessage('Stats modal has been closed.');
+  }
+
+  /**
    * Fetches the exploration ID from the current URL of the exploration editor page.
    * The exploration ID is the string after '/create/' in the URL.
    */
@@ -3698,7 +3814,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} cardName - The name of the card to navigate to.
    */
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
-    let elements;
     if (this.isViewportAtMobileWidth()) {
       // Check if the state graph modal is already open before clicking the
       // resize button.
@@ -3719,46 +3834,7 @@ export class ExplorationEditor extends BaseUser {
       }
     }
 
-    // Get all state node groups (not just labels) since we need to click the
-    // background rect which has the click handler.
-    const stateNodeGroupSelector = '.e2e-test-node';
-    await this.page.waitForSelector(stateNodeGroupSelector);
-    elements = await this.page.$$(stateNodeGroupSelector);
-
-    const cardNames = await Promise.all(
-      elements.map(element =>
-        element.$eval(
-          '.e2e-test-node-label',
-          node => node.textContent?.trim() || ''
-        )
-      )
-    );
-    const cardIndex = cardNames.indexOf(cardName);
-
-    if (cardIndex === -1) {
-      throw new Error(`Card name ${cardName} not found in the graph.`);
-    }
-
-    let nodeGroup: ElementHandle<Element> | null = null;
-    if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
-    } else {
-      nodeGroup = elements[cardIndex];
-    }
-
-    if (!nodeGroup) {
-      throw new Error(`Could not find card button for card: ${cardName}`);
-    }
-
-    // Click on the node background rect which has the click handler.
-    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
-    if (!nodeBackground) {
-      throw new Error(
-        `Could not find clickable background for card: ${cardName}`
-      );
-    }
-    await this.clickOnElement(nodeBackground);
-    await this.waitForNetworkIdle({idleTime: 1000});
+    await this.clickStateCard(cardName);
 
     const headingName = !cardName.trimEnd().endsWith('...')
       ? cardName

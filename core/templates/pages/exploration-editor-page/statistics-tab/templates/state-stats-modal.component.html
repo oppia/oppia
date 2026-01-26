@@ -2,9 +2,9 @@
   <h3>Statistics for "<a (click)="navigateToStateEditor()">{{ stateName }}</a>"</h3>
 </div>
 
-<div class="modal-body oppia-state-stats-modal-body">
+<div class="modal-body oppia-state-stats-modal-body e2e-test-state-stats-modal-body">
   <div class="section">
-    <div class="d-inline-block">
+    <div class="d-inline-block e2e-test-state-stats-card-entered-here-count">
       <strong>Card entered</strong>: {{ numEnters }}
       <strong>times.</strong>
     </div>
@@ -54,7 +54,7 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" (click)="cancel()">Close</button>
+  <button class="btn btn-secondary e2e-test-modal-close-button" (click)="cancel()">Close</button>
 </div>
 
 <style>
