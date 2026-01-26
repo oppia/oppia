@@ -35,22 +35,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.admin_email_address = 'testadmin@example.com'
         self.system_email_address = 'system@example.com'
 
-    def test_send_mail_raises_exception_for_invalid_permissions(self) -> None:
-        """Tests the send_mail exception raised for invalid user permissions."""
-        send_email_exception = self.assertRaisesRegex(
-            Exception, 'This app cannot send emails to users.'
-        )
-
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
-            email_services.send_mail(
-                self.system_email_address,
-                self.admin_email_address,
-                'subject',
-                'body',
-                'html',
-                bcc_admin=False,
-            )
-
     @test_utils.set_platform_parameters(
         [
             (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),

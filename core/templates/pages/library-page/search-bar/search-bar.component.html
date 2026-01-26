@@ -26,6 +26,7 @@
   <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}"
        ngbDropdown
        autoClose="outside"
+       (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-category-selector e2e-test-search-bar-category-selector dropdown">
     <button ngbDropdownToggle
             type="button"
@@ -125,6 +126,7 @@
   <div ngbDropdown
        autoClose="outside"
        [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}"
+       (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-language-selector e2e-test-search-bar-language-selector dropdown">
     <button ngbDropdownToggle
             type="button"

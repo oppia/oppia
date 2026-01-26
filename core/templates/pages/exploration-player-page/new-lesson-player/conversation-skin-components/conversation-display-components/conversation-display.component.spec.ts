@@ -50,7 +50,7 @@ import {PlayerPositionService} from '../../../services/player-position.service';
 import {ConversationDisplayComponent} from './conversation-display.component';
 import {I18nLanguageCodeService} from '../../../../../services/i18n-language-code.service';
 import {NewEndChapterCheckMarkComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-check-mark.component';
-import {NewEndChapterConfettiComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component.ts';
+import {NewEndChapterConfettiComponent} from '../../../new-lesson-player/conversation-skin-components/conversation-display-components/new-end-chapter-confetti.component';
 import {PlatformFeatureService} from '../../../../../services/platform-feature.service';
 import {InteractionCustomizationArgs} from '../../../../../../../extensions/interactions/customization-args-defs';
 import {UserInfo} from '../../../../../domain/user/user-info.model';

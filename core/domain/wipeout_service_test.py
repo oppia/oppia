@@ -1454,6 +1454,33 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
         )
         self.assertNotIn(self.user_1_id, updated_user_group_model.user_ids)
 
+    def test_remove_user_from_translation_coordinators(self) -> None:
+        translation_coordinator_model = (
+            suggestion_models.TranslationCoordinatorsModel(
+                id='hi',
+                coordinator_ids=[self.user_1_id, self.user_2_id],
+                coordinators_count=2,
+            )
+        )
+        translation_coordinator_model.put()
+
+        existing_model = (
+            suggestion_models.TranslationCoordinatorsModel.get_by_id('hi')
+        )
+        self.assertIn(self.user_1_id, existing_model.coordinator_ids)
+        self.assertEqual(existing_model.coordinators_count, 2)
+
+        wipeout_service.delete_user(
+            wipeout_service.get_pending_deletion_request(self.user_1_id)
+        )
+
+        updated_model = (
+            suggestion_models.TranslationCoordinatorsModel.get_by_id('hi')
+        )
+        self.assertNotIn(self.user_1_id, updated_model.coordinator_ids)
+        self.assertIn(self.user_2_id, updated_model.coordinator_ids)
+        self.assertEqual(updated_model.coordinators_count, 1)
+
     def test_one_config_property_when_the_deletion_is_repeated_is_pseudonymized(
         self,
     ) -> None:

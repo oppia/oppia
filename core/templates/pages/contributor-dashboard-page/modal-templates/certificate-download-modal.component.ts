@@ -83,10 +83,10 @@ export class CertificateDownloadModalComponent {
       this.errorMessage = 'Invalid date range.';
       return;
     }
-    if (toDate >= today) {
+    if (toDate > today) {
       this.errorsFound = true;
       this.errorMessage =
-        "Please select a 'To' date that is earlier than " + "today's date";
+        "Please select a 'To' date that is not in the future.";
       return;
     }
     this.errorsFound = false;

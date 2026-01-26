@@ -55,9 +55,8 @@ module.exports = function (config) {
     frameworks: ['jasmine'],
     files: [
       // Constants must be loaded before everything else.
-      // Since jquery, angular-mocks and math-expressions
+      // Since angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.5.1/jquery.min.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.

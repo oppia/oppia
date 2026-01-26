@@ -7,9 +7,7 @@ interface Window {
   decodeURIComponent: (encodedURIComponent: string) => string;
   encodeURIComponent: (decodedURIComponent: string) => string;
   gtag: Function;
-  $: JQueryStatic;
   Base64Binary: Base64Binary;
-  jQuery: JQueryStatic;
   dataLayer: object[];
   Guppy: Guppy;
   webkitAudioContext: typeof AudioContext;
