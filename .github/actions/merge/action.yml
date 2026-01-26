@@ -11,6 +11,11 @@ runs:
           echo "Skipping merge because not triggered by a PR event."
           exit 0
         fi
+        if [[ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]]
+        then
+          echo "PR is from a fork. Skipping merge step."
+          exit 0
+        fi
         echo "Base Repository: ${{ github.repository }}"
         echo "Base Branch: ${{ github.base_ref }}"
         echo "Head Repository: ${{ github.event.pull_request.head.repo.full_name }}"
