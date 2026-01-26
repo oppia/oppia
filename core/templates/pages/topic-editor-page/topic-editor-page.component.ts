@@ -70,7 +70,8 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   setDocumentTitle(): void {
-    let topicName = this.topicEditorStateService.getTopic().getName();
+    let topicName = this.topicEditorStateService.getTopic()?.getName();
+    if (!topicName) return;
     this.pageTitleService.setDocumentTitle(topicName + ' - Oppia');
     this.pageTitleService.setNavbarSubtitleForMobileView(topicName);
     this.topic = this.topicEditorStateService.getTopic();
@@ -199,6 +200,7 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   _validateTopic(): void {
+    if (!this.topic) return;
     this.validationIssues = this.topic.validate();
     if (this.topicEditorStateService.getTopicWithNameExists()) {
       this.validationIssues.push('A topic with this name already exists.');
