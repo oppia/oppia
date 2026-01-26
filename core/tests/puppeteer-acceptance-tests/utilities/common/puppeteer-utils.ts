@@ -748,6 +748,15 @@ export class BaseUser {
     await element.type(text);
   }
 
+  async setNodePlannedPublicationDate(
+    selector: string,
+    dateString: string
+  ): Promise<void> {
+    await this.page.waitForSelector(selector);
+    await this.page.click(selector, {clickCount: 3});
+    await this.page.type(selector, dateString);
+  }
+
   /**
    * This selects a value in a dropdown.
    */

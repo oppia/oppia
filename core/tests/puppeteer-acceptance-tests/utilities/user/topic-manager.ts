@@ -362,6 +362,12 @@ const activeTabClass = 'e2e-test-active-tab';
 const previewQuestionSelector = '.e2e-test-preview-question';
 const toggleSkillEditOptionsButton =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
+const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
+const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
+const outlineEditorInput = '.e2e-test-rte';
+const saveOutlineButton = '.e2e-test-node-outline-save-button';
+const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
+const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 
 export class TopicManager extends BaseUser {
   /**
@@ -4361,6 +4367,72 @@ export class TopicManager extends BaseUser {
       await this.page.waitForSelector(publishTopicButton, {hidden: true});
     }
   }
-}
 
+  async makeChapterReadtToPublish(
+    chapterName: string,
+    storyName: string,
+    topicName: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+    await this.waitForPageToFullyLoad();
+
+    await this.page.waitForSelector(chapterTitleSelector);
+    const chapterTitles = await this.page.$$(chapterTitleSelector);
+
+    for (const titleElement of chapterTitles) {
+      const title = await this.page.evaluate(
+        el => el.textContent.trim(),
+        titleElement
+      );
+
+      if (title === chapterName) {
+        await titleElement.click();
+        await this.waitForStaticAssetsToLoad();
+        await this.expectElementToBeVisible(chapterEditorContainerSelector);
+        showMessage(`Chapter ${chapterName} opened in chapter editor.`);
+
+        if (this.isViewportAtMobileWidth()) {
+          await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+          const elements = await this.page.$$(
+            mobileCollapsibleCardHeaderSelector
+          );
+          if (elements.length < 5) {
+            throw new Error('Not enough elements collapsible headers found,');
+          }
+          await elements[2].click();
+          await elements[3].click();
+          await elements[4].click();
+        }
+      }
+    }
+    await this.typeInInputField(
+      chapterDescriptionField,
+      'This is a chapter description.'
+    );
+
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3); //Handle flaky ness for this
+
+    const dateString = futureDate.toLocaleDateString('en-US');
+
+    await this.setNodePlannedPublicationDate(
+      plannedPublicationDateInput,
+      dateString
+    );
+
+    await this.typeInInputField(outlineEditorInput, 'This is an outline.');
+    await this.clickOnElementWithSelector(saveOutlineButton);
+    // await this.page.waitForSelector(finalizeOutlineCheckbox);
+    await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
+    await this.addAcquiredSkill('Place Values skills');
+
+    await this.saveStoryDraft();
+    await this.page.waitForSelector(markAsReadyToPublishButton);
+    await this.clickOnElementWithSelector(markAsReadyToPublishButton);
+
+    await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
+
+    showMessage(`Chapter ${chapterName} marked as ready to publish.`);
+  }
+}
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
