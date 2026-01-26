@@ -17,8 +17,8 @@
  * backend.
  */
 
-import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 import {
   CollectionSummary,
@@ -44,13 +44,13 @@ import {
   ProfileSummary,
   SubscriberSummaryBackendDict,
 } from 'domain/user/profile-summary.model';
-import {SuggestionThread} from 'domain/suggestion/suggestion-thread-object.model';
+import { SuggestionThread } from 'domain/suggestion/suggestion-thread-object.model';
 import {
   CreatorTopicSummary,
   CreatorTopicSummaryBackendDict,
 } from 'domain/topic/creator-topic-summary.model';
-import {LoggerService} from 'services/contextual/logger.service';
-import {SuggestionsService} from 'services/suggestions.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { SuggestionsService } from 'services/suggestions.service';
 
 interface CreatorDashboardDataBackendDict {
   dashboard_stats: CreatorDashboardStatsBackendDict;
@@ -91,7 +91,7 @@ export class CreatorDashboardBackendApiService {
     private http: HttpClient,
     private suggestionsService: SuggestionsService,
     private loggerService: LoggerService
-  ) {}
+  ) { }
 
   _getSuggestionThreads(
     feedbackDicts: FeedbackThreadBackendDict[],
@@ -140,8 +140,8 @@ export class CreatorDashboardBackendApiService {
               // Because lastWeekStats may be null.
               lastWeekStats: dashboardData.last_week_stats
                 ? CreatorDashboardStats.createFromBackendDict(
-                    dashboardData.last_week_stats
-                  )
+                  dashboardData.last_week_stats
+                )
                 : null,
               displayPreference: dashboardData.display_preference,
               subscribersList: dashboardData.subscribers_list.map(subscriber =>
@@ -183,8 +183,8 @@ export class CreatorDashboardBackendApiService {
               ),
               topicSummaries: dashboardData.topic_summary_dicts
                 ? dashboardData.topic_summary_dicts.map(topicSummaryDict =>
-                    CreatorTopicSummary.createFromBackendDict(topicSummaryDict)
-                  )
+                  CreatorTopicSummary.createFromBackendDict(topicSummaryDict)
+                )
                 : [],
             });
           },
@@ -197,6 +197,64 @@ export class CreatorDashboardBackendApiService {
 
   async fetchDashboardDataAsync(): Promise<CreatorDashboardData> {
     return this._fetchDashboardDataAsync();
+  }
+
+  async fetchCreatorStatsReportAsync(): Promise<{
+    summary: {
+      num_ratings: number;
+      average_ratings: number | null;
+      total_plays: number;
+      total_open_feedback: number;
+      total_subscribers: number;
+      creator_completion_rate: number | null;
+      weekly_series?: Array<{
+        date: string;
+        num_ratings: number;
+        average_ratings: number | null;
+        total_plays: number;
+      }>;
+    };
+    explorations: Array<{
+      id: string;
+      title: string;
+      num_open_threads: number;
+      average_rating: number | null;
+      plays: number;
+      num_starts?: number;
+      num_completions?: number;
+      completion_rate?: number | null;
+      last_updated_msec: number;
+    }>;
+  }> {
+    return this.http
+      .get<{
+        summary: {
+          num_ratings: number;
+          average_ratings: number | null;
+          total_plays: number;
+          total_open_feedback: number;
+          total_subscribers: number;
+          creator_completion_rate: number | null;
+          weekly_series?: Array<{
+            date: string;
+            num_ratings: number;
+            average_ratings: number | null;
+            total_plays: number;
+          }>;
+        };
+        explorations: Array<{
+          id: string;
+          title: string;
+          num_open_threads: number;
+          average_rating: number | null;
+          plays: number;
+          num_starts?: number;
+          num_completions?: number;
+          completion_rate?: number | null;
+          last_updated_msec: number;
+        }>;
+      }>('/creatorstatsreport')
+      .toPromise();
   }
 
   async postExplorationViewAsync(newViewType: string): Promise<void> {

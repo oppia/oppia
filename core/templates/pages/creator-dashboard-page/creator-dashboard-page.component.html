@@ -7,21 +7,20 @@
   </div>
 
   <div class="m-auto oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content pt-1"
-       *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
-       [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
+    *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0"
+    [ngClass]="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
     <mat-card layout="row" class="oppia-mat-card">
-      <div class="average-ratings stats-card"
-           tabindex="0" >
+      <div class="average-ratings stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_AVERAGE_RATING' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-average-rating"
-            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ dashboardStats.averageRatings || 'N/A' }}
+          [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
         <h2 class="stat-value-without-rating"
-            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ dashboardStats.averageRatings || 'N/A' }}
+          [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.averageRatings || 'N/A' }}
         </h2>
         <div class="e2e-test-oppia-total-users" [hidden]="!dashboardStats.numRatings">
           <p *ngIf="dashboardStats.numRatings === 1">
@@ -35,14 +34,14 @@
       <div class="total-plays stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_PLAYS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-plays"
-            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ dashboardStats.totalPlays }}
+          [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.totalPlays }}
         </h2>
         <h2 class="stat-value-without-rating"
-            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ dashboardStats.totalPlays }}
+          [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.totalPlays }}
         </h2>
         <p [hidden]="!relativeChangeInTotalPlays" [attr.aria-hidden]="!relativeChangeInTotalPlays">
           (+{{ relativeChangeInTotalPlays }} from last week)
@@ -51,27 +50,27 @@
       <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_OPEN_FEEDBACK' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-open-feedback"
-            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ dashboardStats.totalOpenFeedback }}
+          [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ dashboardStats.totalOpenFeedback }}
         </h2>
         <h2 class="stat-value-without-rating"
-            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+          [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
           {{ dashboardStats.totalOpenFeedback }}
         </h2>
       </div>
       <div class="total-open-feedback stats-card" tabindex="0">
         <p class="stat-description" [innerHTML]="'I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS' | translate"></p>
         <h2 class="stat-value-with-rating e2e-test-oppia-total-subscribers"
-            [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ subscribersList?.length }}
+          [attr.aria-hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="!dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ subscribersList?.length }}
         </h2>
         <h2 class="stat-value-without-rating"
-            [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
-            [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
-            {{ subscribersList?.length }}
+          [attr.aria-hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays"
+          [hidden]="dashboardStats.numRatings || relativeChangeInTotalPlays">
+          {{ subscribersList?.length }}
         </h2>
       </div>
     </mat-card>
@@ -80,46 +79,40 @@
   <div *ngIf="explorationsList?.length > 0 || collectionsList?.length > 0">
     <ul class="oppia-dashboard-tabs">
       <li *ngIf="explorationsList?.length > 0"
-          [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
-        <a class="oppia-dashboard-tabs-text"
-           tabindex="0"
-           (keydown.enter)="setActiveTab('myExplorations')"
-           (click)="setActiveTab('myExplorations')"
-           [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
+        [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
+        <a class="oppia-dashboard-tabs-text" tabindex="0" (keydown.enter)="setActiveTab('myExplorations')"
+          (click)="setActiveTab('myExplorations')" [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS' | translate">
         </a>
       </li>
       <li *ngIf="canCreateCollections && collectionsList?.length > 0"
-          [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-        <a class="oppia-dashboard-tabs-text e2e-test-collections-tab"
-           tabindex="0"
-           (keydown.enter)="setActiveTab('myCollections')"
-           (click)="setActiveTab('myCollections')"
-           [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
+        [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+        <a class="oppia-dashboard-tabs-text e2e-test-collections-tab" tabindex="0"
+          (keydown.enter)="setActiveTab('myCollections')" (click)="setActiveTab('myCollections')"
+          [innerHTML]="'I18N_DASHBOARD_COLLECTIONS' | translate">
         </a>
       </li>
-      <li *ngIf="subscribersList?.length > 0"
-          class="e2e-test-subscription-tab"
-          [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
-        <a class="oppia-dashboard-tabs-text"
-           tabindex="0"
-           (keydown.enter)="setActiveTab('mySubscribers')"
-           (click)="setActiveTab('mySubscribers')"
-           [innerHTML]="'I18N_DASHBOARD_SUBSCRIBERS' | translate">
+      <li *ngIf="subscribersList?.length > 0" class="e2e-test-subscription-tab"
+        [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
+        <a class="oppia-dashboard-tabs-text" tabindex="0" (keydown.enter)="setActiveTab('mySubscribers')"
+          (click)="setActiveTab('mySubscribers')" [innerHTML]="'I18N_DASHBOARD_SUBSCRIBERS' | translate">
+        </a>
+      </li>
+      <li [ngClass]="{'oppia-dashboard-tabs-active': activeTab === 'statsReport'}">
+        <a class="oppia-dashboard-tabs-text e2e-test-stats-report-tab" tabindex="0"
+          (keydown.enter)="setActiveTab('statsReport')" (click)="setActiveTab('statsReport')">
+          STATS REPORT
         </a>
       </li>
 
       <li class="list-card-view-toggle dashboard-hide-mobile"
-          *ngIf="activeTab === 'myExplorations' && explorationsList?.length > 0">
-        <button class="card-view-btn"
-                [ngClass]="{'dashboard-active-view': myExplorationsView === 'card'}"
-                (click)="setMyExplorationsView('card')"
-                aria-label="Card View">
+        *ngIf="activeTab === 'myExplorations' && explorationsList?.length > 0">
+        <button class="card-view-btn" [ngClass]="{'dashboard-active-view': myExplorationsView === 'card'}"
+          (click)="setMyExplorationsView('card')" aria-label="Card View">
           <span class="fa fa-th-large"></span>
         </button>
         <button class="list-view-btn e2e-test-oppia-list-view-btn"
-                [ngClass]="{'dashboard-active-view': myExplorationsView === 'list'}"
-                (click)="setMyExplorationsView('list')"
-                aria-label="List View">
+          [ngClass]="{'dashboard-active-view': myExplorationsView === 'list'}" (click)="setMyExplorationsView('list')"
+          aria-label="List View">
           <span class="fa fa-list"></span>
         </button>
       </li>
@@ -128,8 +121,7 @@
 
   <div *ngIf="activeTab === 'myExplorations'">
     <div *ngIf="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text pt-1">
-      <mat-card layout="row"
-                class="oppia-page-card oppia-dashboard-intro-card">
+      <mat-card layout="row" class="oppia-page-card oppia-dashboard-intro-card">
         <div>
           <p [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE' | translate"></p>
         </div>
@@ -140,33 +132,25 @@
     </div>
 
     <div *ngIf="explorationsList?.length > 0" class="oppia-dashboard-tab-panel oppia-dashboard-tab-panel-container">
-      <span class="sort-explorations-select float-end"
-            *ngIf="activeTab === 'myExplorations'"
-            [ngClass]="{'sort-explorations-select-three-tabs': (collectionsList?.length !== 0 && subscribersList?.length !== 0)}">
+      <span class="sort-explorations-select float-end" *ngIf="activeTab === 'myExplorations'"
+        [ngClass]="{'sort-explorations-select-three-tabs': (collectionsList?.length !== 0 && subscribersList?.length !== 0)}">
         <p class="sort-by-text" [innerHTML]="'I18N_DASHBOARD_EXPLORATIONS_SORT_BY' | translate">Sort By</p>
-        <select [(ngModel)]="currentSortType"
-                class="sort-options"
-                aria-label="Sort Type"
-                (change)="setExplorationsSortingOptions(currentSortType)">
+        <select [(ngModel)]="currentSortType" class="sort-options" aria-label="Sort Type"
+          (change)="setExplorationsSortingOptions(currentSortType)">
           <option *ngFor="let item of HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS | keyvalue"
-                  [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]"
-                  [innerHTML]="item.value | translate">
+            [value]="EXPLORATIONS_SORT_BY_KEYS[item.key]" [innerHTML]="item.value | translate">
           </option>
         </select>
-        <span class="sort-order fas"
-              (click)="setExplorationsSortingOptions(currentSortType)"
-              tabindex="0"
-              (keydown.enter)="setExplorationsSortingOptions(currentSortType)"
-              [ngClass]="isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'"
-              role="button"
-              [attr.aria-label]="'Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order'">
+        <span class="sort-order fas" (click)="setExplorationsSortingOptions(currentSortType)" tabindex="0"
+          (keydown.enter)="setExplorationsSortingOptions(currentSortType)"
+          [ngClass]="isCurrentSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'" role="button"
+          [attr.aria-label]="'Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order'">
         </span>
       </span>
     </div>
 
     <div *ngIf="myExplorationsView === 'list' && explorationsList?.length > 0">
-      <mat-card layout="row"
-                class="oppia-dashboard-list-view-item">
+      <mat-card layout="row" class="oppia-dashboard-list-view-item">
         <table class="oppia-dashboard-table">
           <colgroup>
             <col class="oppia-colgroup-col-1">
@@ -178,71 +162,67 @@
           </colgroup>
           <tr>
             <th *ngFor="let item of EXPLORATIONS_SORT_BY_KEYS | keyvalue: returnZero"
-                class="oppia-dashboard-table-headings"
-                tabindex="0"
-                scope="col"
-                [attr.aria-label]="(item.key === 'TITLE' ? 'Exploration.' :
+              class="oppia-dashboard-table-headings" tabindex="0" scope="col" [attr.aria-label]="(item.key === 'TITLE' ? 'Exploration.' :
                 (item.key === 'RATING' ? 'Rating.' :
                  (item.key === 'NUM_VIEWS' ? 'Plays.' :
                   (item.key === 'OPEN_FEEDBACK' ? 'Open Threads.' :
                    (item.key === 'LAST_UPDATED' ? 'Last Updated.' :
                     ''))))) +
                ' Sort by ' + (isCurrentSortDescending ? 'descending' : 'ascending') + ' order button'"
-                (keydown.enter)="setExplorationsSortingOptions(item.value)"
-                (click)="setExplorationsSortingOptions(item.value)">
+              (keydown.enter)="setExplorationsSortingOptions(item.value)"
+              (click)="setExplorationsSortingOptions(item.value)">
               <p *ngIf="item.key === 'TITLE'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION' | translate"></p>
               <p *ngIf="item.key === 'RATING'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_RATING' | translate"></p>
               <p *ngIf="item.key === 'NUM_VIEWS'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_PLAYS' | translate"></p>
-              <p *ngIf="item.key === 'OPEN_FEEDBACK'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS' | translate"></p>
-              <p *ngIf="item.key === 'LAST_UPDATED'" [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED' | translate"></p>
-              <span class="fas"
-                    *ngIf="currentSortType === item.value"
-                    [ngClass]="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+              <p *ngIf="item.key === 'OPEN_FEEDBACK'"
+                [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS' | translate"></p>
+              <p *ngIf="item.key === 'LAST_UPDATED'"
+                [innerHTML]="'I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED' | translate"></p>
+              <span class="fas" *ngIf="currentSortType === item.value"
+                [ngClass]="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
               </span>
             </th>
           </tr>
           <hr>
-          <tr *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
-              class="exploration-list-item">
+          <tr
+            *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+            class="exploration-list-item">
             <td>
               <a [href]="getExplorationUrl(exploration.id)"
-                 [attr.aria-label]="'Exploration: ' + (exploration.title || DEFAULT_EMPTY_TITLE)"
-                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-title">
+                [attr.aria-label]="'Exploration: ' + (exploration.title || DEFAULT_EMPTY_TITLE)"
+                class="oppia-dashboard-list-summary e2e-test-exp-summary-row-title">
                 {{ exploration.title || DEFAULT_EMPTY_TITLE }}
               </a>
             </td>
-            <td colspan="3"
-                *ngIf="exploration.status === 'private'"
-                class="exp-private-text">
+            <td colspan="3" *ngIf="exploration.status === 'private'" class="exp-private-text">
               <a [href]="getExplorationUrl(exploration.id)" class="oppia-dashboard-list-summary">
                 {{ publishText }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
               <a [href]="getExplorationUrl(exploration.id)"
-                 [attr.aria-label]="'Rating: ' + ((getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A')"
-                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-rating">
+                [attr.aria-label]="'Rating: ' + ((getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A')"
+                class="oppia-dashboard-list-summary e2e-test-exp-summary-row-rating">
                 {{ (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A' }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
-              <a [href]="getExplorationUrl(exploration.id)"
-                 [attr.aria-label]="'Plays: ' + exploration.numViews"
-                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
+              <a [href]="getExplorationUrl(exploration.id)" [attr.aria-label]="'Plays: ' + exploration.numViews"
+                class="oppia-dashboard-list-summary e2e-test-exp-summary-row-num-views">
                 {{ exploration.numViews }}
               </a>
             </td>
             <td *ngIf="exploration.status !== 'private'">
               <a [href]="'/create/' + exploration.id +'#/feedback'"
-                 [attr.aria-label]="'Open Threads' + exploration.numOpenThreads"
-                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-open-feedback">
+                [attr.aria-label]="'Open Threads' + exploration.numOpenThreads"
+                class="oppia-dashboard-list-summary e2e-test-exp-summary-row-open-feedback">
                 {{ exploration.numOpenThreads }}
               </a>
             </td>
             <td>
               <a [href]="getExplorationUrl(exploration.id)"
-                 [attr.aria-label]="'Last updated: ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)"
-                 class="oppia-dashboard-list-summary e2e-test-exp-summary-row-last-updated">
+                [attr.aria-label]="'Last updated: ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)"
+                class="oppia-dashboard-list-summary e2e-test-exp-summary-row-last-updated">
                 {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
               </a>
             </td>
@@ -251,17 +231,14 @@
       </mat-card>
     </div>
 
-    <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0"
-         class="oppia-card-view-wrap">
-      <mat-card *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
-                class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
-                is-private="exploration.status === 'private'">
+    <div *ngIf="myExplorationsView === 'card' && explorationsList?.length > 0" class="oppia-card-view-wrap">
+      <mat-card
+        *ngFor="let exploration of explorationsList | sortBy: isCurrentSortDescending: sortByFunction(exploration?.ratings)"
+        class="oppia-activity-summary-tile oppia-dashboard-card-view-item e2e-test-exploration-dashboard-card"
+        is-private="exploration.status === 'private'">
         <a [href]="'/create/' + exploration.id">
-          <div class="title-section"
-               [ngStyle]="{'background-color': exploration.thumbnailBgColor}">
-            <img class="thumbnail-image"
-                 alt=""
-                 [src]="getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)">
+          <div class="title-section" [ngStyle]="{'background-color': exploration.thumbnailBgColor}">
+            <img class="thumbnail-image" alt="" [src]="getCompleteThumbnailIconUrl(exploration.thumbnailIconUrl)">
             <h2 class="activity-title e2e-test-exp-summary-tile-title">
               <span>{{ (exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40 }}</span>
             </h2>
@@ -272,44 +249,36 @@
         </a>
         <div [attr.section]="right-section">
           <a [ngClass]="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-             aria-label="Dashboard Statistics"
-             [href]="getExplorationUrl(exploration.id)">
+            aria-label="Dashboard Statistics" [href]="getExplorationUrl(exploration.id)">
           </a>
           <div class="exp-private-text" *ngIf="exploration.status === 'private'" tabindex="0">
             {{ publishText }}
           </div>
-          <div *ngIf="exploration.status !== 'private'"
-               fxLayout="row"
-               layout-wrap
-               class="metrics"
-               fxLayoutAlign="space-between center">
+          <div *ngIf="exploration.status !== 'private'" fxLayout="row" layout-wrap class="metrics"
+            fxLayoutAlign="space-between center">
             <ul class="row-one">
               <li flex="50" class="e2e-test-exp-summary-tile-rating">
                 <span>
                   <span class="fa fa-star oppia-dashboard-card-statistic-icon"
-                        ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}"
-                        placement="top">
+                    ngbTooltip="{{ 'I18N_LIBRARY_RATINGS_TOOLTIP' | translate }}" placement="top">
                   </span>
-                  <span class="oppia-dashboard-card-statistic-value" tabindex="0" [attr.aria-label]="'Ratings ' + (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A'">
+                  <span class="oppia-dashboard-card-statistic-value" tabindex="0"
+                    [attr.aria-label]="'Ratings ' + (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A'">
                     {{ (getAverageRating(exploration.ratings) | number:'1.1-1') || 'N/A' }}
                   </span>
                 </span>
               </li>
 
-              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback"
-                  tabindex="0"
-                  [attr.aria-label]="'Feedbacks ' + exploration.numOpenThreads ">
+              <li flex="50" class="e2e-test-exp-summary-tile-open-feedback" tabindex="0"
+                [attr.aria-label]="'Feedbacks ' + exploration.numOpenThreads ">
                 <span class="fa fa-comments oppia-dashboard-card-statistic-icon"
-                      ngbTooltip="{{ 'I18N_DASHBOARD_OPEN_FEEDBACK' | translate }}"
-                      placement="top">
+                  ngbTooltip="{{ 'I18N_DASHBOARD_OPEN_FEEDBACK' | translate }}" placement="top">
                 </span>
-                <a *ngIf="exploration.numOpenThreads != 0"
-                   [href]="'/create/' + exploration.id + '#/feedback'"
-                   class="oppia-dashboard-card-statistic-value">
+                <a *ngIf="exploration.numOpenThreads != 0" [href]="'/create/' + exploration.id + '#/feedback'"
+                  class="oppia-dashboard-card-statistic-value">
                   {{ exploration.numOpenThreads }}
                 </a>
-                <span *ngIf="exploration.numOpenThreads === 0"
-                      class="oppia-dashboard-card-statistic-value">
+                <span *ngIf="exploration.numOpenThreads === 0" class="oppia-dashboard-card-statistic-value">
                   {{ exploration.numOpenThreads }}
                 </span>
               </li>
@@ -318,39 +287,29 @@
             <ul class="row-two">
               <li flex="50" class="e2e-test-exp-summary-tile-num-views">
                 <span class="fa fa-eye oppia-dashboard-card-statistic-icon"
-                      ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}"
-                      placement="top">
+                  ngbTooltip="{{ 'I18N_LIBRARY_VIEWS_TOOLTIP' | translate }}" placement="top">
                 </span>
-                <span class="oppia-dashboard-card-statistic-value"
-                      tabindex="0"
-                      [attr.aria-label]="'Views ' + exploration.numViews">
+                <span class="oppia-dashboard-card-statistic-value" tabindex="0"
+                  [attr.aria-label]="'Views ' + exploration.numViews">
                   {{ exploration.numViews }}
                 </span>
               </li>
 
               <li flex="50" class="e2e-test-exp-summary-tile-last-updated">
                 <span class="far fa-clock oppia-dashboard-card-statistic-icon"
-                      ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}"
-                      placement="top">
+                  ngbTooltip="{{ 'I18N_LIBRARY_LAST_UPDATED' | translate }}" placement="top">
                 </span>
-                <span class="oppia-dashboard-card-statistic-value"
-                      tabindex="0"
-                      [attr.aria-label]="'Last updated ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)">
+                <span class="oppia-dashboard-card-statistic-value" tabindex="0"
+                  [attr.aria-label]="'Last updated ' + getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec)">
                   {{ getLocaleAbbreviatedDatetimeString(exploration.lastUpdatedMsec) }}
                 </span>
               </li>
             </ul>
             <div class="row-three" flex="100">
-              <sharing-links *ngIf="exploration.status !== 'private'"
-                             (click)="$event.stopPropagation()"
-                             flex="100"
-                             class="dashboard-hide-mobile oppia-dashboard-hide-mobile position-relative w-100"
-                             layoutType="row"
-                             layoutAlignType="space-around center"
-                             twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                             shareType="exploration"
-                             smallFont="true"
-                             [explorationId]="exploration.id">
+              <sharing-links *ngIf="exploration.status !== 'private'" (click)="$event.stopPropagation()" flex="100"
+                class="dashboard-hide-mobile oppia-dashboard-hide-mobile position-relative w-100" layoutType="row"
+                layoutAlignType="space-around center" twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                shareType="exploration" smallFont="true" [explorationId]="exploration.id">
               </sharing-links>
             </div>
           </div>
@@ -361,45 +320,38 @@
 
   <div *ngIf="activeTab === 'mySubscribers'" class="oppia-dashboard-subscribers-tab-panel-container">
     <div class="oppia-dashboard-tab-panel">
-      <span *ngIf="subscribersList?.length > 1"
-            class="oppia-subscriber-text"
-            [innerHTML]="'I18N_TOTAL_SUBSCRIBERS_TEXT' | translate: {totalSubscribers: subscribersList?.length, messageFormat: true}">
+      <span *ngIf="subscribersList?.length > 1" class="oppia-subscriber-text"
+        [innerHTML]="'I18N_TOTAL_SUBSCRIBERS_TEXT' | translate: {totalSubscribers: subscribersList?.length, messageFormat: true}">
       </span>
-      <span *ngIf="subscribersList?.length === 1"
-            class="oppia-subscriber-text"
-            [innerHTML]="'I18N_ONE_SUBSCRIBER_TEXT' | translate">
+      <span *ngIf="subscribersList?.length === 1" class="oppia-subscriber-text"
+        [innerHTML]="'I18N_ONE_SUBSCRIBER_TEXT' | translate">
       </span>
-      <span class="sort-explorations-select float-end"
-            *ngIf="activeTab === 'mySubscribers'"
-            [ngClass]="{'sort-explorations-select-three-tabs': (collectionsList?.length !== 0 && subscribersList?.length !== 0)}">
+      <span class="sort-explorations-select float-end" *ngIf="activeTab === 'mySubscribers'"
+        [ngClass]="{'sort-explorations-select-three-tabs': (collectionsList?.length !== 0 && subscribersList?.length !== 0)}">
         <p class="sort-by-text">Sort By</p>
-        <select [(ngModel)]="currentSubscribersSortType"
-                class="sort-options oppia-sort-options"
-                (change)="setSubscriptionSortingOptions(currentSubscribersSortType)">
-          <option *ngFor="let item of HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS | keyvalue">{{ SUBSCRIPTION_SORT_BY_KEYS[item.key] }}</option>
+        <select [(ngModel)]="currentSubscribersSortType" class="sort-options oppia-sort-options"
+          (change)="setSubscriptionSortingOptions(currentSubscribersSortType)">
+          <option *ngFor="let item of HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS | keyvalue">{{
+            SUBSCRIPTION_SORT_BY_KEYS[item.key] }}</option>
         </select>
-        <span class="sort-order fas"
-              (click)="setSubscriptionSortingOptions(currentSubscribersSortType)"
-              [ngClass]="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
+        <span class="sort-order fas" (click)="setSubscriptionSortingOptions(currentSubscribersSortType)"
+          [ngClass]="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
         </span>
       </span>
     </div>
     <mat-card class="oppia-subscription-card e2e-test-subscription-card"
-              *ngFor="let subscriber of subscribersList | sortBy: isCurrentSubscriptionSortDescending: sortSubscriptionFunction()">
-      <a class="oppia-subscription-profile-link" [href]="'/profile/' + subscriber.username" target="_blank" rel="noopener">
+      *ngFor="let subscriber of subscribersList | sortBy: isCurrentSubscriptionSortDescending: sortSubscriptionFunction()">
+      <a class="oppia-subscription-profile-link" [href]="'/profile/' + subscriber.username" target="_blank"
+        rel="noopener">
         <picture>
-          <source type="image/webp"
-                  [srcset]="getProfileImageWebpDataUrl(subscriber.username)">
-          <source type="image/png"
-                  [srcset]="getProfileImagePngDataUrl(subscriber.username)">
+          <source type="image/webp" [srcset]="getProfileImageWebpDataUrl(subscriber.username)">
+          <source type="image/png" [srcset]="getProfileImagePngDataUrl(subscriber.username)">
           <img class="oppia-subscription-card-profile-picture rounded-circle"
-               [src]="getProfileImagePngDataUrl(subscriber.username)"
-               alt="subscriberImageUrl">
+            [src]="getProfileImagePngDataUrl(subscriber.username)" alt="subscriberImageUrl">
         </picture>
         <span class="oppia-subscription-card-summary">
           <div class="oppia-subscription-name-container">
-            <strong class="e2e-test-subscription-name"
-                    ngbPopover="showUsernamePopover(subscriber.username)">
+            <strong class="e2e-test-subscription-name" ngbPopover="showUsernamePopover(subscriber.username)">
               {{ subscriber.username| truncate:10 }}
             </strong>
           </div>
@@ -417,20 +369,277 @@
       <em>There are no collections to display.</em>
     </div>
 
-    <ul class="oppia-dashboard-tiles"
-        *ngIf="activeTab === 'myCollections' && collectionsList?.length > 0">
-      <span *ngFor="let collection of collectionsList">
-        <oppia-collection-summary-tile [getCollectionId]="collection.id"
-                                       [getCollectionTitle]="collection.title"
-                                       [getLastUpdatedMsec]="collection.lastUpdatedMsec"
-                                       [getNodeCount]="collection.nodeCount"
-                                       [getObjective]="collection.objective"
-                                       [getThumbnailIconUrl]="collection.thumbnailIconUrl"
-                                       [getThumbnailBgColor]="collection.thumbnailBgColor"
-                                       [isLinkedToEditorPage]="true">
-        </oppia-collection-summary-tile>
-      </span>
     </ul>
+  </div>
+
+  <div *ngIf="activeTab === 'statsReport'" class="stats-report-tab-container p-4">
+    <div class="row">
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Average Rating</div>
+          <div class="h3 mb-0">{{ (reportSummary?.average_ratings != null ? reportSummary?.average_ratings :
+            dashboardStats.averageRatings) || 'N/A' }}</div>
+        </mat-card>
+      </div>
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Total Plays</div>
+          <div class="h3 mb-0">{{ (reportSummary?.total_plays != null ? reportSummary?.total_plays :
+            dashboardStats.totalPlays) | summarizeNonnegativeNumber }}</div>
+        </mat-card>
+      </div>
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Open Feedback</div>
+          <div class="h3 mb-0">{{ (reportSummary?.total_open_feedback != null ? reportSummary?.total_open_feedback :
+            dashboardStats.totalOpenFeedback) }}</div>
+        </mat-card>
+      </div>
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Subscribers</div>
+          <div class="h3 mb-0">{{ reportSummary?.total_subscribers != null ? reportSummary?.total_subscribers :
+            subscribersList?.length }}</div>
+        </mat-card>
+      </div>
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Avg Completion Rate</div>
+          <div class="h3 mb-0">{{ (reportSummary?.creator_completion_rate != null ?
+            reportSummary?.creator_completion_rate : creatorCompletionRate) !== null ?
+            ((reportSummary?.creator_completion_rate != null ? reportSummary?.creator_completion_rate :
+            creatorCompletionRate) + '%') : 'N/A' }}</div>
+        </mat-card>
+      </div>
+      <div class="col-md-4">
+        <mat-card class="oppia-mat-card p-3 mb-3">
+          <div class="text-muted small uppercase font-weight-bold">Avg Time Spent</div>
+          <div class="h3 mb-0">{{ avgTimeSpentMinutes != null ? (avgTimeSpentMinutes + ' min') : 'N/A' }}</div>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="h5 mb-0">Exploration Performance</h3>
+        <div class="d-flex align-items-center gap-2">
+          <select (change)="setSort($event.target.value)" class="form-control form-control-sm w-auto">
+            <option value="plays">Plays</option>
+            <option value="average_rating">Avg Rating</option>
+            <option value="num_open_threads">Open Threads</option>
+          </select>
+          <button class="btn btn-sm btn-outline-secondary" (click)="setSort(sortKey)">
+            <i class="fas" [ngClass]="sortDir === 'asc' ? 'fa-sort-amount-up' : 'fa-sort-amount-down'"></i>
+          </button>
+          <select (change)="setFilter($event.target.value)" class="form-control form-control-sm w-auto ml-2">
+            <option value="all">All</option>
+            <option value="high_rating">High Rating (>=4)</option>
+            <option value="low_rating">Low Rating (<=2)< /option>
+            <option value="has_open_threads">Has Open Threads</option>
+            <option value="recently_updated">Updated in 30 days</option>
+            <option value="high_plays">High Plays (>=1000)</option>
+          </select>
+          <input class="form-control form-control-sm w-auto ml-2" placeholder="Search title" [(ngModel)]="filterText" />
+          <button class="btn btn-sm btn-primary ml-3" (click)="exportJson()">Export JSON</button>
+        </div>
+      </div>
+
+      <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover mb-0">
+          <thead class="thead-light">
+            <tr>
+              <th>Exploration</th>
+              <th>Open Threads</th>
+              <th>Avg Rating</th>
+              <th>Plays</th>
+              <th>Starts</th>
+              <th>Completions</th>
+              <th>Completion Rate</th>
+              <th>Last Updated</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let exp of pageExplorations()">
+              <td class="font-weight-bold">{{ exp.title || 'Untitled' }}</td>
+              <td>{{ exp.num_open_threads }}</td>
+              <td>
+                <span *ngIf="exp.average_rating !== null">
+                  {{ exp.average_rating | number:'1.1-1' }} <i class="fas fa-star text-warning small"></i>
+                </span>
+                <span *ngIf="exp.average_rating === null">N/A</span>
+              </td>
+              <td>{{ exp.plays }}</td>
+              <td>{{ exp.num_starts != null ? exp.num_starts : 'N/A' }}</td>
+              <td>{{ exp.num_completions != null ? exp.num_completions : 'N/A' }}</td>
+              <td>
+                {{ exp.completion_rate !== null && exp.completion_rate !== undefined ? (exp.completion_rate + '%') :
+                'N/A' }}
+              </td>
+              <td class="small text-muted">{{ exp.last_updated_msec | date:'mediumDate' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div class="small text-muted">
+          Showing page {{ pageIndex + 1 }} • Page size:
+          <select (change)="setPageSize($event.target.value)"
+            class="form-control form-control-sm d-inline-block w-auto ml-1">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-sm btn-outline-primary" (click)="prevPage()"
+            [disabled]="pageIndex === 0">Previous</button>
+          <button class="btn btn-sm btn-outline-primary" (click)="nextPage()"
+            [disabled]="(pageIndex + 1) * pageSize >= filteredExplorations.length">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-5">
+      <h3 class="h5 mb-3">Analytics & Trends</h3>
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <mat-card class="oppia-mat-card p-3 h-100">
+            <h4 class="h6 mb-3 border-bottom pb-2">Top Explorations by Plays</h4>
+            <div class="chart-container">
+              <div *ngFor="let b of topExplorationBars" class="mb-3">
+                <div class="d-flex justify-content-between mb-1 small">
+                  <span class="text-truncate mr-2" [title]="b.label">{{ b.label }}</span>
+                  <span class="font-weight-bold">{{ b.value }}</span>
+                </div>
+                <div class="progress" style="height: 8px;">
+                  <div class="progress-bar" role="progressbar" [style.width.%]="b.widthPct" aria-valuenow="b.widthPct"
+                    aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+        <div class="col-md-6 mb-4">
+          <mat-card class="oppia-mat-card p-3 h-100">
+            <h4 class="h6 mb-3 border-bottom pb-2">Engagement Trends (Last 12 Weeks)</h4>
+            <div class="d-flex justify-content-center align-items-center" style="height: 160px;">
+              <svg viewBox="0 0 320 140" width="100%" height="100%">
+                <polyline [attr.points]="trendPolylinePoints" fill="none" stroke="#00645c" stroke-width="2"></polyline>
+                <circle *ngFor="let p of trendPoints" [attr.cx]="p.x" [attr.cy]="p.y" r="4" fill="#00645c">
+                  <title>{{ p.label }}: {{ p.value }} plays</title>
+                </circle>
+                <text *ngFor="let p of trendPoints" [attr.x]="p.x" y="135" font-size="9" text-anchor="middle"
+                  class="small text-muted">{{ p.label }}</text>
+              </svg>
+            </div>
+          </mat-card>
+        </div>
+        <div class="col-md-6 mb-4">
+          <mat-card class="oppia-mat-card p-3 h-100">
+            <h4 class="h6 mb-3 border-bottom pb-2">Learning Outcomes Distribution</h4>
+            <div class="d-flex align-items-end chart-grid" style="height: 180px; gap: 10px;">
+              <div *ngFor="let h of outcomesDistribution"
+                class="flex-grow-1 d-flex flex-column align-items-center h-100 justify-content-end"
+                [attr.title]="h.label + ': ' + h.count">
+                <div class="badge badge-light mb-1 small">{{ h.count }}</div>
+                <div class="bg-success rounded-top w-100" [style.height.%]="h.heightPct"></div>
+                <div class="small text-muted mt-2 text-center" style="font-size: 9px; min-height: 24px;">{{ h.label }}
+                </div>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+        <div class="col-md-6 mb-4">
+          <mat-card class="oppia-mat-card p-3 h-100">
+            <h4 class="h6 mb-3 border-bottom pb-2">Histogram: Plays Distribution</h4>
+            <div class="d-flex align-items-end chart-grid" style="height: 180px; gap: 10px;">
+              <div *ngFor="let h of histogram"
+                class="flex-grow-1 d-flex flex-column align-items-center h-100 justify-content-end"
+                [attr.title]="h.label + ': ' + h.count">
+                <div class="badge badge-light mb-1 small">{{ h.count }}</div>
+                <div class="bg-primary rounded-top w-100" [style.height.%]="h.heightPct"></div>
+                <div class="small text-muted mt-2 text-center" style="font-size: 9px; min-height: 24px;">{{ h.label }}
+                </div>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mt-4">
+      <div class="col-md-7 mb-4">
+        <mat-card class="oppia-mat-card p-3 h-100">
+          <h4 class="h6 mb-4 border-bottom pb-2 font-weight-bold">Content Effectiveness</h4>
+          <div *ngFor="let c of contentEffectiveness" class="p-3 mb-3 bg-light rounded border">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="font-weight-bold">{{ c.type }}</span>
+              <span class="badge badge-success" *ngIf="c.delta != null">+{{ c.delta }}%</span>
+            </div>
+            <div class="row text-center row-metrics">
+              <div class="col-4 border-right">
+                <div class="text-muted small">Engagement</div>
+                <div class="h5 mb-0">{{ c.engagement }}%</div>
+              </div>
+              <div class="col-4 border-right">
+                <div class="text-muted small">Completion</div>
+                <div class="h5 mb-0">{{ c.completion }}%</div>
+              </div>
+              <div class="col-4">
+                <div class="text-muted small">Avg Score</div>
+                <div class="h5 mb-0">{{ c.avgScore != null ? (c.avgScore + '%') : 'N/A' }}</div>
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+      <div class="col-md-5 mb-4">
+        <mat-card class="oppia-mat-card p-3 h-100">
+          <h4 class="h6 mb-4 border-bottom pb-2 font-weight-bold">Ratings & Feedback</h4>
+          <div class="mb-4">
+            <div *ngFor="let r of ratingsBreakdown" class="d-flex align-items-center mb-2">
+              <div class="small font-weight-bold mr-2" style="width: 30px;">{{ r.stars }}★</div>
+              <div class="progress flex-grow-1" style="height: 10px;">
+                <div class="progress-bar bg-warning" role="progressbar"
+                  [style.width.%]="(r.count || 0) > 0 ? Math.min(100, Math.round((r.count / (reportSummary?.num_ratings || 1)) * 100)) : 0">
+                </div>
+              </div>
+              <div class="small text-muted ml-2" style="width: 30px; text-align: right;">{{ r.count }}</div>
+            </div>
+          </div>
+          <h5 class="small font-weight-bold mb-3 uppercase text-muted">Recent Comments</h5>
+          <div class="comments-list">
+            <div *ngFor="let c of recentComments" class="mb-3 p-2 bg-white rounded border-left border-primary"
+              style="border-left-width: 3px !important;">
+              <div class="d-flex justify-content-between mb-1">
+                <span class="small font-weight-bold">{{ c.author }}</span>
+                <span class="small text-muted">{{ c.ago }}</span>
+              </div>
+              <div class="small italic text-dark">"{{ c.text }}"</div>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="mt-3 bg-dark text-white p-4 rounded shadow">
+      <h4 class="h6 mb-3 border-bottom border-secondary pb-2">Key Insights Summary</h4>
+      <div class="row text-center">
+        <div class="col-md-4 border-right border-secondary">
+          <div class="small text-muted uppercase">Top Performing Module</div>
+          <div class="h6 mb-0">{{ (reportExplorations | slice:0:1)[0]?.title || 'N/A' }}</div>
+        </div>
+        <div class="col-md-4 border-right border-secondary">
+          <div class="small text-muted uppercase">Knowledge Gaps</div>
+          <div class="h6 mb-0">{{ (reportExplorations | slice:-1)[0]?.title || 'N/A' }}</div>
+        </div>
+        <div class="col-md-4">
+          <div class="small text-muted uppercase">Peak Activity Time</div>
+          <div class="h6 mb-0">{{ peakActivityTime || 'N/A' }}</div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 <style>
@@ -439,17 +648,21 @@
     display: flex;
     width: 384%;
   }
+
   .oppia-subscription-card-profile-picture {
     float: left;
     margin-left: 0;
     margin-top: 0;
     width: 60px;
   }
+
   .oppia-subscription-card-summary {
     margin-left: 0;
     margin-top: 0;
   }
-  .row-one, .row-two {
+
+  .row-one,
+  .row-two {
     display: flex;
     font-size: 12px;
     justify-content: space-between;
@@ -459,13 +672,16 @@
     padding-right: 10px;
     padding-top: 7px;
   }
+
   .row-two {
     margin-bottom: 12px;
   }
+
   .oppia-mat-card {
     align-items: baseline;
     display: flex;
   }
+
   .oppia-create-question {
     padding-right: 25px
   }
@@ -488,24 +704,69 @@
     min-height: 74px;
     position: relative;
   }
+
   .oppia-creator-dashboard-main-content .stats-card .stat-description {
     margin-bottom: 0;
     padding-right: 10px;
     word-wrap: break-word;
   }
+
+  .stats-report-tab-container {
+    background: #f8fafc;
+    min-height: 500px;
+  }
+
+  .uppercase {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .italic {
+    font-style: italic;
+  }
+
+  .row-metrics .h5 {
+    font-weight: 600;
+    color: #1a202c;
+  }
+
+  .row-metrics .col-4 {
+    padding: 10px 5px;
+  }
+
+  .chart-grid .bg-success {
+    background-color: #48bb78 !important;
+  }
+
+  .chart-grid .bg-primary {
+    background-color: #4299e1 !important;
+  }
+
+  .comments-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .font-weight-bold {
+    font-weight: 700;
+  }
+
   .oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
     margin-top: 0;
     position: absolute;
     top: 0.75em;
   }
- .oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
+
+  .oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
     bottom: -0.7em;
     position: absolute;
   }
+
   .oppia-creator-dashboard-mobile-mode {
     margin: auto;
     width: 100%;
   }
+
   .oppia-dashboard-tabs {
     border-bottom: 1px solid #fff;
     display: -webkit-flex;
@@ -516,12 +777,14 @@
     padding-left: 0;
     text-align: center;
   }
+
   .oppia-dashboard-tabs li {
     display: -webkit-flex;
     display: flex;
     margin-bottom: 0;
     width: 200px;
   }
+
   .oppia-dashboard-tabs .oppia-dashboard-tabs-text {
     color: #00645c;
     font-size: 1em;
@@ -530,12 +793,14 @@
     text-transform: uppercase;
     width: 100%;
   }
+
   .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text,
   .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text:hover {
     border-bottom: 4px solid #00645c;
     color: #00645c;
     margin-left: 7.5px;
   }
+
   .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover {
     color: #00645c;
     font-size: 1em;
@@ -544,17 +809,21 @@
     text-transform: uppercase;
     width: 100%;
   }
+
   .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
   .oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
     text-decoration: none;
   }
+
   .oppia-dashboard-empty-text {
     padding-top: 1em;
   }
+
   .oppia-dashboard-title {
     margin-bottom: 50px;
     margin-top: 0;
   }
+
   .oppia-dashboard-title h1 {
     color: #01645c;
     display: inline;
@@ -562,22 +831,27 @@
     font-size: 3em;
     margin-bottom: 25px;
   }
+
   .stats-card h2 {
-      font-size: 32px;
-      font-weight: 500;
-    }
+    font-size: 32px;
+    font-weight: 500;
+  }
+
   .oppia-dashboard-title-desktop {
     padding-top: 78.5px;
   }
+
   .oppia-dashboard-title-mobile {
     padding-top: 15px;
     text-align: center;
   }
+
   .oppia-dashboard-tabs .list-card-view-toggle {
     margin-left: auto;
     margin-right: 7.5px;
     width: auto;
   }
+
   .oppia-exp-dropdown-stats {
     background: white;
     left: 0;
@@ -630,7 +904,7 @@
     padding: 13px 0 10px;
   }
 
-  .oppia-dashboard-card-view-item .metrics > .row-three {
+  .oppia-dashboard-card-view-item .metrics>.row-three {
     padding: 0 0 5px 14px;
     text-align: left;
   }
@@ -660,6 +934,7 @@
     margin: 20px 7.5px 0 7.5px;
     padding: 10px 20px;
   }
+
   .oppia-dashboard-table {
     font-size: 15px;
     width: 100%;
@@ -731,6 +1006,7 @@
     position: absolute;
     width: 0;
   }
+
   .list-card-view-toggle button {
     background: #fff;
     border: 1px solid #ddd;
@@ -739,19 +1015,23 @@
     margin-top: 7px;
     padding: 5px 12px;
   }
+
   .list-card-view-toggle .card-view-btn {
     border-bottom-left-radius: 5px;
     border-top-left-radius: 5px;
   }
+
   .list-card-view-toggle .list-view-btn {
     border-bottom-right-radius: 5px;
     border-top-right-radius: 5px;
     margin-left: -1px;
   }
+
   .list-card-view-toggle .dashboard-active-view {
     background: #00645c;
     color: #fff;
   }
+
   .oppia-dashboard-container .oppia-dashboard-list-summary,
   .oppia-dashboard-container .oppia-dashboard-list-summary:hover,
   .oppia-dashboard-container .oppia-dashboard-list-summary:active,
@@ -760,13 +1040,16 @@
     display: block;
     text-decoration: none;
   }
+
   .oppia-dashboard-container .exp-private-text {
     color: #757575;
     font-style: italic;
   }
+
   .oppia-card-view-wrap {
     position: relative;
   }
+
   .oppia-dashboard-mobile-statistics-card-link {
     background: white;
     height: 54px;
@@ -774,6 +1057,7 @@
     position: absolute;
     width: 96%;
   }
+
   .oppia-dashboard-statistics-card-link {
     background: white;
     height: 37%;
@@ -785,6 +1069,7 @@
   .oppia-dashboard-card-statistic-value {
     padding-left: 19px;
   }
+
   ul.oppia-dashboard-tiles {
     display: grid;
     grid-template-columns: auto auto auto auto;
@@ -802,14 +1087,11 @@
     width: 26%;
   }
 
-  .oppia-colgroup-col-2
-  .oppia-colgroup-col-3 {
+  .oppia-colgroup-col-2 .oppia-colgroup-col-3 {
     width: 13%;
   }
 
-  .oppia-colgroup-col-4
-  .oppia-colgroup-col-5
-  .oppia-colgroup-col-6 {
+  .oppia-colgroup-col-4 .oppia-colgroup-col-5 .oppia-colgroup-col-6 {
     width: 16%;
   }
 
@@ -826,19 +1108,24 @@
     display: inline-block;
     margin-top: 14px;
   }
+
   .oppia-subscription-name-container {
     font-size: 17.5px;
     margin-bottom: 5px;
   }
+
   .oppia-impact-text {
     font-size: 14.5px;
   }
+
   .oppia-table-container {
     margin-top: 10px;
   }
+
   .oppia-m-text {
     white-space: pre-wrap;
   }
+
   .oppia-sort-options {
     width: 160px;
   }
@@ -856,6 +1143,7 @@
       top: 1.75em;
     }
   }
+
   @media(max-width: 815px) {
     .oppia-dashboard-container {
       padding-left: 10px;
@@ -928,7 +1216,7 @@
       height: auto;
     }
 
-    .oppia-dashboard-card-view-item .metrics > .row-three {
+    .oppia-dashboard-card-view-item .metrics>.row-three {
       flex-basis: 25%;
     }
 
@@ -951,12 +1239,14 @@
       font-weight: 500;
     }
   }
+
   @media(max-width: 316px) {
     body {
-     width: fit-content;
+      width: fit-content;
     }
+
     .mat-card {
-     width: fit-content;
+      width: fit-content;
     }
   }
 </style>
