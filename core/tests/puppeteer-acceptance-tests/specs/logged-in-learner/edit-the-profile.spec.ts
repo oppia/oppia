@@ -47,6 +47,8 @@ describe('Logged-In Learner', function () {
   });
 
   it('should be able to find the preferences page', async function () {
+    await loggedInLearner.goto('http://localhost:8181/login');
+
     await loggedInLearner.clickOnProfileDropdown();
 
     await loggedInLearner.expectProfileDropdownToContainElementWithContent(
