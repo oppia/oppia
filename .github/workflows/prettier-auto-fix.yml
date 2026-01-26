@@ -1,0 +1,56 @@
+name: Auto-format PR branch with Prettier
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - fix-voiceover-placeholder-text
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          elif [ -f yarn.lock ]; then
+            yarn install --frozen-lockfile
+          else
+            npm install
+          fi
+
+      - name: Run Prettier on target files
+        run: |
+          npx prettier --version
+          npx prettier --write \
+            core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.ts \
+            core/templates/pages/exploration-editor-page/translation-tab/state-translation/state-translation.component.spec.ts
+
+      - name: Commit and push formatting
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "riyaseema80"
+          git config user.email "riyaseema80@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: run Prettier"
+            git push
+          else
+            echo "No formatting changes"
+          fi
