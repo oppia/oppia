@@ -10,6 +10,49 @@ To make it easier to get started, we've catalogued some of the different ways to
 - [Voice artists](https://github.com/oppia/oppia/wiki/Instructions-for-voice-artists)
 - [Designers and artists](https://github.com/oppia/oppia/wiki/Contributing-to-Oppia%27s-design)
 
+## Making Your First Contribution (Especially Documentation)
+
+If you’re new to open source or looking to make a small first contribution, documentation improvements are a great place to start. These contributions help improve clarity for future contributors and learners, and they usually don’t require setting up the full development environment.
+
+### What Counts as a Documentation Contribution?
+Documentation contributions can include:
+- Fixing typos or grammar issues
+- Improving clarity or wording in existing documentation
+- Adding missing explanations or examples
+- Updating outdated information
+- Improving README files or inline comments
+
+Documentation files are typically written in Markdown (`.md`) and can be found throughout the repository, including:
+- `README.md`
+- `CONTRIBUTING.md`
+- Files inside the `docs/` directory
+
+### How to Make a Documentation Contribution
+1. Fork the repository and clone it locally.
+2. Create a new branch for your change:
+```
+git checkout -b improve-docs
+```
+3. Make your documentation changes.
+4. Commit your changes with a clear message:
+```
+git commit -m "Improve documentation clarity"
+```
+5. Push your branch and open a Pull Request.
+
+When opening your Pull Request, briefly describe:
+- What you changed
+- Why the change improves the documentation
+
+No prior experience with Oppia or large codebases is required for documentation-only contributions.
+
+### Need Help or Not Sure What to Work On?
+If you’re unsure where to start, feel free to:
+- Browse issues labeled `documentation` or `good first issue`
+- Ask questions in GitHub Discussions
+
+We’re happy to help guide first-time contributors!
+
 If you are interested in working on Oppia's Android app, you should also take a look at the [oppia/oppia-android repository](https://github.com/oppia/oppia-android).
 
 If you run into any problems, you can check out the [user documentation](http://oppia.github.io/). Feel free to say hello on [GitHub Discussions](https://github.com/oppia/oppia/discussions), too! :)
