@@ -4,15 +4,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 
-<link rel="preload" href="/assets/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Font Awesome preloads removed; fonts are provided via CSS and assets pipeline -->
 
 <link rel="preload"
       media="screen"
       href="https://fonts.googleapis.com/css2?family=Capriola&family=Roboto:wght@400;500;700&family=Noto+Serif:ital@0;1&display=swap"
       as="style"
       onload="this.onload=null;this.rel='stylesheet'">
-<link rel="stylesheet" href="/assets/vendor/fontawesome/css/all.min.css">
 <% if (!htmlWebpackPlugin.options.lightweight) { %>
   <link rel="preload"
         media="screen"

@@ -199,6 +199,7 @@
     "ngx-trim-directive": "^1.1.0",
     "path-browserify": "^1.0.1",
     "proxy-polyfill": "^0.3.2",
+    "readable-stream": "2.3.7",
     "requireindex": "^1.2.0",
     "rxjs": "^6.0.0",
     "rxjs-marbles": "^6.0.0",
