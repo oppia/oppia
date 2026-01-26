@@ -101,6 +101,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/view-subtopic-study-guides.spec.ts"
     },
     {
+      "name": "logged-in-user/check-improvements-tab",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/check-improvements-tab.spec.ts"
+    },
+    {
       "name": "logged-in-user/create-and-delete-account",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-user/create-and-delete-account.spec.ts"
     },

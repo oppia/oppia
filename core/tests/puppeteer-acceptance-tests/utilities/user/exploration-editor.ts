@@ -7158,6 +7158,17 @@ export class ExplorationEditor extends BaseUser {
       false
     );
   }
+
+  /**
+   * Checks if the improvements tab is hidden (not present) in the exploration editor.
+   * This is expected for unpublished explorations.
+   */
+  async expectImprovementsTabToBeHidden(): Promise<void> {
+    const improvementsTabSelector = '.e2e-test-improvements-tab';
+    const improvementsTabElements = await this.page.$$(improvementsTabSelector);
+    expect(improvementsTabElements.length).toBe(0);
+    showMessage('Improvements tab is hidden as expected.');
+  }
 }
 
 export let ExplorationEditorFactory = (): ExplorationEditor =>

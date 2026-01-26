@@ -16,7 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * EE. Learner can complete the embedded lesson
+ * LO.11. Play an embedded exploration (External Users)
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -87,6 +87,27 @@ describe('Logged-Out Learner in Embedded Lesson', function () {
 
       // Expect rate options to not be available.
       await loggedOutUser.expectRateOptionsNotAvailable();
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should be able to play embedded exploration with different language settings',
+    async function () {
+      // Navigate to embedded exploration URL.
+      await loggedOutUser.goto(
+        `http://localhost:8181/embed/exploration/${explorationId}`
+      );
+      await loggedOutUser.expectCardContentToMatch('Content 0');
+
+      // Verify language dropdown is present and functional in embedded mode.
+      await loggedOutUser.expectLanguageDropdownToBePresent();
+
+      // Complete the embedded exploration.
+      await loggedOutUser.continueToNextCard();
+      await loggedOutUser.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson!'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
