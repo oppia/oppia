@@ -236,8 +236,12 @@ def is_mac_os() -> bool:
 
 
 def is_linux_os() -> bool:
-    """Check if the running system is Linux."""
+    """Returns True if the current operating system is Linux.
+
+    This helper function is used to handle Linux-specific behavior in Oppia.
+    """
     return OS_NAME == 'Linux'
+
 
 
 def is_x64_architecture() -> bool:
