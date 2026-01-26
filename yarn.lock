@@ -3333,13 +3333,6 @@
   dependencies:
     "@types/node" "*"
 
-"@types/select2@^4.0.48":
-  version "4.0.55"
-  resolved "https://registry.yarnpkg.com/@types/select2/-/select2-4.0.55.tgz#7cd4788fbd9588acb680db39c137cf14b2136c5a"
-  integrity sha512-lqngYTv7W1e8HiLSEq7cJhnnKqV3vuwCBkfka6ZXBoM0Z8aVoZrR9gxjbwRzcqBBw4EpAvVXZGPuaDOM+apeZw==
-  dependencies:
-    "@types/jquery" "*"
-
 "@types/selenium-standalone@^7.0.0":
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/@types/selenium-standalone/-/selenium-standalone-7.0.1.tgz#7d94c2f663ceb495648c2c2a300f317d3a835257"

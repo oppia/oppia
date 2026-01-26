@@ -155,10 +155,8 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
     await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
     await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('needs update');
-    // TODO(#22748): Ideally changing the voiceover to stale should change the
-    // status to "1/3" instead of "2/3". Once fixed, update the code below to
-    // expect "1/3" instead of "2/3".
-    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('2/3');
+    // Stale voiceovers should count as incomplete.
+    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('1/3');
     await voiceoverSubmitter.expectNodeWariningSignToBeVisible(true);
 
     // Mark voiceover as up to date.
