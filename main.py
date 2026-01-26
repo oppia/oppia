@@ -439,6 +439,14 @@ URLS = [
         creator_dashboard.CreatorDashboardHandler,
     ),
     get_redirect_route(
+        r'%s' % feconf.CREATOR_STATS_REPORT_URL,
+        creator_dashboard.CreatorStatsReportHandler,
+    ),
+    get_redirect_route(
+        r'%s' % feconf.CREATOR_STATS_REPORT_CSV_URL,
+        creator_dashboard.CreatorStatsCsvHandler,
+    ),
+    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         creator_dashboard.NewExplorationHandler,
     ),

@@ -658,3 +658,53 @@ class CreationButtonsTests(test_utils.GenericTestBase):
             expected_status_int=400,
         )
         self.logout()
+
+
+class CreatorStatsReportHandlerTests(test_utils.GenericTestBase):
+    """Tests for CreatorStatsReportHandler."""
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_get_stats_report(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        # Create dummy data.
+        self.save_new_default_exploration('exp1', self.owner_id, title='Exp 1')
+        self.save_new_default_exploration('exp2', self.owner_id, title='Exp 2')
+
+        response = self.get_json(feconf.CREATOR_STATS_REPORT_URL)
+
+        self.assertIn('summary', response)
+        self.assertIn('explorations', response)
+        self.assertEqual(len(response['explorations']), 2)
+        self.assertEqual(response['summary']['total_plays'], 0)
+        self.logout()
+
+
+class CreatorStatsCsvHandlerTests(test_utils.GenericTestBase):
+    """Tests for CreatorStatsCsvHandler."""
+
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def test_get_csv_report(self) -> None:
+        self.login(self.OWNER_EMAIL)
+        # Create dummy data.
+        self.save_new_default_exploration('exp1', self.owner_id, title='Exp 1')
+
+        response = self.get_html_response(feconf.CREATOR_STATS_REPORT_CSV_URL)
+
+        self.assertEqual(response.content_type, 'text/csv')
+        self.assertIn('Total Plays', response.body.decode('utf-8'))
+        self.assertIn('Exp 1', response.body.decode('utf-8'))
+        self.logout()
