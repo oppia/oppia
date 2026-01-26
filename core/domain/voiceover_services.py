@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import logging
 import os
 
 from core import feconf
@@ -940,6 +941,10 @@ def _regenerate_voiceovers_for_given_contents(
             regeneration task. If None, the method is invoked by a
             synchronous process and task-tracking is not required.
     """
+    logging.info(
+        'Voiceover regeneration logs: Fetched contents for voiceover regeneration: %s'
+        % language_code_to_contents_mapping
+    )
     # A dictionary mapping each language code to a list of accent codes that
     # support autogeneration.
     language_code_to_autogeneratable_accent_codes = {}
@@ -1049,6 +1054,13 @@ def _regenerate_voiceovers_for_given_contents(
             failed_content_ids = [
                 error[0] for error in errors_while_voiceover_regeneration
             ]
+
+            logging.info(
+                'Voiceover regeneration logs: The following content IDs failed to regenerate voiceovers for language accent code %s in exploration %s: %s',
+                language_accent_code,
+                exploration_id,
+                ', '.join(failed_content_ids),
+            )
 
             if requested_task_is_async:
                 # Ruling out the possibility of None for mypy type checking.
@@ -1274,6 +1286,12 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     # A dictionary where each key is a language code, and each value is a
     # content mapping dictionary. The content mapping dictionary contains
     # content IDs as keys and their corresponding HTML content as values.
+
+    logging.info(
+        'Voiceover regeneration logs: Regeneration triggered for exploration: %s in language accent: %s',
+        exploration_id,
+        language_accent_code,
+    )
     language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
     language_code = get_language_code_from_language_accent_code(

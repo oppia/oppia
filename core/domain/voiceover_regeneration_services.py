@@ -24,7 +24,6 @@ import html
 import io
 import json
 import logging
-import time
 import uuid
 
 from core import feconf, utils
@@ -601,9 +600,6 @@ def regenerate_voiceovers_of_exploration(
             content_id, language_accent_code
         )
 
-        # Pause for 3 seconds to prevent sudden spikes in workload.
-        time.sleep(WAIT_TIME_FOR_VOICEOVER_REGENERATION_IN_SECONDS)
-
         try:
             # Generates a voiceover for the provided HTML content in the
             # specified language accent.
@@ -614,6 +610,13 @@ def regenerate_voiceovers_of_exploration(
                     language_accent_code,
                     voiceover_filename,
                 )
+            )
+
+            logging.info(
+                'Voiceover regeneration logs: Successfully generated voiceover for content_id %s in exploration %s (%s)',
+                content_id,
+                exploration_id,
+                language_accent_code,
             )
 
             # Fetches the generated voiceover.
