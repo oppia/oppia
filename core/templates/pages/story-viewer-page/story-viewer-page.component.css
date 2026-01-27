@@ -94,7 +94,6 @@ oppia-story-viewer-page.oppia-login-or-signup-text {
 
 oppia-story-viewer-page .oppia-chapter-coming-soon {
   cursor: not-allowed;
-  pointer-events: none;
 }
 
 oppia-story-viewer-page .oppia-story-viewer-card-coming-soon {
@@ -103,11 +102,4 @@ oppia-story-viewer-page .oppia-story-viewer-card-coming-soon {
 
 oppia-story-viewer-page .oppia-lesson-icon-coming-soon {
   background-color: #ccc;
-}
-
-oppia-story-viewer-page .oppia-coming-soon-label {
-  color: #888;
-  font-size: 14px;
-  font-style: italic;
-  margin-left: 8px;
 }
