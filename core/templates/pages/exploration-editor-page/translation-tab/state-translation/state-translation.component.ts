@@ -357,6 +357,42 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return summary;
   }
 
+  ngOnInit(): void {
+    // Initialize rule input type to data format mapping.
+    this.RULE_INPUT_TYPES_TO_DATA_FORMATS = {
+      TranslatableSetOfNormalizedString:
+        TRANSLATION_DATA_FORMAT_SET_OF_NORMALIZED_STRING,
+      TranslatableSetOfUnicodeString:
+        TRANSLATION_DATA_FORMAT_SET_OF_UNICODE_STRING,
+    };
+
+    // Initialize tab IDs.
+    this.TAB_ID_CONTENT = AppConstants.COMPONENT_NAME_CONTENT;
+    this.TAB_ID_FEEDBACK = AppConstants.COMPONENT_NAME_FEEDBACK;
+    this.TAB_ID_HINTS = AppConstants.COMPONENT_NAME_HINT;
+    this.TAB_ID_RULE_INPUTS = AppConstants.COMPONENT_NAME_RULE_INPUT;
+    this.TAB_ID_SOLUTION = AppConstants.COMPONENT_NAME_SOLUTION;
+    this.TAB_ID_CUSTOMIZATION_ARGS =
+      AppConstants.COMPONENT_NAME_INTERACTION_CUSTOMIZATION_ARGS;
+
+    // Default state.
+    this.activatedTabId = this.TAB_ID_CONTENT;
+    this.stateHints = [];
+    this.stateAnswerGroups = [];
+
+    // Subscribe to refresh events.
+    this.directiveSubscriptions.add(
+      this.stateEditorService.onRefreshStateTranslation.subscribe(() => {
+        this.initStateTranslation();
+      })
+    );
+
+    // Initialize state translation data.
+    this.initStateTranslation();
+    this.initActiveIndex = this.getIndexOfActiveCard();
+    this.stateEditorService.setInitActiveContentId(null);
+  }
+
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
   }
