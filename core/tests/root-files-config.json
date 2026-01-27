@@ -39,6 +39,7 @@
     "core/tests/puppeteer-acceptance-tests/jest.config.js",
     "core/tests/puppeteer-acceptance-tests/custom-jest-environment.js",
     "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
+    "core/templates/pages/contributor-dashboard-page/contributor-dashboard-page.component.css",
   ],
   "RUN_ALL_TESTS_ROOT_FILES": [
     "extensions/ckeditor_plugins/pre/plugin.js",
@@ -57,3 +58,4 @@
     "extensions/value_generators/valueGeneratorsRequires.ts"
   ]
 }
+
