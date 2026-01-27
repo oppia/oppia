@@ -1110,7 +1110,6 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
 
 
 class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
-    """Checks the access to the story viewer page."""
 
     def setUp(self) -> None:
         super().setUp()
@@ -1120,16 +1119,41 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
+        self.skill_id = 'skill_1'
+        self.exp_id = 'exp_1'
 
-        self.save_new_story(
-            self.story_id,
-            self.admin_id,
-            self.topic_id,
-            url_fragment='story-one',
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description'
         )
+
+        self.save_new_valid_exploration(
+            self.exp_id, self.admin_id, title='Exploration', category='Category'
+        )
+        self.publish_exploration(self.admin_id, self.exp_id)
+
+        story_node = story_domain.StoryNode.create_default_story_node(
+            'node_1', self.exp_id
+        )
+        story_node.title = 'Chapter 1'
+
+        story = story_domain.Story.create_default_story(
+            self.story_id,
+            'Story Title',
+            'Description',
+            self.topic_id,
+            'story-one',
+        )
+        story.story_contents.nodes = [story_node]
+        story.story_contents.initial_node_id = 'node_1'
+        story.story_contents.next_node_id = 'node_2'
+
+        story_services.save_new_story(self.admin_id, story)
+
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title', 'url-frag'
         )
+        subtopic.skill_ids = [self.skill_id]
+
         self.save_new_topic(
             self.topic_id,
             self.admin_id,
