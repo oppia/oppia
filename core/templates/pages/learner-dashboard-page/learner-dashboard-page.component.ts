@@ -242,6 +242,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.loadingIndicatorIsShown = true;
     this.loaderService.showLoadingScreen('Loading');
 
     let userInfoPromise = this.userService.getUserInfoAsync();
@@ -364,6 +365,8 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         ];
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
+          this.loadingIndicatorIsShown = false;
+          this.loadingIndicatorIsShown = false;
           // So that focus is applied after the loading screen has dissapeared.
           this.communityLessonsDataLoaded = true;
           this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
@@ -418,6 +421,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SECTION_I18N_IDS
         .COMMUNITY_LESSONS
     ) {
+      this.loadingIndicatorIsShown = true;
       this.loaderService.showLoadingScreen('Loading');
       let dashboardCollectionsDataPromise =
         this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
@@ -464,6 +468,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
+            this.loadingIndicatorIsShown = false;
             this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
@@ -482,6 +487,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
       LearnerDashboardPageConstants.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
         .LESSONS
     ) {
+      this.loadingIndicatorIsShown = true;
       this.loaderService.showLoadingScreen('Loading');
       let dashboardCollectionsDataPromise =
         this.learnerDashboardBackendApiService.fetchLearnerDashboardCollectionsDataAsync();
@@ -528,6 +534,7 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         .then(() => {
           setTimeout(() => {
             this.loaderService.hideLoadingScreen();
+            this.loadingIndicatorIsShown = false;
             this.communityLessonsDataLoaded = true;
             // So that focus is applied after the loading screen has dissapeared.
             this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
