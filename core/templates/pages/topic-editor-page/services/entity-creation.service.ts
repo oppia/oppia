@@ -24,6 +24,9 @@ import {CreateNewSubtopicModalComponent} from 'pages/topic-editor-page/modal-tem
 import {CreateNewSkillModalService} from './create-new-skill-modal.service';
 import {TopicEditorRoutingService} from './topic-editor-routing.service';
 import {TopicEditorStateService} from './topic-editor-state.service';
+import {PageContextService} from 'services/page-context.service';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +36,9 @@ export class EntityCreationService {
     private createNewSkillModalService: CreateNewSkillModalService,
     private ngbModal: NgbModal,
     private topicEditorRoutingService: TopicEditorRoutingService,
-    private topicEditorStateService: TopicEditorStateService
+    private topicEditorStateService: TopicEditorStateService,
+    private pageContextService: PageContextService,
+    private assetsBackendApiService: AssetsBackendApiService
   ) {}
 
   createSubtopic(): void {
@@ -43,10 +48,46 @@ export class EntityCreationService {
         windowClass: 'create-new-subtopic',
       })
       .result.then(
-        subtopicId => {
-          this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
-            subtopicId
-          );
+        result => {
+          const subtopicId = result.subtopicId;
+          const imageData: ImageUploaderData | null = result.imageData;
+
+          // Upload the image if provided.
+          if (imageData) {
+            const entityType = this.pageContextService.getEntityType();
+            const entityId = this.pageContextService.getEntityId();
+
+            if (!entityType || !entityId) {
+              throw new Error(
+                'Entity type and ID are required for image upload'
+              );
+            }
+
+            this.assetsBackendApiService
+              .postThumbnailFile(
+                imageData.image_data,
+                imageData.filename,
+                entityType,
+                entityId
+              )
+              .toPromise()
+              .then(() => {
+                // Navigate to subtopic editor after successful image upload.
+                this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
+                  subtopicId
+                );
+              })
+              .catch(error => {
+                throw new Error(
+                  'Failed to upload subtopic thumbnail: ' + error
+                );
+              });
+          } else {
+            // Navigate directly if no image.
+            this.topicEditorRoutingService.navigateToSubtopicEditorWithId(
+              subtopicId
+            );
+          }
         },
         () => {
           // Note to developers:

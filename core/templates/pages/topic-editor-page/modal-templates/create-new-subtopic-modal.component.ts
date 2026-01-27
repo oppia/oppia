@@ -327,7 +327,10 @@ export class CreateNewSubtopicModalComponent
       this.subtopicId,
       this.subtopicTitle
     );
-    this.ngbActiveModal.close(this.subtopicId);
+    this.ngbActiveModal.close({
+      subtopicId: this.subtopicId,
+      imageData: this.uploadedImageData,
+    });
   }
 
   localValueChange(event: string): void {
