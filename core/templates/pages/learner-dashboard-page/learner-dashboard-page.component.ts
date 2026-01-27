@@ -366,7 +366,6 @@ export class LearnerDashboardPageComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.loaderService.hideLoadingScreen();
           this.loadingIndicatorIsShown = false;
-          this.loadingIndicatorIsShown = false;
           // So that focus is applied after the loading screen has dissapeared.
           this.communityLessonsDataLoaded = true;
           this.focusManagerService.setFocusWithoutScroll('ourLessonsBtn');
