@@ -3217,7 +3217,7 @@ class QuestionAdminRoleHandlerTest(test_utils.GenericTestBase):
         self.login(self.SUPER_ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
         self.put_json(
-            '/qualityadminrolehandler',
+            '/questionadminrolehandler',
             {'action': 'assign', 'username': username},
             csrf_token=csrf_token,
             expected_status_int=404,
