@@ -1117,27 +1117,22 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
         self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
-
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.skill_id = 'skill_1'
-
         self.save_new_skill(
             self.skill_id, self.admin_id, description='Skill Description'
         )
-
         self.save_new_story(
             self.story_id,
             self.admin_id,
             self.topic_id,
             url_fragment='story-one',
         )
-
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title', 'url-frag'
         )
         subtopic.skill_ids = [self.skill_id]
-
         self.save_new_topic(
             self.topic_id,
             self.admin_id,
@@ -1151,7 +1146,6 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             subtopics=[subtopic],
             next_subtopic_id=2,
         )
-
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id, self.admin_id
