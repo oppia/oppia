@@ -1,0 +1,16 @@
+/* Fix username overlapping in contributor dashboard */
+
+.oppia-short-contributor-username-container,
+.oppia-long-contributor-username-container {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.e2e-test-username {
+  display: block;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+}
