@@ -1,3 +1,4 @@
+
 /* Fix username overlapping in contributor dashboard */
 
 .oppia-short-contributor-username-container,
@@ -9,8 +10,8 @@
 .e2e-test-username {
   display: block;
   max-width: 100%;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
+  white-space: nowrap;
 }
+
