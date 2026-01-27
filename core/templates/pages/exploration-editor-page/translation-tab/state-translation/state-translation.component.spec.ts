@@ -126,8 +126,11 @@ class MockFormatRtePreviewPipe {
   }
 }
 class MockPlatformFeatureService {
-  // Add any methods that are used in the component if needed
+  isFeatureEnabled(): boolean {
+    return false;
+  }
 }
+
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
