@@ -128,9 +128,7 @@ module.exports = {
     }),
     // This generates the RTL version for all CSS bundles.
     new WebpackRTLPlugin({
-      minify: {
-        zindex: false,
-      },
+      minify: false,
     }),
   ],
   module: {

@@ -155,6 +155,10 @@ runs:
         cat /home/runner/work/oppia/oppia/requirements.txt
       shell: bash
 
+    - name: Ensure psutil is installed
+      run: python -c "import psutil" 2>/dev/null || python -m pip install psutil>=5.9.0
+      shell: bash
+
     - name: Check Yarn Cache
       # Check the yarn cache again to see what packages were just
       # installed.
