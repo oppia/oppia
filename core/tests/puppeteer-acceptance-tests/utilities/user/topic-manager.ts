@@ -4411,7 +4411,7 @@ export class TopicManager extends BaseUser {
     );
 
     const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 3); //Handle flaky ness for this
+    futureDate.setDate(futureDate.getDate() + 1); //Handle flaky ness for this
 
     const dateString = futureDate.toLocaleDateString('en-US');
 

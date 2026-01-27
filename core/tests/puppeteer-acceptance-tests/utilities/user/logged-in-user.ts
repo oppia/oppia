@@ -3909,10 +3909,16 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
   ): Promise<void> {
-    const lessonCards = await context.$$(lessonCardContainer);
+    // const lessonCards = await context.$$(lessonCardContainer); e2e-test-redesigned-lesson-card-container
+    const lessonCards = await context.$$(
+      '.e2e-test-redesigned-lesson-card-container'
+    );
     const lessonCardTitles = await Promise.all(
+      // lessonCards.map(card =>
+      //   card.$eval(lessonTitleSelector, el => el.textContent?.trim())
+      // ) e2e-test-lesson-card-title
       lessonCards.map(card =>
-        card.$eval(lessonTitleSelector, el => el.textContent?.trim())
+        card.$eval('.e2e-test-lesson-card-title', el => el.textContent?.trim())
       )
     );
     const titleFound = lessonCardTitles.some(title =>

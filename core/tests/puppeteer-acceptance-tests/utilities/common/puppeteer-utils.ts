@@ -1560,6 +1560,39 @@ export class BaseUser {
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
   }
 
+  private async getChapterByName(
+    chapterName: string
+  ): Promise<ElementHandle<Element>> {
+    const chapters = await this.page.$$('.e2e-test-chapter-title');
+
+    for (const chapter of chapters) {
+      const text = await this.page.evaluate(
+        el => el.textContent?.trim(),
+        chapter
+      );
+
+      if (text?.includes(chapterName)) {
+        return chapter;
+      }
+    }
+
+    throw new Error(`Chapter with name "${chapterName}" not found`);
+  }
+
+  async expectChapterToBeClickable(
+    chapterName: string,
+    shouldBeClickable: boolean = true
+  ): Promise<void> {
+    const chapterElement = await this.getChapterByName(chapterName);
+
+    await this.page.waitForFunction(
+      isElementClickable,
+      {},
+      chapterElement,
+      shouldBeClickable
+    );
+  }
+
   /**
    * Helper method to wait for a action progress message to disappear
    * @param {string} progressMessage - The processing message to wait for completion
