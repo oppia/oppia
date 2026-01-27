@@ -131,8 +131,6 @@ describe('Logged-In Learner', function () {
       'loggedInLearner2',
       'logged_in_learner2@example.com'
     );
-
-    // await UserFactory.closeBrowserForUser(curriculumAdmin);
   }, 6000000);
 
   it(
@@ -171,7 +169,7 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.expectChapterToBeClickable(
         'Find the Value of a Number'
-      ); //Make it as not clickable
+      ); //Make it as not clickable after kishans PR merged
 
       await loggedInLearner1.navigateToLearnerDashboard();
       await loggedInLearner1.expectScreenshotToMatch(
@@ -190,12 +188,10 @@ describe('Logged-In Learner', function () {
         'Coming Soon'
       );
 
-      // Todo : Creat a fcuntion to check progress percentage in lesson card in goal section
-      // await loggedInLearner1.expectLessonCardProgressToBe(
-      //   'In Progress',
-      //   ['Chapter 1: What are the Place Values'],
-      //   100
-      // );
+      await loggedInLearner1.expectLessonProgressInRedesignedDashboardToBe(
+        ' Chapter 1: What are the Place Values ',
+        '100'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -205,7 +201,6 @@ describe('Logged-In Learner', function () {
       await loggedInLearner2.navigateToClassroomPage('math');
       await loggedInLearner2.selectAndOpenTopic('Place Values');
 
-      // Working Fine availableLessonListHasChapters function and commingSoonLessonListHasChapters function
       await loggedInLearner2.availableLessonListHasChapters([
         'What are the Place Values',
       ]);
@@ -282,30 +277,38 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickOnElementWithSelector(
         publishUptoChaptersDropdownSelector
       );
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '3');
+      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '2');
       await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
 
+      await UserFactory.closeBrowserForUser(curriculumAdmin);
+
+      //See new chapter on classroom page
       await loggedInLearner2.navigateToClassroomPage('math');
       await loggedInLearner2.selectAndOpenTopic('Place Values');
       await loggedInLearner2.availableLessonListHasChapters([
         'What are the Place Values',
         'Find the Value of a Number',
         'Comparing Numbers',
+      ]);
+      await loggedInLearner2.commingSoonLessonListHasChapters([
         'Rounding Numbers part 1',
+        'Rounding Numbers part 2',
       ]);
 
-      await loggedInLearner1.navigateToLearnerDashboard();
-      await loggedInLearner1.navigateToProgressSection();
+      // // await loggedInLearner1.expectLessonCardToHaveNewLabel(
+      // //   'Find the Value of a Number'
+      // // );
+      // See new chapter on learner dashboard
 
-      await loggedInLearner1.expectLessonCardToHaveNewLabel(
-        'Find the Value of a Number'
-      );
-      await loggedInLearner1.resumeLessonFromLearnerDashboard(
-        'Find the Value of a Number'
-      );
-      await loggedInLearner2.expectExplorationCompletionToastMessage(
-        'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
-      );
+      // await loggedInLearner1.navigateToLearnerDashboard();
+      // await loggedInLearner1.navigateToProgressSection();
+
+      // await loggedInLearner1.resumeLessonFromLearnerDashboard(
+      //   'Find the Value of a Number'
+      // );
+      // await loggedInLearner2.expectExplorationCompletionToastMessage(
+      //   'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
+      // );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );

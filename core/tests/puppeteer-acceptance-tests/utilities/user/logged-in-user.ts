@@ -324,6 +324,10 @@ const removeModalCancelButtonSelector =
 const removeModalConfirmButtonSelector =
   '.e2e-test-remove-activity-modal-container .e2e-test-modal-confirm-delete-button';
 
+// Common > Lesson Card.
+const commonLessonCardContainerSelector =
+  '.e2e-test-redesigned-lesson-card-container';
+const commonlessonTitleSelector = '.e2e-test-lesson-title';
 // Common > Lesson Card (story viewer / goal detail).
 // Lessons are rendered inside the expanded goal list (goal-list-story-nodes).
 const lessonCardContainer = '.goal-list-story-nodes';
@@ -3910,15 +3914,13 @@ export class LoggedInUser extends BaseUser {
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
   ): Promise<void> {
     // const lessonCards = await context.$$(lessonCardContainer); e2e-test-redesigned-lesson-card-container
-    const lessonCards = await context.$$(
-      '.e2e-test-redesigned-lesson-card-container'
-    );
+    const lessonCards = await context.$$(commonLessonCardContainerSelector);
     const lessonCardTitles = await Promise.all(
       // lessonCards.map(card =>
       //   card.$eval(lessonTitleSelector, el => el.textContent?.trim())
       // ) e2e-test-lesson-card-title
       lessonCards.map(card =>
-        card.$eval('.e2e-test-lesson-card-title', el => el.textContent?.trim())
+        card.$eval(commonlessonTitleSelector, el => el.textContent?.trim())
       )
     );
     const titleFound = lessonCardTitles.some(title =>
@@ -4494,11 +4496,11 @@ export class LoggedInUser extends BaseUser {
         lessonTitleSelector,
         el => el.textContent
       );
-
+      // Todo : remove extra space from lesson titles , trim it
       if (!lessonTitleText || lessonTitleText !== lessonTitle) {
         continue;
       }
-
+      this.waitForElementToStabilize(circleProgressElementSelector);
       const currentProgress = await lessonCard.$eval(
         circleProgressElementSelector,
         el => el.textContent
