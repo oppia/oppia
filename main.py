@@ -1445,10 +1445,10 @@ URLS.extend(
         get_redirect_route(
             r'/collection/<collection_id>', oppia_root.OppiaRootPage
         ),
-        # get_redirect_route(
-        #     r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
-        #     oppia_root.OppiaRootPage,
-        # ),
+        get_redirect_route(
+            r'%s/story/<story_url_fragment>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+            oppia_root.OppiaRootPage,
+        ),
         get_redirect_route(
             r'/learn/<classroom_url_fragment>', oppia_root.OppiaRootPage
         ),
