@@ -24,7 +24,6 @@
              [href]="getChapterExplorationUrl(node)"
              [class.oppia-chapter-coming-soon]="isChapterDisplayedAsComingSoon(node)"
              [attr.title]="isChapterDisplayedAsComingSoon(node) ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null"
-             (click)="isChapterDisplayedAsComingSoon(node) && $event.preventDefault()"
              tabindex="0">
 
             <div>
@@ -65,6 +64,9 @@
                     </span>
                     <span *ngIf="isHackyStoryNodeTitleTranslationDisplayed(index)">
                       {{index + 1}}: {{ storyNodesTitleTranslationKeys[index] | translate }}
+                    </span>
+                    <span *ngIf="isChapterDisplayedAsComingSoon(node)" class="oppia-coming-soon-label">
+                      ({{ 'I18N_LEARNER_STORY_TILE_COMING_SOON' | translate }})
                     </span>
                   </span>
 
