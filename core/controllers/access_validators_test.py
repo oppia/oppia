@@ -1127,7 +1127,9 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             self.topic_id,
             url_fragment='story-one',
         )
-
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title', 'url-frag'
+        )
         self.save_new_topic(
             self.topic_id,
             self.admin_id,
@@ -1138,8 +1140,8 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
             canonical_story_ids=[self.story_id],
             additional_story_ids=[],
             uncategorized_skill_ids=[],
-            subtopics=[],
-            next_subtopic_id=1,
+            subtopics=[subtopic],
+            next_subtopic_id=2,
         )
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
