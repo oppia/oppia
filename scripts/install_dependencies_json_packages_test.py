@@ -25,6 +25,7 @@ import re
 import ssl
 import tempfile
 import zipfile
+from urllib import error as urlerror
 from urllib import request as urlrequest
 
 from core.tests import test_utils
@@ -644,6 +645,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.assertEqual(url, test_url)
             self._assert_ssl_context_matches_default(context)
             return MockResponse()
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
 
         with urlopen_swap:
             response = install_dependencies_json_packages.url_open(test_url)
