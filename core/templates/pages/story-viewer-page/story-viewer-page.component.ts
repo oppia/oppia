@@ -344,11 +344,11 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     );
   }
 
-  getChapterExplorationUrl(node: ReadOnlyStoryNode): string | null {
+  getChapterExplorationUrl(node: ReadOnlyStoryNode): string {
     // When serial chapter feature is enabled, "Ready To Publish" chapters
     // should not be accessible.
     if (this.isChapterDisplayedAsComingSoon(node)) {
-      return null;
+      return 'javascript:void(0)';
     }
     return this.getExplorationUrl(node as unknown as StoryNode);
   }
