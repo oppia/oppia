@@ -7,7 +7,7 @@
           [(ngModel)]="skillFilterText" autofocus>
       </mat-card>
       <div class="skill-list-box">
-        <mat-radio-group [(ngModel)]="selectedSkill" (change)="setSelectedSkillId()">
+        <mat-radio-group [(ngModel)]="selectedSkill" (ngModelChange)="setSelectedSkillId()">
           <div *ngFor="let topic of currCategorizedSkills | keyvalue">
             <mat-card class="list-view-item" *ngIf="checkTopicIsNotEmpty(topic.key)">
               <mat-card class="list-view-item">
