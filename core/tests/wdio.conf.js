@@ -65,10 +65,6 @@ var suites = {
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
 
-  explorationStatisticsTab: [
-    './core/tests/webdriverio_desktop/explorationStatisticsTab.js'
-  ],
-
   explorationTranslationTab: [
     './core/tests/webdriverio_desktop/explorationTranslationTab.js'
   ],

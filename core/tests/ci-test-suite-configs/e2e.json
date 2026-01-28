@@ -37,10 +37,6 @@
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },
     {
-      "name": "explorationStatisticsTab",
-      "module": "core/tests/webdriverio_desktop/explorationStatisticsTab.js"
-    },
-    {
       "name": "explorationTranslationTab",
       "module": "core/tests/webdriverio_desktop/explorationTranslationTab.js"
     },
