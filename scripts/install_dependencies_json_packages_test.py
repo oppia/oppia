@@ -672,6 +672,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.assertEqual(url, test_url)
             self._assert_ssl_context_matches_default(context)
             if len(attempts) == 1:
+                # Here we use type Any because the 'headers' argument in
+                # HTTPError expects an email.message.Message object, but
+                # a dict is sufficient for our mock.
+                # Here use cast because the dict is an incompatible type.
                 raise urlerror.HTTPError(
                     url,
                     403,
@@ -687,6 +691,10 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             sleep_calls.append(seconds)
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        # Here we use type Any because install_dependencies_json_packages
+        # is a module and we need to access its internal attribute 'time'
+        # which is not explicitly exported.
+        # Here use cast because the module type does not explicitly expose 'time'.
         sleep_swap = self.swap(
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
