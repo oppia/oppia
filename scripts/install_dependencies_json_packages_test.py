@@ -645,12 +645,52 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self._assert_ssl_context_matches_default(context)
             return MockResponse()
 
-        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
-
         with urlopen_swap:
             response = install_dependencies_json_packages.url_open(test_url)
         self.assertEqual(response.getcode(), 200)
         self.assertEqual(response.url, test_url)
+
+    def test_url_open_retries_when_rate_limited_with_retry_after(self) -> None:
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                raise urlerror.HTTPError(
+                    url, 403, 'rate limit exceeded', {'Retry-After': '1'}, None
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            install_dependencies_json_packages.time, 'sleep', mock_sleep
+        )
+
+        with urlopen_swap, sleep_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, test_url)
+        self.assertEqual(attempts, [test_url, test_url])
+        self.assertEqual(sleep_calls, [1])
 
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext

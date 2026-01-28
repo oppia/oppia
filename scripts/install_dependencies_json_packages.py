@@ -24,6 +24,7 @@ import os
 import pathlib
 import ssl
 import sys
+import time
 import urllib
 import zipfile
 from http import client
@@ -149,17 +150,62 @@ def url_retrieve(
 
 def url_open(
     source_url: Union[str, urllib.request.Request],
+    max_attempts: int = 5,
 ) -> urllib.request._UrlopenRet:
     """Opens a URL and returns the response.
 
     Args:
         source_url: Union[str, Request]. The URL.
+        max_attempts: int. The maximum number of attempts that will be made to
+            open the URL.
 
     Returns:
         urlopen. The 'urlopen' object.
+
+    Raises:
+        HTTPError. If the URL cannot be opened after all attempts.
     """
     context = ssl.create_default_context(cafile=certifi.where())
-    return urllib.request.urlopen(source_url, context=context)
+    attempts = 0
+    while True:
+        attempts += 1
+        try:
+            return urllib.request.urlopen(source_url, context=context)
+        except urlerror.HTTPError as exception:
+            # If we are rate limited, wait for the specified time and retry.
+            if (
+                exception.code == 403
+                and 'rate limit' in str(exception).lower()
+                and attempts < max_attempts
+            ):
+                retry_after_header = exception.headers.get('Retry-After')
+                delay_secs = 0
+                if retry_after_header is not None:
+                    try:
+                        delay_secs = int(retry_after_header)
+                    except ValueError:
+                        delay_secs = 0
+                else:
+                    # GitHub exposes the reset time as a Unix timestamp.
+                    rate_limit_reset = exception.headers.get(
+                        'X-RateLimit-Reset'
+                    )
+                    if rate_limit_reset is not None:
+                        try:
+                            reset_timestamp = int(rate_limit_reset)
+                            delay_secs = max(
+                                0, reset_timestamp - int(time.time())
+                            )
+                        except ValueError:
+                            delay_secs = 0
+
+                if delay_secs > 0:
+                    time.sleep(delay_secs)
+                    continue
+
+            # For non-rate-limit errors or when we have exhausted the attempts,
+            # re-raise the original exception.
+            raise exception
 
 
 # Here we use total=False since some fields in this dict
