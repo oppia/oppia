@@ -1297,7 +1297,8 @@ def _get_all_recipient_ids(
     participant_ids = {
         message.author_id
         for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)
+        if message.author_id
+        and user_services.is_user_registered(message.author_id)
     }
 
     batch_recipient_ids = owner_ids - {author_id}
