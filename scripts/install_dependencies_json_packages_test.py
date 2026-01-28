@@ -30,7 +30,7 @@ from urllib import request as urlrequest
 
 from core.tests import test_utils
 
-from typing import Any, BinaryIO, Final, NoReturn, Tuple
+from typing import Any, BinaryIO, Final, NoReturn, Tuple, cast
 
 from . import common, install_dependencies_json_packages
 
@@ -673,7 +673,11 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self._assert_ssl_context_matches_default(context)
             if len(attempts) == 1:
                 raise urlerror.HTTPError(
-                    url, 403, 'rate limit exceeded', {'Retry-After': '1'}, None
+                    url,
+                    403,
+                    'rate limit exceeded',
+                    cast(Any, {'Retry-After': '1'}),
+                    None,
                 )
             return MockResponse()
 
@@ -684,7 +688,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
-            install_dependencies_json_packages.time, 'sleep', mock_sleep
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
         )
 
         with urlopen_swap, sleep_swap:
