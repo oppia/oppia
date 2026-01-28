@@ -1847,14 +1847,14 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = datastore_services.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
-    commit_cmds_user_ids = datastore_services.StringProperty(
+    commit_cmds_user_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # The user ids that are enclosed inside the 'content' field in the relevant
     # snapshot content model.
-    content_user_ids = datastore_services.StringProperty(
+    content_user_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:

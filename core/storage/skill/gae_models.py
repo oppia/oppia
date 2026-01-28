@@ -19,7 +19,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -119,11 +119,13 @@ class SkillModel(base_models.VersionedModel):
     )
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
-    misconceptions = datastore_services.JsonProperty(
+    misconceptions: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # The rubrics for the skill that explain each difficulty level.
-    rubrics = datastore_services.JsonProperty(repeated=True, indexed=False)
+    rubrics: List[Any] = datastore_services.JsonProperty(
+        repeated=True, indexed=False
+    )  # type: ignore[assignment]
     # The ISO 639-1 code for the language this skill is written in.
     language_code = datastore_services.StringProperty(
         required=True, indexed=True
@@ -135,9 +137,9 @@ class SkillModel(base_models.VersionedModel):
     # A dict representing the skill contents.
     skill_contents = datastore_services.JsonProperty(indexed=False)
     # The prerequisite skills for the skill.
-    prerequisite_skill_ids = datastore_services.StringProperty(
+    prerequisite_skill_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # The id to be used by the next misconception added.
     next_misconception_id = datastore_services.IntegerProperty(
         required=True, indexed=False

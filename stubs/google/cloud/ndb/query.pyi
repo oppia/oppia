@@ -55,7 +55,7 @@ class Query:
     project: str
     app: str
     namespace: str
-    projection: List[Union[str, Property]]
+    projection: List[Union[str, Property[Any]]]
     keys_only: bool
     offset: int
     limit: Optional[int]
@@ -72,7 +72,7 @@ class Query:
         self,
         limit: Optional[int] = ...,
         offset: Optional[int] = ...,
-        projection: Optional[List[Property]] = ...,
+        projection: Optional[List[Property[Any]]] = ...,
         keys_only: Literal[False] = ...,
     ) -> Sequence[TYPE_MODEL]: ...
     @overload

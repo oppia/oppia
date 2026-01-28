@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -47,18 +47,22 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
     content_count = datastore_services.IntegerProperty(
         required=True, indexed=True
     )
-    incomplete_translation_language_codes = datastore_services.StringProperty(
+    incomplete_translation_language_codes: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     translation_counts = datastore_services.JsonProperty(
         default={}, indexed=False
     )
-    language_codes_with_assigned_voice_artists = (
+    language_codes_with_assigned_voice_artists: List[str] = (
         datastore_services.StringProperty(repeated=True, indexed=True)
-    )
-    language_codes_needing_voice_artists = datastore_services.StringProperty(
+    )  # type: ignore[assignment]
+    language_codes_needing_voice_artists: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -287,15 +291,19 @@ class TranslationOpportunityModel(base_models.BaseModel):
     # The ID of the entity.
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     # A list of topic IDs that are related to this opportunity.
-    topic_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    topic_ids: List[str] = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )  # type: ignore[assignment]
     # The total number of contents available for translation.
     content_count = datastore_services.IntegerProperty(
         required=True, indexed=True
     )
     # List of language codes in which the entity translation is incomplete.
-    incomplete_translation_language_codes = datastore_services.StringProperty(
+    incomplete_translation_language_codes: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # Dict mapping language codes to number of completed translations.
     translation_counts = datastore_services.JsonProperty(
         required=True, indexed=True

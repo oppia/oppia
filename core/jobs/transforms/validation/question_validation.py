@@ -25,7 +25,7 @@ from core.jobs.transforms.validation import base_validation
 from core.jobs.types import model_property
 from core.platform import models
 
-from typing import Iterator, List, Optional, Tuple, Type, Union
+from typing import Any, Iterator, List, Optional, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -88,7 +88,7 @@ def question_commit_log_entry_model_relationships(
     model: Type[question_models.QuestionCommitLogEntryModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property, List[Type[question_models.QuestionModel]]
+        datastore_services.Property[Any], List[Type[question_models.QuestionModel]]
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""

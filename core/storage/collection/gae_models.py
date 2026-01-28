@@ -182,7 +182,9 @@ class CollectionModel(base_models.VersionedModel):
         default=constants.DEFAULT_LANGUAGE_CODE, indexed=True
     )
     # Tags associated with this collection.
-    tags = datastore_services.StringProperty(repeated=True, indexed=True)
+    tags: List[str] = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )  # type: ignore[assignment]
 
     # The version of all property blob schemas.
     schema_version = datastore_services.IntegerProperty(
@@ -481,15 +483,21 @@ class CollectionRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of owners of this collection.
-    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to edit this collection.
-    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to voiceover this collection.
-    voice_artist_ids = datastore_services.StringProperty(
+    owner_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
+    # The user_ids of users who are allowed to edit this collection.
+    editor_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
+    # The user_ids of users who are allowed to voiceover this collection.
+    voice_artist_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    viewer_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
 
     # Whether this collection is owned by the community.
     community_owned = datastore_services.BooleanProperty(
@@ -845,7 +853,9 @@ class CollectionSummaryModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # Tags associated with this collection.
-    tags = datastore_services.StringProperty(repeated=True, indexed=True)
+    tags: List[str] = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )  # type: ignore[assignment]
 
     # Aggregate user-assigned ratings of the collection.
     ratings = datastore_services.JsonProperty(default=None, indexed=False)
@@ -879,19 +889,25 @@ class CollectionSummaryModel(base_models.BaseModel):
     )
 
     # The user_ids of owners of this collection.
-    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    owner_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
     # The user_ids of users who are allowed to edit this collection.
-    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    editor_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
     # The user_ids of users who are allowed to view this collection.
-    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    viewer_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the collection's content).
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids = datastore_services.StringProperty(
+    contributor_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
     # A dict representing the contributors of non-trivial commits to this
     # collection. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.

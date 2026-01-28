@@ -28,7 +28,7 @@ from core.jobs.types import model_property, user_validation_errors
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterator, List, Tuple, Type, Union
+from typing import Any, Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -129,7 +129,7 @@ def completed_activities_model_relationships(
     model: Type[user_models.CompletedActivitiesModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -150,7 +150,7 @@ def incomplete_activities_model_relationships(
     model: Type[user_models.IncompleteActivitiesModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -170,7 +170,7 @@ def incomplete_activities_model_relationships(
 def exp_user_last_playthrough_model_relationships(
     model: Type[user_models.ExpUserLastPlaythroughModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_id, [exp_models.ExplorationModel]
@@ -181,7 +181,7 @@ def learner_playlist_model_relationships(
     model: Type[user_models.LearnerPlaylistModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -201,7 +201,7 @@ def learner_playlist_model_relationships(
 def user_contributions_model_relationships(
     model: Type[user_models.UserContributionsModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.created_exploration_ids, [exp_models.ExplorationModel]
@@ -225,7 +225,7 @@ def user_subscriptions_model_relationships(
     model: Type[user_models.UserSubscriptionsModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -254,7 +254,7 @@ def user_subscribers_model_relationships(
     model: Type[user_models.UserSubscribersModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[Type[user_models.UserSubscriptionsModel]],
     ]
 ]:
@@ -293,7 +293,7 @@ def user_stats_model_relationships(
 def exploration_user_data_model_relationships(
     model: Type[user_models.ExplorationUserDataModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[exp_models.ExplorationModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -305,7 +305,7 @@ def collection_progress_model_relationships(
     model: Type[user_models.CollectionProgressModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -328,7 +328,7 @@ def collection_progress_model_relationships(
 def story_progress_model_relationships(
     model: Type[user_models.StoryProgressModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[story_models.StoryModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[story_models.StoryModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -339,7 +339,7 @@ def story_progress_model_relationships(
 def user_query_model_relationships(
     model: Type[user_models.UserQueryModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[email_models.BulkEmailModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -350,7 +350,7 @@ def user_query_model_relationships(
 def user_bulk_emails_model_relationships(
     model: Type[user_models.UserBulkEmailsModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[email_models.BulkEmailModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[email_models.BulkEmailModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -361,7 +361,7 @@ def user_bulk_emails_model_relationships(
 def user_skill_mastery_model_relationships(
     model: Type[user_models.UserSkillMasteryModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property, List[Type[skill_models.SkillModel]]]
+    Tuple[datastore_services.Property[Any], List[Type[skill_models.SkillModel]]]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 

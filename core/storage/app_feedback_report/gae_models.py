@@ -577,7 +577,9 @@ class AppFeedbackReportTicketModel(base_models.BaseModel):
         required=False, indexed=True
     )
     # A list of report IDs associated with this ticket.
-    report_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    report_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
 
     @classmethod
     def create(

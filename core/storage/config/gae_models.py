@@ -21,7 +21,7 @@ from __future__ import annotations
 import core.storage.base_model.gae_models as base_models
 from core.platform import models
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -63,7 +63,9 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    rules = datastore_services.JsonProperty(repeated=True)
+    rules: List[Any] = datastore_services.JsonProperty(
+        repeated=True
+    )  # type: ignore[assignment]
     rule_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True
     )
@@ -151,7 +153,9 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         default=0, indexed=True
     )
     # A list of IDs of user groups for which the feature flag will be enabled.
-    user_group_ids = datastore_services.StringProperty(repeated=True)
+    user_group_ids: List[str] = datastore_services.StringProperty(
+        repeated=True
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

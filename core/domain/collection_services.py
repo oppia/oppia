@@ -704,11 +704,11 @@ def get_collection_summaries_where_user_has_role(
     col_summary_models: Sequence[collection_models.CollectionSummaryModel] = (
         collection_models.CollectionSummaryModel.query(
             datastore_services.any_of(
-                collection_models.CollectionSummaryModel.owner_ids == user_id,
-                collection_models.CollectionSummaryModel.editor_ids == user_id,
-                collection_models.CollectionSummaryModel.viewer_ids == user_id,
+                collection_models.CollectionSummaryModel.owner_ids == user_id,  # type: ignore[arg-type, comparison-overlap]
+                collection_models.CollectionSummaryModel.editor_ids == user_id,  # type: ignore[arg-type, comparison-overlap]
+                collection_models.CollectionSummaryModel.viewer_ids == user_id,  # type: ignore[arg-type, comparison-overlap]
                 collection_models.CollectionSummaryModel.contributor_ids
-                == user_id,
+                == user_id,  # type: ignore[arg-type, comparison-overlap]
             )
         ).fetch()
     )

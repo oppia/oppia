@@ -25,7 +25,7 @@ import sys
 from core import feconf, utils
 from core.platform import models
 
-from typing import Dict, Final, List, Optional, Sequence, Tuple
+from typing import Any, Dict, Final, List, Optional, Sequence, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -1460,7 +1460,9 @@ class ExplorationIssuesModel(base_models.BaseModel):
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
-    unresolved_issues = datastore_services.JsonProperty(repeated=True)
+    unresolved_issues: List[Any] = datastore_services.JsonProperty(
+        repeated=True
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1575,7 +1577,9 @@ class PlaythroughModel(base_models.BaseModel):
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    actions = datastore_services.JsonProperty(repeated=True)
+    actions: List[Any] = datastore_services.JsonProperty(
+        repeated=True
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1706,9 +1710,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # List of LearnerAnswerInfo dicts, which is defined in
     # stats_domain.py, each dict corresponds to a single answer info of
     # learner.
-    learner_answer_info_list = datastore_services.JsonProperty(
+    learner_answer_info_list: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # The schema version of the LearnerAnswerInfo dict. If the
     # LearnerAnswerInfo schema changes in future this needs to be incremented.
     learner_answer_info_schema_version = datastore_services.IntegerProperty(
@@ -2047,9 +2051,9 @@ class StateAnswersModel(base_models.BaseModel):
     # according to the chronological order of their submission otherwise
     # TopNUnresolvedAnswersByFrequency calculation in
     # InteractionAnswerSummariesAggregator will output invalid results.
-    submitted_answer_list = datastore_services.JsonProperty(
+    submitted_answer_list: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
     # CURRENT_SCHEMA_VERSION in this class needs to be incremented.

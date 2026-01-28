@@ -22,7 +22,7 @@ from core import feconf
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Optional, Sequence, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -129,14 +129,14 @@ class TopicModel(base_models.VersionedModel):
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
-    canonical_story_references = datastore_services.JsonProperty(
+    canonical_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # This consists of the list of objects referencing additional stories that
     # are part of this topic.
-    additional_story_references = datastore_services.JsonProperty(
+    additional_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # The schema version for the story reference object on each of the above 2
     # lists.
     story_reference_schema_version = datastore_services.IntegerProperty(
@@ -144,11 +144,13 @@ class TopicModel(base_models.VersionedModel):
     )
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
-    uncategorized_skill_ids = datastore_services.StringProperty(
+    uncategorized_skill_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # The list of subtopics that are part of the topic.
-    subtopics = datastore_services.JsonProperty(repeated=True, indexed=False)
+    subtopics: List[Any] = datastore_services.JsonProperty(
+        repeated=True, indexed=False
+    )  # type: ignore[assignment]
     # The schema version of the subtopic dict.
     subtopic_schema_version = datastore_services.IntegerProperty(
         required=True, indexed=True
@@ -183,9 +185,9 @@ class TopicModel(base_models.VersionedModel):
     # based on the user's performance in the test, a topic is recommended to
     # them. Now, this field is used for listing the skill IDs from which the
     # questions should be fetched for the diagnostic test.
-    skill_ids_for_diagnostic_test = datastore_services.StringProperty(
+    skill_ids_for_diagnostic_test: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -510,7 +512,9 @@ class TopicRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of the managers of this topic.
-    manager_ids = datastore_services.StringProperty(indexed=True, repeated=True)
+    manager_ids: List[str] = datastore_services.StringProperty(
+        indexed=True, repeated=True
+    )  # type: ignore[assignment]
 
     # Whether this topic is published.
     topic_is_published = datastore_services.BooleanProperty(

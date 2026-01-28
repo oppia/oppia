@@ -58,19 +58,27 @@ class LearnerGroupModel(base_models.BaseModel):
     # The description of the learner group.
     description = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of facilitators of the learner group.
-    facilitator_user_ids = datastore_services.StringProperty(
+    facilitator_user_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # The list of user_ids of learners of the learner group.
-    learner_user_ids = datastore_services.StringProperty(repeated=True)
+    learner_user_ids: List[str] = datastore_services.StringProperty(
+        repeated=True
+    )  # type: ignore[assignment]
     # The list of user_ids of the learners who are invited to join the
     # learner group.
-    invited_learner_user_ids = datastore_services.StringProperty(repeated=True)
+    invited_learner_user_ids: List[str] = datastore_services.StringProperty(
+        repeated=True
+    )  # type: ignore[assignment]
     # The list of subtopic page ids that are part of the group syllabus.
     # Each subtopic page id is stored as topicid:subtopicid a string.
-    subtopic_page_ids = datastore_services.StringProperty(repeated=True)
+    subtopic_page_ids: List[str] = datastore_services.StringProperty(
+        repeated=True
+    )  # type: ignore[assignment]
     # The list of story ids that are part of the group syllabus.
-    story_ids = datastore_services.StringProperty(repeated=True)
+    story_ids: List[str] = datastore_services.StringProperty(
+        repeated=True
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

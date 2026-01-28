@@ -23,7 +23,7 @@ from core.jobs.decorators import validation_decorators
 from core.jobs.transforms.validation import base_validation
 from core.platform import models
 
-from typing import Iterator, List, Tuple, Type, Union
+from typing import Any, Iterator, List, Tuple, Type, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -59,7 +59,7 @@ def user_auth_details_model_relationships(
     model: Type[auth_models.UserAuthDetailsModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[
             Type[
                 Union[
@@ -80,7 +80,7 @@ def user_id_by_firebase_auth_id_model_relationships(
     model: Type[auth_models.UserIdByFirebaseAuthIdModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[Type[auth_models.UserAuthDetailsModel]],
     ]
 ]:
@@ -93,7 +93,7 @@ def user_identifiers_model_relationships(
     model: Type[auth_models.UserIdentifiersModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property,
+        datastore_services.Property[Any],
         List[Type[auth_models.UserAuthDetailsModel]],
     ]
 ]:

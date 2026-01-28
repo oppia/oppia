@@ -27,6 +27,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -80,18 +81,18 @@ class UserSettingsModel(base_models.BaseModel):
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.
-    subject_interests = datastore_services.StringProperty(
+    subject_interests: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # When the user last edited an exploration.
     # Exploration language preferences specified by the user.
     # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
-    preferred_language_codes = datastore_services.StringProperty(
+    preferred_language_codes: List[str] = datastore_services.StringProperty(
         repeated=True,
         indexed=True,
         choices=[lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES],
-    )
+    )  # type: ignore[assignment]
     # System language preference (for I18N).
     preferred_site_language_code = datastore_services.StringProperty(
         default=None,
@@ -157,9 +158,9 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Currently, "roles" and "banned" fields are not in use.
     # A list of roles assigned to the user.
-    roles = datastore_services.StringProperty(
+    roles: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES
-    )
+    )  # type: ignore[assignment]
     # Flag to indicate whether the user is banned.
     banned = datastore_services.BooleanProperty(indexed=True, default=False)
     # Flag to check whether the user has viewed lesson info modal once which
@@ -433,25 +434,25 @@ class CompletedActivitiesModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations completed by the user.
-    exploration_ids = datastore_services.StringProperty(
+    exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the collections completed by the user.
-    collection_ids = datastore_services.StringProperty(
+    collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the stories completed by the user.
-    story_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    story_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # IDs of all the topics learnt by the user (i.e. the topics in which the
     # learner has completed all the stories).
-    learnt_topic_ids = datastore_services.StringProperty(
+    learnt_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the topics learnt by the user(i.e. the topics in which the
     # learner has completed all the subtopics).
-    mastered_topic_ids = datastore_services.StringProperty(
+    mastered_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -537,25 +538,25 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     """
 
     # The ids of the explorations partially completed by the user.
-    exploration_ids = datastore_services.StringProperty(
+    exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # The ids of the collections partially completed by the user.
-    collection_ids = datastore_services.StringProperty(
+    collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the stories partially completed by the user.
-    story_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    story_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # IDs of all the topics partially learnt by the user(i.e. the topics in
     # which the learner has not completed all the stories).
-    partially_learnt_topic_ids = datastore_services.StringProperty(
+    partially_learnt_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the topics partially mastered by the user(i.e. the topics in
     # which the learner has not completed all the subtopics).
-    partially_mastered_topic_ids = datastore_services.StringProperty(
+    partially_mastered_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -799,13 +800,13 @@ class LearnerGoalsModel(base_models.BaseModel):
     """
 
     # IDs of all the topics selected by the user to learn.
-    topic_ids_to_learn = datastore_services.StringProperty(
+    topic_ids_to_learn: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the topics selected by the user to master.
-    topic_ids_to_master = datastore_services.StringProperty(
+    topic_ids_to_master: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -882,13 +883,13 @@ class LearnerPlaylistModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations in the playlist of the user.
-    exploration_ids = datastore_services.StringProperty(
+    exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of all the collections in the playlist of the user.
-    collection_ids = datastore_services.StringProperty(
+    collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -965,14 +966,14 @@ class UserContributionsModel(base_models.BaseModel):
     """
 
     # IDs of explorations that this user has created.
-    created_exploration_ids = datastore_services.StringProperty(
+    created_exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
-    edited_exploration_ids = datastore_services.StringProperty(
+    edited_exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1133,19 +1134,20 @@ class UserSubscriptionsModel(base_models.BaseModel):
     """
 
     # IDs of explorations that this user subscribes to.
-    exploration_ids = datastore_services.StringProperty(
+    # IDs of explorations that this user subscribes to.
+    exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of collections that this user subscribes to.
-    collection_ids = datastore_services.StringProperty(
+    collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of feedback thread ids that this user subscribes to.
-    general_feedback_thread_ids = datastore_services.StringProperty(
+    general_feedback_thread_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # IDs of the creators to whom this learner has subscribed.
-    creator_ids = datastore_services.StringProperty(repeated=True, indexed=True)
+    creator_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
 
@@ -1286,9 +1288,9 @@ class UserSubscribersModel(base_models.BaseModel):
     """
 
     # IDs of the learners who have subscribed to this user.
-    subscriber_ids = datastore_services.StringProperty(
+    subscriber_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1454,7 +1456,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
-    weekly_creator_stats_list = datastore_services.JsonProperty(repeated=True)
+    weekly_creator_stats_list: List[Any] = datastore_services.JsonProperty(repeated=True)  # type: ignore[assignment]
     # The version of dashboard stats schema.
     schema_version = datastore_services.IntegerProperty(
         required=True,
@@ -1583,24 +1585,34 @@ class ExplorationUserDataModel(base_models.BaseModel):
     )
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
-    rating = datastore_services.IntegerProperty(default=None, indexed=True)
+    rating: Optional[int] = datastore_services.IntegerProperty(
+        default=None, indexed=True
+    )  # type: ignore[assignment]
     # When the most recent rating was awarded, or None if not rated.
-    rated_on = datastore_services.DateTimeProperty(default=None, indexed=False)
+    rated_on: Optional[datetime.datetime] = datastore_services.DateTimeProperty(
+        default=None, indexed=False
+    )  # type: ignore[assignment]
     # List of uncommitted changes made by the user to the exploration.
-    draft_change_list = datastore_services.JsonProperty(default=None)
+    draft_change_list: Optional[List[Any]] = datastore_services.JsonProperty(
+        default=None
+    )  # type: ignore[assignment]
     # Timestamp of when the change list was last updated.
-    draft_change_list_last_updated = datastore_services.DateTimeProperty(
+    draft_change_list_last_updated: Optional[
+        datetime.datetime
+    ] = datastore_services.DateTimeProperty(
         default=None
-    )
+    )  # type: ignore[assignment]
     # The exploration version that this change list applied to.
-    draft_change_list_exp_version = datastore_services.IntegerProperty(
+    draft_change_list_exp_version: Optional[
+        int
+    ] = datastore_services.IntegerProperty(
         default=None
-    )
+    )  # type: ignore[assignment]
     # The version of the draft change list which was last saved by the user.
     # Can be zero if the draft is None or if the user has not committed
     # draft changes to this exploration since the draft_change_list_id property
     # was introduced.
-    draft_change_list_id = datastore_services.IntegerProperty(default=0)
+    draft_change_list_id: int = datastore_services.IntegerProperty(default=0)
     # The user's preference for receiving suggestion emails for this
     # exploration.
     mute_suggestion_notifications = datastore_services.BooleanProperty(
@@ -1611,21 +1623,29 @@ class ExplorationUserDataModel(base_models.BaseModel):
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
     )
     # The state name of the furthest reached checkpoint.
-    furthest_reached_checkpoint_state_name = datastore_services.StringProperty(
+    furthest_reached_checkpoint_state_name: Optional[
+        str
+    ] = datastore_services.StringProperty(
         default=None
-    )
+    )  # type: ignore[assignment]
     # The exploration version of the furthest reached checkpoint.
-    furthest_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None)
-    )
+    furthest_reached_checkpoint_exp_version: Optional[
+        int
+    ] = datastore_services.IntegerProperty(
+        default=None
+    )  # type: ignore[assignment]
     # The state name of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_state_name = (
-        datastore_services.StringProperty(default=None)
-    )
+    most_recently_reached_checkpoint_state_name: Optional[
+        str
+    ] = datastore_services.StringProperty(
+        default=None
+    )  # type: ignore[assignment]
     # The exploration version of the most recently reached checkpoint.
-    most_recently_reached_checkpoint_exp_version = (
-        datastore_services.IntegerProperty(default=None)
-    )
+    most_recently_reached_checkpoint_exp_version: Optional[
+        int
+    ] = datastore_services.IntegerProperty(
+        default=None
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -1863,7 +1883,7 @@ class CollectionProgressModel(base_models.BaseModel):
     )
     # The list of IDs of explorations which have been completed within the
     # context of the collection represented by collection_id.
-    completed_explorations = datastore_services.StringProperty(repeated=True)
+    completed_explorations: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2058,7 +2078,7 @@ class StoryProgressModel(base_models.BaseModel):
     story_id = datastore_services.StringProperty(required=True, indexed=True)
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
-    completed_node_ids = datastore_services.StringProperty(repeated=True)
+    completed_node_ids: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2432,9 +2452,9 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
-    sent_email_model_ids = datastore_services.StringProperty(
+    sent_email_model_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2493,7 +2513,7 @@ class UserGroupModel(base_models.BaseModel):
     # The name of the user group.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of the members of the user group.
-    user_ids = datastore_services.StringProperty(repeated=True)
+    user_ids: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -2930,12 +2950,12 @@ class UserContributionRightsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    can_review_translation_for_language_codes = (
+    can_review_translation_for_language_codes: List[str] = (
         datastore_services.StringProperty(repeated=True, indexed=True)
-    )
-    can_review_voiceover_for_language_codes = datastore_services.StringProperty(
+    )  # type: ignore[assignment]
+    can_review_voiceover_for_language_codes: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
     can_submit_questions = datastore_services.BooleanProperty(
         default=False, indexed=True
@@ -3333,14 +3353,14 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     """
 
     # List of learner group ids which the learner has been invited to join.
-    invited_to_learner_groups_ids = datastore_services.StringProperty(
+    invited_to_learner_groups_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
     # group and has details of the user correspoding to that group.
-    learner_groups_user_details = datastore_services.JsonProperty(
+    learner_groups_user_details: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )
+    )  # type: ignore[assignment]
     # Version of learner group details blob schema.
     learner_groups_user_details_schema_version = (
         datastore_services.IntegerProperty(

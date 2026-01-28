@@ -24,6 +24,7 @@ from core.constants import constants
 from core.platform import models
 
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -212,7 +213,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # The ID of the author of the suggestion.
     author_id = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the reviewer who accepted/rejected the suggestion.
-    final_reviewer_id = datastore_services.StringProperty(indexed=True)
+    final_reviewer_id: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
     # The change command linked to the suggestion. Contains the details of the
     # change.
     change_cmd = datastore_services.JsonProperty(required=True)
@@ -224,7 +225,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     )
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
-    language_code = datastore_services.StringProperty(indexed=True)
+    language_code: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
     # A flag that indicates whether the suggestion is edited by the reviewer.
     edited_by_reviewer = datastore_services.BooleanProperty(
         default=False, indexed=True
@@ -1437,9 +1438,9 @@ class TranslationContributionStatsModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # The unique last_updated dates of the translation suggestions.
-    contribution_dates = datastore_services.DateProperty(
+    contribution_dates: List[datetime.date] = datastore_services.DateProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @classmethod
     def create(
@@ -2337,13 +2338,13 @@ class TranslationSubmitterTotalContributionStatsModel(base_models.BaseModel):
     )
     # The topic ID(s) of the topics for which the contributor has at least one
     # contribution.
-    topic_ids_with_translation_submissions = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_with_translation_submissions: List[str] = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )  # type: ignore[assignment]
     # The outcomes of last 100 translations submitted by the user.
-    recent_review_outcomes = datastore_services.StringProperty(
+    recent_review_outcomes: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True, choices=REVIEW_OUTCOME_CHOICES
-    )
+    )  # type: ignore[assignment]
     # Performance of the user in last 100 translations.
     # recent_performance = accepted cards - 2 (rejected cards).
     recent_performance = datastore_services.IntegerProperty(
@@ -2786,9 +2787,9 @@ class TranslationReviewerTotalContributionStatsModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # # The topic ID(s) to which user has at least one review.
-    topic_ids_with_translation_reviews = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_with_translation_reviews: List[str] = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )  # type: ignore[assignment]
     # The number of reviewed translations.
     reviewed_translations_count = datastore_services.IntegerProperty(
         required=True, indexed=True
@@ -3154,13 +3155,13 @@ class QuestionSubmitterTotalContributionStatsModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # The topic ID(s) to which user has at least one contribution.
-    topic_ids_with_question_submissions = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_with_question_submissions: List[str] = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )  # type: ignore[assignment]
     # Review outcomes of last 100 contributions of the user.
-    recent_review_outcomes = datastore_services.StringProperty(
+    recent_review_outcomes: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
     # Performance of the user in last 100 questions submission.
     # recent_performance = accepted_questions - 2 (rejected_questions).
     recent_performance = datastore_services.IntegerProperty(
@@ -3474,9 +3475,9 @@ class QuestionReviewerTotalContributionStatsModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # The topic ID(s) to which user has at least one contribution.
-    topic_ids_with_question_reviews = datastore_services.StringProperty(
-        repeated=True, indexed=True
-    )
+    topic_ids_with_question_reviews: List[str] = (
+        datastore_services.StringProperty(repeated=True, indexed=True)
+    )  # type: ignore[assignment]
     # The number of reviewed questions.
     reviewed_questions_count = datastore_services.IntegerProperty(
         required=True, indexed=True
@@ -3741,9 +3742,9 @@ class TranslationCoordinatorsModel(base_models.BaseModel):
     """
 
     # The user_ids of the coordinators of this language.
-    coordinator_ids = datastore_services.StringProperty(
+    coordinator_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
 
     # The number of coordinators of this language. This property is added to
     # enable the sorting of datastore query results. It is equal to the

@@ -22,7 +22,7 @@ import core.storage.base_model.gae_models as base_models
 from core import feconf
 from core.platform import models
 
-from typing import Dict
+from typing import Any, Dict, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -40,7 +40,9 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     # The types and ids of activities to show in the library page. Each item
     # in this list is a dict with two keys: 'type' and 'id'.
-    activity_references = datastore_services.JsonProperty(repeated=True)
+    activity_references: List[Any] = datastore_services.JsonProperty(
+        repeated=True
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

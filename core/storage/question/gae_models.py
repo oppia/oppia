@@ -23,7 +23,7 @@ from core import feconf, utils
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, List, Mapping, Sequence
+from typing import Any, Dict, List, Mapping, Sequence
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -128,9 +128,9 @@ class QuestionModel(base_models.VersionedModel):
         required=True, indexed=True
     )
     # The skill ids linked to this question.
-    linked_skill_ids = datastore_services.StringProperty(
+    linked_skill_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
     # The optional skill misconception ids marked as not relevant to the
     # question.
     # Note: Misconception ids are represented in two ways. In the Misconception
@@ -139,9 +139,9 @@ class QuestionModel(base_models.VersionedModel):
     # misconception id, this is because questions can have multiple skills
     # attached to it. Hence, the format for this field will be
     # <skill-id>-<misconceptionid>.
-    inapplicable_skill_misconception_ids = datastore_services.StringProperty(
+    inapplicable_skill_misconception_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -832,9 +832,9 @@ class QuestionSummaryModel(base_models.BaseModel):
     # The misconception ids addressed in the question. This includes
     # tagged misconceptions ids as well as inapplicable misconception
     # ids in the question.
-    misconception_ids = datastore_services.StringProperty(
+    misconception_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )
+    )  # type: ignore[assignment]
     version = datastore_services.IntegerProperty(required=True)
 
     @staticmethod

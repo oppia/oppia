@@ -19,7 +19,7 @@ from __future__ import annotations
 from core.constants import constants
 from core.platform import models
 
-from typing import Dict, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -289,7 +289,9 @@ class StorySummaryModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # The titles of the nodes in the story, in the same order as present there.
-    node_titles = datastore_services.StringProperty(repeated=True, indexed=True)
+    node_titles: List[str] = datastore_services.StringProperty(
+        repeated=True, indexed=True
+    )  # type: ignore[assignment]
     # The thumbnail filename of the story.
     thumbnail_filename = datastore_services.StringProperty(indexed=True)
     # The thumbnail background color of the story.

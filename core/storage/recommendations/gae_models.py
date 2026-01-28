@@ -20,7 +20,7 @@ from __future__ import annotations
 
 from core.platform import models
 
-from typing import Dict, Final
+from typing import Any, Dict, Final, List
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -42,9 +42,9 @@ class ExplorationRecommendationsModel(
     """
 
     # Ids of recommended explorations.
-    recommended_exploration_ids = datastore_services.StringProperty(
+    recommended_exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )
+    )  # type: ignore[assignment]
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

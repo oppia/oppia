@@ -73,6 +73,7 @@ from extensions import domain
 
 import deepdiff
 from typing import (
+    Any,
     Dict,
     Final,
     List,
@@ -136,7 +137,7 @@ class UserExplorationDataDict(TypedDict):
     show_state_editor_tutorial_on_load: bool
     show_state_translation_tutorial_on_load: bool
     is_version_of_draft_valid: Optional[bool]
-    draft_changes: Dict[str, str]
+    draft_changes: Optional[List[Dict[str, Any]]]
     email_preferences: user_domain.UserExplorationPrefsDict
     next_content_id_index: int
     exploration_metadata: exp_domain.ExplorationMetadataDict
@@ -1638,9 +1639,10 @@ def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
     if not exploration_ids:
         return
 
+
     subscription_models: Sequence[user_models.UserSubscriptionsModel] = (
         user_models.UserSubscriptionsModel.query(
-            user_models.UserSubscriptionsModel.exploration_ids.IN(
+            user_models.UserSubscriptionsModel.exploration_ids.IN(  # type: ignore[attr-defined]
                 exploration_ids
             )
         ).fetch()
@@ -1671,10 +1673,10 @@ def delete_explorations_from_user_models(exploration_ids: List[str]) -> None:
         user_models.UserContributionsModel.get_all()
         .filter(
             datastore_services.any_of(
-                user_models.UserContributionsModel.created_exploration_ids.IN(
+                user_models.UserContributionsModel.created_exploration_ids.IN(  # type: ignore[attr-defined]
                     exploration_ids
                 ),
-                user_models.UserContributionsModel.edited_exploration_ids.IN(
+                user_models.UserContributionsModel.edited_exploration_ids.IN(  # type: ignore[attr-defined]
                     exploration_ids
                 ),
             )
@@ -1722,7 +1724,7 @@ def delete_explorations_from_activities(exploration_ids: List[str]) -> None:
     all_entities: List[AcceptableActivityModelTypes] = []
     for model_class in model_classes:
         entities: Sequence[AcceptableActivityModelTypes] = model_class.query(
-            model_class.exploration_ids.IN(exploration_ids)
+            model_class.exploration_ids.IN(exploration_ids)  # type: ignore[attr-defined]
         ).fetch()
         for model in entities:
             model.exploration_ids = [
@@ -3285,6 +3287,7 @@ def create_or_update_draft(
     if (
         exp_user_data
         and exp_user_data.draft_change_list
+        and exp_user_data.draft_change_list_last_updated is not None
         and exp_user_data.draft_change_list_last_updated > current_datetime
     ):
         return
@@ -3337,7 +3340,8 @@ def get_exp_with_draft_applied(
                 for change in exp_user_data.draft_change_list
             ]
             if (
-                exploration.version
+                exp_user_data.draft_change_list_exp_version is not None
+                and exploration.version
                 > exp_user_data.draft_change_list_exp_version
             ):
                 logging.info(
@@ -3360,8 +3364,9 @@ def get_exp_with_draft_applied(
     if (
         exp_user_data
         and exp_user_data.draft_change_list
+        and exp_user_data.draft_change_list_exp_version is not None
         and are_changes_mergeable(
-            exp_id, draft_change_list_exp_version, draft_change_list
+            exp_id, exp_user_data.draft_change_list_exp_version, draft_change_list
         )
     ):
         updated_exploration = apply_change_list(exp_id, draft_change_list)
@@ -3738,7 +3743,8 @@ def update_logged_out_user_progress(
         )
         checkpoint_url_model.furthest_reached_checkpoint_state_name = state_name
     elif (
-        checkpoint_url_model.furthest_reached_checkpoint_exp_version
+        checkpoint_url_model.furthest_reached_checkpoint_exp_version is not None
+        and checkpoint_url_model.furthest_reached_checkpoint_exp_version
         <= exp_version
     ):  # pylint: disable=line-too-long
         furthest_reached_checkpoint_exp = exp_fetchers.get_exploration_by_id(
@@ -3838,6 +3844,12 @@ def sync_logged_out_learner_checkpoint_progress_with_current_exp_version(
     )
 
     if checkpoint_url_model is None:
+        return None
+
+    if checkpoint_url_model.most_recently_reached_checkpoint_state_name is None:
+        return None
+
+    if checkpoint_url_model.furthest_reached_checkpoint_state_name is None:
         return None
 
     latest_exploration = exp_fetchers.get_exploration_by_id(exploration_id)
@@ -4001,7 +4013,9 @@ def sync_logged_out_learner_progress_with_logged_in_progress(
             logged_in_user_model.put()
 
     elif (
-        logged_in_user_model.most_recently_reached_checkpoint_exp_version
+        logged_out_user_data.most_recently_reached_checkpoint_exp_version is not None
+        and logged_in_user_model.most_recently_reached_checkpoint_exp_version is not None
+        and logged_in_user_model.most_recently_reached_checkpoint_exp_version
         < logged_out_user_data.most_recently_reached_checkpoint_exp_version
     ):
         most_recently_interacted_exploration = exp_fetchers.get_exploration_by_id(
