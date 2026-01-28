@@ -679,7 +679,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     # Here we use type Any because the 'headers' argument in
                     # HTTPError expects an email.message.Message object, but
                     # a dict is sufficient for our mock.
-                    # Here use cast because the dict is an incompatible type.
+                    # Here we use cast because the dict is an incompatible type.
                     cast(Any, {'Retry-After': '1'}),
                     None,
                 )
@@ -695,7 +695,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # Here we use type Any because install_dependencies_json_packages
             # is a module and we need to access its internal attribute 'time'
             # which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose 'time'.
+            # Here we use cast because the module type does not explicitly expose 'time'.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
