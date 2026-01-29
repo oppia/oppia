@@ -51,7 +51,6 @@
     "src/environments/environment.ts",
     "extensions/extensions.module.ts",
     "core/templates/domain/state/state-version-history.model.ts",
-    "core/templates/third-party-imports/select2.import.ts",
     "core/templates/domain/utilities/classifier-file.model.ts",
     "extensions/visualizations/visualizationsRequires.ts",
     "extensions/interactions/interactionsQuestionsRequires.ts",

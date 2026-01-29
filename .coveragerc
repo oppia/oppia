@@ -43,14 +43,11 @@ omit =
 
 
 # The 'exclude_lines' is used to skip a particular clause in coverage.
-# We exclude any line with a comment of “pragma: no cover” as this is the default option
+# We exclude any line with a comment of "pragma: no cover" as this is the default option
 # provided by the coverage library.
-# We exclude any line with a comment of “docker: no cover” as this is used to skip
-# lines that will be removed after the migration to Docker.
 # We also exclude @overload, because it is used for defining multiple MyPy definitions
 # of a function and cannot be tested by Python tests.
 [report]
 exclude_lines =
     pragma: no cover
     @overload
-    docker: no cover

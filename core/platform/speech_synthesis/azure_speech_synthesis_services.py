@@ -25,7 +25,7 @@ import json
 import os
 import re
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.domain import voiceover_services
 from core.platform import models
@@ -106,7 +106,7 @@ def get_azure_voicecode_from_language_accent_code(
     file_path = os.path.join(
         feconf.VOICEOVERS_DATA_DIR, 'autogeneratable_language_accent_list.json'
     )
-    with utils.open_file(file_path, 'r') as f:
+    with open(file_path, 'r', encoding='utf-8') as f:
         autogeneratable_language_accent_list = json.loads(f.read())
 
     voice_code: str = autogeneratable_language_accent_list[

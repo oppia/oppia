@@ -1,5 +1,5 @@
 <div *ngIf="blogPostData" class="blog-post-editor row e2e-test-blog-post-editor-container">
-  <mat-card class="editor-field-card col-sm-8 ml-auto">
+  <mat-card class="editor-field-card col-sm-8 ms-auto">
     <div class="blog-post-thumbnail d-flex e2e-test-photo-clickable"
          (mouseenter)="showEditImageIcon=true"
          (mouseleave)="showEditImageIcon=false"
@@ -23,7 +23,7 @@
       </div>
     </div>
     <div class="row preview-button-div" *ngIf="!windowIsNarrow" >
-      <button mat-icon-button (click)="showPreview()" class="preview-button mr-4 e2e-test-blog-card-preview-button">
+      <button mat-icon-button (click)="showPreview()" class="preview-button me-4 e2e-test-blog-card-preview-button">
         <i class="fas fa-eye"></i>
         <h5 class="mt-2">{{ 'I18N_BLOG_POST_EDITOR_SHOW_PREVIEW_HEADING' | translate | uppercase }}</h5>
       </button>
@@ -39,7 +39,7 @@
                    class="profile-image"
                    alt="Profile image of the author of the blog post">
             </picture>
-            <span class="author-username text-center general-text-format ml-4 my-auto">
+            <span class="author-username text-center general-text-format ms-4 my-auto">
               {{ authorName }}
             </span>
           </div>
@@ -58,7 +58,7 @@
             </button>
           </div>
         </mat-card-header>
-        <div class="title-heading mr-2 mb-4 text-left">
+        <div class="title-heading me-2 mb-4 text-start">
           <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_THUMBNAIL_HEADING' | translate | uppercase }}</span>
         </div>
         <div *ngIf="!uploadedImage" class="blog-post-thumbnail-image-uploader d-flex flex-column">
@@ -71,7 +71,7 @@
           </oppia-upload-blog-post-thumbnail>
         </div>
       </div>
-      <div class="title-heading col-sm-2 mr-2" [ngClass]="windowIsNarrow ? 'text-left mb-2' : 'text-center mb-4'">
+      <div class="title-heading col-sm-2 me-2" [ngClass]="windowIsNarrow ? 'text-start mb-2' : 'text-center mb-4'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_TITLE_HEADING' | translate | uppercase }}</span>
       </div>
       <div class="d-block flex-grow-1">
@@ -113,7 +113,7 @@
       </div>
     </div>
     <div class="blog-post-content d-flex mt-2" [ngClass]="{'flex-column': windowIsNarrow}">
-      <div class="title-heading mr-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-left w-100' : 'text-center col-sm-2'">
+      <div class="title-heading me-2 mb-auto" [ngClass]="windowIsNarrow ? 'text-start w-100' : 'text-center col-sm-2'">
         <span class="vertical-sub-align">{{ 'I18N_BLOG_POST_EDITOR_BODY_HEADING' | translate | uppercase }}</span>
         <button class="fas fa-pen oppia-editor-edit-icon position-relative"
                 *ngIf="!contentEditorIsActive && windowIsNarrow"
@@ -136,18 +136,18 @@
           </schema-based-editor>
           <div class="mt-2">
             <button mat-button
-                    class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-blog-post-content"
+                    class="btn btn-success oppia-save-state-item-button float-end e2e-test-save-blog-post-content"
                     (click)="updateContentValue()"
                     aria-label="Button to save entered content.">
               {{ 'I18N_BLOG_POST_EDITOR_SAVE_CONTENT_BUTTON_TEXT' | translate | uppercase }}
             </button>
-            <button mat-button class="btn cancel-button float-right mx-2" (click)="cancelEdit()">
+            <button mat-button class="btn cancel-button float-end mx-2" (click)="cancelEdit()">
               {{ 'I18N_BLOG_POST_EDITOR_CANCEL_BUTTON_TEXT' | translate | uppercase }}
             </button>
             <div class="oppia-clear"></div>
           </div>
           <div *ngIf="windowIsNarrow">
-            <div class="mt-4 text-left">
+            <div class="mt-4 text-start">
               <span class="tag-heading general-text-format">
                 {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
               </span>
@@ -158,7 +158,7 @@
                 {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
               </span>
             </div>
-            <div class="text-left">
+            <div class="text-start">
               <mat-button-toggle-group aria-label="Tags to classify blog post."
                                        [value]="blogPostData.tags"
                                        *ngFor="let tag of defaultTagsList"
@@ -181,7 +181,7 @@
       </button>
     </div>
   </mat-card>
-  <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'mr-auto'">
+  <mat-card class="editor-profile-card col-sm-2" [ngClass]=" windowIsNarrow ? 'buttons-container' : 'me-auto'">
     <mat-card-header *ngIf="!windowIsNarrow" class="d-block">
       <div mat-card-avatar class="author-profile mx-auto">
         <img mat-card-avatar
@@ -237,7 +237,7 @@
             </mat-icon>
           </button>
         </span>
-        <div *ngIf="!windowIsNarrow" class="mt-4 text-left">
+        <div *ngIf="!windowIsNarrow" class="mt-4 text-start">
           <span class="tag-heading general-text-format">
             {{ 'I18N_BLOG_POST_EDITOR_TAGS_HEADING' | translate}}
           </span>
@@ -248,7 +248,7 @@
             {{maxAllowedTags-blogPostData.tags.length}} {{ 'I18N_BLOG_POST_EDITOR_TAGS_LIMIT_SPECIFICATION_SUFFIX' | translate}}
           </span>
         </div>
-        <div *ngIf="!windowIsNarrow" class="text-left">
+        <div *ngIf="!windowIsNarrow" class="text-start">
           <mat-button-toggle-group aria-label="Tags to classify blog post."
                                    [value]="blogPostData.tags"
                                    *ngFor="let tag of defaultTagsList"

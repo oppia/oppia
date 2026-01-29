@@ -23,8 +23,6 @@ import json
 import os
 import re
 
-from core import utils
-
 from typing import List, TypedDict
 
 E2E_TEST_SUITES_THAT_ARE_NOT_RUN_IN_CI = ['full']
@@ -96,8 +94,8 @@ def read_webdriverio_config_file() -> str:
     Returns:
         str. The contents of wdio.conf.js, as a string.
     """
-    webdriverio_config_file_content = utils.open_file(
-        E2E_WEBDRIVERIO_CONFIG_FILE_PATH, 'r'
+    webdriverio_config_file_content = open(
+        E2E_WEBDRIVERIO_CONFIG_FILE_PATH, 'r', encoding='utf-8'
     ).read()
     return webdriverio_config_file_content
 

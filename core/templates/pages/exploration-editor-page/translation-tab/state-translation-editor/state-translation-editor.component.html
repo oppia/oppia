@@ -43,7 +43,7 @@
     </div>
     <button *ngIf="activeWrittenTranslation && (activeWrittenTranslation.needsUpdate === false)"
             type="button"
-            class="btn btn-secondary mt-4 float-right"
+            class="btn btn-secondary mt-4 float-end"
             (click)="markAsNeedingUpdate()">
       Mark translation as needing update
     </button>
@@ -72,11 +72,11 @@
 
     <div class="oppia-save-item-button-container">
       <button type="button"
-              class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-translation"
+              class="btn btn-success oppia-save-state-item-button float-end e2e-test-save-translation"
               (click)="onSaveTranslationButtonClicked()">
         Save
       </button>
-      <button type="button" class="btn btn-secondary float-right" (click)="cancelEdit()">Cancel</button>
+      <button type="button" class="btn btn-secondary float-end" (click)="cancelEdit()">Cancel</button>
       <div class="oppia-clear"></div>
     </div>
   </div>

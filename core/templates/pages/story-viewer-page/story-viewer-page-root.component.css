@@ -286,12 +286,12 @@ oppia-story-viewer-page-root .oppia-chapter-title {
     is being used there). */
     display: flex !important;
   }
-  oppia-story-viewer-page-root .float-left {
+  oppia-story-viewer-page-root .float-start {
     margin-left: 40%;
   }
 }
 @media (max-width: 500px) {
-  oppia-story-viewer-page-root .float-left {
+  oppia-story-viewer-page-root .float-start {
     margin-left: 30%;
   }
 }

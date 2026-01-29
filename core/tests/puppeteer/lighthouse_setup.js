@@ -71,7 +71,7 @@ var topicDescriptionField = '.e2e-test-new-topic-description-field';
 var topicPageTitleFragmField = '.e2e-test-new-page-title-fragm-field';
 var topicThumbnailButton = '.e2e-test-photo-button';
 var topicUploadButton = '.e2e-test-photo-upload-input';
-var topicPhotoSubmit = '.e2e-test-photo-upload-submit';
+var topicPhotoSubmit = 'button.e2e-test-photo-upload-submit';
 var thumbnailContainer = '.e2e-test-thumbnail-container';
 var confirmTopicCreationButton = '.e2e-test-confirm-topic-creation-button';
 var createdTopicLink = '.e2e-test-topic-name';
@@ -415,7 +415,6 @@ const generateDataForClassroom = async function (browser, page) {
           : '';
       });
     } while (statusMessage !== successMessage);
-
     await addThumbnailToTopic(page, 'Fraction');
     await addThumbnailToTopic(page, 'Addition');
     await addThumbnailToTopic(page, 'Subtraction');
@@ -456,10 +455,10 @@ const addThumbnailToTopic = async function (page, topicName) {
     await page.waitForSelector(topicMetaTagInput);
     await page.focus(topicMetaTagInput);
     await page.type(topicMetaTagInput, 'meta');
+    await page.keyboard.press('Tab');
 
     await page.waitForSelector(saveTopicButton);
     await page.click(saveTopicButton);
-
     await page.waitForSelector(topicCommitMessageInput);
     await page.focus(topicCommitMessageInput);
     await page.type(topicCommitMessageInput, 'Updated thumbnail');
@@ -480,9 +479,7 @@ const main = async function () {
   // Change headless to false to see the puppeteer actions.
   const browser = await puppeteer.launch({
     headless: true,
-    // Sandbox requires a non-root user, and we use a root user in docker.
-    // Thus, we need to disable the sandbox.
-    args: ['--no-sandbox'],
+    args: [],
   });
   const page = await browser.newPage();
   await page.setViewport({

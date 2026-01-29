@@ -21,6 +21,7 @@ from __future__ import annotations
 import contextlib
 import logging
 
+from core import utils
 from core.platform import models
 
 from google.cloud import ndb
@@ -43,6 +44,9 @@ if MYPY:  # pragma: no cover
 transaction_services = models.Registry.import_transaction_services()
 
 
+# TypeVar for the singleton metaclass to maintain type information.
+T = TypeVar('T')
+
 Cursor = ndb.Cursor
 Model = ndb.Model
 Key = ndb.Key
@@ -64,7 +68,30 @@ TYPE_MODEL_SUBCLASS = TypeVar(  # pylint: disable=invalid-name
 )
 MAX_GET_RETRIES = 3
 
-CLIENT = ndb.Client()
+
+class NdbClientSingleton(metaclass=utils.SingletonMeta):
+    """Singleton wrapper for the NDB client."""
+
+    def __init__(self) -> None:
+        """Initialize the NDB client."""
+        self._client: ndb.Client = ndb.Client()
+
+    def get_client(self) -> ndb.Client:
+        """Return the NDB client instance.
+
+        Returns:
+            ndb.Client. The NDB client instance.
+        """
+        return self._client
+
+
+def get_client() -> ndb.Client:
+    """Get or create the NDB client lazily.
+
+    Returns:
+        ndb.Client. The NDB client instance.
+    """
+    return NdbClientSingleton().get_client()
 
 
 def get_ndb_context(
@@ -81,7 +108,7 @@ def get_ndb_context(
     # places we need a context but we are unsure if it exists.
     context = ndb.get_context(raise_context_error=False)
     return (
-        CLIENT.context(namespace=namespace, global_cache=global_cache)
+        get_client().context(namespace=namespace, global_cache=global_cache)
         if context is None
         else contextlib.nullcontext(enter_result=context)
     )
@@ -175,6 +202,13 @@ def query_everything(**kwargs: Dict[str, Any]) -> Query:
     everything in the datastore is almost always a bad idea, ESPECIALLY in
     production. Always prefer querying for specific models and combining them
     afterwards.
+
+    Args:
+        **kwargs: Dict[str, Any]. Variable keyword arguments passed to
+            ndb.Query.
+
+    Returns:
+        Query. A query targeting all entities.
     """
     return ndb.Query(**kwargs)
 

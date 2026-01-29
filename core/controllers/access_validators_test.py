@@ -198,7 +198,9 @@ class PracticeSessionAccessValidationPageTests(test_utils.GenericTestBase):
         )
 
         banner_image = b''
-        with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
+        with open(
+            'core/tests/data/classroom-banner.png', 'rb', encoding=None
+        ) as png_file:
             banner_image = png_file.read()
         fs_services.save_original_and_compressed_versions_of_image(
             'banner.png',

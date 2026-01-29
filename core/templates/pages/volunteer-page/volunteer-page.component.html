@@ -33,17 +33,17 @@
       <div class="row mt-4">
         <div class="col-md-4">
           <img [src]="getStaticImageUrl('/icons/community-icon.svg')" alt="Community icon" class="m-3">
-          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1' | translate }}</h3>
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1' | translate }}</h3>
           <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_1_CONTENT' | translate }}</p>
         </div>
         <div class="col-md-4">
           <img [src]="getStaticImageUrl('/icons/skills-icon.svg')" alt="Skills icon" class="m-3">
-          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2' | translate }}</h3>
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2' | translate }}</h3>
           <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_2_CONTENT' | translate }}</p>
         </div>
         <div class="col-md-4">
           <img [src]="getStaticImageUrl('/icons/projects-icon.svg')" alt="Projects icon" class="m-3">
-          <h3 class="font-weight-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3' | translate }}</h3>
+          <h3 class="fw-light">{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3' | translate }}</h3>
           <p class="oppia-volunteer-subtext" >{{ 'I18N_VOLUNTEER_PAGE_WHY_VOLUNTEER_SECTION_HEADING_3_CONTENT' | translate }}</p>
         </div>
       </div>
@@ -62,7 +62,7 @@
             'fa-chevron-left': !isLanguageRTL(), 'fa-chevron-right': isLanguageRTL(),
             'oppia-disabled-chevron': activeTabGroupIndex === 0}">
         </i>
-        <span class="sr-only">Previous</span>
+        <span class="visually-hidden">Previous</span>
       </button>
 
       <mat-tab-group [disablePagination]="true" [animationDuration]="0" [disableRipple]="true">
@@ -499,7 +499,7 @@
             'fa-chevron-right': !isLanguageRTL(), 'fa-chevron-left': isLanguageRTL(),
             'oppia-disabled-chevron': activeTabGroupIndex === tabGroups[screenType].length - 1}">
         </i>
-        <span class="sr-only">Next</span>
+        <span class="visually-hidden">Next</span>
       </button>
     </div>
   </div>

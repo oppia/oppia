@@ -23,7 +23,6 @@ import shutil
 import subprocess
 import sys
 
-from core import utils
 from scripts import common
 
 import yaml
@@ -262,7 +261,6 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.component.spec.ts',
     'core/templates/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.service.spec.ts',
     'core/templates/pages/voiceover-admin-page/voiceover-admin-page.component.spec.ts',
-    'core/templates/services/angular-services.index.ts',
     'core/templates/services/date-time-format.service.spec.ts',
     'core/templates/services/entity-voiceovers.services.spec.ts',
     'core/templates/services/exploration-features.service.spec.ts',
@@ -283,18 +281,9 @@ TS_STRICT_EXCLUDE_PATHS = [
     'core/templates/services/state-interaction-stats.service.spec.ts',
     'core/templates/services/state-top-answers-stats.service.spec.ts',
     'core/templates/services/voiceover-language-management-service.spec.ts',
-    'core/tests/karma.conf.ts',
     'core/tests/puppeteer-acceptance-tests/utilities/user/logged-in-user.ts',
-    'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.spec.ts',
-    'extensions/interactions/CodeRepl/directives/oppia-interactive-code-repl.component.ts',
-    'extensions/interactions/DragAndDropSortInput/drag-and-drop-sort-input-interactions.module.ts',
     'extensions/interactions/FractionInput/directives/fraction-input-validation.service.spec.ts',
-    'extensions/interactions/GraphInput/directives/graph-viz.component.spec.ts',
-    'extensions/interactions/GraphInput/directives/graph-viz.component.ts',
-    'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.spec.ts',
-    'extensions/interactions/ImageClickInput/directives/oppia-interactive-image-click-input.component.ts',
     'extensions/interactions/ItemSelectionInput/directives/oppia-interactive-item-selection-input.component.spec.ts',
-    'extensions/interactions/ItemSelectionInput/item-selection-input-interactions.module.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.spec.ts',
     'extensions/interactions/MultipleChoiceInput/directives/oppia-interactive-multiple-choice-input.component.ts',
     'extensions/interactions/MultipleChoiceInput/multiple-choice-input-interactions.module.ts',
@@ -337,7 +326,7 @@ PREFIXES = ('core', 'extensions', 'typings')
 
 def validate_compiled_js_dir() -> None:
     """Validates that compiled JS dir matches out dir in tsconfig."""
-    with utils.open_file(TSCONFIG_FILEPATH, 'r') as f:
+    with open(TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         config_data = json.load(f)
         out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
     if out_dir != COMPILED_JS_DIR:
@@ -382,11 +371,11 @@ def compile_temp_strict_tsconfig(
     # Update "include" field of temp-tsconfig-strict.json with files those
     # are neither strict typed nor present in TS_STRICT_EXCLUDE_PATHS.
     # Example: List "files_not_type_strict".
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = files_not_type_strict
 
-    with utils.open_file(TEMP_STRICT_TSCONFIG_FILEPATH, 'w') as f:
+    with open(TEMP_STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)
         f.write('\n')
 
@@ -435,11 +424,11 @@ def compile_and_check_typescript(config_path: str) -> None:
     # Set strict TS config include property to ["core", "extensions", "typings"]
     # This make sure to restore include property to its original value after the
     # checks get aborted mid-way.
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'r') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'r', encoding='utf-8') as f:
         strict_ts_config = yaml.safe_load(f)
         strict_ts_config['include'] = PREFIXES
 
-    with utils.open_file(STRICT_TSCONFIG_FILEPATH, 'w') as f:
+    with open(STRICT_TSCONFIG_FILEPATH, 'w', encoding='utf-8') as f:
         json.dump(strict_ts_config, f, indent=2, sort_keys=True)
         f.write('\n')
 

@@ -6,14 +6,14 @@
 <br>
 <div class="blog-admin-page-container">
   <div class="container-fluid row">
-    <div class="col-md-8 mr-auto ml-auto">
+    <div class="col-md-8 me-auto ms-auto">
       <div class="roles-tab">
         <mat-card class="oppia-page-card oppia-long-text">
           <form class="form-horizontal" (submit)="submitUpdateRoleForm(formData.updateRole)">
             <legend class="text-center">Update Role</legend>
-            <div class="d-xl-inline-flex form-group">
+            <div class="d-xl-inline-flex mb-3">
               <label for="label-target-update-form-name" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <div class="col-md-8 col-lg-8 col-sm-8 ms-4">
                 <input type="text"
                        id="label-target-update-form-name"
                        placeholder="Enter username"
@@ -22,13 +22,13 @@
                        class="form-control">
               </div>
             </div>
-            <div class="d-xl-inline-flex form-group">
+            <div class="d-xl-inline-flex mb-3">
               <label for="label-target-update-form-role-select" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select Role</label>
-              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <div class="col-md-8 col-lg-8 col-sm-8 ms-4">
                 <select id="label-target-update-form-role-select"
                         [(ngModel)]="formData.updateRole.newRole"
                         [ngModelOptions]="{standalone: true}"
-                        class="form-control">
+                        class="form-select">
                   <option *ngFor="let role of UPDATABLE_ROLES | keyvalue" [value]="role.key">{{ role.value }}</option>
                 </select>
               </div>
@@ -45,9 +45,9 @@
         <mat-card class="oppia-page-card oppia-long-text">
           <form class="form-horizontal" (submit)="submitRemoveEditorRoleForm(formData.removeEditorRole)">
             <legend class="text-center">Remove Blog Editor</legend>
-            <div class="d-xl-inline-flex form-group">
+            <div class="d-xl-inline-flex mb-3">
               <label for="label-target-form-reviewer-username" class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
-              <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <div class="col-md-8 col-lg-8 col-sm-8 ms-4">
                 <input type="text"
                        id="label-target-form-reviewer-username"
                        class="form-control"
@@ -68,7 +68,7 @@
       <div class="platform-parameters">
         <mat-card class="oppia-page-card oppia-long-text oppia-long-text-card">
           <legend class="text-center">Platform Parameters</legend>
-          <div class="container ml-0">
+          <div class="container ms-0">
             <div *ngFor="let property of platformParameters | keyvalue">
               <div class="row oppia-description-text-container">
                 <span class="col-lg-2 col-md-2 col-sm-2">
@@ -105,6 +105,9 @@
   }
   .roles-tab .view-results-table {
     margin-top: 20px;
+  }
+  .row > * {
+    padding-left: 15px;
   }
 
   .blog-admin-page-container {

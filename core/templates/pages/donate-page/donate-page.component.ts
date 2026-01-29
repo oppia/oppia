@@ -20,7 +20,6 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import 'popper.js';
 import 'bootstrap';
 import {NgbCarousel} from '@ng-bootstrap/ng-bootstrap';
 import {ThanksForDonatingModalComponent} from './thanks-for-donating-modal.component';
