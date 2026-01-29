@@ -363,7 +363,6 @@ const previewQuestionSelector = '.e2e-test-preview-question';
 const toggleSkillEditOptionsButton =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
 const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
-const storyMetaTagInput = '.e2e-test-story-meta-tag-content-field';
 const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
