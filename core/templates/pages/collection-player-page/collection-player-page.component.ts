@@ -145,6 +145,7 @@ export class CollectionPlayerPageComponent implements OnInit, OnDestroy {
       this.collectionPlaythrough.getCompletedExplorationIds()[0]
     );
   }
+
   getNonRecommendedCollectionNodeCount(): number {
     return (
       this.collection.getCollectionNodeCount() -

@@ -25,9 +25,9 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
-import {ExplorationOpportunitySummary} from '../../../domain/opportunity/exploration-opportunity-summary.model';
+import {ExplorationOpportunitySummary} from 'domain/opportunity/exploration-opportunity-summary.model';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {AppConstants} from '../../../app.constants';
+import {AppConstants} from 'app.constants';
 import {
   ContributionDetails,
   ContributionsAndReview,
@@ -36,25 +36,22 @@ import {
   Suggestion,
   SuggestionDetails,
 } from './contributions-and-review.component';
-import {SkillBackendApiService} from '../../../domain/skill/skill-backend-api.service';
-import {TranslationTopicService} from '../../../pages/exploration-editor-page/translation-tab/services/translation-topic.service';
-import {Skill} from '../../../domain/skill/skill.model';
-import {PageContextService} from '../../../services/page-context.service';
-import {UserService} from '../../../services/user.service';
+import {SkillBackendApiService} from 'domain/skill/skill-backend-api.service';
+import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
+import {Skill} from 'domain/skill/skill.model';
+import {PageContextService} from 'services/page-context.service';
+import {UserService} from 'services/user.service';
 import {ContributionAndReviewService} from '../services/contribution-and-review.service';
 import {ContributionOpportunitiesService} from '../services/contribution-opportunities.service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {UserInfo} from '../../../domain/user/user-info.model';
-import {CsrfTokenService} from '../../../services/csrf-token.service';
-import {AlertsService} from '../../../services/alerts.service';
-import {
-  Question,
-  QuestionBackendDict,
-} from '../../../domain/question/question.model';
-import {FormatRtePreviewPipe} from '../../../filters/format-rte-preview.pipe';
-import {PlatformFeatureService} from '../../../services/platform-feature.service';
+import {UserInfo} from 'domain/user/user-info.model';
+import {CsrfTokenService} from 'services/csrf-token.service';
+import {AlertsService} from 'services/alerts.service';
+import {Question, QuestionBackendDict} from 'domain/question/question.model';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 import {OpportunitiesListComponent} from '../opportunities-list/opportunities-list.component';
-import {HtmlEscaperService} from '../../../services/html-escaper.service';
+import {HtmlEscaperService} from 'services/html-escaper.service';
 import {MatIconModule} from '@angular/material/icon';
 import {
   MatSnackBarConfig,
@@ -68,7 +65,7 @@ import {
 import {of, Subject} from 'rxjs';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {delay} from 'rxjs/operators';
-import {WindowRef} from '../../../services/contextual/window-ref.service';
+import {WindowRef} from 'services/contextual/window-ref.service';
 import {PendingSuggestionDict} from '../modal-templates/translation-suggestion-review-modal.component';
 
 class MockNgbModal {
@@ -1378,7 +1375,6 @@ describe('Contributions and review component', () => {
               },
             ]);
             expect(more).toEqual(false);
-
             // When opening the contribution modal for translations,
             // only translations should be shown.
             spyOn(component, '_showTranslationSuggestionModal');
@@ -2080,6 +2076,9 @@ describe('Contributions and review component', () => {
               component.onClickViewSuggestion('suggestion_1');
 
               expect(ngbModal.open).toHaveBeenCalled();
+              expect(
+                contributionAndReviewService.reviewSkillSuggestion
+              ).not.toHaveBeenCalled();
             });
           }
         );
@@ -2341,7 +2340,6 @@ describe('Contributions and review component', () => {
                 }),
               } as NgbModalRef);
               component.onClickViewSuggestion('suggestion_1');
-
               expect(ngbModal.open).toHaveBeenCalled();
             });
           }
@@ -2360,7 +2358,6 @@ describe('Contributions and review component', () => {
                 result: Promise.reject(),
               } as NgbModalRef);
               component.onClickViewSuggestion('suggestion_1');
-
               expect(ngbModal.open).toHaveBeenCalled();
             });
           }
@@ -2375,17 +2372,13 @@ describe('Contributions and review component', () => {
           translationTopicService,
           'getActiveTopicName'
         );
-
         getActiveTopicNameSpy.and.returnValue(null);
         mockActiveTopicEventEmitter.emit();
         tick();
-
         expect(component.topicReady).toBe(false);
-
         getActiveTopicNameSpy.and.returnValue('Math');
         mockActiveTopicEventEmitter.emit();
         tick();
-
         expect(component.topicReady).toBe(true);
       }));
 
@@ -2404,7 +2397,6 @@ describe('Contributions and review component', () => {
                       result: Promise.reject(),
                     } as NgbModalRef);
                     component.onClickViewSuggestion('suggestion_1');
-
                     expect(ngbModal.open).toHaveBeenCalled();
                   });
                 }
@@ -2417,7 +2409,6 @@ describe('Contributions and review component', () => {
           );
         }
       );
-
       // TODO(#9749): Refactor describe block, since the user *is* allowed to
       // review questions here.
       describe('when user is not allowed to review questions', () => {
@@ -2433,7 +2424,6 @@ describe('Contributions and review component', () => {
             expect(component.reviewTabs.length).toEqual(2);
           }
         );
-
         it(
           'should open show view question modal when clicking on' +
             ' question suggestion',
@@ -2442,12 +2432,10 @@ describe('Contributions and review component', () => {
             component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
             component.loadContributions(false).then(() => {
               component.onClickViewSuggestion('suggestion_1');
-
               expect(ngbModal.open).toHaveBeenCalled();
             });
           }
         );
-
         it(
           'should resolve suggestion to skill when closing show question' +
             ' suggestion modal',
@@ -2455,18 +2443,15 @@ describe('Contributions and review component', () => {
             spyOn(ngbModal, 'open').and.returnValue({
               result: Promise.resolve({}),
             } as NgbModalRef);
-
             component.switchToTab(component.TAB_TYPE_REVIEWS, 'add_question');
             component.loadContributions(false).then(() => {
               expect(Object.keys(component.contributions).length).toBe(1);
               component.onClickViewSuggestion('suggestion_1');
               flush();
-
               expect(ngbModal.open).toHaveBeenCalled();
             });
           }
         );
-
         it(
           'should not resolve suggestion to skill when dismissing show question' +
             ' suggestion modal',
@@ -2476,15 +2461,12 @@ describe('Contributions and review component', () => {
             spyOn(ngbModal, 'open').and.returnValue({
               result: Promise.reject({}),
             } as NgbModalRef);
-
             component.loadContributions(false).then(() => {
               component.onClickViewSuggestion('suggestion_1');
-
               expect(ngbModal.open).toHaveBeenCalled();
             });
           }
         );
-
         it('should return correctly check the active tab', () => {
           component.contributionTabs = [
             {
@@ -2514,24 +2496,28 @@ describe('Contributions and review component', () => {
               enabled: false,
             },
           ];
-
           component.switchToTab('reviews', 'translate_content');
-          component.isActiveTab('reviews', 'translate_content');
-
+          expect(component.isActiveTab('reviews', 'translate_content')).toBe(
+            true
+          );
+          expect(component.isActiveTab('contributions', 'add_question')).toBe(
+            false
+          );
           component.switchToTab('contributions', 'add_question');
-          component.isActiveTab('contributions', 'add_question');
+          expect(component.isActiveTab('contributions', 'add_question')).toBe(
+            true
+          );
+          expect(component.isActiveTab('reviews', 'translate_content')).toBe(
+            false
+          );
         });
-
         it('should toggle dropdown when it is clicked', () => {
           component.dropdownShown = false;
-
           component.toggleDropdown();
           expect(component.dropdownShown).toBe(true);
-
           component.toggleDropdown();
           expect(component.dropdownShown).toBe(false);
         });
-
         it('should set active dropdown choice correctly', () => {
           component.contributionTabs = [
             {
@@ -2575,14 +2561,12 @@ describe('Contributions and review component', () => {
               enabled: false,
             },
           ];
-
           expect(
             component.getActiveDropdownTabText('reviews', 'add_question')
           ).toBe('Review Questions');
           expect(
             component.getActiveDropdownTabText('reviews', 'translate_content')
           ).toBe('Review Translations');
-
           expect(
             component.getActiveDropdownTabText('contributions', 'add_question')
           ).toBe('Questions');
@@ -2592,7 +2576,6 @@ describe('Contributions and review component', () => {
               'translate_content'
             )
           ).toBe('Translations');
-
           expect(
             component.getActiveDropdownTabText('accomplishments', 'stats')
           ).toBe('Contribution Stats');
@@ -2600,7 +2583,6 @@ describe('Contributions and review component', () => {
             component.getActiveDropdownTabText('accomplishments', 'badges')
           ).toBe('Badges');
         });
-
         it('should throw an error when invalid tab names given', () => {
           component.contributionTabs = [
             {
@@ -2644,13 +2626,10 @@ describe('Contributions and review component', () => {
               enabled: false,
             },
           ];
-
           expect(() => {
             component.getActiveDropdownTabText('xxx', 'xxx');
-            tick();
           }).toThrowError();
         });
-
         it('should close dropdown when a click is made outside', () => {
           const element = {
             contains: () => {
@@ -2668,14 +2647,12 @@ describe('Contributions and review component', () => {
             true
           );
           component.dropdownShown = true;
-
           component.closeDropdownWhenClickedOutside(
             null as unknown as {target: Node}
           );
           expect(querySelectorSpy).toHaveBeenCalled();
           expect(elementContainsSpy).not.toHaveBeenCalled();
           expect(component.dropdownShown).toBe(true);
-
           // This throws "Argument of type '{ contains: () => boolean; }' is not
           // assignable to parameter of type 'Element'. Type '{ contains:
           // () => boolean; }' is missing the following properties from type
@@ -2683,29 +2660,23 @@ describe('Contributions and review component', () => {
           // more.". We need to suppress this error because only the properties
           // provided in the element object are required for testing.
           querySelectorSpy.and.returnValue(element);
-
           component.closeDropdownWhenClickedOutside(clickEvent);
           expect(querySelectorSpy).toHaveBeenCalled();
           expect(elementContainsSpy).toHaveBeenCalled();
           expect(component.dropdownShown).toBe(true);
-
           elementContainsSpy.and.returnValue(false);
-
           component.closeDropdownWhenClickedOutside(clickEvent);
           expect(component.dropdownShown).toBe(false);
         });
-
         it('should return back when user click is made outside', () => {
           const clickEvent = {
             target: null as unknown as Node,
           };
           spyOn(document, 'querySelector').and.returnValue(null);
-
           component.closeDropdownWhenClickedOutside(clickEvent);
           expect(document.querySelector).toHaveBeenCalled();
         });
       });
-
       describe('when user is allowed to review translations', () => {
         it('should handle queued suggestions correctly when a new suggestion is emitted', fakeAsync(() => {
           let eventEmitter = new EventEmitter();
@@ -2723,14 +2694,12 @@ describe('Contributions and review component', () => {
             },
             result: Promise.resolve(['id1', 'id2']),
           } as NgbModalRef);
-
           const removeSpy = spyOn(
             contributionOpportunitiesService.removeOpportunitiesEventEmitter,
             'emit'
           ).and.returnValue(null);
           const commitTimeoutSpy = spyOn(component, 'startCommitTimeout');
           const undoSnackbarSpy = spyOn(component, 'showUndoSnackbar');
-
           component.contributions = {
             suggestion_1: {
               suggestion: {
@@ -2757,19 +2726,14 @@ describe('Contributions and review component', () => {
               },
             },
           };
-
           component.queuedSuggestionSummary = {
             target_id: 'id_1',
             suggestion_id: 'suggestion_1',
             action_status: 'accepted',
             reviewer_message: 'test',
           };
-
-          // Simulate opening the modal and the user actions.
           component.onClickViewSuggestion('suggestion_1');
-          tick(); // Simulate any asynchronous effects of opening the view.
-
-          // Now emit a new queued suggestion which should trigger the subscription logic.
+          tick();
           eventEmitter.emit({
             target_id: 'id_1',
             suggestion_id: 'suggestion_2',
@@ -2777,12 +2741,10 @@ describe('Contributions and review component', () => {
             reviewer_message: 'test',
           });
           tick();
-
           expect(commitTimeoutSpy).toHaveBeenCalled();
           expect(undoSnackbarSpy).toHaveBeenCalled();
           expect(removeSpy).toHaveBeenCalled();
         }));
-
         it('should commit queued suggestion when the commit timeout expires', fakeAsync(() => {
           spyOn(component, 'commitQueuedSuggestion');
           const COMMIT_TIMEOUT_DURATION = 32000;
@@ -2792,14 +2754,11 @@ describe('Contributions and review component', () => {
             action_status: 'accepted',
             reviewer_message: 'test',
           };
-
           component.startCommitTimeout();
           expect(component.commitQueuedSuggestion).not.toHaveBeenCalled();
-
           tick(COMMIT_TIMEOUT_DURATION);
           expect(component.commitQueuedSuggestion).toHaveBeenCalled();
         }));
-
         it('should commit the queued Suggestion when commit function is called', function () {
           component.queuedSuggestionSummary = {
             target_id: 'id_1',
@@ -2830,12 +2789,10 @@ describe('Contributions and review component', () => {
             contributionOpportunitiesService.removeOpportunitiesEventEmitter,
             'emit'
           ).and.returnValue(null);
-
           component.commitQueuedSuggestion();
           expect(component.queuedSuggestionSummary).toBeNull();
           expect(removeSpy).toHaveBeenCalled();
         });
-
         it('should not commit the queued Suggestion when there is no queued Suggestion', function () {
           component.queuedSuggestionSummary = null;
           spyOn(
@@ -2861,13 +2818,11 @@ describe('Contributions and review component', () => {
             contributionOpportunitiesService.removeOpportunitiesEventEmitter,
             'emit'
           ).and.returnValue(null);
-
           component.commitQueuedSuggestion();
           expect(
             contributionAndReviewService.reviewExplorationSuggestion
           ).not.toHaveBeenCalled();
         });
-
         it('should not call remove suggestion emitter if network call fails', function () {
           component.queuedSuggestionSummary = {
             target_id: 'id_1',
@@ -2898,12 +2853,10 @@ describe('Contributions and review component', () => {
             contributionOpportunitiesService.removeOpportunitiesEventEmitter,
             'emit'
           ).and.returnValue(null);
-
           component.commitQueuedSuggestion();
           expect(component.queuedSuggestionSummary).toBeNull();
           expect(removeSpy).not.toHaveBeenCalled();
         });
-
         it('should not call remove suggestion emitter if network call fails', function () {
           component.queuedSuggestionSummary = {
             target_id: 'id_1',
@@ -2911,40 +2864,31 @@ describe('Contributions and review component', () => {
             action_status: 'accepted',
             reviewer_message: 'test',
           };
-
           component.undoReviewAction();
           expect(component.queuedSuggestionSummary).toBeNull();
         });
-
         it('should show the pop up bar when suggestion is queued', () => {
           spyOn(component, 'commitQueuedSuggestion').and.callThrough();
           component.showUndoSnackbar();
-
           expect(
             snackBarSpy.calls.mostRecent().returnValue.instance.message
           ).toBe('Suggestion queued');
         });
-
         it('should commit the queued suggestion when the snackbar is dismissed', () => {
           const commitQueuedSuggestionSpy = spyOn(
             component,
             'commitQueuedSuggestion'
           ).and.callThrough();
-
           let afterDismissedObservable = new Subject<void>();
           let snackBarRefMock = {
             instance: {message: ''},
             afterDismissed: () => afterDismissedObservable.asObservable(),
             onAction: () => of(null),
           };
-
           snackBarSpy.and.returnValue(snackBarRefMock);
-
           component.showUndoSnackbar();
-
           afterDismissedObservable.next();
           afterDismissedObservable.complete();
-
           expect(commitQueuedSuggestionSpy).toHaveBeenCalled();
         });
 
