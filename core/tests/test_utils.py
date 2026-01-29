@@ -2898,16 +2898,8 @@ version: 1
         Args:
             question_admin_usernames: list(str). List of usernames.
         """
-        with self.super_admin_context():
-            for username in question_admin_usernames:
-                self.put_json(
-                    '/questionadminrolehandler',
-                    {
-                        'username': username,
-                        'action': 'assign',
-                    },
-                    csrf_token=self.get_new_csrf_token(),
-                )
+        for name in question_admin_usernames:
+            self.add_user_role(name, feconf.ROLE_ID_QUESTION_ADMIN)
 
     def set_translation_coordinators(
         self, translation_coordinator_usernames: List[str], language_id: str

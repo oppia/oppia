@@ -356,9 +356,6 @@ URLS = [
         r'/topicmanagerrolehandler', admin.TopicManagerRoleHandler
     ),
     get_redirect_route(
-        r'/questionadminrolehandler', admin.QuestionAdminRoleHandler
-    ),
-    get_redirect_route(
         r'/translationcoordinatorrolehandler',
         admin.TranslationCoordinatorRoleHandler,
     ),
