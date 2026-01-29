@@ -100,10 +100,7 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
     private alertsService: AlertsService,
-    private translateService: TranslateService,
-    private accessValidationBackendApiService: AccessValidationBackendApiService,
-    private router: Router,
-    private location: Location
+    private translateService: TranslateService
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -239,6 +236,11 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
             storyDataDict.getMetaTagContent()
           );
           this.storyTitle = storyDataDict.title;
+
+          // The onLangChange event is initially fired before the story is
+          // loaded. Hence the first setpageTitle() call needs to made
+          // manually, and the onLangChange subscription is added after
+          // the story is loaded.
           this.setPageTitle();
           this.subscribeToOnLangChange();
           this.storyTitleTranslationKey =
@@ -282,6 +284,9 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
         }
       );
 
+    // The pathIconParameters is an array containing the co-ordinates,
+    // background color and icon url for the icons generated on the
+    // path.
     this.pathIconParameters = [];
   }
 

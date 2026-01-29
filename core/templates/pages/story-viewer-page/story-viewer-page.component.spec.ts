@@ -38,7 +38,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
-import {RouterTestingModule} from '@angular/router/testing';
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -82,7 +81,7 @@ describe('Story Viewer Page component', () => {
   beforeEach(fakeAsync(() => {
     TestBed.configureTestingModule({
       declarations: [StoryViewerPageComponent, MockTranslatePipe],
-      imports: [HttpClientTestingModule, RouterTestingModule],
+      imports: [HttpClientTestingModule],
       providers: [
         {
           provide: assetsBackendApiService,
