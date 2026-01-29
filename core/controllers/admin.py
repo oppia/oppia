@@ -1340,11 +1340,6 @@ class AdminHandler(
             question_id_2 = 'dummyQuestionId2'
             question_id_3 = 'dummyQuestionId3'
 
-            # Check if our specific dummy entities exist by their hardcoded IDs.
-            # Using strict=False to return None if they don't exist.
-            # This makes the generator self-contained and independent of other
-            # dummy generators that might create skills with similar descriptions
-            # but different IDs.
             existing_skill = skill_fetchers.get_skill_by_id(
                 skill_id, strict=False
             )
@@ -1352,7 +1347,9 @@ class AdminHandler(
 
             if initial_dummy_opportunites_generation:
                 skill = self._create_dummy_skill(
-                    skill_id, 'Dummy Skill 1', '<p>Dummy Explanation 1</p>'
+                    skill_id,
+                    'Translation Opportunities Dummy Skill',
+                    '<p>Dummy Explanation for Translation Opportunities</p>',
                 )
                 question_1 = self._create_dummy_question(
                     question_id_1, 'Question 1', [skill_id]
@@ -1365,10 +1362,10 @@ class AdminHandler(
                 )
                 story = story_domain.Story.create_default_story(
                     story_id,
-                    'Dummy Story',
-                    'Description',
+                    'Translation Opportunities Dummy Story',
+                    'Dummy story for translation opportunities',
                     topic_id,
-                    'dummy-story',
+                    'translation-dummy-story',
                 )
 
                 question_services.add_question(self.user_id, question_1)
@@ -1386,9 +1383,9 @@ class AdminHandler(
                 )
                 topic = topic_domain.Topic.create_default_topic(
                     topic_id,
-                    'Dummy Topic 1',
-                    'dummy-topic-one',
-                    'description',
+                    'Translation Opportunities Dummy Topic',
+                    'trans-dummy-topic',
+                    'Dummy topic for translation opportunities',
                     'fragm',
                 )
                 topic.update_meta_tag_content('dummy-meta')
