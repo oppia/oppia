@@ -130,6 +130,74 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
                 msg='\n\nOriginal text: %s' % datum[0],
             )
 
+    def test_strip_trailing_empty_elements_with_empty_paragraph(self) -> None:
+        """Test stripping trailing empty paragraph."""
+        html_with_trailing_p = '<p>Valid content</p><p>&nbsp;</p>'
+        result = html_cleaner.strip_trailing_empty_elements(html_with_trailing_p)
+        self.assertEqual(result, '<p>Valid content</p>')
+
+    def test_strip_trailing_empty_elements_with_empty_list(self) -> None:
+        """Test stripping trailing empty list with bullet point."""
+        html_with_trailing_list = (
+            '<p>Valid content</p>'
+            '<p>&nbsp;</p>'
+            '<ul><li><p>&nbsp;</p></li></ul>'
+        )
+        result = html_cleaner.strip_trailing_empty_elements(html_with_trailing_list)
+        self.assertEqual(result, '<p>Valid content</p>')
+
+    def test_strip_trailing_empty_elements_preserves_valid_content(
+        self,
+    ) -> None:
+        """Test that valid content is not removed."""
+        html_with_valid_list = (
+            '<p>Introduction</p>'
+            '<ul><li><p>Item 1</p></li><li><p>Item 2</p></li></ul>'
+        )
+        result = html_cleaner.strip_trailing_empty_elements(html_with_valid_list)
+        self.assertEqual(result, html_with_valid_list)
+
+    def test_strip_trailing_empty_elements_with_mixed_content(self) -> None:
+        """Test stripping only trailing empty elements, not leading ones."""
+        html_with_mixed = (
+            '<p>&nbsp;</p>'
+            '<p>Valid content</p>'
+            '<p>&nbsp;</p>'
+        )
+        result = html_cleaner.strip_trailing_empty_elements(html_with_mixed)
+        # Leading empty paragraph should be preserved, trailing one removed
+        self.assertEqual(result, '<p>&nbsp;</p><p>Valid content</p>')
+
+    def test_strip_trailing_empty_elements_with_nested_empty_lists(
+        self,
+    ) -> None:
+        """Test stripping nested empty list structures."""
+        html_with_nested = (
+            '<p>Content</p>'
+            '<ul><li><ul><li><p>&nbsp;</p></li></ul></li></ul>'
+        )
+        result = html_cleaner.strip_trailing_empty_elements(html_with_nested)
+        self.assertEqual(result, '<p>Content</p>')
+
+    def test_strip_trailing_empty_elements_with_empty_string(self) -> None:
+        """Test handling of empty string input."""
+        result = html_cleaner.strip_trailing_empty_elements('')
+        self.assertEqual(result, '')
+
+    def test_strip_trailing_empty_elements_with_only_empty_elements(
+        self,
+    ) -> None:
+        """Test handling when all elements are empty."""
+        html_all_empty = '<p>&nbsp;</p><ul><li><p>&nbsp;</p></li></ul>'
+        result = html_cleaner.strip_trailing_empty_elements(html_all_empty)
+        self.assertEqual(result, '')
+
+    def test_strip_trailing_empty_elements_with_whitespace_only(self) -> None:
+        """Test handling of elements with only whitespace."""
+        html_with_whitespace = '<p>Content</p><p>   </p><p>\n\t</p>'
+        result = html_cleaner.strip_trailing_empty_elements(html_with_whitespace)
+        self.assertEqual(result, '<p>Content</p>')
+
 
 class HtmlStripperUnitTests(test_utils.GenericTestBase):
     """Test the HTML stripper."""

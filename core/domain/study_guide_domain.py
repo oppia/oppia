@@ -20,7 +20,8 @@ from __future__ import annotations
 
 from core import feconf, utils
 from core.constants import constants
-from core.domain import change_domain, state_domain, translation_domain
+from core.domain import change_domain, html_cleaner, state_domain, translation_domain
+
 
 from typing import (
     Any,
@@ -496,6 +497,12 @@ class StudyGuide:
             StudyGuide. A study guide object with given id, topic_id and
             sections field.
         """
+        # Clean trailing empty elements from content to prevent
+        # extra bullet points and spacing at the bottom of study guides.
+        cleaned_content_html = html_cleaner.strip_trailing_empty_elements(
+            content_html
+        )
+
         content_id_generator = translation_domain.ContentIdGenerator()
         study_guide_id = cls.get_study_guide_id(topic_id, subtopic_id)
         sections = []
@@ -507,7 +514,7 @@ class StudyGuide:
             content_id_generator.generate(
                 translation_domain.ContentType.SECTION, 'content'
             ),
-            content_html,
+            cleaned_content_html,
         )
         sections.append(section)
         return cls(

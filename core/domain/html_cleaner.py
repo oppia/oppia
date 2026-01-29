@@ -263,6 +263,106 @@ def is_html_empty(html_str: str) -> bool:
     return False
 
 
+def strip_trailing_empty_elements(html_string: str) -> str:
+    """Strips trailing empty HTML elements from an HTML string.
+
+    This removes empty paragraphs, list items, and lists that contain only
+    non-breaking spaces or are completely empty from the end of the HTML.
+    This is useful for cleaning up HTML content that may have trailing
+    whitespace artifacts from rich text editors or markdown conversion.
+
+    Args:
+        html_string: str. An HTML string.
+
+    Returns:
+        str. The HTML string with trailing empty elements removed.
+    """
+    if not html_string or not html_string.strip():
+        return html_string
+
+    soup = bs4.BeautifulSoup(html_string, 'html.parser')
+
+    # Get all top-level elements (direct children of the root)
+    elements = list(soup.children)
+
+    # Filter out NavigableString objects that are just whitespace
+    elements = [
+        el for el in elements
+        if not isinstance(el, bs4.NavigableString) or el.strip()
+    ]
+
+    if not elements:
+        return html_string
+
+    # Iterate backwards and remove trailing empty elements
+    while elements:
+        last_element = elements[-1]
+
+        # Skip if it's a NavigableString (text node)
+        if isinstance(last_element, bs4.NavigableString):
+            if not last_element.strip():
+                elements.pop()
+                continue
+            break
+
+        # Check if the element is empty
+        if _is_element_empty(last_element):
+            elements.pop()
+        else:
+            break
+
+    # Reconstruct the HTML from remaining elements
+    if not elements:
+        return ''
+
+    # Create a new soup with the cleaned elements
+    result_parts = []
+    for element in elements:
+        if isinstance(element, bs4.NavigableString):
+            result_parts.append(str(element))
+        else:
+            result_parts.append(str(element))
+
+    return ''.join(result_parts)
+
+
+def _is_element_empty(element: bs4.Tag) -> bool:
+    """Checks if an HTML element is empty or contains only whitespace/nbsp.
+
+    An element is considered empty if:
+    - It has no children
+    - It contains only whitespace or &nbsp;
+    - It contains only nested empty elements
+
+    Args:
+        element: bs4.Tag. The HTML element to check.
+
+    Returns:
+        bool. True if the element is empty, False otherwise.
+    """
+    # Get the text content, replacing &nbsp; with space
+    text_content = element.get_text().replace('\xa0', '').strip()
+
+    # If there's actual text content, it's not empty
+    if text_content:
+        return False
+
+    # Check if element has any non-empty children
+    for child in element.children:
+        if isinstance(child, bs4.NavigableString):
+            # Check if the text node has content other than whitespace/nbsp
+            child_text = str(child).replace('&nbsp;', '').replace('\xa0', '').strip()
+            if child_text:
+                return False
+        elif isinstance(child, bs4.Tag):
+            # Recursively check if child element is empty
+            if not _is_element_empty(child):
+                return False
+
+    return True
+
+
+
 def _raise_validation_errors_for_escaped_html_tag(
     tag: bs4.BeautifulSoup, attr: str, tag_name: str
 ) -> None:

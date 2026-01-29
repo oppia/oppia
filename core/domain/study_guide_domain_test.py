@@ -447,6 +447,22 @@ class StudyGuideDomainUnitTests(test_utils.GenericTestBase):
         self.study_guide.language_code = 'xz'
         self._assert_study_guide_validation_error('Invalid language code')
 
+    def test_create_study_guide_strips_trailing_empty_elements(self) -> None:
+        """Test that create_study_guide removes trailing empty HTML elements."""
+        content_with_trailing_empty = (
+            '<p>Valid content</p>'
+            '<p>&nbsp;</p>'
+            '<ul><li><p>&nbsp;</p></li></ul>'
+        )
+        study_guide = study_guide_domain.StudyGuide.create_study_guide(
+            1, 'topic_id', 'Test Heading', content_with_trailing_empty
+        )
+        # Should only contain the valid content, trailing empty elements removed
+        self.assertEqual(
+            study_guide.sections[0].content.html,
+            '<p>Valid content</p>'
+        )
+
 
 class StudyGuideChangeDomainUnitTests(test_utils.GenericTestBase):
     """Tests for StudyGuideChange domain objects."""
