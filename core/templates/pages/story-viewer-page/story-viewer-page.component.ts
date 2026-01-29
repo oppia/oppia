@@ -42,6 +42,7 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+
 import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
 
@@ -84,7 +85,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
   isLoggedIn: boolean = false;
   storyNodesTitleTranslationKeys: string[] = [];
   storyNodesDescTranslationKeys: string[] = [];
-
   constructor(
     private urlInterpolationService: UrlInterpolationService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
@@ -213,7 +213,6 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
       throw new Error('Story url fragment is null');
     }
     this.storyUrlFragment = storyUrlFragment;
-
     this.loaderService.showLoadingScreen('Loading');
     this.storyViewerBackendApiService
       .fetchStoryDataAsync(
