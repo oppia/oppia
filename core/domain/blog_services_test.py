@@ -804,6 +804,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 'rank': rank,
                 'tags': old_blog_post_tag,
                 'title': old_blog_post_title,
+                'summary': 'Hello Blog Post',
             }
             self.assertEqual(actual_docs, [initial_blog_post_doc])
             self.assertEqual(add_docs_counter.times_called, 1)
@@ -830,6 +831,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
                 'rank': rank,
                 'tags': new_blog_post_tags,
                 'title': new_blog_post_title,
+                'summary': 'Hello Blog Post',
             }
 
             self.process_and_flush_pending_tasks()
