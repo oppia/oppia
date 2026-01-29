@@ -2559,8 +2559,18 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
+      // Wait for dropdowns to be visible before clicking them.
+      await this.page.waitForSelector(basicSettingsDropdown, {
+        visible: true,
+        timeout: 10000,
+      });
       await this.clickOnElementWithSelector(basicSettingsDropdown);
       await this.clickOnElementWithSelector(advanceSettingsDropdown);
+      // Ensure roles dropdown is visible before clicking (critical for test reliability).
+      await this.page.waitForSelector(rolesSettingsDropdown, {
+        visible: true,
+        timeout: 10000,
+      });
       await this.clickOnElementWithSelector(rolesSettingsDropdown);
       await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
       await this.clickOnElementWithSelector(permissionSettingsDropdown);
