@@ -1903,8 +1903,8 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.query(
                 datastore_services.any_of(
                     cls.committer_id == user_id,
-                    cls.commit_cmds_user_ids == user_id,
-                    cls.content_user_ids == user_id,
+                    cls.commit_cmds_user_ids == user_id,  # type: ignore[comparison-overlap]
+                    cls.content_user_ids == user_id,  # type: ignore[comparison-overlap]
                 )
             ).get(keys_only=True)
             is not None

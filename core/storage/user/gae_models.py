@@ -424,7 +424,7 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        return cls.query(cls.roles == role).fetch()
+        return cls.query(cls.roles == role).fetch()  # type: ignore[comparison-overlap]
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -2588,7 +2588,7 @@ class UserGroupModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return (
-            cls.query(cls.user_ids == user_id).get(keys_only=True) is not None
+            cls.query(cls.user_ids == user_id).get(keys_only=True) is not None  # type: ignore[comparison-overlap]
         )
 
     @classmethod
@@ -2599,7 +2599,7 @@ class UserGroupModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_group_models: List[UserGroupModel] = list(
-            cls.query(cls.user_ids == user_id).fetch()
+            cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
 
         for user_group_model in user_group_models:
@@ -2621,7 +2621,7 @@ class UserGroupModel(base_models.BaseModel):
         """
         user_data = {}
         user_group_models: List[UserGroupModel] = list(
-            cls.query(cls.user_ids == user_id).fetch()
+            cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
         for user_group_model in user_group_models:
             user_data[user_group_model.id] = {
@@ -3088,7 +3088,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             translations in the given language code.
         """
         reviewer_keys = cls.query(
-            cls.can_review_translation_for_language_codes == language_code
+            cls.can_review_translation_for_language_codes == language_code  # type: ignore[comparison-overlap]
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -3105,7 +3105,7 @@ class UserContributionRightsModel(base_models.BaseModel):
             voiceovers in the given language code.
         """
         reviewer_keys = cls.query(
-            cls.can_review_voiceover_for_language_codes == language_code
+            cls.can_review_voiceover_for_language_codes == language_code  # type: ignore[comparison-overlap]
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 

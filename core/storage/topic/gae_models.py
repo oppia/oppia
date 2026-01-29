@@ -511,7 +511,7 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         """
         return (
             TopicRightsSnapshotMetadataModel.query(
-                TopicRightsSnapshotMetadataModel.content_user_ids == user_id
+                TopicRightsSnapshotMetadataModel.content_user_ids == user_id  # type: ignore[comparison-overlap]
             ).get(keys_only=True)
             is not None
         )
@@ -557,7 +557,7 @@ class TopicRightsModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            cls.query(cls.manager_ids == user_id).get(keys_only=True)
+            cls.query(cls.manager_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
             is not None
         )
 
@@ -572,7 +572,7 @@ class TopicRightsModel(base_models.VersionedModel):
             list(TopicRightsModel). The list of TopicRightsModel objects in
             which the given user is a manager.
         """
-        return cls.query(cls.manager_ids == user_id).fetch()
+        return cls.query(cls.manager_ids == user_id).fetch()  # type: ignore[comparison-overlap]
 
     def compute_models_to_commit(
         self,
@@ -704,7 +704,7 @@ class TopicRightsModel(base_models.VersionedModel):
             format. In this case, we are returning all the ids of the topics
             this user manages.
         """
-        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
+        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)  # type: ignore[comparison-overlap]
         managed_topic_ids = [right.id for right in managed_topics]
 
         return {'managed_topic_ids': managed_topic_ids}
