@@ -129,11 +129,19 @@ class TopicModel(base_models.VersionedModel):
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     canonical_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
     # This consists of the list of objects referencing additional stories that
     # are part of this topic.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     additional_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
@@ -144,10 +152,16 @@ class TopicModel(base_models.VersionedModel):
     )
     # This consists of the list of uncategorized skill ids that are not part of
     # any subtopic.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     uncategorized_skill_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # The list of subtopics that are part of the topic.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     subtopics: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
@@ -185,6 +199,8 @@ class TopicModel(base_models.VersionedModel):
     # based on the user's performance in the test, a topic is recommended to
     # them. Now, this field is used for listing the skill IDs from which the
     # questions should be fetched for the diagnostic test.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     skill_ids_for_diagnostic_test: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -512,6 +528,8 @@ class TopicRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_ids of the managers of this topic.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     manager_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
     )  # type: ignore[assignment]

@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import datetime
 import itertools
 import random
 import string
@@ -1288,6 +1289,8 @@ class UserSubscribersModel(base_models.BaseModel):
     """
 
     # IDs of the learners who have subscribed to this user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     subscriber_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -1456,6 +1459,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     weekly_creator_stats_list: List[Any] = datastore_services.JsonProperty(repeated=True)  # type: ignore[assignment]
     # The version of dashboard stats schema.
     schema_version = datastore_services.IntegerProperty(
@@ -1585,24 +1592,36 @@ class ExplorationUserDataModel(base_models.BaseModel):
     )
     # The rating (1-5) the user assigned to the exploration. Note that this
     # represents a rating given on completion of the exploration.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     rating: Optional[int] = datastore_services.IntegerProperty(
         default=None, indexed=True
     )  # type: ignore[assignment]
     # When the most recent rating was awarded, or None if not rated.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     rated_on: Optional[datetime.datetime] = datastore_services.DateTimeProperty(
         default=None, indexed=False
     )  # type: ignore[assignment]
     # List of uncommitted changes made by the user to the exploration.
+    # Here we use type Any because the change list can contain various types
+    # of modifications.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     draft_change_list: Optional[List[Any]] = datastore_services.JsonProperty(
         default=None
     )  # type: ignore[assignment]
     # Timestamp of when the change list was last updated.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     draft_change_list_last_updated: Optional[
         datetime.datetime
     ] = datastore_services.DateTimeProperty(
         default=None
     )  # type: ignore[assignment]
     # The exploration version that this change list applied to.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     draft_change_list_exp_version: Optional[
         int
     ] = datastore_services.IntegerProperty(
@@ -1623,24 +1642,32 @@ class ExplorationUserDataModel(base_models.BaseModel):
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE
     )
     # The state name of the furthest reached checkpoint.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     furthest_reached_checkpoint_state_name: Optional[
         str
     ] = datastore_services.StringProperty(
         default=None
     )  # type: ignore[assignment]
     # The exploration version of the furthest reached checkpoint.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     furthest_reached_checkpoint_exp_version: Optional[
         int
     ] = datastore_services.IntegerProperty(
         default=None
     )  # type: ignore[assignment]
     # The state name of the most recently reached checkpoint.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     most_recently_reached_checkpoint_state_name: Optional[
         str
     ] = datastore_services.StringProperty(
         default=None
     )  # type: ignore[assignment]
     # The exploration version of the most recently reached checkpoint.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     most_recently_reached_checkpoint_exp_version: Optional[
         int
     ] = datastore_services.IntegerProperty(
@@ -1883,6 +1910,8 @@ class CollectionProgressModel(base_models.BaseModel):
     )
     # The list of IDs of explorations which have been completed within the
     # context of the collection represented by collection_id.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     completed_explorations: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
@@ -2078,6 +2107,8 @@ class StoryProgressModel(base_models.BaseModel):
     story_id = datastore_services.StringProperty(required=True, indexed=True)
     # The list of node ids which have been completed within the context of
     # the story represented by story_id.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     completed_node_ids: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
@@ -2452,6 +2483,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     sent_email_model_ids: List[str] = datastore_services.StringProperty(
         indexed=True, repeated=True
     )  # type: ignore[assignment]
@@ -2513,6 +2546,8 @@ class UserGroupModel(base_models.BaseModel):
     # The name of the user group.
     name = datastore_services.StringProperty(required=True, indexed=True)
     # The list of user_ids of the members of the user group.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     user_ids: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
 
     @staticmethod
@@ -2951,8 +2986,12 @@ class UserContributionRightsModel(base_models.BaseModel):
     """
 
     can_review_translation_for_language_codes: List[str] = (
+        # Here we use MyPy ignore because the inferred type of the property
+        # does not match the type annotation.
         datastore_services.StringProperty(repeated=True, indexed=True)
     )  # type: ignore[assignment]
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     can_review_voiceover_for_language_codes: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -3353,11 +3392,17 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     """
 
     # List of learner group ids which the learner has been invited to join.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     invited_to_learner_groups_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
     # group and has details of the user correspoding to that group.
+    # Here we use type Any because the list contains dictionary with
+    # dynamic keys.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     learner_groups_user_details: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
