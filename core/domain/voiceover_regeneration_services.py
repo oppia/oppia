@@ -331,6 +331,11 @@ def synthesize_voiceover_for_html_string(
                 filename = cached_model.voiceover_filename
                 binary_audio_data = fs.get('%s/%s' % ('audio', filename))
                 is_cached_model_used_for_voiceovers = True
+                logging.info(
+                    'Voiceover synthesis log: Using cached voiceover for exploration ID: %s, content_html: %s'
+                    % (exploration_id, content_html)
+                )
+                logging.info('Voiceover synthesis log: %s.' % oppia_project_id)
         except Exception as e:
             cached_model = None
             logging.warning('Failed to retrieve voiceover from cache: %s' % e)
@@ -344,10 +349,18 @@ def synthesize_voiceover_for_html_string(
                     parsed_text, language_accent_code, oppia_project_id
                 )
             )
+            logging.info(
+                'Voiceover synthesis log: Generated new voiceover for exploration ID: %s, content_html: %s'
+                % (exploration_id, content_html)
+            )
         except Exception as e:
             error_details = str(e)
 
     if error_details:
+        logging.error(
+            'Voiceover synthesis error: Error during speech synthesis for exploration ID: %s, content_html: %s. Error details: %s'
+            % (exploration_id, content_html, error_details)
+        )
         raise Exception(error_details)
 
     tempbuffer = io.BytesIO()

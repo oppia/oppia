@@ -57,6 +57,16 @@ if MYPY:  # pragma: no cover
 )
 datastore_services = models.Registry.import_datastore_services()
 
+# Voiceover regeneration for all curated explorations significantly increases
+# the workload and makes debugging difficult. Therefore, I’m running the
+# voiceover regeneration on a single exploration for testing purposes.
+exploration_id_to_regenerate_voiceovers = [
+    'umPkwp0L1M0-',
+    # The below two exploration IDs are related to unit tests.
+    'exploration_id_1',
+    'exploration_id_2',
+]
+
 
 # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
 # apache_beam library and absences of stubs in Typeshed, forces MyPy to
@@ -114,6 +124,13 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
             str. The status string for the voiceover generation process.
         """
         entity_id = combined_models[0]
+
+        if entity_id not in exploration_id_to_regenerate_voiceovers:
+            logging.info(
+                'Voiceover synthesis log: Skipping voiceover generation for exploration ID: %s',
+                entity_id,
+            )
+            return
 
         logging.info(
             'Voiceover synthesis log: Generating voiceovers for exploration ID: %s',
@@ -386,6 +403,10 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         voiceover_filename = voiceover_regeneration_services.generate_new_voiceover_filename(
                             content_id, language_accent_code
                         )
+                        logging.info(
+                            'Voiceover synthesis log: Generated new voiceover filename: %s for content_id: %s, content_html: %s.'
+                            % (voiceover_filename, content_id, content_html)
+                        )
 
                         with datastore_services.get_ndb_context():
                             sentence_tokens_with_durations = voiceover_regeneration_services.synthesize_voiceover_for_html_string(
@@ -426,13 +447,22 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 error,
                             )
                         )
+                        logging.error(
+                            'Voiceover synthesis log: Error generating voiceover for exploration ID: %s, language_accent_code: %s, content_id: %s. Error: %s'
+                            % (
+                                entity_id,
+                                language_accent_code,
+                                content_id,
+                                str(error),
+                            )
+                        )
 
                 entity_voiceovers.validate()
                 entity_voiceovers_id_to_domain_object[entity_voiceovers_id] = (
                     entity_voiceovers
                 )
 
-                logs_during_voiceover_generation += (
+                final_report_logs = (
                     'Completed voiceover generation for entity ID: %s. '
                     'Total content IDs processed: %d. '
                     'Total characters processed: %d.\n'
@@ -442,6 +472,8 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                         number_of_characters,
                     )
                 )
+                logging.info('Voiceover synthesis log: %s.' % final_report_logs)
+                logs_during_voiceover_generation += final_report_logs
                 logging.info(
                     'Voiceover synthesis log: Completed voiceover generation for entity ID: %s.'
                     % entity_voiceovers_id

@@ -417,9 +417,6 @@ def regenerate_speech_from_text(
         speech_synthesis_result = speech_synthesizer.speak_ssml_async(
             ssml_text_for_speech_synthesis
         ).get()
-        logging.info(
-            'Voiceover synthesis log: Speech synthesis attempt completed.'
-        )
 
         binary_audio_data = speech_synthesis_result.audio_data
 
@@ -436,6 +433,11 @@ def regenerate_speech_from_text(
                 error_details = cancellation_details.error_details
                 error_code = str(cancellation_details.error_code)
 
+            logging.error(
+                'Voiceover synthesis error: Speech synthesis failed for content %s with error code %s and details: %s'
+                % (plaintext, error_code, error_details)
+            )
+
             # Exponential backoff for retrying speech synthesis in case of too
             # many requests, connection # failure, or service timeout errors.
             if error_code in [
@@ -443,12 +445,20 @@ def regenerate_speech_from_text(
                 'CancellationErrorCode.ConnectionFailure',
                 'CancellationErrorCode.ServiceTimeout',
             ]:
+                logging.info(
+                    'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                )
                 delay_before_retrying_in_sec *= 2
             else:
+                logging.info(
+                    'Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.'
+                )
                 break
 
         if error_details is None:
             break
+
+    logging.info('Voiceover synthesis log: Speech synthesis attempt completed.')
 
     return (
         binary_audio_data,
