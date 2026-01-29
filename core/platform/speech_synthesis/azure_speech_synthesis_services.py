@@ -22,8 +22,10 @@ speech-service/index-text-to-speech.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
+import time
 
 from core import feconf
 from core.constants import constants
@@ -263,9 +265,16 @@ def convert_plaintext_to_ssml_content(
     for content in content_list:
         # Updates the content to pronounce `-` correctly in the given language.
         if ' - ' in content:
-            content = content.replace(
-                '-', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
-            )
+            pattern = re.compile(r'(\d+)\s*-\s*(\d+)')
+
+            def replacer(match: re.Match[str]) -> str:
+                num1, num2 = match.groups()
+                pronunciation = (
+                    MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['-']
+                )
+                return '%s %s %s' % (num1, pronunciation, num2)
+
+            content = pattern.sub(replacer, content)
 
         # Update the content to pronounce `*` correctly in the given language.
         if ' * ' in content:
@@ -286,7 +295,8 @@ def convert_plaintext_to_ssml_content(
         # Update the content to pronounce `/` correctly in the given language.
         if ' / ' in content:
             content = content.replace(
-                '/', MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷']
+                ' / ',
+                MATH_TEMPLATE_SSML_BLOCK % math_symbol_pronunciations['÷'],
             )
 
         # Update the content to pronounce `÷` correctly in the given language.
@@ -393,21 +403,73 @@ def regenerate_speech_from_text(
         plaintext, language_accent_code
     )
 
-    speech_synthesis_result = speech_synthesizer.speak_ssml_async(
-        ssml_text_for_speech_synthesis
-    ).get()
+    delay_before_retrying_in_sec = 1
 
-    binary_audio_data = speech_synthesis_result.audio_data
+    for _ in range(get_number_of_retry_attempts_for_voiceover_synthesis()):
+        # Adding a delay before retrying the speech synthesis.
+        time.sleep(delay_before_retrying_in_sec)
+        logging.info(
+            'Voiceover synthesis log: Retrying speech synthesis after %s seconds delay.',
+            delay_before_retrying_in_sec,
+        )
+        speech_synthesis_result = speech_synthesizer.speak_ssml_async(
+            ssml_text_for_speech_synthesis
+        ).get()
 
-    error_details = None
-    if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
-        cancellation_details = speech_synthesis_result.cancellation_details
+        binary_audio_data = speech_synthesis_result.audio_data
 
-        if cancellation_details.reason == speechsdk.CancellationReason.Error:
-            error_details = cancellation_details.error_details
+        error_details = None
+        error_code = None
+
+        if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
+            cancellation_details = speech_synthesis_result.cancellation_details
+
+            if (
+                cancellation_details.reason
+                == speechsdk.CancellationReason.Error
+            ):
+                error_details = cancellation_details.error_details
+                error_code = str(cancellation_details.error_code)
+
+            logging.error(
+                'Voiceover synthesis error: Speech synthesis failed for content %s with error code %s and details: %s'
+                % (plaintext, error_code, error_details)
+            )
+
+            # Exponential backoff for retrying speech synthesis in case of too
+            # many requests, connection # failure, or service timeout errors.
+            if error_code in [
+                'CancellationErrorCode.TooManyRequests',
+                'CancellationErrorCode.ConnectionFailure',
+                'CancellationErrorCode.ServiceTimeout',
+            ]:
+                logging.info(
+                    'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                )
+                delay_before_retrying_in_sec *= 2
+            else:
+                logging.info(
+                    'Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.'
+                )
+                break
+
+        if error_details is None:
+            break
+
+    logging.info('Voiceover synthesis log: Speech synthesis attempt completed.')
 
     return (
         binary_audio_data,
         word_boundary_collection_instance.audio_offset_list,
         error_details,
     )
+
+
+def get_number_of_retry_attempts_for_voiceover_synthesis() -> int:
+    """Returns the max retry attempts for voiceover synthesis.
+    The limit is lower in GAE/Gunicorn environments to prevent worker timeouts.
+
+    Returns:
+        int. The max number of retry attempts for voiceover synthesis.
+    """
+    return 4
