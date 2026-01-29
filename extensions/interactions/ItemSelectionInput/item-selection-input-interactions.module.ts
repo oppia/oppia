@@ -25,7 +25,7 @@ import {InteractiveItemSelectionInputComponent} from './directives/oppia-interac
 import {ShortResponseItemSelectionInputComponent} from './directives/oppia-short-response-item-selection-input.component';
 import {ResponseItemSelectionInputComponent} from './directives/oppia-response-item-selection-input.component';
 import {TranslateModule} from '@ngx-translate/core';
-import {RichTextComponentsModule} from 'rich_text_components/rich-text-components.module';
+import {RichTextComponentsModule} from '../../rich_text_components/rich-text-components.module';
 
 @NgModule({
   imports: [
