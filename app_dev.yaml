@@ -111,13 +111,6 @@ handlers:
   upload: core/templates/(.*\.(html))$
   secure: always
   expiration: "0"
-- url: /third_party/generated
-  static_dir: third_party/generated
-  secure: always
-  http_headers:
-    # This is replaced by a specific origin when doing a deployment.
-    Access-Control-Allow-Origin: "*"
-  expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*\.(css|png))
@@ -128,7 +121,7 @@ handlers:
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   expiration: "0"
-# Serve PNG images for interactions, rich_text_components, objects, 
+# Serve PNG images for interactions, rich_text_components, objects,
 # and custom ckeditor plugins under extensions in dev mode. This regex allows
 # us to recursively serve PNG images scripts under the five specified
 # directories. "\1" and "\2" insert capture groups from the url pattern.

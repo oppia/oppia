@@ -18,17 +18,9 @@
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
 <% } %>
-<% if (webpackConfig.mode == 'production') { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.min.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-<% } else { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-<% } %>
+
+<!-- Angular / webpack-generated global styles (bundled) -->
+<link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
 
 <link rel="stylesheet" type="text/css" media="screen"
       href="/templates/css/oppia.css">
