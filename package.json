@@ -40,6 +40,7 @@
     "@types/jest": "^27.5.1",
     "@types/jest-image-snapshot": "^5.1.0",
     "@types/js-yaml": "^4.0.5",
+    "@types/karma": "^6.3.8", 
     "@types/leaflet": "1.9.0",
     "@types/lodash": "4.14.190",
     "@types/mathjax": "0.0.37",
