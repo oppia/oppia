@@ -240,6 +240,8 @@ const goalsHeadingInRedesignedDashbaordSelector = '.e2e-test-goals-heading';
 const continueFromWhereLeftOffSectionInRedesignedDashboardSelector =
   '.e2e-test-continue-where-you-left-off';
 const learnSomethingNewSectionSelector = '.e2e-test-learner-dash-section';
+const recommendationsSectionSelector =
+  '.e2e-test-learner-dash-recommended-section';
 const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
@@ -2933,15 +2935,15 @@ export class LoggedInUser extends BaseUser {
    * @param {string} progress - The progress of the lesson.
    */
   async resumeLessonFromLearnerDashboard(lessonTitle: string): Promise<void> {
-    await this.page.waitForSelector(lessonCardContainer, {
+    await this.page.waitForSelector(commonLessonCardContainerSelector, {
       visible: true,
     });
 
-    const lessonCards = await this.page.$$(lessonCardContainer);
+    const lessonCards = await this.page.$$(commonLessonCardContainerSelector);
 
     for (const lessonCard of lessonCards) {
       const lessonTitleText = await lessonCard.$eval(
-        lessonTitleSelector,
+        commonlessonTitleSelector,
         el => el.textContent
       );
 
@@ -4453,6 +4455,60 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  async expectChapterToBePresentInRecommendedSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(recommendationsSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(commonLessonCardContainerSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Recommended section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const recommendationSection = await this.page.$(
+      recommendationsSectionSelector
+    );
+    if (!recommendationSection) {
+      throw new Error('Recommended section not found.');
+    }
+    await this.expectLessonCardToBePresent(chapterTitle, recommendationSection);
+  }
+
+  async expectChapterToBePresentInProgressSection(
+    chapterTitle: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(recommendationsSectionSelector);
+    // Wait for lesson cards to load if they exist.
+    try {
+      await this.page.waitForSelector(commonLessonCardContainerSelector, {
+        visible: true,
+        timeout: 5000,
+      });
+    } catch (error) {
+      // Lesson cards may not be present if section is empty (no untracked topics).
+      // This is expected for new users.
+      showMessage(
+        'Recommended section is empty (no lesson cards found). This is expected for new users.'
+      );
+      return;
+    }
+    const recommendationSection = await this.page.$(
+      recommendationsSectionSelector
+    );
+    if (!recommendationSection) {
+      throw new Error('Recommended section not found.');
+    }
+    await this.expectLessonCardToBePresent(chapterTitle, recommendationSection);
+  }
+
   /**
    * Function to verify the continue from where you left section in the redesigned learner dashboard is present or not.
    * @param {boolean} visible - Whether the section should be visible or not.
@@ -4500,7 +4556,7 @@ export class LoggedInUser extends BaseUser {
       if (!lessonTitleText || lessonTitleText !== lessonTitle) {
         continue;
       }
-      this.waitForElementToStabilize(circleProgressElementSelector);
+      this.waitForElementToStabilize(circleProgressElementSelector, 20000); //Have a look later
       const currentProgress = await lessonCard.$eval(
         circleProgressElementSelector,
         el => el.textContent

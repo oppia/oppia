@@ -166,10 +166,10 @@ describe('Logged-In Learner', function () {
       await loggedInLearner1.expectChapterToBeClickable(
         'What are the Place Values'
       );
-
-      await loggedInLearner1.expectChapterToBeClickable(
-        'Find the Value of a Number'
-      ); //Make it as not clickable after kishans PR merged
+      // Todo:After Resolving #24423
+      // await loggedInLearner1.expectChapterToBeClickable(
+      //   'Find the Value of a Number' , false
+      // );
 
       await loggedInLearner1.navigateToLearnerDashboard();
       await loggedInLearner1.expectScreenshotToMatch(
@@ -208,9 +208,10 @@ describe('Logged-In Learner', function () {
         'Find the Value of a Number',
       ]);
 
-      await loggedInLearner2.expectChapterToBeClickable(
-        'Find the Value of a Number'
-      ); // Makle it false after kishan PR merged
+      // Todo:After Resolving #24423
+      // await loggedInLearner2.expectChapterToBeClickable(
+      //   'Find the Value of a Number'
+      // );
 
       await loggedInLearner2.selectAndPlayChapter('What are the Place Values');
 
@@ -295,21 +296,30 @@ describe('Logged-In Learner', function () {
         'Rounding Numbers part 2',
       ]);
 
-      // // await loggedInLearner1.expectLessonCardToHaveNewLabel(
-      // //   'Find the Value of a Number'
-      // // );
+      await loggedInLearner1.expectLessonCardToHaveNewLabel(
+        'Find the Value of a Number'
+      );
+
       // See new chapter on learner dashboard
+      await loggedInLearner1.navigateToLearnerDashboard();
 
-      // await loggedInLearner1.navigateToLearnerDashboard();
-      // await loggedInLearner1.navigateToProgressSection();
-
-      // await loggedInLearner1.resumeLessonFromLearnerDashboard(
-      //   'Find the Value of a Number'
-      // );
-      // await loggedInLearner2.expectExplorationCompletionToastMessage(
-      //   'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
-      // );
+      await loggedInLearner1.expectScreenshotToMatch(
+        'Chap2InProgressSectionChap3InRecommendedSection',
+        __dirname
+      );
+      await loggedInLearner1.expectChapterToBePresentInRecommendedSection(
+        'Comparing Numbers'
+      );
+      await loggedInLearner1.resumeLessonFromLearnerDashboard(
+        ' Chapter 2: Find the Value of a Number '
+      );
+      await loggedInLearner1.expectExplorationCompletionToastMessage(
+        'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
+  afterAll(async function () {
+    await UserFactory.closeAllBrowsers();
+  });
 });
