@@ -198,6 +198,7 @@ const mobileOptionsButtonSelector = 'i.e2e-test-mobile-options';
 const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
 const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
+const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
 const voiceArtistSettingsDropdown =
   'h3.e2e-test-voice-artists-settings-container';
 const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
@@ -3732,6 +3733,14 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
+   * Expects the exploration to be community owned in the Settings tab.
+   */
+  async expectExplorationToBeCommunityOwned(): Promise<void> {
+    await this.navigateToSettingsTab();
+    await this.expectElementToBeVisible(communityOwnedMessageSelector);
+  }
+
+  /**
    * Assigns a role of manager to any guest user.
    */
   async assignUserToManagerRole(username: string): Promise<void> {
@@ -3765,6 +3774,12 @@ export class ExplorationEditor extends BaseUser {
       visible: true,
       timeout: 5000,
     });
+    await this.page.evaluate(selector => {
+      const input = document.querySelector(selector);
+      if (input) {
+        input.scrollIntoView({block: 'center'});
+      }
+    }, usernameSelector);
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
