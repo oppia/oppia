@@ -1,17 +1,47 @@
 <div class="e2e-test-preview-tab-container">
+
+  <!-- NEW: Language selector -->
+  <div class="oppia-preview-language-selector" *ngIf="availableLanguages.length > 0">
+    <label for="previewLanguage"><strong>Preview in language:</strong></label>
+    <select
+      id="previewLanguage"
+      [(ngModel)]="selectedLanguage"
+      (change)="onLanguageChange(selectedLanguage)">
+      <option *ngFor="let lang of availableLanguages" [value]="lang">
+        {{ lang }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Main preview content -->
   <div *ngIf="isExplorationPopulated">
+
+    <!-- Preview warning message -->
     <div *ngIf="previewWarning">
       <div class="oppia-preview-state-warning">{{ previewWarning }}</div>
     </div>
+
+    <!-- Loading message while voiceovers load -->
     <oppia-loading-message [message]="'Loading'" *ngIf="!voiceoversAreLoaded"></oppia-loading-message>
+
+    <!-- Old conversation skin -->
     <oppia-conversation-skin *ngIf="voiceoversAreLoaded && !isNewLessonPlayerEnabled()"></oppia-conversation-skin>
+
+    <!-- Footer for old player -->
     <page-footer *ngIf="!isNewLessonPlayerEnabled()">
       <oppia-exploration-footer></oppia-exploration-footer>
     </page-footer>
-    <oppia-new-conversation-skin class="preview-conversation-skin" *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()"></oppia-new-conversation-skin>
+
+    <!-- New conversation skin -->
+    <oppia-new-conversation-skin class="preview-conversation-skin" 
+      *ngIf="voiceoversAreLoaded && isNewLessonPlayerEnabled()">
+    </oppia-new-conversation-skin>
+
   </div>
 
+  <!-- Parameter summary and restart button -->
   <div class="oppia-preview-bottom-right-container" [ngClass]="{'restart-btn': isNewLessonPlayerEnabled()}">
+
     <div class="oppia-parameter-summary" *ngIf="showParameterSummary()">
       <strong>Parameters:</strong>
       <table>
@@ -23,19 +53,16 @@
         </tr>
       </table>
     </div>
+
     <button class="btn-lg e2e-test-preview-restart-button" (click)="resetPreview()">
       <i class="fas fa-redo oppia-reload-icon"></i>
       <span class="oppia-restart-text">Restart From Beginning</span>
     </button>
-  </div>
 
+  </div>
 </div>
 
 <style>
-  /*
-  Note that this affects both the learner mode and the 'editor preview'
-  mode.
-  */
   html, body {
     background: #e8e7e3 no-repeat center center fixed;
     background-size: cover;
@@ -49,7 +76,6 @@
   }
 
   .oppia-preview-bottom-right-container {
-    /* Fixed at bottom right corner (before footer) and appear on top of other div*/
     bottom: 42px;
     display: block;
     position: fixed;
@@ -122,5 +148,21 @@
     .restart-btn {
       top: 46px;
     }
+  }
+
+  /* NEW: Language selector styling */
+  .oppia-preview-language-selector {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background-color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    z-index: 1070;
+    font-size: 14px;
+  }
+  .oppia-preview-language-selector select {
+    margin-left: 10px;
+    padding: 2px 5px;
   }
 </style>
