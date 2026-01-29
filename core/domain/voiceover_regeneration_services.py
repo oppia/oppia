@@ -613,10 +613,8 @@ def regenerate_voiceovers_of_exploration(
             )
 
             logging.info(
-                'Voiceover regeneration logs: Successfully generated voiceover for content_id %s in exploration %s (%s)',
-                content_id,
-                exploration_id,
-                language_accent_code,
+                'Voiceover regeneration logs: Successfully generated voiceover for content_id %s in exploration %s (%s)'
+                % (content_id, exploration_id, language_accent_code)
             )
 
             # Fetches the generated voiceover.

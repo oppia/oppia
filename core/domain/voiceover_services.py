@@ -1056,10 +1056,12 @@ def _regenerate_voiceovers_for_given_contents(
             ]
 
             logging.info(
-                'Voiceover regeneration logs: The following content IDs failed to regenerate voiceovers for language accent code %s in exploration %s: %s',
-                language_accent_code,
-                exploration_id,
-                ', '.join(failed_content_ids),
+                'Voiceover regeneration logs: The following content IDs failed to regenerate voiceovers for language accent code %s in exploration %s: %s'
+                % (
+                    language_accent_code,
+                    exploration_id,
+                    ', '.join(failed_content_ids),
+                )
             )
 
             if requested_task_is_async:
@@ -1288,9 +1290,8 @@ def regenerate_voiceovers_of_exploration_for_given_language_accent(
     # content IDs as keys and their corresponding HTML content as values.
 
     logging.info(
-        'Voiceover regeneration logs: Regeneration triggered for exploration: %s in language accent: %s',
-        exploration_id,
-        language_accent_code,
+        'Voiceover regeneration logs: Regeneration triggered for exploration: %s in language accent: %s'
+        % (exploration_id, language_accent_code)
     )
     language_code_to_contents_mapping: Dict[str, Dict[str, str]] = {}
 
