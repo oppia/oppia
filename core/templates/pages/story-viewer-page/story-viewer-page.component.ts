@@ -23,8 +23,6 @@ import {
   ViewChild,
   OnDestroy,
 } from '@angular/core';
-import {Location} from '@angular/common';
-import {Router} from '@angular/router';
 import {TranslateService} from '@ngx-translate/core';
 import {Subscription} from 'rxjs';
 
@@ -44,8 +42,6 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
-import {AccessValidationBackendApiService} from 'pages/oppia-root/routing/access-validation-backend-api.service';
-
 import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
 
