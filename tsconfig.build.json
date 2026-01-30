@@ -6,7 +6,7 @@
     "src/main.ts",
     "core/templates/Polyfills.ts"
   ],
-    "include": ["typings","src/main.ts"],
+    "include": ["typings","src/main.ts","core/templates/**/*.module.ts"],
     "exclude": [
         "core/tests",
         "**/*.spec.ts",
