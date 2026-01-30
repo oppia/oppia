@@ -299,9 +299,9 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(component.selectedSubtopicId).toEqual(1);
     component.editNameOfSubtopicWithId(10);
     expect(component.selectedSubtopicId).toEqual(10);
-    component.editNameOfSubtopicWithId(0);
+    component.editNameOfSubtopicWithId(-1);
     expect(component.editableName).toEqual('');
-    expect(component.selectedSubtopicId).toEqual(0);
+    expect(component.selectedSubtopicId).toEqual(-1);
   });
 
   it('should call initEditor on calls from topic being initialized', () => {
@@ -406,7 +406,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     component.selectedSubtopicId = 5;
     component.editNameOfSubtopicWithId(null);
     expect(component.editableName).toEqual('');
-    expect(component.selectedSubtopicId).toEqual(0);
+    expect(component.selectedSubtopicId).toEqual(-1);
   });
 
   it('should not call removeSkillFromSubtopic when newSubtopicId equals oldSubtopicId', () => {
@@ -514,7 +514,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
 
     expect(component.editNameOfSubtopicWithId).toHaveBeenCalledWith(null);
     expect(component.editableName).toEqual('');
-    expect(component.selectedSubtopicId).toEqual(0);
+    expect(component.selectedSubtopicId).toEqual(-1);
   });
 
   it('should call initEditor after onMoveSkillEnd completes skill transfer', () => {
