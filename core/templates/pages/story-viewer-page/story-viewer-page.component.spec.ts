@@ -551,7 +551,7 @@ describe('Story Viewer Page component', () => {
       completed: true,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
-      status: 'not_started',
+      status: 'Published',
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
@@ -590,7 +590,7 @@ describe('Story Viewer Page component', () => {
       completed: false,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
-      status: 'not_started',
+      status: 'Published',
     };
 
     var storyPlaythroughBackendObject = {
