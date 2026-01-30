@@ -64,7 +64,7 @@ export class AccessValidationBackendApiService {
 
   STORY_VIEWER_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_story_viewer_page/' +
-    '<classroom_url_fragment>/<topic_url_fragment>/<story_url_fragment>';
+    '<classroom_url_fragment>/<topic_url_fragment>/story/<story_url_fragment>';
 
   PRACTICE_SESSION_PAGE_ACCESS_VALIDATOR =
     '/access_validation_handler/can_access_practice_session_page/' +

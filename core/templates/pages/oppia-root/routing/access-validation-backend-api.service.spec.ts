@@ -62,7 +62,7 @@ describe('Access validation backend api service', () => {
 
     let req = httpTestingController.expectOne(
       '/access_validation_handler/can_access_story_viewer_page/' +
-        'classroom/topic/story'
+        'classroom/topic/story/story'
     );
     expect(req.request.method).toEqual('GET');
     req.flush({});

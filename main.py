@@ -209,8 +209,7 @@ URLS = [
     ),
     get_redirect_route(r'/_ah/warmup', WarmupPage),
     get_redirect_route(
-        r'%s/can_access_story_viewer_page/<classroom_url_fragment>'
-        r'/<topic_url_fragment>/<story_url_fragment>'
+        r'%s/can_access_story_viewer_page/<classroom_url_fragment>/<topic_url_fragment>/story/<story_url_fragment>'
         % feconf.ACCESS_VALIDATION_HANDLER_PREFIX,
         access_validators.StoryViewerPageAccessValidationHandler,
     ),
