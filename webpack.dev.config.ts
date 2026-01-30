@@ -36,6 +36,21 @@ module.exports = merge(common, {
     warningsFilter: [
       /export '.*' was not found in/,
       /export .* was not found in/,
+      (warning: string) => {
+        const targetModules = [
+          'delete-account-page.module.ts',
+          'core/templates/pages/oppia-root/index.ts',
+          'core/templates/pages/lightweight-oppia-root/index.ts',
+        ];
+        const targetErrors = [
+          'the request of a dependency is an expression',
+          'System.import() is deprecated',
+        ];
+        const matchesModule = targetModules.some(mod => warning.includes(mod));
+        const matchesError = targetErrors.some(err => warning.includes(err));
+
+        return matchesModule && matchesError;
+      },
     ],
   },
 });
