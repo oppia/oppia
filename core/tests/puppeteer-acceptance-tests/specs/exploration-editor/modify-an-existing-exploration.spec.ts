@@ -24,8 +24,9 @@ import {
   ExplorationEditor,
   INTERACTION_TYPES,
 } from '../../utilities/user/exploration-editor';
+import testConstants from '../../utilities/common/test-constants';
 import {LoggedInUser} from '../../utilities/user/logged-in-user';
-
+const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
 describe('Lesson Creator', function () {
   let expEditor1: ExplorationEditor & LoggedInUser;
   let expEditor2: ExplorationEditor & LoggedInUser;
@@ -83,40 +84,41 @@ describe('Lesson Creator', function () {
   });
 
   it(
-    'should restrict editing for read-only users and handle overwritten/conflicting draft changes',
+    'should restrict editing for read-only users',
     async function () {
       await expEditor2.navigateToExplorationEditor(explorationId);
-
-      // Read-only exploration access (expEditor2 should NOT be able to edit).
       await expEditor2.expectEditCardContentPencilButtonToBeVisible(false);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
+  it(
+    'should get an error when draft changes are overwritten',
+    async function () {
       await expEditor1.navigateToSettingsTab();
       await expEditor1.assignUserToManagerRole('ExpEditor2');
       await expEditor1.navigateToEditorTab();
-
       await expEditor2.reloadPage();
-      await expEditor2.navigateToEditorTab();
 
       await expEditor2.expectEditCardContentPencilButtonToBeVisible(true);
-
       await expEditor1.navigateToCard('Introduction');
       await expEditor1.updateCardContent('Introduction to Mathematics');
+      await expEditor1.expectSaveDraftButtonToBeDisabled(false);
 
       await expEditor2.navigateToCard('Introduction');
       await expEditor2.updateCardContent('Intro to Mathematics (Part 1)');
       await expEditor2.saveExplorationDraft('Updated by expEditor2');
 
-      // Draft overwritten scenario (expEditor1 has autosaved changes,
-      // expEditor2 saves draft -> expEditor1 should see Lost Changes modal).
-      await expEditor1.navigateToExplorationEditor(explorationId);
+      await expEditor1.reloadPage();
       await expEditor1.expectLostChangesModalToBeVisible(true);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
 
+  it(
+    'should get an error when changes are conflicting',
+    async function () {
       await expEditor1.discardLostChanges();
-
-      await expEditor1.expectLostChangesModalToBeVisible(false);
-
-      await expEditor1.waitForPageToFullyLoad();
-
       await expEditor1.navigateToCard('Introduction');
       await expEditor1.updateCardContent('Created by expEditor1');
       await expEditor1.saveExplorationDraft('Editor 1');
@@ -124,38 +126,32 @@ describe('Lesson Creator', function () {
       await expEditor2.navigateToCard('Introduction');
       await expEditor2.updateCardContent('Created by expEditor2');
 
-      // Conflicting changes scenario (expEditor2 edits on stale version,
-      // sees Lost Changes modal, exports and discards lost changes and downloads file.)
       await expEditor2.waitForPageToFullyLoad();
+      await expEditor2.expectLostChangesModalToBeVisible(true);
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should update exploration when changes are not conflicting',
+    async function () {
       await expEditor2.exportAndDiscardLostChanges();
-
-      await expEditor2.waitForPageToFullyLoad();
-      await expEditor2.navigateToCard('Introduction');
       await expEditor2.expectCardContentToBe('Created by expEditor1');
-
       await expEditor2.updateCardContent(
         'Created by expEditor1 and expEditor2'
       );
       await expEditor2.saveExplorationDraft('Updated by expEditor2');
-
-      // Non-conflicting update scenario (expEditor2 saves changes,
-      // expEditor1 should NOT see Lost Changes modal and can rename the state).
-      await expEditor1.navigateToExplorationEditor(explorationId);
-      await expEditor1.waitForPageToFullyLoad();
-      await expEditor1.navigateToEditorTab();
-      await expEditor1.navigateToCard('Introduction');
-
-      await expEditor1.expectLostChangesModalToBeVisible(false);
-
+      await expEditor1.reloadPage();
       await expEditor1.updateStateName('First');
-
-      await expEditor1.waitForPageToFullyLoad();
       await expEditor1.saveExplorationDraft();
 
       await expEditor1.expectLostChangesModalToBeVisible(false);
       await expEditor1.expectStateNameToBe('First');
+      await expEditor2.expectCardContentToBe(
+        'Created by expEditor1 and expEditor2'
+      );
       await expEditor1.expectExplorationGraphToContainCard('First');
     },
-    10 * 60 * 1000
+    DEFAULT_SPEC_TIMEOUT_MSECS
   );
 });

@@ -82,121 +82,10 @@ describe('Exploration Creator', function () {
   );
 
   it(
-    'should save/discard drafts, set initial card, and validate cards list',
-    async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
-
-      await explorationEditor.updateCardContent('Old content');
-      await explorationEditor.saveExplorationDraft('First edit');
-
-      await explorationEditor.updateCardContent('New Content');
-
-      await explorationEditor.discardCurrentChanges();
-      await explorationEditor.expectCardContentToBe('Old content');
-
-      await explorationEditor.updateStateName('First');
-      await explorationEditor.waitForPageToFullyLoad();
-
-      await explorationEditor.saveExplorationDraft('Renamed initial card');
-
-      await explorationEditor.expectStateNameToBe('First');
-      await explorationEditor.expectExplorationGraphToContainCard('First');
-
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard('Second');
-      await explorationEditor.expectCurrentOutcomeDestinationToBe('Second');
-
-      await explorationEditor.expectExplorationGraphToContainCard('Second');
-
-      await explorationEditor.navigateToCard('Second');
-
-      await explorationEditor.updateCardContent('This is the second card.');
-
-      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
-
-      await explorationEditor.viewOppiaResponses();
-      await explorationEditor.directLearnersToNewCard('Final');
-      await explorationEditor.expectCurrentOutcomeDestinationToBe('Final');
-
-      await explorationEditor.expectExplorationGraphToContainCard('Final');
-
-      await explorationEditor.navigateToCard('Final');
-
-      await explorationEditor.updateCardContent('Final Card');
-      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
-
-      await explorationEditor.saveExplorationDraft(
-        'Created Second and Final cards'
-      );
-
-      await explorationEditor.expectExplorationGraphToContainCard('First');
-      await explorationEditor.expectExplorationGraphToContainCard('Second');
-      await explorationEditor.expectExplorationGraphToContainCard('Final');
-
-      await explorationEditor.navigateToSettingsTab();
-      await explorationEditor.selectFirstCard('Second');
-
-      await explorationEditor.reloadPage();
-      await explorationEditor.waitForPageToFullyLoad();
-      await explorationEditor.navigateToPreviewTab();
-
-      await explorationEditor.expectPreviewCardContentToBe(
-        'Second',
-        'This is the second card.'
-      );
-
-      await explorationEditor.navigateToEditorTab();
-
-      await explorationEditor.waitForPageToFullyLoad();
-
-      await explorationEditor.deleteState('First');
-
-      await explorationEditor.saveExplorationDraft();
-
-      await explorationEditor.waitForPageToFullyLoad();
-
-      await explorationEditor.expectExplorationGraphToNotContainCard('First');
-    },
-    10 * 60 * 1000
-  );
-
-  it(
-    'should show save recommendation modal after 50 unsaved changes',
-    async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
-      await explorationEditor.navigateToEditorTab();
-      await explorationEditor.page.keyboard.press('Escape');
-      await explorationEditor.updateCardContent('Initial content');
-      await explorationEditor.saveExplorationDraft();
-
-      for (let i = 1; i <= 50; i++) {
-        await explorationEditor.updateCardContent(`Content ${i}`);
-      }
-
-      await explorationEditor.expectSaveRecommendationModalToBeVisible();
-
-      await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
-
-      await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
-    },
-    50 * 60 * 1000
-  );
-
-  it(
     'should generate warning message if card height limit is exceeded',
     async function () {
-      await explorationEditor.navigateToCreatorDashboardPage();
-      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
-      await explorationEditor.dismissWelcomeModal();
-
+      await explorationEditor.navigateToEditorTab();
       await explorationEditor.updateStateName('1 - Intro');
-      await explorationEditor.waitForPageToFullyLoad();
       await explorationEditor.saveExplorationDraft('Renamed initial card');
 
       await explorationEditor.expectStateNameToBe('1 - Intro');
@@ -223,8 +112,108 @@ describe('Exploration Creator', function () {
       await explorationEditor.updateCardContent(longContent);
 
       await explorationEditor.expectCardHeightLimitWarningToBeVisible();
+      await explorationEditor.discardCurrentChanges();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should discard drafts and create Second and Final cards',
+    async function () {
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+      await explorationEditor.dismissWelcomeModal();
+
+      await explorationEditor.updateCardContent('Old content');
+      await explorationEditor.saveExplorationDraft('First edit');
+
+      await explorationEditor.updateCardContent('New Content');
+      await explorationEditor.discardCurrentChanges();
+      await explorationEditor.expectCardContentToBe('Old content');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should update first card and validate preview content',
+    async function () {
+      await explorationEditor.updateStateName('First');
+      await explorationEditor.saveExplorationDraft('Renamed initial card');
+
+      await explorationEditor.expectStateNameToBe('First');
+
+      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await explorationEditor.viewOppiaResponses();
+      await explorationEditor.directLearnersToNewCard('Second');
+      await explorationEditor.expectCurrentOutcomeDestinationToBe('Second');
+
+      await explorationEditor.navigateToCard('Second');
+      await explorationEditor.updateCardContent('This is the second card.');
+
+      await explorationEditor.addInteraction(INTERACTION_TYPES.CONTINUE_BUTTON);
+      await explorationEditor.viewOppiaResponses();
+      await explorationEditor.directLearnersToNewCard('Final');
+      await explorationEditor.expectCurrentOutcomeDestinationToBe('Final');
+
+      await explorationEditor.expectExplorationGraphToContainCard('Final');
+
+      await explorationEditor.navigateToCard('Final');
+      await explorationEditor.updateCardContent('Final Card');
+      await explorationEditor.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+      await explorationEditor.saveExplorationDraft(
+        'Created Second and Final cards'
+      );
+
+      await explorationEditor.expectExplorationGraphToContainCard('First');
+      await explorationEditor.expectExplorationGraphToContainCard('Second');
+      await explorationEditor.expectExplorationGraphToContainCard('Final');
+      await explorationEditor.navigateToSettingsTab();
+      await explorationEditor.selectFirstCard('Second');
+      await explorationEditor.reloadPage();
+      await explorationEditor.waitForPageToFullyLoad();
+      await explorationEditor.navigateToPreviewTab();
+      await explorationEditor.expectPreviewCardContentToBe(
+        'Second',
+        'This is the second card.'
+      );
+    },
+    10 * 60 * 1000
+  );
+
+  it(
+    'should remove an existing state and save exploration draft',
+    async function () {
+      await explorationEditor.navigateToEditorTab();
+
+      await explorationEditor.deleteState('First');
+      await explorationEditor.saveExplorationDraft();
+
+      await explorationEditor.expectExplorationGraphToNotContainCard('First');
+    },
+    DEFAULT_SPEC_TIMEOUT_MSECS
+  );
+
+  it(
+    'should show warning when there are 50 unsaved changes',
+    async function () {
+      await explorationEditor.navigateToCreatorDashboardPage();
+      await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
+      await explorationEditor.dismissWelcomeModal();
+      await explorationEditor.navigateToEditorTab();
+      await explorationEditor.page.keyboard.press('Escape');
+      await explorationEditor.updateCardContent('Initial content');
+      await explorationEditor.saveExplorationDraft();
+
+      for (let i = 1; i <= 50; i++) {
+        await explorationEditor.updateCardContent(`Content ${i}`);
+      }
+
+      await explorationEditor.expectSaveRecommendationModalToBeVisible();
+      await explorationEditor.saveExplorationDraftFromSaveRecommendationModal();
+      await explorationEditor.expectSaveDraftButtonToBeDisabled(true);
+    },
+    50 * 60 * 1000
   );
 
   afterAll(async function () {

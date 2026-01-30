@@ -438,6 +438,7 @@ const explorationGraphSelector = 'oppia-exploration-graph';
 const explorationGraphNodeBackgroundSelector = 'rect.e2e-test-node-background';
 const explorationGraphNodeDeleteButtonSelector =
   'g.e2e-test-delete-node rect.oppia-node-delete';
+const explorationGraphNodeSelector = 'g.e2e-test-node';
 const confirmDeleteStateButtonSelector = '.e2e-test-confirm-delete-state';
 
 const lostChangesModalSelector = '.e2e-test-lost-changes-modal';
@@ -445,7 +446,7 @@ const lostChangesModalHeadingSelector = '.e2e-test-lost-changes-modal h3';
 const discardAndExportLostChangesButtonSelector =
   'button.e2e-test-discard-and-export-lost-changes-button';
 const stateNameSubmitButtonSelector = 'button.e2e-test-state-name-submit';
-
+const stateNameInputSelector = '.e2e-test-state-name-input';
 const cardHeightLimitWarningSelector = '.e2e-test-card-height-limit-warning';
 
 const saveRecommendationModalSelector = '.e2e-test-save-prompt-modal';
@@ -7194,16 +7195,14 @@ export class ExplorationEditor extends BaseUser {
       await this.navigateToCard(stateName);
     }
 
-    await this.page.waitForSelector(explorationGraphSelector, {visible: true});
+    await this.expectElementToBeVisible(explorationGraphSelector);
 
-    const clickOnGraphNodeElement = async (
-      selectorToClick: string
+    const scrollToGraphNodeElement = async (
+      selectorToFind: string
     ): Promise<boolean> => {
       return await this.page.evaluate(
-        (name: string, selectorToClick: string) => {
-          const nodes = Array.from(
-            document.querySelectorAll('g.e2e-test-node')
-          );
+        (name: string, selector: string, nodeSelector: string) => {
+          const nodes = Array.from(document.querySelectorAll(nodeSelector));
 
           const targetNode = nodes.find(node => {
             const title = node.querySelector('title')?.textContent || '';
@@ -7217,69 +7216,63 @@ export class ExplorationEditor extends BaseUser {
           }
 
           const element = targetNode.querySelector(
-            selectorToClick
-          ) as SVGGraphicsElement | null;
-
+            selector
+          ) as HTMLElement | null;
           if (!element) {
             return false;
           }
 
           element.scrollIntoView({block: 'center', inline: 'center'});
-
-          element.dispatchEvent(
-            new MouseEvent('click', {
-              bubbles: true,
-              cancelable: true,
-              view: window,
-            })
-          );
-
           return true;
         },
         stateName,
-        selectorToClick
+        explorationGraphNodeBackgroundSelector,
+        explorationGraphNodeSelector
       );
     };
 
-    if (isMobile) {
-      await this.page.waitForTimeout(800);
-    }
-
     await this.page.waitForFunction(
-      () => document.querySelectorAll('g.e2e-test-node').length > 0,
-      {timeout: 60000}
+      (nodeSelector: string) =>
+        document.querySelectorAll(nodeSelector).length > 0,
+      {timeout: 60000},
+      explorationGraphNodeSelector
     );
 
-    const nodeClicked = await clickOnGraphNodeElement(
+    const nodeFound = await scrollToGraphNodeElement(
       explorationGraphNodeBackgroundSelector
     );
-    if (!nodeClicked) {
+    if (!nodeFound) {
       throw new Error(`Node not found in graph for card: ${stateName}`);
     }
 
-    await this.page.waitForTimeout(500);
+    await this.clickOnElementWithSelector(
+      explorationGraphNodeBackgroundSelector
+    );
 
-    const deleteClicked = await clickOnGraphNodeElement(
+    const deleteFound = await scrollToGraphNodeElement(
       explorationGraphNodeDeleteButtonSelector
     );
-    if (!deleteClicked) {
+    if (!deleteFound) {
       throw new Error(
         `Delete button not found in graph for card: ${stateName}`
       );
     }
 
-    await this.page.waitForSelector(confirmDeleteStateButtonSelector, {
-      visible: true,
-      timeout: 60000,
-    });
+    await this.clickOnElementWithSelector(
+      explorationGraphNodeDeleteButtonSelector
+    );
+
+    await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
     await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
 
     await this.page.waitForFunction(
-      (name: string) => {
-        const labels = document.querySelectorAll('.e2e-test-node-label');
-        return !Array.from(labels).some(l => l.textContent?.trim() === name);
+      (selector: string, name: string) => {
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === name
+        );
       },
-      {},
+      {timeout: 60000},
+      stateNodeSelector,
       stateName
     );
 
@@ -7288,11 +7281,10 @@ export class ExplorationEditor extends BaseUser {
       if (closeBtn) {
         await this.clickOnElementWithSelector(closeModalButtonSelector);
       }
-
-      await this.page.waitForSelector(explorationStateGraphModalSelector, {
-        hidden: true,
-        timeout: 60000,
-      });
+      await this.expectElementToBeVisible(
+        explorationStateGraphModalSelector,
+        false
+      );
     }
   }
 
@@ -7326,12 +7318,10 @@ export class ExplorationEditor extends BaseUser {
       discardAndExportLostChangesButtonSelector
     );
 
-    await this.page.waitForTimeout(10000);
-
     const downloadedFile =
       await this.waitForExplorationDownload('lostChanges.txt');
     expect(downloadedFile).toBe('lostChanges.txt');
-
+    await this.waitForPageToFullyLoad();
     await this.expectLostChangesModalToBeVisible(false);
   }
 
@@ -7342,18 +7332,21 @@ export class ExplorationEditor extends BaseUser {
   async updateStateName(newStateName: string): Promise<void> {
     await this.clickOnElementWithSelector(currentCardNameContainerSelector);
 
-    await this.page.evaluate(() => {
-      const input = document.querySelector(
-        '.e2e-test-state-name-input'
-      ) as HTMLInputElement;
+    await this.page.evaluate(selector => {
+      const input = document.querySelector(selector) as HTMLInputElement;
       if (input) {
         input.value = '';
         input.focus();
       }
-    });
+    }, stateNameInputSelector);
 
     await this.page.keyboard.type(newStateName);
     await this.clickOnElementWithSelector(stateNameSubmitButtonSelector);
+    await this.waitForPageToFullyLoad();
+    await this.expectTextContentToContain(
+      currentCardNameContainerSelector,
+      newStateName
+    );
   }
 
   /**
@@ -7380,19 +7373,17 @@ export class ExplorationEditor extends BaseUser {
 
     await this.page.waitForFunction(
       (selector: string, value: string) => {
-        const elements = document.querySelectorAll(selector);
-        const cardValues = Array.from(elements).map(element =>
-          element.textContent?.trim()
+        return !Array.from(document.querySelectorAll(selector)).some(
+          el => el.textContent?.trim() === value
         );
-        return !cardValues.includes(value);
       },
-      {},
+      {timeout: 60000},
       stateNodeSelector,
       cardName
     );
 
     if (this.isViewportAtMobileWidth()) {
-      await this.page.click(closeModalButtonSelector);
+      await this.clickOnElementWithSelector(closeModalButtonSelector);
       await this.expectElementToBeVisible(
         explorationStateGraphModalSelector,
         false
@@ -7405,6 +7396,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async discardLostChanges(): Promise<void> {
     await this.clickOnElementWithSelector(errorSavingExplorationModal);
+    await this.expectLostChangesModalToBeVisible(false);
   }
 
   /**
@@ -7450,13 +7442,13 @@ export class ExplorationEditor extends BaseUser {
     }
 
     await this.clickOnElementWithSelector(saveDraftButton);
-    await this.page.waitForSelector(saveDraftButton, {hidden: true});
+    await this.expectElementToBeVisible(saveDraftButton, false);
 
-    await this.page.waitForSelector(toastMessage, {visible: true});
-    await this.page.waitForSelector(toastMessage, {hidden: true});
-
+    await this.expectElementToBeVisible(toastMessage, true);
+    await this.expectElementToBeVisible(toastMessage, false);
     showMessage('Exploration is saved successfully.');
     await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(saveRecommendationModalSelector, false);
   }
 }
 
