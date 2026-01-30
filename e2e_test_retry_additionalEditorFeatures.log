@@ -1,3 +1,0 @@
-Starting new Portserver: python -m scripts.run_portserver --portserver_unix_socket_address /Users/yashbahuguna/opensource/oppia/portserver.socket
-There is already a server running on localhost:8181. Please terminate it before running the end-to-end tests. Exiting.
-Stopping Portserver(pid=91142)...
