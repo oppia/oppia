@@ -259,6 +259,7 @@ describe('Exploration editor tab component', () => {
     ).and.returnValue(mockRefreshStateEditorEventEmitter);
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element as HTMLElement);
+    // Store spy reference for potential updates in individual tests
     spyOn(
       versionHistoryService,
       'getLatestVersionOfExploration'
@@ -1099,4 +1100,207 @@ describe('Exploration editor tab component', () => {
 
     expect(component.validationErrorIsShown).toBeTruthy();
   }));
+
+  it('should return early from saveInteractionData when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveInteractionId');
+    spyOn(stateEditorService, 'setInteractionId');
+
+    const newInteractionData = {
+      interactionId: 'TextInput',
+      customizationArgs: {},
+    };
+    component.saveInteractionData(newInteractionData);
+
+    expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
+    expect(stateEditorService.setInteractionId).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveInteractionData when interactionId is null', () => {
+    stateEditorService.setActiveStateName('First State');
+    spyOn(explorationStatesService, 'saveInteractionId');
+    spyOn(stateEditorService, 'setInteractionId');
+
+    const newInteractionData = {
+      interactionId: null,
+      customizationArgs: {},
+    };
+    component.saveInteractionData(newInteractionData);
+
+    expect(explorationStatesService.saveInteractionId).not.toHaveBeenCalled();
+    expect(stateEditorService.setInteractionId).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveStateContent when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveStateContent');
+
+    const displayedValue = SubtitledHtml.createDefault('', 'content');
+    component.saveStateContent(displayedValue);
+
+    expect(explorationStatesService.saveStateContent).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveInteractionAnswerGroups when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+
+    component.saveInteractionAnswerGroups([]);
+
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveInteractionDefaultOutcome when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+
+    const newOutcome = new Outcome(
+      'dest',
+      null,
+      SubtitledHtml.createDefault('', 'feedback'),
+      false,
+      [],
+      null,
+      null
+    );
+    component.saveInteractionDefaultOutcome(newOutcome);
+
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveSolution when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveSolution');
+
+    const displayedValue = SubtitledHtml.createDefault('', 'solution');
+    component.saveSolution(displayedValue);
+
+    expect(explorationStatesService.saveSolution).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveHints when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveHints');
+
+    component.saveHints([]);
+
+    expect(explorationStatesService.saveHints).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveSolicitAnswerDetails when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveSolicitAnswerDetails');
+
+    component.saveSolicitAnswerDetails(true);
+
+    expect(
+      explorationStatesService.saveSolicitAnswerDetails
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from onChangeCardIsCheckpoint when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveCardIsCheckpoint');
+
+    component.onChangeCardIsCheckpoint();
+
+    expect(
+      explorationStatesService.saveCardIsCheckpoint
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveLinkedSkillId when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveLinkedSkillId');
+
+    component.saveLinkedSkillId('skill_id1');
+
+    expect(explorationStatesService.saveLinkedSkillId).not.toHaveBeenCalled();
+  });
+
+  it('should return early from saveInapplicableSkillMisconceptionIds when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveInapplicableSkillMisconceptionIds');
+
+    component.saveInapplicableSkillMisconceptionIds(['skill_id1']);
+
+    expect(
+      explorationStatesService.saveInapplicableSkillMisconceptionIds
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from initStateEditor when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'getState');
+
+    component.initStateEditor();
+
+    expect(explorationStatesService.getState).not.toHaveBeenCalled();
+  });
+
+  it('should return early from initStateEditor when stateData.name is null', fakeAsync(() => {
+    const state = new State(
+      null,
+      'id',
+      'some',
+      SubtitledHtml.createDefault('', 'content'),
+      new Interaction([], [], {}, null, [], 'id', null),
+      [],
+      true,
+      true,
+      null
+    );
+    stateEditorService.setActiveStateName('First State');
+    spyOn(explorationStatesService, 'getState').and.returnValue(state);
+    spyOn(explorationStatesService, 'getStateContentMemento').and.returnValue(
+      SubtitledHtml.createDefault('', 'content')
+    );
+    spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
+    // getLatestVersionOfExploration is already spied in beforeEach (returns 3, which is not null)
+    // This will cause the code to enter the if block, then return early when stateData.name is null
+    spyOn(
+      versionHistoryBackendApiService,
+      'fetchStateVersionHistoryAsync'
+    ).and.resolveTo(null);
+
+    component.initStateEditor();
+    tick();
+
+    expect(
+      versionHistoryBackendApiService.fetchStateVersionHistoryAsync
+    ).not.toHaveBeenCalled();
+  }));
+
+  it('should return 0 from getLastEditedVersionNumberInCaseOfError when position is null', () => {
+    spyOn(
+      versionHistoryService,
+      'getCurrentPositionInStateVersionHistoryList'
+    ).and.returnValue(null);
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toBe(0);
+  });
+
+  it('should return 0 from getLastEditedVersionNumberInCaseOfError when versionNumber is undefined', () => {
+    spyOn(
+      versionHistoryService,
+      'getCurrentPositionInStateVersionHistoryList'
+    ).and.returnValue(0);
+    versionHistoryService.fetchedStateVersionNumbers = [];
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toBe(0);
+  });
+
+  it('should return 0 from getLastEditedVersionNumberInCaseOfError when versionNumber is null', () => {
+    spyOn(
+      versionHistoryService,
+      'getCurrentPositionInStateVersionHistoryList'
+    ).and.returnValue(0);
+    versionHistoryService.fetchedStateVersionNumbers = [null];
+
+    expect(component.getLastEditedVersionNumberInCaseOfError()).toBe(0);
+  });
 });

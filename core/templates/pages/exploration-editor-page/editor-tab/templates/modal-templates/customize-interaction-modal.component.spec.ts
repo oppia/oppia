@@ -597,4 +597,21 @@ describe('Customize Interaction Modal Component', () => {
       'Interaction is missing customization argument placeholder'
     );
   });
+
+  it('should return empty object from getContentIdToContent when interactionId is null', () => {
+    stateInteractionIdService.displayed = null;
+
+    const result = component.getContentIdToContent();
+
+    expect(result).toEqual({});
+  });
+
+  it('should return early from populateNullContentIds when interactionId is null', () => {
+    stateInteractionIdService.displayed = null;
+    spyOn(component, 'getContentIdToContent');
+
+    component.populateNullContentIds();
+
+    expect(component.getContentIdToContent).not.toHaveBeenCalled();
+  });
 });

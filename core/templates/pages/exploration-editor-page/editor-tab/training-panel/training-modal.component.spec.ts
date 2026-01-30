@@ -33,6 +33,7 @@ import {AnswerGroup} from 'domain/exploration/answer-group.model';
 import {AnswerClassificationService} from 'pages/exploration-player-page/services/answer-classification.service';
 import {GraphDataService} from 'pages/exploration-editor-page/services/graph-data.service';
 import {ExplorationWarningsService} from 'pages/exploration-editor-page/services/exploration-warnings.service';
+import {AngularNameService} from 'pages/exploration-editor-page/services/angular-name.service';
 
 class MockActiveModal {
   close(): void {
@@ -83,6 +84,10 @@ describe('Training Modal Component', () => {
   let trainingDataService: TrainingDataService;
   let graphDataService: GraphDataService;
   let explorationWarningsService: ExplorationWarningsService;
+  let stateEditorService: StateEditorService;
+  let stateInteractionIdService: StateInteractionIdService;
+  let explorationStatesService: ExplorationStatesService;
+  let angularNameService: AngularNameService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -122,6 +127,7 @@ describe('Training Modal Component', () => {
         ResponsesService,
         ExplorationWarningsService,
         GraphDataService,
+        AngularNameService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     });
@@ -136,6 +142,10 @@ describe('Training Modal Component', () => {
     responsesService = TestBed.inject(ResponsesService);
     explorationWarningsService = TestBed.inject(ExplorationWarningsService);
     graphDataService = TestBed.inject(GraphDataService);
+    stateEditorService = TestBed.inject(StateEditorService);
+    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    angularNameService = TestBed.inject(AngularNameService);
     spyOn(ngbActiveModal, 'close').and.stub();
     spyOn(explorationWarningsService, 'updateWarnings').and.stub();
     spyOn(graphDataService, 'recompute').and.stub();
@@ -244,4 +254,155 @@ describe('Training Modal Component', () => {
       expect(ngbActiveModal.close).toHaveBeenCalled();
     }
   );
+
+  it('should return early from onConfirm callback when stateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+
+    component.classification = {
+      answerGroupIndex: 5,
+      newOutcome: new Outcome(
+        'dest',
+        null,
+        SubtitledHtml.createDefault('', 'feedback'),
+        true,
+        [],
+        null,
+        null
+      ),
+    };
+    component.unhandledAnswer = 'string';
+    spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
+    spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(3);
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
+    spyOn(responsesService, 'getDefaultOutcome').and.returnValue(null);
+    spyOn(responsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, callback) => {
+        if (callback) {
+          callback(answerGroups, defaultOutcome);
+        }
+      }
+    );
+
+    component.onConfirm();
+
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).not.toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from onConfirm when newOutcome is null', () => {
+    component.classification = {
+      answerGroupIndex: 0,
+      newOutcome: null,
+    };
+    component.unhandledAnswer = 'string';
+    spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
+    spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(3);
+    spyOn(AnswerGroup, 'createNew');
+
+    component.onConfirm();
+
+    expect(AnswerGroup.createNew).not.toHaveBeenCalled();
+  });
+
+  it('should return early from init when currentStateName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue(null);
+    spyOn(explorationStatesService, 'getState');
+
+    component.init();
+
+    expect(explorationStatesService.getState).not.toHaveBeenCalled();
+  });
+
+  it('should return early from init when interactionId is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
+    stateInteractionIdService.savedMemento = null;
+    spyOn(explorationStatesService, 'getState').and.returnValue({
+      interaction: 'TextInput',
+    });
+    spyOn(angularNameService, 'getNameOfInteractionRulesService');
+
+    component.init();
+
+    expect(
+      angularNameService.getNameOfInteractionRulesService
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should return early from init when rulesServiceName is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
+    stateInteractionIdService.savedMemento = 'TextInput';
+    spyOn(explorationStatesService, 'getState').and.returnValue({
+      interaction: 'TextInput',
+    });
+    spyOn(
+      angularNameService,
+      'getNameOfInteractionRulesService'
+    ).and.returnValue(null);
+
+    component.init();
+
+    expect(component.trainingDataAnswer).toBe('');
+  });
+
+  it('should return early from init when rulesServiceName is not in mapping', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
+    stateInteractionIdService.savedMemento = 'TextInput';
+    spyOn(explorationStatesService, 'getState').and.returnValue({
+      interaction: 'TextInput',
+    });
+    spyOn(
+      angularNameService,
+      'getNameOfInteractionRulesService'
+    ).and.returnValue('NonExistentService');
+
+    component.init();
+
+    expect(component.trainingDataAnswer).toBe('');
+  });
+
+  it('should not save default outcome when newDefaultOutcome is null', () => {
+    spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
+    spyOn(explorationStatesService, 'saveInteractionAnswerGroups');
+    spyOn(explorationStatesService, 'saveInteractionDefaultOutcome');
+
+    component.classification = {
+      answerGroupIndex: 5,
+      newOutcome: new Outcome(
+        'dest',
+        null,
+        SubtitledHtml.createDefault('', 'feedback'),
+        true,
+        [],
+        null,
+        null
+      ),
+    };
+    component.unhandledAnswer = 'string';
+    spyOn(trainingDataService, 'associateWithAnswerGroup').and.stub();
+    spyOn(responsesService, 'getAnswerGroupCount').and.returnValue(3);
+    spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
+    spyOn(responsesService, 'getDefaultOutcome').and.returnValue(null);
+    spyOn(responsesService, 'save').and.callFake(
+      (answerGroups, defaultOutcome, callback) => {
+        if (callback) {
+          callback(answerGroups, defaultOutcome);
+        }
+      }
+    );
+
+    component.onConfirm();
+
+    expect(
+      explorationStatesService.saveInteractionAnswerGroups
+    ).toHaveBeenCalled();
+    expect(
+      explorationStatesService.saveInteractionDefaultOutcome
+    ).not.toHaveBeenCalled();
+  });
 });
