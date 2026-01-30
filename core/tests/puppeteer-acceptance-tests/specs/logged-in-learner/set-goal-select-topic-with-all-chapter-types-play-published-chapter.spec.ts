@@ -166,7 +166,8 @@ describe('Logged-In Learner', function () {
       await loggedInLearner1.expectChapterToBeClickable(
         'What are the Place Values'
       );
-      // Todo:After Resolving #24423
+
+      // Todo:After Resolving issue #24423
       // await loggedInLearner1.expectChapterToBeClickable(
       //   'Find the Value of a Number' , false
       // );
@@ -208,10 +209,15 @@ describe('Logged-In Learner', function () {
         'Find the Value of a Number',
       ]);
 
-      // Todo:After Resolving #24423
+      // Todo:After Resolving issue #24423
       // await loggedInLearner2.expectChapterToBeClickable(
-      //   'Find the Value of a Number'
+      //   'Find the Value of a Number' , false
       // );
+
+      await loggedInLearner2.expectScreenshotToMatch(
+        'avialableChap1CommingSoonChap2',
+        __dirname
+      );
 
       await loggedInLearner2.selectAndPlayChapter('What are the Place Values');
 

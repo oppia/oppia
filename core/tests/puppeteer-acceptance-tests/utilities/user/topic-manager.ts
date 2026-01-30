@@ -4410,8 +4410,8 @@ export class TopicManager extends BaseUser {
     );
 
     const futureDate = new Date();
-    futureDate.setMonth(futureDate.getMonth() + 1); //Flaky nature
-
+    futureDate.setDate(futureDate.getDate() + 3); //Flaky nature
+    futureDate.setHours(12, 0, 0, 0);
     const dateString = futureDate.toLocaleDateString('en-US');
 
     await this.setNodePlannedPublicationDate(
@@ -4432,6 +4432,36 @@ export class TopicManager extends BaseUser {
     await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
 
     showMessage(`Chapter ${chapterName} marked as ready to publish.`);
+  }
+
+  async expectAllListedChaptersStatus(
+    chapterNames: string[],
+    chapStatus: string = 'Published'
+  ): Promise<void> {
+    await this.page.waitForSelector('tr.story-node');
+
+    const rows = await this.page.$$('tr.story-node');
+    const found = new Set<string>();
+
+    for (const row of rows) {
+      const title = await row.$eval('.e2e-test-chapter-title', el =>
+        el.textContent?.trim()
+      );
+
+      if (chapterNames.includes(title)) {
+        const status = await row.$eval('.e2e-test-chapter-status', el =>
+          el.textContent?.trim()
+        );
+
+        expect(status).toBe(chapStatus);
+        found.add(title);
+      }
+    }
+
+    const missing = chapterNames.filter(c => !found.has(c));
+    if (missing.length) {
+      throw new Error(`Chapters not found: ${missing.join(', ')}`);
+    }
   }
 }
 export let TopicManagerFactory = (): TopicManager => new TopicManager();
