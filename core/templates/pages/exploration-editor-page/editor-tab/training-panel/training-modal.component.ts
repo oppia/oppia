@@ -116,6 +116,7 @@ export class TrainingModalComponent
       newOutcome: null,
     };
     this.addingNewResponse = false;
+    this.trainingDataAnswer = '';
 
     this.init();
   }
@@ -190,6 +191,7 @@ export class TrainingModalComponent
   init(): void {
     let currentStateName = this.stateEditorService.getActiveStateName();
     if (currentStateName === null) {
+      this.trainingDataAnswer = '';
       return;
     }
     let state = this.explorationStatesService.getState(currentStateName);
@@ -197,6 +199,7 @@ export class TrainingModalComponent
     // Retrieve the interaction ID.
     let interactionId = this.stateInteractionIdService.savedMemento;
     if (interactionId === null) {
+      this.trainingDataAnswer = '';
       return;
     }
 
@@ -206,6 +209,7 @@ export class TrainingModalComponent
       rulesServiceName === null ||
       !(rulesServiceName in RULES_SERVICE_MAPPING)
     ) {
+      this.trainingDataAnswer = '';
       return;
     }
 
