@@ -23,7 +23,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import 'charts.css';
+import 'charts.css/dist/charts.min.css';
 import './bar-chart.component.css';
 
 interface DataPoint {
