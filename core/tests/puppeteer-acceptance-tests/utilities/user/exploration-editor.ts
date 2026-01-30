@@ -201,10 +201,7 @@ const basicSettingsDropdown = 'h3.e2e-test-settings-container';
 const feedbackSettingsDropdown = 'h3.e2e-test-feedback-settings-container';
 const permissionSettingsDropdown = 'h3.e2e-test-permission-settings-container';
 const communityOwnedMessageSelector = '.e2e-test-is-community-owned';
-const voiceArtistSettingsDropdown =
-  'h3.e2e-test-voice-artists-settings-container';
 const rolesSettingsDropdown = 'h3.e2e-test-roles-settings-container';
-const advanceSettingsDropdown = 'h3.e2e-test-advanced-settings-container';
 const explorationControlsSettingsDropdown =
   'h3.e2e-test-controls-bar-settings-container';
 const settingsContainerSelector =

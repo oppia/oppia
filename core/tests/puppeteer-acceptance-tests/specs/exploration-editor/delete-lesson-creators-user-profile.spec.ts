@@ -20,7 +20,6 @@
 
 import {UserFactory} from '../../utilities/common/user-factory';
 import testConstants from '../../utilities/common/test-constants';
-import {showMessage} from '../../utilities/common/show-message';
 import {
   ExplorationEditor,
   INTERACTION_TYPES,
