@@ -1153,14 +1153,14 @@ class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
 
     def test_validation_returns_true_if_story_exists(self) -> None:
         self.get_html_response(
-            '%s/can_access_story_viewer_page/staging/topic-name/story-one'
+            '%s/can_access_story_viewer_page/staging/topic-name/story/story-one'
             % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=200,
         )
 
     def test_validation_returns_false_if_story_does_not_exist(self) -> None:
         self.get_json(
-            '%s/can_access_story_viewer_page/staging/topic-name/invalid-story'
+            '%s/can_access_story_viewer_page/staging/topic-name/story/invalid-story'
             % ACCESS_VALIDATION_HANDLER_PREFIX,
             expected_status_int=404,
         )
