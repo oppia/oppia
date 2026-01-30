@@ -17,7 +17,11 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["path", "stream", "zlib"],
+            "allowedCommonJsDependencies": [
+              "path",
+              "stream",
+              "zlib"
+            ],
             "outputPath": "dist/oppia-angular",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -35,7 +39,8 @@
             "styles": [
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
-              "node_modules/ngx-toastr/toastr.css"
+              "node_modules/ngx-toastr/toastr.css",
+              "node_modules/charts.css/dist/charts.min.css"
             ],
             "scripts": []
           },
@@ -105,6 +110,7 @@
               "assets"
             ],
             "styles": [
+              "node_modules/charts.css/dist/charts.min.css"
             ],
             "scripts": []
           }
