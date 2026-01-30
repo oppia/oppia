@@ -7197,11 +7197,11 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationGraphSelector);
 
-    const scrollToGraphNodeElement = async (
-      selectorToFind: string
+    const clickOnGraphNodeElement = async (
+      selectorToClick: string
     ): Promise<boolean> => {
       return await this.page.evaluate(
-        (name: string, selector: string, nodeSelector: string) => {
+        (name: string, selectorToClick: string, nodeSelector: string) => {
           const nodes = Array.from(document.querySelectorAll(nodeSelector));
 
           const targetNode = nodes.find(node => {
@@ -7216,17 +7216,18 @@ export class ExplorationEditor extends BaseUser {
           }
 
           const element = targetNode.querySelector(
-            selector
+            selectorToClick
           ) as HTMLElement | null;
+
           if (!element) {
             return false;
           }
-
           element.scrollIntoView({block: 'center', inline: 'center'});
+          element.dispatchEvent(new Event('click', {bubbles: true}));
           return true;
         },
         stateName,
-        explorationGraphNodeBackgroundSelector,
+        selectorToClick,
         explorationGraphNodeSelector
       );
     };
@@ -7238,29 +7239,16 @@ export class ExplorationEditor extends BaseUser {
       explorationGraphNodeSelector
     );
 
-    const nodeFound = await scrollToGraphNodeElement(
-      explorationGraphNodeBackgroundSelector
-    );
-    if (!nodeFound) {
-      throw new Error(`Node not found in graph for card: ${stateName}`);
-    }
+    await clickOnGraphNodeElement(explorationGraphNodeBackgroundSelector);
 
-    await this.clickOnElementWithSelector(
-      explorationGraphNodeBackgroundSelector
-    );
-
-    const deleteFound = await scrollToGraphNodeElement(
+    const deleteClicked = await clickOnGraphNodeElement(
       explorationGraphNodeDeleteButtonSelector
     );
-    if (!deleteFound) {
+    if (!deleteClicked) {
       throw new Error(
         `Delete button not found in graph for card: ${stateName}`
       );
     }
-
-    await this.clickOnElementWithSelector(
-      explorationGraphNodeDeleteButtonSelector
-    );
 
     await this.expectElementToBeVisible(confirmDeleteStateButtonSelector);
     await this.clickOnElementWithSelector(confirmDeleteStateButtonSelector);
