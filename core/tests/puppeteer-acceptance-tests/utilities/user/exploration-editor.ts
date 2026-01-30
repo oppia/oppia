@@ -62,6 +62,8 @@ const addRoleDropdown = 'mat-select.e2e-test-role-select';
 const collaboratorRoleOption = 'Collaborator (can make changes)';
 const playtesterRoleOption = 'Playtester (can give feedback)';
 const saveRoleButton = 'button.e2e-test-save-role';
+const rolesHeaderSelector = '.e2e-test-roles-header';
+const usernameSelector = '.e2e-test-role-username';
 
 const interactionDiv = '.e2e-test-interaction';
 const addInteractionModalSelector = 'customize-interaction-body-container';
@@ -2488,31 +2490,6 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Function to navigate to exploration editor by exploration ID.
-   * @param {string} explorationId - The exploration ID to open.
-   */
-  async navigateToExplorationEditorPageById(
-    explorationId: string
-  ): Promise<void> {
-    if (!explorationId) {
-      throw new Error(
-        'Exploration ID must be provided to navigate to its editor page.'
-      );
-    }
-
-    // Directly navigate to the editor URL for the given exploration ID.
-    await this.goto(`${baseUrl}/create/${explorationId}`, true);
-
-    // Wait for either the editor to load or an error page to appear.
-    await this.page.waitForFunction(() => {
-      return (
-        !!document.querySelector('.e2e-test-exploration-main-tab') ||
-        !!document.querySelector('.e2e-test-error-page-heading')
-      );
-    });
-  }
-
-  /**
    * Function to create an exploration with a content and interaction.
    * This is a composite function that can be used when a straightforward, simple exploration setup is required.
    *
@@ -2535,11 +2512,9 @@ export class ExplorationEditor extends BaseUser {
   async navigateToSettingsTab(): Promise<void> {
     // Ensure the editor is fully loaded before attempting to navigate.
     await this.waitForPageToFullyLoad();
-    // Give the page a moment to fully settle after rendering.
-    await this.page.waitForTimeout(500);
 
     // Ensure the welcome modal is not blocking the navbar or options button.
-    await this.dismissWelcomeModalIfPresent();
+    await this.dismissWelcomeModal();
 
     if (this.isViewportAtMobileWidth()) {
       const element = await this.page.$(mobileNavbarDropdown);
@@ -2559,22 +2534,26 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileSettingsBarSelector);
 
       // Open all dropdowns because by default all dropdowns are closed in mobile view.
-      // Wait for dropdowns to be visible before clicking them.
-      await this.page.waitForSelector(basicSettingsDropdown, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(basicSettingsDropdown);
-      await this.clickOnElementWithSelector(advanceSettingsDropdown);
-      // Ensure roles dropdown is visible before clicking (critical for test reliability).
-      await this.page.waitForSelector(rolesSettingsDropdown, {
-        visible: true,
-        timeout: 10000,
-      });
-      await this.clickOnElementWithSelector(rolesSettingsDropdown);
-      await this.clickOnElementWithSelector(voiceArtistSettingsDropdown);
-      await this.clickOnElementWithSelector(permissionSettingsDropdown);
-      await this.clickOnElementWithSelector(feedbackSettingsDropdown);
+      // Use expandSettingsTabSection which checks if already expanded.
+      await this.expectElementToBeVisible(basicSettingsDropdown);
+      await this.expandSettingsTabSection('Basic Settings');
+      await this.expandSettingsTabSection('Advanced Features');
+      await this.expandSettingsTabSection('Roles');
+      await this.expandSettingsTabSection('Voice Artists');
+      // Note: Permissions and Feedback don't have expandSettingsTabSection support yet,
+      // so we handle them directly with toggle check.
+      const isPermissionExpanded = await this.isElementVisible(
+        '.e2e-test-permission-settings-content'
+      );
+      if (!isPermissionExpanded) {
+        await this.clickOnElementWithSelector(permissionSettingsDropdown);
+      }
+      const isFeedbackExpanded = await this.isElementVisible(
+        '.e2e-test-feedback-settings-content'
+      );
+      if (!isFeedbackExpanded) {
+        await this.clickOnElementWithSelector(feedbackSettingsDropdown);
+      }
     } else {
       await this.page.waitForSelector(settingsTabSelector, {
         visible: true,
@@ -2683,35 +2662,63 @@ export class ExplorationEditor extends BaseUser {
    * This is a composite function that can be used when a straightforward, simple exploration published is required.
    * @param {string} title - The title of the exploration.
    * @param {string} goal - The goal of the exploration.
-   * @param {string} category - The category of the exploration.,
+   * @param {string} category - The category of the exploration.
    * @param {string} tags - The tags of the exploration.
+   * @param {string} language - The language of the exploration (default: 'English').
    */
   async publishExplorationWithMetadata(
     title: string,
     goal: string,
     category: string,
-    tags?: string
+    tags?: string,
+    language: string = 'English'
   ): Promise<string> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
-        await this.page.waitForSelector(mobileNavbarDropdown, {
-          visible: true,
-        });
-        const element = await this.page.$(mobileNavbarOptions);
-        // If the element is not present, it means the mobile navigation bar is not expanded.
-        // The option to save changes appears only in the mobile view after clicking on the mobile options button,
-        // which expands the mobile navigation bar.
+        await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
+        const element = await this.getElementInParent(
+          mobileNavbarOptions
+        ).catch(() => null);
         if (!element) {
           await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+          await this.page.waitForSelector(mobileNavbarDropdown, {
+            visible: true,
+          });
         }
+
+        // Click the mobile changes dropdown.
+        await this.page.waitForSelector(mobileChangesDropdownSelector, {
+          visible: true,
+          timeout: 15000,
+        });
         await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
-        await this.clickOnElementWithSelector(mobilePublishButtonSelector);
+
+        await this.page.waitForSelector(mobilePublishButtonSelector, {
+          visible: true,
+          timeout: 10000,
+        });
+
+        // Scroll the button into view and click it using direct JavaScript.
+        // This approach handles sticky footers that might occlude the button.
+        await this.page.evaluate(() => {
+          const button = document.querySelector(
+            'button.e2e-test-mobile-publish-button'
+          ) as HTMLElement | null;
+          if (button) {
+            button.scrollIntoView({block: 'end', inline: 'center'});
+            button.click();
+          }
+        });
+
+        await this.page.waitForSelector(explorationTitleInput, {
+          visible: true,
+        });
       } else {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
-        const publishButton = await this.page.$(
+        const publishButton = await this.getElementInParent(
           publishExplorationButtonSelector
         );
         if (!publishButton) {
@@ -2725,15 +2732,14 @@ export class ExplorationEditor extends BaseUser {
     };
 
     const fillExplorationMetadataDetails = async () => {
-      await this.clickOnElementWithSelector(explorationTitleInput);
-      await this.typeInInputField(explorationTitleInput, title);
-      await this.clickOnElementWithSelector(explorationGoalInput);
-      await this.typeInInputField(explorationGoalInput, goal);
-      await this.clickOnElementWithSelector(explorationCategoryDropdown);
-      await this.clickOnElementWithText(category);
-      if (tags) {
-        await this.typeInInputField(tagsField, tags);
-      }
+      const tagsArray = tags ? tags.split(',').map(tag => tag.trim()) : [];
+      await this.fillExplorationMetadataDetails(
+        title,
+        goal,
+        category,
+        language,
+        tagsArray
+      );
     };
 
     const confirmPublish = async (): Promise<string> => {
@@ -2767,9 +2773,9 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       showMessage('Failed to publish the exploration.\n' + error.stack);
 
-      const errorSavingExplorationElement = await this.page.$(
+      const errorSavingExplorationElement = await this.getElementInParent(
         errorSavingExplorationModal
-      );
+      ).catch(() => null);
       if (errorSavingExplorationElement) {
         await this.clickOnElementWithSelector(errorSavingExplorationModal);
         await this.page.waitForNavigation({
@@ -2782,239 +2788,26 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Robust publish helper which preserves the original behavior of
-   * `publishExplorationWithMetadata` (unchanged) and adds a mobile-robust
-   * implementation that only affects invocations of the new function.
-   */
-  async publishExplorationWithMetadataRobust(
-    title: string,
-    goal: string,
-    category: string,
-    tags?: string
-  ): Promise<string> {
-    // For desktop, reuse the original function to avoid duplicating logic.
-    if (!this.isViewportAtMobileWidth()) {
-      return await this.publishExplorationWithMetadata(
-        title,
-        goal,
-        category,
-        tags
-      );
-    }
-
-    // Mobile-specific robust implementation (kept separate from the original
-    // function so we do not change existing behavior).
-    const publishExplorationMobile = async () => {
-      await this.waitForPageToFullyLoad();
-      await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
-      const element = await this.page.$(mobileNavbarOptions);
-      if (!element) {
-        await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-        // Allow a short time for the mobile nav animation to finish.
-        await this.page.waitForTimeout(300);
-      }
-
-      // Click the mobile changes dropdown with a fallback.
-      try {
-        await this.page.waitForSelector(mobileChangesDropdownSelector, {
-          visible: true,
-          timeout: 15000,
-        });
-        try {
-          await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
-        } catch (err) {
-          showMessage(
-            'Click on mobile changes dropdown failed, attempting in-page click fallback.'
-          );
-          await this.page.evaluate(() => {
-            const el = document.querySelector(
-              'div.e2e-test-mobile-changes-dropdown'
-            ) as HTMLElement | null;
-            if (el) {
-              el.scrollIntoView({block: 'center', inline: 'center'});
-              ['mousedown', 'mouseup', 'click'].forEach(type => {
-                const ev = new MouseEvent(type, {
-                  bubbles: true,
-                  cancelable: true,
-                  view: window,
-                });
-                el.dispatchEvent(ev);
-              });
-            }
-          });
-        }
-      } catch (e) {
-        showMessage(
-          'Mobile changes dropdown did not appear; attempting alternate selector #discardButtonPopup.'
-        );
-        const alt = await this.page.$('#discardButtonPopup');
-        if (alt) {
-          await this.clickOnElement(alt);
-        } else {
-          throw new Error('Mobile changes dropdown not found.');
-        }
-      }
-
-      await this.page.waitForSelector(mobilePublishButtonSelector, {
-        visible: true,
-        timeout: 10000,
-      });
-
-      // For mobile viewports with sticky footers, we need to scroll the button
-      // into view and then scroll down a bit more to ensure the footer doesn't
-      // occlude it.
-      await this.page.evaluate(() => {
-        const button = document.querySelector(
-          'button.e2e-test-mobile-publish-button'
-        ) as HTMLElement | null;
-        if (button) {
-          button.scrollIntoView({block: 'end', inline: 'center'});
-        }
-      });
-
-      // Wait a moment for the scroll to complete and any layout shifts to settle.
-      await this.page.waitForTimeout(300);
-
-      // Now click the button using direct JavaScript dispatch to bypass clickability
-      // checks, since we've already handled scrolling.
-      await this.page.evaluate(() => {
-        const button = document.querySelector(
-          'button.e2e-test-mobile-publish-button'
-        ) as HTMLElement | null;
-        if (button) {
-          button.click();
-        }
-      });
-
-      // Allow time for the publish action to complete and the page to settle.
-      // This ensures the backend has processed the publish before the next action.
-      await this.page.waitForTimeout(1500);
-    };
-
-    const fillExplorationMetadataDetails = async () => {
-      // Fill title.
-      await this.clickOnElementWithSelector(explorationTitleInput);
-      await this.typeInInputField(explorationTitleInput, title);
-      // Trigger validation by blurring the field.
-      await this.page.evaluate(() => {
-        const titleInput = document.querySelector(
-          'input.e2e-test-exploration-title-input-modal'
-        ) as HTMLElement | null;
-        if (titleInput) {
-          titleInput.dispatchEvent(new Event('blur'));
-        }
-      });
-      await this.page.waitForTimeout(200);
-
-      // Fill goal - note: goal must be at least 15 characters.
-      await this.clickOnElementWithSelector(explorationGoalInput);
-      // Clear any existing text first.
-      await this.page.evaluate(() => {
-        const goalInput = document.querySelector(
-          'input.e2e-test-exploration-objective-input-modal'
-        ) as HTMLInputElement | null;
-        if (goalInput) {
-          goalInput.value = '';
-        }
-      });
-      await this.typeInInputField(explorationGoalInput, goal);
-      // Trigger validation by blurring the field.
-      await this.page.evaluate(() => {
-        const goalInput = document.querySelector(
-          'input.e2e-test-exploration-objective-input-modal'
-        ) as HTMLElement | null;
-        if (goalInput) {
-          goalInput.dispatchEvent(new Event('blur'));
-        }
-      });
-      await this.page.waitForTimeout(200);
-
-      // Select category.
-      await this.clickOnElementWithSelector(explorationCategoryDropdown);
-      await this.clickOnElementWithText(category);
-      await this.page.waitForTimeout(200);
-
-      // Add tags if provided.
-      if (tags) {
-        await this.typeInInputField(tagsField, tags);
-        await this.page.evaluate(() => {
-          const tagsInput = document.querySelector(
-            'input[placeholder*="Add a new tag"]'
-          ) as HTMLElement | null;
-          if (tagsInput) {
-            tagsInput.dispatchEvent(new Event('blur'));
-          }
-        });
-        await this.page.waitForTimeout(200);
-      }
-    };
-
-    const confirmPublish = async (): Promise<string> => {
-      await this.clickOnElementWithSelector(saveExplorationChangesButton);
-      await this.waitForPageToFullyLoad();
-      await this.page.waitForSelector(explorationConfirmPublishButton, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(explorationConfirmPublishButton);
-      await this.page.waitForSelector(explorationIdElement);
-      const explorationIdUrl = await this.page.$eval(
-        explorationIdElement,
-        element => (element as HTMLElement).innerText
-      );
-      const explorationId = explorationIdUrl.replace(/^.*\/explore\//, '');
-      await this.waitForElementToStabilize(closePublishedPopUpButton);
-      await this.clickOnElementWithSelector(closePublishedPopUpButton);
-      await this.expectElementToBeVisible(closePublishedPopUpButton, false);
-
-      if (!explorationId) {
-        throw new Error('Failed to get exploration ID.');
-      }
-      return explorationId;
-    };
-
-    await publishExplorationMobile();
-    await fillExplorationMetadataDetails();
-
-    try {
-      return await confirmPublish();
-    } catch (error) {
-      showMessage(
-        'Failed to publish the exploration (robust flow).\n' + error.stack
-      );
-      const errorSavingExplorationElement = await this.page.$(
-        errorSavingExplorationModal
-      );
-      if (errorSavingExplorationElement) {
-        await this.clickOnElementWithSelector(errorSavingExplorationModal);
-        await this.page.waitForNavigation({
-          waitUntil: ['load', 'networkidle0'],
-        });
-      }
-      await publishExplorationMobile();
-      return await confirmPublish();
-    }
-  }
-
-  /**
    * Navigate to feedback tab.
    */
   async navigateToFeedbackTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      const mobileNavbarElement = await this.page.$(mobileNavbarOptions);
+      const mobileNavbarElement = await this.getElementInParent(
+        mobileNavbarOptions
+      ).catch(() => null);
       if (!mobileNavbarElement) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
+        await this.expectElementToBeVisible(mobileNavbarDropdown);
       }
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
-      await this.page.waitForSelector(mobileNavbarPane);
+      await this.expectElementToBeVisible(mobileNavbarPane);
       await this.clickOnElementWithSelector(mobileFeedbackTabButton);
     } else {
       await this.clickOnElementWithSelector(feedBackButtonTab);
       await this.waitForNetworkIdle();
     }
 
-    await this.page.waitForSelector(explorationFeedbackTabContentSelector, {
-      visible: true,
-    });
+    await this.expectElementToBeVisible(explorationFeedbackTabContentSelector);
   }
 
   /**
@@ -3683,10 +3476,7 @@ export class ExplorationEditor extends BaseUser {
    * This does not modify any prebuilt functions; it uses existing helpers
    * and adds resilient fallbacks for mobile/constrained viewports.
    */
-  async ensureRolesFormIsOpen(): Promise<void> {
-    const rolesHeaderSelector = '.e2e-test-roles-header';
-    const usernameSelector = '.e2e-test-role-username';
-
+  async expectRolesFormToBeOpen(): Promise<void> {
     // Ensure Settings tab is visible and Roles section is expanded (on mobile).
     await this.navigateToSettingsTab();
     // Give the Settings tab time to render before proceeding.
@@ -3740,14 +3530,35 @@ export class ExplorationEditor extends BaseUser {
         timeout: 5000,
       });
     }
+
+    // Verify the roles form is open by checking the username input field is visible and interactive.
+    await this.expectElementToBeVisible(usernameSelector);
   }
 
   /**
    * Expects the exploration to be community owned in the Settings tab.
+   * Verifies the message "This exploration is public and community-editable.
+   * It is available in the Oppia library."
    */
   async expectExplorationToBeCommunityOwned(): Promise<void> {
     await this.navigateToSettingsTab();
     await this.expectElementToBeVisible(communityOwnedMessageSelector);
+
+    // Verify the exact text from the CUJ expectations.
+    const messageText = await this.page.$eval(
+      communityOwnedMessageSelector,
+      el => el.textContent?.trim() || ''
+    );
+
+    if (
+      !messageText.includes('public') ||
+      !messageText.includes('community-editable') ||
+      !messageText.includes('available')
+    ) {
+      throw new Error(
+        `Expected community-owned message but got: "${messageText}"`
+      );
+    }
   }
 
   /**
@@ -3777,19 +3588,11 @@ export class ExplorationEditor extends BaseUser {
    * Assigns a role of manager to any guest user assuming the Roles form is
    * already open and the username input is visible. This avoids re-clicking the
    * edit button when it may be unreliable in constrained viewports.
+   * @param {string} username - The username to assign the manager role to.
    */
   async assignUserToManagerRoleAfterFormOpen(username: string): Promise<void> {
-    const usernameSelector = '.e2e-test-role-username';
-    await this.page.waitForSelector(usernameSelector, {
-      visible: true,
-      timeout: 5000,
-    });
-    await this.page.evaluate(selector => {
-      const input = document.querySelector(selector);
-      if (input) {
-        input.scrollIntoView({block: 'center'});
-      }
-    }, usernameSelector);
+    await this.expectElementToBeVisible(usernameSelector);
+    await this.expectElementToBeClickable(addUsernameInputBox);
     await this.clickOnElementWithSelector(addUsernameInputBox);
     await this.typeInInputField(addUsernameInputBox, username);
     await this.clickOnElementWithSelector(addRoleDropdown);
@@ -3797,7 +3600,7 @@ export class ExplorationEditor extends BaseUser {
       "//mat-option[contains(., 'Manager (can edit permissions)')]"
     );
     await managerOption.click();
-    await this.page.waitForSelector(tagFilterDropdownSelector, {hidden: true});
+    await this.expectElementToBeVisible(tagFilterDropdownSelector, false);
     await this.clickOnElementWithSelector(saveRoleButton);
     await this.page.waitForSelector(saveRoleButton, {hidden: true});
     showMessage(
@@ -5268,15 +5071,33 @@ export class ExplorationEditor extends BaseUser {
   }
 
   /**
-   * Checks whether the current user can manage the exploration (i.e., is a manager/owner).
+   * Checks whether the specified user is a manager of the exploration.
+   * Verifies by checking that the username appears explicitly in the Managers section.
    */
-  async expectUserToBeExplorationManager(): Promise<void> {
+  async expectUserToBeExplorationManager(username: string): Promise<void> {
     // Ensure we are on the settings tab where role management is displayed.
     await this.navigateToSettingsTab();
 
-    // The edit roles button is only visible when the user has role modification permission.
-    await this.expectElementToBeVisible(editRoleButton);
-    showMessage('User can manage exploration roles.');
+    // Verify the username is listed in the managers section (the definitive check per CUJ).
+    const managersSection = await this.page.$(
+      '.e2e-test-roles-settings-container'
+    );
+    if (!managersSection) {
+      throw new Error('Managers section not found');
+    }
+
+    const managersText = await this.page.evaluate(
+      el => el.textContent || '',
+      managersSection
+    );
+
+    if (!managersText.includes(username)) {
+      throw new Error(
+        `Expected user "${username}" to be listed as manager, but not found in: ${managersText}`
+      );
+    }
+
+    showMessage(`User ${username} is listed as a manager of this exploration.`);
   }
 
   /**

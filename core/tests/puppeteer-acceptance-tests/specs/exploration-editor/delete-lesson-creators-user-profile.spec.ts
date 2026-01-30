@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Acceptance test for LC.9: Delete lesson creator's user profile.
+ * @fileoverview Acceptance test from CUJv3 Doc
+ * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/
+ * LC.9: Delete lesson creator's user profile.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
@@ -51,14 +53,14 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.updateCardContent('Introduction to positive numbers');
     await expEditor1.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
     await expEditor1.saveExplorationDraft();
-    await expEditor1.publishExplorationWithMetadataRobust(
+    await expEditor1.publishExplorationWithMetadata(
       'Positive Numbers',
       'This exploration teaches students about positive numbers and their properties.',
       'Mathematics'
     );
 
     // 2. Roles Assignment. Ensure Settings is open and Roles form is visible.
-    await expEditor1.ensureRolesFormIsOpen();
+    await expEditor1.expectRolesFormToBeOpen();
 
     await expEditor1.assignUserToManagerRoleAfterFormOpen('expEditor2');
 
@@ -71,7 +73,7 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.saveExplorationDraft();
     // Allow page to fully settle before publishing second exploration.
     await expEditor1.page.waitForTimeout(1000);
-    await expEditor1.publishExplorationWithMetadataRobust(
+    await expEditor1.publishExplorationWithMetadata(
       'Negative Numbers',
       'This exploration teaches students about negative numbers and their applications.',
       'Mathematics'
@@ -87,15 +89,14 @@ describe('Lesson Creator Profile Deletion', function () {
     await expEditor1.navigateToPreferencesPage();
     await expEditor1.deleteAccount();
     await expEditor1.confirmAccountDeletion('expEditor1');
-    showMessage('Account deleted for expEditor1.');
 
     // 5. Verify ownership and access permissions as expEditor2.
-    await expEditor2.navigateToExplorationEditorPageById(wholeNumbersExpId);
+    await expEditor2.navigateToExplorationEditor(wholeNumbersExpId);
     await expEditor2.expectErrorPage(404);
-    await expEditor2.navigateToExplorationEditorPageById(negativeNumbersExpId);
+    await expEditor2.navigateToExplorationEditor(negativeNumbersExpId);
     await expEditor2.expectExplorationToBeCommunityOwned();
-    await expEditor2.navigateToExplorationEditorPageById(positiveNumbersExpId);
-    await expEditor2.expectUserToBeExplorationManager();
+    await expEditor2.navigateToExplorationEditor(positiveNumbersExpId);
+    await expEditor2.expectUserToBeExplorationManager('expEditor2');
   }, 600000);
 
   afterAll(async function () {

@@ -844,6 +844,7 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(deleteMyAcccountButton, {
       hidden: true,
     });
+    showMessage(`Account deleted for ${username}.`);
   }
 
   /**
