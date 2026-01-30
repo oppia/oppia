@@ -328,7 +328,8 @@ describe('Training Modal Component', () => {
 
   it('should return early from init when interactionId is null', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
-    (stateInteractionIdService as any).savedMemento = null;
+    // @ts-expect-error -- Testing null assignment for savedMemento.
+    stateInteractionIdService.savedMemento = null;
     spyOn(explorationStatesService, 'getState').and.returnValue({
       interaction: 'TextInput',
     });

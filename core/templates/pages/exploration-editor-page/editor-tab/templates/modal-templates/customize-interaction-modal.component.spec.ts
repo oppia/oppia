@@ -599,7 +599,8 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return empty object from getContentIdToContent when interactionId is null', () => {
-    (stateInteractionIdService as any).displayed = null;
+    // @ts-expect-error -- Testing null assignment for interactionId.
+    stateInteractionIdService.displayed = null;
 
     const result = component.getContentIdToContent();
 
@@ -607,7 +608,8 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return early from populateNullContentIds when interactionId is null', () => {
-    (stateInteractionIdService as any).displayed = null;
+    // @ts-expect-error -- Testing null assignment for interactionId.
+    stateInteractionIdService.displayed = null;
     spyOn(component, 'getContentIdToContent');
 
     component.populateNullContentIds();
