@@ -224,11 +224,10 @@ export class TopicEditorNavbarComponent
       this.alertsService.addWarning(errorMessage);
       return false;
     }
+    this.showTopicEditOptions = false;
     if (!this.topicRights.canPublishTopic()) {
-      this.showTopicEditOptions = false;
       return false;
     }
-    this.showTopicEditOptions = false;
     this.topicRightsBackendApiService
       .unpublishTopicAsync(this.topicId)
       .then(() => {
