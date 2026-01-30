@@ -1,6 +1,12 @@
 {
   "suites": [
     {
+  "name": "IO.2.ViewBlog",
+  "testDir": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user",
+  "testFiles": ["click-all-links-on-blog-page.spec.ts"]
+    },
+
+    {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
