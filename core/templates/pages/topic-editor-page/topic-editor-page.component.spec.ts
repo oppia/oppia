@@ -354,6 +354,71 @@ describe('Topic editor page', () => {
     expect(topicPreviewSpy).toHaveBeenCalled();
   });
 
+  it('should not set document title when topic is not loaded', () => {
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      undefined
+    );
+    const setDocumentTitleSpy = spyOn(pageTitleService, 'setDocumentTitle');
+    const setNavbarSubtitleSpy = spyOn(
+      pageTitleService,
+      'setNavbarSubtitleForMobileView'
+    );
+
+    component.setDocumentTitle();
+
+    expect(setDocumentTitleSpy).not.toHaveBeenCalled();
+    expect(setNavbarSubtitleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not set document title when topic has no name', () => {
+    let topicWithoutName = new Topic(
+      'id',
+      '',
+      'Abbrev.',
+      'url-frag',
+      'Description',
+      'en',
+      [],
+      [],
+      [],
+      1,
+      1,
+      [],
+      'str',
+      '',
+      {},
+      false,
+      '',
+      '',
+      []
+    );
+    topicWithoutName.setName('');
+    (topicEditorStateService.getTopic as jasmine.Spy).and.returnValue(
+      topicWithoutName
+    );
+    const setDocumentTitleSpy = spyOn(pageTitleService, 'setDocumentTitle');
+    const setNavbarSubtitleSpy = spyOn(
+      pageTitleService,
+      'setNavbarSubtitleForMobileView'
+    );
+
+    component.setDocumentTitle();
+
+    expect(setDocumentTitleSpy).not.toHaveBeenCalled();
+    expect(setNavbarSubtitleSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not validate when topic is not set', () => {
+    component.topic = undefined;
+    component.validationIssues = ['existing'];
+    component.prepublishValidationIssues = ['pre-existing'];
+
+    component._validateTopic();
+
+    expect(component.validationIssues).toEqual(['existing']);
+    expect(component.prepublishValidationIssues).toEqual(['pre-existing']);
+  });
+
   it('should validate the topic and return validation issues', () => {
     component.topic = topic;
     spyOn(topicEditorStateService, 'getTopicWithNameExists').and.returnValue(
