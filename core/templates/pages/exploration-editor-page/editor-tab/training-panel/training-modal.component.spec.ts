@@ -46,7 +46,7 @@ class MockActiveModal {
 }
 
 class MockStateInteractionIdService {
-  savedMemento = 'TextInput';
+  savedMemento: string | null = 'TextInput';
 }
 
 class MockExplorationStatesService {
@@ -278,7 +278,14 @@ describe('Training Modal Component', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
     spyOn(responsesService, 'getDefaultOutcome').and.returnValue(null);
     spyOn(responsesService, 'save').and.callFake(
-      (answerGroups, defaultOutcome, callback) => {
+      (
+        answerGroups: AnswerGroup[],
+        defaultOutcome: Outcome | null,
+        callback: (
+          newAnswerGroups: AnswerGroup[],
+          newDefaultOutcome: Outcome | null
+        ) => void
+      ) => {
         if (callback) {
           callback(answerGroups, defaultOutcome);
         }
@@ -321,7 +328,7 @@ describe('Training Modal Component', () => {
 
   it('should return early from init when interactionId is null', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
-    stateInteractionIdService.savedMemento = null;
+    (stateInteractionIdService as any).savedMemento = null;
     spyOn(explorationStatesService, 'getState').and.returnValue({
       interaction: 'TextInput',
     });
@@ -389,7 +396,14 @@ describe('Training Modal Component', () => {
     spyOn(responsesService, 'getAnswerGroups').and.returnValue([]);
     spyOn(responsesService, 'getDefaultOutcome').and.returnValue(null);
     spyOn(responsesService, 'save').and.callFake(
-      (answerGroups, defaultOutcome, callback) => {
+      (
+        answerGroups: AnswerGroup[],
+        defaultOutcome: Outcome | null,
+        callback: (
+          newAnswerGroups: AnswerGroup[],
+          newDefaultOutcome: Outcome | null
+        ) => void
+      ) => {
         if (callback) {
           callback(answerGroups, defaultOutcome);
         }
