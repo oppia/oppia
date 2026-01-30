@@ -259,7 +259,7 @@ describe('Exploration editor tab component', () => {
     ).and.returnValue(mockRefreshStateEditorEventEmitter);
     let element = document.createElement('div');
     spyOn(document, 'querySelector').and.returnValue(element as HTMLElement);
-    // Store spy reference for potential updates in individual tests
+    // Store spy reference for potential updates in individual tests.
     spyOn(
       versionHistoryService,
       'getLatestVersionOfExploration'
@@ -1260,8 +1260,8 @@ describe('Exploration editor tab component', () => {
       SubtitledHtml.createDefault('', 'content')
     );
     spyOn(explorationStatesService, 'isInitialized').and.returnValue(true);
-    // getLatestVersionOfExploration is already spied in beforeEach (returns 3, which is not null)
-    // This will cause the code to enter the if block, then return early when stateData.name is null
+    // GetLatestVersionOfExploration is already spied in beforeEach (returns 3, which is not null).
+    // This will cause the code to enter the if block, then return early when stateData.name is null.
     spyOn(
       versionHistoryBackendApiService,
       'fetchStateVersionHistoryAsync'
