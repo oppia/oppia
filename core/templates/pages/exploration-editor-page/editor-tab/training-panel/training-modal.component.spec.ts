@@ -328,7 +328,10 @@ describe('Training Modal Component', () => {
 
   it('should return early from init when interactionId is null', () => {
     spyOn(stateEditorService, 'getActiveStateName').and.returnValue('main');
-    // @ts-expect-error -- Testing null assignment for savedMemento.
+    // This throws "Type 'null' is not assignable to type 'string'.".
+    // We need to suppress this error because we want to test the behavior when
+    // savedMemento is null.
+    // @ts-expect-error
     stateInteractionIdService.savedMemento = null;
     spyOn(explorationStatesService, 'getState').and.returnValue({
       interaction: 'TextInput',

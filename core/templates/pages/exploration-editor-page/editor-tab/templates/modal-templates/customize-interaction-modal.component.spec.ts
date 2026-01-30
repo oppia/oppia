@@ -599,7 +599,10 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return empty object from getContentIdToContent when interactionId is null', () => {
-    // @ts-expect-error -- Testing null assignment for interactionId.
+    // This throws "Type 'null' is not assignable to type 'string'.".
+    // We need to suppress this error because we want to test the behavior when
+    // interactionId is null.
+    // @ts-expect-error
     stateInteractionIdService.displayed = null;
 
     const result = component.getContentIdToContent();
@@ -608,7 +611,10 @@ describe('Customize Interaction Modal Component', () => {
   });
 
   it('should return early from populateNullContentIds when interactionId is null', () => {
-    // @ts-expect-error -- Testing null assignment for interactionId.
+    // This throws "Type 'null' is not assignable to type 'string'.".
+    // We need to suppress this error because we want to test the behavior when
+    // interactionId is null.
+    // @ts-expect-error
     stateInteractionIdService.displayed = null;
     spyOn(component, 'getContentIdToContent');
 
