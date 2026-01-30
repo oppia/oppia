@@ -928,8 +928,16 @@ describe('Topic editor tab directive', () => {
 
   it('should return early from initEditor when entityType is null', () => {
     const mockPageContextService = TestBed.inject(PageContextService);
+    const imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
     spyOn(mockPageContextService, 'getEntityType').and.returnValue(null);
+    const getTrustedResourceUrlSpy = spyOn(
+      imageUploadHelperService,
+      'getTrustedResourceUrlForThumbnailFilename'
+    );
+
     component.initEditor();
+
+    expect(getTrustedResourceUrlSpy).not.toHaveBeenCalled();
   });
 
   it('should return empty array from getEligibleSkillSummariesForDiagnosticTest when topic is null', () => {

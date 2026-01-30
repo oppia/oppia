@@ -38,11 +38,11 @@ import {TopicEditorStateService} from './services/topic-editor-state.service';
   templateUrl: './topic-editor-page.component.html',
 })
 export class TopicEditorPageComponent implements OnInit, OnDestroy {
-  topic: Topic;
-  validationIssues: string[];
-  prepublishValidationIssues: string[];
-  warningsAreShown: boolean;
-  topicRights: TopicRights;
+  topic: Topic | null = null;
+  validationIssues: string[] = [];
+  prepublishValidationIssues: string[] = [];
+  warningsAreShown = false;
+  topicRights: TopicRights | null = null;
   cancelNavigationOnce = false;
 
   constructor(
