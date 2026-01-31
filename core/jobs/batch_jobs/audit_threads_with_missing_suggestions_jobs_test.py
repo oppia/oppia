@@ -18,17 +18,17 @@
 
 from __future__ import annotations
 
-from typing import Type
 
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_threads_with_missing_suggestions_jobs
 from core.jobs.types import job_run_result
 from core.platform import models
 
+from typing import Type
+
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import feedback_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import feedback_models, suggestion_models
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [
