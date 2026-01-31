@@ -4411,9 +4411,7 @@ export class TopicManager extends BaseUser {
 
     const today = new Date();
     let futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + 1);
-    futureDate.setMonth(today.getMonth() + 1);
-    futureDate.setFullYear(today.getFullYear() + 1);
+    futureDate.setDate(today.getDate() + 3);
     const dateString = futureDate.toLocaleDateString('en-US');
 
     await this.setNodePlannedPublicationDate(
@@ -4423,7 +4421,6 @@ export class TopicManager extends BaseUser {
 
     await this.typeInInputField(outlineEditorInput, 'This is an outline.');
     await this.clickOnElementWithSelector(saveOutlineButton);
-    // await this.page.waitForSelector(finalizeOutlineCheckbox);
     await this.clickOnElementWithSelector(finalizeOutlineCheckbox);
     await this.addAcquiredSkill('Place Values skills');
 

@@ -763,17 +763,20 @@ export class BaseUser {
     dateString: string
   ): Promise<void> {
     const isoDate = this.toISODate(dateString);
-    //Remove this lines after run
-    // await this.page.waitForSelector(selector);
-    // await this.page.click(selector, {clickCount: 3});
-    // await this.page.type(selector, dateString);
     await this.page.$eval(
       selector,
       (el, value) => {
         const input = el as HTMLInputElement;
-        input.value = value as string;
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+          window.HTMLInputElement.prototype,
+          'value'
+        )?.set;
+
+        nativeInputValueSetter?.call(input, value);
+
         input.dispatchEvent(new Event('input', {bubbles: true}));
         input.dispatchEvent(new Event('change', {bubbles: true}));
+        input.dispatchEvent(new Event('blur', {bubbles: true}));
       },
       isoDate
     );

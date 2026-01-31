@@ -165,7 +165,7 @@ describe('Logged-In Learner', function () {
       );
 
       const futureDate = new Date();
-      futureDate.setMonth(futureDate.getMonth() + 1);
+      futureDate.setMonth(futureDate.getMonth() + 3);
 
       const dateString = futureDate.toLocaleDateString('en-US');
 
