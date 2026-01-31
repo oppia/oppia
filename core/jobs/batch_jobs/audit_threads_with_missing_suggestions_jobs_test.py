@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from core import feconf
+
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_threads_with_missing_suggestions_jobs
 from core.jobs.types import job_run_result
@@ -66,7 +68,7 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             id='suggestion1',
             thread_id=thread.id,
-            suggestion_type='edit_state_content',
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type='exploration',
             target_id='exp1',
             status='review',
