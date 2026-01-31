@@ -748,13 +748,36 @@ export class BaseUser {
     await element.type(text);
   }
 
+  private toISODate(dateString: string): string {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      throw new Error(`Invalid date string: ${dateString}`);
+    }
+
+    return date.toISOString().split('T')[0];
+  }
+
   async setNodePlannedPublicationDate(
     selector: string,
     dateString: string
   ): Promise<void> {
-    await this.page.waitForSelector(selector);
-    await this.page.click(selector, {clickCount: 3});
-    await this.page.type(selector, dateString);
+    const isoDate = this.toISODate(dateString);
+    //Remove this lines after run
+    // await this.page.waitForSelector(selector);
+    // await this.page.click(selector, {clickCount: 3});
+    // await this.page.type(selector, dateString);
+    await this.page.$eval(
+      selector,
+      (el, value) => {
+        const input = el as HTMLInputElement;
+        input.value = value as string;
+        input.dispatchEvent(new Event('input', {bubbles: true}));
+        input.dispatchEvent(new Event('change', {bubbles: true}));
+      },
+      isoDate
+    );
+    showMessage('Planned publication date is set to: ' + isoDate);
   }
 
   /**

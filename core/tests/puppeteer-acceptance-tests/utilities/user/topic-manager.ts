@@ -4409,9 +4409,11 @@ export class TopicManager extends BaseUser {
       'This is a chapter description.'
     );
 
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 3); //Flaky nature
-    futureDate.setHours(12, 0, 0, 0);
+    const today = new Date();
+    let futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 1);
+    futureDate.setMonth(today.getMonth() + 1);
+    futureDate.setFullYear(today.getFullYear() + 1);
     const dateString = futureDate.toLocaleDateString('en-US');
 
     await this.setNodePlannedPublicationDate(
