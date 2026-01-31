@@ -383,16 +383,22 @@ export class VolunteerPageComponent implements OnInit, OnDestroy {
 
   setScreenType(): void {
     const width = this.windowDimensionsService.getWidth();
+    let newScreenType: 'desktop' | 'tablet' | 'mobile' | 'smallMobile';
+
     if (width < 440) {
-      this.screenType = 'smallMobile';
+      newScreenType = 'smallMobile';
     } else if (width < 641) {
-      this.screenType = 'mobile';
+      newScreenType = 'mobile';
     } else if (width < 769) {
-      this.screenType = 'tablet';
+      newScreenType = 'tablet';
     } else {
-      this.screenType = 'desktop';
+      newScreenType = 'desktop';
     }
-    this.activeTabGroupIndex = 0;
+
+    if (this.screenType !== newScreenType) {
+      this.screenType = newScreenType;
+      this.activeTabGroupIndex = 0;
+    }
   }
 
   incrementTabGroupIndex(): void {

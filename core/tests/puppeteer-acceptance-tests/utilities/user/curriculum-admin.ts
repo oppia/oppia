@@ -2444,6 +2444,28 @@ export class CurriculumAdmin extends TopicManager {
     await this.clickOnElementWithSelector(topicSelector);
     await this.page.waitForSelector(openTopicDropdownButton);
 
+    // Wait for the topic to appear in the classroom before adding prerequisites.
+    await this.page.waitForFunction(
+      (
+        topicBoxSelector: string,
+        topicNameSelector: string,
+        expectedTopicName: string
+      ) => {
+        const topicBoxElements = document.querySelectorAll(topicBoxSelector);
+        for (const element of topicBoxElements) {
+          const topicNameElement = element.querySelector(topicNameSelector);
+          if (topicNameElement?.textContent?.trim() === expectedTopicName) {
+            return true;
+          }
+        }
+        return false;
+      },
+      {},
+      classroomTopicBoxSelector,
+      classroomTopicNameSelector,
+      topicName
+    );
+
     for (const prerequisiteTopic of prerequisiteTopics) {
       await this.addPrerequisiteTopicForATopicInClassroom(
         topicName,
