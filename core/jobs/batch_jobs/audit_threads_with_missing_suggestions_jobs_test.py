@@ -65,7 +65,7 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
         suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            id='suggestion1',
+            id=thread.id,
             thread_id=thread.id,
             suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type='exploration',
@@ -189,7 +189,7 @@ class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
             suggestion_models.GeneralSuggestionModel,
             id='suggestion1',
             thread_id=valid_thread.id,
-            suggestion_type='edit_state_content',
+            suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type='exploration',
             target_id='exp1',
             status='review',
