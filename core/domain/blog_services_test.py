@@ -705,6 +705,9 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         ]
         expected_blog_post_tags = all_blog_post_tags[:-1]
 
+        all_blog_post_summaries = ['Hello Blog Post +%s' % i for i in range(5)]
+        expected_blog_post_summaries = all_blog_post_summaries[:-1]
+
         def mock_add_documents_to_index(
             docs: List[Dict[str, str]], index: int
         ) -> List[str]:
@@ -712,9 +715,11 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             ids = [doc['id'] for doc in docs]
             titles = [doc['title'] for doc in docs]
             tags = [doc['tags'] for doc in docs]
+            summaries = [doc['summary'] for doc in docs]
             self.assertEqual(set(ids), set(expected_blog_post_ids))
             self.assertEqual(set(titles), set(expected_blog_post_titles))
             self.assertEqual(tags.sort(), expected_blog_post_tags.sort())
+            self.assertEqual(set(summaries), set(expected_blog_post_summaries))
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
