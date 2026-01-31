@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import audit_threads_with_missing_suggestions_jobs
 from core.jobs.types import job_run_result
