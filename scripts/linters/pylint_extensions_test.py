@@ -235,7 +235,7 @@ class HangingIndentCheckerTests(unittest.TestCase):
     def test_comment_after_parenthesis_spans_single_line(
         self,
     ) -> None:
-        """Tests branch where comment exists but excluded remains True."""
+        """Tests conditional statement which does not end with colon."""
         node_with_no_message = astroid.scoped_nodes.Module(
             name='test', doc='Custom test'
         )
@@ -1699,7 +1699,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
     def test_function_with_no_docstring_in_indentation_check(self) -> None:
         """Tests that check_docstring_section_indentation handles functions with no docstring."""
         node_function_no_doc = astroid.extract_node(
-            """def func_without_doc(arg1): #@
+            """def func(arg1): #@
                 a = arg1 + 10
                 return a
             """
@@ -1711,6 +1711,18 @@ class DocstringParameterCheckerTests(unittest.TestCase):
             self.checker_test_object.checker.visit_functiondef(
                 node_function_no_doc
             )
+
+    def test_function_with_docstring_outside_class(self):
+        """Tests that a standalone function with a docstring does not trigger errors."""
+        node = astroid.extract_node(
+            """
+            def func(arg1):
+                \"\"\"This function has a docstring.\"\"\"
+                return arg1
+            """
+        )
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_functiondef(node)
 
     def test_returns_section_without_description_triggers_in_description_false(
         self,
@@ -4669,6 +4681,18 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
             """
         )
         compare_node = if_node.test
+        with self.checker_test_object.assertNoMessages():
+            self.checker_test_object.checker.visit_compare(compare_node)
+
+    def test_non_none_inequality_does_not_trigger(self):
+        """Test that 'x != y' where y is a value(not None) does not trigger a message."""
+        node = astroid.extract_node(
+            """
+            if x != 3:
+                pass
+            """
+        )
+        compare_node = node.test
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
 
