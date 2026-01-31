@@ -227,6 +227,11 @@ describe('Logged-In Learner', function () {
       );
 
       await curriculumAdmin.makeChapterReadtToPublish(
+        'What are the Place Values',
+        "Jamie's Adventures in the Arcade",
+        'Place Values'
+      );
+      await curriculumAdmin.makeChapterReadtToPublish(
         'Find the Value of a Number',
         "Jamie's Adventures in the Arcade",
         'Place Values'
