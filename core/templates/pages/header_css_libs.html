@@ -21,11 +21,7 @@
 
 <!-- Angular / webpack-generated global styles (bundled) -->
 <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
-
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/oppia.css">
-
-<% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/templates/css/oppia-material.css">
+<% if (htmlWebpackPlugin.options.enableChunkCss) { %>
+  <!-- Angular / webpack-generated chunk styles (bundled) -->
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles-chunk.css">
 <% } %>
