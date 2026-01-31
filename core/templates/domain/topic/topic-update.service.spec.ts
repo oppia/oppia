@@ -1359,10 +1359,10 @@ describe('Topic update service', function () {
     expect(() => {
       topicUpdateService.removeSkillFromSubtopic(
         _sampleTopic,
-        10,
+        999,
         _secondSkillSummary
       );
-    }).toThrowError("Subtopic with id 10 doesn't exist");
+    }).toThrowError("Subtopic with id 999 doesn't exist");
     expect(undoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
