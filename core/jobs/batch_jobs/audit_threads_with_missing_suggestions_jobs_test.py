@@ -66,13 +66,23 @@ class AuditThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
         suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
             id=thread.id,
-            thread_id=thread.id,
             suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type='exploration',
             target_id='exp1',
-            status='review',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
             author_id='user1',
             final_reviewer_id=None,
+            score_category='content',
+            change_cmd={
+                'cmd': 'edit_state_property',
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p>Updated</p>',
+                    'content_id': 'content',
+                },
+            },
             deleted=False,
         )
 
@@ -187,14 +197,24 @@ class FixThreadsWithMissingSuggestionsJobTest(job_test_utils.JobTestBase):
 
         suggestion = self.create_model(
             suggestion_models.GeneralSuggestionModel,
-            id='suggestion1',
-            thread_id=valid_thread.id,
+            id=valid_thread.id,
             suggestion_type=feconf.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type='exploration',
             target_id='exp1',
-            status='review',
+            target_version_at_submission=1,
+            status=suggestion_models.STATUS_IN_REVIEW,
             author_id='user1',
             final_reviewer_id=None,
+            score_category='content',
+            change_cmd={
+                'cmd': 'edit_state_property',
+                'state_name': 'Introduction',
+                'property_name': 'content',
+                'new_value': {
+                    'html': '<p>Updated</p>',
+                    'content_id': 'content',
+                },
+            },
             deleted=False,
         )
 

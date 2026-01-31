@@ -55,7 +55,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
                 )
             )
             | 'Extract suggestion thread ids'
-            >> beam.Map(lambda model: model.thread_id)
+            >> beam.Map(lambda model: model.id)
         )
 
     def _get_invalid_threads(
