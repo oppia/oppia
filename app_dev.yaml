@@ -101,9 +101,9 @@ handlers:
 # Serve CSS files under core/templates.
 # This regex allows us to recursively serve CSS files.
 # "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/css/(.*\.css)$
-  static_files: core/templates/css/\1
-  upload: core/templates/css/(.*\.css)$
+- url: /templates/(.*\.(css))$
+  static_files: core/templates/\1
+  upload: core/templates/(.*\.(css))$
   secure: always
   expiration: "0"
 - url: /templates/(.*\.(html))$
