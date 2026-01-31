@@ -40,6 +40,17 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
         self.assertEqual(user_id, 'uid')
 
 
+class ExternalAccountTests(test_utils.TestBase):
+
+    def test_unpacking(self) -> None:
+        auth_id, email, disabled = auth_domain.ExternalAccount(
+            'a', 'a@a.com', True
+        )
+        self.assertEqual(auth_id, 'a')
+        self.assertEqual(email, 'a@a.com')
+        self.assertTrue(disabled)
+
+
 class AuthClaimsTests(test_utils.TestBase):
 
     def test_rejects_empty_auth_id(self) -> None:
