@@ -17,7 +17,6 @@
  */
 
 import 'pages/common-imports';
-import 'bootstrap';
 import {platformBrowserDynamic} from '@angular/platform-browser-dynamic';
 import {enableProdMode} from '@angular/core';
 import {LighweightAppModule} from 'pages/lightweight-oppia-root/app.module';
