@@ -29,8 +29,7 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import feedback_models
-    from mypy_imports import suggestion_models
+    from mypy_imports import feedback_models, suggestion_models
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [
@@ -169,5 +168,6 @@ class FixThreadsWithMissingSuggestionsJob(BaseThreadsWithMissingSuggestionsJob):
     def _unset_has_suggestion(
         thread: feedback_models.GeneralFeedbackThreadModel,
     ) -> feedback_models.GeneralFeedbackThreadModel:
+        """Unsets has_suggestion flag."""
         thread.has_suggestion = False
         return thread
