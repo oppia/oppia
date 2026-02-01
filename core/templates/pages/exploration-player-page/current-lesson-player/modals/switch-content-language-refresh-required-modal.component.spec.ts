@@ -50,15 +50,15 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
   let component: SwitchContentLanguageRefreshRequiredModalComponent;
   let fixture: ComponentFixture<SwitchContentLanguageRefreshRequiredModalComponent>;
   let ngbActiveModal: NgbActiveModal;
-  let windowRef: WindowRef;
+  let windowRef: MockWindowRef;
 
   beforeEach(async(() => {
-    const mockWindowRef = new MockWindowRef();
+    windowRef = new MockWindowRef();
     TestBed.configureTestingModule({
       declarations: [SwitchContentLanguageRefreshRequiredModalComponent],
       providers: [
         {provide: NgbActiveModal, useClass: MockActiveModal},
-        {provide: WindowRef, useValue: mockWindowRef},
+        {provide: WindowRef, useValue: windowRef},
       ],
     }).compileComponents();
   }));
@@ -68,8 +68,8 @@ describe('SwitchContentLanguageRefreshRequiredModalComponent', function () {
       SwitchContentLanguageRefreshRequiredModalComponent
     );
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
-    windowRef = TestBed.inject(WindowRef);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
+    windowRef = TestBed.get(WindowRef);
   });
 
   it('should dismiss modal', () => {
