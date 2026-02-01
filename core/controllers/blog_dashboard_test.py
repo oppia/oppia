@@ -333,7 +333,6 @@ class BlogPostHandlerTests(test_utils.GenericTestBase):
     def test_get_blog_post_data_with_author_account_deleted_by_blog_admin(
         self,
     ) -> None:
-        blog_services.create_blog_author_details_model(self.blog_editor_id)
         blog_services.update_blog_author_details(
             self.blog_editor_id, 'new author name', 'general user bio'
         )

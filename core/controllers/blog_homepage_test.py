@@ -112,7 +112,6 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
         )
 
     def test_get_blog_homepage_data_with_author_account_deleted(self) -> None:
-        blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
             self.blog_admin_id, 'new author name', 'general user bio'
         )
@@ -206,7 +205,6 @@ class BlogPostDataHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(self.blog_post_one.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post_one.id)
-        blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
             self.blog_admin_id, 'new author name', 'general user bio'
         )
@@ -426,7 +424,6 @@ class AuthorsPageHandlerTest(test_utils.GenericTestBase):
         }
         blog_services.update_blog_post(self.blog_post.id, self.change_dict)
         blog_services.publish_blog_post(self.blog_post.id)
-        blog_services.create_blog_author_details_model(self.blog_admin_id)
         blog_services.update_blog_author_details(
             self.blog_admin_id, 'new author name', 'general user bio'
         )

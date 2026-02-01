@@ -951,6 +951,7 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         user_settings.user_bio = self.user_bio
         user_services.save_user_settings(user_settings)
         user_services.set_username(self.user_id, self.user_name)
+        blog_services.create_blog_author_details_model(self.user_id)
 
     def test_get_blog_author_details_model(self) -> None:
         author_details = blog_services.get_blog_author_details(self.user_id)
