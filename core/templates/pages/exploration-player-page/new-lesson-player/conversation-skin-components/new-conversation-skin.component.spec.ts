@@ -96,7 +96,7 @@ class MockWindowRef {
     },
     onresize: () => {},
     addEventListener(event: string, callback) {
-      callback({returnValue: null});
+      callback({returnValue: null, preventDefault: () => {}});
     },
     scrollTo: (x, y) => {},
   };
