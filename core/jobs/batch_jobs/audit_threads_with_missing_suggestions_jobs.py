@@ -67,6 +67,11 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
                 >> beam.Map(lambda model: model.id)
             )
 
+    # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+    # apache_beam library and absences of stubs in Typeshed, forces MyPy to
+    # assume that PTransform class is of type Any. Thus to avoid MyPy's error
+    # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+    # ignore here.
     class _GetInvalidFeedbackThreads(BeamPTransform):  # type: ignore[misc]
         """Returns feedback threads marked as having suggestions but without one."""
 
