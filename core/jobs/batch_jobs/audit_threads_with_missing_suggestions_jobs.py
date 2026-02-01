@@ -30,8 +30,6 @@ import apache_beam as beam
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models, suggestion_models
-
-    from apache_beam import PTransform as BeamPTransform
 else:
     BeamPTransform = beam.PTransform
 
@@ -48,7 +46,12 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = False
 
-    class _GetSuggestionThreadIds(BeamPTransform):
+    # TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+    # apache_beam library and absences of stubs in Typeshed, forces MyPy to
+    # assume that PTransform class is of type Any. Thus to avoid MyPy's error
+    # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+    # ignore here.
+    class _GetSuggestionThreadIds(BeamPTransform):  # type: ignore[misc]
         """Returns thread_ids that have a GeneralSuggestionModel."""
 
         def expand(self, pbegin: beam.pvalue.PBegin) -> beam.PCollection[str]:
@@ -64,7 +67,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
                 >> beam.Map(lambda model: model.id)
             )
 
-    class _GetInvalidFeedbackThreads(BeamPTransform):
+    class _GetInvalidFeedbackThreads(BeamPTransform):  # type: ignore[misc]
         """Returns feedback threads marked as having suggestions but without one."""
 
         def expand(
