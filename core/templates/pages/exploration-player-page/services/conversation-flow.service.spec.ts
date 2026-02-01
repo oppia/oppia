@@ -1556,10 +1556,10 @@ describe('Conversation flow service', () => {
 
       expect(markCheckpointSpy).toHaveBeenCalledWith('expId', 'Checkpoint1');
 
-      // Reset spy for second call
+      // Reset spy for second call.
       markCheckpointSpy.calls.reset();
 
-      // Second checkpoint
+      // Second checkpoint.
       (explorationEngineService.getState as jasmine.Spy).and.returnValue({
         name: 'Checkpoint2',
         cardIsCheckpoint: true,

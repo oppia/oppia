@@ -2687,7 +2687,7 @@ def get_checkpoint_progress_for_explorations(
         return {}
 
     exp_id_to_exp_map = exp_fetchers.get_multiple_explorations_by_id(
-        exploration_ids
+        exploration_ids, strict=False
     )
     user_id_exp_id_pairs = list(itertools.product([user_id], exploration_ids))
     exp_user_data_models = user_models.ExplorationUserDataModel.get_multi(

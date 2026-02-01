@@ -19,6 +19,8 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
+    exp_domain,
+    exp_services,
     learner_progress_services,
     story_domain,
     story_services,
@@ -958,8 +960,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             title=self.EXP_TITLE_1,
             category='Test',
         )
-        from core.domain import exp_domain
-
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = exp_domain.State.create_default_state(
@@ -967,8 +967,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         )
         state_1.card_is_checkpoint = True
         exploration.states['checkpoint_1'] = state_1
-        from core.domain import exp_services
-
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -996,8 +994,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             title=self.EXP_TITLE_1,
             category='Test',
         )
-        from core.domain import exp_domain
-
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = exp_domain.State.create_default_state(
@@ -1010,8 +1006,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         state_2.card_is_checkpoint = True
         exploration.states['checkpoint_1'] = state_1
         exploration.states['checkpoint_2'] = state_2
-        from core.domain import exp_services
-
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -1034,7 +1028,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         incomplete_exps = response['incomplete_explorations_list']
         self.assertEqual(len(incomplete_exps), 1)
-        # Progress = floor((2-1)/3 * 100) = floor(33.33) = 33
+        # Progress = floor((2-1)/3 * 100) = floor(33.33) = 33.
         self.assertEqual(incomplete_exps[0]['progress'], 33)
 
         self.logout()
@@ -1050,12 +1044,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             title=self.EXP_TITLE_1,
             category='Test',
         )
-        from core.domain import exp_domain
-
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
-        from core.domain import exp_services
-
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -1083,12 +1073,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             title=self.EXP_TITLE_1,
             category='Test',
         )
-        from core.domain import exp_domain
-
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
-        from core.domain import exp_services
-
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -1110,7 +1096,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         """Test that multiple explorations each have their own progress."""
         self.login(self.VIEWER_EMAIL)
 
-        from core.domain import exp_domain, exp_services
         from core.platform import models
 
         user_models = models.Registry.import_models([models.Names.USER])[0]

@@ -24,12 +24,14 @@ from core.constants import constants
 from core.domain import (
     collection_domain,
     collection_services,
+    exp_domain,
     exp_fetchers,
     exp_services,
     learner_goals_services,
     learner_playlist_services,
     learner_progress_services,
     rights_manager,
+    state_domain,
     story_domain,
     story_fetchers,
     story_services,
@@ -3386,8 +3388,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add checkpoints to the exploration.
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
-        state_1 = exp_domain.State.create_default_state(
-            'checkpoint_1', is_initial_state=False
+        state_1 = state_domain.State.create_default_state(
+            'checkpoint_1', 'content_1', 'default_outcome_1',
+            is_initial_state=False
         )
         state_1.card_is_checkpoint = True
         exploration.states['checkpoint_1'] = state_1
@@ -3423,12 +3426,14 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Add checkpoints.
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
-        state_1 = exp_domain.State.create_default_state(
-            'checkpoint_1', is_initial_state=False
+        state_1 = state_domain.State.create_default_state(
+            'checkpoint_1', 'content_1', 'default_outcome_1',
+            is_initial_state=False
         )
         state_1.card_is_checkpoint = True
-        state_2 = exp_domain.State.create_default_state(
-            'checkpoint_2', is_initial_state=False
+        state_2 = state_domain.State.create_default_state(
+            'checkpoint_2', 'content_2', 'default_outcome_2',
+            is_initial_state=False
         )
         state_2.card_is_checkpoint = True
         exploration.states['checkpoint_1'] = state_1
@@ -3465,8 +3470,9 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         init_state_1 = exploration_1.states[exploration_1.init_state_name]
         init_state_1.card_is_checkpoint = True
-        state_1_1 = exp_domain.State.create_default_state(
-            'checkpoint_1', is_initial_state=False
+        state_1_1 = state_domain.State.create_default_state(
+            'checkpoint_1', 'content_1', 'default_outcome_1',
+            is_initial_state=False
         )
         state_1_1.card_is_checkpoint = True
         exploration_1.states['checkpoint_1'] = state_1_1
