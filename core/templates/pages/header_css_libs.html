@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 
-<!-- Font Awesome preloads removed; fonts are provided via CSS and assets pipeline -->
+<!-- Font Awesome webfonts are provided via Angular assets pipeline -->
 
 <link rel="preload"
       media="screen"
@@ -18,9 +18,17 @@
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
 <% } %>
-<!-- Angular / webpack-generated global styles (bundled) -->
-<link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
-<% if (htmlWebpackPlugin.options.enableChunkCss) { %>
-  <!-- Angular / webpack-generated chunk styles (bundled) -->
-  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles-chunk.css">
+
+<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr) -->
+<!-- This replaces the old third_party.css from dependencies.json -->
+<!-- Loaded synchronously to ensure Bootstrap styles are available before Angular initializes -->
+<% if (htmlWebpackPlugin.files.css[0] && htmlWebpackPlugin.files.css[0].includes('/build/')) { %>
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
+<% } else { %>
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
+<% } %>
+
+<!-- Oppia webpack component styles (includes RTL support) -->
+<% for (var chunk in htmlWebpackPlugin.files.css) { %>
+  <link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[chunk] %>">
 <% } %>

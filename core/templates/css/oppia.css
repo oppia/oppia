@@ -292,9 +292,9 @@ html {
   */
   font-size: 62.5%;
   height: 100%;
-  /* 
+  /*
     Added this line because Bootstrap 5 added smooth scroll default behavior.
-    Reference: https://katalon-inc.my.site.com/support/article/Test-case-failures-due-to-auto-scrolling-in-Bootstrap-5-and-how-to-fix 
+    Reference: https://katalon-inc.my.site.com/support/article/Test-case-failures-due-to-auto-scrolling-in-Bootstrap-5-and-how-to-fix
   */
   scroll-behavior: auto !important;
 }
@@ -348,9 +348,9 @@ body {
   margin: 0 auto;
   overflow-x: hidden;
   padding: 0;
-  /* 
+  /*
    Match Bootstrap 4 default body alignment ensures text starts left-aligned
-   instead of relying on --bs-body-text-align in Bootstrap 5 
+   instead of relying on --bs-body-text-align in Bootstrap 5
   */
   text-align: left;
   width: 100%;
@@ -380,8 +380,8 @@ legend {
 
 /*
 In Bootstrap 5, <select> elements use .form-select instead of .form-control.
-This separates select styling from input/textarea styling, 
-ensuring proper spacing, custom dropdown arrow, and consistent appearance 
+This separates select styling from input/textarea styling,
+ensuring proper spacing, custom dropdown arrow, and consistent appearance
 across browsers. Use .form-select for all <select> fields.
 */
 .form-select {

@@ -82,7 +82,7 @@ module.exports = {
       DIFF_DELETE: ['diff_match_patch/lib/diff_match_patch', 'DIFF_DELETE'],
     }),
     new HtmlWebpackPlugin({
-      chunks: ['oppia_root'],
+      chunks: 'all',
       filename: 'oppia-root.mainpage.html',
       meta: defaultMeta,
       template: commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
@@ -90,7 +90,7 @@ module.exports = {
       inject: false,
     }),
     new HtmlWebpackPlugin({
-      chunks: ['lightweight_oppia_root'],
+      chunks: 'all',
       filename: 'lightweight-oppia-root.mainpage.html',
       meta: defaultMeta,
       template:
