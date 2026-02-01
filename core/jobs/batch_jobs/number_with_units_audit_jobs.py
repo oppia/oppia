@@ -22,7 +22,7 @@ from core.jobs.types import job_run_result
 from core.platform import models
 
 import apache_beam as beam
-from typing import Iterable, List
+from typing import Iterable
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -102,20 +102,19 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
 
     def _extract_units_from_state_dict(
         self, state_dict: state_domain.StateDict
-    ) -> List[str]:
+    ) -> Iterable[str]:
         """Extracts NumberWithUnits unit strings from a state dict."""
         interaction_dict = state_dict.get('interaction')
         if not isinstance(interaction_dict, dict):
-            return []
+            return
 
         if interaction_dict.get('id') != 'NumberWithUnits':
-            return []
+            return
 
         answer_groups = interaction_dict.get('answer_groups', [])
         if not isinstance(answer_groups, list):
-            return []
+            return
 
-        units: List[str] = []
         for answer_group in answer_groups:
             if not isinstance(answer_group, dict):
                 continue
@@ -133,6 +132,4 @@ class FindNumberWithUnitsRuleUnitsJob(base_jobs.JobBase):
                         continue
                     unit_name = unit_dict.get('unit')
                     if isinstance(unit_name, str):
-                        units.append(unit_name)
-
-        return units
+                        yield unit_name
