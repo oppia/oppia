@@ -24,13 +24,13 @@ from core.constants import constants
 from core.domain import (
     collection_domain,
     collection_services,
+    exp_domain,
     exp_fetchers,
     exp_services,
     learner_goals_services,
     learner_playlist_services,
     learner_progress_services,
     rights_manager,
-    state_domain,
     story_domain,
     story_fetchers,
     story_services,
@@ -3391,22 +3391,54 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
-        state_1 = state_domain.State.create_default_state(
-            'Checkpoint 1',
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
-            is_initial_state=False,
+
+        # Add a new state as checkpoint.
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_ADD_STATE,
+                        'state_name': 'Checkpoint 1',
+                        'content_id_for_state_content': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Checkpoint 1',
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator.next_content_id_index,
+                    }
+                ),
+            ],
+            'Add checkpoints',
         )
-        state_1.card_is_checkpoint = True
-        exploration.states['Checkpoint 1'] = state_1
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
-        exp_services.save_new_exploration(self.owner_id, exploration)
 
         # Get checkpoint progress.
         progress = (
@@ -3439,36 +3471,77 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         content_id_generator = translation_domain.ContentIdGenerator(
             exploration.next_content_id_index
         )
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.card_is_checkpoint = True
-        state_1 = state_domain.State.create_default_state(
-            'Checkpoint 1',
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
-            is_initial_state=False,
+
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_ADD_STATE,
+                        'state_name': 'Checkpoint 1',
+                        'content_id_for_state_content': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Checkpoint 1',
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_ADD_STATE,
+                        'state_name': 'Checkpoint 2',
+                        'content_id_for_state_content': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Checkpoint 2',
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator.next_content_id_index,
+                    }
+                ),
+            ],
+            'Add checkpoints',
         )
-        state_1.card_is_checkpoint = True
-        state_2 = state_domain.State.create_default_state(
-            'Checkpoint 2',
-            content_id_generator.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
-            is_initial_state=False,
-        )
-        state_2.card_is_checkpoint = True
-        exploration.states['Checkpoint 1'] = state_1
-        exploration.states['Checkpoint 2'] = state_2
-        exploration.next_content_id_index = (
-            content_id_generator.next_content_id_index
-        )
-        exp_services.save_new_exploration(self.owner_id, exploration)
 
         # Record progress to Checkpoint 1.
         user_models.ExplorationUserDataModel(
@@ -3498,27 +3571,55 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         exploration_1 = self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Test Exploration 1'
         )
-        init_state_1 = exploration_1.states[exploration_1.init_state_name]
-        init_state_1.card_is_checkpoint = True
         content_id_generator_1 = translation_domain.ContentIdGenerator(
             exploration_1.next_content_id_index
         )
-        state_1_1 = state_domain.State.create_default_state(
-            'Checkpoint 1',
-            content_id_generator_1.generate(
-                translation_domain.ContentType.CONTENT
-            ),
-            content_id_generator_1.generate(
-                translation_domain.ContentType.DEFAULT_OUTCOME
-            ),
-            is_initial_state=False,
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_0,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration_1.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_ADD_STATE,
+                        'state_name': 'Checkpoint 1',
+                        'content_id_for_state_content': (
+                            content_id_generator_1.generate(
+                                translation_domain.ContentType.CONTENT
+                            )
+                        ),
+                        'content_id_for_default_outcome': (
+                            content_id_generator_1.generate(
+                                translation_domain.ContentType.DEFAULT_OUTCOME
+                            )
+                        ),
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': 'Checkpoint 1',
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'next_content_id_index',
+                        'new_value': content_id_generator_1.next_content_id_index,
+                    }
+                ),
+            ],
+            'Add checkpoints',
         )
-        state_1_1.card_is_checkpoint = True
-        exploration_1.states['Checkpoint 1'] = state_1_1
-        exploration_1.next_content_id_index = (
-            content_id_generator_1.next_content_id_index
-        )
-        exp_services.save_new_exploration(self.owner_id, exploration_1)
 
         # Create second exploration with checkpoints.
         exploration_2 = self.save_new_valid_exploration(
