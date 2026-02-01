@@ -3187,17 +3187,19 @@ def can_delete_question(
         if not self.user_id:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_DELETE_ANY_QUESTION in self.user.actions:
-            return handler(self, question_id, **kwargs)
+        user_actions_info = user_services.get_user_actions_info(self.user_id)
+
         if (
-            role_services.ACTION_DELETE_QUESTION_IN_MANAGED_TOPIC
-            in self.user.actions
+            role_services.ACTION_DELETE_ANY_QUESTION
+            in user_actions_info.actions
         ):
-            return can_edit_question(handler)(self, question_id, **kwargs)
-        raise self.UnauthorizedUserException(
-            '%s does not have enough rights to delete the question.'
-            % self.user_id
-        )
+            return handler(self, question_id, **kwargs)
+
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the question.'
+                % self.user_id
+            )
 
     return test_can_delete_question
 

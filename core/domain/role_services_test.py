@@ -62,6 +62,8 @@ class RolesAndActionsServicesUnitTests(test_utils.GenericTestBase):
                 role_services.ACTION_MANAGE_QUESTION_RIGHTS,
                 role_services.ACTION_VISIT_ANY_QUESTION_EDITOR_PAGE,
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR_PAGE,
+                role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS,
+                role_services.ACTION_EDIT_SKILL,
             ],
         )
 
