@@ -4552,11 +4552,9 @@ export class LoggedInUser extends BaseUser {
         lessonTitleSelector,
         el => el.textContent
       );
-      // Todo : remove extra space from lesson titles , trim it
       if (!lessonTitleText || lessonTitleText !== lessonTitle) {
         continue;
       }
-      this.waitForElementToStabilize(circleProgressElementSelector, 20000); //Have a look later
       const currentProgress = await lessonCard.$eval(
         circleProgressElementSelector,
         el => el.textContent

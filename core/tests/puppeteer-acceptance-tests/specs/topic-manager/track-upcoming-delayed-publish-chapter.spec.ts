@@ -128,7 +128,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.waitForPageToFullyLoad();
 
       await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
-      const chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
+      let chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
 
       for (const titleElement of chapterTitles) {
         const title = await curriculumAdmin.page.evaluate(
@@ -247,11 +247,60 @@ describe('Logged-In Learner', function () {
         'Draft'
       );
 
-      await curriculumAdmin.makeChapterReadtToPublish(
-        'What are the Place Values',
+      await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
+
+      await curriculumAdmin.waitForPageToFullyLoad();
+
+      await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
+      chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
+
+      for (const titleElement of chapterTitles) {
+        const title = await curriculumAdmin.page.evaluate(
+          el => el.textContent.trim(),
+          titleElement
+        );
+
+        if (title === 'What are the Place Values') {
+          await titleElement.click();
+          await curriculumAdmin.waitForStaticAssetsToLoad();
+          await curriculumAdmin.expectElementToBeVisible(
+            chapterEditorContainerSelector
+          );
+
+          if (curriculumAdmin.isViewportAtMobileWidth()) {
+            await curriculumAdmin.page.waitForSelector(
+              mobileCollapsibleCardHeaderSelector
+            );
+            const elements = await curriculumAdmin.page.$$(
+              mobileCollapsibleCardHeaderSelector
+            );
+            if (elements.length < 5) {
+              throw new Error('Not enough elements collapsible headers found,');
+            }
+            await elements[2].click();
+            await elements[3].click();
+            await elements[4].click();
+          }
+        }
+      }
+      await curriculumAdmin.setNodePlannedPublicationDate(
+        plannedPublicationDateInput,
+        dateString
+      );
+      await curriculumAdmin.saveStoryDraft();
+      await curriculumAdmin.page.waitForSelector(markAsReadyToPublishButton);
+      await curriculumAdmin.clickOnElementWithSelector(
+        markAsReadyToPublishButton
+      );
+
+      await curriculumAdmin.expectElementToBeVisible(
+        markAsReadyToPublishButton,
+        false
+      );
+
       await curriculumAdmin.makeChapterReadtToPublish(
         'Find the Value of a Number',
         "Jamie's Adventures in the Arcade",
