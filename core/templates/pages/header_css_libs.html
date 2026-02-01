@@ -27,8 +27,3 @@
 <% } else { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
 <% } %>
-
-<!-- Oppia webpack component styles (includes RTL support) -->
-<% for (var chunk in htmlWebpackPlugin.files.css) { %>
-  <link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[chunk] %>">
-<% } %>
