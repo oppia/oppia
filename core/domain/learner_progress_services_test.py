@@ -39,7 +39,6 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
-    translation_domain,
     user_services,
 )
 from core.platform import models
@@ -3376,7 +3375,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         """Test checkpoint progress with explorations that have no checkpoints
         visited.
         """
-        # Create exploration with checkpoints but no user progress.
+        # Create exploration with checkpoint.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID_0,
             self.owner_id,
@@ -3385,14 +3384,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             objective='Test Objective',
         )
 
-        # Add checkpoints to the exploration.
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.card_is_checkpoint = True
-
-        # Add a new state as checkpoint.
+        # Mark initial state as checkpoint.
         exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID_0,
@@ -3405,39 +3397,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                         'new_value': True,
                     }
                 ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'Checkpoint 1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
-                        ),
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Checkpoint 1',
-                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                        'new_value': True,
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                    }
-                ),
             ],
-            'Add checkpoints',
+            'Mark initial state as checkpoint',
         )
 
         # Get checkpoint progress.
@@ -3452,13 +3413,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             progress[self.EXP_ID_0]['visited_checkpoints_count'], 0
         )
-        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 2)
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
 
     def test_get_checkpoint_progress_for_explorations_with_partial_progress(
         self,
     ) -> None:
         """Test checkpoint progress calculation with partial completion."""
-        # Create exploration with multiple checkpoints.
+        # Create exploration with checkpoint.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID_0,
             self.owner_id,
@@ -3467,11 +3428,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             objective='Test Objective',
         )
 
-        # Add checkpoints.
-        content_id_generator = translation_domain.ContentIdGenerator(
-            exploration.next_content_id_index
-        )
-
+        # Mark initial state as checkpoint.
         exp_services.update_exploration(
             self.owner_id,
             self.EXP_ID_0,
@@ -3484,71 +3441,16 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                         'new_value': True,
                     }
                 ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'Checkpoint 1',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
-                        ),
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Checkpoint 1',
-                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                        'new_value': True,
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'Checkpoint 2',
-                        'content_id_for_state_content': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
-                        ),
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Checkpoint 2',
-                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
-                        'new_value': True,
-                    }
-                ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator.next_content_id_index,
-                    }
-                ),
             ],
-            'Add checkpoints',
+            'Mark initial state as checkpoint',
         )
 
-        # Record progress to Checkpoint 1.
+        # Record progress to checkpoint.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.user_id, self.EXP_ID_0),
             user_id=self.user_id,
             exploration_id=self.EXP_ID_0,
-            most_recently_reached_checkpoint_state_name='Checkpoint 1',
+            most_recently_reached_checkpoint_state_name=exploration.init_state_name,
         ).put()
 
         # Get checkpoint progress.
@@ -3561,18 +3463,15 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Verify partial progress.
         self.assertIn(self.EXP_ID_0, progress)
         self.assertEqual(
-            progress[self.EXP_ID_0]['visited_checkpoints_count'], 2
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 1
         )
-        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 3)
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
 
     def test_get_checkpoint_progress_for_multiple_explorations(self) -> None:
         """Test checkpoint progress for multiple explorations."""
-        # Create first exploration with checkpoints.
+        # Create first exploration with checkpoint.
         exploration_1 = self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Test Exploration 1'
-        )
-        content_id_generator_1 = translation_domain.ContentIdGenerator(
-            exploration_1.next_content_id_index
         )
         exp_services.update_exploration(
             self.owner_id,
@@ -3586,55 +3485,36 @@ class LearnerProgressTests(test_utils.GenericTestBase):
                         'new_value': True,
                     }
                 ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_ADD_STATE,
-                        'state_name': 'Checkpoint 1',
-                        'content_id_for_state_content': (
-                            content_id_generator_1.generate(
-                                translation_domain.ContentType.CONTENT
-                            )
-                        ),
-                        'content_id_for_default_outcome': (
-                            content_id_generator_1.generate(
-                                translation_domain.ContentType.DEFAULT_OUTCOME
-                            )
-                        ),
-                    }
-                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+
+        # Create second exploration with checkpoint.
+        exploration_2 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.owner_id, title='Test Exploration 2'
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
                 exp_domain.ExplorationChange(
                     {
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': 'Checkpoint 1',
+                        'state_name': exploration_2.init_state_name,
                         'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
                         'new_value': True,
                     }
                 ),
-                exp_domain.ExplorationChange(
-                    {
-                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                        'property_name': 'next_content_id_index',
-                        'new_value': content_id_generator_1.next_content_id_index,
-                    }
-                ),
             ],
-            'Add checkpoints',
+            'Mark initial state as checkpoint',
         )
-
-        # Create second exploration with checkpoints.
-        exploration_2 = self.save_new_valid_exploration(
-            self.EXP_ID_1, self.owner_id, title='Test Exploration 2'
-        )
-        init_state_2 = exploration_2.states[exploration_2.init_state_name]
-        init_state_2.card_is_checkpoint = True
-        exp_services.save_new_exploration(self.owner_id, exploration_2)
 
         # Record progress on first exploration only.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.user_id, self.EXP_ID_0),
             user_id=self.user_id,
             exploration_id=self.EXP_ID_0,
-            most_recently_reached_checkpoint_state_name='Checkpoint 1',
+            most_recently_reached_checkpoint_state_name=exploration_1.init_state_name,
         ).put()
 
         # Get checkpoint progress for both.
@@ -3646,11 +3526,12 @@ class LearnerProgressTests(test_utils.GenericTestBase):
 
         # Verify progress for both explorations.
         self.assertIn(self.EXP_ID_0, progress)
-        self.assertIn(self.EXP_ID_1, progress)
         self.assertEqual(
-            progress[self.EXP_ID_0]['visited_checkpoints_count'], 2
+            progress[self.EXP_ID_0]['visited_checkpoints_count'], 1
         )
-        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 2)
+        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 1)
+
+        self.assertIn(self.EXP_ID_1, progress)
         self.assertEqual(
             progress[self.EXP_ID_1]['visited_checkpoints_count'], 0
         )
