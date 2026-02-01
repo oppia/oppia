@@ -30,8 +30,6 @@ import apache_beam as beam
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models, suggestion_models
-else:
-    BeamPTransform = beam.PTransform
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [
@@ -51,7 +49,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
     # assume that PTransform class is of type Any. Thus to avoid MyPy's error
     # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
     # ignore here.
-    class _GetSuggestionThreadIds(BeamPTransform):  # type: ignore[misc]
+    class _GetSuggestionThreadIds(beam.PTransform):  # type: ignore[misc]
         """Returns thread_ids that have a GeneralSuggestionModel."""
 
         def expand(self, pbegin: beam.pvalue.PBegin) -> beam.PCollection[str]:
@@ -72,7 +70,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
     # assume that PTransform class is of type Any. Thus to avoid MyPy's error
     # (Class cannot subclass 'PTransform' (has type 'Any')), we added an
     # ignore here.
-    class _GetInvalidFeedbackThreads(BeamPTransform):  # type: ignore[misc]
+    class _GetInvalidFeedbackThreads(beam.PTransform):  # type: ignore[misc]
         """Returns feedback threads marked as having suggestions but without one."""
 
         def expand(
