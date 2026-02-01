@@ -88,7 +88,6 @@ module.exports = {
       template: commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
-      chunksSortMode: 'manual',
     }),
     new HtmlWebpackPlugin({
       chunks: ['lightweight_oppia_root'],
@@ -100,7 +99,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
-      chunksSortMode: 'manual',
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
