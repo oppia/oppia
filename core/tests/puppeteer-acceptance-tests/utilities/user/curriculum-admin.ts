@@ -328,7 +328,9 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
-
+const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
+const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
+const publishChapterButton = '.e2e-test-publish-chapters-button';
 export class CurriculumAdmin extends TopicManager {
   /**
    * Moves the classrooms in the order of the given classroom names.
@@ -1924,6 +1926,39 @@ export class CurriculumAdmin extends TopicManager {
       await this.page.waitForSelector(`${publishStoryButton}:not([disabled])`);
       await this.clickOnElementWithSelector(publishStoryButton);
       await this.page.waitForSelector(unpublishStoryButton, {visible: true});
+    }
+  }
+
+  async publishStoryDraftSerialChapter(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOnElementWithSelector(mobilePublishStoryButton);
+    } else {
+      await this.clickOnElementWithSelector(publishChapterButton);
+    }
+  }
+
+  /**
+   * Function to click on the ready to publish button.
+   */
+  async clickReadyToPublishButton(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+
+      await this.expectElementToBeVisible(mobileReadyToPublishButton);
+      await this.clickOnElementWithSelector(mobileReadyToPublishButton);
+    } else {
+      await this.page.waitForSelector(markAsReadyToPublishButton);
+      await this.clickOnElementWithSelector(markAsReadyToPublishButton);
+
+      await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
     }
   }
 

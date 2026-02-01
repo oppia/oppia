@@ -45,6 +45,12 @@ const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const cancelUnpublishModalButton = '.e2e-test-cancel-unpublish-modal-button';
 const chapterConfirmAndUnpublishButton =
   '.e2e-test-confirm-unpublish-modal-button';
+const addChapterButton = 'button.e2e-test-add-chapter-button';
+const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
+const mobileSaveStoryChangesDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const mobilePublishStoryButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
@@ -126,7 +132,16 @@ describe('Logged-In Learner', function () {
         'Place Values'
       );
       await curriculumAdmin.waitForPageToFullyLoad();
-
+      if (curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.waitForStaticAssetsToLoad();
+        const addChapterButtonElement =
+          await curriculumAdmin.page.$(addChapterButton);
+        if (!addChapterButtonElement) {
+          await curriculumAdmin.clickOnElementWithSelector(
+            mobileChapterCollapsibleCard
+          );
+        }
+      }
       await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
       let chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
 
@@ -153,6 +168,7 @@ describe('Logged-In Learner', function () {
             if (elements.length < 5) {
               throw new Error('Not enough elements collapsible headers found,');
             }
+            await elements[1].click();
             await elements[2].click();
             await elements[3].click();
             await elements[4].click();
@@ -183,15 +199,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.addAcquiredSkill('Place Values skills');
 
       await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.page.waitForSelector(markAsReadyToPublishButton);
-      await curriculumAdmin.clickOnElementWithSelector(
-        markAsReadyToPublishButton
-      );
-
-      await curriculumAdmin.expectElementToBeVisible(
-        markAsReadyToPublishButton,
-        false
-      );
+      await curriculumAdmin.clickReadyToPublishButton();
 
       await curriculumAdmin.expectScreenshotToMatch(
         'chapterMarkedAsReadyToPublish.png',
@@ -211,7 +219,7 @@ describe('Logged-In Learner', function () {
         'publishChapterUpto1.png',
         __dirname
       );
-      await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      await curriculumAdmin.publishStoryDraftSerialChapter();
 
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
@@ -221,8 +229,26 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickOnElementWithSelector(
         publishUptoChaptersDropdownSelector
       );
+
+      //clicking cancel on unpublish modal
       await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '-1');
-      await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      if (curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.page.waitForSelector(
+          mobileSaveStoryChangesDropdown,
+          {
+            visible: true,
+          }
+        );
+        await curriculumAdmin.clickOnElementWithSelector(
+          mobileSaveStoryChangesDropdown
+        );
+        await curriculumAdmin.page.waitForSelector(mobilePublishStoryButton);
+        await curriculumAdmin.clickOnElementWithSelector(
+          mobilePublishStoryButton
+        );
+      } else {
+        await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      }
       await curriculumAdmin.clickOnElementWithSelector(
         cancelUnpublishModalButton
       );
@@ -237,8 +263,26 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickOnElementWithSelector(
         publishUptoChaptersDropdownSelector
       );
+
+      //confirming unpublish on modal
       await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '-1');
-      await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      if (curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.page.waitForSelector(
+          mobileSaveStoryChangesDropdown,
+          {
+            visible: true,
+          }
+        );
+        await curriculumAdmin.clickOnElementWithSelector(
+          mobileSaveStoryChangesDropdown
+        );
+        await curriculumAdmin.page.waitForSelector(mobilePublishStoryButton);
+        await curriculumAdmin.clickOnElementWithSelector(
+          mobilePublishStoryButton
+        );
+      } else {
+        await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      }
       await curriculumAdmin.clickOnElementWithSelector(
         chapterConfirmAndUnpublishButton
       );
@@ -280,6 +324,7 @@ describe('Logged-In Learner', function () {
             if (elements.length < 5) {
               throw new Error('Not enough elements collapsible headers found,');
             }
+            await elements[1].click();
             await elements[2].click();
             await elements[3].click();
             await elements[4].click();
@@ -291,15 +336,7 @@ describe('Logged-In Learner', function () {
         dateString
       );
       await curriculumAdmin.saveStoryDraft();
-      await curriculumAdmin.page.waitForSelector(markAsReadyToPublishButton);
-      await curriculumAdmin.clickOnElementWithSelector(
-        markAsReadyToPublishButton
-      );
-
-      await curriculumAdmin.expectElementToBeVisible(
-        markAsReadyToPublishButton,
-        false
-      );
+      await curriculumAdmin.clickReadyToPublishButton();
 
       await curriculumAdmin.makeChapterReadtToPublish(
         'Find the Value of a Number',
@@ -326,7 +363,7 @@ describe('Logged-In Learner', function () {
         publishUptoChaptersDropdownSelector
       );
       await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '3');
-      await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
+      await curriculumAdmin.publishStoryDraftSerialChapter();
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
