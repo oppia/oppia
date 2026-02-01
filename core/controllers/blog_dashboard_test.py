@@ -144,12 +144,14 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
 
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        ).to_dict()
+        )
+        assert pre_update_author_details is not None
+        pre_update_author_details_dict = pre_update_author_details.to_dict()
         self.assertEqual(
-            pre_update_author_details['displayed_author_name'],
+            pre_update_author_details_dict['displayed_author_name'],
             self.BLOG_EDITOR_USERNAME,
         )
-        self.assertEqual(pre_update_author_details['author_bio'], '')
+        self.assertEqual(pre_update_author_details_dict['author_bio'], '')
 
         json_response = self.put_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
@@ -177,9 +179,11 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         }
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        ).to_dict()
+        )
+        assert pre_update_author_details is not None
+        pre_update_author_details_dict = pre_update_author_details.to_dict()
         self.assertEqual(
-            pre_update_author_details['displayed_author_name'],
+            pre_update_author_details_dict['displayed_author_name'],
             self.BLOG_EDITOR_USERNAME,
         )
 
@@ -196,8 +200,10 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         payload = {'displayed_author_name': 'new user', 'author_bio': 1234}
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
-        ).to_dict()
-        self.assertEqual(pre_update_author_details['author_bio'], '')
+        )
+        assert pre_update_author_details is not None
+        pre_update_author_details_dict = pre_update_author_details.to_dict()
+        self.assertEqual(pre_update_author_details_dict['author_bio'], '')
 
         self.put_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),

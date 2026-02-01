@@ -103,6 +103,24 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(blog_post_id == self.blog_post_a_id)
         self.assertFalse(blog_post_id == self.blog_post_b_id)
 
+    def test_create_new_blog_post_creates_author_details(self) -> None:
+        """Tests that create_new_blog_post ensures BlogAuthorDetailsModel exists."""
+        self.signup('newauthor@example.com', 'newauthor')
+        new_user_id = self.get_user_id_from_email('newauthor@example.com')
+
+        author_model_before = blog_models.BlogAuthorDetailsModel.get_by_author(
+            new_user_id
+        )
+        self.assertIsNone(author_model_before)
+        new_blog_post = blog_services.create_new_blog_post(new_user_id)
+        author_model_after = blog_models.BlogAuthorDetailsModel.get_by_author(
+            new_user_id
+        )
+        self.assertIsNotNone(author_model_after)
+        assert author_model_after is not None
+        self.assertEqual(author_model_after.author_id, new_user_id)
+        self.assertEqual(new_blog_post.author_id, new_user_id)
+
     def test_generate_summary_of_blog_post(self) -> None:
         html_content = '<a href="http://www.google.com">Hello, Oppia Blog</a>'
         expected_summary = 'Hello, Oppia Blog'
@@ -955,14 +973,32 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
                 Exception,
                 ('Unable to fetch author details for the given user.'),
             ):
+                # Test with strict=True (default).
                 blog_services.get_blog_author_details(self.user_id)
 
-    def test_get_blog_author_details_create_fails(self) -> None:
-        """Tests that get_blog_author_details raises an error when user details cannot be fetched."""
+    def test_get_blog_author_details_with_strict_false_returns_none(
+        self,
+    ) -> None:
+        """Tests that get_blog_author_details returns None when strict=False and author details are missing."""
 
-        def _mock_get_by_author(unused_user_id: str) -> None:
-            """Always returns None to simulate missing author details."""
+        def _mock_get_author_details_by_author(unused_user_id: str) -> None:
             return None
+
+        get_author_details_swap = self.swap(
+            blog_models.BlogAuthorDetailsModel,
+            'get_by_author',
+            _mock_get_author_details_by_author,
+        )
+
+        with get_author_details_swap:
+            # With strict=False, should return None instead of raising.
+            author_details = blog_services.get_blog_author_details(
+                self.user_id, strict=False
+            )
+            self.assertIsNone(author_details)
+
+    def test_get_blog_author_details_create_fails(self) -> None:
+        """Tests that create_blog_author_details_model raises an error when user details cannot be fetched."""
 
         # Here we use type Any because this mock replaces the real get_user_settings function,
         # which accepts flexible keyword arguments (like 'strict')
@@ -973,23 +1009,18 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             """Mocked get_user_settings that always returns None."""
             return None
 
-        get_by_author_swap = self.swap(
-            blog_models.BlogAuthorDetailsModel,
-            'get_by_author',
-            _mock_get_by_author,
-        )
-
         get_user_settings_swap = self.swap(
             user_services,
             'get_user_settings',
             _mock_get_user_settings,
         )
 
-        with get_by_author_swap, get_user_settings_swap:
+        with get_user_settings_swap:
             with self.assertRaisesRegex(
                 Exception, 'Unable to fetch user details for the given user'
             ):
-                blog_services.get_blog_author_details(self.user_id)
+                # This should fail when trying to create author details.
+                blog_services.create_blog_author_details_model(self.user_id)
 
     def test_update_blog_author_details(self) -> None:
         new_author_name = 'new author name'

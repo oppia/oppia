@@ -141,6 +141,45 @@ class BlogHomepageDataHandlerTest(test_utils.GenericTestBase):
             'new author name',
         )
 
+    def test_pagination_with_deleted_author_on_later_pages(self) -> None:
+        """Tests that pagination works correctly when deleted authors appear on later pages."""
+        self.signup('author2@example.com', 'author2')
+        author2_id = self.get_user_id_from_email('author2@example.com')
+        self.add_user_role('author2', feconf.ROLE_ID_BLOG_POST_EDITOR)
+        for i in range(15):
+            blog_post = blog_services.create_new_blog_post(self.blog_admin_id)
+            change_dict: blog_services.BlogPostChangeDict = {
+                'title': f'Blog Admin Post {i}',
+                'thumbnail_filename': 'thumbnail.svg',
+                'content': f'<p>Content {i}</p>',
+                'tags': ['Tag1'],
+            }
+            blog_services.update_blog_post(blog_post.id, change_dict)
+            blog_services.publish_blog_post(blog_post.id)
+        for i in range(15):
+            blog_post = blog_services.create_new_blog_post(author2_id)
+            change_dict = {
+                'title': f'Author2 Post {i}',
+                'thumbnail_filename': 'thumbnail.svg',
+                'content': f'<p>Content {i}</p>',
+                'tags': ['Tag1'],
+            }
+            blog_services.update_blog_post(blog_post.id, change_dict)
+            blog_services.publish_blog_post(blog_post.id)
+        user_models.UserSettingsModel.delete_by_id(author2_id)
+        self.login(self.user_email)
+        response = self.get_json('%s?offset=0' % feconf.BLOG_HOMEPAGE_DATA_URL)
+        self.assertEqual(len(response['blog_post_summary_dicts']), 10)
+        response = self.get_json('%s?offset=10' % feconf.BLOG_HOMEPAGE_DATA_URL)
+        self.assertEqual(len(response['blog_post_summary_dicts']), 10)
+        response = self.get_json('%s?offset=20' % feconf.BLOG_HOMEPAGE_DATA_URL)
+        self.assertEqual(len(response['blog_post_summary_dicts']), 10)
+        for post_dict in response['blog_post_summary_dicts']:
+            if post_dict['author_username'] == 'author account deleted':
+                self.assertEqual(
+                    post_dict['displayed_author_name'], 'Blog Author'
+                )
+
 
 class BlogPostDataHandlerTest(test_utils.GenericTestBase):
     """Checks that the data of the blog post and other data on
