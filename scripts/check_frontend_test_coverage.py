@@ -65,8 +65,14 @@ NOT_FULLY_COVERED_FILENAMES = [
     'core/templates/pages/blog-post-page/blog-post-page.component.ts',
     'core/templates/pages/exploration-editor-page/editor-tab/'
     'exploration-editor-tab.component.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/templates/'
+    'modal-templates/customize-interaction-modal.component.ts',
+    'core/templates/pages/exploration-editor-page/editor-tab/training-panel/'
+    'training-modal.component.ts',
     'core/templates/pages/exploration-editor-page/services/'
     'exploration-states.service.ts',
+    'core/templates/pages/exploration-editor-page/services/'
+    'populate-rule-content-ids.service.ts',
     'core/templates/pages/exploration-player-page/services/'
     'learner-answer-info.service.ts',
     'core/templates/services/suggestion-modal.service.ts',
