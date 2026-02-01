@@ -22,6 +22,7 @@ import subprocess
 import sys
 import time
 
+from core.constants import constants
 from core.tests import test_utils
 from scripts import (
     build,
@@ -32,7 +33,7 @@ from scripts import (
     servers,
 )
 
-from typing import ContextManager, Final, Tuple
+from typing import Any, Callable, ContextManager, Dict, Final, Optional, Tuple
 
 CHROME_DRIVER_VERSION: Final = '77.0.3865.40'
 
@@ -70,6 +71,75 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             self.exit_stack.close()
         finally:
             super().tearDown()
+
+    def _swap_servers(
+        self,
+        servers_list: list[str],
+        *,
+        default_fn: Callable[
+            ..., ContextManager[scripts_test_utils.PopenStub]
+        ] = (mock_managed_process),
+        # Here we use type Any because special_overrides may contain tuples of
+        # heterogeneous shapes used across tests (1-, 2- or 3-element tuples where
+        # the second element can be a list/dict or None, and the third a bool).
+        special_overrides: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        """Enter contexts for multiple managed_* server functions.
+
+        Args:
+            servers_list: list[str]. List of attribute names on the `servers`
+                module to mock.
+            default_fn: Callable[..., ContextManager[PopenStub]]. Default callable
+                to swap in for each server.
+            special_overrides: Optional[Dict[str, Any]]. Optional mapping from
+                server name to a tuple whose first element is a callable
+                (used instead of default_fn) and whose remaining elements (if any)
+                are additional data such as expected_kwargs or called flags. The
+                tuple may be length 1, 2 or 3 depending on the test usage.
+        """
+        special_overrides = special_overrides or {}
+        for srv in servers_list:
+            override = special_overrides.get(srv)
+            if override is None:
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, default_fn)
+                )
+                continue
+
+            # Override is a tuple where:
+            # override[0] is the callable to use
+            # override[1] (if present) is expected_kwargs (often a list/dict)
+            # override[2] (if present) is called (bool)
+            override_fn: Callable[
+                ..., ContextManager[scripts_test_utils.PopenStub]
+            ] = override[0]
+
+            # Here we use type Any because expected_kwargs can be a list, dict or
+            # None depending on the test case.
+            expected_kwargs: Optional[Any] = None
+
+            called_flag: Optional[bool] = None
+            if len(override) >= 2:
+                expected_kwargs = override[1]
+            if len(override) >= 3:
+                called_flag = override[2]
+
+            if expected_kwargs is not None or called_flag is not None:
+                # Here we use type Any because the dict values (expected_kwargs)
+                # have heterogeneous shapes (lists/dicts with different key/value
+                # types) across tests.
+                kwargs: Dict[str, Any] = {}
+                if expected_kwargs is not None:
+                    kwargs['expected_kwargs'] = expected_kwargs
+                if called_flag is not None:
+                    kwargs['called'] = called_flag
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, override_fn, **kwargs)
+                )
+            else:
+                self.exit_stack.enter_context(
+                    self.swap_with_checks(servers, srv, override_fn)
+                )
 
     def test_wait_for_port_to_be_in_use_when_port_successfully_opened(
         self,
@@ -168,57 +238,36 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (
+                    mock_managed_process,
+                    [
+                        {
+                            'suite_name': 'full',
+                            'chrome_version': None,
+                            'dev_mode': True,
+                            'mobile': False,
+                            'sharding_instances': 3,
+                            'debug_mode': False,
+                            'stdout': subprocess.PIPE,
+                        },
+                    ],
+                )
+            },
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -262,53 +311,24 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_webdriverio_server,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'mobile': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (mock_managed_webdriverio_server,)
+            },
         )
+
         args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
             args=[]
         )
@@ -384,11 +404,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 1
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
+        self._swap_servers(['managed_portserver'])
+
         self.exit_stack.enter_context(
             self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
         )
@@ -404,11 +421,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_run_tests(unused_args: str) -> Tuple[str, int]:
             return 'sample\noutput', 0
 
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
+        self._swap_servers(['managed_portserver'])
+
         self.exit_stack.enter_context(
             self.swap(run_e2e_tests, 'run_tests', mock_run_tests)
         )
@@ -447,65 +461,42 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 common, 'set_constants_to_default', lambda: None
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webpack_compiler',
-                mock_managed_process,
-                called=False,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ],
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+        self._swap_servers(
+            ['managed_webpack_compiler'],
+            special_overrides={
+                'managed_webpack_compiler': (mock_managed_process, None, False)
+            },
+        )
+
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (
+                    mock_managed_process,
+                    [
+                        {
+                            'suite_name': 'full',
+                            'chrome_version': None,
+                            'dev_mode': True,
+                            'mobile': False,
+                            'sharding_instances': 3,
+                            'debug_mode': False,
+                            'stdout': subprocess.PIPE,
+                        },
+                    ],
+                )
+            },
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -537,57 +528,36 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': True,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (
+                    mock_managed_process,
+                    [
+                        {
+                            'suite_name': 'full',
+                            'chrome_version': None,
+                            'dev_mode': True,
+                            'mobile': False,
+                            'sharding_instances': 3,
+                            'debug_mode': True,
+                            'stdout': subprocess.PIPE,
+                        },
+                    ],
+                )
+            },
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -620,58 +590,37 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'full',
-                        'chrome_version': CHROME_DRIVER_VERSION,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (
+                    mock_managed_process,
+                    [
+                        {
+                            'suite_name': 'full',
+                            'chrome_version': CHROME_DRIVER_VERSION,
+                            'dev_mode': True,
+                            'mobile': False,
+                            'sharding_instances': 3,
+                            'debug_mode': False,
+                            'stdout': subprocess.PIPE,
+                        },
+                    ],
+                )
+            },
         )
+
         self.exit_stack.enter_context(
             self.swap_with_checks(
                 sys, 'exit', lambda _: None, expected_args=[(0,)]
@@ -705,57 +654,36 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
-                'managed_webdriverio_server',
-                mock_managed_process,
-                expected_kwargs=[
-                    {
-                        'suite_name': 'collections',
-                        'chrome_version': None,
-                        'dev_mode': True,
-                        'mobile': False,
-                        'sharding_instances': 3,
-                        'debug_mode': False,
-                        'stdout': subprocess.PIPE,
-                    },
-                ],
-            )
+
+        self._swap_servers(
+            ['managed_webdriverio_server'],
+            special_overrides={
+                'managed_webdriverio_server': (
+                    mock_managed_process,
+                    [
+                        {
+                            'suite_name': 'collections',
+                            'chrome_version': None,
+                            'dev_mode': True,
+                            'mobile': False,
+                            'sharding_instances': 3,
+                            'debug_mode': False,
+                            'stdout': subprocess.PIPE,
+                        },
+                    ],
+                )
+            },
         )
         self.exit_stack.enter_context(
             self.swap_with_checks(
@@ -788,41 +716,158 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                 expected_args=[(True,)],
             )
         )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+
+        self._swap_servers(
+            [
                 'managed_elasticsearch_dev_server',
-                mock_managed_process,
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_firebase_auth_emulator', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_dev_appserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_redis_server', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers, 'managed_portserver', mock_managed_process
-            )
-        )
-        self.exit_stack.enter_context(
-            self.swap_with_checks(
-                servers,
+                'managed_firebase_auth_emulator',
+                'managed_dev_appserver',
+                'managed_redis_server',
+                'managed_portserver',
                 'managed_cloud_datastore_emulator',
-                mock_managed_process,
-            )
+            ]
         )
 
         with self.assertRaisesRegex(SystemExit, '^1$'):
             with self.swap_mock_set_constants_to_default:
                 run_e2e_tests.main(args=['--mobile', '--suite', 'collections'])
+
+    def test_run_tests_skips_emulator_block_when_not_in_emulator_mode(
+        self,
+    ) -> None:
+        class FakeProc:
+            """Fake process that exits immediately with no output."""
+
+            def __init__(self) -> None:
+                self.stdout = self
+                self.returncode = 0
+
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
+                return b''
+
+            def poll(self) -> int:  # pylint: disable=missing-docstring
+                return self.returncode
+
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(
+                    run_e2e_tests,
+                    'install_third_party_libraries',
+                    lambda _: None,
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
+
+            self._swap_servers(
+                [
+                    'managed_redis_server',
+                    'managed_elasticsearch_dev_server',
+                    'managed_dev_appserver',
+                    'managed_webdriverio_server',
+                    'managed_cloud_datastore_emulator',
+                    'managed_firebase_auth_emulator',
+                ],
+                default_fn=lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                special_overrides={
+                    'managed_firebase_auth_emulator': (
+                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                        None,
+                        False,
+                    ),
+                    'managed_cloud_datastore_emulator': (
+                        lambda *a, **k: contextlib.nullcontext(FakeProc()),
+                        None,
+                        False,
+                    ),
+                },
+            )
+
+            args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
+                args=[]
+            )
+            with self.swap_mock_set_constants_to_default:
+                output_lines, return_code = run_e2e_tests.run_tests(args)
+
+        self.assertEqual(output_lines, [])
+        self.assertEqual(return_code, 0)
+
+    def test_run_tests_loops_until_process_ends(self) -> None:
+        class FakeStdout:
+            """Fake stdout stream for simulating process output lines."""
+
+            def __init__(self) -> None:
+                self.lines = [b'line1\n', b'line2\n', b'']
+                self.index = 0
+
+            def readline(self) -> bytes:  # pylint: disable=missing-docstring
+                if self.index < len(self.lines):
+                    line = self.lines[self.index]
+                    self.index += 1
+                    return line
+                return b''
+
+        class FakeProc:
+            """Fake process object to simulate polling behavior."""
+
+            def __init__(self) -> None:
+                self.stdout = FakeStdout()
+                self.returncode = 0
+                self.poll_call_count = 0
+
+            def poll(self) -> int | None:  # pylint: disable=missing-docstring
+                self.poll_call_count += 1
+                return None if self.poll_call_count < 3 else 0
+
+        fake_proc = FakeProc()
+
+        with self.swap(constants, 'EMULATOR_MODE', False):
+            self.exit_stack.enter_context(
+                self.swap(
+                    common, 'is_oppia_server_already_running', lambda *_: False
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(
+                    run_e2e_tests,
+                    'install_third_party_libraries',
+                    lambda _: None,
+                )
+            )
+            self.exit_stack.enter_context(
+                self.swap(build, 'build_js_files', lambda *_, **__: None)
+            )
+
+            self._swap_servers(
+                [
+                    'managed_redis_server',
+                    'managed_elasticsearch_dev_server',
+                    'managed_dev_appserver',
+                    'managed_webdriverio_server',
+                    'managed_cloud_datastore_emulator',
+                ],
+                default_fn=lambda *a, **k: contextlib.nullcontext(fake_proc),
+                special_overrides={
+                    'managed_cloud_datastore_emulator': (
+                        lambda *a, **k: contextlib.nullcontext(fake_proc),
+                        None,
+                        False,
+                    ),
+                },
+            )
+
+            args = run_e2e_tests._PARSER.parse_args(  # pylint: disable=protected-access
+                args=[]
+            )
+            with self.swap_mock_set_constants_to_default:
+                output_lines, return_code = run_e2e_tests.run_tests(args)
+
+        expected_lines = [b'line1', b'line2']
+        self.assertEqual(output_lines, expected_lines)
+        self.assertEqual(return_code, 0)
