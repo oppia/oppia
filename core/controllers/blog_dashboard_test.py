@@ -51,6 +51,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             self.BLOG_EDITOR_EMAIL
         )
 
+        blog_services.create_blog_author_details_model(self.blog_admin_id)
+        blog_services.create_blog_author_details_model(self.blog_editor_id)
+
     def test_get_dashboard_page_data(self) -> None:
         # Checks blog editor can access blog dashboard.
         self.login(self.BLOG_EDITOR_EMAIL)
