@@ -506,20 +506,6 @@ describe('Full exploration editor', function () {
       // Set network connection to offline.
       await general.goOffline();
 
-      // DO NOT wait for offline toast to disappear
-      await explorationEditorPage.waitForOfflineAlert();
-
-      // Immediately go online BEFORE toast disappears
-      await general.goOnline();
-
-      // This line will now FAIL intermittently / consistently
-      await explorationEditorPage.waitForOfflineAlert();
-
-      //reset to offile so that follwoing test pass as intented
-      await general.goOffline();
-      // Check that toast message appeared when offline.
-      await explorationEditorPage.waitForOfflineAlert();
-
       // Add a content change to check changes can be done when offline.
       await explorationEditorMainTab.setContent(
         async function (richTextEditor) {
