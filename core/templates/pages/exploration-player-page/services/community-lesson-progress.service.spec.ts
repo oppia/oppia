@@ -71,21 +71,21 @@ describe('CommunityLessonProgressService', () => {
       const explorationId = 'exp123';
 
       service.markCheckpointReached(explorationId, 'Checkpoint1');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('Checkpoint1');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'Checkpoint1'
+      );
 
       service.markCheckpointReached(explorationId, 'Checkpoint2');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('Checkpoint2');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'Checkpoint2'
+      );
     });
 
     it('should emit progress update when checkpoint is reached', fakeAsync(() => {
       const explorationId = 'exp123';
       let emittedExpId: string | null = null;
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -105,12 +105,8 @@ describe('CommunityLessonProgressService', () => {
 
       expect(service.getVisitedCheckpointsCount(exp1)).toBe(2);
       expect(service.getVisitedCheckpointsCount(exp2)).toBe(1);
-      expect(
-        service.getMostRecentlyReachedCheckpoint(exp1)
-      ).toEqual('CP2');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(exp2)
-      ).toEqual('CP1');
+      expect(service.getMostRecentlyReachedCheckpoint(exp1)).toEqual('CP2');
+      expect(service.getMostRecentlyReachedCheckpoint(exp2)).toEqual('CP1');
     });
   });
 
@@ -194,26 +190,28 @@ describe('CommunityLessonProgressService', () => {
 
   describe('getMostRecentlyReachedCheckpoint', () => {
     it('should return null for unexplored explorations', () => {
-      expect(service.getMostRecentlyReachedCheckpoint('nonexistent')).toBeNull();
+      expect(
+        service.getMostRecentlyReachedCheckpoint('nonexistent')
+      ).toBeNull();
     });
 
     it('should return the most recently reached checkpoint', () => {
       const explorationId = 'exp123';
 
       service.markCheckpointReached(explorationId, 'CP1');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('CP1');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'CP1'
+      );
 
       service.markCheckpointReached(explorationId, 'CP2');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('CP2');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'CP2'
+      );
 
       service.markCheckpointReached(explorationId, 'CP3');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('CP3');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'CP3'
+      );
     });
 
     it('should update when a new checkpoint is reached', () => {
@@ -236,9 +234,9 @@ describe('CommunityLessonProgressService', () => {
     it('should return false for unvisited checkpoints', () => {
       const explorationId = 'exp123';
 
-      expect(
-        service.isCheckpointVisited(explorationId, 'UnvisitedCP')
-      ).toBe(false);
+      expect(service.isCheckpointVisited(explorationId, 'UnvisitedCP')).toBe(
+        false
+      );
     });
 
     it('should return true for visited checkpoints', () => {
@@ -265,9 +263,9 @@ describe('CommunityLessonProgressService', () => {
     it('should return false for explorations without any visited checkpoints', () => {
       const explorationId = 'exp123';
 
-      expect(
-        service.isCheckpointVisited(explorationId, 'AnyCheckpoint')
-      ).toBe(false);
+      expect(service.isCheckpointVisited(explorationId, 'AnyCheckpoint')).toBe(
+        false
+      );
     });
   });
 
@@ -305,7 +303,7 @@ describe('CommunityLessonProgressService', () => {
 
       service.markCheckpointReached(explorationId, 'CP1');
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -337,7 +335,7 @@ describe('CommunityLessonProgressService', () => {
       service.markCheckpointReached('exp1', 'CP1');
       let emittedExpId: string | null = 'not-null';
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -388,7 +386,7 @@ describe('CommunityLessonProgressService', () => {
       const explorationId = 'exp123';
       let emittedExpId: string | null = null;
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -404,7 +402,7 @@ describe('CommunityLessonProgressService', () => {
 
       service.markCheckpointReached(explorationId, 'CP1');
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -418,7 +416,7 @@ describe('CommunityLessonProgressService', () => {
       service.markCheckpointReached('exp1', 'CP1');
       let emittedExpId: string | null = 'not-null';
 
-      service.progressUpdate$.subscribe((updatedExpId) => {
+      service.progressUpdate$.subscribe(updatedExpId => {
         emittedExpId = updatedExpId;
       });
 
@@ -455,15 +453,15 @@ describe('CommunityLessonProgressService', () => {
 
       service.markCheckpointReached(explorationId, 'Introduction');
       expect(service.getVisitedCheckpointsCount(explorationId)).toBe(1);
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('Introduction');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'Introduction'
+      );
 
       service.markCheckpointReached(explorationId, 'BasicConcepts');
       expect(service.getVisitedCheckpointsCount(explorationId)).toBe(2);
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('BasicConcepts');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'BasicConcepts'
+      );
 
       // User tries again and goes back to first checkpoint (should not increment)
       service.markCheckpointReached(explorationId, 'Introduction');
@@ -471,16 +469,16 @@ describe('CommunityLessonProgressService', () => {
 
       service.markCheckpointReached(explorationId, 'AdvancedConcepts');
       expect(service.getVisitedCheckpointsCount(explorationId)).toBe(3);
-      expect(
-        service.getMostRecentlyReachedCheckpoint(explorationId)
-      ).toEqual('AdvancedConcepts');
+      expect(service.getMostRecentlyReachedCheckpoint(explorationId)).toEqual(
+        'AdvancedConcepts'
+      );
 
-      expect(
-        service.isCheckpointVisited(explorationId, 'Introduction')
-      ).toBe(true);
-      expect(
-        service.isCheckpointVisited(explorationId, 'BasicConcepts')
-      ).toBe(true);
+      expect(service.isCheckpointVisited(explorationId, 'Introduction')).toBe(
+        true
+      );
+      expect(service.isCheckpointVisited(explorationId, 'BasicConcepts')).toBe(
+        true
+      );
       expect(
         service.isCheckpointVisited(explorationId, 'AdvancedConcepts')
       ).toBe(true);
@@ -504,15 +502,9 @@ describe('CommunityLessonProgressService', () => {
       expect(service.getVisitedCheckpointsCount(geometry)).toBe(1);
       expect(service.getVisitedCheckpointsCount(calculus)).toBe(1);
 
-      expect(
-        service.getMostRecentlyReachedCheckpoint(algebra)
-      ).toEqual('CP3');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(geometry)
-      ).toEqual('CP1');
-      expect(
-        service.getMostRecentlyReachedCheckpoint(calculus)
-      ).toEqual('CP1');
+      expect(service.getMostRecentlyReachedCheckpoint(algebra)).toEqual('CP3');
+      expect(service.getMostRecentlyReachedCheckpoint(geometry)).toEqual('CP1');
+      expect(service.getMostRecentlyReachedCheckpoint(calculus)).toEqual('CP1');
     });
   });
 });

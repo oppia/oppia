@@ -1450,10 +1450,7 @@ describe('Conversation flow service', () => {
       flushMicrotasks();
       tick();
 
-      expect(markCheckpointSpy).toHaveBeenCalledWith(
-        'expId',
-        currentStateName
-      );
+      expect(markCheckpointSpy).toHaveBeenCalledWith('expId', currentStateName);
     }));
 
     it('should not track community lesson progress for story chapter mode', fakeAsync(() => {
@@ -1544,7 +1541,10 @@ describe('Conversation flow service', () => {
       ).and.stub();
 
       spyOn(playerPositionService, 'getDisplayedCardIndex').and.returnValue(1);
-      spyOn(playerTranscriptService, 'getPrevSessionStatesProgress').and.returnValue([]);
+      spyOn(
+        playerTranscriptService,
+        'getPrevSessionStatesProgress'
+      ).and.returnValue([]);
       spyOn(explorationEngineService, 'getState').and.returnValue({
         name: 'Checkpoint1',
         cardIsCheckpoint: true,

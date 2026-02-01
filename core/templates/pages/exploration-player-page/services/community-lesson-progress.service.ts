@@ -78,9 +78,7 @@ export class CommunityLessonProgressService {
    * @param explorationId - The ID of the exploration
    * @returns The progress data, or null if no progress exists
    */
-  getExplorationProgress(
-    explorationId: string
-  ): ExplorationProgress | null {
+  getExplorationProgress(explorationId: string): ExplorationProgress | null {
     const progress = this.explorationProgressMap.get(explorationId);
     return progress || null;
   }
