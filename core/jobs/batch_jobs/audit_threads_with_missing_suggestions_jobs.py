@@ -44,42 +44,69 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = False
 
-    def _get_suggestion_thread_ids(self) -> beam.PCollection[str]:
+    class _GetSuggestionThreadIds(beam.PTransform):
         """Returns thread_ids that have a GeneralSuggestionModel."""
-        return (
-            self.pipeline
-            | 'Get GeneralSuggestionModels'
-            >> ndb_io.GetModels(
-                suggestion_models.GeneralSuggestionModel.get_all(
-                    include_deleted=False
-                )
-            )
-            | 'Extract suggestion thread ids'
-            >> beam.Map(lambda model: model.id)
-        )
 
-    def _get_invalid_threads(
-        self,
-        valid_suggestion_thread_ids: beam.PCollection[str],
-    ) -> beam.PCollection[feedback_models.GeneralFeedbackThreadModel]:
-        """Returns threads marked as having suggestions but without one."""
-        return (
-            self.pipeline
-            | 'Get GeneralFeedbackThreadModels'
-            >> ndb_io.GetModels(
-                feedback_models.GeneralFeedbackThreadModel.get_all(
-                    include_deleted=False
+        def expand(self, pbegin: beam.pvalue.PBegin) -> beam.PCollection[str]:
+            return (
+                pbegin
+                | 'Get GeneralSuggestionModels'
+                >> ndb_io.GetModels(
+                    suggestion_models.GeneralSuggestionModel.get_all(
+                        include_deleted=False
+                    )
+                )
+                | 'Extract suggestion thread ids'
+                >> beam.Map(lambda model: model.id)
+            )
+
+    class _GetInvalidFeedbackThreads(beam.PTransform):
+        """Returns feedback threads marked as having suggestions but without one."""
+
+        def expand(
+            self,
+            valid_suggestion_thread_ids: beam.PCollection[str],
+        ) -> beam.PCollection[feedback_models.GeneralFeedbackThreadModel]:
+            feedback_threads = (
+                valid_suggestion_thread_ids.pipeline
+                | 'Get GeneralFeedbackThreadModels'
+                >> ndb_io.GetModels(
+                    feedback_models.GeneralFeedbackThreadModel.get_all(
+                        include_deleted=False
+                    )
+                )
+                | 'Keep threads which has_suggestion=True'
+                >> beam.Filter(lambda thread: thread.has_suggestion)
+            )
+
+            feedback_id_to_model = (
+                feedback_threads
+                | 'Map feedback threads to (id,model)'
+                >> beam.Map(lambda thread: (thread.id, thread))
+            )
+
+            suggestion_id_to_none = (
+                valid_suggestion_thread_ids
+                | 'Map suggestion ids to None'
+                >> beam.Map(lambda id: (id, None))
+            )
+
+            return (
+                {
+                    'feedback': feedback_id_to_model,
+                    'suggestions': suggestion_id_to_none,
+                }
+                | 'CoGroup feedback threads with suggestion ids'
+                >> beam.CoGroupByKey()
+                | 'Select threads with missing suggestions'
+                >> beam.FlatMap(
+                    lambda group: (
+                        group[1]['feedback']
+                        if not group[1]['suggestions']
+                        else []
+                    )
                 )
             )
-            | 'Filter threads with missing suggestions'
-            >> beam.Filter(
-                lambda thread, suggestion_thread_ids: (
-                    thread.has_suggestion
-                    and thread.id not in suggestion_thread_ids
-                ),
-                beam.pvalue.AsList(valid_suggestion_thread_ids),
-            )
-        )
 
 
 class AuditThreadsWithMissingSuggestionsJob(
@@ -90,8 +117,11 @@ class AuditThreadsWithMissingSuggestionsJob(
     DATASTORE_UPDATES_ALLOWED = False
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        suggestion_thread_ids = self._get_suggestion_thread_ids()
-        invalid_threads = self._get_invalid_threads(suggestion_thread_ids)
+        invalid_threads = (
+            self.pipeline
+            | BaseThreadsWithMissingSuggestionsJob._GetSuggestionThreadIds()
+            | BaseThreadsWithMissingSuggestionsJob._GetInvalidFeedbackThreads()
+        )
 
         invalid_thread_logs = invalid_threads | 'Log invalid threads' >> beam.Map(
             lambda model: job_run_result.JobRunResult.as_stdout(
@@ -127,8 +157,11 @@ class FixThreadsWithMissingSuggestionsJob(BaseThreadsWithMissingSuggestionsJob):
     DATASTORE_UPDATES_ALLOWED = True
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        suggestion_thread_ids = self._get_suggestion_thread_ids()
-        invalid_threads = self._get_invalid_threads(suggestion_thread_ids)
+        invalid_threads = (
+            self.pipeline
+            | BaseThreadsWithMissingSuggestionsJob._GetSuggestionThreadIds()
+            | BaseThreadsWithMissingSuggestionsJob._GetInvalidFeedbackThreads()
+        )
 
         updated_threads = (
             invalid_threads
