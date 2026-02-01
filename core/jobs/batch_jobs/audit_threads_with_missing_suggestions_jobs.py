@@ -30,6 +30,7 @@ import apache_beam as beam
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models, suggestion_models
+
     from apache_beam import PTransform as BeamPTransform
 else:
     BeamPTransform = beam.PTransform
