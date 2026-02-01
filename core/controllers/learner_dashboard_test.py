@@ -19,7 +19,6 @@ from __future__ import annotations
 from core import feconf
 from core.constants import constants
 from core.domain import (
-    exp_domain,
     exp_services,
     learner_progress_services,
     state_domain,
@@ -964,13 +963,13 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
-            'checkpoint_1',
+            'Checkpoint 1',
             'content_1',
             'default_outcome_1',
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
-        exploration.states['checkpoint_1'] = state_1
+        exploration.states['Checkpoint 1'] = state_1
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -1001,27 +1000,27 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
-            'checkpoint_1',
+            'Checkpoint 1',
             'content_1',
             'default_outcome_1',
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         state_2 = state_domain.State.create_default_state(
-            'checkpoint_2',
+            'Checkpoint 2',
             'content_2',
             'default_outcome_2',
             is_initial_state=False,
         )
         state_2.card_is_checkpoint = True
-        exploration.states['checkpoint_1'] = state_1
-        exploration.states['checkpoint_2'] = state_2
+        exploration.states['Checkpoint 1'] = state_1
+        exploration.states['Checkpoint 2'] = state_2
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
         # Mark as incomplete and record checkpoint progress.
         learner_progress_services.mark_exploration_as_incomplete(
-            self.viewer_id, self.EXP_ID_1, 'checkpoint_1', 1
+            self.viewer_id, self.EXP_ID_1, 'Checkpoint 1', 1
         )
 
         # Record checkpoint progress (visited 2 out of 3 checkpoints).
@@ -1032,7 +1031,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_1),
             user_id=self.viewer_id,
             exploration_id=self.EXP_ID_1,
-            most_recently_reached_checkpoint_state_name='checkpoint_1',
+            most_recently_reached_checkpoint_state_name='Checkpoint 1',
         ).put()
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
@@ -1123,13 +1122,13 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             init_state = exploration.states[exploration.init_state_name]
             init_state.card_is_checkpoint = True
             state_1 = state_domain.State.create_default_state(
-                'checkpoint_1',
+                'Checkpoint 1',
                 'content_1',
                 'default_outcome_1',
                 is_initial_state=False,
             )
             state_1.card_is_checkpoint = True
-            exploration.states['checkpoint_1'] = state_1
+            exploration.states['Checkpoint 1'] = state_1
             exp_services.save_new_exploration(self.owner_id, exploration)
             self.publish_exploration(self.owner_id, exp_id)
             learner_progress_services.mark_exploration_as_incomplete(
@@ -1144,7 +1143,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_3),
             user_id=self.viewer_id,
             exploration_id=self.EXP_ID_3,
-            most_recently_reached_checkpoint_state_name='checkpoint_1',
+            most_recently_reached_checkpoint_state_name='Checkpoint 1',
         ).put()
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)

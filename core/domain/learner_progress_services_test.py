@@ -3388,13 +3388,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
-            'checkpoint_1',
+            'Checkpoint 1',
             'content_1',
             'default_outcome_1',
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
-        exploration.states['checkpoint_1'] = state_1
+        exploration.states['Checkpoint 1'] = state_1
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         # Get checkpoint progress.
@@ -3428,29 +3428,29 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
-            'checkpoint_1',
+            'Checkpoint 1',
             'content_1',
             'default_outcome_1',
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         state_2 = state_domain.State.create_default_state(
-            'checkpoint_2',
+            'Checkpoint 2',
             'content_2',
             'default_outcome_2',
             is_initial_state=False,
         )
         state_2.card_is_checkpoint = True
-        exploration.states['checkpoint_1'] = state_1
-        exploration.states['checkpoint_2'] = state_2
+        exploration.states['Checkpoint 1'] = state_1
+        exploration.states['Checkpoint 2'] = state_2
         exp_services.save_new_exploration(self.owner_id, exploration)
 
-        # Record progress to checkpoint_1.
+        # Record progress to Checkpoint 1.
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.user_id, self.EXP_ID_0),
             user_id=self.user_id,
             exploration_id=self.EXP_ID_0,
-            most_recently_reached_checkpoint_state_name='checkpoint_1',
+            most_recently_reached_checkpoint_state_name='Checkpoint 1',
         ).put()
 
         # Get checkpoint progress.
@@ -3476,13 +3476,13 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         init_state_1 = exploration_1.states[exploration_1.init_state_name]
         init_state_1.card_is_checkpoint = True
         state_1_1 = state_domain.State.create_default_state(
-            'checkpoint_1',
+            'Checkpoint 1',
             'content_1',
             'default_outcome_1',
             is_initial_state=False,
         )
         state_1_1.card_is_checkpoint = True
-        exploration_1.states['checkpoint_1'] = state_1_1
+        exploration_1.states['Checkpoint 1'] = state_1_1
         exp_services.save_new_exploration(self.owner_id, exploration_1)
 
         # Create second exploration with checkpoints.
@@ -3498,7 +3498,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             id='%s.%s' % (self.user_id, self.EXP_ID_0),
             user_id=self.user_id,
             exploration_id=self.EXP_ID_0,
-            most_recently_reached_checkpoint_state_name='checkpoint_1',
+            most_recently_reached_checkpoint_state_name='Checkpoint 1',
         ).put()
 
         # Get checkpoint progress for both.
