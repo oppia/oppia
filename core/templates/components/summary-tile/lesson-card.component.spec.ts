@@ -78,6 +78,7 @@ describe('LessonCardComponent', () => {
     activity_type: 'exploration',
     category: 'Algebra',
     title: 'Test Title',
+    progress: 40,
   };
 
   const sampleNode = {
@@ -377,7 +378,7 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
     expect(component.title).toEqual(sampleExploration.title);
 
-    expect(component.progress).toEqual(0);
+    expect(component.progress).toEqual(40);
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 

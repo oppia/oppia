@@ -16,6 +16,8 @@
 
 from __future__ import annotations
 
+import math
+
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -274,6 +276,53 @@ class LearnerDashboardExplorationsProgressHandler(
                 learner_progress.exploration_playlist_summaries
             )
         )
+
+        exploration_ids_for_progress = [
+            summary_dict['id']
+            for summary_dict in (
+                incomplete_exp_summary_dicts
+                + completed_exp_summary_dicts
+                + exploration_playlist_summary_dicts
+            )
+        ]
+        progress_by_exp_id = (
+            learner_progress_services.get_checkpoint_progress_for_explorations(
+                self.user_id, exploration_ids_for_progress
+            )
+        )
+
+        def _get_progress_percent(
+            exploration_id: str, is_completed: bool
+        ) -> int:
+            if is_completed:
+                return 100
+            progress_data = progress_by_exp_id.get(exploration_id)
+            if progress_data is None:
+                return 0
+            total_checkpoints = progress_data['total_checkpoints_count']
+            if total_checkpoints == 0:
+                return 0
+            visited_checkpoints = max(
+                progress_data['visited_checkpoints_count'] - 1, 0
+            )
+            return int(
+                math.floor((visited_checkpoints / total_checkpoints) * 100)
+            )
+
+        for summary_dict in incomplete_exp_summary_dicts:
+            summary_dict['progress'] = _get_progress_percent(
+                summary_dict['id'], False
+            )
+
+        for summary_dict in completed_exp_summary_dicts:
+            summary_dict['progress'] = _get_progress_percent(
+                summary_dict['id'], True
+            )
+
+        for summary_dict in exploration_playlist_summary_dicts:
+            summary_dict['progress'] = _get_progress_percent(
+                summary_dict['id'], False
+            )
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id)
