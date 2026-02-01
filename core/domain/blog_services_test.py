@@ -1239,6 +1239,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             sorted(
                 [
                     self.ids_of_blog_posts_by_user_A[0],
+                    self.ids_of_blog_posts_by_user_A[1],
                     self.ids_of_blog_posts_by_user_A[2],
                 ]
             ),
