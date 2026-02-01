@@ -27,6 +27,7 @@ from core.domain import (
     subscription_services,
     topic_domain,
     topic_services,
+    translation_domain,
 )
 from core.tests import test_utils
 
@@ -962,14 +963,24 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         )
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         state_1 = state_domain.State.create_default_state(
             'Checkpoint 1',
-            'content_1',
-            'default_outcome_1',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         exploration.states['Checkpoint 1'] = state_1
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -999,22 +1010,36 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         )
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         state_1 = state_domain.State.create_default_state(
             'Checkpoint 1',
-            'content_1',
-            'default_outcome_1',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         state_2 = state_domain.State.create_default_state(
             'Checkpoint 2',
-            'content_2',
-            'default_outcome_2',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_2.card_is_checkpoint = True
         exploration.states['Checkpoint 1'] = state_1
         exploration.states['Checkpoint 2'] = state_2
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         exp_services.save_new_exploration(self.owner_id, exploration)
         self.publish_exploration(self.owner_id, self.EXP_ID_1)
 
@@ -1121,14 +1146,24 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             )
             init_state = exploration.states[exploration.init_state_name]
             init_state.card_is_checkpoint = True
+            content_id_generator = translation_domain.ContentIdGenerator(
+                exploration.next_content_id_index
+            )
             state_1 = state_domain.State.create_default_state(
                 'Checkpoint 1',
-                'content_1',
-                'default_outcome_1',
+                content_id_generator.generate(
+                    translation_domain.ContentType.CONTENT
+                ),
+                content_id_generator.generate(
+                    translation_domain.ContentType.DEFAULT_OUTCOME
+                ),
                 is_initial_state=False,
             )
             state_1.card_is_checkpoint = True
             exploration.states['Checkpoint 1'] = state_1
+            exploration.next_content_id_index = (
+                content_id_generator.next_content_id_index
+            )
             exp_services.save_new_exploration(self.owner_id, exploration)
             self.publish_exploration(self.owner_id, exp_id)
             learner_progress_services.mark_exploration_as_incomplete(

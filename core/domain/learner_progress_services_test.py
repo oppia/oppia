@@ -39,6 +39,7 @@ from core.domain import (
     topic_domain,
     topic_fetchers,
     topic_services,
+    translation_domain,
     user_services,
 )
 from core.platform import models
@@ -3385,16 +3386,26 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Add checkpoints to the exploration.
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
             'Checkpoint 1',
-            'content_1',
-            'default_outcome_1',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         exploration.states['Checkpoint 1'] = state_1
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         # Get checkpoint progress.
@@ -3425,24 +3436,38 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
 
         # Add checkpoints.
+        content_id_generator = translation_domain.ContentIdGenerator(
+            exploration.next_content_id_index
+        )
         init_state = exploration.states[exploration.init_state_name]
         init_state.card_is_checkpoint = True
         state_1 = state_domain.State.create_default_state(
             'Checkpoint 1',
-            'content_1',
-            'default_outcome_1',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_1.card_is_checkpoint = True
         state_2 = state_domain.State.create_default_state(
             'Checkpoint 2',
-            'content_2',
-            'default_outcome_2',
+            content_id_generator.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_2.card_is_checkpoint = True
         exploration.states['Checkpoint 1'] = state_1
         exploration.states['Checkpoint 2'] = state_2
+        exploration.next_content_id_index = (
+            content_id_generator.next_content_id_index
+        )
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         # Record progress to Checkpoint 1.
@@ -3475,14 +3500,24 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         )
         init_state_1 = exploration_1.states[exploration_1.init_state_name]
         init_state_1.card_is_checkpoint = True
+        content_id_generator_1 = translation_domain.ContentIdGenerator(
+            exploration_1.next_content_id_index
+        )
         state_1_1 = state_domain.State.create_default_state(
             'Checkpoint 1',
-            'content_1',
-            'default_outcome_1',
+            content_id_generator_1.generate(
+                translation_domain.ContentType.CONTENT
+            ),
+            content_id_generator_1.generate(
+                translation_domain.ContentType.DEFAULT_OUTCOME
+            ),
             is_initial_state=False,
         )
         state_1_1.card_is_checkpoint = True
         exploration_1.states['Checkpoint 1'] = state_1_1
+        exploration_1.next_content_id_index = (
+            content_id_generator_1.next_content_id_index
+        )
         exp_services.save_new_exploration(self.owner_id, exploration_1)
 
         # Create second exploration with checkpoints.
