@@ -64,6 +64,7 @@ import {StoryViewerBackendApiService} from 'domain/story_viewer/story-viewer-bac
 import {StateObjectsBackendDict} from 'domain/exploration/states.model';
 import {ReadOnlyExplorationBackendApiService} from 'domain/exploration/read-only-exploration-backend-api.service';
 import {CheckpointProgressService} from './checkpoint-progress.service';
+import {CommunityLessonProgressService} from './community-lesson-progress.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {LoaderService} from 'services/loader.service';
 import {ProgressUrlService} from './progress-url.service';
@@ -173,7 +174,8 @@ export class ConversationFlowService {
     private questionPlayerEngineService: QuestionPlayerEngineService,
     private numberAttemptsService: NumberAttemptsService,
     private translateService: TranslateService,
-    private hintsAndSolutionManagerService: HintsAndSolutionManagerService
+    private hintsAndSolutionManagerService: HintsAndSolutionManagerService,
+    private communityLessonProgressService: CommunityLessonProgressService
   ) {}
 
   /**
@@ -322,6 +324,14 @@ export class ConversationFlowService {
               this.isLoggedIn,
               this.progressUrlService.getUniqueProgressUrlId()
             );
+
+            // Track progress for community lessons (non-story-mode explorations)
+            if (!this.explorationModeService.isInStoryChapterMode()) {
+              this.communityLessonProgressService.markCheckpointReached(
+                explorationId,
+                currentStateName
+              );
+            }
           });
         this.checkpointProgressService.setVisitedCheckpointStateNames(
           currentStateName
