@@ -29,7 +29,10 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
+    from apache_beam import PTransform as BeamPTransform
     from mypy_imports import feedback_models, suggestion_models
+else:
+    BeamPTransform = beam.PTransform
 
 (feedback_models, suggestion_models) = models.Registry.import_models(
     [
@@ -44,7 +47,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
 
     DATASTORE_UPDATES_ALLOWED = False
 
-    class _GetSuggestionThreadIds(beam.PTransform):
+    class _GetSuggestionThreadIds(BeamPTransform):
         """Returns thread_ids that have a GeneralSuggestionModel."""
 
         def expand(self, pbegin: beam.pvalue.PBegin) -> beam.PCollection[str]:
@@ -60,7 +63,7 @@ class BaseThreadsWithMissingSuggestionsJob(base_jobs.JobBase):
                 >> beam.Map(lambda model: model.id)
             )
 
-    class _GetInvalidFeedbackThreads(beam.PTransform):
+    class _GetInvalidFeedbackThreads(BeamPTransform):
         """Returns feedback threads marked as having suggestions but without one."""
 
         def expand(
