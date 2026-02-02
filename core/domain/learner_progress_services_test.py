@@ -3553,7 +3553,7 @@ class LearnerProgressTests(test_utils.GenericTestBase):
     ) -> None:
         """Test checkpoint progress for explorations with no checkpoints."""
         # Create exploration without marking any state as checkpoint.
-        exploration = self.save_new_valid_exploration(
+        self.save_new_valid_exploration(
             self.EXP_ID_0, self.owner_id, title='Test Exploration'
         )
 
