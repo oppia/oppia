@@ -37,6 +37,12 @@ exp_models, question_models = models.Registry.import_models(
 datastore_services = models.Registry.import_datastore_services()
 
 
+# Here we use object because we need to test edge cases where state data is
+# malformed with unexpected types (e.g., a string where a dict is expected).
+# The job's defensive type checks handle such corrupted datastore data.
+MalformedStateDict = Dict[str, object]
+
+
 class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
 
     JOB_CLASS: Type[
@@ -261,6 +267,206 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             [job_run_result.JobRunResult(stdout=str(['N', 'kg', 'm', 's']))]
         )
 
+    def test_job_handles_malformed_state_data(self) -> None:
+        # State with interaction that is not a dict.
+        malformed_state_1 = self._create_base_malformed_state_dict(
+            'content_0', 'default_outcome_1'
+        )
+        malformed_state_1['interaction'] = 'not_a_dict'
+
+        # State with answer_groups that is not a list.
+        malformed_state_2 = self._create_base_malformed_state_dict(
+            'content_2', 'default_outcome_3'
+        )
+        interaction_2 = malformed_state_2['interaction']
+        assert isinstance(interaction_2, dict)
+        interaction_2['id'] = 'NumberWithUnits'
+        interaction_2['answer_groups'] = 'not_a_list'
+
+        # State with answer_group that is not a dict.
+        malformed_state_3 = self._create_base_malformed_state_dict(
+            'content_4', 'default_outcome_5'
+        )
+        interaction_3 = malformed_state_3['interaction']
+        assert isinstance(interaction_3, dict)
+        interaction_3['id'] = 'NumberWithUnits'
+        interaction_3['answer_groups'] = ['not_a_dict']
+
+        # State with rule_spec that is not a dict.
+        malformed_state_4 = self._create_base_malformed_state_dict(
+            'content_6', 'default_outcome_7'
+        )
+        interaction_4 = malformed_state_4['interaction']
+        assert isinstance(interaction_4, dict)
+        default_outcome_4 = interaction_4['default_outcome']
+        interaction_4['id'] = 'NumberWithUnits'
+        interaction_4['answer_groups'] = [
+            {
+                'outcome': default_outcome_4,
+                'rule_specs': ['not_a_dict'],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
+        # State with inputs that is not a dict.
+        malformed_state_5 = self._create_base_malformed_state_dict(
+            'content_8', 'default_outcome_9'
+        )
+        interaction_5 = malformed_state_5['interaction']
+        assert isinstance(interaction_5, dict)
+        default_outcome_5 = interaction_5['default_outcome']
+        interaction_5['id'] = 'NumberWithUnits'
+        interaction_5['answer_groups'] = [
+            {
+                'outcome': default_outcome_5,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': 'not_a_dict',
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
+        # State with number_with_units (f) that is not a dict.
+        malformed_state_6 = self._create_base_malformed_state_dict(
+            'content_10', 'default_outcome_11'
+        )
+        interaction_6 = malformed_state_6['interaction']
+        assert isinstance(interaction_6, dict)
+        default_outcome_6 = interaction_6['default_outcome']
+        interaction_6['id'] = 'NumberWithUnits'
+        interaction_6['answer_groups'] = [
+            {
+                'outcome': default_outcome_6,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': 'not_a_dict',
+                        },
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
+        # State with unit_dict that is not a dict followed by a valid one.
+        malformed_state_7 = self._create_base_malformed_state_dict(
+            'content_12', 'default_outcome_13'
+        )
+        interaction_7 = malformed_state_7['interaction']
+        assert isinstance(interaction_7, dict)
+        default_outcome_7 = interaction_7['default_outcome']
+        interaction_7['id'] = 'NumberWithUnits'
+        interaction_7['answer_groups'] = [
+            {
+                'outcome': default_outcome_7,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 2,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': [
+                                    'not_a_dict',
+                                    {'unit': 'g', 'exponent': 1},
+                                ],
+                            }
+                        },
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
+        # State with unit_dict where 'unit' is not a string followed by a valid unit.
+        malformed_state_8 = self._create_base_malformed_state_dict(
+            'content_14', 'default_outcome_15'
+        )
+        interaction_8 = malformed_state_8['interaction']
+        assert isinstance(interaction_8, dict)
+        default_outcome_8 = interaction_8['default_outcome']
+        interaction_8['id'] = 'NumberWithUnits'
+        interaction_8['answer_groups'] = [
+            {
+                'outcome': default_outcome_8,
+                'rule_specs': [
+                    {
+                        'rule_type': 'IsEquivalentTo',
+                        'inputs': {
+                            'f': {
+                                'type': 'real',
+                                'real': 2,
+                                'fraction': {
+                                    'isNegative': False,
+                                    'wholeNumber': 0,
+                                    'numerator': 0,
+                                    'denominator': 1,
+                                },
+                                'units': [
+                                    {'unit': 123, 'exponent': 1},
+                                    {'unit': 'mg', 'exponent': 1},
+                                ],
+                            }
+                        },
+                    }
+                ],
+                'training_data': [],
+                'tagged_skill_misconception_id': None,
+            }
+        ]
+
+        # Valid state with actual units to ensure job runs and produces output.
+        valid_state = self._create_state_with_units(
+            [{'unit': 'cm', 'exponent': 1}]
+        )
+
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_1_ID,
+            title='exploration title',
+            category='category',
+            objective='objective',
+            language_code='cs',
+            init_state_name='state',
+            states_schema_version=48,
+            states={
+                'malformed_1': malformed_state_1,
+                'malformed_2': malformed_state_2,
+                'malformed_3': malformed_state_3,
+                'malformed_4': malformed_state_4,
+                'malformed_5': malformed_state_5,
+                'malformed_6': malformed_state_6,
+                'malformed_7': malformed_state_7,
+                'malformed_8': malformed_state_8,
+                'valid_state': valid_state,
+            },
+            next_content_id_index=16,
+        )
+        exp_model.update_timestamps()
+
+        datastore_services.put_multi([exp_model])
+
+        # Valid state produces 'cm', malformed_state_7 produces 'g', and
+        # malformed_state_8 produces 'mg' (both have valid units after invalid
+        # ones that get skipped).
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout=str(['cm', 'g', 'mg']))]
+        )
+
     def _create_state_with_units(
         self, units: List[Dict[str, Union[str, int]]]
     ) -> state_domain.StateDict:
@@ -297,3 +503,23 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             }
         ]
         return state_dict
+
+    def _create_base_malformed_state_dict(
+        self, content_id: str, default_outcome_id: str
+    ) -> MalformedStateDict:
+        """Creates a base state dict that can be modified for malformed tests.
+
+        This function returns a plain Dict[str, object] rather than a TypedDict
+        to allow testing edge cases where state data is malformed.
+
+        Args:
+            content_id: str. The content ID for the state.
+            default_outcome_id: str. The default outcome ID for the state.
+
+        Returns:
+            MalformedStateDict. A base state dict as a plain dictionary.
+        """
+        state_dict = state_domain.State.create_default_state(
+            'state', content_id, default_outcome_id, is_initial_state=True
+        ).to_dict()
+        return dict(state_dict)
