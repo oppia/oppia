@@ -677,6 +677,14 @@ def build_using_ng() -> None:
         get_file_count('dist/oppia-angular-prod') > 0
     ), 'angular generated bundle should be non-empty'
 
+    # Inject the hashed CSS filename into header_css_libs.html.
+    print('Injecting hashed CSS filename into header_css_libs.html')
+    inject_css_hash_script = os.path.join(
+        'scripts', 'inject_css_hash.js'
+    )
+    node_bin = common.NODE_BIN_PATH
+    subprocess.check_call([node_bin, inject_css_hash_script])
+
 
 def build_using_webpack(config_path: str) -> None:
     """Execute webpack build process. This takes all TypeScript files we have in
@@ -1453,21 +1461,12 @@ def main(args: Optional[Sequence[str]] = None) -> None:
     # Clean up the existing generated folders.
     clean()
 
-    # Regenerate /third_party/generated from scratch.
-    safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
-    build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
     if options.minify_third_party_libs_only:
-        if options.prod_env:
-            minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
-            return
-        else:
-            raise Exception(
-                'minify_third_party_libs_only should not be '
-                'set in non-prod env.'
-            )
+        raise Exception(
+            'minify_third_party_libs_only is no longer supported.'
+        )
 
     common.modify_constants(
         prod_env=options.prod_env,
@@ -1475,7 +1474,6 @@ def main(args: Optional[Sequence[str]] = None) -> None:
         maintenance_mode=options.maintenance_mode,
     )
     if options.prod_env:
-        minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         hashes = generate_hashes()
         generate_python_package()
         if options.source_maps:

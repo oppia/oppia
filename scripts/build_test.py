@@ -1083,7 +1083,7 @@ class BuildTests(test_utils.GenericTestBase):
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
+            'ensure_files_exist_gets_called': False,
             'modify_constants_gets_called': True,
             'clean_gets_called': True,
         }
@@ -1127,7 +1127,7 @@ class BuildTests(test_utils.GenericTestBase):
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
+            'ensure_files_exist_gets_called': False,
             'clean_gets_called': True,
         }
 
@@ -1143,7 +1143,7 @@ class BuildTests(test_utils.GenericTestBase):
         clean_swap = self.swap(build, 'clean', mock_clean)
         assert_raises_regexp_context_manager = self.assertRaisesRegex(
             Exception,
-            'minify_third_party_libs_only should not be set in non-prod env.',
+            'minify_third_party_libs_only is no longer supported.',
         )
         with ensure_files_exist_swap, assert_raises_regexp_context_manager:
             with clean_swap:
@@ -1158,7 +1158,7 @@ class BuildTests(test_utils.GenericTestBase):
             'clean_gets_called': False,
         }
         expected_check_function_calls = {
-            'ensure_files_exist_gets_called': True,
+            'ensure_files_exist_gets_called': False,
             'ensure_modify_constants_gets_called': False,
             'clean_gets_called': True,
         }
@@ -1182,8 +1182,13 @@ class BuildTests(test_utils.GenericTestBase):
             common, 'modify_constants', mock_modify_constants
         )
         clean_swap = self.swap(build, 'clean', mock_clean)
+        assert_raises_regexp_context_manager = self.assertRaisesRegex(
+            Exception,
+            'minify_third_party_libs_only is no longer supported.',
+        )
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
-            build.main(args=['--prod_env', '--minify_third_party_libs_only'])
+            with assert_raises_regexp_context_manager:
+                build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
