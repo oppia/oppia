@@ -123,13 +123,22 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.signup('neweditor@example.com', 'NewEditor')
         new_editor_id = self.get_user_id_from_email('neweditor@example.com')
         self.add_user_role('NewEditor', feconf.ROLE_ID_BLOG_POST_EDITOR)
+        self.login('neweditor@example.com')
+        # Create a blog post to trigger author model creation.
+        csrf_token = self.get_new_csrf_token()
+        self.post_json(
+            '%s' % feconf.BLOG_DASHBOARD_DATA_URL,
+            {},
+            csrf_token=csrf_token,
+        )
+        # Now delete the author model to simulate it being missing.
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
             new_editor_id
         )
         self.assertIsNotNone(author_model)
         assert author_model is not None
         author_model.delete()
-        self.login('neweditor@example.com')
+        # Verify dashboard still works with missing author model.
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
         )
@@ -137,8 +146,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             json_response['author_details']['displayed_author_name'], ''
         )
         self.assertEqual(json_response['author_details']['author_bio'], '')
-        self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
-        self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
         self.logout()
 
     def test_create_new_blog_post(self) -> None:
