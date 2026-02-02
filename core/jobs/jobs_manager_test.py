@@ -205,7 +205,10 @@ class RefreshStateOfBeamJobRunModelTests(test_utils.GenericTestBase):
             jobs_manager.refresh_state_of_beam_job_run_model(self.run_model)
 
         self.assertGreater(len(logs), 0)
-        self.assertIn('uh-oh', logs[0])
+        self.assertIn(
+            'Voiceover synthesis log: Retrieving Oppia project ID: None.',
+            logs[0],
+        )
 
 
 class CancelJobTests(test_utils.GenericTestBase):
@@ -261,7 +264,10 @@ class CancelJobTests(test_utils.GenericTestBase):
             jobs_manager.cancel_job(self.run_model)
 
         self.assertGreater(len(logs), 0)
-        self.assertIn('uh-oh', logs[0])
+        self.assertIn(
+            'Voiceover synthesis log: Retrieving Oppia project ID: None.',
+            logs[0],
+        )
 
 
 class LimitJobResourcesTests(test_utils.GenericTestBase):
