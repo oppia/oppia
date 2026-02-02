@@ -79,7 +79,7 @@ Improvements to editors and players
 
 ### Commit History:
 
-- Changed parent to ctrl in stettings tab. (#7058)
+- Changed parent to ctrl in settings tab. (#7058)
 - Fix #6864: Fix console error in learner dashboard and empty suggestion modal (#7056)
 - Add missing ctrl (#7032)
 
