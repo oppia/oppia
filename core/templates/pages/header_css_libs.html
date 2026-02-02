@@ -22,7 +22,7 @@
 <!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr) -->
 <!-- This replaces the old third_party.css from dependencies.json -->
 <!-- Loaded synchronously to ensure Bootstrap styles are available before Angular initializes -->
-<% if (htmlWebpackPlugin.files.css[0] && htmlWebpackPlugin.files.css[0].includes('/build/')) { %>
+<% if (webpackConfig.mode === 'production') { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
 <% } else { %>
   <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
