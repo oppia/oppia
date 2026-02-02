@@ -367,7 +367,8 @@ const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
 const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
-
+const publishUptoChaptersDropdownSelector =
+  'select.e2e-test-publish-up-to-chapter-dropdown';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -4433,6 +4434,20 @@ export class TopicManager extends BaseUser {
     showMessage(`Chapter ${chapterName} marked as ready to publish.`);
   }
 
+  async publishStoryDraftChapterUpto(dropdownValue: string): Promise<void> {
+    await this.waitForPageToFullyLoad();
+
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
+    await this.clickOnElementWithSelector(publishUptoChaptersDropdownSelector);
+    await this.select(publishUptoChaptersDropdownSelector, dropdownValue);
+  }
   async expectAllListedChaptersStatus(
     chapterNames: string[],
     chapStatus: string = 'Published'

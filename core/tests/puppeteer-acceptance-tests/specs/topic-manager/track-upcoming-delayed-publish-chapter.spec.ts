@@ -29,8 +29,6 @@ import {showMessage} from '../../utilities/common/show-message';
 
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const publishUptoChaptersDropdownSelector =
-  'select.e2e-test-publish-up-to-chapter-dropdown';
 const publishChapterButton = '.e2e-test-publish-chapters-button';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
@@ -202,7 +200,7 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickReadyToPublishButton();
 
       await curriculumAdmin.expectScreenshotToMatch(
-        'chapterMarkedAsReadyToPublish.png',
+        'chapterMarkedAsReadyToPublish',
         __dirname
       );
 
@@ -210,13 +208,9 @@ describe('Logged-In Learner', function () {
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.waitForPageToFullyLoad();
-      await curriculumAdmin.clickOnElementWithSelector(
-        publishUptoChaptersDropdownSelector
-      );
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '0');
+      await curriculumAdmin.publishStoryDraftChapterUpto('0');
       await curriculumAdmin.expectScreenshotToMatch(
-        'publishChapterUpto1.png',
+        'publishChapterUpto1',
         __dirname
       );
       await curriculumAdmin.publishStoryDraftSerialChapter();
@@ -225,13 +219,7 @@ describe('Logged-In Learner', function () {
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.waitForPageToFullyLoad();
-      await curriculumAdmin.clickOnElementWithSelector(
-        publishUptoChaptersDropdownSelector
-      );
-
-      //clicking cancel on unpublish modal
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '-1');
+      await curriculumAdmin.publishStoryDraftChapterUpto('-1');
       if (curriculumAdmin.isViewportAtMobileWidth()) {
         await curriculumAdmin.page.waitForSelector(
           mobileSaveStoryChangesDropdown,
@@ -260,12 +248,7 @@ describe('Logged-In Learner', function () {
         ['What are the Place Values'],
         'Published'
       );
-      await curriculumAdmin.clickOnElementWithSelector(
-        publishUptoChaptersDropdownSelector
-      );
-
-      //confirming unpublish on modal
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '-1');
+      await curriculumAdmin.publishStoryDraftChapterUpto('-1');
       if (curriculumAdmin.isViewportAtMobileWidth()) {
         await curriculumAdmin.page.waitForSelector(
           mobileSaveStoryChangesDropdown,
@@ -358,11 +341,7 @@ describe('Logged-In Learner', function () {
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.waitForPageToFullyLoad();
-      await curriculumAdmin.clickOnElementWithSelector(
-        publishUptoChaptersDropdownSelector
-      );
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '3');
+      await curriculumAdmin.publishStoryDraftChapterUpto('3');
       await curriculumAdmin.publishStoryDraftSerialChapter();
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
@@ -370,7 +349,7 @@ describe('Logged-In Learner', function () {
       );
       await curriculumAdmin.waitForPageToFullyLoad();
       await curriculumAdmin.expectScreenshotToMatch(
-        'allChapterInPublishedState.png',
+        'allChapterInPublishedState',
         __dirname
       );
     },
