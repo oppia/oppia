@@ -53,6 +53,7 @@ Terminology:
 
 from __future__ import annotations
 
+import itertools
 import logging
 
 from core import feconf
@@ -68,7 +69,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import List, Optional
+from typing import Iterable, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -177,11 +178,199 @@ def get_auth_claims_from_request(
 
 
 def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
-    """Returns all accounts registered with Firebase."""
-    return [
-        auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
-        for user in firebase_auth.list_users().iterate_all()
-    ]
+    """Returns all accounts registered with Firebase.
+
+    Returns:
+        List[auth_domain.ExternalAccount]. The list of all external accounts.
+
+    Raises:
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    try:
+        return [
+            auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
+            for user in firebase_auth.list_users().iterate_all()
+        ]
+    except firebase_exceptions.FirebaseError as e:
+        raise auth_domain.AuthProviderError('Failed to list accounts') from e
+
+
+def create_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Creates a new external account in Firebase.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to create. When the ID
+            of the account is None, Firebase will generate a new ID.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the created account.
+
+    Raises:
+        ValueError. If the specified user properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    uid, email, disabled = account
+    try:
+        user = firebase_auth.create_user(
+            uid=uid, email=email, disabled=disabled
+        )
+    except firebase_exceptions.FirebaseError as e:
+        raise auth_domain.AuthProviderError('Failed to create account') from e
+    else:
+        uid, email, disabled = user.uid, user.email, user.disabled
+        return auth_domain.ExternalAccount(uid, email, disabled)
+
+
+def update_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Updates an existing external account in Firebase.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to update.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the updated account.
+
+    Raises:
+        ValueError. If the specified user ID or properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    uid, email, disabled = account
+    try:
+        # NOTE: Convert None to '' to satisfy the type checker (expects str).
+        # SDK raises ValueError for both None and '', so behavior is unchanged.
+        user = firebase_auth.update_user(
+            uid or '', email=email, disabled=disabled
+        )
+    except firebase_exceptions.FirebaseError as e:
+        raise auth_domain.AuthProviderError('Failed to update account') from e
+    else:
+        uid, email, disabled = user.uid, user.email, user.disabled
+        return auth_domain.ExternalAccount(uid, email, disabled)
+
+
+def delete_external_account(account: auth_domain.ExternalAccount) -> None:
+    """Deletes an external account from Firebase.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to delete.
+
+    Raises:
+        ValueError. If the auth ID is None, empty or malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    try:
+        # NOTE: Convert None to '' to satisfy the type checker (expects str).
+        # SDK raises ValueError for both None and '', so behavior is unchanged.
+        firebase_auth.delete_user(account.auth_id or '')
+    except firebase_exceptions.FirebaseError as e:
+        raise auth_domain.AuthProviderError('Failed to delete account') from e
+
+
+def delete_multi_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Deletes multiple external accounts from Firebase.
+
+    PERF: This operation uses batching to fire less network requests.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to delete.
+
+    Raises:
+        ValueError. If the identifiers are invalid.
+        auth_domain.AuthProviderError. If any accounts failed to be deleted.
+    """
+    errors = []
+    error_count = 0
+    batch_offset = 0
+
+    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
+    # SDK raises ValueError for both None and '', so behavior is unchanged.
+    auth_ids = (account.auth_id or '' for account in accounts)
+
+    while batch := list(itertools.islice(auth_ids, feconf.FIREBASE_BATCH_SIZE)):
+        try:
+            result = firebase_auth.delete_users(batch)
+        except firebase_exceptions.FirebaseError as e:
+            error_count += len(batch)
+            errors.append(
+                'At slice=%d:%d: %s'
+                % (batch_offset, batch_offset + len(batch), e)
+            )
+        else:
+            error_count += result.failure_count
+            errors.extend(
+                'At index=%d: %s' % (batch_offset + error.index, error.reason)
+                for error in result.errors
+            )
+        finally:
+            batch_offset += len(batch)
+
+    if error_count:
+        errors.insert(
+            0, 'Error deleting %d/%d accounts:' % (error_count, batch_offset)
+        )
+        raise auth_domain.AuthProviderError('\n\t'.join(errors))
+
+
+def import_multi_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Imports multiple external accounts WITHOUT making any safety checks.
+
+    WARNING: This operation DOES NOT protect against duplicate accounts!
+    The ONLY way to guarantee this function is used safely is by running it on
+    an empty server, where collisions are impossible.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+
+    Raises:
+        ValueError. If the specified user properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    errors = []
+    error_count = 0
+    batch_offset = 0
+
+    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
+    # SDK raises ValueError for both None and '', so behavior is unchanged.
+    records = (
+        firebase_auth.ImportUserRecord(
+            uid=account.auth_id or '',
+            email=account.email,
+            disabled=account.disabled,
+        )
+        for account in accounts
+    )
+
+    while batch := list(itertools.islice(records, feconf.FIREBASE_BATCH_SIZE)):
+        try:
+            result = firebase_auth.import_users(batch)
+        except firebase_exceptions.FirebaseError as e:
+            error_count += len(batch)
+            errors.append(
+                'At slice=%d:%d: %s'
+                % (batch_offset, batch_offset + len(batch), e)
+            )
+        else:
+            error_count += result.failure_count
+            errors.extend(
+                'At index=%d: %s' % (batch_offset + error.index, error.reason)
+                for error in result.errors
+            )
+        finally:
+            batch_offset += len(batch)
+
+    if error_count:
+        errors.insert(
+            0, 'Error importing %d/%d accounts:' % (error_count, batch_offset)
+        )
+        raise auth_domain.AuthProviderError('\n\t'.join(errors))
 
 
 def mark_user_for_deletion(user_id: str) -> None:
@@ -319,7 +508,7 @@ def get_multi_auth_ids_from_user_ids(
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
-        user_ids: list(str). The user IDs.
+        user_ids: List[str]. The user IDs.
 
     Returns:
         list(str|None). The auth IDs associated with each of the given user IDs,
@@ -363,7 +552,7 @@ def get_multi_user_ids_from_auth_ids(
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
-        auth_ids: list(str). The auth IDs.
+        auth_ids: List[str]. The auth IDs.
 
     Returns:
         list(str|None). The user IDs associated with each of the given auth IDs,
@@ -442,7 +631,7 @@ def associate_multi_auth_ids_with_user_ids(
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+        auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]. The
             associations to commit.
 
     Raises:
@@ -630,7 +819,7 @@ def _create_auth_claims(
     """Returns a new AuthClaims domain object from Firebase claims.
 
     Args:
-        firebase_claims: dict(str: *). The raw claims returned by the Firebase
+        firebase_claims: Dict[str, Any]. The raw claims returned by the Firebase
             SDK.
 
     Returns:

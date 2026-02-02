@@ -36,7 +36,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import ContextManager, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, ContextManager, Dict, List, Optional, Tuple, Union, cast
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -64,7 +64,7 @@ class FirebaseAdminSdkStub:
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the
     Firebase Admin SDK as if it were real.
 
-    FRAGILE! This class returns users as firebase_admin.auth.UserRecord objects
+    FRAGILE! This class returns users as firebase_auth.UserRecord objects
     for API parity, but the Firebase Admin SDK doesn't expose a constructor for
     it as part of the public API. To compensate, we depend on implementation
     details (isolated to the _set_user_fragile method) that may stop working in
@@ -86,7 +86,7 @@ class FirebaseAdminSdkStub:
                 super(Test, self).tearDown()
 
             def test_sdk(self):
-                user_record = firebase_admin.get_user('uid')
+                user_record = firebase_auth.get_user('uid')
                 self.assertEqual(user_record.uid, 'uid')
     """
 
@@ -184,17 +184,21 @@ class FirebaseAdminSdkStub:
         return session_cookie
 
     def create_user(
-        self, uid: str, email: Optional[str] = None, disabled: bool = False
-    ) -> str:
+        self,
+        uid: Optional[str] = None,
+        email: Optional[str] = None,
+        disabled: bool = False,
+    ) -> firebase_auth.UserRecord:
         """Adds user to storage if new, otherwise raises an error.
 
         Args:
-            uid: str. The unique Firebase account ID for the user.
+            uid: str|None. The unique Firebase account ID for the user. If None,
+                then a randomly generated string will be used instead.
             email: str|None. The email address for the user, or None.
             disabled: bool. Whether the user account is to be disabled.
 
         Returns:
-            str. An ID token that represents the given user's authorization.
+            firebase_auth.UserRecord. The final state of the account.
 
         Raises:
             ValueError. The uid argument was not provided.
@@ -204,8 +208,13 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UidAlreadyExistsError(
                 'uid=%r already exists' % uid, None, None
             )
-        self._set_user_fragile(uid, email, disabled, None)
-        return self._encode_user_claims(uid)
+        if uid is None:
+            # NOTE: Firebase UIDs usually, but not always, have a length of 28.
+            # https://groups.google.com/g/firebase-talk/c/5ENGCX8y04M/m/fbU8OktXBQAJ.
+            uid = utils.generate_random_string(28)
+        if not uid:
+            raise ValueError('uid must not be empty string')
+        return self._set_user_fragile(uid, email, disabled, None)
 
     def delete_user(self, uid: str) -> None:
         """Removes user from storage if found, otherwise raises an error.
@@ -220,9 +229,7 @@ class FirebaseAdminSdkStub:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
         del self._users_by_uid[uid]
 
-    def delete_users(
-        self, uids: List[str], force_delete: bool = False
-    ) -> firebase_auth.BatchDeleteAccountsResponse:
+    def delete_users(self, uids: List[str]) -> firebase_auth.DeleteUsersResult:
         """Deletes the users identified by the specified user ids.
 
         Deleting a non-existing user does not generate an error (the method is
@@ -235,44 +242,22 @@ class FirebaseAdminSdkStub:
         Args:
             uids: A list of strings indicating the uids of the users to be
                 deleted. Must have <= 1000 entries.
-            force_delete: Optional parameter that indicates if users should be
-                deleted, even if they're not disabled. Defaults to False.
 
         Returns:
-            BatchDeleteAccountsResponse. Holds the errors encountered, if any.
+            firebase_auth.DeleteUsersResult. Holds info for errors encountered.
 
         Raises:
             ValueError. If any of the identifiers are invalid or if more than
                 1000 identifiers are specified.
         """
         if len(uids) > 1000:
-            raise ValueError('`uids` paramter must have <= 1000 entries.')
-
-        if force_delete:
-            uids_to_delete = set(uids)
-            errors = []
-        else:
-            # Here we use cast because method 'utils.partition' returns a
-            # broader type Tuple[Iterable[...], Iterable[...]], thus to
-            # narrow down the type to 'UidsPartitionTupleType' we used
-            # cast here.
-            disabled_uids, enabled_uids = cast(
-                UidsPartitionTupleType,
-                utils.partition(
-                    uids,
-                    predicate=lambda uid: self._users_by_uid[uid].disabled,
-                    enumerated=True,
-                ),
-            )
-            uids_to_delete = {uid for _, uid in disabled_uids}
-            errors = [
-                (i, 'uid=%r must be disabled first' % uid)
-                for i, uid in enabled_uids
-            ]
-
+            raise ValueError('`uids` parameter must have <= 1000 entries.')
+        if not all(uids):
+            raise ValueError('All accounts must provide valid auth IDs.')
+        uids_to_delete = set(uids)
         for uid in uids_to_delete.intersection(self._users_by_uid):
             del self._users_by_uid[uid]
-        return self._create_delete_users_result_fragile(errors)
+        return self._create_delete_users_result_fragile([], len(uids_to_delete))
 
     def get_user(self, uid: str) -> firebase_auth.UserRecord:
         """Returns user with given ID if found, otherwise raises an error.
@@ -337,16 +322,16 @@ class FirebaseAdminSdkStub:
         return user
 
     def import_users(
-        self, records: List[firebase_admin.auth.ImportUserRecord]
-    ) -> firebase_admin.auth.UserImportResult:
+        self, records: List[firebase_auth.ImportUserRecord]
+    ) -> firebase_auth.UserImportResult:
         """Adds the given user records to the stub's storage.
 
         Args:
-            records: list(firebase_admin.auth.ImportUserRecord). The users to
+            records: list(firebase_auth.ImportUserRecord). The users to
                 add.
 
         Returns:
-            firebase_admin.auth.UserImportResult. Object with details about the
+            firebase_auth.UserImportResult. Object with details about the
             operation.
         """
         for record in records:
@@ -354,13 +339,13 @@ class FirebaseAdminSdkStub:
                 record.uid,
                 record.email,
                 record.disabled,
-                json.dumps(record.custom_claims),
+                record.custom_claims and json.dumps(record.custom_claims),
             )
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(
         self, page_token: Optional[str] = None, max_results: int = 1000
-    ) -> firebase_admin.auth.ListUsersPage:
+    ) -> firebase_auth.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
         The `page_token` argument governs the starting point of the page. The
@@ -424,49 +409,56 @@ class FirebaseAdminSdkStub:
         }
 
     def set_custom_user_claims(
-        self, uid: str, custom_claims: Optional[str]
-    ) -> str:
+        self, uid: str, custom_claims: Optional[Dict[str, str] | str]
+    ) -> None:
         """Updates the custom claims of the given user.
 
         Args:
             uid: str. The Firebase account ID of the user.
-            custom_claims: str|None. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}', or None.
-
-        Returns:
-            str. The uid of the user.
+            custom_claims: Dict[str, str] | str | None. A JSON dict with string
+                keys and values, or a string-encoded JSON dict with string keys
+                and values, or None.
 
         Raises:
             UserNotFoundError. The Firebase account has not been created yet.
         """
-        return self.update_user(uid, custom_claims=custom_claims)
+        self.update_user(uid, custom_claims=custom_claims)
 
-    def update_user(
-        self,
-        uid: str,
-        email: Optional[str] = None,
-        disabled: bool = False,
-        custom_claims: Optional[str] = None,
-    ) -> str:
+    # Here we use type Any because `_set_user_fragile` is responsible for giving
+    # the properties strong types. This method stubs a public function in the
+    # Firebase Admin SDK, so it'd introduce even more fragility and maintenance
+    # if we try duplicate the types here.
+    def update_user(self, uid: str, **kwargs: Any) -> firebase_auth.UserRecord:
         """Updates the user in storage if found, otherwise raises an error.
+
+        The properties supported by this stub are:
+            email: str|None. The email address for the user, or None to erase
+                the email if it exists.
+            disabled: bool. Whether the user account is to be disabled.
+            custom_claims: Dict[str, str] | str | None. A JSON dict with
+                string keys and values, or a string-encoded JSON dict with
+                string keys and values, or None.
+
+        If any of these properties are omitted, then they will not be changed.
 
         Args:
             uid: str. The Firebase account ID of the user.
-            email: str|None. The email address for the user, or None.
-            disabled: bool. Whether the user account is to be disabled.
-            custom_claims: str|None. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}', or None.
+            **kwargs: Any. The properties to update. If a property is omitted,
+                then it won't be changed.
 
         Returns:
-            str. The uid of the user.
+            firebase_auth.UserRecord. The final state of the account.
 
         Raises:
             UserNotFoundError. The Firebase account has not been created yet.
         """
         if uid not in self._users_by_uid:
             raise firebase_auth.UserNotFoundError('%s not found' % uid)
-        self._set_user_fragile(uid, email, disabled, custom_claims)
-        return uid
+        user = self._users_by_uid[uid]
+        disabled = kwargs.get('disabled', user.disabled)
+        email = kwargs.get('email', user.email)
+        custom_claims = kwargs.get('custom_claims', user.custom_claims)
+        return self._set_user_fragile(uid, email, disabled, custom_claims)
 
     def verify_id_token(
         self, token: str
@@ -637,8 +629,8 @@ class FirebaseAdminSdkStub:
 
     def mock_delete_users_error(
         self,
-        batch_error_pattern: Tuple[Optional[Exception]] = (None,),
-        individual_error_pattern: Tuple[Optional[bool]] = (None,),
+        batch_error_pattern: Tuple[Optional[Exception], ...] = (None,),
+        individual_error_pattern: Tuple[Optional[str], ...] = (None,),
     ) -> ContextManager[None]:
         """Returns a context in which `delete_users` fails according to the
         given patterns.
@@ -654,11 +646,12 @@ class FirebaseAdminSdkStub:
         Args:
             batch_error_pattern: tuple(Exception|None). Enumerates which
                 successive calls will raise an exception. For values of None, no
-                exception is raised. The pattern is cycled. By default, an error
-                will never be raised.
-            individual_error_pattern: tuple(bool). Enumerates which individual
-                users will cause an error. The pattern is cycled. By default, an
+                exception is raised. The pattern is cycled, and by default an
                 error will never be raised.
+            individual_error_pattern: tuple(str|None). Enumerates which
+                individual users will cause an error. Each value is either the
+                error reason (a string), or None. The pattern is cycled, and by
+                default an error will never be raised.
 
         Returns:
             Context manager. The context manager with the mocked implementation.
@@ -669,8 +662,8 @@ class FirebaseAdminSdkStub:
         )
 
         def mock_delete_users(
-            uids: List[str], force_delete: bool = False
-        ) -> firebase_auth.BatchDeleteAccountsResponse:
+            uids: List[str],
+        ) -> firebase_auth.DeleteUsersResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
             if error_to_raise is not None:
@@ -692,38 +685,38 @@ class FirebaseAdminSdkStub:
             updated_uids_to_delete = [uid for _, (uid, _) in uids_to_delete]
             errors = [(i, error) for i, (_, error) in uids_to_fail]
 
-            self.delete_users(updated_uids_to_delete, force_delete=force_delete)
+            self.delete_users(updated_uids_to_delete)
 
-            return self._create_delete_users_result_fragile(errors)
+            return self._create_delete_users_result_fragile(errors, len(uids))
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'delete_users', mock_delete_users)
 
     def mock_import_users_error(
         self,
-        batch_error_pattern: Tuple[Optional[Exception]] = (None,),
-        individual_error_pattern: Tuple[Optional[str]] = (None,),
+        batch_error_pattern: Tuple[Optional[Exception], ...] = (None,),
+        individual_error_pattern: Tuple[Optional[str], ...] = (None,),
     ) -> ContextManager[None]:
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
         Example:
-            with mock_import_users_error(batch_error_pattern=(False, True)):
+            with mock_import_users_error(batch_error_pattern=(None, Exception)):
                 import_users(...) # OK
-                import_users(...) # Raises!
+                import_users(...) # Raises Exception.
                 import_users(...) # OK
-                import_users(...) # Raises!
+                import_users(...) # Raises Exception.
                 import_users(...) # OK
 
         Args:
             batch_error_pattern: tuple(Exception|None). Enumerates which
                 successive calls will raise an exception. For values of None, no
-                exception is raised. The pattern is cycled. By default, an error
-                will never be raised.
+                exception is raised. The pattern is cycled, and by default an
+                error will never be raised.
             individual_error_pattern: tuple(str|None). Enumerates which
                 individual users will cause an error. Each value is either the
-                error reason (a string), or None. The pattern is cycled. By
-                default, an error will never be raised.
+                error reason (a string), or None. The pattern is cycled, and by
+                default an error will never be raised.
 
         Returns:
             Context manager. The context manager with the mocked implementation.
@@ -734,7 +727,7 @@ class FirebaseAdminSdkStub:
         )
 
         def mock_import_users(
-            records: List[firebase_admin.auth.ImportUserRecord],
+            records: List[firebase_auth.ImportUserRecord],
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
@@ -756,17 +749,19 @@ class FirebaseAdminSdkStub:
                 ),
             )
 
-            self.import_users([record for _, (record, _) in records_to_import])
-
+            updated_records_to_import = [
+                record for _, (record, _) in records_to_import
+            ]
             errors = [(i, error) for i, (_, error) in records_to_fail]
-            return self._create_user_import_result_fragile(
-                len(records), errors=errors
-            )
+
+            self.import_users(updated_records_to_import)
+
+            return self._create_user_import_result_fragile(len(records), errors)
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
 
-    def _encode_user_claims(self, uid: str) -> str:
+    def mock_encoded_user_claims(self, uid: str) -> str:
         """Returns encoded claims for the given user.
 
         Args:
@@ -810,8 +805,8 @@ class FirebaseAdminSdkStub:
         uid: str,
         email: Optional[str],
         disabled: bool,
-        custom_claims: Optional[str],
-    ) -> None:
+        custom_claims: Optional[Dict[str, str] | str],
+    ) -> firebase_auth.UserRecord:
         """Sets the given properties for the corresponding user.
 
         FRAGILE! The dict keys used by the UserRecord constructor are an
@@ -819,11 +814,17 @@ class FirebaseAdminSdkStub:
 
         Args:
             uid: str. The Firebase account ID of the user.
-            email: str. The email address for the user.
+            email: str|None. The email address for the user.
             disabled: bool. Whether the user account is to be disabled.
-            custom_claims: str. A string-encoded JSON with string keys and
-                values, e.g. '{"role":"admin"}'.
+            custom_claims: Dict[str, str] | str | None. A JSON dict with string
+                keys and values, or a string-encoded JSON dict with string keys
+                and values, or None.
+
+        Returns:
+            firebase_auth.UserRecord. The final state of the user.
         """
+        if isinstance(custom_claims, dict):
+            custom_claims = json.dumps(custom_claims)
         self._users_by_uid[uid] = firebase_auth.UserRecord(
             {
                 'localId': uid,
@@ -832,6 +833,7 @@ class FirebaseAdminSdkStub:
                 'customAttributes': custom_claims,
             }
         )
+        return self._users_by_uid[uid]
 
     def _create_list_users_page_fragile(
         self, page_list: List[List[firebase_auth.UserRecord]], page_index: int
@@ -874,24 +876,26 @@ class FirebaseAdminSdkStub:
         return page
 
     def _create_delete_users_result_fragile(
-        self, errors: List[Tuple[int, str]]
-    ) -> firebase_auth.BatchDeleteAccountsResponse:
-        """Creates a new BatchDeleteAccountsResponse instance with the given
-        values.
+        self, errors: List[Tuple[int, str]], total: int
+    ) -> firebase_auth.DeleteUsersResult:
+        """Creates a result with the given values.
 
-        FRAGILE! The dict keys used by the BatchDeleteAccountsResponse
-        constructor are an implementation detail that may break in future
-        versions of the SDK.
+        FRAGILE! The dict keys used by the DeleteUsersResult constructor are an
+        implementation detail that may break in future versions of the SDK.
 
         Args:
             errors: list(tuple(int, str)). A list of (index, error) pairs.
+            total: int. The total number of records initially requested.
 
         Returns:
-            firebase_admin.auth.BatchDeleteAccountsResponse. The response.
+            firebase_auth.DeleteUsersResult. The response.
         """
-        return firebase_auth.BatchDeleteAccountsResponse(
-            errors=[{'index': i, 'message': error} for i, error in errors]
-        )
+        mock_response = mock.Mock()
+        mock_response.errors = [
+            firebase_auth.ErrorInfo({'index': i, 'message': error})
+            for i, error in errors
+        ]
+        return firebase_auth.DeleteUsersResult(mock_response, total)
 
     def _create_user_import_result_fragile(
         self, total: int, errors: List[Tuple[int, str]]
@@ -906,7 +910,7 @@ class FirebaseAdminSdkStub:
             errors: list(tuple(int, str)). A list of (index, error) pairs.
 
         Returns:
-            firebase_admin.auth.UserImportResult. The response.
+            firebase_auth.UserImportResult. The response.
         """
         return firebase_auth.UserImportResult(
             {
@@ -1094,7 +1098,8 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
             firebase_auth_services.revoke_super_admin_privileges('uid')
 
     def test_grant_super_admin_privileges_revokes_session_cookies(self) -> None:
-        id_token = self.firebase_sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
+        id_token = self.firebase_sdk_stub.mock_encoded_user_claims('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
         )
@@ -1115,7 +1120,8 @@ class SuperAdminPrivilegesTests(FirebaseAuthServicesTestBase):
     def test_revoke_super_admin_privileges_revokes_session_cookies(
         self,
     ) -> None:
-        id_token = self.firebase_sdk_stub.create_user('aid')
+        self.firebase_sdk_stub.create_user('aid')
+        id_token = self.firebase_sdk_stub.mock_encoded_user_claims('aid')
         firebase_auth_services.associate_auth_id_with_user_id(
             auth_domain.AuthIdUserIdPair('aid', 'uid')
         )
@@ -1138,8 +1144,9 @@ class EstablishAuthSessionTests(FirebaseAuthServicesTestBase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.id_token = self.firebase_sdk_stub.create_user(
-            self.AUTH_ID, email=self.EMAIL
+        self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
+        self.id_token = self.firebase_sdk_stub.mock_encoded_user_claims(
+            self.AUTH_ID
         )
 
     def test_adds_cookie_to_response_from_id_token_in_request(self) -> None:
@@ -1195,7 +1202,8 @@ class DestroyAuthSessionTests(FirebaseAuthServicesTestBase):
 class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
     def test_returns_none_when_cookie_is_missing(self) -> None:
-        id_token = self.firebase_sdk_stub.create_user(self.AUTH_ID)
+        self.firebase_sdk_stub.create_user(self.AUTH_ID)
+        id_token = self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID)
 
         self.assertIsNone(
             firebase_auth_services.get_auth_claims_from_request(
@@ -1209,8 +1217,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
         )
 
     def test_returns_claims_when_cookie_is_present(self) -> None:
+        self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1223,11 +1232,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
 
     def test_admin_email_address_is_super_admin(self) -> None:
         admin_email_address = 'testadmin@example.com'
-
+        self.firebase_sdk_stub.create_user(
+            self.AUTH_ID, email=admin_email_address
+        )
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(
-                self.AUTH_ID, email=admin_email_address
-            ),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1241,8 +1250,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
     def test_raises_stale_auth_session_error_when_cookie_is_expired(
         self,
     ) -> None:
+        self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1262,8 +1272,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
     def test_raises_stale_auth_session_error_when_cookie_is_revoked(
         self,
     ) -> None:
+        self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1282,10 +1293,11 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
                 )
 
     def test_raises_user_disabled_error_when_user_is_disabled(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            self.AUTH_ID, email=self.EMAIL, disabled=True
+        )
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(
-                self.AUTH_ID, email=self.EMAIL, disabled=True
-            ),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1303,8 +1315,9 @@ class GetAuthClaimsFromRequestTests(FirebaseAuthServicesTestBase):
             )
 
     def test_raises_auth_session_error_when_cookie_is_invalid(self) -> None:
+        self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL)
         cookie = firebase_auth.create_session_cookie(
-            self.firebase_sdk_stub.create_user(self.AUTH_ID, email=self.EMAIL),
+            self.firebase_sdk_stub.mock_encoded_user_claims(self.AUTH_ID),
             feconf.FIREBASE_SESSION_COOKIE_MAX_AGE,
         )
 
@@ -1651,6 +1664,21 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
 
         self.assertEqual(firebase_auth_services.get_all_external_accounts(), [])
 
+    def test_get_all_external_accounts_raises_error_when_firebase_fails(
+        self,
+    ) -> None:
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'list_users',
+                error=firebase_exceptions.InternalError('connection failed'),
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Failed to list accounts'
+            ),
+        ):
+            firebase_auth_services.get_all_external_accounts()
+
 
 class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
@@ -1781,3 +1809,508 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
                 self.user_id
             )
         )
+
+
+class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
+
+    def test_create_account_with_all_fields(self) -> None:
+        account = auth_domain.ExternalAccount(
+            auth_id='new_uid', email='test@example.com', disabled=False
+        )
+
+        result = firebase_auth_services.create_external_account(account)
+
+        self.assertEqual(result.auth_id, 'new_uid')
+        self.assertEqual(result.email, 'test@example.com')
+        self.assertEqual(result.disabled, False)
+        self.firebase_sdk_stub.assert_is_user('new_uid')
+
+    def test_create_account_with_minimal_fields(self) -> None:
+        account = auth_domain.ExternalAccount(auth_id='new_uid')
+
+        result = firebase_auth_services.create_external_account(account)
+
+        self.assertEqual(result.auth_id, 'new_uid')
+        self.assertIsNone(result.email)
+        self.assertEqual(result.disabled, False)
+        self.firebase_sdk_stub.assert_is_user('new_uid')
+
+    def test_create_account_with_disabled_flag(self) -> None:
+        account = auth_domain.ExternalAccount(
+            auth_id='new_uid', email='test@example.com', disabled=True
+        )
+
+        result = firebase_auth_services.create_external_account(account)
+
+        self.assertEqual(result.auth_id, 'new_uid')
+        self.assertEqual(result.disabled, True)
+        self.firebase_sdk_stub.assert_is_disabled('new_uid')
+
+    def test_create_account_without_uid_generates_one(self) -> None:
+        account = auth_domain.ExternalAccount(
+            auth_id=None, email='test@example.com', disabled=False
+        )
+
+        result = firebase_auth_services.create_external_account(account)
+
+        self.assertIsNotNone(result.auth_id)
+        self.assertEqual(result.email, 'test@example.com')
+        self.assertEqual(result.disabled, False)
+        self.firebase_sdk_stub.assert_is_user(result.auth_id or '')
+
+    def test_create_account_raises_error_when_uid_is_empty_string(self) -> None:
+        self.firebase_sdk_stub.create_user('existing_uid')
+        account = auth_domain.ExternalAccount(auth_id='')
+
+        with self.assertRaisesRegex(ValueError, 'uid must not be empty string'):
+            firebase_auth_services.create_external_account(account)
+
+    def test_create_account_raises_error_when_uid_already_exists(self) -> None:
+        self.firebase_sdk_stub.create_user('existing_uid')
+        account = auth_domain.ExternalAccount(auth_id='existing_uid')
+
+        with self.assertRaisesRegex(
+            auth_domain.AuthProviderError, 'Failed to create account'
+        ):
+            firebase_auth_services.create_external_account(account)
+
+    def test_create_account_raises_error_on_firebase_error(self) -> None:
+        account = auth_domain.ExternalAccount(auth_id='new_uid')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'create_user',
+                firebase_exceptions.UnknownError('connection failed'),
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Failed to create account'
+            ),
+        ):
+            firebase_auth_services.create_external_account(account)
+
+    def test_update_account_email(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            'existing_uid', email='old@example.com', disabled=False
+        )
+        account = auth_domain.ExternalAccount(
+            auth_id='existing_uid', email='new@example.com', disabled=False
+        )
+
+        result = firebase_auth_services.update_external_account(account)
+
+        self.assertEqual(result.auth_id, 'existing_uid')
+        self.assertEqual(result.email, 'new@example.com')
+        self.assertEqual(result.disabled, False)
+
+    def test_update_account_disabled_status(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            'existing_uid', email='old@example.com', disabled=False
+        )
+        account = auth_domain.ExternalAccount(
+            auth_id='existing_uid', email='old@example.com', disabled=True
+        )
+
+        result = firebase_auth_services.update_external_account(account)
+
+        self.assertEqual(result.auth_id, 'existing_uid')
+        self.assertEqual(result.disabled, True)
+        self.firebase_sdk_stub.assert_is_disabled('existing_uid')
+
+    def test_update_account_multiple_fields(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            'existing_uid', email='old@example.com', disabled=False
+        )
+        account = auth_domain.ExternalAccount(
+            auth_id='existing_uid', email='updated@example.com', disabled=True
+        )
+
+        result = firebase_auth_services.update_external_account(account)
+
+        self.assertEqual(result.auth_id, 'existing_uid')
+        self.assertEqual(result.email, 'updated@example.com')
+        self.assertEqual(result.disabled, True)
+
+    def test_update_account_raises_error_when_not_found(self) -> None:
+        account = auth_domain.ExternalAccount(
+            auth_id='nonexistent_uid', email='test@example.com', disabled=False
+        )
+
+        with self.assertRaisesRegex(
+            auth_domain.AuthProviderError, 'Failed to update account'
+        ):
+            firebase_auth_services.update_external_account(account)
+
+    def test_update_account_raises_error_on_firebase_error(self) -> None:
+        self.firebase_sdk_stub.create_user(
+            'existing_uid', email='old@example.com', disabled=False
+        )
+        account = auth_domain.ExternalAccount(
+            auth_id='existing_uid', email='new@example.com', disabled=False
+        )
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'update_user',
+                firebase_exceptions.UnknownError('connection failed'),
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Failed to update account'
+            ),
+        ):
+            firebase_auth_services.update_external_account(account)
+
+    def test_delete_account_successfully(self) -> None:
+        self.firebase_sdk_stub.create_user('uid_to_delete')
+        account = auth_domain.ExternalAccount(auth_id='uid_to_delete')
+
+        firebase_auth_services.delete_external_account(account)
+
+        self.firebase_sdk_stub.assert_is_not_user('uid_to_delete')
+
+    def test_delete_account_raises_error_when_not_found(self) -> None:
+        account = auth_domain.ExternalAccount(auth_id='nonexistent_uid')
+
+        with self.assertRaisesRegex(
+            auth_domain.AuthProviderError, 'Failed to delete account'
+        ):
+            firebase_auth_services.delete_external_account(account)
+
+    def test_delete_account_raises_error_on_firebase_error(self) -> None:
+        self.firebase_sdk_stub.create_user('uid_to_delete')
+        account = auth_domain.ExternalAccount(auth_id='uid_to_delete')
+
+        with (
+            self.swap_to_always_raise(
+                firebase_auth,
+                'delete_user',
+                firebase_exceptions.UnknownError('connection failed'),
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Failed to delete account'
+            ),
+        ):
+            firebase_auth_services.delete_external_account(account)
+
+    def test_delete_multiple_accounts_successfully(self) -> None:
+        for i in range(5):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+        ]
+
+        firebase_auth_services.delete_multi_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_not_user_multi(
+            ['uid_0', 'uid_1', 'uid_2']
+        )
+        self.firebase_sdk_stub.assert_is_user_multi(['uid_3', 'uid_4'])
+
+    def test_delete_all_accounts(self) -> None:
+        for i in range(5):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(5)
+        ]
+
+        firebase_auth_services.delete_multi_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_not_user_multi(
+            ['uid_0', 'uid_1', 'uid_2', 'uid_3', 'uid_4']
+        )
+
+    def test_delete_empty_list_succeeds(self) -> None:
+        firebase_auth_services.delete_multi_external_accounts([])
+
+    def test_delete_accounts_with_batching(self) -> None:
+        for i in range(2505):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(2505)
+        ]
+
+        firebase_auth_services.delete_multi_external_accounts(accounts)
+
+        uids = [f'uid_{i}' for i in range(2505)]
+        self.firebase_sdk_stub.assert_is_not_user_multi(uids)
+
+    def test_delete_accounts_raises_error_when_some_fail(self) -> None:
+        for i in range(3):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_delete_users_error(
+                individual_error_pattern=(None, 'Failed to delete')
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Error deleting 1/3 accounts'
+            ),
+        ):
+            firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_delete_accounts_with_none_auth_id(self) -> None:
+        self.firebase_sdk_stub.create_user('uid_0')
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=None),
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+        ]
+
+        with self.assertRaisesRegex(
+            ValueError, r'All accounts must provide valid auth IDs.'
+        ):
+            firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_delete_accounts_reports_correct_error_indices(self) -> None:
+        for i in range(5):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+            auth_domain.ExternalAccount(auth_id='uid_3'),
+            auth_domain.ExternalAccount(auth_id='uid_4'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_delete_users_error(
+                individual_error_pattern=(None, 'error1', None, 'error2', None)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error deleting 2/5 accounts:\n'
+                r'\tAt index=1: error1\n'
+                r'\tAt index=3: error2',
+            ),
+        ):
+            firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_delete_accounts_with_multiple_batches_reports_correct_indices(
+        self,
+    ) -> None:
+        for i in range(2505):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(2505)
+        ]
+
+        # Pattern that will fail at specific indices across batches:
+        # - Batch 0: fail at index 500
+        # - Batch 1: fail at index 1500 (offset 1000 + local index 500)
+        # - Batch 2: fail at index 2000 (offset 2000 + local index 0)
+        error_pattern: List[str | None] = [None] * 2505
+        error_pattern[500] = 'error at 500'
+        error_pattern[1500] = 'error at 1500'
+        error_pattern[2000] = 'error at 2000'
+
+        with (
+            self.firebase_sdk_stub.mock_delete_users_error(
+                individual_error_pattern=tuple(error_pattern)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error deleting 3/2505 accounts:\n'
+                r'\tAt index=500: error at 500\n'
+                r'\tAt index=1500: error at 1500\n'
+                r'\tAt index=2000: error at 2000',
+            ),
+        ):
+            firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_delete_accounts_with_sdk_error_during_batch(self) -> None:
+        for i in range(750):
+            self.firebase_sdk_stub.create_user(f'uid_{i}')
+
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(750)
+        ]
+
+        with (
+            self.swap(feconf, 'FIREBASE_BATCH_SIZE', 250),
+            self.firebase_sdk_stub.mock_delete_users_error(
+                batch_error_pattern=(
+                    None,
+                    firebase_exceptions.UnknownError('uh-oh!'),
+                    None,
+                )
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error deleting 250/750 accounts:\n'
+                r'\tAt slice=250:500: uh-oh!',
+            ),
+        ):
+            firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_import_multiple_accounts_successfully(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id=f'uid_{i}', email=f'user{i}@example.com', disabled=False
+            )
+            for i in range(5)
+        ]
+
+        firebase_auth_services.import_multi_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_user_multi(
+            [f'uid_{i}' for i in range(5)]
+        )
+
+    def test_import_accounts_with_all_fields(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id='uid_0', email='user0@example.com', disabled=False
+            ),
+            auth_domain.ExternalAccount(
+                auth_id='uid_1', email='user1@example.com', disabled=True
+            ),
+            auth_domain.ExternalAccount(
+                auth_id='uid_2', email=None, disabled=False
+            ),
+        ]
+
+        firebase_auth_services.import_multi_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_user_multi(['uid_0', 'uid_1', 'uid_2'])
+        self.firebase_sdk_stub.assert_is_not_disabled('uid_0')
+        self.firebase_sdk_stub.assert_is_disabled('uid_1')
+        self.firebase_sdk_stub.assert_is_not_disabled('uid_2')
+
+    def test_import_empty_list_succeeds(self) -> None:
+        firebase_auth_services.import_multi_external_accounts([])
+
+    def test_import_accounts_with_batching(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id=f'uid_{i}', email=f'user{i}@example.com', disabled=False
+            )
+            for i in range(2505)
+        ]
+
+        firebase_auth_services.import_multi_external_accounts(accounts)
+
+        uids = [f'uid_{i}' for i in range(2505)]
+        self.firebase_sdk_stub.assert_is_user_multi(uids)
+
+    def test_import_accounts_raises_error_when_some_fail(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=(None, 'Failed to import')
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Error importing 1/3 accounts'
+            ),
+        ):
+            firebase_auth_services.import_multi_external_accounts(accounts)
+
+    def test_import_accounts_with_none_auth_id_raises_value_error(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=None),
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+        ]
+
+        # The SDK raises ValueError for empty/None uid values.
+        with self.assertRaisesRegex(ValueError, 'uid'):
+            firebase_auth_services.import_multi_external_accounts(accounts)
+
+    def test_import_accounts_with_empty_auth_id_raises_value_error(
+        self,
+    ) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=''),
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+        ]
+
+        # The SDK raises ValueError for empty/None uid values.
+        with self.assertRaisesRegex(ValueError, 'uid'):
+            firebase_auth_services.import_multi_external_accounts(accounts)
+
+    def test_import_accounts_reports_correct_error_indices(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+            auth_domain.ExternalAccount(auth_id='uid_3'),
+            auth_domain.ExternalAccount(auth_id='uid_4'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=(None, 'error1', None, 'error2', None)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 2/5 accounts:\n'
+                r'\tAt index=1: error1\n'
+                r'\tAt index=3: error2',
+            ),
+        ):
+            firebase_auth_services.import_multi_external_accounts(accounts)
+
+    def test_import_accounts_with_multiple_batches_reports_correct_indices(
+        self,
+    ) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(2505)
+        ]
+
+        # Pattern that will fail at specific indices across batches:
+        # - Batch 0: fail at index 500
+        # - Batch 1: fail at index 1500 (offset 1000 + local index 500)
+        # - Batch 2: fail at index 2000 (offset 2000 + local index 0)
+        error_pattern: List[str | None] = [None] * 2505
+        error_pattern[500] = 'error at 500'
+        error_pattern[1500] = 'error at 1500'
+        error_pattern[2000] = 'error at 2000'
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=tuple(error_pattern)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 3/2505 accounts:\n'
+                r'\tAt index=500: error at 500\n'
+                r'\tAt index=1500: error at 1500\n'
+                r'\tAt index=2000: error at 2000',
+            ),
+        ):
+            firebase_auth_services.import_multi_external_accounts(accounts)
+
+    def test_import_accounts_with_sdk_error_during_batch(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(750)
+        ]
+
+        with (
+            self.swap(feconf, 'FIREBASE_BATCH_SIZE', 250),
+            self.firebase_sdk_stub.mock_import_users_error(
+                batch_error_pattern=(
+                    None,
+                    firebase_exceptions.UnknownError('uh-oh!'),
+                    None,
+                )
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 250/750 accounts:\n'
+                r'\tAt slice=250:500: uh-oh!',
+            ),
+        ):
+            firebase_auth_services.import_multi_external_accounts(accounts)

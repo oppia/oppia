@@ -26,7 +26,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import webapp2
-from typing import Final, List, Optional
+from typing import Final, Iterable, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -199,7 +199,7 @@ def get_multi_auth_ids_from_user_ids(
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
-        user_ids: list(str). The user IDs.
+        user_ids: List[str]. The user IDs.
 
     Returns:
         list(str|None). The auth IDs associated with each of the given user IDs,
@@ -233,7 +233,7 @@ def get_multi_user_ids_from_auth_ids(
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
-        auth_ids: list(str). The auth IDs.
+        auth_ids: List[str]. The auth IDs.
 
     Returns:
         list(str|None). The user IDs associated with each of the given auth IDs,
@@ -263,7 +263,7 @@ def associate_multi_auth_ids_with_user_ids(
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
+        auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]. The
             associations to commit.
 
     Raises:
@@ -277,6 +277,92 @@ def associate_multi_auth_ids_with_user_ids(
 def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
     """Returns all accounts from our external authentication provider."""
     return platform_auth_services.get_all_external_accounts()
+
+
+def create_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Creates a new external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to create. When the
+            auth ID of the account is None, a new one will be generated.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the created account.
+
+    Raises:
+        ValueError. If the account fields are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    return platform_auth_services.create_external_account(account)
+
+
+def update_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Updates an existing external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to update.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the updated account.
+
+    Raises:
+        ValueError. If the account fields are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    return platform_auth_services.update_external_account(account)
+
+
+def delete_external_account(account: auth_domain.ExternalAccount) -> None:
+    """Deletes an external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to delete.
+
+    Raises:
+        ValueError. If the auth ID is None, empty, or malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.delete_external_account(account)
+
+
+def delete_multi_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Deletes multiple external accounts.
+
+    PERF: This operation uses batching to reduce the amount of network calls.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to delete.
+
+    Raises:
+        ValueError. If an auth ID is malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.delete_multi_external_accounts(accounts)
+
+
+def import_multi_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Imports multiple external accounts WITHOUT making any safety checks.
+
+    WARNING: This operation DOES NOT protect against duplicate accounts!
+    The ONLY way to guarantee this function is used safely is by running it on
+    an empty server, where collisions are impossible.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+
+    Raises:
+        ValueError. If the specified user properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.import_multi_external_accounts(accounts)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:
