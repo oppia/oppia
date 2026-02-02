@@ -1167,15 +1167,12 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         # EXP_ID_1: No checkpoint visited (0%)
         # EXP_ID_2: No checkpoint visited (0%)
         # EXP_ID_3: Visited the checkpoint (0% = floor((1-1)/1*100) = 0%)
+        exp_3 = exp_services.get_exploration_by_id(self.EXP_ID_3)
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_3),
             user_id=self.viewer_id,
             exploration_id=self.EXP_ID_3,
-            most_recently_reached_checkpoint_state_name=(
-                self.save_new_valid_exploration(
-                    self.EXP_ID_3, self.owner_id, title='Test'
-                ).init_state_name
-            ),
+            most_recently_reached_checkpoint_state_name=exp_3.init_state_name,
         ).put()
 
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
