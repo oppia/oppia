@@ -27,8 +27,15 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
 )
+from core.platform import models
 
 from typing import Dict, List, Optional, TypedDict
+
+MYPY = False
+if MYPY:
+    from mypy_imports import blog_models
+
+(blog_models,) = models.Registry.import_models([models.Names.BLOG])
 
 
 class BlogCardSummaryDict(TypedDict):
@@ -114,9 +121,21 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        author_details = blog_services.get_blog_author_details(self.user_id)
-        assert author_details is not None
-        author_details_dict = author_details.to_dict()
+        author_details = blog_services.get_blog_author_details(
+            self.user_id, strict=False
+        )
+
+        if author_details is not None:
+            author_details_dict = author_details.to_dict()
+        else:
+            author_details_dict = {
+                'id': None,
+                'author_id': self.user_id,
+                'displayed_author_name': '',
+                'author_bio': '',
+                'last_updated': None,
+            }
+
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
         no_of_draft_blog_posts = 0

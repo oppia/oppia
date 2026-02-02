@@ -26,9 +26,12 @@ from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import user_models
+    from mypy_imports import blog_models, user_models
 
-(user_models,) = models.Registry.import_models([models.Names.USER])
+(
+    blog_models,
+    user_models,
+) = models.Registry.import_models([models.Names.BLOG, models.Names.USER])
 
 
 class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
@@ -114,6 +117,28 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             json_response['published_blog_post_summary_dicts'][0]['title'],
         )
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
+
+    def test_get_dashboard_with_missing_author_model(self) -> None:
+        """Tests that dashboard gracefully handles missing author model."""
+        self.signup('neweditor@example.com', 'NewEditor')
+        new_editor_id = self.get_user_id_from_email('neweditor@example.com')
+        self.add_user_role('NewEditor', feconf.ROLE_ID_BLOG_POST_EDITOR)
+        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            new_editor_id
+        )
+        self.assertIsNotNone(author_model)
+        author_model.delete()
+        self.login('neweditor@example.com')
+        json_response = self.get_json(
+            '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
+        )
+        self.assertEqual(
+            json_response['author_details']['displayed_author_name'], ''
+        )
+        self.assertEqual(json_response['author_details']['author_bio'], '')
+        self.assertEqual(json_response['published_blog_post_summary_dicts'], [])
+        self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
+        self.logout()
 
     def test_create_new_blog_post(self) -> None:
         # Checks blog editor can create a new blog post.

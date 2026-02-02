@@ -509,6 +509,11 @@ def publish_blog_post(blog_post_id: str) -> None:
     blog_post.validate(strict=True)
     blog_post_summary = get_blog_post_summary_by_id(blog_post_id, strict=True)
     blog_post_summary.validate(strict=True)
+    author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+        blog_post.author_id
+    )
+    if author_model is None:
+        create_blog_author_details_model(blog_post.author_id)
 
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
@@ -1097,7 +1102,14 @@ def update_blog_author_details(
     )
 
     if blog_author_model is None:
-        raise Exception('Unable to fetch author details for the given user.')
+        create_blog_author_details_model(user_id)
+        blog_author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            user_id
+        )
+        if blog_author_model is None:
+            raise Exception(
+                'Unable to fetch author details for the given user.'
+            )
 
     blog_author_model.displayed_author_name = displayed_author_name
     blog_author_model.author_bio = author_bio

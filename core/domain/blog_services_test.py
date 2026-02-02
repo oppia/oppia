@@ -314,6 +314,29 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         self.assertIsNotNone(blog_post_summary.published_on)
         self.assertEqual(blog_post.published_on, blog_post_summary.published_on)
 
+    def test_publish_blog_post_creates_author_details(self) -> None:
+        """Tests that publish_blog_post creates author model if missing."""
+        self.signup('author@example.com', 'Author')
+        author_user_id = self.get_user_id_from_email('author@example.com')
+        blog_post = blog_services.create_new_blog_post(author_user_id)
+        blog_post_id = blog_post.id
+        author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            author_user_id
+        )
+        self.assertIsNotNone(author_model)
+        author_model.delete()
+        author_model_after_delete = (
+            blog_models.BlogAuthorDetailsModel.get_by_author(author_user_id)
+        )
+        self.assertIsNone(author_model_after_delete)
+        blog_services.update_blog_post(blog_post_id, self.change_dict_two)
+        blog_services.publish_blog_post(blog_post_id)
+        recreated_author_model = (
+            blog_models.BlogAuthorDetailsModel.get_by_author(author_user_id)
+        )
+        self.assertIsNotNone(recreated_author_model)
+        self.assertEqual(recreated_author_model.author_id, author_user_id)
+
     def test_cannot_publish_invalid_blog_post(self) -> None:
         """Checks that an invalid blog post is not published."""
         with self.assertRaisesRegex(Exception, ('Title should not be empty')):
