@@ -118,7 +118,9 @@ describe('Interaction Rules Registry Service', () => {
     itemSelectionInputRulesService = TestBed.inject(
       ItemSelectionInputRulesService
     );
-    mathEquationInputRulesService = TestBed.inject(MathEquationInputRulesService);
+    mathEquationInputRulesService = TestBed.inject(
+      MathEquationInputRulesService
+    );
     multipleChoiceInputRulesService = TestBed.inject(
       MultipleChoiceInputRulesService
     );

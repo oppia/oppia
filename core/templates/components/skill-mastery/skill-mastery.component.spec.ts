@@ -39,7 +39,9 @@ describe('SkillMasteryViewerComponent', () => {
       providers: [SkillMasteryBackendApiService],
       imports: [HttpClientTestingModule],
     }).compileComponents();
-    skillMasteryBackendApiService = TestBed.inject(SkillMasteryBackendApiService);
+    skillMasteryBackendApiService = TestBed.inject(
+      SkillMasteryBackendApiService
+    );
   }));
 
   beforeEach(() => {
