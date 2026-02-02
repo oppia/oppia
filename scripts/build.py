@@ -677,14 +677,6 @@ def build_using_ng() -> None:
         get_file_count('dist/oppia-angular-prod') > 0
     ), 'angular generated bundle should be non-empty'
 
-    # Rename styles.css to styles.min.css for consistency with old naming convention.
-    # Note: Angular CLI already minifies this file when optimization is enabled.
-    styles_path = os.path.join('dist', 'oppia-angular-prod', 'styles.css')
-    styles_min_path = os.path.join('dist', 'oppia-angular-prod', 'styles.min.css')
-    if os.path.exists(styles_path):
-        shutil.move(styles_path, styles_min_path)
-        print('Renamed styles.css to styles.min.css')
-
 
 def build_using_webpack(config_path: str) -> None:
     """Execute webpack build process. This takes all TypeScript files we have in
