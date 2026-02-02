@@ -48,6 +48,10 @@ export class ModeratorAuthGuard implements CanActivate {
       return true;
     }
 
+    sessionStorage.setItem(
+      'oppia_401_error_message',
+      'You must be a moderator to access this page.'
+    );
     this.router
       .navigate([
         `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,

@@ -52,6 +52,10 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
+          sessionStorage.setItem(
+            'oppia_401_error_message',
+            'You must be a facilitator to access this page.'
+          );
           this.router
             .navigate([
               `${AppConstants.PAGES_REGISTERED_WITH_FRONTEND.ERROR.ROUTE}/401`,
