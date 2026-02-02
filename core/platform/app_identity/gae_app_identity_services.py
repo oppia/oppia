@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
 from core import feconf
@@ -38,6 +39,11 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
+    logging.info(
+        'Voiceover synthesis log: Retrieving Oppia project ID: %s.'
+        % feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV
+    )
+
     # Since the Dataflow runtime cannot access environment variables in a Beam
     # job, we must explicitly set and retrieve the project ID within the Beam
     # environment.

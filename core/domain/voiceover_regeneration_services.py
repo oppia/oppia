@@ -46,11 +46,16 @@ from typing import Dict, List, Optional, Tuple, Union
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import speech_synthesis_services, voiceover_models
+    from mypy_imports import (
+        app_identity_services,
+        speech_synthesis_services,
+        voiceover_models,
+    )
 
 (voiceover_models,) = models.Registry.import_models([models.Names.VOICEOVER])
 
 speech_synthesis_services = models.Registry.import_speech_synthesis_services()
+app_identity_services = models.Registry.import_app_identity_services()
 
 
 def _extract_text_from_link_tag(element: bs4.Tag) -> str:
@@ -306,6 +311,9 @@ def synthesize_voiceover_for_html_string(
     )
 
     parsed_text = parse_html(content_html)
+    logging.info(
+        'Voiceover synthesis log: Oppia project ID: %s.' % oppia_project_id
+    )
 
     content_hash_code = (
         voiceover_models.CachedAutomaticVoiceoversModel.generate_hash_from_text(
@@ -335,7 +343,6 @@ def synthesize_voiceover_for_html_string(
                     'Voiceover synthesis log: Using cached voiceover for exploration ID: %s, content_html: %s'
                     % (exploration_id, content_html)
                 )
-                logging.info('Voiceover synthesis log: %s.' % oppia_project_id)
         except Exception as e:
             cached_model = None
             logging.warning('Failed to retrieve voiceover from cache: %s' % e)
@@ -374,6 +381,19 @@ def synthesize_voiceover_for_html_string(
     # throws a very mysterious error that entails a mutagen
     # object being recursively passed around in app engine.
     del audio
+
+    logging.info('Voiceover synthesis log: Storing voiceover to GCS.')
+    logging.info(
+        'Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename
+    )
+    logging.info(
+        'Voiceover synthesis log: Oppia project ID: %s.'
+        % app_identity_services.get_application_id()
+    )
+    logging.info(
+        'Voiceover synthesis log: GCS bucket name: %s.'
+        % app_identity_services.get_gcs_resource_bucket_name()
+    )
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
         binary_audio_data,
