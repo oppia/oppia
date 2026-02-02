@@ -42,7 +42,9 @@ const BACKEND_PROD_HEADER_CSS_LIBS_PATH = path.join(
 var findHashedStylesFile = function () {
   try {
     var files = fs.readdirSync(DIST_DIR);
-    var stylesFiles = files.filter(file => file.match(/^styles\.[a-z0-9]+\.css$/));
+    var stylesFiles = files.filter(file =>
+      /^styles\.[a-f0-9]+\.css$/i.test(file)
+    );
 
     if (stylesFiles.length === 0) {
       throw new Error(
@@ -73,7 +75,7 @@ var updateHeaderCssLibs = function (hashedFilename, filePath) {
     }
 
     var content = fs.readFileSync(filePath, 'utf-8');
-    var stylesCssPattern = /href="\/dist\/oppia-angular-prod\/styles(\.[a-z0-9]+)?\.css"/;
+    var stylesCssPattern = /href="\/dist\/oppia-angular-prod\/styles(\.[a-f0-9]+)?\.css"/i;
     var newHref = `href="/dist/oppia-angular-prod/${hashedFilename}"`;
 
     if (!content.match(stylesCssPattern)) {

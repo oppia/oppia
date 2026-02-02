@@ -62,7 +62,7 @@
               "outputPath": "dist/oppia-angular-prod",
               "aot": true,
               "optimization": true,
-              "outputHashing": "bundles",
+              "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
               "extractLicenses": true,
