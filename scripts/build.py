@@ -163,9 +163,9 @@ MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
 
 _PARSER = argparse.ArgumentParser(
     description="""
-Creates a third-party directory where all the JS and CSS dependencies are
-built and stored. Depending on the options passed to the script, might also
-minify third-party libraries and/or generate a build directory.
+Builds the production version of Oppia. Generates hashes for assets,
+minifies files, and creates the build directory. Angular CLI handles
+CSS bundling including third-party dependencies.
 """
 )
 
@@ -1279,8 +1279,7 @@ def _verify_hashes(
 ) -> None:
     """Verify a few metrics after build process finishes:
         1) The hashes in filenames belongs to the hash dict.
-        2) hashes.json, third_party.min.css and third_party.min.js are built and
-        hashes are inserted.
+        2) hashes.json is built and hash is inserted.
 
     Args:
         output_dirnames: list(str). List of directory paths that contain
@@ -1293,33 +1292,17 @@ def _verify_hashes(
     for built_dir in output_dirnames:
         for root, _, filenames in os.walk(built_dir):
             for filename in filenames:
-                parent_dir = os.path.basename(root)
-                converted_filepath = os.path.join(
-                    THIRD_PARTY_GENERATED_DEV_DIR, parent_dir, filename
+                relative_filepath = os.path.relpath(
+                    os.path.join(root, filename), start=built_dir
                 )
-                if hash_should_be_inserted(converted_filepath):
-                    # Obtain the same filepath format as the hash dict's key.
-                    relative_filepath = os.path.relpath(
-                        os.path.join(root, filename), start=built_dir
-                    )
+                if hash_should_be_inserted(relative_filepath):
                     _verify_filepath_hash(relative_filepath, file_hashes)
 
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME]
     )
-    third_party_css_final_filename = _insert_hash(
-        MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH],
-    )
 
-    _ensure_files_exist(
-        [
-            os.path.join(ASSETS_OUT_DIR, hash_final_filename),
-            os.path.join(
-                THIRD_PARTY_GENERATED_OUT_DIR, third_party_css_final_filename
-            ),
-        ]
-    )
+    _ensure_files_exist([os.path.join(ASSETS_OUT_DIR, hash_final_filename)])
 
 
 def generate_hashes() -> Dict[str, str]:
@@ -1335,7 +1318,6 @@ def generate_hashes() -> Dict[str, str]:
         ASSETS_DEV_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['dev_dir'],
-        THIRD_PARTY_GENERATED_DEV_DIR,
     ]
     for hash_dir in hash_dirs:
         hashes.update(get_file_hashes(hash_dir))
@@ -1378,14 +1360,12 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
         ASSETS_DEV_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['staging_dir'],
-        THIRD_PARTY_GENERATED_DEV_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir'],
     ]
     copy_output_dirs = [
         ASSETS_OUT_DIR,
         EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
-        THIRD_PARTY_GENERATED_OUT_DIR,
         WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir'],
     ]
     assert len(copy_input_dirs) == len(copy_output_dirs)
@@ -1398,15 +1378,9 @@ def generate_build_directory(hashes: Dict[str, str]) -> None:
 
     _verify_hashes(copy_output_dirs, hashes)
 
-    source_dirs_for_assets = [ASSETS_DEV_DIR, THIRD_PARTY_GENERATED_DEV_DIR]
-    output_dirs_for_assets = [ASSETS_OUT_DIR, THIRD_PARTY_GENERATED_OUT_DIR]
+    source_dirs_for_assets = [ASSETS_DEV_DIR]
+    output_dirs_for_assets = [ASSETS_OUT_DIR]
     _compare_file_count(source_dirs_for_assets, output_dirs_for_assets)
-
-    source_dirs_for_third_party = [THIRD_PARTY_GENERATED_DEV_DIR]
-    output_dirs_for_third_party = [THIRD_PARTY_GENERATED_OUT_DIR]
-    _compare_file_count(
-        source_dirs_for_third_party, output_dirs_for_third_party
-    )
 
     source_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['staging_dir']]
     output_dirs_for_webpack = [WEBPACK_DIRNAMES_TO_DIRPATHS['out_dir']]
