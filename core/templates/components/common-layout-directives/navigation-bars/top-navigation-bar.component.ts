@@ -330,6 +330,9 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
           );
       }
+    }).finally(() => {
+      // Set authStatusResolved to true regardless of success/failure
+      // so UI doesn't remain in loading state indefinitely
       this.authStatusResolved = true;
     });
 

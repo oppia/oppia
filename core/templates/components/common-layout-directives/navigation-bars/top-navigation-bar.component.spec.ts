@@ -1060,4 +1060,16 @@ describe('TopNavigationBarComponent', () => {
 
     expect(component.authStatusResolved).toBe(true);
   }));
+
+  it('should set authStatusResolved to true even if getUserInfoAsync fails', fakeAsync(() => {
+    spyOn(component, 'truncateNavbar').and.stub();
+    spyOn(userService, 'getUserInfoAsync').and.rejectWith('Auth error');
+
+    expect(component.authStatusResolved).toBe(false);
+
+    component.ngOnInit();
+    tick();
+
+    expect(component.authStatusResolved).toBe(true);
+  }));
 });
