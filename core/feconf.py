@@ -1384,6 +1384,14 @@ FIREBASE_EMULATOR_PORT = 9099
 # cookie requires the user to sign-in _explicitly_.
 FIREBASE_SESSION_COOKIE_MAX_AGE = datetime.timedelta(days=14)
 
+# As of 2026-01, all batch operations in the Firebase Admin SDK have a maximum
+# batch size of 1000.
+#
+# https://firebase.google.com/docs/reference/admin/python/firebase_admin.auth#firebase_admin.auth.Client.list_users
+# https://firebase.google.com/docs/reference/admin/python/firebase_admin.auth#firebase_admin.auth.Client.delete_users
+# https://firebase.google.com/docs/reference/admin/python/firebase_admin.auth#firebase_admin.auth.Client.import_users
+FIREBASE_BATCH_SIZE = 1000
+
 # TODO(#10501): Once domain objects can be imported by the storage layer, move
 # these back to appropriate places (rights_domain, topic_domain).
 # The reserved prefix for keys that are automatically inserted into a

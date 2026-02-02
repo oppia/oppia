@@ -26,7 +26,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import webapp2
-from typing import Final, List, Optional
+from typing import Final, Iterable, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -277,6 +277,73 @@ def associate_multi_auth_ids_with_user_ids(
 def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
     """Returns all accounts from our external authentication provider."""
     return platform_auth_services.get_all_external_accounts()
+
+
+def create_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Creates a new external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to create. When the
+            auth ID of the account is None, Firebase will generate a new ID.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the created account.
+
+    Raises:
+        ValueError. If the account fields are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    return platform_auth_services.create_external_account(account)
+
+
+def update_external_account(
+    account: auth_domain.ExternalAccount,
+) -> auth_domain.ExternalAccount:
+    """Updates an existing external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to update.
+
+    Returns:
+        auth_domain.ExternalAccount. The final state of the updated account.
+
+    Raises:
+        ValueError. If the account fields are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    return platform_auth_services.update_external_account(account)
+
+
+def delete_external_account(account: auth_domain.ExternalAccount) -> None:
+    """Deletes an external account.
+
+    Args:
+        account: auth_domain.ExternalAccount. The account to delete.
+
+    Raises:
+        ValueError. If the auth ID is None, empty, or malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.delete_external_account(account)
+
+
+def delete_multi_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Deletes multiple external accounts.
+
+    PERF: This operation uses batching to reduce the amount of network calls.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to delete.
+
+    Raises:
+        ValueError. If an auth ID is malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.delete_multi_external_accounts(accounts)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:

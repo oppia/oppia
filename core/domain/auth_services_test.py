@@ -18,6 +18,8 @@
 
 from __future__ import annotations
 
+from unittest import mock
+
 from core.constants import constants
 from core.domain import (
     auth_domain,
@@ -267,6 +269,57 @@ class AuthServicesTests(test_utils.GenericTestBase):
             self.assertItemsEqual(
                 auth_services.get_all_external_accounts(), mock_accounts
             )
+
+    def test_create_external_account(self) -> None:
+        input_account = auth_domain.ExternalAccount()
+        output_account = auth_domain.ExternalAccount('aid', 'a@a.com', False)
+
+        with mock.patch.object(
+            platform_auth_services,
+            'create_external_account',
+            return_value=output_account,
+        ) as mock_create:
+            result = auth_services.create_external_account(input_account)
+
+        mock_create.assert_called_once_with(input_account)
+        self.assertEqual(result, output_account)
+
+    def test_update_external_account(self) -> None:
+        input_account = auth_domain.ExternalAccount()
+        output_account = auth_domain.ExternalAccount('aid', 'a@a.com', True)
+
+        with mock.patch.object(
+            platform_auth_services,
+            'update_external_account',
+            return_value=output_account,
+        ) as mock_update:
+            result = auth_services.update_external_account(input_account)
+
+        mock_update.assert_called_once_with(input_account)
+        self.assertEqual(result, output_account)
+
+    def test_delete_external_account(self) -> None:
+        account = auth_domain.ExternalAccount('aid', None, False)
+
+        with mock.patch.object(
+            platform_auth_services, 'delete_external_account'
+        ) as mock_delete:
+            auth_services.delete_external_account(account)
+
+        mock_delete.assert_called_once_with(account)
+
+    def test_delete_multi_external_accounts(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount('aid1', None, False),
+            auth_domain.ExternalAccount('aid2', None, False),
+        ]
+
+        with mock.patch.object(
+            platform_auth_services, 'delete_multi_external_accounts'
+        ) as mock_delete_multi:
+            auth_services.delete_multi_external_accounts(accounts)
+
+        mock_delete_multi.assert_called_once_with(accounts)
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,

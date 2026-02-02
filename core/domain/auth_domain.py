@@ -22,7 +22,7 @@ import collections
 
 from core import utils
 
-from typing import Any, Optional, TypedDict
+from typing import Any, NamedTuple, Optional, TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -37,10 +37,10 @@ AuthIdUserIdPair = collections.namedtuple(
 )
 
 
-# The minimum fields needed to link an Oppia user with authentication providers.
-ExternalAccount = collections.namedtuple(
-    'ExternalAccount', ['auth_id', 'email', 'disabled']
-)
+class AuthProviderError(Exception):
+    """Wraps errors raised by our auth provider."""
+
+    pass
 
 
 class InvalidAuthSessionError(Exception):
@@ -114,6 +114,14 @@ class AuthClaims:
                 == (other.auth_id, other.email, other.role_is_super_admin)
             )
         )
+
+
+class ExternalAccount(NamedTuple):
+    """The minimum fields required to link an Oppia user with auth providers."""
+
+    auth_id: Optional[str] = None
+    email: Optional[str] = None
+    disabled: bool = False
 
 
 class UserAuthDetailsDict(TypedDict):
