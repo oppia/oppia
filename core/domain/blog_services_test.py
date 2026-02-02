@@ -324,6 +324,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             author_user_id
         )
         self.assertIsNotNone(author_model)
+        assert author_model is not None
         author_model.delete()
         author_model_after_delete = (
             blog_models.BlogAuthorDetailsModel.get_by_author(author_user_id)
@@ -335,6 +336,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             blog_models.BlogAuthorDetailsModel.get_by_author(author_user_id)
         )
         self.assertIsNotNone(recreated_author_model)
+        assert recreated_author_model is not None
         self.assertEqual(recreated_author_model.author_id, author_user_id)
 
     def test_cannot_publish_invalid_blog_post(self) -> None:

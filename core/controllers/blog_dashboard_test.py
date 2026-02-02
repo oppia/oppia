@@ -127,6 +127,7 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
             new_editor_id
         )
         self.assertIsNotNone(author_model)
+        assert author_model is not None
         author_model.delete()
         self.login('neweditor@example.com')
         json_response = self.get_json(

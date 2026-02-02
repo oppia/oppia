@@ -126,8 +126,6 @@ class BlogDashboardDataHandler(
             author_details_dict = author_details.to_dict()
         else:
             author_details_dict = {
-                'id': None,
-                'author_id': self.user_id,
                 'displayed_author_name': '',
                 'author_bio': '',
                 'last_updated': None,
