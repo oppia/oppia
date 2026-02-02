@@ -915,9 +915,7 @@ describe('Story Viewer Page component', () => {
 
     mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
       true;
-    expect(component.getChapterExplorationUrl(readyToPublishNode)).toBe(
-      'javascript:void(0)'
-    );
+    expect(component.getChapterExplorationUrl(readyToPublishNode)).toBeNull();
   });
 
   it('should return exploration URL for published chapters', () => {
