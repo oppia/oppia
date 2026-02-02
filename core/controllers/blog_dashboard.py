@@ -27,15 +27,12 @@ from core.domain import (
     platform_parameter_list,
     platform_parameter_services,
 )
-from core.platform import models
 
 from typing import Dict, List, Optional, TypedDict
 
 MYPY = False
 if MYPY:
-    from mypy_imports import blog_models
-
-(blog_models,) = models.Registry.import_models([models.Names.BLOG])
+    pass
 
 
 class BlogCardSummaryDict(TypedDict):
