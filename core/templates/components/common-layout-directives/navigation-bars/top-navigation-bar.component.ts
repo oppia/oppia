@@ -108,9 +108,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   isBlogAdmin: boolean = false;
   isBlogPostEditor: boolean = false;
   userIsLoggedIn: boolean = false;
-  // Flag to track whether the auth status has been resolved from the
-  // getUserInfoAsync() call. This prevents the "Sign In" UI from briefly
-  // flashing before the actual auth state is known.
+  /**
+   * Flag to track whether the auth status has been resolved from the
+   * getUserInfoAsync() call. This prevents the "Sign In" UI from briefly
+   * flashing before the actual auth state is known.
+   */
   authStatusResolved: boolean = false;
   currentUrl!: string;
   userMenuIsShown: boolean = false;
@@ -332,7 +334,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
       }
     }).finally(() => {
       // Set authStatusResolved to true regardless of success/failure
-      // so UI doesn't remain in loading state indefinitely
+      // so UI doesn't remain in loading state indefinitely.
       this.authStatusResolved = true;
     });
 
