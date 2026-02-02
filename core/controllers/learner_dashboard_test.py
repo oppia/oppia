@@ -20,6 +20,7 @@ from core import feconf
 from core.constants import constants
 from core.domain import (
     exp_domain,
+    exp_fetchers,
     exp_services,
     learner_progress_services,
     story_domain,
@@ -1167,7 +1168,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         # EXP_ID_1: No checkpoint visited (0%)
         # EXP_ID_2: No checkpoint visited (0%)
         # EXP_ID_3: Visited the checkpoint (0% = floor((1-1)/1*100) = 0%)
-        exp_3 = exp_services.get_exploration_by_id(self.EXP_ID_3)
+        exp_3 = exp_fetchers.get_exploration_by_id(self.EXP_ID_3)
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_3),
             user_id=self.viewer_id,
