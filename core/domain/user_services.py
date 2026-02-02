@@ -1998,16 +1998,11 @@ def update_email_preferences(
     return False
 
 
-def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
-    """Gives email preferences of user with given user_id.
+def get_email_preferences(
+    user_id: str,
+) -> user_domain.UserEmailPreferences:
+    """Gives email preferences of user with given user_id."""
 
-    Args:
-        user_id: str. The unique ID of the user.
-
-    Returns:
-        UserGlobalPrefs. Representing whether the user has chosen to receive
-        email updates.
-    """
     email_preferences_model = (
         user_models.UserEmailPreferencesModel.get(
             user_id, strict=False
@@ -2015,46 +2010,39 @@ def get_email_preferences(user_id: str) -> user_domain.UserGlobalPrefs:
     )
     if email_preferences_model is None:
         email_preferences=(
-            user_domain.UserGlobalPrefs.create_default_prefs()
+            user_domain.UserEmailPreferences.create_default_prefs(user_id)
         )
     else:
-        email_preferences_model = (
-            email_preferences_model.to_domain_object
+        email_preferences = (
+            email_preferences_model.to_domain_object()
         )
+        
     email_preferences.validate()
         
-    return user_domain.UserGlobalPrefs(
-        email_preferences.site_updates,
-        email_preferences.editor_role_notifications,
-        email_preferences.feedback_message_notifications,
-        email_preferences.subscription_notifications,
-    )
+    return email_preferences
 
   
 
 
 def get_users_email_preferences(
     user_ids: List[str],
-) -> List[user_domain.UserGlobalPrefs]:
-    """Get email preferences for the list of users.
-
-    Args:
-        user_ids: list(str). A list of user IDs for whom we want to get email
-            preferences.
-
-    Returns:
-        list(UserGlobalPrefs). Representing whether the users had chosen to
-        receive email updates.
-    """
+) -> List[user_domain.UserEmailPreferences]:
+    """Get email preferences for the list of users."""
+    
     user_email_preferences_models = (
         user_models.UserEmailPreferencesModel.get_multi(user_ids)
     )
-    result = []
     
-    for email_preferences_model in user_email_preferences_models:
+    result: List[user_domain.UserEmailPreferences] = []
+
+    
+    for user_id, email_preferences_model in zip(
+        user_ids, user_email_preferences_models
+    ):
+         
         if email_preferences_model is None:
             email_preferences = (
-                user_domain.UserGlobalPrefs.create_default_prefs()
+                user_domain.UserEmailPreferences.create_default_prefs(user_id)
         )
     else:
         email_preferences = (
@@ -2063,14 +2051,7 @@ def get_users_email_preferences(
 
     email_preferences.validate()
 
-    result.append(
-        user_domain.UserGlobalPrefs(
-            email_preferences.site_updates,
-            email_preferences.editor_role_notifications,
-            email_preferences.feedback_message_notifications,
-            email_preferences.subscription_notifications,
-        )
-    )
+    result.append(email_preferences)
     return result
 
 

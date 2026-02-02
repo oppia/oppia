@@ -1043,6 +1043,7 @@ class UserContributionsModel(base_models.BaseModel):
 
 
 class UserEmailPreferencesModel(base_models.BaseModel):
+    
     """Email preferences for a particular user.
 
     Instances of this class are keyed by the user id.
@@ -1066,7 +1067,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
     subscription_notifications = datastore_services.BooleanProperty(
         indexed=True, default=feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE
     )
-    
+        
     def to_domain_object(self) -> user_domain.UserEmailPreferences:
         """Returns the domain object representation of this model."""
         return user_domain.UserEmailPreferences(
@@ -1076,20 +1077,24 @@ class UserEmailPreferencesModel(base_models.BaseModel):
             feedback_message_notifications=self.feedback_message_notifications,
             subscription_notifications=self.subscription_notifications,
         )
-        def update_from_domain_object(
+    def update_from_domain_object(
         self, domain_object: user_domain.UserEmailPreferences
     ) -> None:
          """Updates this model from the given domain object."""
-        self.site_updates = domain_object.site_updates
-        self.editor_role_notifications = (
-            domain_object.editor_role_notifications
+         self.site_updates = domain_object.site_updates
+         self.editor_role_notifications = (
+             domain_object.editor_role_notifications
+         )
+         self.feedback_message_notifications = (
+             domain_object.feedback_message_notifications
+         
+         )
+         self.subscription_notifications = (
+             domain_object.subscription_notifications
+         
         )
-        self.feedback_message_notifications = (
-            domain_object.feedback_message_notifications
-        )
-        self.subscription_notifications = (
-            domain_object.subscription_notifications
-        )
+         
+
 
 
     @staticmethod
