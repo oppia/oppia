@@ -47,7 +47,7 @@
 }
 
 .classroom-content-container .classroom-content .diagnostic-test-container {
-  align-items: start;
+  align-items: stretch;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -62,7 +62,8 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  height: 115px;
+  height: auto;
+  min-height: 115px;
   padding: 12px 36px;
   width: 338px;
 }
@@ -74,9 +75,12 @@
   font-style: normal;
   font-weight: 700;
   height: fit-content;
+  hyphens: auto;
   letter-spacing: -0.02em;
   line-height: 20px;
+  overflow-wrap: anywhere;
   width: 266px;
+  word-break: break-word;
 }
 
 .diagnostic-test-container .diagnostic-test-box .diagnostic-test-info p {
@@ -131,6 +135,8 @@
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 20px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .oppia-classroom-page-container .classroom-top .classroom-admin-banner {
