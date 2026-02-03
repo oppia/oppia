@@ -370,6 +370,8 @@ const publishUptoChaptersDropdownSelector =
   'select.e2e-test-publish-up-to-chapter-dropdown';
 const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
 const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
+const mobileSaveStoryChangesDropdown =
+  'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
