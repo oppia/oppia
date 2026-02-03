@@ -51,11 +51,11 @@
       </stories-list>
     </div>
     <div *ngIf="activeTab === 'subtopic'">
-      <subtopics-list [classroomUrlFragment]="''"
+      <subtopics-list [classroomUrlFragment]="classroomUrlFragment"
                       [subtopicsList]="subtopics"
                       [topicId]="topic.getId()"
                       [topicName]="topicName"
-                      [topicUrlFragment]="''">
+                      [topicUrlFragment]="topicUrlFragment">
       </subtopics-list>
     </div>
     <div  *ngIf="activeTab === 'practice'">
@@ -78,11 +78,11 @@
     background-color: #fff;
     margin: 0 auto;
     position: relative;
-    top: 50px;
+    top: 0;
     width: 50%;
   }
   .topic-preview-parent {
-    margin-top: -40px;
+    margin-top: 0;
   }
   .topic-preview-nav {
     background-color: #00645c;
@@ -102,7 +102,7 @@
     display: inline-block;
     flex: 1;
     height: 100%;
-    padding: 20px 0;
+    padding: 10px 0;
     text-align: center;
   }
   .topic-preview-icon img {
