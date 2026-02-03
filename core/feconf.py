@@ -1080,6 +1080,10 @@ REGENERATE_VOICEOVER_ON_EXP_UPDATE_URL = (
     '/regenerate_voiceover_on_exp_update/<exploration_id>/'
     '<exploration_version>/<exploration_title>'
 )
+REGENERATE_VOICEOVERS_FOR_EXPLORATION_URL = (
+    '/regenerate_voiceovers_for_exploration/'
+    '<exploration_id>/<language_accent_code>'
+)
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -1740,6 +1744,16 @@ class TranslatedContentDict(TypedDict):
     content_format: str
 
 
+class VoiceoverRegenerationState(enum.Enum):
+    """Represents the possible states of voiceover regeneration status for
+    exploration content.
+    """
+
+    GENERATING = 'GENERATING'
+    SUCCEEDED = 'SUCCEEDED'
+    FAILED = 'FAILED'
+
+
 class VoiceoverType(enum.Enum):
     """Represents all possible voicever types."""
 
@@ -1778,9 +1792,12 @@ FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS = {
         'remove_user_from_rights_models'
     ),
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE': (
-        'regenerate_voiceovers_for_updated_exploration'
+        'regenerate_voiceovers_on_exploration_update'
     ),
     'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_CURATION': (
-        'regenerate_voiceovers_on_exploration_curation'
+        'regenerate_voiceovers_on_exploration_added_to_topic'
+    ),
+    'FUNCTION_ID_REGENERATE_VOICEOVERS_OF_EXPLORATION_FOR_GIVEN_LANGUAGE_ACCENT': (
+        'regenerate_voiceovers_of_exploration_for_given_language_accent'
     ),
 }

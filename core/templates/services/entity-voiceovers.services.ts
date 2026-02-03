@@ -205,9 +205,7 @@ export class EntityVoiceoversService {
       this.languageAccentCodeToEntityVoiceovers
     );
     for (let entityVoiceovers of allEntityVoiceovers) {
-      if (entityVoiceovers.getManualVoiceover(contentId)) {
-        entityVoiceovers.removeVoiceover(contentId);
-      }
+      entityVoiceovers.removeVoiceover(contentId);
     }
   }
 
