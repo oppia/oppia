@@ -1712,7 +1712,7 @@ class DocstringParameterCheckerTests(unittest.TestCase):
                 node_function_no_doc
             )
 
-    def test_function_with_docstring_outside_class(self):
+    def test_function_with_docstring_outside_class(self) -> None:
         """Tests that a standalone function with a docstring does not trigger errors."""
         node = astroid.extract_node(
             """
@@ -4684,7 +4684,7 @@ class InequalityWithNoneCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertNoMessages():
             self.checker_test_object.checker.visit_compare(compare_node)
 
-    def test_non_none_inequality_does_not_trigger(self):
+    def test_non_none_inequality_does_not_trigger(self) -> None:
         """Test that 'x != y' where y is a value(not None) does not trigger a message."""
         node = astroid.extract_node(
             """
