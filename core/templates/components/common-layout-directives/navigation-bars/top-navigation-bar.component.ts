@@ -462,6 +462,8 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
         this.preventPageUnloadEventService.removeListener();
+        // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
+        // rather than manually being triggered by buttons.
         this.siteAnalyticsService.registerStartLoginEvent('loginButton');
         setTimeout(() => {
           this.windowRef.nativeWindow.location.href = loginUrl;

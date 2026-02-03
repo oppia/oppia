@@ -88,6 +88,8 @@ import {LearnerExplorationSummary} from '../../../../domain/summary/learner-expl
 import {ChapterProgressService} from '../../services/chapter-progress.service';
 import {CardAnimationService} from '../../services/card-animation.service';
 import {MobileMenuService} from '../../services/mobile-menu.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {AuthService} from 'services/auth.service';
 class MockWindowRef {
   nativeWindow = {
     location: {
@@ -100,6 +102,10 @@ class MockWindowRef {
     },
     scrollTo: (x, y) => {},
   };
+}
+
+class MockAuthService {
+  onUserSignIn = new EventEmitter<void>();
 }
 
 describe('New Conversation skin component', () => {
@@ -149,6 +155,7 @@ describe('New Conversation skin component', () => {
   let translateService: TranslateService;
   let learnerDashboardBackendApiService: LearnerDashboardBackendApiService;
   let conceptCardManagerService: ConceptCardManagerService;
+  let preventPageUnloadEventService: PreventPageUnloadEventService;
 
   let displayedCard = new StateCard(
     null,
@@ -446,6 +453,11 @@ describe('New Conversation skin component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
+        {
+          provide: AuthService,
+          useClass: MockAuthService,
+        },
+        PreventPageUnloadEventService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -520,6 +532,9 @@ describe('New Conversation skin component', () => {
     translateService = TestBed.inject(TranslateService);
     learnerDashboardBackendApiService = TestBed.inject(
       LearnerDashboardBackendApiService
+    );
+    preventPageUnloadEventService = TestBed.inject(
+      PreventPageUnloadEventService
     );
   }));
 
@@ -2446,4 +2461,10 @@ describe('New Conversation skin component', () => {
     tick(2000);
     flush();
   }));
+
+  it('should remove before unload listener on ngOnDestroy', () => {
+    spyOn(preventPageUnloadEventService, 'removeListener');
+    componentInstance.ngOnDestroy();
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
 });

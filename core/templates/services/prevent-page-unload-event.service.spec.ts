@@ -55,25 +55,25 @@ describe('Prevent page unload event service', function () {
   } as Window;
 
   it('should adding listener', () => {
-    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
 
     preventPageUnloadEventService.addListener();
 
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
   it('should removing listener', () => {
     spyOn(preventPageUnloadEventService, 'removeListener').and.callThrough();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
     preventPageUnloadEventService.removeListener();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
     preventPageUnloadEventService.addListener();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
 
     preventPageUnloadEventService.removeListener();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeFalse();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(false);
   });
 
   it('should test if Alert is displayed', () => {
@@ -84,7 +84,7 @@ describe('Prevent page unload event service', function () {
     windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
   it('should prevent multiple listeners', () => {
@@ -93,7 +93,7 @@ describe('Prevent page unload event service', function () {
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(0);
     preventPageUnloadEventService.addListener();
     expect(windowRef.nativeWindow.addEventListener).toHaveBeenCalledTimes(1);
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
 
     preventPageUnloadEventService.addListener();
 
@@ -117,7 +117,7 @@ describe('Prevent page unload event service', function () {
     windowRef.nativeWindow.location.reload();
 
     expect(reloadEvt.preventDefault).toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 
   it('should test if Alert is not displayed when a condition is passed', () => {
@@ -136,6 +136,6 @@ describe('Prevent page unload event service', function () {
     windowRef.nativeWindow.location.reload(validationCallback());
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
-    expect(preventPageUnloadEventService.isListenerActive()).toBeTrue();
+    expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
   });
 });

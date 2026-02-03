@@ -22,6 +22,8 @@ import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import './save-progress-modal.component.css';
 
 @Component({
@@ -38,7 +40,9 @@ export class SaveProgressModalComponent {
     private userService: UserService,
     private windowRef: WindowRef,
     private localStorageService: LocalStorageService,
-    private ngbActiveModal: NgbActiveModal
+    private ngbActiveModal: NgbActiveModal,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {}
 
   isLanguageRTL(): boolean {
@@ -55,6 +59,10 @@ export class SaveProgressModalComponent {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
+      this.preventPageUnloadEventService.removeListener();
+      // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
+      // rather than manually being triggered by buttons.
+      this.siteAnalyticsService.registerStartLoginEvent('saveProgressModal');
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });

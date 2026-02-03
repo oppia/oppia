@@ -16,7 +16,7 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import {Injectable, Optional} from '@angular/core';
+import {EventEmitter, Injectable, Optional} from '@angular/core';
 import {FirebaseOptions} from '@angular/fire';
 import {AngularFireAuth} from '@angular/fire/auth';
 import firebase from 'firebase/app';
@@ -96,6 +96,7 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
+  onUserSignIn: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,

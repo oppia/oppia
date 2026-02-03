@@ -31,6 +31,8 @@ import {
   HttpClientTestingModule,
   HttpTestingController,
 } from '@angular/common/http/testing';
+import {EventEmitter} from '@angular/core';
+import {AuthService} from 'services/auth.service';
 
 describe('Login required message component', () => {
   let component: LoginRequiredMessageComponent;
@@ -43,6 +45,14 @@ describe('Login required message component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredMessageComponent],
+      providers: [
+        {
+          provide: AuthService,
+          useValue: {
+            onUserSignIn: new EventEmitter<void>(),
+          },
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginRequiredMessageComponent);

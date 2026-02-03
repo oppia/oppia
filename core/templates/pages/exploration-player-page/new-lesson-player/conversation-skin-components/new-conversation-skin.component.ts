@@ -312,7 +312,7 @@ export class NewConversationSkinComponent {
 
       let pid =
         this.localStorageService.getUniqueProgressIdOfLoggedOutLearner();
-      if (pid && this.isLoggedIn) {
+      if (pid && this.isLoggedIn && this.explorationId) {
         await this.editableExplorationBackendApiService.changeLoggedOutProgressToLoggedInProgressAsync(
           this.explorationId,
           pid

@@ -27,6 +27,13 @@ import {
 } from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AppRoutingModule} from './routing/app.routing.module';
+import {AngularFireModule} from '@angular/fire';
+import {
+  AngularFireAuth,
+  AngularFireAuthModule,
+  USE_EMULATOR,
+} from '@angular/fire/auth';
+import {AuthService} from 'services/auth.service';
 
 // Components.
 import {LightweightOppiaRootComponent} from './lightweight-oppia-root.component';
@@ -84,6 +91,8 @@ export class HammerConfig extends HammerGestureConfig {
     HttpClientModule,
     AppRoutingModule,
     ToastrModule.forRoot(toastrConfig),
+    AngularFireModule.initializeApp(AuthService.firebaseConfig),
+    AngularFireAuthModule,
   ],
   declarations: [LightweightOppiaRootComponent],
   entryComponents: [LightweightOppiaRootComponent],
@@ -103,6 +112,11 @@ export class HammerConfig extends HammerGestureConfig {
     {
       provide: HAMMER_GESTURE_CONFIG,
       useClass: HammerConfig,
+    },
+    AngularFireAuth,
+    {
+      provide: USE_EMULATOR,
+      useValue: AuthService.firebaseEmulatorConfig,
     },
   ],
   bootstrap: [LightweightOppiaRootComponent],

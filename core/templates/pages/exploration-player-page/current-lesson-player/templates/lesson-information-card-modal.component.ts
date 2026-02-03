@@ -38,6 +38,8 @@ import {PlayerTranscriptService} from '../../services/player-transcript.service'
 import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
+import {SiteAnalyticsService} from 'services/site-analytics.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -105,7 +107,9 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private localStorageService: LocalStorageService,
     private progressUrlService: ProgressUrlService,
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
-    private playerPositionService: PlayerPositionService
+    private playerPositionService: PlayerPositionService,
+    private siteAnalyticsService: SiteAnalyticsService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {
     super(ngbActiveModal);
   }
@@ -277,6 +281,12 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
+      this.preventPageUnloadEventService.removeListener();
+      // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
+      // rather than manually being triggered by buttons.
+      this.siteAnalyticsService.registerStartLoginEvent(
+        'lessonInformationCardModal'
+      );
       this.localStorageService.updateUniqueProgressIdOfLoggedOutLearner(urlId);
       this.windowRef.nativeWindow.location.href = loginUrl;
     });
