@@ -160,7 +160,9 @@ export class BeamJobsTabComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.jobNames.complete();
     this.beamJobRuns.complete();
-    this.beamJobRunsRefreshIntervalSubscription.unsubscribe();
+    if (this.beamJobRunsRefreshIntervalSubscription) {
+      this.beamJobRunsRefreshIntervalSubscription.unsubscribe();
+    }
   }
 
   onError<T>(error: Error): Observable<T[]> {
