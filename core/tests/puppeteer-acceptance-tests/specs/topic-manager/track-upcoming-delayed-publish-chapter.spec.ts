@@ -39,7 +39,6 @@ const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
-const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const cancelUnpublishModalButton = '.e2e-test-cancel-unpublish-modal-button';
 const chapterConfirmAndUnpublishButton =
   '.e2e-test-confirm-unpublish-modal-button';
@@ -49,6 +48,8 @@ const mobileSaveStoryChangesDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+const publishUptoChaptersDropdownSelector =
+  'select.e2e-test-publish-up-to-chapter-dropdown';
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
@@ -252,20 +253,11 @@ describe('Logged-In Learner', function () {
         ['What are the Place Values'],
         'Published'
       );
-      await curriculumAdmin.publishStoryDraftChapterUpto('-1');
+      await curriculumAdmin.clickOnElementWithSelector(
+        publishUptoChaptersDropdownSelector
+      );
+      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '-1');
       if (curriculumAdmin.isViewportAtMobileWidth()) {
-        await curriculumAdmin.clickOnElementWithSelector(
-          '.e2e-test-mobile-options-base'
-        );
-        await curriculumAdmin.page.waitForSelector(
-          mobileSaveStoryChangesDropdown,
-          {
-            visible: true,
-          }
-        );
-        await curriculumAdmin.clickOnElementWithSelector(
-          mobileSaveStoryChangesDropdown
-        );
         await curriculumAdmin.page.waitForSelector(mobilePublishStoryButton);
         await curriculumAdmin.clickOnElementWithSelector(
           mobilePublishStoryButton
@@ -276,18 +268,17 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.clickOnElementWithSelector(
         chapterConfirmAndUnpublishButton
       );
-      await curriculumAdmin.expectAllListedChaptersStatus(
-        ['What are the Place Values', 'Find the Value of a Number'],
-        'Draft'
-      );
 
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
+      await curriculumAdmin.expectAllListedChaptersStatus(
+        ['What are the Place Values', 'Find the Value of a Number'],
+        'Draft'
+      );
 
       await curriculumAdmin.waitForPageToFullyLoad();
-
       await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
       chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
 
