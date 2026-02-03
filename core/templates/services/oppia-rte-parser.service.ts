@@ -18,14 +18,14 @@
 
 import {TemplatePortal} from '@angular/cdk/portal';
 import {Injectable} from '@angular/core';
-import {NoninteractiveCollapsible} from 'extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
-import {NoninteractiveImage} from 'extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
-import {NoninteractiveLink} from 'extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
-import {NoninteractiveMath} from 'extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
-import {NoninteractiveSkillreview} from 'extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
-import {NoninteractiveTabs} from 'extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
-import {NoninteractiveVideo} from 'extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
-import {NoninteractiveWorkedexample} from 'extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
+import {NoninteractiveCollapsible} from '../../../extensions/rich_text_components/Collapsible/directives/oppia-noninteractive-collapsible.component';
+import {NoninteractiveImage} from '../../../extensions/rich_text_components/Image/directives/oppia-noninteractive-image.component';
+import {NoninteractiveLink} from '../../../extensions/rich_text_components/Link/directives/oppia-noninteractive-link.component';
+import {NoninteractiveMath} from '../../../extensions/rich_text_components/Math/directives/oppia-noninteractive-math.component';
+import {NoninteractiveSkillreview} from '../../../extensions/rich_text_components/Skillreview/directives/oppia-noninteractive-skillreview.component';
+import {NoninteractiveTabs} from '../../../extensions/rich_text_components/Tabs/directives/oppia-noninteractive-tabs.component';
+import {NoninteractiveVideo} from '../../../extensions/rich_text_components/Video/directives/oppia-noninteractive-video.component';
+import {NoninteractiveWorkedexample} from '../../../extensions/rich_text_components/Workedexample/directives/oppia-noninteractive-workedexample.component';
 
 const selectorToComponentClassMap = {
   'oppia-noninteractive-collapsible': NoninteractiveCollapsible,
