@@ -74,32 +74,24 @@ export class SplashPageComponent implements OnInit {
     );
   }
 
-  private _nagivateToClassroomPage(): void {
-    this.windowRef.nativeWindow.location.href = '/learn';
-  }
-
   onClickStartLearningButton(): void {
     this.siteAnalyticsService.registerClickHomePageStartLearningButtonEvent();
-    this._nagivateToClassroomPage();
   }
 
   onClickBrowseLessonsButton(): void {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
-    this._nagivateToClassroomPage();
   }
 
   onClickAccessAndroidButton(): void {
-    this.windowRef.nativeWindow.location.href = '/android';
+    // No analytics event is currently registered for this button.
   }
 
   onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/volunteer';
   }
 
   onClickStartTeachingButton(): void {
     this.siteAnalyticsService.registerClickStartTeachingButtonEvent();
-    this.windowRef.nativeWindow.location.href = '/creator-guidelines';
   }
 
   // TODO(#11657): Extract the testimonials code into a separate component.
