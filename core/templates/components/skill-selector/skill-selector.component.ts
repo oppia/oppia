@@ -51,9 +51,19 @@ export class SkillSelectorComponent implements OnInit {
   @Output() selectedSkillIdChange: EventEmitter<string> = new EventEmitter();
   currCategorizedSkills!: CategorizedSkills;
   selectedSkill!: string;
-  skillFilterText: string = '';
+  _skillFilterText: string = '';
+  get skillFilterText(): string {
+    return this._skillFilterText;
+  }
+  set skillFilterText(val: string) {
+    this._skillFilterText = val;
+    this.refreshFilterLists();
+  }
+
   topicFilterList: {topicName: string; checked: boolean}[] = [];
   subTopicFilterDict: SubTopicFilterDict = {};
+  augmentedTopicFilterList: {topicName: string; checked: boolean}[] = [];
+  augmentedSubTopicFilterDict: SubTopicFilterDict = {};
   initialSubTopicFilterDict: SubTopicFilterDict = {};
   userCanEditSkills: boolean = false;
 
@@ -64,20 +74,25 @@ export class SkillSelectorComponent implements OnInit {
 
   ngOnInit(): void {
     this.currCategorizedSkills = this.categorizedSkills;
-    for (let topicName in this.currCategorizedSkills) {
-      let topicNameDict = {
-        topicName: topicName,
-        checked: false,
-      };
-      this.topicFilterList.push(topicNameDict);
-      let subTopics = this.currCategorizedSkills[topicName];
-      this.subTopicFilterDict[topicName] = [];
-      for (let subTopic in subTopics) {
-        let subTopicNameDict = {
-          subTopicName: subTopic,
+    if (this.currCategorizedSkills) {
+      for (let topicName in this.currCategorizedSkills) {
+        let topicNameDict = {
+          topicName: topicName,
           checked: false,
         };
-        this.subTopicFilterDict[topicName].push(subTopicNameDict);
+        this.topicFilterList.push(topicNameDict);
+        this.augmentedTopicFilterList.push(topicNameDict);
+        let subTopics = this.currCategorizedSkills[topicName];
+        this.subTopicFilterDict[topicName] = [];
+        this.augmentedSubTopicFilterDict[topicName] = [];
+        for (let subTopic in subTopics) {
+          let subTopicNameDict = {
+            subTopicName: subTopic,
+            checked: false,
+          };
+          this.subTopicFilterDict[topicName].push(subTopicNameDict);
+          this.augmentedSubTopicFilterDict[topicName].push(subTopicNameDict);
+        }
       }
     }
     this.initialSubTopicFilterDict = cloneDeep(this.subTopicFilterDict);
@@ -212,6 +227,108 @@ export class SkillSelectorComponent implements OnInit {
     return this.untriagedSkillSummaries.filter(val => {
       return filteredSkills.includes(val.description);
     });
+  }
+
+  /**
+   * Checks if a topic contains any skills that match the current search text.
+   * This method is used to conditionally show/hide topics in the filter dropdown
+   * based on whether they contain matching skills.
+   *
+   * @param topicName - The name of the topic to check
+   * @returns true if the topic has at least one matching skill, or if there's no search text
+   */
+  refreshFilterLists(): void {
+    // If no search text, show all topics.
+    if (!this.skillFilterText) {
+      this.augmentedTopicFilterList = this.topicFilterList;
+      this.augmentedSubTopicFilterDict = this.subTopicFilterDict;
+      return;
+    }
+
+    this.augmentedTopicFilterList = [];
+    this.augmentedSubTopicFilterDict = {};
+
+    for (const topic of this.topicFilterList) {
+      const topicName = topic.topicName;
+      // Filter subtopics for this topic.
+      // We do not call checkTopicHasMatchingSkills here because that method
+      // checks all subtopics for matches, and then we would perform the same check
+      // again below to filter the subtopics. Instead, we filter subtopics first
+      // and if any match, we know the topic has matches.
+      const matchingSubtopics = this.subTopicFilterDict[topicName]
+        ? this.subTopicFilterDict[topicName].filter(subtopic =>
+            this.checkSubtopicHasMatchingSkills(
+              topicName,
+              subtopic.subTopicName
+            )
+          )
+        : [];
+
+      if (matchingSubtopics.length > 0) {
+        this.augmentedTopicFilterList.push(topic);
+        this.augmentedSubTopicFilterDict[topicName] = matchingSubtopics;
+      } else if (
+        !this.subTopicFilterDict[topicName] &&
+        this.checkTopicHasMatchingSkills(topicName)
+      ) {
+        this.augmentedTopicFilterList.push(topic);
+      }
+    }
+  }
+
+  /**
+   * Checks if a topic contains any skills that match the current search text.
+   *
+   * @param topicName - The name of the topic to check
+   * @returns true if the topic has at least one matching skill, or if there's no search text
+   */
+  checkTopicHasMatchingSkills(topicName: string): boolean {
+    // If no search text, show all topics.
+    if (!this.skillFilterText) {
+      return true;
+    }
+
+    if (!this.categorizedSkills) {
+      return false;
+    }
+
+    const topicSkills = this.categorizedSkills[topicName];
+
+    // Check all subtopics within this topic.
+    for (const subTopicName in topicSkills) {
+      if (this.checkSubtopicHasMatchingSkills(topicName, subTopicName)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Checks if a subtopic contains any skills that match the current search text.
+   * This method is used to conditionally show/hide subtopics in the filter dropdown
+   * based on whether they contain matching skills.
+   *
+   * @param topicName - The name of the topic containing the subtopic
+   * @param subTopicName - The name of the subtopic to check
+   * @returns true if the subtopic has at least one matching skill, or if there's no search text
+   */
+  checkSubtopicHasMatchingSkills(
+    topicName: string,
+    subTopicName: string
+  ): boolean {
+    // If no search text, show all subtopics.
+    if (!this.skillFilterText) {
+      return true;
+    }
+
+    if (!this.categorizedSkills) {
+      return false;
+    }
+
+    const skills = this.categorizedSkills[topicName][subTopicName];
+    // Reuse the existing search logic for consistency.
+    return this.searchInSubtopicSkills(skills, this.skillFilterText).length > 0;
   }
 
   clearAllFilters(): void {
