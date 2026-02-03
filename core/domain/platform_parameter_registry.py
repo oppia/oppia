@@ -505,16 +505,7 @@ Registry.create_platform_parameter(
 # correspond to owners of the app before setting this to True. If
 # SYSTEM_EMAIL_ADDRESS is not that of an app owner, email messages from this
 # address cannot be sent. If True then emails can be sent to any user.
-Registry.create_platform_parameter(
-    ParamName.SERVER_CAN_SEND_EMAILS,
-    (
-        'Whether the application can send emails.'
-        'Change this value to True for production environments using the '
-        'platform parameter dashboard.'
-    ),
-    platform_parameter_domain.DataTypes.BOOL,
-    default=False,
-)
+
 
 Registry.create_platform_parameter(
     ParamName.SYSTEM_EMAIL_ADDRESS,
