@@ -161,3 +161,106 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     }
                 )
             )
+
+    def test_locally_pseudonymize_models_have_wipeout_handling(self) -> None:
+        """Ensure all models with LOCALLY_PSEUDONYMIZE policy are explicitly
+        handled in the wipeout service.
+
+        When adding a new model with LOCALLY_PSEUDONYMIZE deletion policy, you
+        must also add corresponding wipeout logic in core/domain/wipeout_service
+        to handle user deletion for that model. After doing so, add the model
+        class name to the MODELS_WITH_WIPEOUT_HANDLING set below.
+
+        This test prevents issues where a model with LOCALLY_PSEUDONYMIZE policy
+        is added but the wipeout service is not updated, which would cause user
+        deletion to fail verification.
+        """
+        # This set contains all model class names that have LOCALLY_PSEUDONYMIZE
+        # deletion policy and have been verified to have corresponding wipeout
+        # handling in core/domain/wipeout_service.py.
+        #
+        # Base classes that are inherited from but not directly instantiated
+        # are included here as they don't need direct wipeout handling.
+        #
+        # When adding a new model with LOCALLY_PSEUDONYMIZE policy, follow
+        # these steps:
+        # 1. Add wipeout handling in wipeout_service.py.
+        # 2. Add tests for the wipeout handling.
+        # 3. Add the model class name to this set.
+        models_with_wipeout_handling = {
+            # Base classes (inherited from, not directly instantiated).
+            'BaseCommitLogEntryModel',
+            'BaseSnapshotMetadataModel',
+            # Improvements models.
+            'ExplorationStatsTaskEntryModel',
+            # Suggestion models.
+            'GeneralSuggestionModel',
+            'TranslationCoordinatorsModel',
+            # Exploration models.
+            'ExplorationSnapshotMetadataModel',
+            'ExplorationRightsSnapshotMetadataModel',
+            'ExplorationRightsSnapshotContentModel',
+            'ExplorationVersionHistoryModel',
+            # Collection models.
+            'CollectionSnapshotMetadataModel',
+            'CollectionRightsSnapshotMetadataModel',
+            'CollectionRightsSnapshotContentModel',
+            # Feedback models.
+            'GeneralFeedbackThreadModel',
+            'GeneralFeedbackMessageModel',
+            # Blog models.
+            'BlogPostModel',
+            'BlogPostSummaryModel',
+            'BlogAuthorDetailsModel',
+            # Topic models.
+            'TopicSnapshotMetadataModel',
+            'TopicCommitLogEntryModel',
+            'TopicRightsSnapshotMetadataModel',
+            'TopicRightsSnapshotContentModel',
+            'TopicRightsModel',
+            # Story models.
+            'StorySnapshotMetadataModel',
+            'StoryCommitLogEntryModel',
+            # Skill models.
+            'SkillSnapshotMetadataModel',
+            'SkillCommitLogEntryModel',
+            # Question models.
+            'QuestionSnapshotMetadataModel',
+            'QuestionCommitLogEntryModel',
+            # Subtopic models.
+            'SubtopicPageSnapshotMetadataModel',
+            'SubtopicPageCommitLogEntryModel',
+            'StudyGuideSnapshotMetadataModel',
+            'StudyGuideCommitLogEntryModel',
+            # Config models.
+            'PlatformParameterSnapshotMetadataModel',
+            # User models.
+            'UserGroupModel',
+            # App feedback report models.
+            'AppFeedbackReportModel',
+        }
+
+        locally_pseudonymize_models = [
+            clazz.__name__
+            for clazz in test_utils.get_storage_model_classes()
+            if (
+                clazz.__name__
+                not in test_utils.BASE_MODEL_CLASSES_WITHOUT_DATA_POLICIES
+                and clazz.get_deletion_policy()
+                == base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+            )
+        ]
+
+        models_missing_wipeout_handling = set(locally_pseudonymize_models) - (
+            models_with_wipeout_handling
+        )
+
+        self.assertEqual(
+            models_missing_wipeout_handling,
+            set(),
+            'The following models have LOCALLY_PSEUDONYMIZE deletion policy '
+            'but are not listed as having wipeout handling. Please add wipeout '
+            'logic in core/domain/wipeout_service.py and then add the model '
+            'name to the models_with_wipeout_handling set in this test: %s'
+            % sorted(models_missing_wipeout_handling),
+        )
