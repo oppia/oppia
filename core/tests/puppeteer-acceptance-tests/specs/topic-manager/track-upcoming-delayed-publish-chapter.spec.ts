@@ -220,7 +220,11 @@ describe('Logged-In Learner', function () {
         'Place Values'
       );
       await curriculumAdmin.publishStoryDraftChapterUpto('-1');
+
       if (curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.clickOnElementWithSelector(
+          '.e2e-test-mobile-options-base'
+        );
         await curriculumAdmin.page.waitForSelector(
           mobileSaveStoryChangesDropdown,
           {
@@ -250,6 +254,9 @@ describe('Logged-In Learner', function () {
       );
       await curriculumAdmin.publishStoryDraftChapterUpto('-1');
       if (curriculumAdmin.isViewportAtMobileWidth()) {
+        await curriculumAdmin.clickOnElementWithSelector(
+          '.e2e-test-mobile-options-base'
+        );
         await curriculumAdmin.page.waitForSelector(
           mobileSaveStoryChangesDropdown,
           {

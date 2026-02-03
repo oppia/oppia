@@ -366,9 +366,10 @@ const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
-const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const publishUptoChaptersDropdownSelector =
   'select.e2e-test-publish-up-to-chapter-dropdown';
+const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
+const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -4368,6 +4369,25 @@ export class TopicManager extends BaseUser {
     }
   }
 
+  /**
+   * Function to click on the ready to publish button.
+   */
+  async clickReadyToPublishButton(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+
+      await this.expectElementToBeVisible(mobileReadyToPublishButton);
+      await this.clickOnElementWithSelector(mobileReadyToPublishButton);
+    } else {
+      await this.page.waitForSelector(markAsReadyToPublishButton);
+      await this.clickOnElementWithSelector(markAsReadyToPublishButton);
+
+      await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
+    }
+  }
   async makeChapterReadtToPublish(
     chapterName: string,
     storyName: string,
@@ -4426,11 +4446,7 @@ export class TopicManager extends BaseUser {
     await this.addAcquiredSkill('Place Values skills');
 
     await this.saveStoryDraft();
-    await this.page.waitForSelector(markAsReadyToPublishButton);
-    await this.clickOnElementWithSelector(markAsReadyToPublishButton);
-
-    await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
-
+    await this.clickReadyToPublishButton();
     showMessage(`Chapter ${chapterName} marked as ready to publish.`);
   }
 

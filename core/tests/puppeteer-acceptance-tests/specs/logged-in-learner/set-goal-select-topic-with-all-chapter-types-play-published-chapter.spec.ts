@@ -137,13 +137,8 @@ describe('Logged-In Learner', function () {
       "Jamie's Adventures in the Arcade",
       'Place Values'
     );
-    await curriculumAdmin.waitForPageToFullyLoad();
-    await curriculumAdmin.clickOnElementWithSelector(
-      publishUptoChaptersDropdownSelector
-    );
-    await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '0');
-    await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
-
+    await curriculumAdmin.publishStoryDraftChapterUpto('0');
+    await curriculumAdmin.publishStoryDraftSerialChapter();
     loggedInLearner1 = await UserFactory.createNewUser(
       'loggedInLearner1',
       'logged_in_learner1@example.com'
@@ -301,13 +296,8 @@ describe('Logged-In Learner', function () {
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.waitForPageToFullyLoad();
-      await curriculumAdmin.clickOnElementWithSelector(
-        publishUptoChaptersDropdownSelector
-      );
-      await curriculumAdmin.select(publishUptoChaptersDropdownSelector, '2');
-      await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
-
+      await curriculumAdmin.publishStoryDraftChapterUpto('2');
+      await curriculumAdmin.publishStoryDraftSerialChapter();
       await UserFactory.closeBrowserForUser(curriculumAdmin);
 
       //See new chapter on classroom page

@@ -328,8 +328,6 @@ const submitAnswerButton = 'button.e2e-test-submit-answer-button';
 const submitSolutionButton = 'button.e2e-test-submit-solution-button';
 const interactionNameDiv = 'div.oppia-interaction-tile-name';
 const saveQuestionButton = 'button.e2e-test-save-question-button';
-const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
-const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const publishChapterButton = '.e2e-test-publish-chapters-button';
 export class CurriculumAdmin extends TopicManager {
   /**
@@ -1931,6 +1929,7 @@ export class CurriculumAdmin extends TopicManager {
 
   async publishStoryDraftSerialChapter(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector('.e2e-test-mobile-options-base');
       await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
         visible: true,
       });
@@ -1939,26 +1938,6 @@ export class CurriculumAdmin extends TopicManager {
       await this.clickOnElementWithSelector(mobilePublishStoryButton);
     } else {
       await this.clickOnElementWithSelector(publishChapterButton);
-    }
-  }
-
-  /**
-   * Function to click on the ready to publish button.
-   */
-  async clickReadyToPublishButton(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
-
-      await this.expectElementToBeVisible(mobileReadyToPublishButton);
-      await this.clickOnElementWithSelector(mobileReadyToPublishButton);
-    } else {
-      await this.page.waitForSelector(markAsReadyToPublishButton);
-      await this.clickOnElementWithSelector(markAsReadyToPublishButton);
-
-      await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
     }
   }
 
