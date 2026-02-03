@@ -64,7 +64,7 @@ class FirebaseAdminSdkStub:
     NOT INTENDED TO BE USED DIRECTLY. Just install it and then interact with the
     Firebase Admin SDK as if it were real.
 
-    FRAGILE! This class returns users as firebase_admin.auth.UserRecord objects
+    FRAGILE! This class returns users as firebase_auth.UserRecord objects
     for API parity, but the Firebase Admin SDK doesn't expose a constructor for
     it as part of the public API. To compensate, we depend on implementation
     details (isolated to the _set_user_fragile method) that may stop working in
@@ -86,7 +86,7 @@ class FirebaseAdminSdkStub:
                 super(Test, self).tearDown()
 
             def test_sdk(self):
-                user_record = firebase_admin.get_user('uid')
+                user_record = firebase_get_user('uid')
                 self.assertEqual(user_record.uid, 'uid')
     """
 
@@ -322,16 +322,16 @@ class FirebaseAdminSdkStub:
         return user
 
     def import_users(
-        self, records: List[firebase_admin.auth.ImportUserRecord]
-    ) -> firebase_admin.auth.UserImportResult:
+        self, records: List[firebase_auth.ImportUserRecord]
+    ) -> firebase_auth.UserImportResult:
         """Adds the given user records to the stub's storage.
 
         Args:
-            records: list(firebase_admin.auth.ImportUserRecord). The users to
+            records: list(firebase_auth.ImportUserRecord). The users to
                 add.
 
         Returns:
-            firebase_admin.auth.UserImportResult. Object with details about the
+            firebase_auth.UserImportResult. Object with details about the
             operation.
         """
         for record in records:
@@ -339,13 +339,13 @@ class FirebaseAdminSdkStub:
                 record.uid,
                 record.email,
                 record.disabled,
-                json.dumps(record.custom_claims),
+                record.custom_claims and json.dumps(record.custom_claims),
             )
         return self._create_user_import_result_fragile(len(records), [])
 
     def list_users(
         self, page_token: Optional[str] = None, max_results: int = 1000
-    ) -> firebase_admin.auth.ListUsersPage:
+    ) -> firebase_auth.ListUsersPage:
         """Retrieves a page of user accounts from a Firebase project.
 
         The `page_token` argument governs the starting point of the page. The
@@ -694,29 +694,29 @@ class FirebaseAdminSdkStub:
 
     def mock_import_users_error(
         self,
-        batch_error_pattern: Tuple[Optional[Exception]] = (None,),
-        individual_error_pattern: Tuple[Optional[str]] = (None,),
+        batch_error_pattern: Tuple[Optional[Exception], ...] = (None,),
+        individual_error_pattern: Tuple[Optional[str], ...] = (None,),
     ) -> ContextManager[None]:
         """Returns a context in which `import_users` fails according to the
         given patterns.
 
         Example:
-            with mock_import_users_error(batch_error_pattern=(False, True)):
+            with mock_import_users_error(batch_error_pattern=(None, Excpetion)):
                 import_users(...) # OK
-                import_users(...) # Raises!
+                import_users(...) # Raises Exception.
                 import_users(...) # OK
-                import_users(...) # Raises!
+                import_users(...) # Raises Exception.
                 import_users(...) # OK
 
         Args:
             batch_error_pattern: tuple(Exception|None). Enumerates which
                 successive calls will raise an exception. For values of None, no
-                exception is raised. The pattern is cycled. By default, an error
-                will never be raised.
+                exception is raised. The pattern is cycled, and by default an
+                error will never be raised.
             individual_error_pattern: tuple(str|None). Enumerates which
                 individual users will cause an error. Each value is either the
-                error reason (a string), or None. The pattern is cycled. By
-                default, an error will never be raised.
+                error reason (a string), or None. The pattern is cycled, and by
+                default an error will never be raised.
 
         Returns:
             Context manager. The context manager with the mocked implementation.
@@ -727,7 +727,7 @@ class FirebaseAdminSdkStub:
         )
 
         def mock_import_users(
-            records: List[firebase_admin.auth.ImportUserRecord],
+            records: List[firebase_auth.ImportUserRecord],
         ) -> firebase_auth.UserImportResult:
             """Mock function that fails according to the input patterns."""
             error_to_raise = next(updated_batch_error_pattern)
@@ -749,12 +749,14 @@ class FirebaseAdminSdkStub:
                 ),
             )
 
-            self.import_users([record for _, (record, _) in records_to_import])
-
+            updated_records_to_import = [
+                record for _, (record, _) in records_to_import
+            ]
             errors = [(i, error) for i, (_, error) in records_to_fail]
-            return self._create_user_import_result_fragile(
-                len(records), errors=errors
-            )
+
+            self.import_users(updated_records_to_import)
+
+            return self._create_user_import_result_fragile(len(records), errors)
 
         assert self._test is not None
         return self._test.swap(firebase_auth, 'import_users', mock_import_users)
@@ -908,7 +910,7 @@ class FirebaseAdminSdkStub:
             errors: list(tuple(int, str)). A list of (index, error) pairs.
 
         Returns:
-            firebase_admin.auth.UserImportResult. The response.
+            firebase_auth.UserImportResult. The response.
         """
         return firebase_auth.UserImportResult(
             {
@@ -2134,3 +2136,166 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
             ),
         ):
             firebase_auth_services.delete_multi_external_accounts(accounts)
+
+    def test_import_multiple_accounts_successfully(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id=f'uid_{i}', email=f'user{i}@example.com', disabled=False
+            )
+            for i in range(5)
+        ]
+
+        firebase_auth_services.import_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_user_multi(
+            [f'uid_{i}' for i in range(5)]
+        )
+
+    def test_import_accounts_with_all_fields(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id='uid_0', email='user0@example.com', disabled=False
+            ),
+            auth_domain.ExternalAccount(
+                auth_id='uid_1', email='user1@example.com', disabled=True
+            ),
+            auth_domain.ExternalAccount(
+                auth_id='uid_2', email=None, disabled=False
+            ),
+        ]
+
+        firebase_auth_services.import_external_accounts(accounts)
+
+        self.firebase_sdk_stub.assert_is_user_multi(['uid_0', 'uid_1', 'uid_2'])
+        self.firebase_sdk_stub.assert_is_not_disabled('uid_0')
+        self.firebase_sdk_stub.assert_is_disabled('uid_1')
+        self.firebase_sdk_stub.assert_is_not_disabled('uid_2')
+
+    def test_import_empty_list_succeeds(self) -> None:
+        firebase_auth_services.import_external_accounts([])
+
+    def test_import_accounts_with_batching(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(
+                auth_id=f'uid_{i}', email=f'user{i}@example.com', disabled=False
+            )
+            for i in range(2505)
+        ]
+
+        firebase_auth_services.import_external_accounts(accounts)
+
+        uids = [f'uid_{i}' for i in range(2505)]
+        self.firebase_sdk_stub.assert_is_user_multi(uids)
+
+    def test_import_accounts_raises_error_when_some_fail(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=(None, 'Failed to import')
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError, 'Error importing 1/3 accounts'
+            ),
+        ):
+            firebase_auth_services.import_external_accounts(accounts)
+
+    def test_import_accounts_with_none_auth_id_raises_value_error(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=None),
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+        ]
+
+        # The SDK raises ValueError for empty/None uid values.
+        with self.assertRaisesRegex(ValueError, 'uid'):
+            firebase_auth_services.import_external_accounts(accounts)
+
+    def test_import_accounts_with_empty_auth_id_raises_value_error(
+        self,
+    ) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=''),
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+        ]
+
+        # The SDK raises ValueError for empty/None uid values.
+        with self.assertRaisesRegex(ValueError, 'uid'):
+            firebase_auth_services.import_external_accounts(accounts)
+
+    def test_import_accounts_reports_correct_error_indices(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id='uid_0'),
+            auth_domain.ExternalAccount(auth_id='uid_1'),
+            auth_domain.ExternalAccount(auth_id='uid_2'),
+            auth_domain.ExternalAccount(auth_id='uid_3'),
+            auth_domain.ExternalAccount(auth_id='uid_4'),
+        ]
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=(None, 'error1', None, 'error2', None)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 2/5 accounts:\n'
+                r'\tAt index=1: error1\n'
+                r'\tAt index=3: error2',
+            ),
+        ):
+            firebase_auth_services.import_external_accounts(accounts)
+
+    def test_import_accounts_with_multiple_batches_reports_correct_indices(
+        self,
+    ) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(2505)
+        ]
+
+        # Pattern that will fail at specific indices across batches:
+        # - Batch 0: fail at index 500
+        # - Batch 1: fail at index 1500 (offset 1000 + local index 500)
+        # - Batch 2: fail at index 2000 (offset 2000 + local index 0)
+        error_pattern: List[str | None] = [None] * 2505
+        error_pattern[500] = 'error at 500'
+        error_pattern[1500] = 'error at 1500'
+        error_pattern[2000] = 'error at 2000'
+
+        with (
+            self.firebase_sdk_stub.mock_import_users_error(
+                individual_error_pattern=tuple(error_pattern)
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 3/2505 accounts:\n'
+                r'\tAt index=500: error at 500\n'
+                r'\tAt index=1500: error at 1500\n'
+                r'\tAt index=2000: error at 2000',
+            ),
+        ):
+            firebase_auth_services.import_external_accounts(accounts)
+
+    def test_import_accounts_with_sdk_error_during_batch(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount(auth_id=f'uid_{i}') for i in range(750)
+        ]
+
+        with (
+            self.swap(feconf, 'FIREBASE_BATCH_SIZE', 250),
+            self.firebase_sdk_stub.mock_import_users_error(
+                batch_error_pattern=(
+                    None,
+                    firebase_exceptions.UnknownError('uh-oh!'),
+                    None,
+                )
+            ),
+            self.assertRaisesRegex(
+                auth_domain.AuthProviderError,
+                r'Error importing 250/750 accounts:\n'
+                r'\tAt slice=250:500: uh-oh!',
+            ),
+        ):
+            firebase_auth_services.import_external_accounts(accounts)

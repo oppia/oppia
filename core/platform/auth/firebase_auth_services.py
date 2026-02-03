@@ -178,11 +178,21 @@ def get_auth_claims_from_request(
 
 
 def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
-    """Returns all accounts registered with Firebase."""
-    return [
-        auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
-        for user in firebase_auth.list_users().iterate_all()
-    ]
+    """Returns all accounts registered with Firebase.
+
+    Returns:
+        auth_domain.ExternalAccount. The list of all external accounts.
+
+    Raises:
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    try:
+        return [
+            auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
+            for user in firebase_auth.list_users().iterate_all()
+        ]
+    except firebase_exceptions.FirebaseError as e:
+        raise auth_domain.AuthProviderError('Failed to list accounts') from e
 
 
 def create_external_account(
@@ -230,7 +240,7 @@ def update_external_account(
     """
     uid, email, disabled = account
     try:
-        # NOTE: Convert None to '' to satisfy type checker (expects str).
+        # NOTE: Convert None to '' to satisfy the type checker (expects str).
         # SDK raises ValueError for both None and '', so behavior is unchanged.
         user = firebase_auth.update_user(
             uid or '', email=email, disabled=disabled
@@ -253,7 +263,7 @@ def delete_external_account(account: auth_domain.ExternalAccount) -> None:
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
     try:
-        # NOTE: Convert None to '' to satisfy type checker (expects str).
+        # NOTE: Convert None to '' to satisfy the type checker (expects str).
         # SDK raises ValueError for both None and '', so behavior is unchanged.
         firebase_auth.delete_user(account.auth_id or '')
     except firebase_exceptions.FirebaseError as e:
@@ -278,7 +288,7 @@ def delete_multi_external_accounts(
     error_count = 0
     batch_offset = 0
 
-    # NOTE: Convert None to '' to satisfy type checker (expects a str).
+    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
     # SDK raises ValueError for both None and '', so behavior is unchanged.
     auth_ids = (account.auth_id or '' for account in accounts)
 
@@ -294,8 +304,8 @@ def delete_multi_external_accounts(
         else:
             error_count += result.failure_count
             errors.extend(
-                'At index=%d: %s' % (batch_offset + e.index, e.reason)
-                for e in result.errors
+                'At index=%d: %s' % (batch_offset + error.index, error.reason)
+                for error in result.errors
             )
         finally:
             batch_offset += len(batch)
@@ -303,6 +313,62 @@ def delete_multi_external_accounts(
     if error_count:
         errors.insert(
             0, 'Error deleting %d/%d accounts:' % (error_count, batch_offset)
+        )
+        raise auth_domain.AuthProviderError('\n\t'.join(errors))
+
+
+def import_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Imports multiple external accounts WITHOUT making any safety checks.
+
+    WARNING: This operation DOES NOT protect against duplicate accounts!
+    The ONLY way to guarantee this function is used safely is by running it on
+    an empty server, where collisions are impossible.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+
+    Raises:
+        ValueError. If the specified user properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    errors = []
+    error_count = 0
+    batch_offset = 0
+
+    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
+    # SDK raises ValueError for both None and '', so behavior is unchanged.
+    records = (
+        firebase_auth.ImportUserRecord(
+            uid=account.auth_id or '',
+            email=account.email,
+            disabled=account.disabled,
+        )
+        for account in accounts
+    )
+
+    while batch := list(itertools.islice(records, feconf.FIREBASE_BATCH_SIZE)):
+        try:
+            result = firebase_auth.import_users(batch)
+        except firebase_exceptions.FirebaseError as e:
+            error_count += len(batch)
+            errors.append(
+                'At slice=%d:%d: %s'
+                % (batch_offset, batch_offset + len(batch), e)
+            )
+        else:
+            error_count += result.failure_count
+            errors.extend(
+                'At index=%d: %s' % (batch_offset + error.index, error.reason)
+                for error in result.errors
+            )
+        finally:
+            batch_offset += len(batch)
+
+    if error_count:
+        errors.insert(
+            0, 'Error importing %d/%d accounts:' % (error_count, batch_offset)
         )
         raise auth_domain.AuthProviderError('\n\t'.join(errors))
 

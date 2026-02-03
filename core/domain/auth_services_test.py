@@ -321,6 +321,19 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         mock_delete_multi.assert_called_once_with(accounts)
 
+    def test_import_external_accounts(self) -> None:
+        accounts = [
+            auth_domain.ExternalAccount('aid1', None, False),
+            auth_domain.ExternalAccount('aid2', None, False),
+        ]
+
+        with mock.patch.object(
+            platform_auth_services, 'import_external_accounts'
+        ) as mock_import:
+            auth_services.import_external_accounts(accounts)
+
+        mock_import.assert_called_once_with(accounts)
+
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,
     ) -> None:

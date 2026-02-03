@@ -346,6 +346,25 @@ def delete_multi_external_accounts(
     platform_auth_services.delete_multi_external_accounts(accounts)
 
 
+def import_external_accounts(
+    accounts: Iterable[auth_domain.ExternalAccount],
+) -> None:
+    """Imports multiple external accounts WITHOUT making any safety checks.
+
+    WARNING: This operation DOES NOT protect against duplicate accounts!
+    The ONLY way to guarantee this function is used safely is by running it on
+    an empty server, where collisions are impossible.
+
+    Args:
+        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+
+    Raises:
+        ValueError. If the specified user properties are invalid.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
+    """
+    platform_auth_services.import_external_accounts(accounts)
+
+
 def grant_super_admin_privileges(user_id: str) -> None:
     """Grants the user super admin privileges.
 
