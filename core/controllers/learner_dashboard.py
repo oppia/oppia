@@ -300,8 +300,6 @@ class LearnerDashboardExplorationsProgressHandler(
             if progress_data is None:
                 return 0
             total_checkpoints = progress_data['total_checkpoints_count']
-            if total_checkpoints == 0:
-                return 0
             visited_checkpoints = max(
                 progress_data['visited_checkpoints_count'] - 1, 0
             )

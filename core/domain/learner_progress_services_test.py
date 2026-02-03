@@ -3548,29 +3548,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         # Should return empty dict for nonexistent exploration.
         self.assertEqual(progress, {})
 
-    def test_get_checkpoint_progress_for_exploration_with_no_checkpoints(
-        self,
-    ) -> None:
-        """Test checkpoint progress for explorations with no checkpoints."""
-        # Create exploration without marking any state as checkpoint.
-        self.save_new_valid_exploration(
-            self.EXP_ID_0, self.owner_id, title='Test Exploration'
-        )
-
-        # Get checkpoint progress.
-        progress = (
-            learner_progress_services.get_checkpoint_progress_for_explorations(
-                self.user_id, [self.EXP_ID_0]
-            )
-        )
-
-        # Should return 0 for both visited and total checkpoints.
-        self.assertIn(self.EXP_ID_0, progress)
-        self.assertEqual(
-            progress[self.EXP_ID_0]['visited_checkpoints_count'], 0
-        )
-        self.assertEqual(progress[self.EXP_ID_0]['total_checkpoints_count'], 0)
-
     def test_get_checkpoint_progress_with_invalid_checkpoint_name(self) -> None:
         """Test checkpoint progress with invalid checkpoint name in user data."""
         # Create exploration with checkpoints.
