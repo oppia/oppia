@@ -286,7 +286,7 @@ def create_external_account(
 
     Args:
         account: auth_domain.ExternalAccount. The account to create. When the
-            auth ID of the account is None, Firebase will generate a new ID.
+            auth ID of the account is None, a new one will be generated.
 
     Returns:
         auth_domain.ExternalAccount. The final state of the created account.
