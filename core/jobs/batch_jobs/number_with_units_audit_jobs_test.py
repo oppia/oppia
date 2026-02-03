@@ -70,8 +70,8 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         )
         exp_state_3 = state_domain.State.create_default_state(
             'state', 'content_4', 'default_outcome_5', is_initial_state=True
-        ).to_dict()
-        exp_state_3['interaction']['id'] = 'TextInput'
+        )
+        exp_state_3.update_interaction_id('TextInput')
 
         exp_model_1 = self.create_model(
             exp_models.ExplorationModel,
@@ -85,7 +85,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             states={
                 'num_with_units_1': exp_state_1,
                 'num_with_units_2': exp_state_2,
-                'text_state': exp_state_3,
+                'text_state': exp_state_3.to_dict(),
             },
             next_content_id_index=6,
         )
@@ -93,8 +93,8 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
 
         exp_state_4 = state_domain.State.create_default_state(
             'state', 'content_0', 'default_outcome_1', is_initial_state=True
-        ).to_dict()
-        exp_state_4['interaction']['id'] = 'TextInput'
+        )
+        exp_state_4.update_interaction_id('TextInput')
 
         exp_model_2 = self.create_model(
             exp_models.ExplorationModel,
@@ -105,7 +105,7 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             language_code='cs',
             init_state_name='state',
             states_schema_version=48,
-            states={'text_state': exp_state_4},
+            states={'text_state': exp_state_4.to_dict()},
             next_content_id_index=2,
         )
         exp_model_2.update_timestamps()
@@ -145,84 +145,102 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
 
         exp_state_2 = state_domain.State.create_default_state(
             'state', 'content_6', 'default_outcome_7', is_initial_state=True
-        ).to_dict()
-        exp_state_2['interaction']['id'] = 'NumberWithUnits'
-        exp_default_outcome = exp_state_2['interaction']['default_outcome']
-        assert exp_default_outcome is not None
-        exp_state_2['interaction']['answer_groups'] = [
-            {
-                'outcome': exp_default_outcome,
-                'rule_specs': [
-                    {
-                        'rule_type': 'IsEquivalentTo',
-                        'inputs': {
-                            'f': {
-                                'type': 'real',
-                                'real': 3,
-                                'fraction': {
-                                    'isNegative': False,
-                                    'wholeNumber': 0,
-                                    'numerator': 0,
-                                    'denominator': 1,
-                                },
-                                'units': [
-                                    {'unit': 'kg', 'exponent': 1},
-                                    {'unit': 'm', 'exponent': 2},
-                                ],
-                            }
-                        },
-                    },
-                    {
-                        'rule_type': 'IsEquivalentTo',
-                        'inputs': {
-                            'f': {
-                                'type': 'real',
-                                'real': 4,
-                                'fraction': {
-                                    'isNegative': False,
-                                    'wholeNumber': 0,
-                                    'numerator': 0,
-                                    'denominator': 1,
-                                },
-                                'units': [
-                                    {'unit': 'N', 'exponent': 1},
-                                    {'unit': 's', 'exponent': -2},
-                                ],
-                            }
-                        },
-                    },
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None,
-            },
-            {
-                'outcome': exp_default_outcome,
-                'rule_specs': [
-                    {
-                        'rule_type': 'IsEquivalentTo',
-                        'inputs': {
-                            'f': {
-                                'type': 'real',
-                                'real': 5,
-                                'fraction': {
-                                    'isNegative': False,
-                                    'wholeNumber': 0,
-                                    'numerator': 0,
-                                    'denominator': 1,
-                                },
-                                'units': [
-                                    {'unit': 'kg', 'exponent': 1},
-                                    {'unit': 'm', 'exponent': 1},
-                                    {'unit': 's', 'exponent': -2},
-                                ],
-                            }
-                        },
-                    }
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None,
-            },
-        ]
+        )
+        exp_state_2.update_interaction_id('NumberWithUnits')
+        default_outcome = exp_state_2.interaction.default_outcome
+        assert default_outcome is not None
+        exp_state_2.update_interaction_answer_groups(
+            [
+                state_domain.AnswerGroup(
+                    state_domain.Outcome(
+                        default_outcome.dest,
+                        default_outcome.dest_if_really_stuck,
+                        state_domain.SubtitledHtml('feedback_8', ''),
+                        default_outcome.labelled_as_correct,
+                        default_outcome.param_changes,
+                        default_outcome.refresher_exploration_id,
+                        default_outcome.missing_prerequisite_skill_id,
+                    ),
+                    [
+                        state_domain.RuleSpec(
+                            'IsEquivalentTo',
+                            {
+                                'f': {
+                                    'type': 'real',
+                                    'real': 3,
+                                    'fraction': {
+                                        'isNegative': False,
+                                        'wholeNumber': 0,
+                                        'numerator': 0,
+                                        'denominator': 1,
+                                    },
+                                    'units': [
+                                        {'unit': 'kg', 'exponent': 1},
+                                        {'unit': 'm', 'exponent': 2},
+                                    ],
+                                }
+                            },
+                        ),
+                        state_domain.RuleSpec(
+                            'IsEquivalentTo',
+                            {
+                                'f': {
+                                    'type': 'real',
+                                    'real': 4,
+                                    'fraction': {
+                                        'isNegative': False,
+                                        'wholeNumber': 0,
+                                        'numerator': 0,
+                                        'denominator': 1,
+                                    },
+                                    'units': [
+                                        {'unit': 'N', 'exponent': 1},
+                                        {'unit': 's', 'exponent': -2},
+                                    ],
+                                }
+                            },
+                        ),
+                    ],
+                    [],
+                    None,
+                ),
+                state_domain.AnswerGroup(
+                    state_domain.Outcome(
+                        default_outcome.dest,
+                        default_outcome.dest_if_really_stuck,
+                        state_domain.SubtitledHtml('feedback_9', ''),
+                        default_outcome.labelled_as_correct,
+                        default_outcome.param_changes,
+                        default_outcome.refresher_exploration_id,
+                        default_outcome.missing_prerequisite_skill_id,
+                    ),
+                    [
+                        state_domain.RuleSpec(
+                            'IsEquivalentTo',
+                            {
+                                'f': {
+                                    'type': 'real',
+                                    'real': 5,
+                                    'fraction': {
+                                        'isNegative': False,
+                                        'wholeNumber': 0,
+                                        'numerator': 0,
+                                        'denominator': 1,
+                                    },
+                                    'units': [
+                                        {'unit': 'kg', 'exponent': 1},
+                                        {'unit': 'm', 'exponent': 1},
+                                        {'unit': 's', 'exponent': -2},
+                                    ],
+                                }
+                            },
+                        ),
+                    ],
+                    [],
+                    None,
+                ),
+            ]
+        )
 
         exp_model = self.create_model(
             exp_models.ExplorationModel,
@@ -235,9 +253,9 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
             states_schema_version=48,
             states={
                 'num_with_units_1': exp_state_1,
-                'num_with_units_2': exp_state_2,
+                'num_with_units_2': exp_state_2.to_dict(),
             },
-            next_content_id_index=8,
+            next_content_id_index=10,
         )
         exp_model.update_timestamps()
 
@@ -471,38 +489,48 @@ class FindNumberWithUnitsRuleUnitsJobTests(job_test_utils.JobTestBase):
         self, units: List[Dict[str, Union[str, int]]]
     ) -> state_domain.StateDict:
         """Creates a NumberWithUnits state dict with the provided units."""
-        state_dict = state_domain.State.create_default_state(
+        state = state_domain.State.create_default_state(
             'state', 'content_0', 'default_outcome_1', is_initial_state=True
-        ).to_dict()
-        default_outcome = state_dict['interaction']['default_outcome']
+        )
+        state.update_interaction_id('NumberWithUnits')
+        default_outcome = state.interaction.default_outcome
         assert default_outcome is not None
-        state_dict['interaction']['id'] = 'NumberWithUnits'
-        state_dict['interaction']['answer_groups'] = [
-            {
-                'outcome': default_outcome,
-                'rule_specs': [
-                    {
-                        'rule_type': 'IsEquivalentTo',
-                        'inputs': {
-                            'f': {
-                                'type': 'real',
-                                'real': 2,
-                                'fraction': {
-                                    'isNegative': False,
-                                    'wholeNumber': 0,
-                                    'numerator': 0,
-                                    'denominator': 1,
-                                },
-                                'units': units,
-                            }
-                        },
-                    }
-                ],
-                'training_data': [],
-                'tagged_skill_misconception_id': None,
-            }
-        ]
-        return state_dict
+        state.update_interaction_answer_groups(
+            [
+                state_domain.AnswerGroup(
+                    state_domain.Outcome(
+                        default_outcome.dest,
+                        default_outcome.dest_if_really_stuck,
+                        state_domain.SubtitledHtml('feedback_2', ''),
+                        default_outcome.labelled_as_correct,
+                        default_outcome.param_changes,
+                        default_outcome.refresher_exploration_id,
+                        default_outcome.missing_prerequisite_skill_id,
+                    ),
+                    [
+                        state_domain.RuleSpec(
+                            'IsEquivalentTo',
+                            {
+                                'f': {
+                                    'type': 'real',
+                                    'real': 2,
+                                    'fraction': {
+                                        'isNegative': False,
+                                        'wholeNumber': 0,
+                                        'numerator': 0,
+                                        'denominator': 1,
+                                    },
+                                    'units': units,
+                                }
+                            },
+                        ),
+                    ],
+                    [],
+                    None,
+                ),
+            ]
+        )
+        return state.to_dict()
 
     def _create_base_malformed_state_dict(
         self, content_id: str, default_outcome_id: str
