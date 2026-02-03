@@ -49,14 +49,14 @@ var findHashedStylesFile = function () {
     if (stylesFiles.length === 0) {
       throw new Error(
         `No hashed styles.*.css file found in ${DIST_DIR}. ` +
-        'Make sure the Angular production build has completed successfully.'
+          'Make sure the Angular production build has completed successfully.'
       );
     }
 
     if (stylesFiles.length > 1) {
       console.warn(
         `Warning: Multiple styles files found: ${stylesFiles.join(', ')}. ` +
-        `Using the first one: ${stylesFiles[0]}`
+          `Using the first one: ${stylesFiles[0]}`
       );
     }
 
@@ -70,18 +70,21 @@ var findHashedStylesFile = function () {
 var updateHeaderCssLibs = function (hashedFilename, filePath) {
   try {
     if (!fs.existsSync(filePath)) {
+      // eslint-disable-next-line no-console
       console.log(`File ${filePath} does not exist, skipping.`);
       return;
     }
 
     var content = fs.readFileSync(filePath, 'utf-8');
-    var stylesCssPattern = /href="\/dist\/oppia-angular-prod\/styles(\.[a-f0-9]+)?\.css"/i;
+    var stylesCssPattern =
+      /href="\/dist\/oppia-angular-prod\/styles(\.[a-f0-9]+)?\.css"/i;
     var newHref = `href="/dist/oppia-angular-prod/${hashedFilename}"`;
 
     if (!content.match(stylesCssPattern)) {
+      // eslint-disable-next-line no-console
       console.warn(
         `Warning: Could not find styles.css reference in ${filePath}. ` +
-        'The file may need manual updating.'
+          'The file may need manual updating.'
       );
       return;
     }
@@ -89,27 +92,33 @@ var updateHeaderCssLibs = function (hashedFilename, filePath) {
     var updatedContent = content.replace(stylesCssPattern, newHref);
 
     if (content === updatedContent) {
+      // eslint-disable-next-line no-console
       console.log(`No changes needed in ${filePath} (already up to date).`);
       return;
     }
 
     fs.writeFileSync(filePath, updatedContent, 'utf-8');
+    // eslint-disable-next-line no-console
     console.log(`Successfully updated ${filePath} with ${hashedFilename}.`);
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error(`Error updating ${filePath}:`, error.message);
     process.exit(1);
   }
 };
 
 var main = function () {
+  // eslint-disable-next-line no-console
   console.log('Injecting hashed CSS filename into header_css_libs.html.');
 
   var hashedFilename = findHashedStylesFile();
-  console.log(`Found hashed CSS file: ${hashedFilename}`);
+  // eslint-disable-next-line no-console
+  console.log(`Found hashed CSS file: ${hashedFilename}.`);
 
   updateHeaderCssLibs(hashedFilename, HEADER_CSS_LIBS_PATH);
   updateHeaderCssLibs(hashedFilename, BACKEND_PROD_HEADER_CSS_LIBS_PATH);
 
+  // eslint-disable-next-line no-console
   console.log('CSS hash injection complete.');
 };
 

@@ -1188,7 +1188,9 @@ class BuildTests(test_utils.GenericTestBase):
         )
         with ensure_files_exist_swap, modify_constants_swap, clean_swap:
             with assert_raises_regexp_context_manager:
-                build.main(args=['--prod_env', '--minify_third_party_libs_only'])
+                build.main(
+                    args=['--prod_env', '--minify_third_party_libs_only']
+                )
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
