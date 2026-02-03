@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Script to inject hashed CSS filename into header_css_libs.html.
+ * @fileoverview Script to inject hashed CSS filename into built header_css_libs.html files.
+ * IMPORTANT: This modifies ONLY the built output files in backend_prod_files/, not source files.
+ * Source files in core/templates/ should always keep the placeholder 'styles.css'.
  */
 
 'use strict';
@@ -22,14 +24,7 @@ const fs = require('fs');
 const path = require('path');
 
 const DIST_DIR = path.join(__dirname, '..', 'dist', 'oppia-angular-prod');
-const HEADER_CSS_LIBS_PATH = path.join(
-  __dirname,
-  '..',
-  'core',
-  'templates',
-  'pages',
-  'header_css_libs.html'
-);
+// Only modify the BUILT output file, not the source
 const BACKEND_PROD_HEADER_CSS_LIBS_PATH = path.join(
   __dirname,
   '..',
@@ -77,7 +72,7 @@ var updateHeaderCssLibs = function (hashedFilename, filePath) {
 
     var content = fs.readFileSync(filePath, 'utf-8');
     var stylesCssPattern =
-      /href="\/dist\/oppia-angular-prod\/styles(\.[a-f0-9]+)?\.css"/i;
+      /href="\/dist\/oppia-angular-prod\/styles(\.css|(\.[a-f0-9]+)?\.css)"/i;
     var newHref = `href="/dist/oppia-angular-prod/${hashedFilename}"`;
 
     if (!content.match(stylesCssPattern)) {
@@ -109,13 +104,15 @@ var updateHeaderCssLibs = function (hashedFilename, filePath) {
 
 var main = function () {
   // eslint-disable-next-line no-console
-  console.log('Injecting hashed CSS filename into header_css_libs.html.');
+  console.log(
+    'Injecting hashed CSS filename into backend_prod_files/header_css_libs.html.'
+  );
 
   var hashedFilename = findHashedStylesFile();
   // eslint-disable-next-line no-console
   console.log(`Found hashed CSS file: ${hashedFilename}.`);
 
-  updateHeaderCssLibs(hashedFilename, HEADER_CSS_LIBS_PATH);
+  // Only update the built output file, not source files
   updateHeaderCssLibs(hashedFilename, BACKEND_PROD_HEADER_CSS_LIBS_PATH);
 
   // eslint-disable-next-line no-console
