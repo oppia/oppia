@@ -677,12 +677,6 @@ def build_using_ng() -> None:
         get_file_count('dist/oppia-angular-prod') > 0
     ), 'angular generated bundle should be non-empty'
 
-    # Inject the hashed CSS filename into header_css_libs.html.
-    print('Injecting hashed CSS filename into header_css_libs.html')
-    inject_css_hash_script = os.path.join('scripts', 'inject_css_hash.js')
-    node_bin = common.NODE_BIN_PATH
-    subprocess.check_call([node_bin, inject_css_hash_script])
-
 
 def build_using_webpack(config_path: str) -> None:
     """Execute webpack build process. This takes all TypeScript files we have in
