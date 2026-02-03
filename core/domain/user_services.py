@@ -1941,6 +1941,7 @@ def update_email_preferences(
                 id=user_id
             )
             
+    email_preferences_model.update_timestamps()        
     email_preferences_model.site_updates = (
         email_preferences.site_updates
     )
