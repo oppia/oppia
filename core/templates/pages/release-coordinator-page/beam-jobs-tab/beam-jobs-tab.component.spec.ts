@@ -118,6 +118,9 @@ describe('Beam Jobs Tab Component', () => {
         },
       ],
     });
+    afterEach(() => {
+      fixture.destroy();
+    });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {

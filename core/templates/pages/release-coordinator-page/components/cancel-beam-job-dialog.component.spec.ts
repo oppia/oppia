@@ -69,6 +69,9 @@ describe('Cancel beam job dialog', () => {
         {provide: MatDialogRef, useValue: mockDialogRef},
       ],
     });
+    afterEach(() => {
+      fixture.destroy();
+    });
     // NOTE: This allows tests to compile the DOM of each dialog component.
     TestBed.overrideModule(BrowserDynamicTestingModule, {
       set: {
