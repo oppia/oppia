@@ -107,8 +107,11 @@ describe('Logged-In Learner', function () {
   it('should be able to report the lesson from the sidebar', async function () {
     // Navigate to a lesson.
     await loggedInLearner.navigateToCommunityLibraryPage();
+    await loggedInLearner.waitForPageToFullyLoad();
     await loggedInLearner.searchForLessonInSearchBar('Algebra Basics');
+    await loggedInLearner.waitForPageToFullyLoad();
     await loggedInLearner.playLessonFromSearchResults('Algebra Basics');
+    await loggedInLearner.waitForPageToFullyLoad();
     await loggedInLearner.continueToNextCard();
 
     // Report Exploration.
