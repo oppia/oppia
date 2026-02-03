@@ -31,7 +31,7 @@ from core.domain import (
 from typing import Dict, List, Optional, TypedDict
 
 MYPY = False
-if MYPY:
+if MYPY:  # pragma: no cover
     pass
 
 
