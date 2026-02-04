@@ -131,39 +131,33 @@ class AngularStylesHashPlugin {
       const HtmlWebpackPlugin = require('html-webpack-plugin');
       const hooks = HtmlWebpackPlugin.getHooks(compilation);
 
-      hooks.beforeEmit.tapAsync(
-        'AngularStylesHashPlugin',
-        (data, callback) => {
-          const hashedFilename = this.findHashedStylesFile();
+      hooks.beforeEmit.tapAsync('AngularStylesHashPlugin', (data, callback) => {
+        const hashedFilename = this.findHashedStylesFile();
 
-          if (hashedFilename) {
-            const fullPath = this.baseHref + hashedFilename;
-            // eslint-disable-next-line no-console
-            console.log(
-              `[AngularStylesHashPlugin] Found Angular styles: ${hashedFilename}`
-            );
+        if (hashedFilename) {
+          const fullPath = this.baseHref + hashedFilename;
+          // eslint-disable-next-line no-console
+          console.log(
+            `[AngularStylesHashPlugin] Found Angular styles: ${hashedFilename}`
+          );
 
-            // Replace styles.css references with hashed version in the template.
-            data.html = data.html.replace(
-              new RegExp(
-                `${this.baseHref}styles\\.css(?!\\.[a-f0-9])`,
-                'g'
-              ),
-              fullPath
-            );
+          // Replace styles.css references with hashed version in the template.
+          data.html = data.html.replace(
+            new RegExp(`${this.baseHref}styles\\.css(?!\\.[a-f0-9])`, 'g'),
+            fullPath
+          );
 
-            // Update hashes.json for frontend use.
-            this.updateHashesJson(hashedFilename);
-          } else {
-            console.warn(
-              '[AngularStylesHashPlugin] Could not find hashed styles file. ' +
-                'Using fallback styles.css'
-            );
-          }
-
-          callback(null, data);
+          // Update hashes.json for frontend use.
+          this.updateHashesJson(hashedFilename);
+        } else {
+          console.warn(
+            '[AngularStylesHashPlugin] Could not find hashed styles file. ' +
+              'Using fallback styles.css'
+          );
         }
-      );
+
+        callback(null, data);
+      });
     });
   }
 }

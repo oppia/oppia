@@ -99,7 +99,7 @@ module.exports = {
             options: options,
           },
           // Helper function to get hashed filename for CSS/JS assets.
-          getHashedFilename: (filename) => {
+          getHashedFilename: filename => {
             const parsedFile = path.parse(filename);
             const assetKeys = Object.keys(compilation.assets);
             for (const key of assetKeys) {
@@ -137,7 +137,7 @@ module.exports = {
             options: options,
           },
           // Helper function to get hashed filename for CSS/JS assets.
-          getHashedFilename: (filename) => {
+          getHashedFilename: filename => {
             const parsedFile = path.parse(filename);
             const assetKeys = Object.keys(compilation.assets);
             for (const key of assetKeys) {
