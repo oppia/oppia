@@ -23,7 +23,7 @@ from core.domain import (
     exp_fetchers,
     feedback_services,
     subscription_services,
-    suggestion_registry,
+    suggestion_domain,
     suggestion_services,
     user_services,
 )
@@ -161,10 +161,10 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         )
         if suggestion is None:
             suggestion = None
-        elif isinstance(
-            suggestion,
-            suggestion_registry.SuggestionEditStateContent
-        ) and suggestion.is_deprecated:
+        elif (
+            isinstance(suggestion, suggestion_domain.Suggestion)
+            and suggestion.is_deprecated
+        ):
             suggestion = None
 
         suggestion_thread = feedback_services.get_thread(thread_id)
@@ -192,7 +192,6 @@ class FeedbackThreadHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             authors_settings.pop(0)
 
         for m, author_settings in zip(messages, authors_settings):
-
             if author_settings is None:
                 author_username = None
             else:
