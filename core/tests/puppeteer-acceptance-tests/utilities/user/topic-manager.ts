@@ -4428,6 +4428,7 @@ export class TopicManager extends BaseUser {
           if (elements.length < 5) {
             throw new Error('Not enough elements collapsible headers found,');
           }
+          await elements[1].click();
           await elements[2].click();
           await elements[3].click();
           await elements[4].click();
