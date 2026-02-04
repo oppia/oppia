@@ -43,6 +43,7 @@ import {AngularNameService} from 'pages/exploration-editor-page/services/angular
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
 import {StateEditorRefreshService} from 'pages/exploration-editor-page/services/state-editor-refresh.service';
 import {PageContextService} from 'services/page-context.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {EntityTranslationsService} from 'services/entity-translations.services';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {ExplorationImprovementsTaskRegistryService} from 'services/exploration-improvements-task-registry.service';
@@ -76,6 +77,9 @@ class MockParameterizeRuleDescriptionPipe {
   ): string {
     return '';
   }
+}
+class MockExplorationLanguageCodeService {
+  displayed = 'en';
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
 class MockWrapTextWithEllipsisPipe {
@@ -139,6 +143,7 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let explorationState1 = {
     Introduction: {
       content: {
@@ -333,6 +338,9 @@ describe('State translation component', () => {
     );
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
+    );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
     );
     explorationStatesService.init(explorationState1, false);
     entityTranslationsService = TestBed.inject(EntityTranslationsService);
@@ -742,6 +750,58 @@ describe('State translation component', () => {
       });
     }
   );
+  it('should return null for missing translation in non-original language', () => {
+    it('should return null for missing translation in non-original language', () => {
+      (translationLanguageService.getActiveLanguageCode as any).and.returnValue('es');
+      // explorationLanguageCodeService.displayed is 'en' by mock default.
+
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'Original Content',
+      });
+
+      // Entity translations for 'es' are missing/empty.
+      expect(component.getRequiredHtml(subtitledObject)).toBeNull();
+    });
+
+    it('should return original content for original language in voiceover mode', () => {
+      spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue('en');
+      // The following lines appear to be misplaced code from a different context.
+      // They are commented out to maintain syntactical correctness of the test file.
+      // console.log('Lang Code:', langCode);
+      // // @ts-ignore
+      // console.log('Displayed Lang:', this.explorationLanguageCodeService.displayed);
+      //
+      // if (langCode === this.explorationLanguageCodeService.displayed) {
+      //   return subtitledHtml.html;
+      // }
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'Original Content',
+      });
+
+      expect(component.getRequiredHtml(subtitledObject)).toBe('Original Content');
+    });
+
+    it('should return correct empty content message for original language', () => {
+      (translationLanguageService.getActiveLanguageCode as any).and.returnValue('en');
+      // explorationLanguageCodeService.displayed is 'en'.
+
+      expect(component.getEmptyContentMessage()).toBe(
+        'There is no text available to voiceover.'
+      );
+    });
+
+    it('should check if original content is present', () => {
+      let subtitledObject = SubtitledHtml.createFromBackendDict({
+        content_id: 'content_1',
+        html: 'Content',
+      });
+      expect(component.hasOriginalContent(subtitledObject)).toBe(true);
+
+      subtitledObject.html = '';
+      expect(component.hasOriginalContent(subtitledObject)).toBe(false);
+    });
 });
 describe('State translation component', () => {
   let component: StateTranslationComponent;
