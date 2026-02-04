@@ -4397,7 +4397,14 @@ export class TopicManager extends BaseUser {
   ): Promise<void> {
     await this.openStoryEditor(storyName, topicName);
     await this.waitForPageToFullyLoad();
-
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
     await this.page.waitForSelector(chapterTitleSelector);
     const chapterTitles = await this.page.$$(chapterTitleSelector);
 
@@ -4470,6 +4477,14 @@ export class TopicManager extends BaseUser {
     chapterNames: string[],
     chapStatus: string = 'Published'
   ): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.page.waitForSelector(mobileCollapsibleCardHeaderSelector);
+      const elements = await this.page.$$(mobileCollapsibleCardHeaderSelector);
+      if (elements.length < 2) {
+        throw new Error('Not enough elements collapsible headers found,');
+      }
+      await elements[1].click();
+    }
     await this.page.waitForSelector('tr.story-node');
 
     const rows = await this.page.$$('tr.story-node');
