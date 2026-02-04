@@ -252,6 +252,22 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'],
         )
 
+    def test_get_all_external_accounts(self) -> None:
+        mock_accounts = [
+            auth_domain.ExternalAccount('aid1', 'email1@example.com', True),
+            auth_domain.ExternalAccount('aid2', 'email2@example.com', False),
+            auth_domain.ExternalAccount('aid3', 'email3@example.com', True),
+        ]
+
+        with self.swap(
+            platform_auth_services,
+            'get_all_external_accounts',
+            lambda: mock_accounts,
+        ):
+            self.assertItemsEqual(
+                auth_services.get_all_external_accounts(), mock_accounts
+            )
+
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,
     ) -> None:
