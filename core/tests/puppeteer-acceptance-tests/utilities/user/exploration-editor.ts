@@ -6549,12 +6549,34 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationCategoryDropdown);
     await this.clickOnElementWithSelector(explorationCategoryDropdown);
-    await this.clickOnElementWithText(category);
+    // Wait for the dropdown options to render and find the matching category.
+    await this.page.waitForSelector('mat-option', {visible: true});
+    const categoryOptions = await this.page.$$('mat-option');
+    const categoryOptionTexts = await this.page.$$eval('mat-option', options =>
+      options.map(option => option.textContent?.trim())
+    );
+    const categoryIndex = categoryOptionTexts.indexOf(category);
+    if (categoryIndex !== -1) {
+      await categoryOptions[categoryIndex].click();
+    }
+    // Wait for the dropdown to close.
+    await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectTextContentToBe(categoryDropdown, category);
 
     await this.expectElementToBeVisible(explorationLanguageSelector);
     await this.clickOnElementWithSelector(explorationLanguageSelector);
-    await this.clickOnElementWithText(language);
+    // Wait for the dropdown options to render and find the matching language.
+    await this.page.waitForSelector('mat-option', {visible: true});
+    const languageOptions = await this.page.$$('mat-option');
+    const languageOptionTexts = await this.page.$$eval('mat-option', options =>
+      options.map(option => option.textContent?.trim())
+    );
+    const languageIndex = languageOptionTexts.indexOf(language);
+    if (languageIndex !== -1) {
+      await languageOptions[languageIndex].click();
+    }
+    // Wait for the dropdown to close.
+    await this.page.waitForSelector('mat-option', {visible: false});
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);
