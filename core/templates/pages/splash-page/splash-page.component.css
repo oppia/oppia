@@ -79,19 +79,17 @@
   text-transform: none;
 }
 
-.splash-page .oppia-splash-button-container a.primary-button.btn {
-  align-items: center;
-  display: inline-flex;
+/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
+.splash-page ::ng-deep .oppia-splash-button-container .primary-button.btn {
+  box-sizing: border-box !important;
   font-family: "Capriola", "Roboto", Arial, sans-serif !important;
   font-size: 16px !important;
   font-weight: normal !important;
-  justify-content: center;
   letter-spacing: normal !important;
-  margin-bottom: 40px;
+  margin-bottom: 40px !important;
   margin-top: -20px !important;
   min-width: 300px !important;
   padding: 10px !important;
-  text-decoration: none;
 }
 
 .splash-page .oppia-splash-button:hover,
