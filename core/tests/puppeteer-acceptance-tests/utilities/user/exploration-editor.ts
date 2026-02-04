@@ -7129,6 +7129,7 @@ export class ExplorationEditor extends BaseUser {
     }
     const editorUrl = `${baseUrl}/create/${explorationId}#/`;
     await this.goto(editorUrl);
+    await this.waitForPageToFullyLoad();
 
     showMessage('Navigation to exploration editor is successful.');
   }
