@@ -18,8 +18,6 @@
 
 from __future__ import annotations
 
-import logging
-
 from core.constants import constants
 from core.domain import beam_job_domain
 from core.jobs import base_jobs, jobs_manager
@@ -30,17 +28,11 @@ from typing import List, Optional, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import (
-        app_identity_services,
-        beam_job_models,
-        datastore_services,
-    )
+    from mypy_imports import beam_job_models, datastore_services
 
 (beam_job_models,) = models.Registry.import_models([models.Names.BEAM_JOB])
 
 datastore_services = models.Registry.import_datastore_services()
-
-app_identity_services = models.Registry.import_app_identity_services()
 
 
 def run_beam_job(
@@ -69,10 +61,6 @@ def run_beam_job(
 
     run_synchronously = constants.EMULATOR_MODE
 
-    logging.info(
-        'Logging Oppia project ID before running Beam job: %s'
-        % app_identity_services.get_application_id()
-    )
     run_model = jobs_manager.run_job(job_class, run_synchronously)
 
     return get_beam_job_run_from_model(run_model)

@@ -443,7 +443,7 @@ def regenerate_speech_from_text(
             )
 
             # Exponential backoff for retrying speech synthesis in case of too
-            # many requests, connection # failure, or service timeout errors.
+            # many requests, connection failure, or service timeout errors.
             if error_code in [
                 'CancellationErrorCode.TooManyRequests',
                 'CancellationErrorCode.ConnectionFailure',

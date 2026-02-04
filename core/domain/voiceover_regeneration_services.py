@@ -389,12 +389,8 @@ def synthesize_voiceover_for_html_string(
         'Voiceover synthesis log: Voiceover filename: %s.' % voiceover_filename
     )
     logging.info(
-        'Voiceover synthesis log: Oppia project ID: %s.'
-        % app_identity_services.get_application_id()
-    )
-    logging.info(
         'Voiceover synthesis log: GCS bucket name: %s.'
-        % app_identity_services.get_gcs_resource_bucket_name()
+        % app_identity_services.get_gcs_resource_bucket_name(oppia_project_id)
     )
     fs.commit(
         '%s/%s' % ('audio', voiceover_filename),
