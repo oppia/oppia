@@ -189,4 +189,12 @@ describe('Keyboard Shortcuts', () => {
       expect(nextButton.isEqualNode(document.activeElement));
     }
   );
+
+  it('should not throw error if search bar or category bar is missing', () => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+    keyboardShortcutService.bindLibraryPageShortcuts();
+
+    expect(() => Mousetrap.trigger('/')).not.toThrowError();
+    expect(() => Mousetrap.trigger('c')).not.toThrowError();
+  });
 });
