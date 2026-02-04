@@ -48,7 +48,8 @@ export class ModeratorAuthGuard implements CanActivate {
       return true;
     }
 
-    sessionStorage.setItem(
+    // Store error message in sessionStorage since location.replaceState will clear router state.
+    window.sessionStorage.setItem(
       'oppia_401_error_message',
       'You must be a moderator to access this page.'
     );

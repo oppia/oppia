@@ -49,7 +49,7 @@ export class BlogAdminAuthGuard implements CanActivate {
     }
 
     // Store error message in sessionStorage since location.replaceState will clear router state.
-    sessionStorage.setItem(
+    window.sessionStorage.setItem(
       'oppia_401_error_message',
       'You must be a blog admin to access this page.'
     );

@@ -42,11 +42,15 @@ export class ErrorPageComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     // Get custom error message from sessionStorage.
     // Auth guards store it there since location.replaceState clears router state.
-    const storedErrorMessage = sessionStorage.getItem('oppia_401_error_message');
+    const storedErrorMessage = this.windowRef.nativeWindow.sessionStorage.getItem(
+      'oppia_401_error_message'
+    );
     if (storedErrorMessage) {
       this.customErrorMessage = storedErrorMessage;
       // Clear it immediately after reading so it doesn't persist across page reloads.
-      sessionStorage.removeItem('oppia_401_error_message');
+      this.windowRef.nativeWindow.sessionStorage.removeItem(
+        'oppia_401_error_message'
+      );
     }
   }
 
