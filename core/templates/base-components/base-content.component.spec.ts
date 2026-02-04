@@ -19,11 +19,11 @@
 import {DOCUMENT} from '@angular/common';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
-import {NavigationEnd, Router} from '@angular/router';
+import {NavigationEnd, NavigationStart, Router} from '@angular/router';
 import {AppConstants} from 'app.constants';
 import {LimitToPipe} from 'filters/limit-to.pipe';
 import {CookieModule, CookieService} from 'ngx-cookie';
-import {Observable, of} from 'rxjs';
+import {Observable, of, Subject} from 'rxjs';
 import {BottomNavbarStatusService} from 'services/bottom-navbar-status.service';
 import {UrlService} from 'services/contextual/url.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -79,6 +79,10 @@ describe('Base Content Component', () => {
 
   class MockLoaderService {
     onLoadingMessageChange: Observable<string> = of('Test Message');
+
+    showLoadingScreen(message: string): void {}
+
+    hideLoadingScreen(): void {}
   }
 
   // We are mocking Router service to return the NavigationEnd object,
@@ -198,6 +202,62 @@ describe('Base Content Component', () => {
     expect(windowRef.nativeWindow.location.href).toEqual(
       'https://oppiatestserver.appspot.com' + pathname + search + hash
     );
+  });
+
+  it('should show loader on NavigationStart and hide on NavigationEnd', () => {
+    // Create a new test bed with a controllable router events subject.
+    const routerEventsSubject = new Subject<NavigationStart | NavigationEnd>();
+
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      imports: [CookieModule.forRoot()],
+      declarations: [BaseContentComponent, MockTranslatePipe, LimitToPipe],
+      providers: [
+        {
+          provide: Router,
+          useValue: {events: routerEventsSubject.asObservable()},
+        },
+        {
+          provide: PlatformFeatureService,
+          useValue: mockPlatformFeatureService,
+        },
+        {
+          provide: WindowRef,
+          useClass: MockWindowRef,
+        },
+        {
+          provide: UrlService,
+          useClass: MockUrlService,
+        },
+        BackgroundMaskService,
+        BottomNavbarStatusService,
+        KeyboardShortcutService,
+        LoaderService,
+        {
+          provide: PageTitleService,
+          useClass: MockPageTitleService,
+        },
+        SidebarStatusService,
+      ],
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
+
+    const testFixture = TestBed.createComponent(BaseContentComponent);
+    const testLoaderService = TestBed.inject(LoaderService);
+    spyOn(testLoaderService, 'showLoadingScreen');
+    spyOn(testLoaderService, 'hideLoadingScreen');
+
+    testFixture.componentInstance.ngOnInit();
+
+    // Emit NavigationStart and verify loader is shown.
+    routerEventsSubject.next(new NavigationStart(1, '/test-url'));
+    expect(testLoaderService.showLoadingScreen).toHaveBeenCalledWith('Loading');
+
+    // Emit NavigationEnd and verify loader is hidden.
+    routerEventsSubject.next(new NavigationEnd(1, '/test-url', '/test-url'));
+    expect(testLoaderService.hideLoadingScreen).toHaveBeenCalled();
+
+    testFixture.componentInstance.ngOnDestroy();
   });
 
   it('should return true for isNewLessonPlayerEnabled when feature is enabled and pathname includes lesson', () => {
