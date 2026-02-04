@@ -274,6 +274,11 @@ def associate_multi_auth_ids_with_user_ids(
     )
 
 
+def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
+    """Returns all accounts from our external authentication provider."""
+    return platform_auth_services.get_all_external_accounts()
+
+
 def grant_super_admin_privileges(user_id: str) -> None:
     """Grants the user super admin privileges.
 
