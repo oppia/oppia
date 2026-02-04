@@ -272,7 +272,7 @@
   </div>
   <div class="translation-state-contents">
     <div
-      *ngIf="isActive(TAB_ID_CONTENT)"
+      *ngIf="isActive(TAB_ID_CONTENT) && hasOriginalContent(stateContent)"
       class="translation-state-content e2e-test-content-text"
     >
       <span>
@@ -317,6 +317,7 @@
             let caContent of interactionCustomizationArgTranslatableContent;
             index as index
           "
+          [hidden]="!hasOriginalContent(caContent.content)"
           [ngClass]="{active: activeCustomizationArgContentIndex === index}"
         >
           <a
@@ -448,6 +449,7 @@
           <li
             class="oppia-rule-block e2e-test-translation-feedback mt-0"
             *ngFor="let answerGroup of stateAnswerGroups; index as index"
+            [hidden]="!hasOriginalContent(answerGroup.outcome.feedback)"
             [ngClass]="{active: activeAnswerGroupIndex === index}"
           >
             <a
@@ -538,6 +540,7 @@
             [ngClass]="{
               active: activeAnswerGroupIndex === stateAnswerGroups.length
             }"
+            [hidden]="!hasOriginalContent(stateDefaultOutcome.feedback)"
             class="oppia-rule-block e2e-test-translation-feedback"
           >
             <a
@@ -617,6 +620,7 @@
         <li
           class="oppia-rule-block e2e-test-translation-hint mt-0"
           *ngFor="let hint of stateHints; index as index"
+          [hidden]="!hasOriginalContent(hint.hintContent)"
           [ngClass]="{active: activeHintIndex === index}"
         >
           <a
@@ -666,7 +670,7 @@
     </div>
 
     <div
-      *ngIf="isActive(TAB_ID_SOLUTION)"
+      *ngIf="isActive(TAB_ID_SOLUTION) && hasOriginalContent(stateSolution.explanation)"
       class="translation-state-content e2e-test-solution-text"
     >
       <span
