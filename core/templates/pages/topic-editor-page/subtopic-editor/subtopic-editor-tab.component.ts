@@ -64,7 +64,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   subtopicPage!: SubtopicPage;
   studyGuide!: StudyGuide;
   activeSectionIndex: number = -1;
-  allowedBgColors!: string[];
+  allowedBgColors!: readonly string[];
   htmlData!: string;
   sections!: StudyGuideSection[];
   isEditable: boolean = false;
@@ -167,9 +167,7 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       } else {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
       }
-      this.allowedBgColors = [
-        ...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic,
-      ];
+      this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
         this.sections = sections;
