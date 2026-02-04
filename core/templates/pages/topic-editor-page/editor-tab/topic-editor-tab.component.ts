@@ -65,7 +65,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   initialTopicUrlFragment!: string;
   editableTopicUrlFragment!: string;
   editableDescription!: string;
-  allowedBgColors!: string[];
+  allowedBgColors!: readonly string[];
   topicNameExists!: boolean;
   topicUrlFragmentExists!: boolean;
   hostname!: string;
@@ -168,7 +168,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.initialTopicUrlFragment = this.topic.getUrlFragment();
     this.editableTopicUrlFragment = this.topic.getUrlFragment();
     this.editableDescription = this.topic.getDescription();
-    this.allowedBgColors = [...AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic];
+    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
     this.topicNameExists = false;
     this.topicUrlFragmentExists = false;
     this.hostname = this.windowRef.nativeWindow.location.hostname;
