@@ -16,10 +16,32 @@
  * @fileoverview Oppia root component.
  */
 
-import {Component} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Subscription} from 'rxjs';
+import {PageNavigationLoadingService} from 'services/page-navigation-loading.service';
 
 @Component({
   selector: 'lightweight-oppia-root',
   templateUrl: './lightweight-oppia-root.component.html',
 })
-export class LightweightOppiaRootComponent {}
+export class LightweightOppiaRootComponent implements OnInit, OnDestroy {
+  isNavigationLoading = false;
+  private loadingSubscription: Subscription | null = null;
+
+  constructor(
+    private pageNavigationLoadingService: PageNavigationLoadingService
+  ) {}
+
+  ngOnInit(): void {
+    this.loadingSubscription =
+      this.pageNavigationLoadingService.isLoading$.subscribe(isLoading => {
+        this.isNavigationLoading = isLoading;
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.loadingSubscription) {
+      this.loadingSubscription.unsubscribe();
+    }
+  }
+}

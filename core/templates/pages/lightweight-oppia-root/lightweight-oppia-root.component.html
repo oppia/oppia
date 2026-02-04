@@ -1,1 +1,16 @@
+<div *ngIf="isNavigationLoading"
+     class="oppia-navigation-loading-overlay"
+     aria-live="polite"
+     aria-busy="true"
+     role="status">
+  <div class="oppia-navigation-loading-spinner">
+    <div class="oppia-loading-spinner-circle"></div>
+    <span class="oppia-loading-spinner-text" aria-label="Loading page content">
+      Loading
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </span>
+  </div>
+</div>
 <router-outlet custom="light"></router-outlet>

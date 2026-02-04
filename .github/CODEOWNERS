@@ -49,6 +49,7 @@
 /core/controllers/oppia_root*.py @oppia/lace-frontend-reviewers
 /core/templates/components/shared-component.module.ts @oppia/lace-frontend-reviewers
 /core/templates/services/loader.service*.ts @oppia/lace-frontend-reviewers
+/core/templates/services/page-navigation-loading.service*.ts @oppia/lace-frontend-reviewers
 /core/templates/components/code-mirror/ @oppia/lace-frontend-reviewers
 /core/templates/components/filter-fields/ @oppia/lace-frontend-reviewers
 /core/templates/components/oppia-angular-root.component.* @oppia/lace-frontend-reviewers
