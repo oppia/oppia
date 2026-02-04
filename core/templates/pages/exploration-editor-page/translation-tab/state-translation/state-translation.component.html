@@ -80,7 +80,7 @@
 </div>
 <div class="oppia-page-card oppia-state-translation-page">
   <div class="translation-nav" joyrideStep="translationTabCardOptions" [stepContent]="TranslationTabCardOptions">
-     <ul id="tutorialTranslationState" class="oppia-translation-tabs">
+    <ul id="tutorialTranslationState" class="oppia-translation-tabs">
       <li [ngClass]="{'oppia-active-translation-tab e2e-test-active-translation-tab': isActive(TAB_ID_CONTENT)}" class="e2e-test-accessibility-translation-content" aria-label="Content of the card" role="button">
         <div (click)="onTabClick(TAB_ID_CONTENT)" tabindex="0" (keydown.enter)="onTabClick(TAB_ID_CONTENT)" [ngStyle]="tabStatusColorStyle(TAB_ID_CONTENT)" class="oppia-translation-tabs-text e2e-test-translation-content-tab">
           <span [hidden]="!tabNeedUpdatesStatus(TAB_ID_CONTENT)" class="oppia-tab-needs-update"
@@ -268,9 +268,9 @@
           </li>
         </ul>
       </div>
-      
 
-     <div>
+
+      <div>
         <ul class="oppia-translation-preview oppia-option-list nav-stacked nav-pills" role="tablist">
           <li [ngClass]="{'active': activeAnswerGroupIndex === stateAnswerGroups.length}"
               class="oppia-rule-block e2e-test-translation-feedback">
@@ -299,7 +299,6 @@
                                             [rteString]="getRequiredHtml(stateDefaultOutcome.feedback)"
                                             class="oppia-rte-editor">
                   </oppia-rte-output-display>
-                </div>
                 </div>
               </div>
             </div>
