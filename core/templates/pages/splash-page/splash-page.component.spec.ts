@@ -30,6 +30,7 @@ import {UserService} from 'services/user.service';
 import {SplashPageComponent} from './splash-page.component';
 import {of} from 'rxjs';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
+import {PrimaryButtonComponent} from '../../components/button-directives/primary-button.component';
 
 class MockWindowRef {
   _window = {
@@ -80,7 +81,7 @@ describe('Splash Page', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SplashPageComponent, MockTranslatePipe],
+      declarations: [SplashPageComponent, MockTranslatePipe, PrimaryButtonComponent],
       providers: [
         {
           provide: I18nLanguageCodeService,

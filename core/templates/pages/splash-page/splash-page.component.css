@@ -80,28 +80,18 @@
 }
 
 .splash-page .oppia-splash-button-container a.primary-button.btn {
-  padding: 10px !important;
-  min-width: 300px !important;
-  font-size: 16px !important;
-  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  text-decoration: none;
+  display: inline-flex;
   font-family: "Capriola", "Roboto", Arial, sans-serif !important;
-  font-weight: normal !important;
-  letter-spacing: normal !important;
-}
-
-.splash-page ::ng-deep .oppia-splash-button-container .primary-button.btn {
-  padding: 10px !important;
-  min-width: 300px !important;
   font-size: 16px !important;
+  font-weight: normal !important;
+  justify-content: center;
+  letter-spacing: normal !important;
   margin-bottom: 40px;
   margin-top: -20px !important;
-  font-family: "Capriola", "Roboto", Arial, sans-serif !important;
-  font-weight: normal !important;
-  letter-spacing: normal !important;
-  box-sizing: border-box !important;
+  min-width: 300px !important;
+  padding: 10px !important;
+  text-decoration: none;
 }
 
 .splash-page .oppia-splash-button:hover,
