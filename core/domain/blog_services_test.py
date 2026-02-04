@@ -1239,8 +1239,8 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             sorted(
                 [
                     self.ids_of_blog_posts_by_user_A[0],
-                    self.ids_of_blog_posts_by_user_A[1],
                     self.ids_of_blog_posts_by_user_A[2],
+                    self.ids_of_blog_posts_by_user_B[1],
                 ]
             ),
         )
@@ -1288,6 +1288,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
                 [
                     self.ids_of_blog_posts_by_user_B[0],
                     self.ids_of_blog_posts_by_user_B[1],
+                    self.ids_of_blog_posts_by_user_B[2],
                 ]
             ),
         )
@@ -1303,6 +1304,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             sorted(
                 [
                     self.ids_of_blog_posts_by_user_B[1],
+                    self.ids_of_blog_posts_by_user_B[2],
                 ]
             ),
         )
