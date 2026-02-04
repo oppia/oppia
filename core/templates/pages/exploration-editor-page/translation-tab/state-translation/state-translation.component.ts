@@ -35,6 +35,7 @@ import {
   StateEditorService,
 } from 'components/state-editor/state-editor-properties-services/state-editor.service';
 import {ExplorationStatesService} from 'pages/exploration-editor-page/services/exploration-states.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 import {RouterService} from 'pages/exploration-editor-page/services/router.service';
 import {ExplorationHtmlFormatterService} from 'services/exploration-html-formatter.service';
 import {TranslationStatusService} from '../services/translation-status.service';
@@ -109,6 +110,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private ckEditorCopyContentService: CkEditorCopyContentService,
     private explorationHtmlFormatterService: ExplorationHtmlFormatterService,
     private explorationStatesService: ExplorationStatesService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService,
     private routerService: RouterService,
     private stateEditorService: StateEditorService,
     private entityTranslationsService: EntityTranslationsService,
@@ -128,18 +130,24 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
-  getRequiredHtml(subtitledHtml: SubtitledHtml): string {
+  getRequiredHtml(subtitledHtml: SubtitledHtml): string | null {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
+    console.log('getRequiredHtml - LangCode:', langCode);
+    console.log('getRequiredHtml - Displayed:', this.explorationLanguageCodeService.displayed);
+
+    if (langCode === this.explorationLanguageCodeService.displayed) {
+      return subtitledHtml.html;
+    }
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return subtitledHtml.html;
+      return null;
     }
 
     let translationContent =
@@ -147,24 +155,27 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
     if (!translationContent) {
-      return subtitledHtml.html;
+      return null;
     }
 
     return translationContent.translation as string;
   }
 
-  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string {
+  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string | null {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return SubtitledUnicode.unicode;
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
+    if (langCode === this.explorationLanguageCodeService.displayed) {
+      return SubtitledUnicode.unicode;
+    }
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return SubtitledUnicode.unicode;
+      return null;
     }
 
     let translationContent =
@@ -172,7 +183,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
     if (!translationContent) {
-      return SubtitledUnicode.unicode;
+      return null;
     }
 
     return translationContent.translation as string;
@@ -180,15 +191,28 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   getEmptyContentMessage(): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+      let langCode = this.translationLanguageService.getActiveLanguageCode();
+      if (langCode === this.explorationLanguageCodeService.displayed) {
+        return 'There is no text available to voiceover.';
+      } else {
       return (
         'The translation for this section has not been created yet. ' +
         'Switch to translation mode to add a text translation.'
       );
+     }
     } else {
       return 'There is no text available to translate.';
     }
   }
-
+  hasOriginalContent(
+    subtitledContent: SubtitledHtml | SubtitledUnicode
+  ): boolean {
+    if (subtitledContent instanceof SubtitledHtml) {
+      return subtitledContent.html !== '';
+    } else if (subtitledContent instanceof SubtitledUnicode) {
+      return subtitledContent.unicode !== '';
+    }
+  }
   isActive(tabId: string): boolean {
     return this.activatedTabId === tabId;
   }
