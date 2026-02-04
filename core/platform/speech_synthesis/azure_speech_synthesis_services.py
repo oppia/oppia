@@ -60,6 +60,8 @@ MAIN_CONTENT_SSML_TEMPLATE_BLOCK = """
     </p>
 """
 
+MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF = 10
+
 
 class WordBoundaryCollection:
     """This class handles word boundary events to collect the time offsets
@@ -407,7 +409,9 @@ def regenerate_speech_from_text(
 
     delay_before_retrying_in_sec = 1
 
-    for _ in range(get_number_of_retry_attempts_for_voiceover_synthesis()):
+    for _ in range(
+        MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF
+    ):
         # Adding a delay before retrying the speech synthesis.
         time.sleep(delay_before_retrying_in_sec)
         logging.info(
@@ -465,19 +469,3 @@ def regenerate_speech_from_text(
         word_boundary_collection_instance.audio_offset_list,
         error_details,
     )
-
-
-def get_number_of_retry_attempts_for_voiceover_synthesis() -> int:
-    """Returns the max retry attempts for voiceover synthesis.
-    The limit is lower in GAE/Gunicorn environments to prevent worker timeouts.
-
-    Returns:
-        int. The max number of retry attempts for voiceover synthesis.
-    """
-    if feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV is None:
-        # Gunicorn workers have a 60s timeout. Capping at 4 retries ensures
-        # the cumulative backoff (15s) stays well within the request limit.
-        return 4
-
-    # Dataflow environments handle long-running processes, allowing more retries.
-    return 10

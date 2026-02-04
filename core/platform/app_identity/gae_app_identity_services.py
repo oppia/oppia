@@ -18,10 +18,9 @@
 
 from __future__ import annotations
 
-import logging
 import os
 
-from core import feconf
+from typing import Optional
 
 _GCS_RESOURCE_BUCKET_NAME_SUFFIX = '-resources'
 
@@ -39,17 +38,6 @@ def get_application_id() -> str:
     Raises:
         ValueError. Value can't be None for application id.
     """
-    logging.info(
-        'Voiceover synthesis log: Retrieving Oppia project ID: %s.'
-        % feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV
-    )
-
-    # Since the Dataflow runtime cannot access environment variables in a Beam
-    # job, we must explicitly set and retrieve the project ID within the Beam
-    # environment.
-    if feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV is not None:
-        return feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV
-
     oppia_project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', 'dev-project-id')
     assert isinstance(oppia_project_id, str)
     if not oppia_project_id:
@@ -57,7 +45,7 @@ def get_application_id() -> str:
     return oppia_project_id
 
 
-def get_gcs_resource_bucket_name() -> str:
+def get_gcs_resource_bucket_name(oppia_project_id: Optional[str] = None) -> str:
     """Returns the application's bucket name for GCS resources, which depends
     on the application ID in production mode, or default bucket name in
     development mode.
@@ -69,7 +57,13 @@ def get_gcs_resource_bucket_name() -> str:
     if we try to use it in production mode but the default bucket hasn't been
     enabled through the project console.
 
+    Args:
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
+
     Returns:
         str. The bucket name for the application's GCS resources.
     """
-    return '%s%s' % (get_application_id(), _GCS_RESOURCE_BUCKET_NAME_SUFFIX)
+    project_id = oppia_project_id or get_application_id()
+    return '%s%s' % (project_id, _GCS_RESOURCE_BUCKET_NAME_SUFFIX)

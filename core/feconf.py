@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, Final, List, Optional, TypedDict, Union
+from typing import Callable, Dict, Final, List, TypedDict, Union
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -527,12 +527,6 @@ AZURE_TEXT_TO_SPEECH_REGION = 'centralus'
 OPPIA_CONTENT_TAG_DELIMITER = '; '
 
 OPPIA_AUTOMATIC_VOICEOVER_PROVIDER = 'azure'
-
-# The Google Cloud Dataflow environment cannot access the configured environment
-# variables, causing the Oppia project ID to always default to dev-project-id.
-# To resolve this, the project ID must be explicitly set within the Beam job so
-# that downstream services receive the correct value.
-OPPIA_PROJECT_ID_IN_DATAFLOW_ENV: Optional[str] = None
 
 # This flag is used for distinguishing the prod/test environments for feature
 # gating.

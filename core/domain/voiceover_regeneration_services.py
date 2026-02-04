@@ -307,7 +307,9 @@ def synthesize_voiceover_for_html_string(
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
     fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exploration_id,
+        oppia_project_id=oppia_project_id,
     )
 
     parsed_text = parse_html(content_html)

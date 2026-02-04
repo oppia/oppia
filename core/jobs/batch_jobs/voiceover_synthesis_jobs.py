@@ -81,12 +81,11 @@ class GenerateVoiceoversFn(beam.DoFn):  # type: ignore[misc]
         logging.info(
             'Voiceover synthesis log: Initializing GenerateVoiceoversFn.'
         )
-        feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV = oppia_project_id
+
         self.oppia_project_id = oppia_project_id
         logging.info(
-            'Voiceover synthesis log: Saved oppia_project_id to feconf: %s, %s',
-            oppia_project_id,
-            feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV,
+            'Voiceover synthesis log: Setting oppia project ID from args: %s',
+            self.oppia_project_id,
         )
 
     def process(

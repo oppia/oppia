@@ -20,7 +20,6 @@ from __future__ import annotations
 
 from unittest import mock
 
-from core import feconf
 from core.constants import constants
 from core.platform import models
 from core.platform.speech_synthesis import azure_speech_synthesis_services
@@ -587,17 +586,4 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
                 content, math_symbol_pronunciations
             ),
             expected_content_to_be_pronounced,
-        )
-
-    def test_should_return_correct_retry_attempts(self) -> None:
-        self.assertEqual(
-            azure_speech_synthesis_services.get_number_of_retry_attempts_for_voiceover_synthesis(),
-            4,
-        )
-
-        # Simulating Dataflow environment.
-        feconf.OPPIA_PROJECT_ID_IN_DATAFLOW_ENV = 'oppia-project-id-dataflow'
-        self.assertEqual(
-            azure_speech_synthesis_services.get_number_of_retry_attempts_for_voiceover_synthesis(),
-            10,
         )
