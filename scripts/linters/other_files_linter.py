@@ -76,7 +76,7 @@ THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     },
     {
         'name': 'Skulpt',
-        'dependency_key': 'skulpt-dist',
+        'dependency_key': 'skulpt',
         'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
         'type_defs_filename_prefix': 'skulpt-defs-',
     },
