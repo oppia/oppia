@@ -30,6 +30,8 @@ import {InteractionSpecsKey} from 'pages/interaction-specs.constants';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {EntityVoiceoversService} from 'services/entity-voiceovers.services';
+import { SubtitledHtml } from 'domain/exploration/subtitled-html.model';
+import { SubtitledUnicode } from 'domain/exploration/subtitled-unicode.model';
 
 interface AvailabilityStatus {
   available: boolean;
@@ -165,6 +167,20 @@ export class TranslationStatusService implements OnInit {
 
         let allContentIds =
           this.explorationStatesService.getAllContentIdsByStateName(stateName);
+         // Filter out empty content
+        allContentIds = allContentIds.filter(contentId => {
+          const content =
+            this.explorationStatesService.initalContentsMapping[contentId];
+          if (!content) {
+            return true;
+          }
+          if (content instanceof SubtitledHtml) {
+            return content.html !== '';
+          } else if (content instanceof SubtitledUnicode) {
+            return content.unicode !== '';
+          }
+          return true;
+        });
         let interactionId =
           this.explorationStatesService.getInteractionIdMemento(stateName);
         // This is used to prevent users from adding unwanted hints audio, as
