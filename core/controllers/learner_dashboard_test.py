@@ -1189,3 +1189,56 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(exp_progress_map[self.EXP_ID_3], 0)
 
         self.logout()
+
+    def test_exploration_progress_with_missing_progress_data(self) -> None:
+        """Test that progress is 0 when progress data is missing."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration with checkpoint.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as incomplete without visiting checkpoints.
+        learner_progress_services.mark_exploration_as_incomplete(
+            self.viewer_id, self.EXP_ID_1, exploration.init_state_name, 1
+        )
+
+        def mock_get_checkpoint_progress_for_explorations(
+            *_args: str, **_kwargs: str
+        ) -> dict[str, dict[str, int]]:
+            return {}
+
+        with self.swap(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            mock_get_checkpoint_progress_for_explorations,
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        incomplete_exps = response['incomplete_explorations_list']
+        self.assertEqual(len(incomplete_exps), 1)
+        self.assertEqual(incomplete_exps[0]['progress'], 0)
+
+        self.logout()
