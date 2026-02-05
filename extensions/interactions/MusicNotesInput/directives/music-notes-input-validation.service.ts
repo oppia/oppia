@@ -16,16 +16,16 @@
  * @fileoverview Validator service for the interaction.
  */
 
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
-import {AnswerGroup} from 'domain/exploration/answer-group.model';
+import { AnswerGroup } from 'domain/exploration/answer-group.model';
 import {
   Warning,
   BaseInteractionValidationService,
 } from 'interactions/base-interaction-validation.service';
-import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
-import {Outcome} from 'domain/exploration/outcome.model';
-import {AppConstants} from 'app.constants';
+import { MusicNotesInputCustomizationArgs } from 'extensions/interactions/customization-args-defs';
+import { Outcome } from 'domain/exploration/outcome.model';
+import { AppConstants } from 'app.constants';
 
 @Injectable({
   providedIn: 'root',
@@ -33,13 +33,52 @@ import {AppConstants} from 'app.constants';
 export class MusicNotesInputValidationService {
   constructor(
     private baseInteractionValidationServiceInstance: BaseInteractionValidationService
-  ) {}
+  ) { }
 
   getCustomizationArgsWarnings(
     customizationArgs: MusicNotesInputCustomizationArgs
   ): Warning[] {
-    // TODO(#20442): Implement customization args validations.
-    return [];
+    const warningsList: Warning[] = [];
+
+  this.baseInteractionValidationServiceInstance.requireCustomizationArguments(
+    customizationArgs,
+    ['sequenceToGuess', 'initialSequence']
+  );
+
+
+    if (customizationArgs.sequenceToGuess.value.length === 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Please add at least one note for the learner to guess.',
+      });
+    }
+
+    if (customizationArgs.initialSequence.value.length === 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Please add at least one starting note in the initial sequence.',
+      });
+    }
+
+    customizationArgs.sequenceToGuess.value.forEach((note, index) => {
+      if (!note.readableNoteName || !note.noteDuration) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: `Note ${index + 1} in sequenceToGuess is invalid.`,
+        });
+      }
+    });
+
+    customizationArgs.initialSequence.value.forEach((note, index) => {
+      if (!note.readableNoteName || !note.noteDuration) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: `Note ${index + 1} in initialSequence is invalid.`,
+        });
+      }
+    });
+
+    return warningsList;
   }
 
   getAllWarnings(
