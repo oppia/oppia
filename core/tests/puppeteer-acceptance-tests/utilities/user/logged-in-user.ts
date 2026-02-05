@@ -4671,7 +4671,6 @@ export class LoggedInUser extends BaseUser {
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
     const lessonSel = learnerDashSelectors.lessonCard;
 
-    // wait until at least one lesson card exists
     await this.page.waitForSelector(lessonSel.content);
 
     const cards = await this.page.$$(lessonSel.content);
@@ -4761,7 +4760,9 @@ export class LoggedInUser extends BaseUser {
           }
         }
 
-        if (chapterFound) break;
+        if (chapterFound) {
+          break;
+        }
       }
 
       if (!chapterFound) {
