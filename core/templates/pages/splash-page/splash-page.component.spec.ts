@@ -81,7 +81,11 @@ describe('Splash Page', () => {
 
   beforeEach(async () => {
     TestBed.configureTestingModule({
-      declarations: [SplashPageComponent, MockTranslatePipe, PrimaryButtonComponent],
+      declarations: [
+        SplashPageComponent,
+        MockTranslatePipe,
+        PrimaryButtonComponent,
+      ],
       providers: [
         {
           provide: I18nLanguageCodeService,
