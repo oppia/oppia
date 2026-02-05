@@ -16,7 +16,12 @@
  * @fileoverview Unit tests for error page.
  */
 import {CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
-import {TestBed, ComponentFixture, fakeAsync, tick} from '@angular/core/testing';
+import {
+  TestBed,
+  ComponentFixture,
+  fakeAsync,
+  tick,
+} from '@angular/core/testing';
 import {TranslateModule} from '@ngx-translate/core';
 
 import {ErrorPageComponent} from './error-page.component';
