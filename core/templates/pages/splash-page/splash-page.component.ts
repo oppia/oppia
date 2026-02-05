@@ -82,10 +82,6 @@ export class SplashPageComponent implements OnInit {
     this.siteAnalyticsService.registerClickBrowseLessonsButtonEvent();
   }
 
-  onClickAccessAndroidButton(): void {
-    // No analytics event is currently registered for this button.
-  }
-
   onClickStartContributingButton(): void {
     this.siteAnalyticsService.registerClickStartContributingButtonEvent();
   }
