@@ -545,6 +545,8 @@ class TasksTests(test_utils.EmailTestBase):
         self.assertEqual(cloud_task_run_model_obj.latest_job_state, 'SUCCEEDED')
 
     def test_should_handle_voiceover_deferred_tasks_successfully(self) -> None:
+        self.signup('user@example.com', 'user')
+        user_id = self.get_user_id_from_email('user@example.com')
         exploration_id = 'exploration_id'
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)
@@ -572,7 +574,7 @@ class TasksTests(test_utils.EmailTestBase):
         payload = {
             'fn_identifier': function_id,
             'cloud_task_model_id': new_model_id,
-            'args': [exploration_id, '2025-12-13 21:08:46', 'author_id'],
+            'args': [exploration_id, '2025-12-13 21:08:46', self.owner_id],
             'kwargs': {},
         }
 

@@ -1012,6 +1012,8 @@ def _regenerate_voiceovers_for_given_contents(
             voiceover_regeneration_task
         )
 
+    errors_while_voiceover_regeneration = []
+
     for language_code in language_codes:
         language_accent_codes = (
             language_code_to_autogeneratable_accent_codes.get(language_code, [])
