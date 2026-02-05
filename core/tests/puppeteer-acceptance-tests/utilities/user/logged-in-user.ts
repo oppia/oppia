@@ -3915,12 +3915,8 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     context: puppeteer.ElementHandle<Element> | puppeteer.Page = this.page
   ): Promise<void> {
-    // const lessonCards = await context.$$(lessonCardContainer); e2e-test-redesigned-lesson-card-container
     const lessonCards = await context.$$(commonLessonCardContainerSelector);
     const lessonCardTitles = await Promise.all(
-      // lessonCards.map(card =>
-      //   card.$eval(lessonTitleSelector, el => el.textContent?.trim())
-      // ) e2e-test-lesson-card-title
       lessonCards.map(card =>
         card.$eval(commonlessonTitleSelector, el => el.textContent?.trim())
       )
@@ -4726,7 +4722,9 @@ export class LoggedInUser extends BaseUser {
           }
         }
 
-        if (chapterFound) break;
+        if (chapterFound) {
+          break;
+        }
       }
 
       if (!chapterFound) {
