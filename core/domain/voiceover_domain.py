@@ -317,6 +317,9 @@ class EntityVoiceovers:
             voiceover_type: VoiceoverType. The voiceover type of the given
                 voiceover.
         """
+        if content_id not in self.voiceovers_mapping:
+            return
+
         self.voiceovers_mapping[content_id][voiceover_type.value] = None
 
         if self.is_both_voiceovers_empty(content_id):
@@ -367,21 +370,23 @@ class EntityVoiceovers:
             sentence_tokens_with_durations
         )
 
-    def mark_manual_voiceovers_as_needing_update(self, content_id: str) -> None:
+    def mark_voiceovers_as_needing_update(
+        self, content_id: str, voiceover_type: feconf.VoiceoverType
+    ) -> None:
         """Marks the manual voiceover for the given content ID as needing
         update.
 
         Args:
             content_id: str. The ID of the content for which the manual
                 voiceover is being marked.
+            voiceover_type: VoiceoverType. The voiceover type of the given
+                voiceover.
         """
         if content_id not in self.voiceovers_mapping:
             return
-        manual_voiceover = self.voiceovers_mapping[content_id][
-            feconf.VoiceoverType.MANUAL.value
-        ]
-        if manual_voiceover is not None:
-            manual_voiceover.needs_update = True
+        voiceover = self.voiceovers_mapping[content_id][voiceover_type.value]
+        if voiceover is not None:
+            voiceover.needs_update = True
 
     @classmethod
     def create_empty(

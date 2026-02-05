@@ -1033,6 +1033,79 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(ValueError, 'Error'):
                 git_changes_utils.get_refs()
 
+    def test_get_refs_without_stdin_single_ref(self) -> None:
+        def mock_get_branch() -> str:
+            return 'branch1'
+
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
+            return (b'local_sha1 local_ref', b'')
+
+        with self.swap(
+            common, 'get_current_branch_name', mock_get_branch
+        ), self.swap_with_checks(
+            common,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+            expected_args=[(['git', 'show-ref', 'branch1'],)],
+        ):
+            self.assertEqual(
+                git_changes_utils.get_refs(),
+                [
+                    git_changes_utils.GitRef(
+                        local_ref='local_ref',
+                        local_sha1='local_sha1',
+                        remote_ref=None,
+                        remote_sha1=None,
+                    )
+                ],
+            )
+
+    def test_get_refs_with_tty_stdin_uses_branch(self) -> None:
+        def mock_get_branch() -> str:
+            return 'branch1'
+
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
+            return (b'local_sha1 local_ref\nremote_sha1 remote_ref', b'')
+
+        with self.swap(sys.stdin, 'isatty', lambda: True), self.swap(
+            common, 'get_current_branch_name', mock_get_branch
+        ), self.swap(
+            common,
+            'start_subprocess_for_result',
+            mock_start_subprocess_for_result,
+        ):
+            refs = git_changes_utils.get_refs()
+            self.assertEqual(len(refs), 1)
+            self.assertEqual(refs[0].local_ref, 'local_ref')
+
+    def test_get_refs_with_empty_stdin_should_fallback(self) -> None:
+        def mock_get_branch() -> str:
+            return 'branch1'
+
+        def mock_start_subprocess_for_result(
+            unused_cmd_tokens: List[str],
+        ) -> Tuple[bytes, bytes]:
+            return (b'local_sha1 local_ref', b'')
+
+        with tempfile.NamedTemporaryFile() as temp_stdin_file:
+            with open(temp_stdin_file.name, 'r', encoding='utf-8') as f:
+                with self.swap(sys, 'stdin', f), self.swap(
+                    sys.stdin, 'isatty', lambda: False
+                ), self.swap(
+                    common, 'get_current_branch_name', mock_get_branch
+                ), self.swap(
+                    common,
+                    'start_subprocess_for_result',
+                    mock_start_subprocess_for_result,
+                ):
+                    refs = git_changes_utils.get_refs()
+                    self.assertEqual(len(refs), 1)
+                    self.assertEqual(refs[0].local_ref, 'local_ref')
+
     def test_get_js_or_ts_files_from_diff_with_js_file(self) -> None:
         self.assertEqual(
             git_changes_utils.get_js_or_ts_files_from_diff(
@@ -1082,6 +1155,25 @@ class GitChangesUtilsTests(test_utils.GenericTestBase):
                 git_changes_utils.get_python_dot_test_files_from_diff(
                     [b'test/file1.py', b'test/file2.py', b'test/file3.py']
                 ),
+                set(),
+            )
+
+    def test_get_python_dot_test_files_from_diff_with_non_python_files(
+        self,
+    ) -> None:
+        with self.swap(os.path, 'exists', lambda _: False):
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff(
+                    [b'test/file1.js', b'readme.md']
+                ),
+                set(),
+            )
+
+    def test_get_python_dot_test_files_from_diff_with_empty_input(self) -> None:
+        os_path_exists_swap = self.swap(os.path, 'exists', lambda _: False)
+        with os_path_exists_swap:
+            self.assertEqual(
+                git_changes_utils.get_python_dot_test_files_from_diff([]),
                 set(),
             )
 
