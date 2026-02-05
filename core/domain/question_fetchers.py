@@ -19,7 +19,6 @@
 from __future__ import annotations
 
 import copy
-import logging
 
 from core import feconf
 from core.constants import constants
@@ -156,7 +155,7 @@ def get_question_from_model(
 
 def migrate_state_schema(
     versioned_question_state: question_domain.VersionedQuestionStateDict,
-    current_next_content_id_index: Optional[int] = None
+    current_next_content_id_index: Optional[int] = None,
 ) -> Optional[int]:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
@@ -170,6 +169,10 @@ def migrate_state_schema(
                 question.
             state: The State domain object representing the question
                 state data.
+
+        current_next_content_id_index: int. A variable passed
+            from suggestion_migration_job which next_content_id_index
+            is set to before migration.
 
     Returns:
         int. The next content id index for generating content id.
