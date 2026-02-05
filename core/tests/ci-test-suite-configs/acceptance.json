@@ -1,8 +1,8 @@
 {
   "suites": [
     {
-      "name": "logged-in-learner/set-goal-select-topic-with-all-chapter-types-play-published-chapter",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/set-goal-select-topic-with-all-chapter-types-play-published-chapter.spec.ts"
+      "name": "logged-in-learner/serial-chapter",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-in-learner/serial-chapter.spec.ts"
     },
     {
       "name": "topic-manager/track-upcoming-delayed-publish-chapter",

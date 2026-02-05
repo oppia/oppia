@@ -30,9 +30,6 @@ import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const ROLES = testConstants.Roles;
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
-const publishUptoChaptersDropdownSelector =
-  'select.e2e-test-publish-up-to-chapter-dropdown';
-const publishChapterButton = '.e2e-test-publish-chapters-button';
 const returnToStoryFromLastStateSelector =
   '.e2e-test-end-chapter-return-to-story';
 const studyGuideRecommendationSelector =
@@ -132,7 +129,6 @@ describe('Logged-In Learner', function () {
       'Place Values'
     );
 
-    //Create function for this
     await curriculumAdmin.openStoryEditor(
       "Jamie's Adventures in the Arcade",
       'Place Values'
@@ -273,7 +269,7 @@ describe('Logged-In Learner', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
   it(
-    'should learner sees available and coming soon chapters in a topic',
+    'should learner continues learning when new chapters are published',
     async function () {
       await curriculumAdmin.makeChapterReadtToPublish(
         'Comparing Numbers',
@@ -291,7 +287,6 @@ describe('Logged-In Learner', function () {
         'Place Values'
       );
 
-      //Create function for this
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
@@ -317,7 +312,6 @@ describe('Logged-In Learner', function () {
       //   'Find the Value of a Number'
       // );
 
-      // See new chapter on learner dashboard
       await loggedInLearner1.navigateToLearnerDashboard();
 
       await loggedInLearner1.expectScreenshotToMatch(
