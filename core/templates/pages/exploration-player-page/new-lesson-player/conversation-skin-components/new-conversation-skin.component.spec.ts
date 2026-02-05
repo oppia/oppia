@@ -1625,6 +1625,9 @@ describe('New Conversation skin component', () => {
     );
 
     conversationFlowService.setNextCardIfStuck(nextCardIfStuck);
+    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue({
+      getStateName: () => 'StateName',
+    });
     componentInstance.triggerRedirectionToStuckState();
 
     const nextCard = conversationFlowService.getNextStateCard();
@@ -2369,6 +2372,9 @@ describe('New Conversation skin component', () => {
     );
     spyOn(conversationFlowService, 'setNextStateCard');
     spyOn(conversationFlowService, 'showPendingCard');
+    spyOn(conversationFlowService, 'getDisplayedCard').and.returnValue({
+      getStateName: () => 'StateName',
+    });
     componentInstance.showInteraction = true;
     componentInstance.triggerRedirectionToStuckState();
     expect(conversationFlowService.setNextStateCard).toHaveBeenCalledWith(

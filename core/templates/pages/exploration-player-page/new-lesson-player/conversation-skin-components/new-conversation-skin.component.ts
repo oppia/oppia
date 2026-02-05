@@ -189,6 +189,8 @@ export class NewConversationSkinComponent {
           this.playerTranscriptService.resetNumberOfIncorrectSubmissions();
           this.conversationFlowService.setNextCardIfStuck(null);
           this.continueToReviseStateButtonIsVisible = false;
+          // Reset showInteraction when a new card opens after stuck state redirect.
+          this.showInteraction = true;
           let pathnameArray = this.urlService.getPathname().split('/');
 
           if (
@@ -502,6 +504,12 @@ export class NewConversationSkinComponent {
   }
 
   triggerRedirectionToStuckState(): void {
+    // Save the current state name before redirecting so that after
+    // completing the revision, the learner can navigate back to it.
+    const currentStateName = this.conversationFlowService
+      .getDisplayedCard()
+      .getStateName();
+    this.conversationFlowService.setOriginalStuckStateName(currentStateName);
     // Redirect the learner.
     let nextStateCard = this.conversationFlowService.getNextCardIfStuck();
     if (nextStateCard) {

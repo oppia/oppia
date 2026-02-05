@@ -1525,4 +1525,111 @@ describe('Conversation flow service', () => {
 
     expect(conversationFlowService.getNextStateCard()).toBe(nextCard);
   });
+
+  // Tests for stuck state return navigation (Issue #22779)
+  describe('originalStuckStateName tracking', () => {
+    it('should set and get originalStuckStateName', () => {
+      expect(conversationFlowService.getOriginalStuckStateName()).toBeNull();
+
+      conversationFlowService.setOriginalStuckStateName('StuckState');
+
+      expect(conversationFlowService.getOriginalStuckStateName()).toBe(
+        'StuckState'
+      );
+    });
+
+    it('should clear originalStuckStateName when set to null', () => {
+      conversationFlowService.setOriginalStuckStateName('StuckState');
+      expect(conversationFlowService.getOriginalStuckStateName()).toBe(
+        'StuckState'
+      );
+
+      conversationFlowService.setOriginalStuckStateName(null);
+
+      expect(conversationFlowService.getOriginalStuckStateName()).toBeNull();
+    });
+  });
+
+  describe('showUpcomingCard stuck state return', () => {
+    it('should create fresh card for stuck state when originalStuckStateName is set', () => {
+      conversationFlowService.displayedCard = createCard('RevisionState');
+      conversationFlowService.setOriginalStuckStateName('StuckState');
+
+      const freshCard = new StateCard(
+        'StuckState',
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'TextInput', null),
+        [],
+        '',
+        null
+      );
+
+      spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+        freshCard
+      );
+      spyOn(conversationFlowService, 'setNextStateCard');
+      spyOn(conversationFlowService, 'showPendingCard');
+
+      conversationFlowService.showUpcomingCard();
+
+      expect(explorationEngineService.getStateCardByName).toHaveBeenCalledWith(
+        'StuckState'
+      );
+      expect(conversationFlowService.setNextStateCard).toHaveBeenCalledWith(
+        freshCard
+      );
+      expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
+      expect(conversationFlowService.getOriginalStuckStateName()).toBeNull();
+    });
+
+    it('should clear originalStuckStateName after navigating back', () => {
+      conversationFlowService.displayedCard = createCard('RevisionState');
+      conversationFlowService.setOriginalStuckStateName('StuckState');
+
+      const freshCard = new StateCard(
+        'StuckState',
+        null,
+        null,
+        new Interaction([], [], null, null, [], 'TextInput', null),
+        [],
+        '',
+        null
+      );
+
+      spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
+        freshCard
+      );
+      spyOn(conversationFlowService, 'setNextStateCard');
+      spyOn(conversationFlowService, 'showPendingCard');
+
+      conversationFlowService.showUpcomingCard();
+
+      // Verify the stuck state name is cleared after navigation.
+      expect(conversationFlowService.getOriginalStuckStateName()).toBeNull();
+    });
+
+    it('should proceed with normal navigation when originalStuckStateName is null', () => {
+      conversationFlowService.displayedCard = createCard('CurrentState');
+      conversationFlowService.setOriginalStuckStateName(null);
+
+      spyOn(conceptCardManagerService, 'getConceptCard').and.returnValue(null);
+      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
+        false
+      );
+      spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
+        getStateName: () => 'NextState',
+      });
+      spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(
+        false
+      );
+      spyOn(conversationFlowService, 'setAnswerIsCorrect');
+      spyOn(conversationFlowService, 'showPendingCard');
+
+      conversationFlowService.showUpcomingCard();
+
+      // Should fall through to normal navigation.
+      expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
+    });
+  });
 });
