@@ -154,12 +154,20 @@ describe('Splash Page', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should handle click for access android button', function () {
-    // The navigation is now handled by PrimaryButtonComponent via buttonHref.
-    // This test verifies the method can be called without errors.
-    component.onClickAccessAndroidButton();
+  it('should navigate to android page when button is clicked', function () {
+    const fixture = TestBed.createComponent(SplashPageComponent);
+    fixture.detectChanges();
 
-    // No assertions needed as there's no analytics event for this button.
+    const compiled = fixture.nativeElement;
+    const androidButton = compiled.querySelector(
+      'oppia-primary-button[buttonHref="/android"]'
+    );
+
+    expect(androidButton).toBeTruthy();
+
+    const anchorTag = androidButton.querySelector('a.primary-button.btn');
+    expect(anchorTag).toBeTruthy();
+    expect(anchorTag.getAttribute('href')).toBe('/android');
   });
 
   it('should record analytics when Start Contributing is clicked', function () {

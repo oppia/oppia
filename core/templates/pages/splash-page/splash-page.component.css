@@ -79,19 +79,6 @@
   text-transform: none;
 }
 
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.splash-page ::ng-deep .oppia-splash-button-container .primary-button.btn {
-  box-sizing: border-box !important;
-  font-family: "Capriola", "Roboto", Arial, sans-serif !important;
-  font-size: 16px !important;
-  font-weight: normal !important;
-  letter-spacing: normal !important;
-  margin-bottom: 40px !important;
-  margin-top: -20px !important;
-  min-width: 300px !important;
-  padding: 10px !important;
-}
-
 .splash-page .oppia-splash-button:hover,
 .splash-page .oppia-splash-button:focus,
 .splash-page .oppia-splash-button:active {
