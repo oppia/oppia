@@ -68,12 +68,6 @@
       "name": "exploration-editor/manage-exploration-misconceptions",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/manage-exploration-misconceptions.spec.ts"
     },
-
-    {
-      "name": "exploration-editor/modify-an-existing-exploration",
-      "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-an-existing-exploration.spec.ts"
-    },
-
     {
       "name": "exploration-editor/modify-translations-through-modal",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/modify-translations-through-modal.spec.ts"
@@ -97,6 +91,18 @@
     {
       "name": "exploration-editor/submit-review-and-respond-to-feedback",
       "module": "core/tests/puppeteer-acceptance-tests/specs/exploration-editor/submit-review-and-respond-to-feedback.spec.ts"
+    },
+    {
+      "name": "lesson-creator/create-a-basic-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/create-a-basic-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/modify-an-existing-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/modify-an-existing-exploration.spec.ts"
+    },
+    {
+      "name": "lesson-creator/save-and-publish-the-exploration",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/lesson-creator/save-and-publish-the-exploration.spec.ts"
     },
     {
       "name": "logged-in-user/add-concept-card-with-workedexample-to-exploration",
