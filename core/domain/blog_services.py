@@ -928,15 +928,19 @@ def index_blog_post_summaries_given_ids(blog_post_ids: List[str]) -> None:
 
     blog_post_summaries = get_blog_post_summary_models_by_ids(blog_post_ids)
     blog_post_models = blog_models.BlogPostModel.get_multi(blog_post_ids)
-    content_map = {}
+    blog_post_content_id_to_content_map = {}
     for model in blog_post_models:
         if model:
-            content_map[model.id] = html_cleaner.strip_html_tags(model.content)
+            blog_post_content_id_to_content_map[model.id] = (
+                html_cleaner.strip_html_tags(model.content)
+            )
     valid_summaries = []
     for summary in blog_post_summaries:
         if summary is not None:
-            if summary.id in content_map:
-                summary.summary = content_map[summary.id]
+            if summary.id in blog_post_content_id_to_content_map:
+                summary.summary = blog_post_content_id_to_content_map[
+                    summary.id
+                ]
 
             valid_summaries.append(summary)
     if len(valid_summaries) > 0:
