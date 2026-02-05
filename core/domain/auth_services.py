@@ -280,13 +280,19 @@ def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
 
 
 def create_external_account(
-    account: auth_domain.ExternalAccount,
+    auth_id: Optional[str] = None,
+    email: Optional[str] = None,
+    disabled: bool = False,
 ) -> auth_domain.ExternalAccount:
     """Creates a new external account.
 
     Args:
-        account: auth_domain.ExternalAccount. The account to create. When the
-            auth ID of the account is None, a new one will be generated.
+        auth_id: str|None. The ID to assign to the newly created user. Must be
+            a string between 1-128 characters long, inclusive. If not provided,
+            a random ID will be automatically generated.
+        email: str|None. The user's primary email. If provided, then the email
+            address must be valid.
+        disabled: bool. Indicates whether or not the user account is disabled.
 
     Returns:
         auth_domain.ExternalAccount. The final state of the created account.
@@ -295,7 +301,9 @@ def create_external_account(
         ValueError. If the account fields are invalid.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    return platform_auth_services.create_external_account(account)
+    return platform_auth_services.create_external_account(
+        auth_id=auth_id, email=email, disabled=disabled
+    )
 
 
 def update_external_account(

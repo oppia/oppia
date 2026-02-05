@@ -196,13 +196,19 @@ def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
 
 
 def create_external_account(
-    account: auth_domain.ExternalAccount,
+    auth_id: Optional[str] = None,
+    email: Optional[str] = None,
+    disabled: bool = False,
 ) -> auth_domain.ExternalAccount:
     """Creates a new external account in Firebase.
 
     Args:
-        account: auth_domain.ExternalAccount. The account to create. When the ID
-            of the account is None, Firebase will generate a new ID.
+        auth_id: str|None. The ID to assign to the newly created user. Must be
+            a string between 1-128 characters long, inclusive. If not provided,
+            a random ID will be automatically generated.
+        email: str|None. The user's primary email. If provided, then the email
+            address must be valid.
+        disabled: bool. Indicates whether or not the user account is disabled.
 
     Returns:
         auth_domain.ExternalAccount. The final state of the created account.
@@ -211,16 +217,16 @@ def create_external_account(
         ValueError. If the specified user properties are invalid.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    uid, email, disabled = account
     try:
         user = firebase_auth.create_user(
-            uid=uid, email=email, disabled=disabled
+            uid=auth_id, email=email, disabled=disabled
         )
     except firebase_exceptions.FirebaseError as e:
         raise auth_domain.AuthProviderError('Failed to create account') from e
     else:
-        uid, email, disabled = user.uid, user.email, user.disabled
-        return auth_domain.ExternalAccount(uid, email, disabled)
+        return auth_domain.ExternalAccount(
+            auth_id=user.uid, email=user.email, disabled=user.disabled
+        )
 
 
 def update_external_account(
@@ -240,11 +246,7 @@ def update_external_account(
     """
     uid, email, disabled = account
     try:
-        # NOTE: Convert None to '' to satisfy the type checker (expects str).
-        # SDK raises ValueError for both None and '', so behavior is unchanged.
-        user = firebase_auth.update_user(
-            uid or '', email=email, disabled=disabled
-        )
+        user = firebase_auth.update_user(uid, email=email, disabled=disabled)
     except firebase_exceptions.FirebaseError as e:
         raise auth_domain.AuthProviderError('Failed to update account') from e
     else:
@@ -263,9 +265,7 @@ def delete_external_account(account: auth_domain.ExternalAccount) -> None:
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
     try:
-        # NOTE: Convert None to '' to satisfy the type checker (expects str).
-        # SDK raises ValueError for both None and '', so behavior is unchanged.
-        firebase_auth.delete_user(account.auth_id or '')
+        firebase_auth.delete_user(account.auth_id)
     except firebase_exceptions.FirebaseError as e:
         raise auth_domain.AuthProviderError('Failed to delete account') from e
 
@@ -288,9 +288,7 @@ def delete_multi_external_accounts(
     error_count = 0
     batch_offset = 0
 
-    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
-    # SDK raises ValueError for both None and '', so behavior is unchanged.
-    auth_ids = (account.auth_id or '' for account in accounts)
+    auth_ids = (account.auth_id for account in accounts)
 
     while batch := list(itertools.islice(auth_ids, feconf.FIREBASE_BATCH_SIZE)):
         try:
@@ -337,13 +335,9 @@ def import_multi_external_accounts(
     error_count = 0
     batch_offset = 0
 
-    # NOTE: Convert None to '' to satisfy the type checker (expects a str).
-    # SDK raises ValueError for both None and '', so behavior is unchanged.
     records = (
         firebase_auth.ImportUserRecord(
-            uid=account.auth_id or '',
-            email=account.email,
-            disabled=account.disabled,
+            account.auth_id, email=account.email, disabled=account.disabled
         )
         for account in accounts
     )

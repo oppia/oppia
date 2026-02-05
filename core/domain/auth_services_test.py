@@ -271,32 +271,34 @@ class AuthServicesTests(test_utils.GenericTestBase):
             )
 
     def test_create_external_account(self) -> None:
-        input_account = auth_domain.ExternalAccount()
-        output_account = auth_domain.ExternalAccount('aid', 'a@a.com', False)
+        account = auth_domain.ExternalAccount('aid', 'a@a.com', False)
 
         with mock.patch.object(
             platform_auth_services,
             'create_external_account',
-            return_value=output_account,
+            return_value=account,
         ) as mock_create:
-            result = auth_services.create_external_account(input_account)
+            result = auth_services.create_external_account(
+                auth_id='aid', email='a@a.com', disabled=False
+            )
 
-        mock_create.assert_called_once_with(input_account)
-        self.assertEqual(result, output_account)
+        mock_create.assert_called_once_with(
+            auth_id='aid', email='a@a.com', disabled=False
+        )
+        self.assertEqual(result, account)
 
     def test_update_external_account(self) -> None:
-        input_account = auth_domain.ExternalAccount()
-        output_account = auth_domain.ExternalAccount('aid', 'a@a.com', True)
+        account = auth_domain.ExternalAccount('aid', None, False)
 
         with mock.patch.object(
             platform_auth_services,
             'update_external_account',
-            return_value=output_account,
+            return_value=account,
         ) as mock_update:
-            result = auth_services.update_external_account(input_account)
+            result = auth_services.update_external_account(account)
 
-        mock_update.assert_called_once_with(input_account)
-        self.assertEqual(result, output_account)
+        mock_update.assert_called_once_with(account)
+        self.assertEqual(result, account)
 
     def test_delete_external_account(self) -> None:
         account = auth_domain.ExternalAccount('aid', None, False)

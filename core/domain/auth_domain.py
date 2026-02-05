@@ -119,7 +119,7 @@ class AuthClaims:
 class ExternalAccount(NamedTuple):
     """The minimum fields required to link an Oppia user with auth providers."""
 
-    auth_id: Optional[str] = None
+    auth_id: str
     email: Optional[str] = None
     disabled: bool = False
 

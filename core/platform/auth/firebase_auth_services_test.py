@@ -1814,11 +1814,9 @@ class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
 
     def test_create_account_with_all_fields(self) -> None:
-        account = auth_domain.ExternalAccount(
+        result = firebase_auth_services.create_external_account(
             auth_id='new_uid', email='test@example.com', disabled=False
         )
-
-        result = firebase_auth_services.create_external_account(account)
 
         self.assertEqual(result.auth_id, 'new_uid')
         self.assertEqual(result.email, 'test@example.com')
@@ -1826,9 +1824,9 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_user('new_uid')
 
     def test_create_account_with_minimal_fields(self) -> None:
-        account = auth_domain.ExternalAccount(auth_id='new_uid')
-
-        result = firebase_auth_services.create_external_account(account)
+        result = firebase_auth_services.create_external_account(
+            auth_id='new_uid'
+        )
 
         self.assertEqual(result.auth_id, 'new_uid')
         self.assertIsNone(result.email)
@@ -1836,22 +1834,18 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_user('new_uid')
 
     def test_create_account_with_disabled_flag(self) -> None:
-        account = auth_domain.ExternalAccount(
+        result = firebase_auth_services.create_external_account(
             auth_id='new_uid', email='test@example.com', disabled=True
         )
-
-        result = firebase_auth_services.create_external_account(account)
 
         self.assertEqual(result.auth_id, 'new_uid')
         self.assertEqual(result.disabled, True)
         self.firebase_sdk_stub.assert_is_disabled('new_uid')
 
     def test_create_account_without_uid_generates_one(self) -> None:
-        account = auth_domain.ExternalAccount(
+        result = firebase_auth_services.create_external_account(
             auth_id=None, email='test@example.com', disabled=False
         )
-
-        result = firebase_auth_services.create_external_account(account)
 
         self.assertIsNotNone(result.auth_id)
         self.assertEqual(result.email, 'test@example.com')
@@ -1859,24 +1853,20 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.assert_is_user(result.auth_id or '')
 
     def test_create_account_raises_error_when_uid_is_empty_string(self) -> None:
-        self.firebase_sdk_stub.create_user('existing_uid')
-        account = auth_domain.ExternalAccount(auth_id='')
-
         with self.assertRaisesRegex(ValueError, 'uid must not be empty string'):
-            firebase_auth_services.create_external_account(account)
+            firebase_auth_services.create_external_account(auth_id='')
 
     def test_create_account_raises_error_when_uid_already_exists(self) -> None:
         self.firebase_sdk_stub.create_user('existing_uid')
-        account = auth_domain.ExternalAccount(auth_id='existing_uid')
 
         with self.assertRaisesRegex(
             auth_domain.AuthProviderError, 'Failed to create account'
         ):
-            firebase_auth_services.create_external_account(account)
+            firebase_auth_services.create_external_account(
+                auth_id='existing_uid'
+            )
 
     def test_create_account_raises_error_on_firebase_error(self) -> None:
-        account = auth_domain.ExternalAccount(auth_id='new_uid')
-
         with (
             self.swap_to_always_raise(
                 firebase_auth,
@@ -1887,7 +1877,7 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
                 auth_domain.AuthProviderError, 'Failed to create account'
             ),
         ):
-            firebase_auth_services.create_external_account(account)
+            firebase_auth_services.create_external_account(auth_id='new_uid')
 
     def test_update_account_email(self) -> None:
         self.firebase_sdk_stub.create_user(
@@ -2057,18 +2047,6 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
         ):
             firebase_auth_services.delete_multi_external_accounts(accounts)
 
-    def test_delete_accounts_with_none_auth_id(self) -> None:
-        self.firebase_sdk_stub.create_user('uid_0')
-        accounts = [
-            auth_domain.ExternalAccount(auth_id=None),
-            auth_domain.ExternalAccount(auth_id='uid_0'),
-        ]
-
-        with self.assertRaisesRegex(
-            ValueError, r'All accounts must provide valid auth IDs.'
-        ):
-            firebase_auth_services.delete_multi_external_accounts(accounts)
-
     def test_delete_accounts_reports_correct_error_indices(self) -> None:
         for i in range(5):
             self.firebase_sdk_stub.create_user(f'uid_{i}')
@@ -2217,16 +2195,6 @@ class FirebaseExternalAccountCrudTests(FirebaseAuthServicesTestBase):
                 auth_domain.AuthProviderError, 'Error importing 1/3 accounts'
             ),
         ):
-            firebase_auth_services.import_multi_external_accounts(accounts)
-
-    def test_import_accounts_with_none_auth_id_raises_value_error(self) -> None:
-        accounts = [
-            auth_domain.ExternalAccount(auth_id=None),
-            auth_domain.ExternalAccount(auth_id='uid_0'),
-        ]
-
-        # The SDK raises ValueError for empty/None uid values.
-        with self.assertRaisesRegex(ValueError, 'uid'):
             firebase_auth_services.import_multi_external_accounts(accounts)
 
     def test_import_accounts_with_empty_auth_id_raises_value_error(
