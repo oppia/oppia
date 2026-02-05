@@ -20,7 +20,6 @@ const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WebpackRTLPlugin = require('webpack-rtl-plugin');
-const AngularStylesHashPlugin = require('./webpack.angular-styles-hash-plugin');
 var path = require('path');
 var webpack = require('webpack');
 const macros = require('./webpack.common.macros.ts');
@@ -154,10 +153,6 @@ module.exports = {
           },
         };
       },
-    }),
-    new AngularStylesHashPlugin({
-      angularDistDir: 'dist/oppia-angular-prod',
-      baseHref: '/dist/oppia-angular-prod/',
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],

@@ -54,7 +54,6 @@
     "core/templates/domain/utilities/classifier-file.model.ts",
     "extensions/visualizations/visualizationsRequires.ts",
     "extensions/interactions/interactionsQuestionsRequires.ts",
-    "extensions/value_generators/valueGeneratorsRequires.ts",
-    "webpack.angular-styles-hash-plugin.js"
+    "extensions/value_generators/valueGeneratorsRequires.ts"
   ]
 }
