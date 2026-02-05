@@ -1927,6 +1927,9 @@ export class CurriculumAdmin extends TopicManager {
     }
   }
 
+  /**
+   * Publishes the draft of a serial chapter.
+   */
   async publishStoryDraftSerialChapter(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
       await this.clickOnElementWithSelector('.e2e-test-mobile-options-base');

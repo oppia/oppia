@@ -4390,6 +4390,14 @@ export class TopicManager extends BaseUser {
       await this.expectElementToBeVisible(markAsReadyToPublishButton, false);
     }
   }
+
+  /**
+   * Opens the story editor and marks the specified chapter as ready to publish.
+   *
+   * @param chapterName - The name of the chapter to be marked as ready to publish.
+   * @param storyName - The name of the story containing the chapter.
+   * @param topicName - The name of the topic under which the story exists.
+   */
   async makeChapterReadtToPublish(
     chapterName: string,
     storyName: string,
@@ -4460,6 +4468,11 @@ export class TopicManager extends BaseUser {
     showMessage(`Chapter ${chapterName} marked as ready to publish.`);
   }
 
+  /**
+   * Publishes story draft chapters up to the specified chapter selection.
+   * Selects the given value from the "Publish up to chapters" dropdown.
+   * @param dropdownValue - The value to select from the publish-up-to dropdown.
+   */
   async publishStoryDraftChapterUpto(dropdownValue: string): Promise<void> {
     await this.waitForPageToFullyLoad();
 
@@ -4474,6 +4487,13 @@ export class TopicManager extends BaseUser {
     await this.clickOnElementWithSelector(publishUptoChaptersDropdownSelector);
     await this.select(publishUptoChaptersDropdownSelector, dropdownValue);
   }
+
+  /**
+   * Verifies that all specified chapters are listed and have the expected status.
+   * Fails if any chapter is missing or if its status does not match the expected value.
+   * @param chapterNames - The list of chapter titles to verify.
+   * @param chapStatus - The expected status of each chapter (defaults to 'Published').
+   */
   async expectAllListedChaptersStatus(
     chapterNames: string[],
     chapStatus: string = 'Published'

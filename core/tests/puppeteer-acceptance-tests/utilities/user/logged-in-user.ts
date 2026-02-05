@@ -4455,6 +4455,10 @@ export class LoggedInUser extends BaseUser {
     );
   }
 
+  /**
+   * Function to Verifiy that a specific chapter is present in the recommended section.
+   * @param chapterTitle - The title of the chapter to verify.
+   */
   async expectChapterToBePresentInRecommendedSection(
     chapterTitle: string
   ): Promise<void> {
@@ -4668,7 +4672,6 @@ export class LoggedInUser extends BaseUser {
     await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 
-  // Correction needed in below
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
     const lessonSel = learnerDashSelectors.lessonCard;
 
@@ -4699,6 +4702,10 @@ export class LoggedInUser extends BaseUser {
     throw new Error(`Lesson "${chapterName}" not found`);
   }
 
+  /**
+   * Check if available lesson list has chapters
+   * @param chapterNames - The array of chapter names
+   */
   async availableLessonListHasChapters(chapterNames: string[]): Promise<void> {
     const chapterSelector = 'a';
     await this.page.waitForSelector(availableChapters);
@@ -4730,6 +4737,10 @@ export class LoggedInUser extends BaseUser {
     showMessage('All specified Available chapters are present.');
   }
 
+  /**
+   * Check if comming soon lesson list has chapters
+   * @param chapterNames - The array of chapter names
+   */
   async commingSoonLessonListHasChapters(
     chapterNames: string[]
   ): Promise<void> {
@@ -4764,8 +4775,6 @@ export class LoggedInUser extends BaseUser {
 
     showMessage('All specified Coming Soon chapters are present.');
   }
-
-  //Make Function For available lessons list chapter has new label
 }
 
 export let LoggedInUserFactory = (): LoggedInUser => new LoggedInUser();
