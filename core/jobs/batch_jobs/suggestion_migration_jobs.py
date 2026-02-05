@@ -247,6 +247,7 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
         schema.
         """
         question_dict = question_suggestion_model.change_cmd['question_dict']
+        current_index = question_dict.get('next_content_id_index') 
         versioned_question_state: question_domain.VersionedQuestionStateDict = {
             'state': question_dict['question_state_data'],
             'state_schema_version': question_dict[
@@ -256,7 +257,8 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
 
         try:
             next_content_id_index = question_fetchers.migrate_state_schema(
-                versioned_question_state
+                versioned_question_state,
+                current_next_content_id_index = current_index
             )
 
             question_dict['next_content_id_index'] = next_content_id_index

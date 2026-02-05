@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import copy
+import logging
 
 from core import feconf
 from core.constants import constants
@@ -155,6 +156,7 @@ def get_question_from_model(
 
 def migrate_state_schema(
     versioned_question_state: question_domain.VersionedQuestionStateDict,
+    current_next_content_id_index: Optional[int] = None
 ) -> Optional[int]:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
@@ -185,7 +187,7 @@ def migrate_state_schema(
             % feconf.CURRENT_STATE_SCHEMA_VERSION
         )
 
-    next_content_id_index = None
+    next_content_id_index = current_next_content_id_index
     while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
         if state_schema_version == 54:
             # State conversion function from 54 to 55 removes
