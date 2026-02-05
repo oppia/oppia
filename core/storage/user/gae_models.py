@@ -82,6 +82,8 @@ class UserSettingsModel(base_models.BaseModel):
     # User specified biography (to be shown on their profile page).
     user_bio = datastore_services.TextProperty(indexed=False)
     # Subject interests specified by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     subject_interests: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -89,6 +91,8 @@ class UserSettingsModel(base_models.BaseModel):
     # Exploration language preferences specified by the user.
     # These language preferences are mainly for the purpose
     # of figuring out what to show by default in the library index page.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     preferred_language_codes: List[str] = datastore_services.StringProperty(
         repeated=True,
         indexed=True,
@@ -159,6 +163,8 @@ class UserSettingsModel(base_models.BaseModel):
 
     # Currently, "roles" and "banned" fields are not in use.
     # A list of roles assigned to the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     roles: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True, choices=feconf.ALLOWED_USER_ROLES
     )  # type: ignore[assignment]
@@ -424,6 +430,8 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
+        # Here we use MyPy ignore because the roles property is a list of
+        # strings, but we are querying against a single string.
         return cls.query(cls.roles == role).fetch()  # type: ignore[comparison-overlap]
 
 
@@ -435,22 +443,32 @@ class CompletedActivitiesModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the collections completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the stories completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     story_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # IDs of all the topics learnt by the user (i.e. the topics in which the
     # learner has completed all the stories).
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     learnt_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the topics learnt by the user(i.e. the topics in which the
     # learner has completed all the subtopics).
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     mastered_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -539,22 +557,32 @@ class IncompleteActivitiesModel(base_models.BaseModel):
     """
 
     # The ids of the explorations partially completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # The ids of the collections partially completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the stories partially completed by the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     story_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # IDs of all the topics partially learnt by the user(i.e. the topics in
     # which the learner has not completed all the stories).
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     partially_learnt_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the topics partially mastered by the user(i.e. the topics in
     # which the learner has not completed all the subtopics).
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     partially_mastered_topic_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -801,10 +829,14 @@ class LearnerGoalsModel(base_models.BaseModel):
     """
 
     # IDs of all the topics selected by the user to learn.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     topic_ids_to_learn: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the topics selected by the user to master.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     topic_ids_to_master: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -884,10 +916,14 @@ class LearnerPlaylistModel(base_models.BaseModel):
     """
 
     # IDs of all the explorations in the playlist of the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of all the collections in the playlist of the user.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -967,11 +1003,15 @@ class UserContributionsModel(base_models.BaseModel):
     """
 
     # IDs of explorations that this user has created.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     created_exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of explorations that this user has made a positive
     # (i.e. non-revert) commit to.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     edited_exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
@@ -1136,18 +1176,26 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     # IDs of explorations that this user subscribes to.
     # IDs of explorations that this user subscribes to.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     exploration_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of collections that this user subscribes to.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     collection_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of feedback thread ids that this user subscribes to.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     general_feedback_thread_ids: List[str] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # IDs of the creators to whom this learner has subscribed.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     creator_ids: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
     # When the user last checked notifications. May be None.
     last_checked = datastore_services.DateTimeProperty(default=None)
@@ -1202,7 +1250,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_subscriptions_models: List[UserSubscriptionsModel] = list(
-            cls.query(cls.creator_ids == user_id).fetch()
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
+            cls.query(cls.creator_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
 
         for user_subscribers_model in user_subscriptions_models:
@@ -1228,7 +1279,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return (
-            cls.query(cls.creator_ids == user_id).get(keys_only=True)
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
+            cls.query(cls.creator_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
             is not None
             or cls.get_by_id(user_id) is not None
         )
@@ -1279,7 +1333,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
             ),
         }
 
-        return user_data
+        # Here we use MyPy ignore because the return value is a dict with
+        # heterogeneous values, which MyPy interprets as Dict[str, object],
+        # causing a type mismatch with the signature.
+        return user_data  # type: ignore[return-value]
 
 
 class UserSubscribersModel(base_models.BaseModel):
@@ -1308,7 +1365,10 @@ class UserSubscribersModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_subscribers_models: List[UserSubscribersModel] = list(
-            cls.query(cls.subscriber_ids == user_id).fetch()
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
+            cls.query(cls.subscriber_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
 
         for user_subscribers_model in user_subscribers_models:
@@ -1333,7 +1393,10 @@ class UserSubscribersModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return (
-            cls.query(cls.subscriber_ids == user_id).get(keys_only=True)
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
+            cls.query(cls.subscriber_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
             is not None
             or cls.get_by_id(user_id) is not None
         )
@@ -1575,7 +1638,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             'weekly_creator_stats_list': weekly_stats_constructed,
         }
 
-        return user_data
+        # Here we use MyPy ignore because the return value is a dict with
+        # heterogeneous values, which MyPy interprets as Dict[str, object],
+        # causing a type mismatch with the signature.
+        return user_data  # type: ignore[return-value]
 
 
 class ExplorationUserDataModel(base_models.BaseModel):
@@ -1631,7 +1697,9 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # Can be zero if the draft is None or if the user has not committed
     # draft changes to this exploration since the draft_change_list_id property
     # was introduced.
-    draft_change_list_id: int = datastore_services.IntegerProperty(default=0)
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
+    draft_change_list_id: int = datastore_services.IntegerProperty(default=0)  # type: ignore[assignment]
     # The user's preference for receiving suggestion emails for this
     # exploration.
     mute_suggestion_notifications = datastore_services.BooleanProperty(
@@ -2588,6 +2656,9 @@ class UserGroupModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return (
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.query(cls.user_ids == user_id).get(keys_only=True) is not None  # type: ignore[comparison-overlap]
         )
 
@@ -2599,6 +2670,9 @@ class UserGroupModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_group_models: List[UserGroupModel] = list(
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
 
@@ -2621,6 +2695,9 @@ class UserGroupModel(base_models.BaseModel):
         """
         user_data = {}
         user_group_models: List[UserGroupModel] = list(
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
         )
         for user_group_model in user_group_models:
@@ -2985,10 +3062,10 @@ class UserContributionRightsModel(base_models.BaseModel):
     Instances of this class are keyed by the user id.
     """
 
-    can_review_translation_for_language_codes: List[str] = (
-        # Here we use MyPy ignore because the inferred type of the property
-        # does not match the type annotation.
-        datastore_services.StringProperty(repeated=True, indexed=True)
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
+    can_review_translation_for_language_codes: List[str] = datastore_services.StringProperty(
+        repeated=True, indexed=True
     )  # type: ignore[assignment]
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
@@ -3088,6 +3165,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             translations in the given language code.
         """
         reviewer_keys = cls.query(
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.can_review_translation_for_language_codes == language_code  # type: ignore[comparison-overlap]
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
@@ -3105,6 +3185,9 @@ class UserContributionRightsModel(base_models.BaseModel):
             voiceovers in the given language code.
         """
         reviewer_keys = cls.query(
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.can_review_voiceover_for_language_codes == language_code  # type: ignore[comparison-overlap]
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]

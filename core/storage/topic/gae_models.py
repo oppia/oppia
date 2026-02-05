@@ -511,6 +511,9 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         """
         return (
             TopicRightsSnapshotMetadataModel.query(
+                # Here we use MyPy ignore because the comparison of a list
+                # property with a string via equality operator is valid in NDB
+                # but causes a type mismatch.
                 TopicRightsSnapshotMetadataModel.content_user_ids == user_id  # type: ignore[comparison-overlap]
             ).get(keys_only=True)
             is not None
@@ -557,6 +560,9 @@ class TopicRightsModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
+            # Here we use MyPy ignore because the comparison of a list
+            # property with a string via equality operator is valid in NDB
+            # but causes a type mismatch.
             cls.query(cls.manager_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
             is not None
         )
@@ -572,6 +578,9 @@ class TopicRightsModel(base_models.VersionedModel):
             list(TopicRightsModel). The list of TopicRightsModel objects in
             which the given user is a manager.
         """
+        # Here we use MyPy ignore because the comparison of a list
+        # property with a string via equality operator is valid in NDB
+        # but causes a type mismatch.
         return cls.query(cls.manager_ids == user_id).fetch()  # type: ignore[comparison-overlap]
 
     def compute_models_to_commit(
@@ -704,6 +713,9 @@ class TopicRightsModel(base_models.VersionedModel):
             format. In this case, we are returning all the ids of the topics
             this user manages.
         """
+        # Here we use MyPy ignore because the comparison of a list
+        # property with a string via equality operator is valid in NDB
+        # but causes a type mismatch.
         managed_topics = cls.get_all().filter(cls.manager_ids == user_id)  # type: ignore[comparison-overlap]
         managed_topic_ids = [right.id for right in managed_topics]
 
