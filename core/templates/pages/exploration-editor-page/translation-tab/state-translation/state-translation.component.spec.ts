@@ -119,6 +119,7 @@ describe('State translation component', () => {
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationLanguageCodeService: ExplorationLanguageCodeService;
+
   let explorationState1 = {
     Introduction: {
       content: {
@@ -346,12 +347,12 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isVoiceoverModeActive'
     ).and.returnValue(true);
-    
-    spyOn(
+
+     spyOn(
       translationTabActiveModeService,
       'isTranslationModeActive'
     ).and.returnValue(false);
-    
+
     explorationStatesService.init(explorationState1, false);
     component.isTranslationTabBusy = false;
     component.stateName = 'Introduction';
@@ -361,6 +362,7 @@ describe('State translation component', () => {
   });
 
   afterEach(() => {
+    component.ngOnDestroy();
     if (component) {
       component.ngOnDestroy();
     }
@@ -372,7 +374,7 @@ describe('State translation component', () => {
       it('should init state translation when refreshing page', () => {
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
         refreshStateTranslationEmitter.emit();
-        
+
         expect(component.isActive('content')).toBe(true);
         expect(component.isVoiceoverModeActive()).toBe(true);
         expect(component.isDisabled('content')).toBe(false);
@@ -400,7 +402,7 @@ describe('State translation component', () => {
               content,
             },
           ]);
-       }
+        }
       );
 
       it('should broadcast copy to ck editor when clicking on content', () => {
@@ -461,7 +463,7 @@ describe('State translation component', () => {
             }
           );
         }
-     );
+      );
 
       it('should activate feedback tab when clicking on tab', () => {
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
@@ -499,11 +501,11 @@ describe('State translation component', () => {
         expect(component.contentIdStatusColorStyle('hint_1')).toEqual({
           'border-left': '3px solid #808080',
         });
-       });
+      });
 
       it('should activate solution tab when clicking on tab', () => {
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
-         component.onTabClick('solution');
+        component.onTabClick('solution');
 
         expect(component.isActive('solution')).toBe(true);
         expect(component.isDisabled('solution')).toBe(false);
@@ -529,15 +531,15 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('rule_input_4', 'set_of_normalized_string');
-       });
+      });
 
       it('should change active rule content index', () => {
-          component.onTabClick('rule_input');
+        component.onTabClick('rule_input');
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
         component.changeActiveRuleContentIndex(1);
 
-         expect(
+        expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('rule_input_5', 'set_of_normalized_string');
       });
@@ -555,7 +557,7 @@ describe('State translation component', () => {
             translationTabActiveContentIdService.setActiveContent
           ).not.toHaveBeenCalled();
         }
-     );
+      );
 
       it('should change active hint index', () => {
         component.onTabClick('hint');
@@ -566,7 +568,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('hint_2', 'html');
-       });
+      });
 
       it('should not change active hint index if it is equal to the current one', () => {
         component.onTabClick('hint');
@@ -577,7 +579,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).not.toHaveBeenCalled();
-       });
+      });
 
       it('should change active answer group index', () => {
         component.onTabClick('feedback');
@@ -609,7 +611,7 @@ describe('State translation component', () => {
         'should change active answer group index to default outcome when' +
           ' index provided is equal to answer groups length',
         () => {
-         component.onTabClick('feedback');
+          component.onTabClick('feedback');
 
           spyOn(translationTabActiveContentIdService, 'setActiveContent');
           component.changeActiveAnswerGroupIndex(2);
@@ -621,7 +623,7 @@ describe('State translation component', () => {
       );
 
       it('should not change active hint index if it is equal to the current one', () => {
-    component.onTabClick('feedback');
+        component.onTabClick('feedback');
 
         spyOn(translationTabActiveContentIdService, 'setActiveContent');
         component.changeActiveAnswerGroupIndex(0);
@@ -664,7 +666,7 @@ describe('State translation component', () => {
           'This is the unicode'
         );
       });
-      
+
       it('should return null when html translation is missing in non-original language', () => {
         spyOnProperty(
           explorationLanguageCodeService,
@@ -681,7 +683,7 @@ describe('State translation component', () => {
         // So getWrittenTranslation will return null.
         expect(component.getRequiredHtml(subtitledObject)).toBeNull();
       });
-      
+
       it('should return null when unicode translation is missing in non-original language', () => {
         spyOnProperty(
           explorationLanguageCodeService,
@@ -695,7 +697,7 @@ describe('State translation component', () => {
         });
         expect(component.getRequiredUnicode(subtitledObject)).toBeNull();
       });
-      
+
       it('should return original html content if language matches exploration language', () => {
         spyOnProperty(
           explorationLanguageCodeService,
@@ -711,7 +713,7 @@ describe('State translation component', () => {
           'Original Content'
         );
       });
-      
+
       it(
         "should get empty content message when text translations haven't" +
           ' been added yet',
@@ -721,7 +723,7 @@ describe('State translation component', () => {
               ' Switch to translation mode to add a text translation.'
           );
         }
-     );
+      );
 
       it('should get summary default outcome when outcome is linear', () => {
         expect(
@@ -732,7 +734,7 @@ describe('State translation component', () => {
             'true'
           )
         ).toBe('[] Feedback Text');
-     });
+      });
 
       it(
         'should get summary default outcome when answer group count' +
@@ -747,7 +749,7 @@ describe('State translation component', () => {
             )
           ).toBe('[] Feedback Text');
         }
-     );
+      );
 
       it(
         'should get summary default outcome when answer group count' +
@@ -779,7 +781,7 @@ describe('State translation component', () => {
               Outcome.createNew('unused', '1', 'Feedback text', []),
               null,
               '0'
-              ),
+            ),
             '1',
             null,
             true
@@ -842,7 +844,7 @@ describe('State translation component', () => {
       expect(component.hasOriginalContent(subtitledObject)).toBe(false);
     });
 });
-  
+
 describe('State translation component', () => {
   let component: StateTranslationComponent;
   let fixture: ComponentFixture<StateTranslationComponent>;
@@ -974,7 +976,7 @@ describe('State translation component', () => {
 
   class MockPageContextService {
     getExplorationId() {
-       return 'expId';
+      return 'expId';
     }
   }
 
@@ -1066,7 +1068,7 @@ describe('State translation component', () => {
       translationTabActiveModeService,
       'isVoiceoverModeActive'
     ).and.returnValue(false);
-    
+
     spyOn(
       translationTabActiveModeService,
       'isTranslationModeActive'
@@ -1269,7 +1271,7 @@ describe('State translation component', () => {
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let routerService: RouterService;
   let translationLanguageService: TranslationLanguageService;
-  
+
   let explorationState1 = {
     Introduction: {
       content: {
@@ -1627,9 +1629,9 @@ describe('State translation component', () => {
 
   it('should correctly navigate to the given state', () => {
     spyOn(routerService, 'navigateToMainTab').and.callFake(() => {});
-    
+
     component.navigateToState('new_state');
-    
+
     expect(routerService.navigateToMainTab).toHaveBeenCalledWith('new_state');
   });
 
@@ -1645,7 +1647,7 @@ describe('State translation component', () => {
 
     expect(htmlData).toBe('<p>HTML data</p>');
   });
-  
+
   it('should return null when translation not available', () => {
     const htmlData = component.getRequiredHtml(
       new SubtitledHtml('<p>HTML data</p>', 'content_0')
@@ -1933,7 +1935,6 @@ describe('State translation component', () => {
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
-  let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
@@ -2055,7 +2056,7 @@ describe('State translation component', () => {
       solicit_answer_details: false,
     },
   } as StateObjectsBackendDict;
-  
+
   let explorationState4 = {
     Introduction: {
       classifier_model_id: null,
@@ -2152,6 +2153,7 @@ describe('State translation component', () => {
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
     explorationStatesService = TestBed.inject(ExplorationStatesService);
+    translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
       TranslationTabActiveContentIdService
     );
@@ -2239,7 +2241,7 @@ describe('State translation component', () => {
         expect(
           translationTabActiveContentIdService.setActiveContent
         ).toHaveBeenCalledWith('ca_1', 'html');
-        
+
         component.changeActiveCustomizationArgContentIndex(0);
         expect(
           translationTabActiveContentIdService.setActiveContent
