@@ -4495,12 +4495,16 @@ export class TopicManager extends BaseUser {
       const title = await row.$eval('.e2e-test-chapter-title', el =>
         el.textContent?.trim()
       );
-
+      if (!title) {
+        throw new Error(`${title} is Missing`);
+      }
       if (chapterNames.includes(title)) {
         const status = await row.$eval('.e2e-test-chapter-status', el =>
           el.textContent?.trim()
         );
-
+        if (!status) {
+          throw new Error(`Chapter status missing for: ${title}`);
+        }
         expect(status).toBe(chapStatus);
         found.add(title);
       }
