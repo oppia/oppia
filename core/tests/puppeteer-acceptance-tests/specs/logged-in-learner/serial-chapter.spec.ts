@@ -295,7 +295,6 @@ describe('Logged-In Learner', function () {
       await curriculumAdmin.publishStoryDraftSerialChapter();
       await UserFactory.closeBrowserForUser(curriculumAdmin);
 
-      //See new chapter on classroom page
       await loggedInLearner2.navigateToClassroomPage('math');
       await loggedInLearner2.selectAndOpenTopic('Place Values');
       await loggedInLearner2.availableLessonListHasChapters([
@@ -308,6 +307,7 @@ describe('Logged-In Learner', function () {
         'Rounding Numbers part 2',
       ]);
 
+      // Todo:After Resolving issue #24423
       // await loggedInLearner1.expectLessonCardToHaveNewLabel(
       //   'Find the Value of a Number'
       // );

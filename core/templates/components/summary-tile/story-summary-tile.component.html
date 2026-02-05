@@ -125,7 +125,7 @@
       </div>
     </div>
     <div class="chapters-container-box chapter-container" *ngIf="checkTabletView() && isSerialChapterFeatureLearnerFlagEnabled()">
-      <div class="chapters-list">
+      <div class="chapters-list e2e-test-available-chapters">
         <div class="tablet-view chapters-heading">
           <div class="heading-label">Available</div>
           <div class="chapters-count" [innerHTML]="'I18N_TOPIC_VIEWER_CHAPTERS' | translate:{count:availableNodeCount, messageFormat: true}"></div>
@@ -137,7 +137,7 @@
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
             <div class="chapter-text">
-              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank">
+              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank" class="e2e-test-chapter-title">
                 <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ node.getTitle() }}
                 </span>
@@ -159,12 +159,12 @@
         </div>
         <hr class="tablet-view heading-separator">
         <div *ngFor="let node of nodes;let idx = index">
-          <div class="story-details-box chapter-specific-box coming-soon-chapters" *ngIf="node.getStatus() === 'Ready To Publish'" [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null">
+          <div class="story-details-box chapter-specific-box coming-soon-chapters e2e-test-cooming-soon-chapters" *ngIf="node.getStatus() === 'Ready To Publish'" [attr.title]="isSerialChapterFeatureLearnerFlagEnabled() ? ('I18N_LEARNER_STORY_TILE_COMING_SOON_TOOLTIP' | translate) : null">
             <div class="chapter-icon">
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
             <div class="chapter-text">
-              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank" class="disabled-link">
+              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank" class="disabled-link e2e-test-chapter-title">
                 <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ node.getTitle() }}
                 </span>
