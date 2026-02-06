@@ -437,7 +437,7 @@ def get_published_blog_post_summaries_by_user_id(
         )
         .filter(
             blog_models.BlogPostSummaryModel.published_on
-            >= datetime.datetime(2000, 1, 1)
+            >= datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
         )
         .order(-blog_models.BlogPostSummaryModel.published_on)
         .fetch(max_limit, offset=offset)
@@ -512,7 +512,7 @@ def publish_blog_post(blog_post_id: str) -> None:
 
     if not blog_post_rights.blog_post_is_published:
         blog_post_rights.blog_post_is_published = True
-        published_on = datetime.datetime.utcnow()
+        published_on = datetime.datetime.now(datetime.timezone.utc)
         blog_post.published_on = published_on
         blog_post_summary.published_on = published_on
 
@@ -843,7 +843,7 @@ def get_published_blog_post_summaries(
     blog_post_summary_models: Sequence[blog_models.BlogPostSummaryModel] = (
         blog_models.BlogPostSummaryModel.query(
             blog_models.BlogPostSummaryModel.published_on
-            >= datetime.datetime(2000, 1, 1)
+            >= datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)
         )
         .order(-blog_models.BlogPostSummaryModel.published_on)
         .fetch(max_limit, offset=offset)
@@ -900,10 +900,11 @@ def update_blog_models_author_and_published_on_date(
 
     blog_post.author_id = author_id
     supported_date_string = date + ', 00:00:00:00'
-    blog_post.published_on = utils.convert_string_to_naive_datetime_object(
+    naive_datetime = utils.convert_string_to_naive_datetime_object(
         supported_date_string
     )
-    blog_post.validate(strict=True)
+    # Convert naive datetime to timezone-aware UTC datetime
+    blog_post.published_on = naive_datetime.replace(tzinfo=datetime.timezone.utc)
 
     blog_post_summary = compute_summary_of_blog_post(blog_post)
     _save_blog_post_summary(blog_post_summary)

@@ -589,7 +589,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = datetime.datetime.now(datetime.timezone.utc)
         model.update_timestamps()
         model.put()
 
@@ -602,7 +602,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(blog_model.author_id, self.user_id_b)
         self.assertEqual(
-            blog_model.published_on, datetime.datetime(2000, 5, 9, 0, 0)
+            blog_model.published_on, datetime.datetime(2000, 5, 9, 0, 0, tzinfo=datetime.timezone.utc)
         )
 
         blog_summary_model = blog_models.BlogPostSummaryModel.get_by_id(
@@ -610,7 +610,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(blog_summary_model.author_id, self.user_id_b)
         self.assertEqual(
-            blog_summary_model.published_on, datetime.datetime(2000, 5, 9, 0, 0)
+            blog_summary_model.published_on, datetime.datetime(2000, 5, 9, 0, 0, tzinfo=datetime.timezone.utc)
         )
 
         blog_rights_model = blog_models.BlogPostRightsModel.get_by_id(
@@ -627,10 +627,10 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         model.thumbnail_filename = 'image.png'
         model.content = 'hello bloggers'
         model.url_fragment = 'sample'
-        model.published_on = datetime.datetime.utcnow()
+        model.published_on = datetime.datetime.now(datetime.timezone.utc)
         model.update_timestamps()
         model.put()
-
+        
         # Invalid month.
         with self.assertRaisesRegex(
             Exception,
