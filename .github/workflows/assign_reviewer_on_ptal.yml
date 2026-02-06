@@ -3,9 +3,10 @@ name: Assign Reviewers on PTAL Comment
 on:
   issue_comment:
     types: [created]
-
-permissions: read-all
-
+permissions:
+  pull-requests: write
+  issues: write
+  contents: read
 jobs:
   assign-reviewers:
     if: github.event.issue.pull_request != null
