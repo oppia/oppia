@@ -167,7 +167,7 @@ export class TranslationStatusService implements OnInit {
 
         let allContentIds =
           this.explorationStatesService.getAllContentIdsByStateName(stateName);
-         // Filter out empty content
+         // Filter out empty content.
         allContentIds = allContentIds.filter(contentId => {
           const content =
             this.explorationStatesService.initalContentsMapping[contentId];
