@@ -136,9 +136,7 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
-    console.log('getRequiredHtml - LangCode:', langCode);
-    console.log('getRequiredHtml - Displayed:', this.explorationLanguageCodeService.displayed);
-
+    
     if (langCode === this.explorationLanguageCodeService.displayed) {
       return subtitledHtml.html;
     }
