@@ -7327,6 +7327,7 @@ export class ExplorationEditor extends BaseUser {
   async expectFileToBeDownloaded(fileName: string): Promise<void> {
     const downloadedFile = await this.waitForExplorationDownload(fileName);
     expect(downloadedFile).toBe(fileName);
+    await this.waitForPageToFullyLoad();
   }
 
   /**
