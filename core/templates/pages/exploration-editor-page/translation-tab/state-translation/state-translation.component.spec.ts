@@ -73,6 +73,35 @@ class MockNgbModal {
   }
 }
 
+class MockPlatformFeatureService {
+  // Add any methods your component calls, e.g.
+  isFeatureEnabled() {
+    return false;
+  }
+}
+
+class MockTranslationStatusService {
+  getTranslationStatus() {
+    return {};
+  }
+
+  getActiveStateComponentStatusColor(contentId: string): string {
+    return '#D14836';
+  }
+
+  getActiveStateComponentNeedsUpdateStatus(contentId: string): boolean {
+    return false;
+  }
+
+  getActiveStateContentIdNeedsUpdateStatus(contentId: string): boolean {
+    return false;
+  }
+
+  getActiveStateContentIdStatusColor(contentId: string): string {
+    return '#808080';
+  }
+}
+
 @Pipe({name: 'parameterizeRuleDescriptionPipe'})
 class MockParameterizeRuleDescriptionPipe {
   transform(
@@ -84,7 +113,9 @@ class MockParameterizeRuleDescriptionPipe {
   }
 }
 class MockExplorationLanguageCodeService {
-  displayed = 'en';
+  get displayed() {
+    return 'en';
+  }
 }
 @Pipe({name: 'wrapTextWithEllipsis'})
 class MockWrapTextWithEllipsisPipe {
@@ -118,7 +149,6 @@ describe('State translation component', () => {
   let translationLanguageService: TranslationLanguageService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
-  let explorationLanguageCodeService: ExplorationLanguageCodeService;
 
   let explorationState1 = {
     Introduction: {
@@ -736,20 +766,16 @@ describe('State translation component', () => {
         ).toBe('[] Feedback Text');
       });
 
-      it(
-        'should get summary default outcome when answer group count' +
-          ' is greater than 0',
-        () => {
-          expect(
-            component.summarizeDefaultOutcome(
-              Outcome.createNew('unused', '1', 'Feedback Text', []),
-              'TextInput',
-              1,
-              'true'
-            )
-          ).toBe('[] Feedback Text');
-        }
-      );
+      it('should get summary default outcome when outcome is linear', () => {
+        expect(
+          component.summarizeDefaultOutcome(
+            Outcome.createNew('unused', '1', 'Feedback Text', []),
+            'Continue',
+            0,
+            'true'
+          )
+        ).toBe('[When the button is clicked] Feedback Text');
+      });
 
       it(
         'should get summary default outcome when answer group count' +
@@ -762,7 +788,7 @@ describe('State translation component', () => {
               0,
               'true'
             )
-          ).toBe('[] Feedback Text');
+          ).toBe('[All other answers] Feedback Text');
         }
       );
 
@@ -786,63 +812,64 @@ describe('State translation component', () => {
             null,
             true
           )
-        ).toBe('[] Feedback text');
+        ).toBe('[All other answers] Feedback Text');
+      });
+
+      it('should return null for missing translation in non-original language', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageCode'
+        ).and.returnValue('es');
+        // ExplorationLanguageCodeService.displayed is 'en' by mock default.
+
+        let subtitledObject = SubtitledHtml.createFromBackendDict({
+          content_id: 'content_1',
+          html: 'Original Content',
+        });
+
+        // Entity translations for 'es' are missing/empty.
+        expect(component.getRequiredHtml(subtitledObject)).toBeNull();
+      });
+
+      it('should return original content for original language in voiceover mode', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageCode'
+        ).and.returnValue('en');
+        let subtitledObject = SubtitledHtml.createFromBackendDict({
+          content_id: 'content_1',
+          html: 'Original Content',
+        });
+
+        expect(component.getRequiredHtml(subtitledObject)).toBe(
+          'Original Content'
+        );
+      });
+
+      it('should return correct empty content message for original language', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageCode'
+        ).and.returnValue('en');
+        // ExplorationLanguageCodeService.displayed is 'en'.
+
+        expect(component.getEmptyContentMessage()).toBe(
+          'There is no text available to voiceover.'
+        );
+      });
+
+      it('should check if original content is present', () => {
+        let subtitledObject = SubtitledHtml.createFromBackendDict({
+          content_id: 'content_1',
+          html: 'Content',
+        });
+        expect(component.hasOriginalContent(subtitledObject)).toBe(true);
+
+        subtitledObject.html = '';
+        expect(component.hasOriginalContent(subtitledObject)).toBe(false);
       });
     }
   );
-});
-
-    it('should return null for missing translation in non-original language', () => {
-      (translationLanguageService.getActiveLanguageCode as any).and.returnValue('es');
-      // explorationLanguageCodeService.displayed is 'en' by mock default.
-
-      let subtitledObject = SubtitledHtml.createFromBackendDict({
-        content_id: 'content_1',
-        html: 'Original Content',
-      });
-
-      // Entity translations for 'es' are missing/empty.
-      expect(component.getRequiredHtml(subtitledObject)).toBeNull();
-    });
-
-    it('should return original content for original language in voiceover mode', () => {
-      spyOn(translationLanguageService, 'getActiveLanguageCode').and.returnValue('en');
-      // The following lines appear to be misplaced code from a different context.
-      // They are commented out to maintain syntactical correctness of the test file.
-      // console.log('Lang Code:', langCode);
-      // // @ts-ignore
-      // console.log('Displayed Lang:', this.explorationLanguageCodeService.displayed);
-      //
-      // if (langCode === this.explorationLanguageCodeService.displayed) {
-      //   return subtitledHtml.html;
-      // }
-      let subtitledObject = SubtitledHtml.createFromBackendDict({
-        content_id: 'content_1',
-        html: 'Original Content',
-      });
-
-      expect(component.getRequiredHtml(subtitledObject)).toBe('Original Content');
-    });
-
-    it('should return correct empty content message for original language', () => {
-      (translationLanguageService.getActiveLanguageCode as any).and.returnValue('en');
-      // explorationLanguageCodeService.displayed is 'en'.
-
-      expect(component.getEmptyContentMessage()).toBe(
-        'There is no text available to voiceover.'
-      );
-    });
-
-    it('should check if original content is present', () => {
-      let subtitledObject = SubtitledHtml.createFromBackendDict({
-        content_id: 'content_1',
-        html: 'Content',
-      });
-      expect(component.hasOriginalContent(subtitledObject)).toBe(true);
-
-      subtitledObject.html = '';
-      expect(component.hasOriginalContent(subtitledObject)).toBe(false);
-    });
 });
 
 describe('State translation component', () => {
@@ -1937,6 +1964,7 @@ describe('State translation component', () => {
   let stateEditorService: StateEditorService;
   let translationTabActiveContentIdService: TranslationTabActiveContentIdService;
   let translationTabActiveModeService: TranslationTabActiveModeService;
+  let translationLanguageService: TranslationLanguageService;
   let explorationHtmlFormatterService: ExplorationHtmlFormatterService;
   let explorationState1 = {
     Introduction: {
