@@ -59,7 +59,7 @@ describe('Lesson Creator', function () {
   );
 
   it(
-    'change the first card of the exploration',
+    'should change the first card of the exploration',
     async function () {
       await explorationEditor.updateStateName('First');
       await explorationEditor.saveExplorationDraft('Renamed initial card');
