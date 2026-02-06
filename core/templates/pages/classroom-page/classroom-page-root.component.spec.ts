@@ -44,7 +44,7 @@ describe('Classroom Root Page', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [ClassroomPageRootComponent, MockTranslatePipe],
-      providers: [PageHeadService, UrlService],
+      providers: [PageHeadService,UrlService,AccessValidationBackendApiService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
   }));
@@ -102,4 +102,20 @@ describe('Classroom Root Page', () => {
     expect(component.pageIsShown).toBeFalse();
     expect(component.errorPageIsShown).toBeTrue();
   }));
+  it('should show page when classroom exists', fakeAsync(() => {
+  spyOn(pageHeadService, 'updateTitleAndMetaTags');
+  spyOn(urlService, 'getClassroomUrlFragmentFromUrl').and.returnValue(
+    'classroom_url_fragment'
+  );
+  spyOn(
+    accessValidationBackendApiService,
+    'validateAccessToClassroomPage'
+  ).and.returnValue(Promise.resolve());
+
+  component.ngOnInit();
+  tick();
+
+  expect(component.pageIsShown).toBeTrue();
+  expect(component.errorPageIsShown).toBeFalse();
+}));
 });
