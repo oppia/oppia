@@ -2125,4 +2125,36 @@ describe('Conversation skin component', () => {
     componentInstance.ngOnDestroy();
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   });
+
+  it('should add before unload listener on init', fakeAsync(() => {
+    spyOn(userService, 'getUserInfoAsync').and.returnValue(
+      Promise.resolve(
+        new UserInfo([], false, false, false, false, false, '', '', '', true)
+      )
+    );
+    spyOn(urlService, 'getCollectionIdFromExplorationUrl').and.returnValue(
+      null
+    );
+    spyOn(urlService, 'getPidFromUrl').and.returnValue(null);
+    spyOn(pageContextService, 'getExplorationId').and.returnValue('exp_id');
+    spyOn(urlService, 'isIframed').and.returnValue(false);
+    spyOn(loaderService, 'showLoadingScreen');
+    spyOn(
+      urlInterpolationService,
+      'getStaticCopyrightedImageUrl'
+    ).and.returnValue('url');
+    spyOn(explorationModeService, 'isInQuestionPlayerMode').and.returnValue(
+      false
+    );
+
+    spyOn(preventPageUnloadEventService, 'addListener').and.callFake(
+      (callback: () => void) => {
+        callback();
+      }
+    );
+    componentInstance.ngOnInit();
+    tick();
+    flush();
+    expect(preventPageUnloadEventService.addListener).toHaveBeenCalled();
+  }));
 });
