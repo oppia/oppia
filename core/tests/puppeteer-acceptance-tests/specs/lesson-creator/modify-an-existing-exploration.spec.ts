@@ -136,8 +136,7 @@ describe('Lesson Creator', function () {
     'should update exploration when changes are not conflicting',
     async function () {
       await expEditor2.exportAndDiscardLostChanges();
-      await expEditor2.expectFileToBeDownloaded('lostChanges.txt');
-      await expEditor2.expectLostChangesModalToBeVisible(false);
+      await expEditor2.expectLostChangesFileToBeDownloaded();
       await expEditor2.expectCardContentToBe('Created by expEditor1');
       await expEditor2.updateCardContent(
         'Created by expEditor1 and expEditor2'

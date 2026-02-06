@@ -7322,12 +7322,13 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Expects a file to be downloaded with given file name
-   * @param fileName the name of the file to be downloaded
    */
-  async expectFileToBeDownloaded(fileName: string): Promise<void> {
-    const downloadedFile = await this.waitForExplorationDownload(fileName);
-    expect(downloadedFile).toBe(fileName);
+  async expectLostChangesFileToBeDownloaded(): Promise<void> {
+    const downloadedFile =
+      await this.waitForExplorationDownload('lostChanges.txt');
+    expect(downloadedFile).toBe('lostChanges.txt');
     await this.waitForPageToFullyLoad();
+    await this.expectLostChangesModalToBeVisible(false);
   }
 
   /**
