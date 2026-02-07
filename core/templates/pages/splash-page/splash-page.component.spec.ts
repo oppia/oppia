@@ -154,22 +154,6 @@ describe('Splash Page', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should navigate to android page when button is clicked', function () {
-    const fixture = TestBed.createComponent(SplashPageComponent);
-    fixture.detectChanges();
-
-    const compiled = fixture.nativeElement;
-    const androidButton = compiled.querySelector(
-      'oppia-primary-button[buttonHref="/android"]'
-    );
-
-    expect(androidButton).toBeTruthy();
-
-    const anchorTag = androidButton.querySelector('a.primary-button.btn');
-    expect(anchorTag).toBeTruthy();
-    expect(anchorTag.getAttribute('href')).toBe('/android');
-  });
-
   it('should record analytics when Start Contributing is clicked', function () {
     spyOn(
       siteAnalyticsService,

@@ -1735,24 +1735,6 @@ pre.oppia-pre-wrapped-text {
   background-color: #286090;
   border-color: #204d74
 }
-
-/* Splash page button overrides */
-.splash-page a.primary-button.btn.oppia-splash-button {
-  align-items: center;
-  box-sizing: border-box;
-  display: inline-flex;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 16px;
-  font-weight: normal;
-  justify-content: center;
-  letter-spacing: normal;
-  margin-bottom: 40px;
-  margin-top: -20px;
-  min-width: 300px;
-  padding: 10px;
-  text-decoration: none;
-}
-
 /* Bootstrap override for popovers & tooltip */
 .oppia-help-dropdown .popover.bottom > .arrow {
   border-bottom-color: #000;
