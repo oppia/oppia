@@ -1735,6 +1735,7 @@ pre.oppia-pre-wrapped-text {
   background-color: #286090;
   border-color: #204d74
 }
+
 /* Bootstrap override for popovers & tooltip */
 .oppia-help-dropdown .popover.bottom > .arrow {
   border-bottom-color: #000;
