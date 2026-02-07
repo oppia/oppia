@@ -679,7 +679,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     # Here we use type Any because the 'headers' argument in
                     # HTTPError expects an email.message.Message object, but
                     # a dict is sufficient for our mock.
-                    # Here we use cast because the dict is an incompatible type.
+                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
                     cast(Any, {'Retry-After': '1'}),
                     None,
                 )
@@ -695,7 +695,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             # Here we use type Any because install_dependencies_json_packages
             # is a module and we need to access its internal attribute 'time'
             # which is not explicitly exported.
-            # Here we use cast because the module type does not explicitly expose 'time'.
+            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
@@ -735,6 +735,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     403,
                     'rate limit exceeded',
                     # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
+                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
                     cast(Any, {'Retry-After': 'invalid'}),
                     None,
                 )
@@ -748,6 +749,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
             # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
+            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
@@ -790,6 +792,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     403,
                     'rate limit exceeded',
                     # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
+                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
                     cast(Any, {'X-RateLimit-Reset': '1005'}),
                     None,
                 )
@@ -807,12 +810,14 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
             # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
+            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
         )
         time_swap = self.swap(
             # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
+            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
             cast(Any, install_dependencies_json_packages).time,
             'time',
             mock_time,
@@ -852,6 +857,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     403,
                     'rate limit exceeded',
                     # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
+                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
                     cast(Any, {'X-RateLimit-Reset': 'invalid'}),
                     None,
                 )
@@ -865,6 +871,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
             # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
+            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
