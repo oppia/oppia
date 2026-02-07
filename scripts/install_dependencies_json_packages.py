@@ -185,14 +185,14 @@ def url_open(
                 if retry_after_header is not None:
                     try:
                         delay_secs = int(retry_after_header)
-                    except ValueError:
-                        raise exception
+                    except ValueError as exc:
+                        raise exception from exc
                 elif rate_limit_reset is not None:
                     try:
                         reset_timestamp = int(rate_limit_reset)
                         delay_secs = max(0, reset_timestamp - int(time.time()))
-                    except ValueError:
-                        raise exception
+                    except ValueError as exc:
+                        raise exception from exc
                 else:
                     # If no retry header is present, use exponential backoff.
                     delay_secs = 2**attempt
