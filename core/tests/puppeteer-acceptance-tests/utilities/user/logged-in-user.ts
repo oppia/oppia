@@ -55,6 +55,8 @@ const signUpUsernameField = 'input.e2e-test-username-input';
 const invalidEmailErrorContainer = '#mat-error-1';
 const invalidUsernameErrorContainer = '.oppia-warning-text';
 const optionText = '.mat-option-text';
+const errorContainerSelector = '.e2e-test-error-container';
+const errorPageHeadingSelector = '.e2e-test-error-page-heading';
 const profileDropdown = '.e2e-test-profile-dropdown';
 const learnerDashboardMenuLink = '.e2e-test-learner-dashboard-menu-link';
 const confirmUsernameField = '.e2e-test-confirm-username-field';
@@ -2194,11 +2196,25 @@ export class LoggedInUser extends BaseUser {
    * @param {number} statusCode - The expected error status code.
    */
   async expectErrorPage(statusCode: number): Promise<void> {
-    const isErrorPresent = await this.isTextPresentOnPage(
+    await this.waitForPageToFullyLoad();
+    await this.expectElementToBeVisible(errorContainerSelector);
+    await this.page.waitForFunction(
+      (selector: string, expectedText: string) => {
+        const errorContainer = document.querySelector(selector);
+        return Boolean(
+          errorContainer && errorContainer.textContent?.includes(expectedText)
+        );
+      },
+      {timeout: 30000},
+      errorContainerSelector,
       `Error ${statusCode}`
     );
 
-    if (!isErrorPresent) {
+    const errorHeading = await this.page.$(errorPageHeadingSelector);
+    const errorHeadingText = errorHeading
+      ? await this.page.evaluate(element => element.textContent, errorHeading)
+      : '';
+    if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
       throw new Error(
         `Expected "Error ${statusCode}" to be present on the page, but it was not.`
       );
