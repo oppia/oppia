@@ -273,6 +273,22 @@ describe('Blog Pages functionality', function () {
     }
   );
 
+  it('should successfully search for a unique keyword present only in the blog post body', async function () {
+    await users.logout();
+    await users.login('blog@blogDashboard.com');
+    await blogDashboardPage.get();
+    await blogPages.publishNewBlogPostFromBlogDashboard(
+      'Recipe Post',
+      'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.',
+      ['News', 'Stories']
+    );
+    await blogPages.get();
+    await blogPages.submitSearchQuery('Pineapple');
+    await blogPages.expectNumberOfBlogPostsToBe(1);
+    await blogPages.navigateToBlogPostPage('Recipe Post');
+    await blogPages.expectBlogPostPageTitleToBe('Recipe Post');
+  });
+
   afterEach(async function () {
     await general.checkForConsoleErrors([]);
   });
