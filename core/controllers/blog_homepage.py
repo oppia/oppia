@@ -84,12 +84,6 @@ def _get_blog_card_summary_dicts_for_homepage(
             summary_dict['author_id'], strict=False
         )
 
-        displayed_author_name = (
-            author_details.displayed_author_name
-            if author_details
-            else 'Deleted Author'
-        )
-
         if user_settings:
             card_summary_dict: BlogCardSummaryDict = {
                 'id': summary_dict['id'],
@@ -101,7 +95,7 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'url_fragment': summary_dict['url_fragment'],
                 'published_on': summary_dict['published_on'],
                 'last_updated': summary_dict['last_updated'],
-                'displayed_author_name': displayed_author_name,
+                'displayed_author_name': author_details.displayed_author_name,
             }
         else:
             card_summary_dict = {
@@ -114,7 +108,7 @@ def _get_blog_card_summary_dicts_for_homepage(
                 'url_fragment': summary_dict['url_fragment'],
                 'published_on': summary_dict['published_on'],
                 'last_updated': summary_dict['last_updated'],
-                'displayed_author_name': displayed_author_name,
+                'displayed_author_name': author_details.displayed_author_name,
             }
         summary_dicts.append(card_summary_dict)
     return summary_dicts
@@ -285,12 +279,6 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             blog_post.author_id, strict=False
         )
 
-        displayed_author_name = (
-            author_details.displayed_author_name
-            if author_details
-            else 'Deleted Author'
-        )
-
         blog_post_dict = blog_post.to_dict()
         authors_blog_post_dict: AuthorsBlogPostDict = {
             'id': blog_post_dict['id'],
@@ -301,7 +289,7 @@ class BlogPostDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             'url_fragment': blog_post_dict['url_fragment'],
             'published_on': blog_post_dict['published_on'],
             'last_updated': blog_post_dict['last_updated'],
-            'displayed_author_name': displayed_author_name,
+            'displayed_author_name': author_details.displayed_author_name,
         }
         # We fetch 1 more than the required blog post summaries as the result
         # might contain the blog post which is currently being viewed.
@@ -399,11 +387,9 @@ class AuthorsPageHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 % author_username
             )
 
-        author_details = blog_services.get_blog_author_details(
+        author_details_dict = blog_services.get_blog_author_details(
             user_settings.user_id
-        )
-        assert author_details is not None
-        author_details_dict = author_details.to_dict()
+        ).to_dict()
         num_of_published_blog_post_summaries = blog_services.get_total_number_of_published_blog_post_summaries_by_author(
             user_settings.user_id
         )

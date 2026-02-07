@@ -118,18 +118,9 @@ class BlogDashboardDataHandler(
     def get(self) -> None:
         """Retrieves data for the blog dashboard."""
         assert self.user_id is not None
-        author_details = blog_services.get_blog_author_details(
+        author_details_dict = blog_services.get_blog_author_details(
             self.user_id, strict=False
-        )
-
-        if author_details is not None:
-            author_details_dict = author_details.to_dict()
-        else:
-            author_details_dict = {
-                'displayed_author_name': '',
-                'author_bio': '',
-                'last_updated': None,
-            }
+        ).to_dict()
 
         no_of_published_blog_posts = 0
         published_post_summary_dicts = []
@@ -189,9 +180,9 @@ class BlogDashboardDataHandler(
         blog_services.update_blog_author_details(
             self.user_id, displayed_author_name, author_bio
         )
-        author_details = blog_services.get_blog_author_details(self.user_id)
-        assert author_details is not None
-        author_details_dict = author_details.to_dict()
+        author_details_dict = blog_services.get_blog_author_details(
+            self.user_id
+        ).to_dict()
 
         self.values.update(
             {
@@ -291,7 +282,6 @@ class BlogPostHandler(
         author_details = blog_services.get_blog_author_details(
             blog_post.author_id
         )
-        assert author_details is not None
         max_no_of_tags = platform_parameter_services.get_platform_parameter_value(
             platform_parameter_list.ParamName.MAX_NUMBER_OF_TAGS_ASSIGNED_TO_BLOG_POST.value
         )

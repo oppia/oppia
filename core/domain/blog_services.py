@@ -1044,33 +1044,40 @@ def create_blog_author_details_model(user_id: str) -> None:
 
 def get_blog_author_details(
     user_id: str, strict: bool = True
-) -> Optional[blog_domain.BlogAuthorDetails]:
+) -> blog_domain.BlogAuthorDetails:
     """Returns the blog author details for the given user id.
 
     This is a pure getter function that does not create missing models.
-    BlogAuthorDetailsModel should be created when a blog post is first created.
+    BlogAuthorDetailsModel should be created when a blog post is first
+    created or when author details are updated.
 
     Args:
         user_id: str. The user id of the blog author.
         strict: bool. Whether to raise an exception if the author details
-            are not found. Defaults to True for backward compatibility.
+            are not found. When False, returns a default BlogAuthorDetails
+            with placeholder values instead.
 
     Returns:
-        BlogAuthorDetails|None. The blog author details for the given user ID,
-        or None if strict=False and the details are not found.
+        BlogAuthorDetails. The blog author details for the given user ID.
+        When strict is False and no model is found, a default
+        BlogAuthorDetails with placeholder values is returned.
 
     Raises:
-        Exception. Unable to fetch blog author details for the given user ID
-            (only if strict=True).
+        Exception. No BlogAuthorDetailsModel found for the given user ID
+            (only when strict is True).
     """
     author_model = blog_models.BlogAuthorDetailsModel.get_by_author(user_id)
 
     if author_model is None:
         if strict:
             raise Exception(
-                'Unable to fetch author details for the given user.'
+                'No BlogAuthorDetailsModel found for user_id=%s. '
+                'This may indicate the author\'s account was deleted '
+                'or the model was never created.' % user_id
             )
-        return None
+        return blog_domain.BlogAuthorDetails.create_default_author_details_for_user(
+            user_id
+        )
 
     return blog_domain.BlogAuthorDetails(
         author_model.id,

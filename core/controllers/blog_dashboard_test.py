@@ -119,7 +119,9 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(json_response['draft_blog_post_summary_dicts'], [])
 
     def test_get_dashboard_with_missing_author_model(self) -> None:
-        """Tests that dashboard gracefully handles missing author model."""
+        """Tests that dashboard returns default author details when
+        the author model is missing.
+        """
         self.signup('neweditor@example.com', 'NewEditor')
         new_editor_id = self.get_user_id_from_email('neweditor@example.com')
         self.add_user_role('NewEditor', feconf.ROLE_ID_BLOG_POST_EDITOR)
@@ -135,15 +137,19 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         author_model = blog_models.BlogAuthorDetailsModel.get_by_author(
             new_editor_id
         )
-        self.assertIsNotNone(author_model)
-        assert author_model is not None
+        if author_model is None:
+            self.fail(
+                'Expected BlogAuthorDetailsModel to exist for user_id=%s'
+                % new_editor_id
+            )
         author_model.delete()
-        # Verify dashboard still works with missing author model.
+        # Verify dashboard returns default author details.
         json_response = self.get_json(
             '%s' % (feconf.BLOG_DASHBOARD_DATA_URL),
         )
         self.assertEqual(
-            json_response['author_details']['displayed_author_name'], ''
+            json_response['author_details']['displayed_author_name'],
+            'Deleted User',
         )
         self.assertEqual(json_response['author_details']['author_bio'], '')
         self.logout()
@@ -216,7 +222,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
         )
-        assert pre_update_author_details is not None
         pre_update_author_details_dict = pre_update_author_details.to_dict()
         self.assertEqual(
             pre_update_author_details_dict['displayed_author_name'],
@@ -237,7 +242,6 @@ class BlogDashboardDataHandlerTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.blog_editor_id
         )
-        assert pre_update_author_details is not None
         pre_update_author_details_dict = pre_update_author_details.to_dict()
         self.assertEqual(pre_update_author_details_dict['author_bio'], '')
 

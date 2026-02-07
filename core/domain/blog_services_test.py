@@ -980,7 +980,6 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
 
     def test_get_blog_author_details_model(self) -> None:
         author_details = blog_services.get_blog_author_details(self.user_id)
-        assert author_details is not None
         self.assertEqual(author_details.displayed_author_name, self.user_name)
         self.assertEqual(author_details.author_bio, self.user_bio)
 
@@ -997,15 +996,17 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         with get_author_details_swap:
             with self.assertRaisesRegex(
                 Exception,
-                ('Unable to fetch author details for the given user.'),
+                'No BlogAuthorDetailsModel found for user_id=',
             ):
                 # Test with strict=True (default).
                 blog_services.get_blog_author_details(self.user_id)
 
-    def test_get_blog_author_details_with_strict_false_returns_none(
+    def test_get_blog_author_details_with_strict_false_returns_default(
         self,
     ) -> None:
-        """Tests that get_blog_author_details returns None when strict=False and author details are missing."""
+        """Tests that get_blog_author_details returns a default
+        BlogAuthorDetails when strict=False and the model is missing.
+        """
 
         def _mock_get_author_details_by_author(unused_user_id: str) -> None:
             return None
@@ -1017,11 +1018,15 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         )
 
         with get_author_details_swap:
-            # With strict=False, should return None instead of raising.
+            # With strict=False, should return a default object.
             author_details = blog_services.get_blog_author_details(
                 self.user_id, strict=False
             )
-            self.assertIsNone(author_details)
+            self.assertEqual(
+                author_details.displayed_author_name, 'Deleted User'
+            )
+            self.assertEqual(author_details.author_bio, '')
+            self.assertEqual(author_details.author_id, self.user_id)
 
     def test_get_blog_author_details_create_fails(self) -> None:
         """Tests that create_blog_author_details_model raises an error when user details cannot be fetched."""
@@ -1055,7 +1060,6 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.user_id
         )
-        assert pre_update_author_details is not None
         self.assertNotEqual(
             pre_update_author_details.displayed_author_name, new_author_name
         )
@@ -1070,7 +1074,6 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         updated_author_details = blog_services.get_blog_author_details(
             self.user_id
         )
-        assert updated_author_details is not None
         self.assertEqual(
             updated_author_details.displayed_author_name, new_author_name
         )
@@ -1083,7 +1086,6 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
         pre_update_author_details = blog_services.get_blog_author_details(
             self.user_id
         )
-        assert pre_update_author_details is not None
         self.assertNotEqual(
             pre_update_author_details.displayed_author_name, new_author_name
         )
