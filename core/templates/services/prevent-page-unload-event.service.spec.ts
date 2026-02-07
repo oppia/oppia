@@ -16,13 +16,20 @@
  * @fileoverview Unit tests for the preventPageUnloadEventService.
  */
 
+import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {AuthService} from 'services/auth.service';
+
+class MockAuthService {
+  onUserSignIn = new EventEmitter<void>();
+}
 
 describe('Prevent page unload event service', function () {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let windowRef: WindowRef;
+  let authService: AuthService;
 
   var reloadEvt = document.createEvent('Event');
   reloadEvt.initEvent('mockbeforeunload', true, true);
@@ -31,12 +38,19 @@ describe('Prevent page unload event service', function () {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [PreventPageUnloadEventService],
+      providers: [
+        PreventPageUnloadEventService,
+        {
+          provide: AuthService,
+          useClass: MockAuthService,
+        },
+      ],
     });
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
     );
     windowRef = TestBed.inject(WindowRef);
+    authService = TestBed.inject(AuthService);
   });
 
   // Mocking window object here because beforeunload requres the
@@ -103,6 +117,13 @@ describe('Prevent page unload event service', function () {
   it('should remove listener on ngondestroy', () => {
     spyOn(preventPageUnloadEventService, 'removeListener');
     preventPageUnloadEventService.ngOnDestroy();
+
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
+  });
+
+  it('should remove listener on user sign in', () => {
+    spyOn(preventPageUnloadEventService, 'removeListener');
+    authService.onUserSignIn.emit();
 
     expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   });

@@ -50,7 +50,7 @@ import {LearnerGroupBackendApiService} from 'domain/learner_group/learner-group-
 import {FeedbackUpdatesBackendApiService} from 'domain/feedback_updates/feedback-updates-backend-api.service';
 import {FeedbackThreadSummaryBackendDict} from 'domain/feedback_thread/feedback-thread-summary.model';
 import {LanguageBannerService} from 'components/language-banner/language-banner.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {AuthService} from 'services/auth.service';
 
 import './top-navigation-bar.component.css';
 import {ContentTranslationManagerService} from 'pages/exploration-player-page/services/content-translation-manager.service';
@@ -210,7 +210,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     private platformFeatureService: PlatformFeatureService,
     private learnerGroupBackendApiService: LearnerGroupBackendApiService,
     private languageBannerService: LanguageBannerService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService,
+    private authService: AuthService,
     private contentTranslationManagerService: ContentTranslationManagerService
   ) {}
 
@@ -461,7 +461,7 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
   onLoginButtonClicked(): void {
     this.userService.getLoginUrlAsync().then(loginUrl => {
       if (loginUrl) {
-        this.preventPageUnloadEventService.removeListener();
+        this.authService.onUserSignIn.emit();
         // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
         // rather than manually being triggered by buttons.
         this.siteAnalyticsService.registerStartLoginEvent('loginButton');
