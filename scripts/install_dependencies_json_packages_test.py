@@ -735,6 +735,183 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     403,
                     'rate limit exceeded',
                     # Here we use cast because the dict is an incompatible type.
+                    # Here we use type Any because the dict is an incompatible type.
+                    cast(Any, {'Retry-After': 'invalid'}),
+                    None,
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            # Here we use cast because the module type does not explicitly expose 'time'.
+            # Here we use type Any because the module type does not explicitly expose 'time'.
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
+        )
+
+        with urlopen_swap, sleep_swap:
+            # Should raise because delay is 0 (invalid header treated as 0).
+            with self.assertRaisesRegex(
+                urlerror.HTTPError, 'rate limit exceeded'
+            ):
+                install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(attempts, [test_url])
+        self.assertEqual(sleep_calls, [])
+
+    def test_url_open_retries_when_rate_limited_with_x_rate_limit_reset(
+        self,
+    ) -> None:
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                # Mock current time as 1000, reset at 1005 -> delay 5s.
+                raise urlerror.HTTPError(
+                    url,
+                    403,
+                    'rate limit exceeded',
+                    # Here we use cast because the dict is an incompatible type.
+                    # Here we use type Any because the dict is an incompatible type.
+                    cast(Any, {'X-RateLimit-Reset': '1005'}),
+                    None,
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        # Mock time.time() to return 1000.
+        def mock_time() -> float:
+            return 1000.0
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            # Here we use cast because the module type does not explicitly expose 'time'.
+            # Here we use type Any because the module type does not explicitly expose 'time'.
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
+        )
+        time_swap = self.swap(
+            # Here we use cast because the module type does not explicitly expose 'time'.
+            # Here we use type Any because the module type does not explicitly expose 'time'.
+            cast(Any, install_dependencies_json_packages).time,
+            'time',
+            mock_time,
+        )
+
+        with urlopen_swap, sleep_swap, time_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, test_url)
+        self.assertEqual(attempts, [test_url, test_url])
+        self.assertEqual(sleep_calls, [5])
+
+    def test_url_open_retries_when_rate_limited_with_invalid_x_rate_limit_reset(
+        self,
+    ) -> None:
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                raise urlerror.HTTPError(
+                    url,
+                    403,
+                    'rate limit exceeded',
+                    # Here we use cast because the dict is an incompatible type.
+                    # Here we use type Any because the dict is an incompatible type.
+                    cast(Any, {'X-RateLimit-Reset': 'invalid'}),
+                    None,
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            # Here we use cast because the module type does not explicitly expose 'time'.
+            # Here we use type Any because the module type does not explicitly expose 'time'.
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
+        )
+
+        with urlopen_swap, sleep_swap:
+            # Should raise because delay is 0 (invalid header).
+            with self.assertRaisesRegex(
+                urlerror.HTTPError, 'rate limit exceeded'
+            ):
+                install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(attempts, [test_url])
+
+    def test_url_open_retries_when_rate_limited_with_invalid_retry_after(
+        self,
+    ) -> None:
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                raise urlerror.HTTPError(
+                    url,
+                    403,
+                    'rate limit exceeded',
+                    # Here we use cast because the dict is an incompatible type.
                     cast(Any, {'Retry-After': 'invalid'}),
                     None,
                 )
