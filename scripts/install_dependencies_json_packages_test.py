@@ -676,10 +676,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     url,
                     403,
                     'rate limit exceeded',
-                    # Here we use type Any because the 'headers' argument in
-                    # HTTPError expects an email.message.Message object, but
-                    # a dict is sufficient for our mock.
-                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
                     cast(Any, {'Retry-After': '1'}),
                     None,
                 )
@@ -692,10 +690,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
-            # Here we use type Any because install_dependencies_json_packages
-            # is a module and we need to access its internal attribute 'time'
-            # which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
@@ -734,8 +730,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     url,
                     403,
                     'rate limit exceeded',
-                    # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
-                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
                     cast(Any, {'Retry-After': 'invalid'}),
                     None,
                 )
@@ -748,8 +744,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
-            # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
@@ -791,8 +787,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     url,
                     403,
                     'rate limit exceeded',
-                    # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
-                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
                     cast(Any, {'X-RateLimit-Reset': '1005'}),
                     None,
                 )
@@ -809,15 +805,15 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
-            # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,
         )
         time_swap = self.swap(
-            # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
             cast(Any, install_dependencies_json_packages).time,
             'time',
             mock_time,
@@ -856,8 +852,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                     url,
                     403,
                     'rate limit exceeded',
-                    # Here we use type Any because the 'headers' argument in HTTPError expects an email.message.Message object, but a dict is sufficient for our mock.
-                    # Here use cast because we need to convert the dict to Any type to satisfy the HTTPError headers parameter type requirement.
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
                     cast(Any, {'X-RateLimit-Reset': 'invalid'}),
                     None,
                 )
@@ -870,8 +866,8 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
         sleep_swap = self.swap(
-            # Here we use type Any because install_dependencies_json_packages is a module and we need to access its internal attribute 'time' which is not explicitly exported.
-            # Here use cast because the module type does not explicitly expose the 'time' attribute in its type definition.
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
             cast(Any, install_dependencies_json_packages).time,
             'sleep',
             mock_sleep,

@@ -166,17 +166,17 @@ def url_open(
         HTTPError. If the URL cannot be opened after all attempts.
     """
     context = ssl.create_default_context(cafile=certifi.where())
-    attempts = 0
-    while True:
-        attempts += 1
+    for attempt in range(1, max_attempts + 1):
         try:
             return urllib.request.urlopen(source_url, context=context)
         except urlerror.HTTPError as exception:
             # If we are rate limited, wait for the specified time and retry.
-            if (
-                exception.code == 403
-                and 'rate limit' in str(exception).lower()
-                and attempts < max_attempts
+            if attempt < max_attempts and (
+                exception.code == 429
+                or (
+                    exception.code == 403
+                    and 'rate limit' in str(exception).lower()
+                )
             ):
                 retry_after_header = exception.headers.get('Retry-After')
                 delay_secs = 0
@@ -198,6 +198,10 @@ def url_open(
                             )
                         except ValueError:
                             delay_secs = 0
+
+                if delay_secs == 0:
+                    # If no retry header is present, use exponential backoff.
+                    delay_secs = 2**attempt
 
                 if delay_secs > 0:
                     time.sleep(delay_secs)
