@@ -20,14 +20,13 @@ import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
 import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
 import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
 import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {
+  SkillFilteringService,
+  SubTopicFilterDict,
+} from 'domain/skill/skill-filtering.service';
 import cloneDeep from 'lodash/cloneDeep';
 import {GroupedSkillSummaries} from 'pages/skill-editor-page/services/skill-editor-state.service';
 import {UserService} from 'services/user.service';
-
-interface SubTopicFilterDict {
-  [topicName: string]: {subTopicName: string; checked: boolean}[];
-}
 
 @Component({
   selector: 'oppia-skill-selector',
@@ -68,8 +67,8 @@ export class SkillSelectorComponent implements OnInit {
   userCanEditSkills: boolean = false;
 
   constructor(
-    private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe,
-    private userService: UserService
+    private userService: UserService,
+    private skillFilteringService: SkillFilteringService
   ) {}
 
   ngOnInit(): void {
@@ -105,230 +104,67 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   checkIfEmpty(skills: Object[]): boolean {
-    return skills.length === 0;
+    return this.skillFilteringService.checkIfEmpty(skills);
   }
 
   checkTopicIsNotEmpty(topicName: string): boolean {
-    for (let key in this.currCategorizedSkills[topicName]) {
-      if (Object.keys(this.currCategorizedSkills[topicName][key]).length) {
-        return true;
-      }
-    }
-    return false;
+    return this.skillFilteringService.checkTopicIsNotEmpty(
+      topicName,
+      this.currCategorizedSkills
+    );
   }
 
   setSelectedSkillId(): void {
     this.selectedSkillIdChange.emit(this.selectedSkill);
   }
 
-  // The following function is called when the subtopic filter changes.
-  // This updates the list of Skills displayed in the selector.
   updateSkillsListOnSubtopicFilterChange(): void {
-    let updatedSkillsDict: CategorizedSkills = {};
-    let isAnySubTopicChecked: boolean = false;
-    for (let topicName in this.subTopicFilterDict) {
-      var subTopics = this.subTopicFilterDict[topicName];
-      for (var i = 0; i < subTopics.length; i++) {
-        if (subTopics[i].checked) {
-          if (!updatedSkillsDict.hasOwnProperty(topicName)) {
-            updatedSkillsDict[topicName] = {uncategorized: []};
-          }
-          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
-          let subTopicName: string = subTopics[i].subTopicName;
-          updatedSkillsDict[topicName][subTopicName] =
-            tempCategorizedSkills[topicName][subTopicName];
-          isAnySubTopicChecked = true;
-        }
-      }
-    }
-    if (!isAnySubTopicChecked) {
-      // If no subtopics are checked in the subtop filter, we have
-      // to display all the skills from checked topics.
-      let isAnyTopicChecked: boolean = false;
-      for (var i = 0; i < this.topicFilterList.length; i++) {
-        if (this.topicFilterList[i].checked) {
-          let tempCategorizedSkills: CategorizedSkills = this.categorizedSkills;
-          let topicName: string = this.topicFilterList[i].topicName;
-          updatedSkillsDict[topicName] = tempCategorizedSkills[topicName];
-          isAnyTopicChecked = true;
-        }
-      }
-      if (isAnyTopicChecked) {
-        this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
-      } else {
-        // If no filter is applied on both subtopics and topics, we
-        // need to display all the skills (the original list).
-        this.currCategorizedSkills = cloneDeep(this.categorizedSkills);
-      }
-    } else {
-      this.currCategorizedSkills = cloneDeep(updatedSkillsDict);
-    }
+    this.currCategorizedSkills =
+      this.skillFilteringService.updateSkillsListOnSubtopicFilterChange(
+        this.categorizedSkills,
+        this.subTopicFilterDict,
+        this.topicFilterList
+      );
   }
 
-  // The following function is called when the topic filter changes.
-  // First, the subtopic filter is updated according to the changed
-  // topic filter list. Then the main Skills list is updated.
   updateSkillsListOnTopicFilterChange(): void {
-    let updatedSubTopicFilterList: SubTopicFilterDict = {};
-    let isAnyTopicChecked: boolean = false;
-    for (var i = 0; i < this.topicFilterList.length; i++) {
-      if (this.topicFilterList[i].checked) {
-        let topicName = this.topicFilterList[i].topicName;
-        updatedSubTopicFilterList[topicName] = cloneDeep(
-          this.initialSubTopicFilterDict[topicName]
-        );
-        isAnyTopicChecked = true;
-      }
-    }
-    if (!isAnyTopicChecked) {
-      // If there are no topics checked on topic filter, we have to
-      // display subtopics from all the topics in the subtopic filter.
-      for (let topic in this.initialSubTopicFilterDict) {
-        if (!this.subTopicFilterDict.hasOwnProperty(topic)) {
-          this.subTopicFilterDict[topic] = cloneDeep(
-            this.initialSubTopicFilterDict[topic]
-          );
-        }
-      }
-    } else {
-      this.subTopicFilterDict = cloneDeep(updatedSubTopicFilterList);
-    }
-    // After we update the subtopic filter list, we need to update
-    // the main skills list.
-    this.updateSkillsListOnSubtopicFilterChange();
+    const result =
+      this.skillFilteringService.updateSkillsListOnTopicFilterChange(
+        this.categorizedSkills,
+        this.initialSubTopicFilterDict,
+        this.subTopicFilterDict,
+        this.topicFilterList
+      );
+
+    this.subTopicFilterDict = result.subTopicFilterDict;
+    this.currCategorizedSkills = result.currCategorizedSkills;
   }
 
   searchInSubtopicSkills(
     input: ShortSkillSummary[],
     searchText: string
   ): ShortSkillSummary[] {
-    let skills: string[] = input.map(val => {
-      return val.getDescription();
-    });
-    let filteredSkills = this.filterForMatchingSubstringPipe.transform(
-      skills,
-      searchText
-    );
-    return input.filter(val => {
-      return filteredSkills.includes(val.description);
-    });
+    return this.skillFilteringService.searchInSubtopicSkills(input, searchText);
   }
 
   searchInUntriagedSkillSummaries(searchText: string): SkillSummary[] {
-    let skills: string[] = this.untriagedSkillSummaries
-      .filter(val => !this.skillIdsToExclude.has(val.id))
-      .map(val => {
-        return val.description;
-      });
-    let filteredSkills = this.filterForMatchingSubstringPipe.transform(
-      skills,
+    return this.skillFilteringService.searchInUntriagedSkillSummaries(
+      this.untriagedSkillSummaries,
+      this.skillIdsToExclude,
       searchText
     );
-    return this.untriagedSkillSummaries.filter(val => {
-      return filteredSkills.includes(val.description);
-    });
   }
 
-  /**
-   * Checks if a topic contains any skills that match the current search text.
-   * This method is used to conditionally show/hide topics in the filter dropdown
-   * based on whether they contain matching skills.
-   *
-   * @param topicName - The name of the topic to check
-   * @returns true if the topic has at least one matching skill, or if there's no search text
-   */
   refreshFilterLists(): void {
-    // If no search text, show all topics.
-    if (!this.skillFilterText) {
-      this.augmentedTopicFilterList = this.topicFilterList;
-      this.augmentedSubTopicFilterDict = this.subTopicFilterDict;
-      return;
-    }
+    const result = this.skillFilteringService.computeAugmentedTopicFilterList(
+      this.topicFilterList,
+      this.subTopicFilterDict,
+      this.categorizedSkills,
+      this.skillFilterText
+    );
 
-    this.augmentedTopicFilterList = [];
-    this.augmentedSubTopicFilterDict = {};
-
-    for (const topic of this.topicFilterList) {
-      const topicName = topic.topicName;
-      // Filter subtopics for this topic.
-      // We do not call checkTopicHasMatchingSkills here because that method
-      // checks all subtopics for matches, and then we would perform the same check
-      // again below to filter the subtopics. Instead, we filter subtopics first
-      // and if any match, we know the topic has matches.
-      const matchingSubtopics = this.subTopicFilterDict[topicName]
-        ? this.subTopicFilterDict[topicName].filter(subtopic =>
-            this.checkSubtopicHasMatchingSkills(
-              topicName,
-              subtopic.subTopicName
-            )
-          )
-        : [];
-
-      if (matchingSubtopics.length > 0) {
-        this.augmentedTopicFilterList.push(topic);
-        this.augmentedSubTopicFilterDict[topicName] = matchingSubtopics;
-      } else if (
-        !this.subTopicFilterDict[topicName] &&
-        this.checkTopicHasMatchingSkills(topicName)
-      ) {
-        this.augmentedTopicFilterList.push(topic);
-      }
-    }
-  }
-
-  /**
-   * Checks if a topic contains any skills that match the current search text.
-   *
-   * @param topicName - The name of the topic to check
-   * @returns true if the topic has at least one matching skill, or if there's no search text
-   */
-  checkTopicHasMatchingSkills(topicName: string): boolean {
-    // If no search text, show all topics.
-    if (!this.skillFilterText) {
-      return true;
-    }
-
-    if (!this.categorizedSkills) {
-      return false;
-    }
-
-    const topicSkills = this.categorizedSkills[topicName];
-
-    // Check all subtopics within this topic.
-    for (const subTopicName in topicSkills) {
-      if (this.checkSubtopicHasMatchingSkills(topicName, subTopicName)) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Checks if a subtopic contains any skills that match the current search text.
-   * This method is used to conditionally show/hide subtopics in the filter dropdown
-   * based on whether they contain matching skills.
-   *
-   * @param topicName - The name of the topic containing the subtopic
-   * @param subTopicName - The name of the subtopic to check
-   * @returns true if the subtopic has at least one matching skill, or if there's no search text
-   */
-  checkSubtopicHasMatchingSkills(
-    topicName: string,
-    subTopicName: string
-  ): boolean {
-    // If no search text, show all subtopics.
-    if (!this.skillFilterText) {
-      return true;
-    }
-
-    if (!this.categorizedSkills) {
-      return false;
-    }
-
-    const skills = this.categorizedSkills[topicName][subTopicName];
-    // Reuse the existing search logic for consistency.
-    return this.searchInSubtopicSkills(skills, this.skillFilterText).length > 0;
+    this.augmentedTopicFilterList = result.augmentedTopicFilterList;
+    this.augmentedSubTopicFilterDict = result.augmentedSubTopicFilterDict;
   }
 
   clearAllFilters(): void {
