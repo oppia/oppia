@@ -449,6 +449,85 @@ describe('RteHelperModalComponent', () => {
         },
       });
     }));
+
+    it('should cancel the modal when entity type is missing', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_SERVER
+      );
+
+      spyOn(pageContextService, 'getEntityType').and.returnValue(null);
+
+      const dummyBlob = new Blob();
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(dummyBlob);
+
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: 'svg-data',
+        svg_filename: 'mathImage.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+
+      component.save();
+      flush();
+
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'Entity type is missing. Please reload and try again.'
+      );
+      expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+    }));
+
+    it('should cancel the modal when SVG file is missing in local storage', fakeAsync(() => {
+      spyOn(alertsService, 'addWarning');
+      spyOn(mockExternalRteSaveEventEmitter, 'emit').and.callThrough();
+
+      spyOn(pageContextService, 'getImageSaveDestination').and.returnValue(
+        AppConstants.IMAGE_SAVE_DESTINATION_LOCAL_STORAGE
+      );
+
+      spyOn(pageContextService, 'getEntityType').and.returnValue('exploration');
+
+      const dummyBlob = new Blob();
+      spyOn(
+        imageUploadHelperService,
+        'convertImageDataToImageFile'
+      ).and.returnValue(dummyBlob);
+
+      component.ngOnInit();
+      flush();
+
+      component.customizationArgsForm.value[0] = {
+        raw_latex: 'x^2',
+        svgFile: null,
+        svg_filename: 'mathImage.svg',
+        mathExpressionSvgIsBeingProcessed: false,
+      };
+
+      component.onCustomizationArgsFormChange(
+        component.customizationArgsForm.value
+      );
+
+      component.save();
+      flush();
+
+      expect(mockExternalRteSaveEventEmitter.emit).toHaveBeenCalled();
+      expect(alertsService.addWarning).toHaveBeenCalledWith(
+        'SVG file could not be generated. Please try again.'
+      );
+      expect(activeModal.dismiss).toHaveBeenCalledWith('cancel');
+    }));
   });
 
   describe('when the editor is Link editor', function () {
@@ -563,6 +642,16 @@ describe('RteHelperModalComponent', () => {
       );
       expect(component.isErrorMessageNonempty()).toBe(true);
     }));
+
+    it('should return default character limit for unknown component', () => {
+      expect(component.getCharacterLimit('random_component')).toBe(
+        component.CHARACTER_LIMITS.default
+      );
+    });
+
+    it('should return specific character limit for a known component', () => {
+      expect(component.getCharacterLimit('collapsible_heading')).toBe(200);
+    });
   });
 
   describe("when customization args doesn't have a valid youtube video", function () {

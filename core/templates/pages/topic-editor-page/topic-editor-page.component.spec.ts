@@ -392,6 +392,11 @@ describe('Topic editor page', () => {
     expect(component.getNavbarText()).toEqual('Topic Editor');
   });
 
+  it('should return empty string when topic is not loaded', () => {
+    spyOn(topicEditorStateService, 'hasLoadedTopic').and.returnValue(false);
+    expect(component.getNavbarText()).toBe('');
+  });
+
   it(
     'should load topic based on its id on url when undo or redo action' +
       ' is performed',
