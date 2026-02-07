@@ -678,9 +678,3 @@ indexes:
   properties:
   - name: __key__
     direction: desc
-
-- kind: PlatformFeedbackModel
-  properties:
-  - name: category
-  - name: created_on
-    direction: desc
