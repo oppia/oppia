@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for SkillSelectorComponent.
+ */
+
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -22,14 +26,11 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {UserService} from 'services/user.service';
 import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import {SkillSelectorComponent} from './skill-selector.component';
 import {SkillFilteringService} from 'domain/skill/skill-filtering.service';
-
-/**
- * @fileoverview Unit tests for SkillSelectorComponent.
- */
 
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
@@ -245,6 +246,44 @@ describe('SkillSelectorComponent', () => {
     ]);
   });
 
+  it('should search in untriaged skill summaries and return filtered skills', () => {
+    component.untriagedSkillSummaries = [
+      SkillSummary.createFromBackendDict({
+        id: '1',
+        description: 'This is untriaged skill summary 1',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444,
+      }),
+      SkillSummary.createFromBackendDict({
+        id: '2',
+        description: 'This is untriaged skill summary 2',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444,
+      }),
+    ];
+    component.skillIdsToExclude = new Set(['1']);
+
+    expect(
+      component.searchInUntriagedSkillSummaries('skill summary 2')
+    ).toEqual([
+      SkillSummary.createFromBackendDict({
+        id: '2',
+        description: 'This is untriaged skill summary 2',
+        language_code: '',
+        version: 1,
+        misconception_count: 2,
+        skill_model_created_on: 121212,
+        skill_model_last_updated: 124444,
+      }),
+    ]);
+  });
+
   it('should trigger refreshFilterLists when skillFilterText changes', () => {
     component.categorizedSkills = {
       topic1: {
@@ -260,5 +299,76 @@ describe('SkillSelectorComponent', () => {
     component.skillFilterText = 'new search';
 
     expect(component.refreshFilterLists).toHaveBeenCalled();
+  });
+
+  it('should clear all filters when user clicks on Clear All Filters', () => {
+    component.topicFilterList = [
+      {
+        topicName: 'topic1',
+        checked: true,
+      },
+    ];
+    component.subTopicFilterDict = {
+      topic1: [
+        {
+          subTopicName: 'subtopic1',
+          checked: true,
+        },
+      ],
+    };
+
+    component.clearAllFilters();
+
+    expect(component.topicFilterList).toEqual([
+      {
+        topicName: 'topic1',
+        checked: false,
+      },
+    ]);
+    expect(component.subTopicFilterDict).toEqual({
+      topic1: [
+        {
+          subTopicName: 'subtopic1',
+          checked: false,
+        },
+      ],
+    });
+  });
+
+  it('should filter augmented topics based on search text', () => {
+    component.categorizedSkills = {
+      topic1: {
+        uncategorized: [
+          ShortSkillSummary.create('skill1', 'Algebra equation.'),
+        ],
+        subtopic1: [ShortSkillSummary.create('skill2', 'Geometry shapes.')],
+      },
+      topic2: {
+        uncategorized: [ShortSkillSummary.create('skill3', 'Physics motion.')],
+      },
+    };
+
+    component.ngOnInit();
+    component.skillFilterText = 'Algebra';
+
+    expect(component.augmentedTopicFilterList.length).toBe(1);
+    expect(component.augmentedTopicFilterList[0].topicName).toBe('topic1');
+  });
+
+  it('should return all augmented topics when search text is empty', () => {
+    component.categorizedSkills = {
+      topic1: {
+        uncategorized: [
+          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
+        ],
+      },
+    };
+    component.ngOnInit();
+
+    component.skillFilterText = 'Skill 1';
+    expect(component.augmentedTopicFilterList.length).toBe(1);
+
+    component.skillFilterText = '';
+    expect(component.augmentedTopicFilterList.length).toBe(1);
   });
 });
