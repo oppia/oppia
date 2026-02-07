@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Audit job that finds feedback messages whose thread_id does not exist."""
+"""Jobs that audit and remove feedback messages whose thread_id does not exist."""
 
 from __future__ import annotations
 
@@ -32,14 +32,22 @@ if MYPY:  # pragma: no cover
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
 
-class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
-    """Base class for non-existent threads messages jobs."""
+class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
+    """Removes feedback messages whose thread_id does not exist.
 
-    DATASTORE_UPDATES_ALLOWED = False
+    When DATASTORE_UPDATES_ALLOWED is False, this job behaves as an audit job
+    and only reports invalid models without mutating the datastore.
+    """
 
-    def _get_thread_ids(self) -> beam.PCollection[str]:
-        """Returns a PCollection of thread ids."""
-        return (
+    DATASTORE_UPDATES_ALLOWED = True
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Runs the job.
+
+        Returns:
+            PCollection[JobRunResult]. Results from audit or deletion.
+        """
+        thread_ids = (
             self.pipeline
             | 'Get GeneralFeedbackThreadModels'
             >> ndb_io.GetModels(
@@ -50,20 +58,15 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
             | 'Extract thread ids' >> beam.Map(lambda model: model.id)
         )
 
-    def _get_invalid_messages(
-        self,
-        thread_ids: beam.PCollection[str],
-    ) -> beam.PCollection[feedback_models.GeneralFeedbackMessageModel]:
-        """Returns a PCollection of invalid messages."""
-        return (
+        invalid_messages = (
             self.pipeline
-            | 'Get Messages'
+            | 'Get GeneralFeedbackMessageModels'
             >> ndb_io.GetModels(
                 feedback_models.GeneralFeedbackMessageModel.get_all(
                     include_deleted=False
                 )
             )
-            | 'Filter invalid messages'
+            | 'Filter invalid feedback messages'
             >> beam.Filter(
                 lambda msg, valid_thread_ids: (
                     msg.thread_id not in valid_thread_ids
@@ -72,14 +75,9 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
-    def _get_invalid_user_threads(
-        self,
-        thread_ids: beam.PCollection[str],
-    ) -> beam.PCollection[feedback_models.GeneralFeedbackThreadUserModel]:
-        """Returns a PCollection of invalid user threads."""
-        return (
+        invalid_user_threads = (
             self.pipeline
-            | 'Get User Threads'
+            | 'Get GeneralFeedbackThreadUserModels'
             >> ndb_io.GetModels(
                 feedback_models.GeneralFeedbackThreadUserModel.get_all(
                     include_deleted=False
@@ -87,28 +85,12 @@ class BaseNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
             | 'Filter invalid user threads'
             >> beam.Filter(
-                lambda user_thread, valid_thread_ids: (
-                    user_thread.thread_id not in valid_thread_ids
+                lambda model, valid_thread_ids: (
+                    model.thread_id not in valid_thread_ids
                 ),
                 beam.pvalue.AsList(thread_ids),
             )
         )
-
-
-class AuditNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
-    """Audit job that reports feedback messages with non-existent threads."""
-
-    DATASTORE_UPDATES_ALLOWED = False
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Runs the audit job.
-
-        Returns:
-            PCollection[JobRunResult]. One result per invalid message plus a
-            stats entry with the total count.
-        """
-        thread_ids = self._get_thread_ids()
-        invalid_messages = self._get_invalid_messages(thread_ids)
 
         invalid_message_logs = (
             invalid_messages
@@ -125,6 +107,17 @@ class AuditNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
             )
         )
 
+        invalid_user_thread_logs = invalid_user_threads | 'Log invalid user threads' >> beam.Map(
+            lambda model: job_run_result.JobRunResult.as_stdout(
+                (
+                    'GeneralFeedbackThreadUserModel with non-existent thread: '
+                    f'id={model.id}, '
+                    f'thread_id={model.thread_id}, '
+                    f'user_id={model.user_id}'
+                )
+            )
+        )
+
         invalid_message_count = (
             invalid_messages
             | 'Count invalid feedback messages'
@@ -137,94 +130,48 @@ class AuditNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
             )
         )
 
-        return (
+        invalid_user_thread_count = (
+            invalid_user_threads
+            | 'Count invalid user threads'
+            >> beam.combiners.Count.Globally().with_defaults(0)
+            | 'Report invalid user thread count'
+            >> beam.Map(
+                lambda count: job_run_result.JobRunResult.as_stdout(
+                    f'invalid_user_thread_models_count: {count}'
+                )
+            )
+        )
+
+        outputs = (
             invalid_message_logs,
+            invalid_user_thread_logs,
             invalid_message_count,
-        ) | 'Flatten audit outputs' >> beam.Flatten()
+            invalid_user_thread_count,
+        )
 
-
-class RemoveNonExistentThreadsMessagesJob(BaseNonExistentThreadsMessagesJob):
-    """Beam job that removes feedback messages with non-existent threads."""
-
-    DATASTORE_UPDATES_ALLOWED = True
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Runs the beam job."""
-        thread_ids = self._get_thread_ids()
-        invalid_messages = self._get_invalid_messages(thread_ids)
-        invalid_user_threads = self._get_invalid_user_threads(thread_ids)
-
-        deleted_message_logs = (
-            invalid_messages
-            | 'Log deleted messages'
-            >> beam.Map(
-                lambda model: job_run_result.JobRunResult.as_stdout(
-                    (
-                        'Deleted GeneralFeedbackMessageModel: '
-                        f'id={model.id}, '
-                        f'thread_id={model.thread_id}, '
-                        f'message_id={model.message_id}'
-                    )
-                )
+        if self.DATASTORE_UPDATES_ALLOWED:
+            delete_message_results = (
+                invalid_messages
+                | 'Extract message keys' >> beam.Map(lambda model: model.key)
+                | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
             )
-        )
 
-        deleted_user_thread_logs = (
-            invalid_user_threads
-            | 'Log deleted user threads'
-            >> beam.Map(
-                lambda model: job_run_result.JobRunResult.as_stdout(
-                    (
-                        'Deleted GeneralFeedbackThreadUserModel: '
-                        f'id={model.id}, '
-                        f'thread_id={model.thread_id}, '
-                        f'user_id={model.user_id} '
-                    )
-                )
+            delete_user_thread_results = (
+                invalid_user_threads
+                | 'Extract user thread keys'
+                >> beam.Map(lambda model: model.key)
+                | 'Delete invalid user threads' >> ndb_io.DeleteModels()
             )
-        )
 
-        deleted_message_results = (
-            invalid_messages
-            | 'Extract message keys' >> beam.Map(lambda model: model.key)
-            | 'Delete invalid feedback messages' >> ndb_io.DeleteModels()
-        )
-
-        deleted_user_thread_results = (
-            invalid_user_threads
-            | 'Extract user thread keys' >> beam.Map(lambda model: model.key)
-            | 'Delete non-existent user threads' >> ndb_io.DeleteModels()
-        )
-
-        deleted_message_count = (
-            invalid_messages
-            | 'Count deleted messages'
-            >> beam.combiners.Count.Globally().with_defaults(0)
-            | 'Report deleted message count'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'deleted_feedback_message_models_count: {count}'
-                )
+            outputs += (
+                delete_message_results,
+                delete_user_thread_results,
             )
-        )
 
-        deleted_user_thread_count = (
-            invalid_user_threads
-            | 'Count deleted user threads'
-            >> beam.combiners.Count.Globally().with_defaults(0)
-            | 'Report deleted user thread count'
-            >> beam.Map(
-                lambda count: job_run_result.JobRunResult.as_stdout(
-                    f'deleted_user_thread_models_count: {count}'
-                )
-            )
-        )
+        return outputs | 'Flatten outputs' >> beam.Flatten()
 
-        return (
-            deleted_message_logs,
-            deleted_user_thread_logs,
-            deleted_message_count,
-            deleted_user_thread_count,
-            deleted_message_results,
-            deleted_user_thread_results,
-        ) | 'Flatten deletion outputs' >> beam.Flatten()
+
+class AuditNonExistentThreadsMessagesJob(RemoveNonExistentThreadsMessagesJob):
+    """Audit job for feedback messages with non-existent threads."""
+
+    DATASTORE_UPDATES_ALLOWED = False
