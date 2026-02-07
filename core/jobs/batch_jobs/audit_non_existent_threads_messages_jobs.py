@@ -142,6 +142,13 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
             )
         )
 
+        outputs = [
+            invalid_message_logs,
+            invalid_user_thread_logs,
+            invalid_message_count,
+            invalid_user_thread_count,
+        ]
+
         if self.DATASTORE_UPDATES_ALLOWED:
             delete_message_results = (
                 invalid_messages
@@ -156,20 +163,11 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 | 'Delete invalid user threads' >> ndb_io.DeleteModels()
             )
 
-            outputs = (
-                invalid_message_logs,
-                invalid_user_thread_logs,
-                invalid_message_count,
-                invalid_user_thread_count,
-                delete_message_results,
-                delete_user_thread_results,
-            )
-        else:
-            outputs = (
-                invalid_message_logs,
-                invalid_user_thread_logs,
-                invalid_message_count,
-                invalid_user_thread_count,
+            outputs.extend(
+                [
+                    delete_message_results,
+                    delete_user_thread_results,
+                ]
             )
 
         return outputs | 'Flatten outputs' >> beam.Flatten()
