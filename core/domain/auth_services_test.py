@@ -254,85 +254,45 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ['uid1', 'uid2', 'uid3'],
         )
 
-    def test_get_all_external_accounts(self) -> None:
+    def test_get_all_auth_provider_records(self) -> None:
         mock_accounts = [
-            auth_domain.ExternalAccount('aid1', 'email1@example.com', True),
-            auth_domain.ExternalAccount('aid2', 'email2@example.com', False),
-            auth_domain.ExternalAccount('aid3', 'email3@example.com', True),
+            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', True),
+            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
+            auth_domain.AuthProviderRecord('aid3', 'email3@example.com', True),
         ]
 
         with self.swap(
             platform_auth_services,
-            'get_all_external_accounts',
+            'get_all_auth_provider_records',
             lambda: mock_accounts,
         ):
             self.assertItemsEqual(
-                auth_services.get_all_external_accounts(), mock_accounts
+                auth_services.get_all_auth_provider_records(), mock_accounts
             )
 
-    def test_create_external_account(self) -> None:
-        account = auth_domain.ExternalAccount('aid', 'a@a.com', False)
-
-        with mock.patch.object(
-            platform_auth_services,
-            'create_external_account',
-            return_value=account,
-        ) as mock_create:
-            result = auth_services.create_external_account(
-                auth_id='aid', email='a@a.com', disabled=False
-            )
-
-        mock_create.assert_called_once_with(
-            auth_id='aid', email='a@a.com', disabled=False
-        )
-        self.assertEqual(result, account)
-
-    def test_update_external_account(self) -> None:
-        account = auth_domain.ExternalAccount('aid', None, False)
-
-        with mock.patch.object(
-            platform_auth_services,
-            'update_external_account',
-            return_value=account,
-        ) as mock_update:
-            result = auth_services.update_external_account(account)
-
-        mock_update.assert_called_once_with(account)
-        self.assertEqual(result, account)
-
-    def test_delete_external_account(self) -> None:
-        account = auth_domain.ExternalAccount('aid', None, False)
-
-        with mock.patch.object(
-            platform_auth_services, 'delete_external_account'
-        ) as mock_delete:
-            auth_services.delete_external_account(account)
-
-        mock_delete.assert_called_once_with(account)
-
-    def test_delete_multi_external_accounts(self) -> None:
+    def test_delete_multi_auth_provider_records(self) -> None:
         accounts = [
-            auth_domain.ExternalAccount('aid1', None, False),
-            auth_domain.ExternalAccount('aid2', None, False),
+            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
         ]
 
         with mock.patch.object(
-            platform_auth_services, 'delete_multi_external_accounts'
+            platform_auth_services, 'delete_multi_auth_provider_records'
         ) as mock_delete_multi:
-            auth_services.delete_multi_external_accounts(accounts)
+            auth_services.delete_multi_auth_provider_records(accounts)
 
         mock_delete_multi.assert_called_once_with(accounts)
 
-    def test_import_multi_external_accounts(self) -> None:
+    def test_import_multi_auth_provider_records(self) -> None:
         accounts = [
-            auth_domain.ExternalAccount('aid1', None, False),
-            auth_domain.ExternalAccount('aid2', None, False),
+            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
         ]
 
         with mock.patch.object(
-            platform_auth_services, 'import_multi_external_accounts'
+            platform_auth_services, 'import_multi_auth_provider_records'
         ) as mock_import:
-            auth_services.import_multi_external_accounts(accounts)
+            auth_services.import_multi_auth_provider_records(accounts)
 
         mock_import.assert_called_once_with(accounts)
 

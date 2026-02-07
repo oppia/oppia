@@ -40,10 +40,10 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
         self.assertEqual(user_id, 'uid')
 
 
-class ExternalAccountTests(test_utils.TestBase):
+class AuthProviderRecordTests(test_utils.TestBase):
 
     def test_unpacking(self) -> None:
-        auth_id, email, disabled = auth_domain.ExternalAccount(
+        auth_id, email, disabled = auth_domain.AuthProviderRecord(
             'a', 'a@a.com', True
         )
         self.assertEqual(auth_id, 'a')

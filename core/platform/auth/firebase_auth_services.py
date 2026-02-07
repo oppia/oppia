@@ -177,112 +177,35 @@ def get_auth_claims_from_request(
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
 
-def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
-    """Returns all accounts registered with Firebase.
+def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
+    """Returns all of the records from Firebase.
 
     Returns:
-        List[auth_domain.ExternalAccount]. The list of all external accounts.
+        List[auth_domain.AuthProviderRecord]. A list of all records.
 
     Raises:
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
     try:
         return [
-            auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
+            auth_domain.AuthProviderRecord(user.uid, user.email, user.disabled)
             for user in firebase_auth.list_users().iterate_all()
         ]
     except firebase_exceptions.FirebaseError as e:
         raise auth_domain.AuthProviderError('Failed to list accounts') from e
 
 
-def create_external_account(
-    auth_id: Optional[str] = None,
-    email: Optional[str] = None,
-    disabled: bool = False,
-) -> auth_domain.ExternalAccount:
-    """Creates a new external account in Firebase.
-
-    Args:
-        auth_id: str|None. The ID to assign to the newly created user. Must be
-            a string between 1-128 characters long, inclusive. If not provided,
-            a random ID will be automatically generated.
-        email: str|None. The user's primary email. If provided, then the email
-            address must be valid.
-        disabled: bool. Indicates whether or not the user account is disabled.
-
-    Returns:
-        auth_domain.ExternalAccount. The final state of the created account.
-
-    Raises:
-        ValueError. If the specified user properties are invalid.
-        auth_domain.AuthProviderError. If an error occurs during the operation.
-    """
-    try:
-        user = firebase_auth.create_user(
-            uid=auth_id, email=email, disabled=disabled
-        )
-    except firebase_exceptions.FirebaseError as e:
-        raise auth_domain.AuthProviderError('Failed to create account') from e
-    else:
-        return auth_domain.ExternalAccount(
-            auth_id=user.uid, email=user.email, disabled=user.disabled
-        )
-
-
-def update_external_account(
-    account: auth_domain.ExternalAccount,
-) -> auth_domain.ExternalAccount:
-    """Updates an existing external account in Firebase.
-
-    Args:
-        account: auth_domain.ExternalAccount. The account to update.
-
-    Returns:
-        auth_domain.ExternalAccount. The final state of the updated account.
-
-    Raises:
-        ValueError. If the specified user ID or properties are invalid.
-        auth_domain.AuthProviderError. If an error occurs during the operation.
-    """
-    uid, email, disabled = account
-    try:
-        user = firebase_auth.update_user(uid, email=email, disabled=disabled)
-    except firebase_exceptions.FirebaseError as e:
-        raise auth_domain.AuthProviderError('Failed to update account') from e
-    else:
-        uid, email, disabled = user.uid, user.email, user.disabled
-        return auth_domain.ExternalAccount(uid, email, disabled)
-
-
-def delete_external_account(account: auth_domain.ExternalAccount) -> None:
-    """Deletes an external account from Firebase.
-
-    Args:
-        account: auth_domain.ExternalAccount. The account to delete.
-
-    Raises:
-        ValueError. If the auth ID is None, empty or malformed.
-        auth_domain.AuthProviderError. If an error occurs during the operation.
-    """
-    try:
-        firebase_auth.delete_user(account.auth_id)
-    except firebase_exceptions.FirebaseError as e:
-        raise auth_domain.AuthProviderError('Failed to delete account') from e
-
-
-def delete_multi_external_accounts(
-    accounts: Iterable[auth_domain.ExternalAccount],
+def delete_multi_auth_provider_records(
+    accounts: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Deletes multiple external accounts from Firebase.
-
-    PERF: This operation uses batching to fire less network requests.
+    """Deletes the given records from Firebase.
 
     Args:
-        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to delete.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to delete.
 
     Raises:
-        ValueError. If the identifiers are invalid.
-        auth_domain.AuthProviderError. If any accounts failed to be deleted.
+        ValueError. If any record is malformed.
+        auth_domain.AuthProviderError. If an error occurs during the operation.
     """
     errors = []
     error_count = 0
@@ -315,20 +238,20 @@ def delete_multi_external_accounts(
         raise auth_domain.AuthProviderError('\n\t'.join(errors))
 
 
-def import_multi_external_accounts(
-    accounts: Iterable[auth_domain.ExternalAccount],
+def import_multi_auth_provider_records(
+    accounts: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Imports multiple external accounts WITHOUT making any safety checks.
+    """Imports the given records into Firebase WITHOUT safety checks.
 
-    WARNING: This operation DOES NOT protect against duplicate accounts!
-    The ONLY way to guarantee this function is used safely is by running it on
-    an empty server, where collisions are impossible.
+    WARNING: This operation DOES NOT protect against duplicate records! The ONLY
+    way to guarantee that this function is used safely is by running it on an
+    empty server, where collisions are impossible.
 
     Args:
-        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to import.
 
     Raises:
-        ValueError. If the specified user properties are invalid.
+        ValueError. If any record is malformed.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
     errors = []

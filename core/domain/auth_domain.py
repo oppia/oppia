@@ -116,11 +116,29 @@ class AuthClaims:
         )
 
 
-class ExternalAccount(NamedTuple):
-    """The minimum fields required to link an Oppia user with auth providers."""
+class AuthProviderRecord(NamedTuple):
+    """Fields used by Oppia to manage a user's identity on an auth provider.
+
+    NOTE: As of 2026-01, users must create accounts with a valid email address.
+    For that reason, the email field is currently mandatory. However, we may
+    add additional sign-in methods, like phone numbers, in the future.
+
+    If that happens, then the email field will no longer be required. Instead,
+    we will need to ensure that AT LEAST ONE of the sign-in fields is not None
+    to ensure that the user will be able to sign in to their account.
+
+    Attributes:
+        auth_id: str. The unqiue identifier (with respect to the auth provider)
+            that is assigned to a specific user. Must be a string between 1-128
+            characters long, inclusive.
+        email: str. The user's primary email. The email address must be valid.
+        disabled: bool. Whether the user is able to sign in to their account.
+            Oppia uses this field to prevent users from making changes to data
+            while we are processing their account for deletion/wipeout.
+    """
 
     auth_id: str
-    email: Optional[str] = None
+    email: str
     disabled: bool = False
 
 

@@ -274,103 +274,50 @@ def associate_multi_auth_ids_with_user_ids(
     )
 
 
-def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
-    """Returns all accounts from our external authentication provider."""
-    return platform_auth_services.get_all_external_accounts()
-
-
-def create_external_account(
-    auth_id: Optional[str] = None,
-    email: Optional[str] = None,
-    disabled: bool = False,
-) -> auth_domain.ExternalAccount:
-    """Creates a new external account.
-
-    Args:
-        auth_id: str|None. The ID to assign to the newly created user. Must be
-            a string between 1-128 characters long, inclusive. If not provided,
-            a random ID will be automatically generated.
-        email: str|None. The user's primary email. If provided, then the email
-            address must be valid.
-        disabled: bool. Indicates whether or not the user account is disabled.
+def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
+    """Returns all of the records from our auth provider.
 
     Returns:
-        auth_domain.ExternalAccount. The final state of the created account.
+        List[auth_domain.AuthProviderRecord]. A list of all records.
 
     Raises:
-        ValueError. If the account fields are invalid.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    return platform_auth_services.create_external_account(
-        auth_id=auth_id, email=email, disabled=disabled
-    )
+    return platform_auth_services.get_all_auth_provider_records()
 
 
-def update_external_account(
-    account: auth_domain.ExternalAccount,
-) -> auth_domain.ExternalAccount:
-    """Updates an existing external account.
-
-    Args:
-        account: auth_domain.ExternalAccount. The account to update.
-
-    Returns:
-        auth_domain.ExternalAccount. The final state of the updated account.
-
-    Raises:
-        ValueError. If the account fields are invalid.
-        auth_domain.AuthProviderError. If an error occurs during the operation.
-    """
-    return platform_auth_services.update_external_account(account)
-
-
-def delete_external_account(account: auth_domain.ExternalAccount) -> None:
-    """Deletes an external account.
-
-    Args:
-        account: auth_domain.ExternalAccount. The account to delete.
-
-    Raises:
-        ValueError. If the auth ID is None, empty, or malformed.
-        auth_domain.AuthProviderError. If an error occurs during the operation.
-    """
-    platform_auth_services.delete_external_account(account)
-
-
-def delete_multi_external_accounts(
-    accounts: Iterable[auth_domain.ExternalAccount],
+def delete_multi_auth_provider_records(
+    records: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Deletes multiple external accounts.
-
-    PERF: This operation uses batching to reduce the amount of network calls.
+    """Deletes the given records from our auth provider.
 
     Args:
-        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to delete.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to delete.
 
     Raises:
-        ValueError. If an auth ID is malformed.
+        ValueError. If any record is malformed.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    platform_auth_services.delete_multi_external_accounts(accounts)
+    platform_auth_services.delete_multi_auth_provider_records(records)
 
 
-def import_multi_external_accounts(
-    accounts: Iterable[auth_domain.ExternalAccount],
+def import_multi_auth_provider_records(
+    records: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Imports multiple external accounts WITHOUT making any safety checks.
+    """Imports the given records into our auth provider WITHOUT safety checks.
 
-    WARNING: This operation DOES NOT protect against duplicate accounts!
-    The ONLY way to guarantee this function is used safely is by running it on
-    an empty server, where collisions are impossible.
+    WARNING: This operation DOES NOT protect against duplicate records! The ONLY
+    way to guarantee that this function is used safely is by running it on an
+    empty server, where collisions are impossible.
 
     Args:
-        accounts: Iterable[auth_domain.ExternalAccount]. The accounts to import.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to import.
 
     Raises:
-        ValueError. If the specified user properties are invalid.
+        ValueError. If any record is malformed.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    platform_auth_services.import_multi_external_accounts(accounts)
+    platform_auth_services.import_multi_auth_provider_records(records)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:
