@@ -22,7 +22,6 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
-import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {UserService} from 'services/user.service';
 import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import {SkillSelectorComponent} from './skill-selector.component';
@@ -44,7 +43,7 @@ describe('SkillSelectorComponent', () => {
       providers: [
         UserService,
         FilterForMatchingSubstringPipe,
-        SkillFilteringService, // <--- ADDED THIS NEW SERVICE
+        SkillFilteringService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
