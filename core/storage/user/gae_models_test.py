@@ -2804,7 +2804,7 @@ class UserGroupModelTests(test_utils.GenericTestBase):
         user_models.UserGroupModel.apply_deletion_policy(self.USER_1_ID)
         self.assertIsNone(
             user_models.UserGroupModel.query(
-                user_models.UserGroupModel.user_ids == self.USER_1_ID
+                user_models.UserGroupModel.user_ids == self.USER_1_ID  # type: ignore[comparison-overlap]
             ).get()
         )
         # Test that calling apply_deletion_policy with no existing model
