@@ -141,15 +141,62 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 )
             )
         )
-
-        outputs = [
-            invalid_message_logs,
-            invalid_user_thread_logs,
-            invalid_message_count,
-            invalid_user_thread_count,
-        ]
-
+        outputs = []
         if self.DATASTORE_UPDATES_ALLOWED:
+            deleted_message_logs = (
+                invalid_messages
+                | 'Log deleted messages'
+                >> beam.Map(
+                    lambda model: job_run_result.JobRunResult.as_stdout(
+                        (
+                            'Deleted GeneralFeedbackMessageModel: '
+                            f'id={model.id}, '
+                            f'thread_id={model.thread_id}, '
+                            f'message_id={model.message_id}'
+                        )
+                    )
+                )
+            )
+
+            deleted_user_thread_logs = (
+                invalid_user_threads
+                | 'Log deleted user threads'
+                >> beam.Map(
+                    lambda model: job_run_result.JobRunResult.as_stdout(
+                        (
+                            'Deleted GeneralFeedbackThreadUserModel: '
+                            f'id={model.id}, '
+                            f'thread_id={model.thread_id}, '
+                            f'user_id={model.user_id} '
+                        )
+                    )
+                )
+            )
+
+            deleted_message_count = (
+                invalid_messages
+                | 'Count deleted messages'
+                >> beam.combiners.Count.Globally().with_defaults(0)
+                | 'Report deleted message count'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        f'deleted_feedback_message_models_count: {count}'
+                    )
+                )
+            )
+
+            deleted_user_thread_count = (
+                invalid_user_threads
+                | 'Count deleted user threads'
+                >> beam.combiners.Count.Globally().with_defaults(0)
+                | 'Report deleted user thread count'
+                >> beam.Map(
+                    lambda count: job_run_result.JobRunResult.as_stdout(
+                        f'deleted_user_thread_models_count: {count}'
+                    )
+                )
+            )
+
             delete_message_results = (
                 invalid_messages
                 | 'Extract message keys' >> beam.Map(lambda model: model.key)
@@ -165,12 +212,23 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
 
             outputs.extend(
                 [
+                    deleted_message_logs,
+                    deleted_user_thread_logs,
+                    deleted_message_count,
+                    deleted_user_thread_count,
                     delete_message_results,
                     delete_user_thread_results,
                 ]
             )
-
-        return outputs | 'Flatten outputs' >> beam.Flatten()
+        else:
+            outputs.extend(
+                [
+                    invalid_message_logs,
+                    invalid_user_thread_logs,
+                    invalid_message_count,
+                    invalid_user_thread_count,
+                ]
+            )
 
 
 class AuditNonExistentThreadsMessagesJob(RemoveNonExistentThreadsMessagesJob):
