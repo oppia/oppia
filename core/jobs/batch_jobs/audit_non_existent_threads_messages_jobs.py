@@ -230,6 +230,8 @@ class RemoveNonExistentThreadsMessagesJob(base_jobs.JobBase):
                 ]
             )
 
+        return outputs | 'Flatten outputs' >> beam.Flatten()
+
 
 class AuditNonExistentThreadsMessagesJob(RemoveNonExistentThreadsMessagesJob):
     """Audit job for feedback messages with non-existent threads."""
