@@ -231,7 +231,9 @@ describe('Logged-In Learner', function () {
         __dirname
       );
 
-      await loggedInLearner2.selectAndPlayChapter('What are the Place Values');
+      await loggedInLearner2.clickOnElementWithText(
+        'What are the Place Values'
+      );
 
       await loggedInLearner2.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
@@ -254,7 +256,9 @@ describe('Logged-In Learner', function () {
         'Chap2GreadedOutHasComingSoonLabel',
         __dirname
       );
-      await loggedInLearner2.selectAndPlayChapter('What are the Place Values');
+      await loggedInLearner2.clickOnElementWithText(
+        'What are the Place Values'
+      );
 
       await loggedInLearner2.expectExplorationCompletionToastMessage(
         'Congratulations for completing this lesson! You will now start the lesson from the beginning the next time you come back'
