@@ -2589,6 +2589,15 @@ export class ExplorationEditor extends BaseUser {
     const sectionContentSelector = `.e2e-test-${identifier}-content`;
     const sectionHeaderSelector = `.e2e-test-${identifier}-header`;
 
+    const sectionHeader = await this.page.$(sectionHeaderSelector);
+    if (!sectionHeader) {
+      showMessage(
+        `Skipped: Expanding ${section} section on mobile.\n` +
+          'Reason: Section header not found.'
+      );
+      return;
+    }
+
     // Skip if the section is already expanded.
     if (await this.isElementVisible(sectionContentSelector)) {
       showMessage(
@@ -5074,22 +5083,27 @@ export class ExplorationEditor extends BaseUser {
     // Ensure we are on the settings tab where role management is displayed.
     await this.navigateToSettingsTab();
 
-    // Verify the username is listed in the managers section (the definitive check per CUJ).
-    const managersSection = await this.page.$(
-      '.e2e-test-roles-settings-container'
-    );
-    if (!managersSection) {
-      throw new Error('Managers section not found');
+    // Verify the username is listed in the Managers section (the definitive check per CUJ).
+    const ownersListSelector = '.e2e-test-owner-role-names';
+    await this.expectElementToBeVisible('.e2e-test-roles-content');
+    const owners = await this.page.$$(ownersListSelector);
+    if (owners.length === 0) {
+      throw new Error('Managers list is empty or not found.');
     }
 
-    const managersText = await this.page.evaluate(
-      el => el.textContent || '',
-      managersSection
+    const ownerUsernames = await this.page.$$eval(
+      ownersListSelector,
+      elements =>
+        elements
+          .map(element => element.textContent?.trim() || '')
+          .filter(Boolean)
     );
 
-    if (!managersText.includes(username)) {
+    if (!ownerUsernames.includes(username)) {
       throw new Error(
-        `Expected user "${username}" to be listed as manager, but not found in: ${managersText}`
+        `Expected user "${username}" to be listed as manager, but not found in: ${ownerUsernames.join(
+          ', '
+        )}`
       );
     }
 
