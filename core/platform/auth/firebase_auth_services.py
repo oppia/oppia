@@ -425,7 +425,7 @@ def get_multi_auth_ids_from_user_ids(
     """Returns the auth IDs associated with the given user IDs.
 
     Args:
-        user_ids: List[str]. The user IDs.
+        user_ids: list(str). The user IDs.
 
     Returns:
         list(str|None). The auth IDs associated with each of the given user IDs,
@@ -469,7 +469,7 @@ def get_multi_user_ids_from_auth_ids(
     """Returns the user IDs associated with the given auth IDs.
 
     Args:
-        auth_ids: List[str]. The auth IDs.
+        auth_ids: list(str). The auth IDs.
 
     Returns:
         list(str|None). The user IDs associated with each of the given auth IDs,
@@ -548,7 +548,7 @@ def associate_multi_auth_ids_with_user_ids(
     """Commits the associations between auth IDs and user IDs.
 
     Args:
-        auth_id_user_id_pairs: List[auth_domain.AuthIdUserIdPair]. The
+        auth_id_user_id_pairs: list(auth_domain.AuthIdUserIdPair). The
             associations to commit.
 
     Raises:
@@ -736,7 +736,7 @@ def _create_auth_claims(
     """Returns a new AuthClaims domain object from Firebase claims.
 
     Args:
-        firebase_claims: Dict[str, Any]. The raw claims returned by the Firebase
+        firebase_claims: dict(str: *). The raw claims returned by the Firebase
             SDK.
 
     Returns:
