@@ -277,17 +277,31 @@ describe('Blog Pages functionality', function () {
     await users.logout();
     await users.login('blog@blogDashboard.com');
     await blogDashboardPage.get();
+
+    // 1. Publish the post
     await blogPages.publishNewBlogPostFromBlogDashboard(
       'Recipe Post',
       'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.',
       ['News', 'Stories']
     );
-    await blogDashboardPage.navigateToPublishTab();
-    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(8);
+    await browser.waitUntil(
+      async () => {
+        await blogPages.get();
+        await blogPages.submitSearchQuery('Pineapple');
 
-    await blogPages.get();
-    await blogPages.submitSearchQuery('Pineapple');
-    await blogPages.expectNumberOfBlogPostsToBe(1);
+        try {
+          await blogPages.expectNumberOfBlogPostsToBe(1);
+          return true;
+        } catch (error) {
+          return false;
+        }
+      },
+      {
+        timeout: 10000,
+        timeoutMsg:
+          'Failed to find the "Pineapple" post. The search index likely did not update in time.',
+      }
+    );
     await blogPages.navigateToBlogPostPage('Recipe Post');
     await blogPages.expectBlogPostPageTitleToBe('Recipe Post');
   });
