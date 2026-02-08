@@ -1,3 +1,4 @@
+# TODO(firebase/firebase-admin-python#569): Depend on official stubs rather than maintaining our own.
 from core.domain import auth_domain
 
 import datetime
