@@ -258,7 +258,7 @@ class MigrateQuestionSuggestionsJob(base_jobs.JobBase):
         try:
             next_content_id_index = question_fetchers.migrate_state_schema(
                 versioned_question_state,
-                current_next_content_id_index=current_index
+                current_next_content_id_index=current_index,
             )
 
             question_dict['next_content_id_index'] = next_content_id_index

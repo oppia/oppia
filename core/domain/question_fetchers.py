@@ -133,7 +133,9 @@ def get_question_from_model(
         != feconf.CURRENT_STATE_SCHEMA_VERSION
     ):
         current_content_id_index = question_model.next_content_id_index
-        next_content_id_index = migrate_state_schema(versioned_question_state,current_content_id_index)
+        next_content_id_index = migrate_state_schema(
+            versioned_question_state, current_content_id_index
+        )
 
     if next_content_id_index is not None:
         question_model.next_content_id_index = next_content_id_index
