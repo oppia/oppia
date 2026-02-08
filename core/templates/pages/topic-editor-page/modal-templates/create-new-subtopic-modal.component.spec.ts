@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for the create new subtopic modal component.
  */
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Topic} from 'domain/topic/topic-object.model';
 import {
   ComponentFixture,
@@ -147,6 +148,7 @@ describe('create new subtopic modal', function () {
     htmlLengthService = new MockHtmlLengthService();
 
     TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
       declarations: [
         CreateNewSubtopicModalComponent,
         UrlFragmentEditorComponent,
@@ -268,8 +270,7 @@ describe('create new subtopic modal', function () {
   });
 
   it('should return ALL_COMPONENTS schema when EnableWorkedExamplesRteComponent is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
     let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
     expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
   });
@@ -333,6 +334,7 @@ describe('create new subtopic modal', function () {
   it('should check whether subtopic is valid for legacy mode', () => {
     platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = false;
     component.editableThumbnailFilename = 'examplefilename';
+    component.thumbnailImage = new Blob(['test'], {type: 'image/svg+xml'});
     component.subtopicTitle = 'title';
     component.htmlData = 'data';
     component.editableUrlFragment = 'url';
@@ -345,6 +347,7 @@ describe('create new subtopic modal', function () {
   it('should check whether subtopic is valid for restructured study guides mode', () => {
     platformFeatureService.status.ShowRestructuredStudyGuides.isEnabled = true;
     component.editableThumbnailFilename = 'examplefilename';
+    component.thumbnailImage = new Blob(['test'], {type: 'image/svg+xml'});
     component.subtopicTitle = 'title';
     component.sectionHeadingPlaintext = 'section heading';
     component.sectionContentHtml = 'section content';
@@ -387,14 +390,12 @@ describe('create new subtopic modal', function () {
   });
 
   it('should check if worked examples RTE component feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       true
     );
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
-      false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       false
     );

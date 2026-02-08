@@ -67,13 +67,21 @@
     </div>
     <div class="create-new-topic-input-field">
       <label class="create-new-topic-input-label">Topic Thumbnail*</label>
-      <oppia-thumbnail-uploader [previewTitle]="newlyCreatedTopic.name"
-                                [aspectRatio]="'4:3'"
-                                [disabled]="false"
-                                [useLocalStorage]="true"
-                                [allowedBgColors]="allowedBgColors"
-                                previewDescriptionBgColor="#2F6687">
-      </oppia-thumbnail-uploader>
+      <oppia-image-uploader
+        [imageUploaderParameters]="{
+          disabled: false,
+          maxImageSizeInKB: 100,
+          imageName: 'Thumbnail',
+          orientation: 'landscape',
+          bgColor: allowedBgColors[0],
+          allowedBgColors: allowedBgColors,
+          allowedImageFormats: ['svg'],
+          aspectRatio: '4:3',
+          previewTitle: newlyCreatedTopic.name,
+          previewDescriptionBgColor: '#2F6687'
+        }"
+        (imageSave)="onImageSave($event)">
+      </oppia-image-uploader>
     </div>
   </div>
 

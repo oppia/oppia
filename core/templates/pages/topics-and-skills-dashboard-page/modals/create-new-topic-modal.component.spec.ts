@@ -22,9 +22,7 @@ import {ComponentFixture, TestBed, waitForAsync} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {CreateNewTopicModalComponent} from './create-new-topic-modal.component';
 import {UrlFragmentEditorComponent} from '../../../components/url-fragment-editor/url-fragment-editor.component';
 import {By} from '@angular/platform-browser';
@@ -32,9 +30,7 @@ import {By} from '@angular/platform-browser';
 describe('Create new topic modal', () => {
   let fixture: ComponentFixture<CreateNewTopicModalComponent>;
   let componentInstance: CreateNewTopicModalComponent;
-  let pageContextService: PageContextService;
   let ngbActiveModal: NgbActiveModal;
-  let imageLocalStorageService: ImageLocalStorageService;
   let topicEditorStateService: TopicEditorStateService;
 
   class MockWindowRef {
@@ -51,7 +47,6 @@ describe('Create new topic modal', () => {
       declarations: [CreateNewTopicModalComponent, UrlFragmentEditorComponent],
       providers: [
         NgbActiveModal,
-        ImageLocalStorageService,
         TopicEditorStateService,
         {
           provide: WindowRef,
@@ -65,22 +60,12 @@ describe('Create new topic modal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CreateNewTopicModalComponent);
     componentInstance = fixture.componentInstance;
-    pageContextService = TestBed.inject(PageContextService);
     ngbActiveModal = TestBed.inject(NgbActiveModal);
-    imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
     topicEditorStateService = TestBed.inject(TopicEditorStateService);
   });
 
   it('should create', () => {
     expect(componentInstance).toBeDefined();
-  });
-
-  it('should intialize', () => {
-    spyOn(pageContextService, 'setImageSaveDestinationToLocalStorage');
-    componentInstance.ngOnInit();
-    expect(
-      pageContextService.setImageSaveDestinationToLocalStorage
-    ).toHaveBeenCalled();
   });
 
   it('should save new topic', () => {
@@ -97,12 +82,9 @@ describe('Create new topic modal', () => {
 
   it('should validate newly created topic', () => {
     spyOn(componentInstance.newlyCreatedTopic, 'isValid').and.returnValue(true);
-    spyOn(imageLocalStorageService, 'getStoredImagesData').and.returnValue([
-      {
-        filename: '',
-        imageBlob: null,
-      },
-    ]);
+    componentInstance.thumbnailImage = new Blob(['test'], {
+      type: 'image/svg+xml',
+    });
     expect(componentInstance.isValid()).toBeTrue();
   });
 

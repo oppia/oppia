@@ -89,15 +89,21 @@
 
       <div class="thumbnail-editor e2e-test-subtopic-thumbnail e2e-test-photo-button create-new-subtopic-input-field">
         <strong>Thumbnail Image*</strong>
-        <oppia-thumbnail-uploader (updateFilename)="updateSubtopicThumbnailFilename($event)"
-                                  [useLocalStorage]="false"
-                                  [bgColor]="editableThumbnailBgColor"
-                                  (updateBgColor)="updateSubtopicThumbnailBgColor($event)"
-                                  [allowedBgColors]="allowedBgColors"
-                                  [aspectRatio]="'4:3'"
-                                  [previewTitle]="subtopicTitle"
-                                  previewDescriptionBgColor="#BE563C">
-        </oppia-thumbnail-uploader>
+        <oppia-image-uploader
+          [imageUploaderParameters]="{
+            disabled: false,
+            maxImageSizeInKB: 100,
+            imageName: 'Thumbnail',
+            orientation: 'landscape',
+            bgColor: allowedBgColors[0],
+            allowedBgColors: allowedBgColors,
+            allowedImageFormats: ['svg'],
+            aspectRatio: '4:3',
+            previewTitle: subtopicTitle,
+            previewDescriptionBgColor: '#BE563C'
+          }"
+          (imageSave)="onImageSave($event)">
+        </oppia-image-uploader>
       </div>
     </div>
   </div>

@@ -22,16 +22,17 @@ import {AppConstants} from 'app.constants';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {NewlyCreatedTopic} from 'domain/topics_and_skills_dashboard/newly-created-topic.model';
 import {TopicEditorStateService} from 'pages/topic-editor-page/services/topic-editor-state.service';
-import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
 
 @Component({
   selector: 'oppia-create-new-topic-modal',
   templateUrl: './create-new-topic-modal.component.html',
 })
 export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
-  allowedBgColors: object = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+  allowedBgColors: string[] = Object.values(
+    AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic
+  );
   validUrlFragmentRegex = new RegExp(AppConstants.VALID_URL_FRAGMENT_REGEX);
   newlyCreatedTopic: NewlyCreatedTopic = NewlyCreatedTopic.createDefault();
   hostname: string = this.windowRef.nativeWindow.location.hostname;
@@ -47,23 +48,25 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
   maxWebTitleFrag = AppConstants.MAX_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   minWebTitleFrag = AppConstants.MIN_CHARS_IN_PAGE_TITLE_FRAGMENT_FOR_WEB;
   generatedUrlPrefix = `${this.hostname}/learn/staging`;
+  thumbnailImage: Blob | null = null;
+  thumbnailFilename: string = '';
+  thumbnailBgColor: string = this.allowedBgColors[0] || '';
 
   constructor(
-    private pageContextService: PageContextService,
     private ngbActiveModal: NgbActiveModal,
-    private imageLocalStorageService: ImageLocalStorageService,
     private windowRef: WindowRef,
     private topicEditorStateService: TopicEditorStateService
   ) {
     super(ngbActiveModal);
   }
 
-  ngOnInit(): void {
-    this.pageContextService.setImageSaveDestinationToLocalStorage();
-  }
-
   save(): void {
-    this.ngbActiveModal.close(this.newlyCreatedTopic);
+    this.ngbActiveModal.close({
+      topic: this.newlyCreatedTopic,
+      thumbnailImage: this.thumbnailImage,
+      thumbnailFilename: this.thumbnailFilename,
+      thumbnailBgColor: this.thumbnailBgColor,
+    });
   }
 
   cancel(): void {
@@ -72,9 +75,14 @@ export class CreateNewTopicModalComponent extends ConfirmOrCancelModal {
 
   isValid(): boolean {
     return Boolean(
-      this.newlyCreatedTopic.isValid() &&
-        this.imageLocalStorageService.getStoredImagesData().length > 0
+      this.newlyCreatedTopic.isValid() && this.thumbnailImage !== null
     );
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    this.thumbnailImage = imageData.image_data;
+    this.thumbnailFilename = imageData.filename;
+    this.thumbnailBgColor = imageData.bg_color;
   }
 
   onUrlFragmentChange(urlFragment: string): void {

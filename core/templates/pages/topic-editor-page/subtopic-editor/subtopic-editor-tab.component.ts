@@ -39,6 +39,9 @@ import {StudyGuideSection} from 'domain/topic/study-guide-sections.model';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteStudyGuideSectionComponent} from 'pages/topic-editor-page/subtopic-editor/delete-study-guide-section-modal.component';
 import {AddStudyGuideSectionModalComponent} from 'pages/topic-editor-page/subtopic-editor/add-study-guide-section.component';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-subtopic-editor-tab',
@@ -90,6 +93,8 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   generatedUrlPrefix!: string;
 
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private pageContextService: PageContextService,
     private questionBackendApiService: QuestionBackendApiService,
     private subtopicValidationService: SubtopicValidationService,
     private topicEditorRoutingService: TopicEditorRoutingService,
@@ -161,7 +166,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       } else {
         this.subtopicPage = this.topicEditorStateService.getSubtopicPage();
       }
-      this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
+      this.allowedBgColors = Object.values(
+        AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic
+      );
       if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
         var sections = this.studyGuide.getSections();
         this.sections = sections;
@@ -268,6 +275,33 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
       newThumbnailBgColor
     );
     this.editableThumbnailBgColor = newThumbnailBgColor;
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+
+    if (!entityType || !entityId) {
+      console.error('Entity type or ID not available');
+      return;
+    }
+
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .subscribe(
+        response => {
+          this.updateSubtopicThumbnailFilename(response.filename);
+          this.updateSubtopicThumbnailBgColor(imageData.bg_color);
+        },
+        error => {
+          console.error('Error uploading thumbnail:', error);
+        }
+      );
   }
 
   resetErrorMsg(): void {

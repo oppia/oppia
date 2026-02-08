@@ -45,6 +45,8 @@ import {CdkDragDrop, moveItemInArray} from '@angular/cdk/drag-drop';
 import {Topic} from 'domain/topic/topic-object.model';
 import {TopicRights} from 'domain/topic/topic-rights.model';
 import {RearrangeSkillsInSubtopicsModalComponent} from '../modal-templates/rearrange-skills-in-subtopics-modal.component';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 @Component({
   selector: 'oppia-topic-editor-tab',
@@ -107,6 +109,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
   generatedUrlPrefix!: string;
 
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
     private pageContextService: PageContextService,
     private entityCreationService: EntityCreationService,
     private focusManagerService: FocusManagerService,
@@ -162,7 +165,9 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     this.initialTopicUrlFragment = this.topic.getUrlFragment();
     this.editableTopicUrlFragment = this.topic.getUrlFragment();
     this.editableDescription = this.topic.getDescription();
-    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic;
+    this.allowedBgColors = Object.values(
+      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.topic
+    );
     this.topicNameExists = false;
     this.topicUrlFragmentExists = false;
     this.hostname = this.windowRef.nativeWindow.location.hostname;
@@ -430,6 +435,33 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  onImageSave(imageData: ImageUploaderData): void {
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+
+    if (!entityType || !entityId) {
+      console.error('Entity type or ID not available');
+      return;
+    }
+
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .subscribe(
+        response => {
+          this.updateTopicThumbnailFilename(response.filename);
+          this.updateTopicThumbnailBgColor(imageData.bg_color);
+        },
+        error => {
+          console.error('Error uploading thumbnail:', error);
+        }
+      );
+  }
+
   updateTopicDescription(newDescription: string): void {
     if (newDescription !== this.topic.getDescription()) {
       this.topicUpdateService.setTopicDescription(this.topic, newDescription);
@@ -626,7 +658,7 @@ export class TopicEditorTabComponent implements OnInit, OnDestroy {
       this.skillOptionDialogueBox = false;
     }
 
-    if (Object.keys(this.selectedSkillEditOptionsIndex).length) {
+    if (Object.values(this.selectedSkillEditOptionsIndex).length) {
       this.selectedSkillEditOptionsIndex = {};
       return;
     }

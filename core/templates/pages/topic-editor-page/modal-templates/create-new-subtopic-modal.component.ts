@@ -33,6 +33,9 @@ import {
   CALCULATION_TYPE_CHARACTER,
   HtmlLengthService,
 } from 'services/html-length.service';
+import {ImageUploaderData} from 'components/forms/custom-forms-directives/image-uploader.component';
+import {AssetsBackendApiService} from 'services/assets-backend-api.service';
+import {PageContextService} from 'services/page-context.service';
 
 @Component({
   selector: 'oppia-create-new-subtopic-modal',
@@ -70,8 +73,13 @@ export class CreateNewSubtopicModalComponent
   generatedUrlPrefix!: string;
   studyGuideSectionCharacterLimit: number =
     AppConstants.STUDY_GUIDE_SECTION_CHARACTER_LIMIT;
+  thumbnailImage: Blob | null = null;
+  thumbnailFilename: string = '';
+  thumbnailBgColor: string = '';
 
   constructor(
+    private assetsBackendApiService: AssetsBackendApiService,
+    private pageContextService: PageContextService,
     private ngbActiveModal: NgbActiveModal,
     private subtopicValidationService: SubtopicValidationService,
     private topicUpdateService: TopicUpdateService,
@@ -102,7 +110,10 @@ export class CreateNewSubtopicModalComponent
     this.editableThumbnailFilename = '';
     this.editableThumbnailBgColor = '';
     this.editableUrlFragment = '';
-    this.allowedBgColors = AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic;
+    this.allowedBgColors = Object.values(
+      AppConstants.ALLOWED_THUMBNAIL_BG_COLORS.subtopic
+    );
+    this.thumbnailBgColor = this.allowedBgColors[0] || '';
     this.subtopicId = this.topic.getNextSubtopicId();
     this.MAX_CHARS_IN_SUBTOPIC_TITLE = AppConstants.MAX_CHARS_IN_SUBTOPIC_TITLE;
     this.MAX_CHARS_IN_SUBTOPIC_URL_FRAGMENT =
@@ -176,20 +187,20 @@ export class CreateNewSubtopicModalComponent
   isSubtopicValid(): boolean {
     if (this.isShowRestructuredStudyGuidesFeatureEnabled()) {
       return Boolean(
-        this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.sectionHeadingPlaintext &&
-          this.sectionContentHtml &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
+        this.thumbnailImage &&
+        this.subtopicTitle &&
+        this.sectionHeadingPlaintext &&
+        this.sectionContentHtml &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
       );
     } else {
       return Boolean(
-        this.editableThumbnailFilename &&
-          this.subtopicTitle &&
-          this.htmlData &&
-          this.editableUrlFragment &&
-          this.isUrlFragmentValid()
+        this.thumbnailImage &&
+        this.subtopicTitle &&
+        this.htmlData &&
+        this.editableUrlFragment &&
+        this.isUrlFragmentValid()
       );
     }
   }
@@ -229,6 +240,36 @@ export class CreateNewSubtopicModalComponent
   onUrlFragmentChange(urlFragment: string): void {
     this.editableUrlFragment = urlFragment;
     this.checkSubtopicExistence();
+  }
+
+  onImageSave(imageData: ImageUploaderData): void {
+    const entityType = this.pageContextService.getEntityType();
+    const entityId = this.pageContextService.getEntityId();
+
+    if (!entityType || !entityId) {
+      console.error('Entity type or ID not available');
+      return;
+    }
+
+    this.assetsBackendApiService
+      .postThumbnailFile(
+        imageData.image_data,
+        imageData.filename,
+        entityType,
+        entityId
+      )
+      .subscribe(
+        response => {
+          this.thumbnailImage = imageData.image_data;
+          this.thumbnailFilename = response.filename;
+          this.thumbnailBgColor = imageData.bg_color;
+          this.editableThumbnailFilename = response.filename;
+          this.editableThumbnailBgColor = imageData.bg_color;
+        },
+        error => {
+          console.error('Error uploading thumbnail:', error);
+        }
+      );
   }
 
   save(): void {

@@ -134,18 +134,23 @@
               </span>
             </div>
             <label class="form-heading">Thumbnail</label>
-            <oppia-thumbnail-uploader [disabled]="!topicRights.canEditTopic()"
-                                      [useLocalStorage]="false"
-                                      [filename]="topic.getThumbnailFilename()"
-                                      (updateFilename)="updateTopicThumbnailFilename($event)"
-                                      [bgColor]="topic.getThumbnailBgColor()"
-                                      (updateBgColor)="updateTopicThumbnailBgColor($event)"
-                                      [allowedBgColors]="allowedBgColors"
-                                      [aspectRatio]="'4:3'"
-                                      [previewTitle]="editableName"
-                                      previewDescriptionBgColor="#2F6687"
-                                      [previewFooter]="topic.getCanonicalStoryIds().length + ' Lessons'">
-            </oppia-thumbnail-uploader>
+            <oppia-image-uploader
+              [imageUploaderParameters]="{
+                disabled: !topicRights.canEditTopic(),
+                maxImageSizeInKB: 100,
+                imageName: 'Thumbnail',
+                orientation: 'landscape',
+                bgColor: topic.getThumbnailBgColor(),
+                allowedBgColors: allowedBgColors,
+                allowedImageFormats: ['svg'],
+                aspectRatio: '4:3',
+                filename: topic.getThumbnailFilename(),
+                previewTitle: editableName,
+                previewDescriptionBgColor: '#2F6687',
+                previewFooter: topic.getCanonicalStoryIds().length + ' Lessons'
+              }"
+              (imageSave)="onImageSave($event)">
+            </oppia-image-uploader>
             <div class="topic-classroom-container">
               <label>Classroom</label>
               <span *ngIf="isAssignedToAClassroom()">

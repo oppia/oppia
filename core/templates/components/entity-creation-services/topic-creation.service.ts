@@ -23,9 +23,7 @@ import {TopicsAndSkillsDashboardBackendApiService} from 'domain/topics_and_skill
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {CreateNewTopicModalComponent} from 'pages/topics-and-skills-dashboard-page/modals/create-new-topic-modal.component';
 import {AlertsService} from 'services/alerts.service';
-import {PageContextService} from 'services/page-context.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -38,8 +36,6 @@ export class TopicCreationService {
     private ngbModal: NgbModal,
     private windowRef: WindowRef,
     private alertsService: AlertsService,
-    private pageContextService: PageContextService,
-    private imageLocalStorageService: ImageLocalStorageService,
     private topicCreationBackendApiService: TopicCreationBackendApiService,
     private topicsAndSkillsDashboardBackendApiService: TopicsAndSkillsDashboardBackendApiService,
     private urlInterpolationService: UrlInterpolationService
@@ -49,16 +45,19 @@ export class TopicCreationService {
     if (this.topicCreationInProgress) {
       return;
     }
-    this.pageContextService.setImageSaveDestinationToLocalStorage();
     let modalRef = this.ngbModal.open(CreateNewTopicModalComponent, {
       backdrop: 'static',
       windowClass: 'create-new-topic',
     });
 
     modalRef.result.then(
-      newlyCreatedTopic => {
+      result => {
+        const newlyCreatedTopic = result.topic;
         if (!newlyCreatedTopic.isValid()) {
           throw new Error('Topic fields cannot be empty');
+        }
+        if (!result.thumbnailImage) {
+          throw new Error('Thumbnail image is required');
         }
         this.topicCreationInProgress = true;
         this.alertsService.clearWarnings();
@@ -69,19 +68,19 @@ export class TopicCreationService {
         // new tab is created as soon as the user clicks the 'Create' button
         // and filled with URL once the details are fetched from the backend.
         let newTab = this.windowRef.nativeWindow.open() as Window;
-        let imagesData = this.imageLocalStorageService.getStoredImagesData();
-        let bgColor = this.imageLocalStorageService.getThumbnailBgColor();
-        if (bgColor === null) {
-          throw new Error('Background color not found.');
-        }
+        const imagesData = [
+          {
+            filename: result.thumbnailFilename,
+            imageBlob: result.thumbnailImage,
+          },
+        ];
+        const bgColor = result.thumbnailBgColor;
         this.topicCreationBackendApiService
           .createTopicAsync(newlyCreatedTopic, imagesData, bgColor)
           .then(
             response => {
               this.topicsAndSkillsDashboardBackendApiService.onTopicsAndSkillsDashboardReinitialized.emit();
               this.topicCreationInProgress = false;
-              this.imageLocalStorageService.flushStoredImagesData();
-              this.pageContextService.resetImageSaveDestination();
               newTab.location.href =
                 this.urlInterpolationService.interpolateUrl(
                   this.TOPIC_EDITOR_URL_TEMPLATE,
