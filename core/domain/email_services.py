@@ -232,7 +232,7 @@ def send_bulk_mail(
             subject,
             plaintext_body,
             html_body,
-            attachments,
+            attachments=attachments,
         )
     )
 

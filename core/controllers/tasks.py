@@ -345,6 +345,7 @@ class DeferredTasksHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                     cloud_task_model_id
                 )
             )
+            assert updated_cloud_task_run_domain_instance is not None
 
             if (
                 updated_cloud_task_run_domain_instance.latest_job_state

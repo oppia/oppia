@@ -546,7 +546,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     def test_should_handle_voiceover_deferred_tasks_successfully(self) -> None:
         self.signup('user@example.com', 'user')
-        user_id = self.get_user_id_from_email('user@example.com')
         exploration_id = 'exploration_id'
         self.save_new_valid_exploration(exploration_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, exploration_id)

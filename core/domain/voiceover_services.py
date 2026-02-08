@@ -1088,29 +1088,36 @@ def _regenerate_voiceovers_for_given_contents(
         author_id,
     )
 
-    cloud_task_run_domain_instance = (
-        taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
-    )
-
-    error_string = ''
-    for error_collection in error_collections_during_voiceover_regeneration:
-        error_string += (
-            'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n'
-            % (
-                error_collection['exploration_id'],
-                error_collection['language_accent_code'],
-                error_collection['error_messages'],
+    if requested_task_is_async:
+        error_string = ''
+        for error_collection in error_collections_during_voiceover_regeneration:
+            error_string += (
+                'Exploration ID: %s\nLanguage Accent Code: %s\nErrors: %s \n'
+                % (
+                    error_collection['exploration_id'],
+                    error_collection['language_accent_code'],
+                    error_collection['error_messages'],
+                )
             )
-        )
 
-    if errors_while_voiceover_regeneration:
-        cloud_task_run_domain_instance.latest_job_state = 'PERMANENTLY_FAILED'
-        cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
-            error_string
+        # Ruling out the possibility of None for mypy type checking.
+        assert task_run_id is not None
+        cloud_task_run_domain_instance = (
+            taskqueue_services.get_cloud_task_run_by_model_id(task_run_id)
         )
-        taskqueue_services.update_cloud_task_run_model(
-            cloud_task_run_domain_instance
-        )
+        # Ruling out the possibility of None for mypy type checking.
+        assert cloud_task_run_domain_instance is not None
+
+        if errors_while_voiceover_regeneration:
+            cloud_task_run_domain_instance.latest_job_state = (
+                'PERMANENTLY_FAILED'
+            )
+            cloud_task_run_domain_instance.exception_messages_for_failed_runs.append(
+                error_string
+            )
+            taskqueue_services.update_cloud_task_run_model(
+                cloud_task_run_domain_instance
+            )
 
 
 def regenerate_voiceovers_on_exploration_update(
