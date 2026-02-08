@@ -132,7 +132,8 @@ def get_question_from_model(
         question_model.question_state_data_schema_version
         != feconf.CURRENT_STATE_SCHEMA_VERSION
     ):
-        next_content_id_index = migrate_state_schema(versioned_question_state)
+        current_content_id_index = question_model.next_content_id_index
+        next_content_id_index = migrate_state_schema(versioned_question_state,current_content_id_index)
 
     if next_content_id_index is not None:
         question_model.next_content_id_index = next_content_id_index
@@ -171,8 +172,8 @@ def migrate_state_schema(
                 state data.
 
         current_next_content_id_index: int. A variable passed
-            from suggestion_migration_job which next_content_id_index
-            is set to before migration.
+            by the functions utilizing migrate_state_schema so
+            that current_node_id_index is never set to None
 
     Returns:
         int. The next content id index for generating content id.
