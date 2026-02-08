@@ -173,6 +173,7 @@ oppia-conversation-skin .oppia-button-icon {
   .conversation-skin-supplemental-card-container {
     left: 50%;
     margin: 60px auto 0 auto;
+    /* This min-width is set to auto to prevent the supplemental card from overflowing on small mobile devices (e.g. iPhone SE). */
     min-width: auto;
     position: absolute;
     transform: translateX(-50%);
