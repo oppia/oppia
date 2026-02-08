@@ -256,6 +256,7 @@ describe('Logged-In Learner', function () {
         'Chap2GreadedOutHasComingSoonLabel',
         __dirname
       );
+
       await loggedInLearner2.clickOnElementWithText(
         'What are the Place Values'
       );

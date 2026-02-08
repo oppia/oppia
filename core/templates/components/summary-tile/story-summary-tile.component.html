@@ -137,7 +137,7 @@
               <span class="chapter-icon-number">{{ idx + 1 }}</span>
             </div>
             <div class="chapter-text">
-              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" target="_blank" class="e2e-test-chapter-title">
+              <a [href]="getChapterUrl(node.getTitle())" rel="noopener" class="e2e-test-chapter-title">
                 <span dir="auto" *ngIf="!isHackyNodeTitleTranslationDisplayed(idx)">
                   {{ node.getTitle() }}
                 </span>
