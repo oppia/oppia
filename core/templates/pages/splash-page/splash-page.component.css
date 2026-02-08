@@ -66,12 +66,13 @@
   width: 100vw;
 }
 
-.splash-page .oppia-splash-button {
+.splash-page .oppia-splash-button-container .btn.oppia-splash-button {
   background-color: #015c53;
   border-radius: 5px;
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 16px;
+  letter-spacing: normal;
   margin-bottom: 40px;
   margin-top: -20px;
   min-width: 300px;
@@ -86,24 +87,8 @@
   color: #fff;
 }
 
-/* ::ng-deep is required here because PrimaryButtonComponent uses buttonHref to render
-   anchor tags within its own template, and Angular's view encapsulation prevents this
-   component's CSS from reaching into the child component's template. Without ::ng-deep,
-   these styles won't apply to the anchor tags rendered by PrimaryButtonComponent. */
-/* stylelint-disable-next-line selector-pseudo-element-no-unknown */
-.splash-page ::ng-deep .oppia-splash-button-container .primary-button.btn {
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 16px;
-  font-weight: normal;
-  letter-spacing: normal;
-  margin-bottom: 40px;
-  margin-top: -20px;
-  min-width: 300px;
-  padding: 10px;
-}
-
 @media only screen and (max-width: 500px) {
-  .splash-page button.btn.oppia-splash-button {
+  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
     font-size: 3.6vw;
   }
 }
@@ -131,7 +116,7 @@
 }
 
 @media (min-width: 575px) {
-  .splash-page .oppia-splash-button {
+  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
     left: -webkit-calc(130px - -15%);
     left: -moz-calc(130px - -15%);
     left: -o-calc(130px - -15%);
@@ -140,7 +125,7 @@
 }
 
 @media (max-width: 365px) {
-  .splash-page .oppia-splash-button {
+  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
     min-width: 95%;
   }
 }
@@ -479,7 +464,7 @@
     z-index: 10;
   }
 
-  .splash-page .oppia-splash-button {
+  .splash-page .oppia-splash-button-container .btn.oppia-splash-button {
     min-width: auto;
   }
 

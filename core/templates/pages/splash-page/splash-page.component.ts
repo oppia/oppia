@@ -15,7 +15,7 @@
 /**
  * @fileoverview Component for the Oppia splash page.
  */
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
@@ -38,6 +38,7 @@ export interface Testimonial {
   selector: 'oppia-splash-page',
   templateUrl: './splash-page.component.html',
   styleUrls: ['./splash-page.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class SplashPageComponent implements OnInit {
   // These properties are initialized using Angular lifecycle hooks
