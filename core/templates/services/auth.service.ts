@@ -25,6 +25,7 @@ import {md5} from 'hash-wasm';
 
 import {AppConstants} from 'app.constants';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;
@@ -100,7 +101,8 @@ export class AuthService {
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,
-    private authBackendApiService: AuthBackendApiService
+    private authBackendApiService: AuthBackendApiService,
+    private preventPageUnloadEventService: PreventPageUnloadEventService
   ) {
     if (!this.angularFireAuth) {
       this.authServiceImpl = new NullAuthServiceImpl();
@@ -109,6 +111,10 @@ export class AuthService {
     } else {
       this.authServiceImpl = new ProdAuthServiceImpl(this.angularFireAuth);
     }
+
+    this.onUserSignIn.subscribe(() => {
+      this.preventPageUnloadEventService.removeListener();
+    });
   }
 
   static get firebaseEmulatorIsEnabled(): boolean {

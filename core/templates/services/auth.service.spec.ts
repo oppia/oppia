@@ -22,6 +22,7 @@ import {md5} from 'hash-wasm';
 
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
+import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import firebase from 'firebase';
 
 describe('Auth service', function () {
@@ -32,6 +33,7 @@ describe('Auth service', function () {
   let creds: firebase.auth.UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
+  let preventPageUnloadEventService: jasmine.SpyObj<PreventPageUnloadEventService>;
 
   beforeEach(async () => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
@@ -45,11 +47,20 @@ describe('Auth service', function () {
       beginSessionAsync: Promise.resolve(),
       endSessionAsync: Promise.resolve(),
     });
+    preventPageUnloadEventService =
+      jasmine.createSpyObj<PreventPageUnloadEventService>(
+        'PreventPageUnloadEventService',
+        ['removeListener']
+      );
 
     TestBed.configureTestingModule({
       providers: [
         {provide: AngularFireAuth, useValue: angularFireAuth},
         {provide: AuthBackendApiService, useValue: authBackendApiService},
+        {
+          provide: PreventPageUnloadEventService,
+          useValue: preventPageUnloadEventService,
+        },
       ],
     });
 
@@ -99,19 +110,31 @@ describe('Auth service', function () {
 
   it('should throw if signOutAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).signOutAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        preventPageUnloadEventService
+      ).signOutAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
   it('should throw if signInWithRedirectAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).signInWithRedirectAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        preventPageUnloadEventService
+      ).signInWithRedirectAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
   it('should throw if handleRedirectResultAsync is called without angular fire', async () => {
     await expectAsync(
-      new AuthService(null, authBackendApiService).handleRedirectResultAsync()
+      new AuthService(
+        null,
+        authBackendApiService,
+        preventPageUnloadEventService
+      ).handleRedirectResultAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
 
@@ -175,7 +198,11 @@ describe('Auth service', function () {
         additionalUserInfo: null,
       };
 
-      authService = new AuthService(angularFireAuth, authBackendApiService);
+      authService = new AuthService(
+        angularFireAuth,
+        authBackendApiService,
+        preventPageUnloadEventService
+      );
     });
 
     it('should fail to call signInWithEmail', async () => {
@@ -239,7 +266,11 @@ describe('Auth service', function () {
         'get'
       ).and.returnValue(true);
 
-      authService = new AuthService(angularFireAuth, authBackendApiService);
+      authService = new AuthService(
+        angularFireAuth,
+        authBackendApiService,
+        preventPageUnloadEventService
+      );
     });
 
     it('should not delegate to signInWithRedirectAsync', async () => {
@@ -272,6 +303,11 @@ describe('Auth service', function () {
         messagingSenderId: '',
         appId: '',
       });
+    });
+
+    it('should remove listener on user sign in', () => {
+      authService.onUserSignIn.emit();
+      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
     });
   });
 });

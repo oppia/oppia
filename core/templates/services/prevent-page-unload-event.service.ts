@@ -17,10 +17,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {Subscription} from 'rxjs';
 
 import {WindowRef} from 'services/contextual/window-ref.service';
-import {AuthService} from 'services/auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -32,16 +30,7 @@ export class PreventPageUnloadEventService {
     this: Window,
     ev: BeforeUnloadEvent
   ) => void;
-  private signInSubscription: Subscription;
-
-  constructor(
-    private windowRef: WindowRef,
-    private authService: AuthService
-  ) {
-    this.signInSubscription = this.authService.onUserSignIn.subscribe(() => {
-      this.removeListener();
-    });
-  }
+  constructor(private windowRef: WindowRef) {}
 
   addListener(callback?: () => boolean): void {
     if (this.listenerActive) {
@@ -95,8 +84,5 @@ export class PreventPageUnloadEventService {
 
   ngOnDestroy(): void {
     this.removeListener();
-    if (this.signInSubscription) {
-      this.signInSubscription.unsubscribe();
-    }
   }
 }
