@@ -282,6 +282,9 @@ describe('Blog Pages functionality', function () {
       'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.',
       ['News', 'Stories']
     );
+    await blogDashboardPage.navigateToPublishTab();
+    await blogDashboardPage.expectNumberOfPublishedBlogPostsToBe(8);
+
     await blogPages.get();
     await blogPages.submitSearchQuery('Pineapple');
     await blogPages.expectNumberOfBlogPostsToBe(1);
