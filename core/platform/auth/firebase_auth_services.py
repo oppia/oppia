@@ -196,7 +196,7 @@ def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
 
 
 def delete_multi_auth_provider_records(
-    accounts: Iterable[auth_domain.AuthProviderRecord],
+    records: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
     """Deletes the given records from Firebase.
 
@@ -211,7 +211,7 @@ def delete_multi_auth_provider_records(
     error_count = 0
     batch_offset = 0
 
-    auth_ids = (account.auth_id for account in accounts)
+    auth_ids = (record.auth_id for record in records)
 
     while batch := list(itertools.islice(auth_ids, feconf.FIREBASE_BATCH_SIZE)):
         try:
@@ -238,17 +238,17 @@ def delete_multi_auth_provider_records(
         raise auth_domain.AuthProviderError('\n\t'.join(errors))
 
 
-def import_multi_auth_provider_records(
-    accounts: Iterable[auth_domain.AuthProviderRecord],
+def upload_multi_auth_provider_records(
+    records: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Imports the given records into Firebase WITHOUT safety checks.
+    """Uploads the given records into Firebase WITHOUT safety checks.
 
     WARNING: This operation DOES NOT protect against duplicate records! The ONLY
     way to guarantee that this function is used safely is by running it on an
     empty server, where collisions are impossible.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to import.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to upload.
 
     Raises:
         ValueError. If any record is malformed.
@@ -258,14 +258,14 @@ def import_multi_auth_provider_records(
     error_count = 0
     batch_offset = 0
 
-    records = (
+    users = (
         firebase_auth.ImportUserRecord(
-            account.auth_id, email=account.email, disabled=account.disabled
+            record.auth_id, email=record.email, disabled=record.disabled
         )
-        for account in accounts
+        for record in records
     )
 
-    while batch := list(itertools.islice(records, feconf.FIREBASE_BATCH_SIZE)):
+    while batch := list(itertools.islice(users, feconf.FIREBASE_BATCH_SIZE)):
         try:
             result = firebase_auth.import_users(batch)
         except firebase_exceptions.FirebaseError as e:
@@ -285,7 +285,7 @@ def import_multi_auth_provider_records(
 
     if error_count:
         errors.insert(
-            0, 'Error importing %d/%d accounts:' % (error_count, batch_offset)
+            0, 'Error uploading %d/%d accounts:' % (error_count, batch_offset)
         )
         raise auth_domain.AuthProviderError('\n\t'.join(errors))
 

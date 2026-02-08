@@ -1975,7 +1975,7 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
         ):
             firebase_auth_services.delete_multi_auth_provider_records(accounts)
 
-    def test_import_multiple_accounts_successfully(self) -> None:
+    def test_upload_multiple_accounts_successfully(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord(
                 auth_id=f'uid_{i}',
@@ -1985,13 +1985,13 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             for i in range(5)
         ]
 
-        firebase_auth_services.import_multi_auth_provider_records(accounts)
+        firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
         self.firebase_sdk_stub.assert_is_user_multi(
             [f'uid_{i}' for i in range(5)]
         )
 
-    def test_import_accounts_with_all_fields(self) -> None:
+    def test_upload_accounts_with_all_fields(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord(
                 'uid_0', 'user_0@example.com', disabled=False
@@ -2004,17 +2004,17 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             ),
         ]
 
-        firebase_auth_services.import_multi_auth_provider_records(accounts)
+        firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
         self.firebase_sdk_stub.assert_is_user_multi(['uid_0', 'uid_1', 'uid_2'])
         self.firebase_sdk_stub.assert_is_not_disabled('uid_0')
         self.firebase_sdk_stub.assert_is_disabled('uid_1')
         self.firebase_sdk_stub.assert_is_not_disabled('uid_2')
 
-    def test_import_empty_list_succeeds(self) -> None:
-        firebase_auth_services.import_multi_auth_provider_records([])
+    def test_upload_empty_list_succeeds(self) -> None:
+        firebase_auth_services.upload_multi_auth_provider_records([])
 
-    def test_import_accounts_with_batching(self) -> None:
+    def test_upload_accounts_with_batching(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord(
                 auth_id=f'uid_{i}',
@@ -2024,12 +2024,12 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             for i in range(2505)
         ]
 
-        firebase_auth_services.import_multi_auth_provider_records(accounts)
+        firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
         uids = [f'uid_{i}' for i in range(2505)]
         self.firebase_sdk_stub.assert_is_user_multi(uids)
 
-    def test_import_accounts_raises_error_when_some_fail(self) -> None:
+    def test_upload_accounts_raises_error_when_some_fail(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord('uid_0', 'user_0@example.com'),
             auth_domain.AuthProviderRecord('uid_1', 'user_1@example.com'),
@@ -2041,12 +2041,12 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
                 individual_error_pattern=(None, 'Failed to import')
             ),
             self.assertRaisesRegex(
-                auth_domain.AuthProviderError, 'Error importing 1/3 accounts'
+                auth_domain.AuthProviderError, 'Error uploading 1/3 accounts'
             ),
         ):
-            firebase_auth_services.import_multi_auth_provider_records(accounts)
+            firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
-    def test_import_accounts_with_empty_auth_id_raises_value_error(
+    def test_upload_accounts_with_empty_auth_id_raises_value_error(
         self,
     ) -> None:
         accounts = [
@@ -2056,9 +2056,9 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
 
         # The SDK raises ValueError for empty/None uid values.
         with self.assertRaisesRegex(ValueError, 'uid'):
-            firebase_auth_services.import_multi_auth_provider_records(accounts)
+            firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
-    def test_import_accounts_reports_correct_error_indices(self) -> None:
+    def test_upload_accounts_reports_correct_error_indices(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord('uid_0', 'user_0@example.com'),
             auth_domain.AuthProviderRecord('uid_1', 'user_1@example.com'),
@@ -2073,14 +2073,14 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             ),
             self.assertRaisesRegex(
                 auth_domain.AuthProviderError,
-                r'Error importing 2/5 accounts:\n'
+                r'Error uploading 2/5 accounts:\n'
                 r'\tAt index=1: error1\n'
                 r'\tAt index=3: error2',
             ),
         ):
-            firebase_auth_services.import_multi_auth_provider_records(accounts)
+            firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
-    def test_import_accounts_with_multiple_batches_reports_correct_indices(
+    def test_upload_accounts_with_multiple_batches_reports_correct_indices(
         self,
     ) -> None:
         accounts = [
@@ -2103,15 +2103,15 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             ),
             self.assertRaisesRegex(
                 auth_domain.AuthProviderError,
-                r'Error importing 3/2505 accounts:\n'
+                r'Error uploading 3/2505 accounts:\n'
                 r'\tAt index=500: error at 500\n'
                 r'\tAt index=1500: error at 1500\n'
                 r'\tAt index=2000: error at 2000',
             ),
         ):
-            firebase_auth_services.import_multi_auth_provider_records(accounts)
+            firebase_auth_services.upload_multi_auth_provider_records(accounts)
 
-    def test_import_accounts_with_sdk_error_during_batch(self) -> None:
+    def test_upload_accounts_with_sdk_error_during_batch(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord(f'uid_{i}', f'user_{i}@example.com')
             for i in range(750)
@@ -2128,8 +2128,8 @@ class FirebaseAuthProviderRecordCrudTests(FirebaseAuthServicesTestBase):
             ),
             self.assertRaisesRegex(
                 auth_domain.AuthProviderError,
-                r'Error importing 250/750 accounts:\n'
+                r'Error uploading 250/750 accounts:\n'
                 r'\tAt slice=250:500: uh-oh!',
             ),
         ):
-            firebase_auth_services.import_multi_auth_provider_records(accounts)
+            firebase_auth_services.upload_multi_auth_provider_records(accounts)

@@ -128,7 +128,7 @@ class AuthProviderRecord(NamedTuple):
     to ensure that the user will be able to sign in to their account.
 
     Attributes:
-        auth_id: str. The unqiue identifier (with respect to the auth provider)
+        auth_id: str. The unique identifier (with respect to the auth provider)
             that is assigned to a specific user. Must be a string between 1-128
             characters long, inclusive.
         email: str. The user's primary email. The email address must be valid.

@@ -283,18 +283,18 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         mock_delete_multi.assert_called_once_with(accounts)
 
-    def test_import_multi_auth_provider_records(self) -> None:
+    def test_upload_multi_auth_provider_records(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
             auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
         ]
 
         with mock.patch.object(
-            platform_auth_services, 'import_multi_auth_provider_records'
-        ) as mock_import:
-            auth_services.import_multi_auth_provider_records(accounts)
+            platform_auth_services, 'upload_multi_auth_provider_records'
+        ) as mock_upload:
+            auth_services.upload_multi_auth_provider_records(accounts)
 
-        mock_import.assert_called_once_with(accounts)
+        mock_upload.assert_called_once_with(accounts)
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,

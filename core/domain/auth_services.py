@@ -21,7 +21,7 @@ from __future__ import annotations
 import base64
 import os
 
-from core.domain import auth_domain, caching_services
+from core.domain import auth_domain, caching_services, feature_flag_domain
 from core.platform import models
 from core.platform.auth import firebase_auth_services
 
@@ -295,29 +295,41 @@ def delete_multi_auth_provider_records(
         records: Iterable[auth_domain.AuthProviderRecord]. Records to delete.
 
     Raises:
+        PermissionError. If this function is called from the production server.
         ValueError. If any record is malformed.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
+    if (
+        feature_flag_domain.get_server_mode()
+        == feature_flag_domain.ServerMode.PROD
+    ):
+        raise PermissionError('Bulk record deletion is FORBIDDEN in production')
     platform_auth_services.delete_multi_auth_provider_records(records)
 
 
-def import_multi_auth_provider_records(
+def upload_multi_auth_provider_records(
     records: Iterable[auth_domain.AuthProviderRecord],
 ) -> None:
-    """Imports the given records into our auth provider WITHOUT safety checks.
+    """Uploads the given records into our auth provider WITHOUT safety checks.
 
     WARNING: This operation DOES NOT protect against duplicate records! The ONLY
     way to guarantee that this function is used safely is by running it on an
     empty server, where collisions are impossible.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to import.
+        records: Iterable[auth_domain.AuthProviderRecord]. Records to upload.
 
     Raises:
+        PermissionError. If this function is called from the production server.
         ValueError. If any record is malformed.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    platform_auth_services.import_multi_auth_provider_records(records)
+    if (
+        feature_flag_domain.get_server_mode()
+        == feature_flag_domain.ServerMode.PROD
+    ):
+        raise PermissionError('Bulk record uploads are FORBIDDEN in production')
+    platform_auth_services.upload_multi_auth_provider_records(records)
 
 
 def grant_super_admin_privileges(user_id: str) -> None:
