@@ -25,6 +25,7 @@ from core.domain import (
     auth_domain,
     auth_services,
     caching_services,
+    feature_flag_domain,
     user_domain,
     user_services,
 )
@@ -283,6 +284,24 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
         mock_delete_multi.assert_called_once_with(accounts)
 
+    def test_delete_multi_auth_provider_records_raises_in_prod(self) -> None:
+        accounts = [
+            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+        ]
+
+        with (
+            self.swap_to_always_return(
+                feature_flag_domain,
+                'get_server_mode',
+                feature_flag_domain.ServerMode.PROD,
+            ),
+            self.assertRaisesRegex(
+                PermissionError,
+                'Bulk record deletion is FORBIDDEN in production',
+            ),
+        ):
+            auth_services.delete_multi_auth_provider_records(accounts)
+
     def test_upload_multi_auth_provider_records(self) -> None:
         accounts = [
             auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
@@ -295,6 +314,24 @@ class AuthServicesTests(test_utils.GenericTestBase):
             auth_services.upload_multi_auth_provider_records(accounts)
 
         mock_upload.assert_called_once_with(accounts)
+
+    def test_upload_multi_auth_provider_records_raises_in_prod(self) -> None:
+        accounts = [
+            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+        ]
+
+        with (
+            self.swap_to_always_return(
+                feature_flag_domain,
+                'get_server_mode',
+                feature_flag_domain.ServerMode.PROD,
+            ),
+            self.assertRaisesRegex(
+                PermissionError,
+                'Bulk record uploads are FORBIDDEN in production',
+            ),
+        ):
+            auth_services.upload_multi_auth_provider_records(accounts)
 
     def test_associate_multi_auth_ids_with_user_ids_with_collision_raises(
         self,
