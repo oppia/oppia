@@ -199,7 +199,8 @@ def url_open(
 
                 if delay_secs > 0:
                     time.sleep(delay_secs)
-                    continue
+
+                continue
 
             # For non-rate-limit errors or when we have exhausted the attempts,
             # re-raise the original exception.

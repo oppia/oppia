@@ -882,6 +882,76 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
 
         self.assertEqual(attempts, [test_url])
 
+    def test_url_open_retries_when_rate_limited_with_zero_delay(self) -> None:
+        """Test retry behavior when delay_secs is 0 (no sleep needed).
+
+        This test covers the case where the rate limit reset time is in the past
+        (or equal to current time), resulting in a delay of 0. The function should
+        still retry without sleeping.
+        """
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                # Mock current time as 1000, reset at 1000 -> delay 0s.
+                raise urlerror.HTTPError(
+                    url,
+                    429,
+                    'rate limit exceeded',
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
+                    cast(Any, {'X-RateLimit-Reset': '1000'}),
+                    None,
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        # Mock time.time() to return 1000.
+        def mock_time() -> float:
+            return 1000.0
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
+        )
+        time_swap = self.swap(
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
+            cast(Any, install_dependencies_json_packages).time,
+            'time',
+            mock_time,
+        )
+
+        with urlopen_swap, sleep_swap, time_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, test_url)
+        self.assertEqual(attempts, [test_url, test_url])
+        self.assertEqual(sleep_calls, [])
+
     def _assert_ssl_context_matches_default(
         self, context: ssl.SSLContext
     ) -> None:
