@@ -51,6 +51,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     dummy_jobs,
     email_deletion_jobs,
     exp_migration_jobs,
+    exp_drafts_migration_job,
     exp_search_indexing_jobs,
     exploration_voiceover_sync_jobs,
     math_interactions_audit_jobs,

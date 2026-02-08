@@ -4342,3 +4342,36 @@ def to_exploration_dict_for_android(
 
     exploration_dict_deepcopy = copy.deepcopy(exploration_dict)
     return exploration_dict_deepcopy
+
+
+def migrate_draft_change_list_to_latest_schema(
+    draft_change_list: List[Dict[str, change_domain.AcceptableChangeDictTypes]],
+    exploration: exp_domain.Exploration,
+) -> List[Dict[str, change_domain.AcceptableChangeDictTypes]]:
+    """Migrates a draft change list to be compatible with the latest exploration schema.
+
+    This function mimics the logic of Exploration migration by ensuring the
+    draft changes can be applied to the latest version of the exploration.
+
+    Args:
+        draft_change_list: list(dict). The list of draft changes (as dicts).
+        exploration: Exploration. The current (latest) exploration domain object.
+
+    Returns:
+        list(dict). The updated draft change list.
+    """
+    change_list_objects = [
+        exp_domain.ExplorationChange(change) for change in draft_change_list
+    ]
+
+    try:
+        exp_copy = copy.deepcopy(exploration)
+        apply_change_list(exp_copy.id, change_list_objects)
+        return draft_change_list
+
+    except Exception as e:
+        logging.error(
+            'Draft migration warning: Could not apply draft to exploration %s. '
+            'Error: %s' % (exploration.id, e)
+        )
+        return draft_change_list
