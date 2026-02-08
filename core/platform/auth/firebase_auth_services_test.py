@@ -1630,6 +1630,27 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         )
         self.assertEqual(logs, [])
 
+    def test_get_all_external_accounts_returns_all_firebase_users(self) -> None:
+        self.firebase_sdk_stub.create_user('aid2', 'user2@example.com', False)
+        self.firebase_sdk_stub.create_user('aid3', 'user3@example.com', True)
+
+        self.assertItemsEqual(
+            firebase_auth_services.get_all_external_accounts(),
+            [
+                auth_domain.ExternalAccount(self.AUTH_ID, None, False),
+                auth_domain.ExternalAccount('aid2', 'user2@example.com', False),
+                auth_domain.ExternalAccount('aid3', 'user3@example.com', True),
+            ],
+        )
+
+    def test_get_all_external_accounts_returns_empty_list_when_no_users(
+        self,
+    ) -> None:
+        # Delete user created in setUp.
+        firebase_auth.delete_user(self.AUTH_ID)
+
+        self.assertEqual(firebase_auth_services.get_all_external_accounts(), [])
+
 
 class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
 
