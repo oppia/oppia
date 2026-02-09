@@ -39,7 +39,6 @@ describe('Blog Pages functionality', function () {
       'secondUser',
       'blog admin'
     );
-    // FIX: Created specific user for search test to avoid state pollution
     await users.createUserWithRole(
       'search@blogDashboard.com',
       'searchUser',
