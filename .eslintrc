@@ -80,7 +80,6 @@
         "embedding.js",
         "explorationFeedbackTab.js",
         "explorationHistoryTab.js",
-        "explorationImprovementsTab.js",
         "explorationStatisticsTab.js",
         "explorationTranslationTab.js",
         "extensions.js",
