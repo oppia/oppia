@@ -25,11 +25,9 @@ import sys
 
 from typing import List, Optional
 
-_PARSER = argparse.ArgumentParser(
-    description="""
+_PARSER = argparse.ArgumentParser(description="""
 Checks the frontend test coverage.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--files_to_check',

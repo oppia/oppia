@@ -312,8 +312,7 @@ class EmailTests(test_utils.GenericTestBase):
         unset.
         """
         # Testing no mailgun api key.
-        msg_body = textwrap.dedent(
-            """
+        msg_body = textwrap.dedent("""
             EmailService.SendMail
             From: a@a.com
             To: b@b.com c@c.com d@d.com
@@ -331,8 +330,7 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """
-        )
+            """)
         mailgun_exception = self.assertRaisesRegex(
             Exception,
             (
@@ -356,8 +354,7 @@ class EmailTests(test_utils.GenericTestBase):
 
     def test_mailgun_domain_name_not_set_raises_exception(self) -> None:
         # Testing no mailgun domain name.
-        msg_body = textwrap.dedent(
-            """
+        msg_body = textwrap.dedent("""
             EmailService.SendMail
             From: a@a.com
             To: b@b.com c@c.com d@d.com
@@ -375,8 +372,7 @@ class EmailTests(test_utils.GenericTestBase):
             Reply_to: None
             Recipient Variables:
                 Length: 0
-            """
-        )
+            """)
         mailgun_exception = self.assertRaisesRegex(
             Exception,
             (

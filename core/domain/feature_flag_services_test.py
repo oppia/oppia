@@ -639,7 +639,7 @@ class FeatureFlagServiceTest(test_utils.GenericTestBase):
         return (user_1_id, user_2_id, user_3_id)
 
     def test_feature_flag_enabled_for_given_user_groups(self) -> None:
-        (user_1_id, user_2_id, user_3_id) = (
+        user_1_id, user_2_id, user_3_id = (
             self._signup_multiple_users_and_return_ids()
         )
         user_models.UserGroupModel(

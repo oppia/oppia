@@ -31,10 +31,8 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import collection_models, feedback_models, user_models
 
-(collection_models, feedback_models, user_models) = (
-    models.Registry.import_models(
-        [models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER]
-    )
+collection_models, feedback_models, user_models = models.Registry.import_models(
+    [models.Names.COLLECTION, models.Names.FEEDBACK, models.Names.USER]
 )
 
 

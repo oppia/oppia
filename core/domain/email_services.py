@@ -343,9 +343,7 @@ def convert_email_to_loggable_string(
     )
     attachments_msg_description = """
         Attachments: %s
-        """ % (
-        ', '.join(filenames) if len(filenames) > 0 else 'None'
-    )
+        """ % (', '.join(filenames) if len(filenames) > 0 else 'None')
     loggable_msg = (
         textwrap.dedent(msg)
         + textwrap.dedent(optional_msg_description)

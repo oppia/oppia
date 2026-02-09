@@ -43,7 +43,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(learner_group_models, user_models) = models.Registry.import_models(
+learner_group_models, user_models = models.Registry.import_models(
     [models.Names.LEARNER_GROUP, models.Names.USER]
 )
 
