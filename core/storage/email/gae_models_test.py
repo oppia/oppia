@@ -32,7 +32,7 @@ if MYPY:  # pragma: no cover
     from mypy_imports import user_models  # pylint: disable=unused-import
     from mypy_imports import base_models, email_models
 
-base_models, email_models, user_models = models.Registry.import_models(
+(base_models, email_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.EMAIL, models.Names.USER]
 )
 

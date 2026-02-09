@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, datastore_services, topic_models
 
-base_models, topic_models = models.Registry.import_models(
+(base_models, topic_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.TOPIC]
 )
 datastore_services = models.Registry.import_datastore_services()

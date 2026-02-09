@@ -25,9 +25,11 @@ from scripts import generate_root_files_mapping
 
 from typing import Final, List, Optional, Sequence, Set, TypedDict
 
-_PARSER: Final = argparse.ArgumentParser(description="""
+_PARSER: Final = argparse.ArgumentParser(
+    description="""
 Checks and outputs which test suites to run in the CI. 
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--github_head_ref',
