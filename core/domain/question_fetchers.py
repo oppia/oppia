@@ -173,7 +173,7 @@ def migrate_state_schema(
             state: The State domain object representing the question
                 state data.
 
-        current_next_content_id_index: int. A variable passed
+        current_next_content_id_index: Optional[int]. A variable passed
             by the functions utilizing migrate_state_schema so
             that current_node_id_index is never set to None
 
