@@ -231,7 +231,10 @@ export class BaseUser {
 
         this.page.on('dialog', async dialog => {
           const alertText = dialog.message();
-          if (acceptedBrowserAlerts.includes(alertText)) {
+          if (
+            acceptedBrowserAlerts.includes(alertText) ||
+            dialog.type() === 'beforeunload'
+          ) {
             await dialog.accept();
           } else {
             throw new Error(`Unexpected alert: ${alertText}`);
