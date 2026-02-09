@@ -17,8 +17,8 @@
  */
 
 import {Component, OnInit, Input, Output, EventEmitter} from '@angular/core';
-import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
-import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {
   SkillFilteringService,

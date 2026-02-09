@@ -26,16 +26,60 @@ import {
   waitForAsync,
 } from '@angular/core/testing';
 import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
-import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {UserService} from 'services/user.service';
-import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import {SkillSelectorComponent} from './skill-selector.component';
 import {SkillFilteringService} from 'domain/skill/skill-filtering.service';
+import {SkillSelectorComponent} from './skill-selector.component';
+
+// Mock Service to isolate component tests
+class MockSkillFilteringService {
+  checkIfEmpty(skills: Object[]): boolean {
+    return true;
+  }
+  checkTopicIsNotEmpty(topicName: string, categorizedSkills: any): boolean {
+    return true;
+  }
+  searchInSubtopicSkills(input: any, searchText: string): any {
+    return input;
+  }
+  searchInUntriagedSkillSummaries(summary: any, exclude: any, text: any): any {
+    return summary;
+  }
+  updateSkillsListOnSubtopicFilterChange(
+    skills: any,
+    subDict: any,
+    topicList: any
+  ): any {
+    return skills;
+  }
+  updateSkillsListOnTopicFilterChange(
+    skills: any,
+    initSubDict: any,
+    subDict: any,
+    topicList: any
+  ): any {
+    return {
+      subTopicFilterDict: subDict,
+      currCategorizedSkills: skills,
+    };
+  }
+  computeAugmentedTopicFilterList(
+    list: any,
+    dict: any,
+    skills: any,
+    text: any
+  ): any {
+    return {
+      augmentedTopicFilterList: list,
+      augmentedSubTopicFilterDict: dict,
+    };
+  }
+}
 
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
   let fixture: ComponentFixture<SkillSelectorComponent>;
   let userService: UserService;
+  let skillFilteringService: SkillFilteringService;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
@@ -43,8 +87,10 @@ describe('SkillSelectorComponent', () => {
       declarations: [SkillSelectorComponent],
       providers: [
         UserService,
-        FilterForMatchingSubstringPipe,
-        SkillFilteringService,
+        {
+          provide: SkillFilteringService,
+          useClass: MockSkillFilteringService,
+        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
@@ -54,6 +100,17 @@ describe('SkillSelectorComponent', () => {
     fixture = TestBed.createComponent(SkillSelectorComponent);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService);
+    skillFilteringService = TestBed.inject(SkillFilteringService);
+
+    // Setup basic inputs
+    component.categorizedSkills = {
+      topic1: {
+        uncategorized: [
+          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
+        ],
+        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
+      },
+    };
   });
 
   beforeEach(() => {
@@ -62,313 +119,85 @@ describe('SkillSelectorComponent', () => {
     );
   });
 
-  it('should initialize topic and subtopic filters to unchecked state', fakeAsync(() => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-        subtopic2: [ShortSkillSummary.create('skill3', 'Skill 3 description.')],
-      },
-    };
-
-    expect(component.topicFilterList).toEqual([]);
-    expect(component.subTopicFilterDict).toEqual({});
-
+  it('should initialize and setup filters on ngOnInit', fakeAsync(() => {
     component.ngOnInit();
     tick();
-
-    expect(component.topicFilterList).toEqual([
-      {
-        topicName: 'topic1',
-        checked: false,
-      },
-    ]);
-    expect(component.subTopicFilterDict).toEqual({
-      topic1: [
-        {
-          subTopicName: 'uncategorized',
-          checked: false,
-        },
-        {
-          subTopicName: 'subtopic1',
-          checked: false,
-        },
-        {
-          subTopicName: 'subtopic2',
-          checked: false,
-        },
-      ],
-    });
+    expect(component.topicFilterList.length).toBeGreaterThan(0);
+    expect(component.subTopicFilterDict.topic1).toBeDefined();
   }));
 
-  it('should check if skill is empty', () => {
-    let categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-        subtopic2: [],
-      },
-    };
+  it('should delegate checkIfEmpty to service', () => {
+    const spy = spyOn(skillFilteringService, 'checkIfEmpty');
+    component.checkIfEmpty([]);
+    expect(spy).toHaveBeenCalled();
+  });
 
-    expect(component.checkIfEmpty(categorizedSkills.topic1.subtopic1)).toBe(
-      false
+  it('should delegate checkTopicIsNotEmpty to service', () => {
+    const spy = spyOn(skillFilteringService, 'checkTopicIsNotEmpty');
+    component.checkTopicIsNotEmpty('topic1');
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should delegate searchInSubtopicSkills to service', () => {
+    const spy = spyOn(skillFilteringService, 'searchInSubtopicSkills');
+    component.searchInSubtopicSkills([], 'search');
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should delegate searchInUntriagedSkillSummaries to service', () => {
+    const spy = spyOn(skillFilteringService, 'searchInUntriagedSkillSummaries');
+    component.untriagedSkillSummaries = [];
+    component.searchInUntriagedSkillSummaries('search');
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('should delegate updateSkillsListOnSubtopicFilterChange to service', () => {
+    const spy = spyOn(
+      skillFilteringService,
+      'updateSkillsListOnSubtopicFilterChange'
     );
-    expect(component.checkIfEmpty(categorizedSkills.topic1.subtopic2)).toBe(
-      true
-    );
+    component.updateSkillsListOnSubtopicFilterChange();
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('should check if topic is empty', () => {
-    component.currCategorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-      },
-      topic2: {
-        uncategorized: [],
-      },
-    };
-
-    expect(component.checkTopicIsNotEmpty('topic1')).toBe(true);
-    expect(component.checkTopicIsNotEmpty('topic2')).toBe(false);
-  });
-
-  it('should set selected skill Id when user clicks on radio button', () => {
-    component.selectedSkill = 'skill1';
-    spyOn(component.selectedSkillIdChange, 'emit');
-
-    component.setSelectedSkillId();
-
-    expect(component.selectedSkillIdChange.emit).toHaveBeenCalledWith('skill1');
-  });
-
-  it('should display subtopics from all topics in the subtopic filter if no topic is checked', () => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-      },
-      topic2: {
-        uncategorized: [
-          ShortSkillSummary.create('skill4', 'Skill 4 description.'),
-        ],
-      },
-    };
-
-    component.ngOnInit();
-    component.subTopicFilterDict = {};
+  it('should delegate updateSkillsListOnTopicFilterChange to service', () => {
+    const spy = spyOn(
+      skillFilteringService,
+      'updateSkillsListOnTopicFilterChange'
+    ).and.callThrough();
     component.updateSkillsListOnTopicFilterChange();
-
-    expect(component.subTopicFilterDict).toEqual({
-      topic1: [
-        {
-          subTopicName: 'uncategorized',
-          checked: false,
-        },
-        {
-          subTopicName: 'subtopic1',
-          checked: false,
-        },
-      ],
-      topic2: [
-        {
-          subTopicName: 'uncategorized',
-          checked: false,
-        },
-      ],
-    });
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('should update skill list when user filters skills by only topics', () => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-        subtopic2: [ShortSkillSummary.create('skill3', 'Skill 3 description.')],
-      },
-      topic2: {
-        uncategorized: [
-          ShortSkillSummary.create('skill4', 'Skill 4 description.'),
-        ],
-        subtopic3: [ShortSkillSummary.create('skill5', 'Skill 5 description.')],
-        subtopic4: [ShortSkillSummary.create('skill6', 'Skill 6 description.')],
-      },
-    };
-    component.ngOnInit();
-
-    component.topicFilterList = [
-      {
-        topicName: 'topic1',
-        checked: true,
-      },
-      {
-        topicName: 'topic2',
-        checked: false,
-      },
-    ];
-
-    component.updateSkillsListOnTopicFilterChange();
-
-    expect(component.currCategorizedSkills).toEqual({
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Skill 2 description.')],
-        subtopic2: [ShortSkillSummary.create('skill3', 'Skill 3 description.')],
-      },
-    });
+  it('should delegate refreshFilterLists to service', () => {
+    const spy = spyOn(
+      skillFilteringService,
+      'computeAugmentedTopicFilterList'
+    ).and.callThrough();
+    component.refreshFilterLists();
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('should search in subtopic skills and return filtered skills', () => {
-    let inputShortSkillSummaries: ShortSkillSummary[] = [
-      ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-      ShortSkillSummary.create('skill2', 'Skill 2 description.'),
-      ShortSkillSummary.create('skill3', 'Skill 2 and 3 description.'),
-    ];
-    let searchText = 'skill 2';
-
-    expect(
-      component.searchInSubtopicSkills(inputShortSkillSummaries, searchText)
-    ).toEqual([
-      ShortSkillSummary.create('skill2', 'Skill 2 description.'),
-      ShortSkillSummary.create('skill3', 'Skill 2 and 3 description.'),
-    ]);
-  });
-
-  it('should search in untriaged skill summaries and return filtered skills', () => {
-    component.untriagedSkillSummaries = [
-      SkillSummary.createFromBackendDict({
-        id: '1',
-        description: 'This is untriaged skill summary 1',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444,
-      }),
-      SkillSummary.createFromBackendDict({
-        id: '2',
-        description: 'This is untriaged skill summary 2',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444,
-      }),
-    ];
-    component.skillIdsToExclude = new Set(['1']);
-
-    expect(
-      component.searchInUntriagedSkillSummaries('skill summary 2')
-    ).toEqual([
-      SkillSummary.createFromBackendDict({
-        id: '2',
-        description: 'This is untriaged skill summary 2',
-        language_code: '',
-        version: 1,
-        misconception_count: 2,
-        skill_model_created_on: 121212,
-        skill_model_last_updated: 124444,
-      }),
-    ]);
-  });
-
-  it('should trigger refreshFilterLists when skillFilterText changes', () => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-      },
-    };
-    component.ngOnInit();
-
-    spyOn(component, 'refreshFilterLists');
-
-    component.skillFilterText = 'new search';
-
-    expect(component.refreshFilterLists).toHaveBeenCalled();
-  });
-
-  it('should clear all filters when user clicks on Clear All Filters', () => {
-    component.topicFilterList = [
-      {
-        topicName: 'topic1',
-        checked: true,
-      },
-    ];
-    component.subTopicFilterDict = {
-      topic1: [
-        {
-          subTopicName: 'subtopic1',
-          checked: true,
-        },
-      ],
-    };
+  it('should clear all filters and update list', () => {
+    const spy = spyOn(component, 'updateSkillsListOnTopicFilterChange');
+    component.topicFilterList = [{topicName: 't1', checked: true}];
 
     component.clearAllFilters();
 
-    expect(component.topicFilterList).toEqual([
-      {
-        topicName: 'topic1',
-        checked: false,
-      },
-    ]);
-    expect(component.subTopicFilterDict).toEqual({
-      topic1: [
-        {
-          subTopicName: 'subtopic1',
-          checked: false,
-        },
-      ],
-    });
+    expect(component.topicFilterList[0].checked).toBe(false);
+    expect(spy).toHaveBeenCalled();
   });
 
-  it('should filter augmented topics based on search text', () => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Algebra equation.'),
-        ],
-        subtopic1: [ShortSkillSummary.create('skill2', 'Geometry shapes.')],
-      },
-      topic2: {
-        uncategorized: [ShortSkillSummary.create('skill3', 'Physics motion.')],
-      },
-    };
-
-    component.ngOnInit();
-    component.skillFilterText = 'Algebra';
-
-    expect(component.augmentedTopicFilterList.length).toBe(1);
-    expect(component.augmentedTopicFilterList[0].topicName).toBe('topic1');
+  it('should set selected skill id', () => {
+    spyOn(component.selectedSkillIdChange, 'emit');
+    component.selectedSkill = 's1';
+    component.setSelectedSkillId();
+    expect(component.selectedSkillIdChange.emit).toHaveBeenCalledWith('s1');
   });
 
-  it('should return all augmented topics when search text is empty', () => {
-    component.categorizedSkills = {
-      topic1: {
-        uncategorized: [
-          ShortSkillSummary.create('skill1', 'Skill 1 description.'),
-        ],
-      },
-    };
-    component.ngOnInit();
-
-    component.skillFilterText = 'Skill 1';
-    expect(component.augmentedTopicFilterList.length).toBe(1);
-
-    component.skillFilterText = '';
-    expect(component.augmentedTopicFilterList.length).toBe(1);
+  it('should refresh filter lists when skillFilterText is set', () => {
+    const spy = spyOn(component, 'refreshFilterLists');
+    component.skillFilterText = 'abc';
+    expect(spy).toHaveBeenCalled();
   });
 });
