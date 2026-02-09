@@ -9,7 +9,8 @@
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
             </h3>
-            <ngb-pagination [collectionSize]="totalBlogPosts"
+            <ngb-pagination *ngIf="totalBlogPosts > 0"
+                            [collectionSize]="totalBlogPosts"
                             [(page)]="page"
                             [maxSize]="2"
                             [pageSize]="MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_HOMEPAGE"
@@ -141,7 +142,7 @@
       </div>
     </div>
     <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen" class="d-flex">
-      <ngb-pagination *ngIf="!searchPageIsActive"
+      <ngb-pagination *ngIf="!searchPageIsActive && totalBlogPosts > 0"
                       [collectionSize]="totalBlogPosts"
                       [(page)]="page"
                       [maxSize]="2"
