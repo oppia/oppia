@@ -20,8 +20,7 @@ from __future__ import annotations
 
 import logging
 
-from core.domain import exp_fetchers
-from core.domain import exp_services
+from core.domain import exp_fetchers, exp_services
 from core.jobs import base_jobs
 from core.jobs.io import ndb_io
 from core.jobs.transforms import job_result_transforms
@@ -41,7 +40,7 @@ if MYPY:  # pragma: no cover.
 )
 
 
-class MigrateExplorationDrafts(beam.PTransform):
+class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all ExplorationUserDataModels, checks if they have
     valid drafts, and performs migration if the schema is outdated.
     """
@@ -121,7 +120,10 @@ class MigrateExplorationDrafts(beam.PTransform):
             >> ndb_io.GetModels(
                 exp_models.ExplorationModel.get_all(include_deleted=False)
             )
-            | 'Key ExpModels by ID' >> beam.WithKeys(lambda m: m.id)
+            | 'Key ExpModels by ID'
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda m: m.id
+            )
         )
         user_models_keyed_by_exp_id = (
             user_data_models
