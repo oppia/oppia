@@ -17,8 +17,8 @@
  */
 
 import {Injectable} from '@angular/core';
-import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
-import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
@@ -111,8 +111,6 @@ export class SkillFilteringService {
     }
 
     if (!isAnySubTopicChecked) {
-      // If no subtopics are checked in the subtop filter, we have
-      // to display all the skills from checked topics.
       let isAnyTopicChecked: boolean = false;
       for (var i = 0; i < topicFilterList.length; i++) {
         if (topicFilterList[i].checked) {
@@ -125,8 +123,6 @@ export class SkillFilteringService {
       if (isAnyTopicChecked) {
         return cloneDeep(updatedSkillsDict);
       } else {
-        // If no filter is applied on both subtopics and topics, we
-        // need to display all the skills (the original list).
         return cloneDeep(categorizedSkills);
       }
     } else {
@@ -158,8 +154,6 @@ export class SkillFilteringService {
     }
 
     if (!isAnyTopicChecked) {
-      // If there are no topics checked on topic filter, we have to
-      // display subtopics from all the topics in the subtopic filter.
       for (let topic in initialSubTopicFilterDict) {
         if (!newSubTopicFilterDict.hasOwnProperty(topic)) {
           newSubTopicFilterDict[topic] = cloneDeep(
@@ -171,8 +165,6 @@ export class SkillFilteringService {
       newSubTopicFilterDict = cloneDeep(updatedSubTopicFilterList);
     }
 
-    // After we update the subtopic filter list, we need to update
-    // the main skills list.
     const currCategorizedSkills = this.updateSkillsListOnSubtopicFilterChange(
       categorizedSkills,
       newSubTopicFilterDict,
@@ -194,7 +186,6 @@ export class SkillFilteringService {
     augmentedTopicFilterList: {topicName: string; checked: boolean}[];
     augmentedSubTopicFilterDict: SubTopicFilterDict;
   } {
-    // If no search text, show all topics.
     if (!skillFilterText) {
       return {
         augmentedTopicFilterList: topicFilterList,
@@ -222,7 +213,7 @@ export class SkillFilteringService {
         augmentedTopicFilterList.push(topic);
         augmentedSubTopicFilterDict[topicName] = matchingSubtopics;
       } else if (
-        !subTopicFilterDict[topicName] &&
+        subTopicFilterDict[topicName] &&
         this.checkTopicHasMatchingSkills(
           topicName,
           categorizedSkills,

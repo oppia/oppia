@@ -17,10 +17,10 @@
  */
 
 import {TestBed} from '@angular/core/testing';
-import {ShortSkillSummary} from 'core/templates/domain/skill/short-skill-summary.model';
-import {SkillSummary} from 'core/templates/domain/skill/skill-summary.model';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
 import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import {SkillFilteringService} from 'core/templates/domain/skill/skill-filtering.service';
+import {SkillFilteringService} from 'domain/skill/skill-filtering.service';
 
 describe('SkillFilteringService', () => {
   let service: SkillFilteringService;
@@ -101,7 +101,6 @@ describe('SkillFilteringService', () => {
     ];
     const excludeIds = new Set(['1']);
 
-    // Should find Algebra 2 (since Algebra 1 is excluded).
     const result = service.searchInUntriagedSkillSummaries(
       untriagedSkills,
       excludeIds,
@@ -155,7 +154,6 @@ describe('SkillFilteringService', () => {
       topicFilterList
     );
 
-    // Should return everything for topic1 since no specific subtopic is selected.
     expect(result.topic1.subtopic1.length).toBe(1);
   });
 
@@ -170,11 +168,10 @@ describe('SkillFilteringService', () => {
       topic1: [{subTopicName: 'subtopic1', checked: false}],
     };
     const subTopicFilterDict = {
-      topic1: [{subTopicName: 'subtopic1', checked: true}], // Was checked.
+      topic1: [{subTopicName: 'subtopic1', checked: true}],
     };
     const topicFilterList = [{topicName: 'topic1', checked: true}];
 
-    // This simulates re-checking the topic, which should reset subtopics to initial state.
     const result = service.updateSkillsListOnTopicFilterChange(
       categorizedSkills,
       initialSubTopicFilterDict,
@@ -182,7 +179,6 @@ describe('SkillFilteringService', () => {
       topicFilterList
     );
 
-    // Should reset to unchecked (from initialSubTopicFilterDict).
     expect(result.subTopicFilterDict.topic1[0].checked).toBe(false);
   });
 
@@ -223,7 +219,6 @@ describe('SkillFilteringService', () => {
       topicFilterList
     );
 
-    // Should only contain topic1 skills.
     expect(Object.keys(result.currCategorizedSkills).length).toBe(1);
     expect(result.currCategorizedSkills.topic1).toBeDefined();
     expect(result.currCategorizedSkills.topic2).toBeUndefined();
@@ -256,7 +251,6 @@ describe('SkillFilteringService', () => {
       'Algebra'
     );
 
-    // Should only return topic1 because it matches "Algebra".
     expect(result.augmentedTopicFilterList.length).toBe(1);
     expect(result.augmentedTopicFilterList[0].topicName).toBe('topic1');
   });
