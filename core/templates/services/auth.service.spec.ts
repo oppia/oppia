@@ -144,6 +144,7 @@ describe('Auth service', function () {
     });
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
 
+    spyOn(authService.onUserSignIn, 'emit');
     await expectAsync(authService.signInWithEmail(email)).toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(
@@ -157,6 +158,7 @@ describe('Auth service', function () {
     expect(authBackendApiService.beginSessionAsync).toHaveBeenCalledWith(
       idToken
     );
+    expect(authService.onUserSignIn.emit).toHaveBeenCalled();
   });
 
   it('should propogate signInWithEmailAndPassword errors', async () => {

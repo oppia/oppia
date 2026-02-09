@@ -191,6 +191,7 @@ export class AuthService {
     if (this.creds?.user !== null) {
       const idToken = await this.creds.user.getIdToken();
       await this.authBackendApiService.beginSessionAsync(idToken);
+      this.onUserSignIn.emit();
     }
   }
 
