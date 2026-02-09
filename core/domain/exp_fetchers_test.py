@@ -648,8 +648,7 @@ class ExplorationConversionPipelineTests(test_utils.GenericTestBase):
     NEW_EXP_ID: Final = 'exp_id1'
 
     UPGRADED_EXP_YAML: Final = (
-        (
-            """author_notes: ''
+        ("""author_notes: ''
 auto_tts_enabled: false
 blurb: ''
 category: Art
@@ -739,8 +738,7 @@ states:
 states_schema_version: %d
 tags: []
 title: Old Title
-"""
-        )
+""")
         % (
             exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
             feconf.DEFAULT_INIT_STATE_NAME,

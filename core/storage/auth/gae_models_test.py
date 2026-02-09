@@ -28,7 +28,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import auth_models, base_models, user_models
 
-(auth_models, base_models, user_models) = models.Registry.import_models(
+auth_models, base_models, user_models = models.Registry.import_models(
     [models.Names.AUTH, models.Names.BASE_MODEL, models.Names.USER]
 )
 

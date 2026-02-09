@@ -29,7 +29,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import story_models, topic_models
 
-(topic_models, story_models) = models.Registry.import_models(
+topic_models, story_models = models.Registry.import_models(
     [models.Names.TOPIC, models.Names.STORY]
 )
 

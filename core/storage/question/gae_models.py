@@ -31,7 +31,7 @@ if MYPY:  # pragma: no cover
     from core.domain import state_domain  # pylint: disable=invalid-import
     from mypy_imports import base_models, datastore_services
 
-(base_models, skill_models) = models.Registry.import_models(
+base_models, skill_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.SKILL]
 )
 
