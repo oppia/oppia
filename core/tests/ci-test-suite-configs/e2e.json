@@ -9,10 +9,6 @@
       "module": "core/tests/webdriverio_desktop/additionalEditorFeaturesModals.js"
     },
     {
-      "name": "blog",
-      "module": "core/tests/webdriverio_desktop/blog.js"
-    },
-    {
       "name": "collections",
       "module": "core/tests/webdriverio_desktop/collections.js"
     },

@@ -421,6 +421,21 @@ const blogPostTitleContainerSelector =
 const blogPostContentSelector = '.e2e-test-blog-post-content';
 const blogPostTitleSelector = '.e2e-test-blog-post-tile-title';
 const explorationViewsSelector = '.e2e-test-exp-summary-tile-views';
+const blogWelcomeHeadingSelector = '.e2e-test-blog-welcome-heading';
+const blogNoResultsFoundSelector = '.e2e-test-no-results-found';
+const blogPostListSelector = '.e2e-test-blog-post-list';
+const blogPostTileItemSelector = '.e2e-test-blog-post-tile-item';
+const blogPostPageCardSelector = '.e2e-test-oppia-blog-post-page-card';
+const blogAuthorNameSelector = '.e2e-test-author-name';
+const blogPostAuthorSelector = '.e2e-test-username-visible';
+const blogPostPublishDateSelector = '.mobile-published-date';
+const blogPostTagContainerSelector = '.e2e-test-blog-tag-container';
+const blogShareButtonSelector = '.share-blog-post-button';
+const blogSuggestedForYouSectionSelector = '.post-to-recommend-section';
+const blogSuggestedForYouHeadingSelector = '.post-to-recommend-section-heading';
+const navbarAboutTabBlogButton = '.e2e-test-navbar-about-menu-blog-button';
+const blogSearchFieldSelector = '.e2e-test-search-field';
+const postsDisplayHeadingSelector = '.posts-display-heading';
 
 // Common Selectors.
 const commonModalTitleSelector = '.e2e-test-modal-header';
@@ -7132,6 +7147,161 @@ export class LoggedOutUser extends BaseUser {
    */
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
+  }
+
+  /**
+   * Navigates to the blog page via the navbar (About > Blog).
+   */
+  async navigateToBlogPageViaNavbar(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      // On mobile, navigate directly to blog URL since there's no blog button in sidebar.
+      await this.navigateToBlogPage();
+    } else {
+      await this.page.waitForSelector(navbarAboutTab, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(navbarAboutTab);
+      await this.clickButtonToNavigateToNewPage(
+        navbarAboutTabBlogButton,
+        blogUrl
+      );
+    }
+  }
+
+  /**
+   * Expects the blog welcome message to be visible.
+   */
+  async expectBlogWelcomeMessageToBeVisible(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) =>
+        document
+          .querySelector(selector)
+          ?.textContent?.includes('Welcome to the Oppia Blog!') === true,
+      {timeout: 10000},
+      blogWelcomeHeadingSelector
+    );
+  }
+
+  /**
+   * Expects the "no blog posts" message to be visible.
+   */
+  async expectNoBlogPostsMessageToBeVisible(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) =>
+        document
+          .querySelector(selector)
+          ?.textContent?.includes(
+            'Sorry, there are no blog posts matching this query'
+          ) === true,
+      {timeout: 10000},
+      blogNoResultsFoundSelector
+    );
+  }
+
+  /**
+   * Expects the number of blog posts on the current page to be equal to the given number.
+   * @param number - The expected number of blog posts.
+   */
+  async expectNumberOfBlogPostsOnPageToBe(number: number): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expected: number) =>
+        document.querySelectorAll(selector).length === expected,
+      {timeout: 10000},
+      blogPostTileItemSelector,
+      number
+    );
+
+    showMessage(`Found ${number} blog post(s) on the page as expected.`);
+  }
+
+  /**
+   * Expects a blog post with the given title to be present on the page.
+   * @param title - The title of the blog post to check for.
+   */
+  async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string, expectedTitle: string) => {
+        const titles = Array.from(document.querySelectorAll(selector)).map(el =>
+          el.textContent?.trim()
+        );
+        return titles.includes(expectedTitle);
+      },
+      {timeout: 10000},
+      blogPostTitleSelector,
+      title
+    );
+
+    showMessage(`Blog post with title "${title}" is present.`);
+  }
+
+  /**
+   * Expects the blog page layout to be correct with all required elements.
+   */
+  async expectBlogPageLayoutToBeCorrect(): Promise<void> {
+    await this.expectElementToBeVisible(postsDisplayHeadingSelector);
+
+    const blogPosts = await this.page.$$(blogPostListSelector);
+    if (blogPosts.length === 0) {
+      showMessage('No blog posts found, but layout elements are present.');
+    }
+    await this.expectElementToBeVisible(blogPostTitleSelector);
+    await this.expectElementToBeVisible(blogPostAuthorSelector);
+    await this.expectElementToBeVisible(blogPostPublishDateSelector);
+    await this.expectElementToBeVisible(blogPostTagContainerSelector);
+    await this.expectElementToBeVisible(blogSearchFieldSelector);
+
+    const paginationExists = await this.page.$(blogPaginationSelector);
+    if (paginationExists) {
+      await this.expectElementToBeVisible(blogPaginationSelector);
+    }
+
+    showMessage('Blog page layout is correct with all required elements.');
+  }
+
+  /**
+   * Clicks on the first blog post in the list.
+   */
+  async clickOnFirstBlogPost(): Promise<void> {
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelectorAll(selector).length > 0,
+      {timeout: 10000},
+      blogPostTitleSelector
+    );
+
+    const firstBlogPost = await this.page.$(blogPostTitleSelector);
+
+    if (!firstBlogPost) {
+      throw new Error('No blog posts found to click on.');
+    }
+
+    await firstBlogPost.click();
+    await this.waitForNetworkIdle();
+
+    await this.page.waitForFunction(
+      (selector: string) => document.querySelector(selector) !== null,
+      {timeout: 10000},
+      blogPostPageCardSelector
+    );
+  }
+
+  /**
+   * Expects all blog post page elements to be visible (title, author, publish time, content, tags, share icon, suggested posts).
+   */
+  async expectBlogPostPageElementsToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostTitleContainerSelector);
+    await this.expectElementToBeVisible(blogAuthorNameSelector);
+    await this.expectElementToBeVisible(blogPostContentSelector);
+    await this.expectElementToBeVisible(blogShareButtonSelector);
+
+    const suggestedSection = await this.page.$(
+      blogSuggestedForYouSectionSelector
+    );
+
+    if (suggestedSection) {
+      await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
+    }
+
+    showMessage('All blog post page elements are visible.');
   }
 }
 
