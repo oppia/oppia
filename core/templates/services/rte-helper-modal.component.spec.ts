@@ -40,7 +40,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {DirectivesModule} from '../directives/directives.module';
 import {NgbActiveModal, NgbModalModule} from '@ng-bootstrap/ng-bootstrap';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter} from '@angular/core';
+import {EventEmitter} from '@angular/core'
 import {
   TranslateFakeLoader,
   TranslateLoader,
