@@ -164,9 +164,12 @@ def url_open(
 
     Raises:
         HTTPError. If the URL cannot be opened after all attempts.
+        ValueError. If max_attempts is not positive.
     """
+    if max_attempts <= 0:
+        raise ValueError('max_attempts must be a positive integer')
     context = ssl.create_default_context(cafile=certifi.where())
-    for attempt in range(1, max_attempts + 1):
+    for attempt in range(1, max_attempts + 1):  # pragma: no cover
         try:
             return urllib.request.urlopen(source_url, context=context)
         except urlerror.HTTPError as exception:

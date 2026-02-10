@@ -1102,3 +1102,135 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
                 )
             with open(output_path, 'rb') as buffer:
                 self.assertEqual(buffer.read(), b'content')
+
+    def test_url_open_raises_non_rate_limit_http_error(self) -> None:
+        """Test that non-rate-limited HTTP errors are raised immediately."""
+        test_url = 'https://example.com/test'
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:
+            # Simulate a 404 error (not rate limited)
+            raise urlerror.HTTPError(
+                url,
+                404,
+                'Not Found',
+                # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
+                cast(Any, {}),
+                None,
+            )
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            with self.assertRaisesRegex(urlerror.HTTPError, 'Not Found'):
+                install_dependencies_json_packages.url_open(test_url)
+
+    def test_url_open_raises_after_exhausting_retries_for_non_rate_limit_error(
+        self,
+    ) -> None:
+        """Test that non-rate-limit errors on final attempt cause immediate raise."""
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:
+            attempts.append(url)
+            # On the final attempt, raise a non-rate-limited error (500)
+            raise urlerror.HTTPError(
+                url,
+                500,
+                'Internal Server Error',
+                # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
+                cast(Any, {}),
+                None,
+            )
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            with self.assertRaisesRegex(
+                urlerror.HTTPError, 'Internal Server Error'
+            ):
+                # Use max_attempts=1 to ensure error is raised immediately
+                install_dependencies_json_packages.url_open(
+                    test_url, max_attempts=1
+                )
+
+        self.assertEqual(attempts, [test_url])
+
+    def test_url_open_retries_with_exponential_backoff(self) -> None:
+        """Test retries with exponential backoff when no retry headers present."""
+        test_url = 'https://example.com/test'
+        attempts = []
+
+        class MockResponse:
+            """Mock response object for urlopen."""
+
+            def __init__(self) -> None:
+                self.url = test_url
+
+            def getcode(self) -> int:
+                """Return HTTP status code."""
+                return 200
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            attempts.append(url)
+            self.assertEqual(url, test_url)
+            self._assert_ssl_context_matches_default(context)
+            if len(attempts) == 1:
+                # Rate limit error with no retry header
+                raise urlerror.HTTPError(
+                    url,
+                    429,
+                    'rate limit exceeded',
+                    # Here we use type Any because the headers argument is expected to be email.message.Message, but we are providing a dict for testing.
+                    # Here we use cast because HTTPError expects email.message.Message for headers but a dict is sufficient for this mock.
+                    cast(Any, {}),
+                    None,
+                )
+            return MockResponse()
+
+        sleep_calls = []
+
+        def mock_sleep(seconds: float) -> None:
+            sleep_calls.append(seconds)
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+        sleep_swap = self.swap(
+            # Here we use type Any because we need to access the time attribute on the module which is not statically known to mypy.
+            # Here we use cast because we are swapping the time module in install_dependencies_json_packages, and casting to Any avoids type errors.
+            cast(Any, install_dependencies_json_packages).time,
+            'sleep',
+            mock_sleep,
+        )
+
+        with urlopen_swap, sleep_swap:
+            response = install_dependencies_json_packages.url_open(test_url)
+
+        self.assertEqual(response.getcode(), 200)
+        self.assertEqual(response.url, test_url)
+        self.assertEqual(attempts, [test_url, test_url])
+        # Should use exponential backoff: 2^attempt = 2^1 = 2 seconds
+        self.assertEqual(sleep_calls, [2])
+
+    def test_url_open_with_zero_max_attempts(self) -> None:
+        """Test url_open with max_attempts=0 (edge case).
+
+        When max_attempts is 0 or negative, the function should raise a
+        ValueError since it's an invalid argument. This eliminates the
+        unreachable branch from the empty for loop.
+        """
+        test_url = 'https://example.com/test'
+
+        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:
+            raise AssertionError('urlopen() should not be called')
+
+        urlopen_swap = self.swap(urlrequest, 'urlopen', mock_urlopen)
+
+        with urlopen_swap:
+            with self.assertRaisesRegex(
+                ValueError, 'max_attempts must be a positive integer'
+            ):
+                install_dependencies_json_packages.url_open(
+                    test_url, max_attempts=0
+                )
