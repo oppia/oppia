@@ -61,7 +61,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import email_models, secrets_services, suggestion_models
 
-email_models, suggestion_models = models.Registry.import_models(
+(email_models, suggestion_models) = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.SUGGESTION]
 )
 secrets_services = models.Registry.import_secrets_services()

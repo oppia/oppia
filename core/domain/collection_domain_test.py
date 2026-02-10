@@ -32,7 +32,9 @@ from core.tests import test_utils
 # If evaluating differences in YAML, conversion to dict form via
 # utils.dict_from_yaml can isolate differences quickly.
 
-SAMPLE_YAML_CONTENT = ("""category: A category
+SAMPLE_YAML_CONTENT = (
+    (
+        """category: A category
 language_code: en
 nodes:
 - exploration_id: an_exploration_id
@@ -40,7 +42,10 @@ objective: An objective
 schema_version: %d
 tags: []
 title: A title
-""") % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+"""
+    )
+    % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
+)
 
 
 class CollectionChangeTests(test_utils.GenericTestBase):

@@ -82,8 +82,10 @@ if MYPY:  # pragma: no cover
         suggestion_registry.SuggestionAddQuestion,
     ]
 
-feedback_models, suggestion_models, user_models = models.Registry.import_models(
-    [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
+(feedback_models, suggestion_models, user_models) = (
+    models.Registry.import_models(
+        [models.Names.FEEDBACK, models.Names.SUGGESTION, models.Names.USER]
+    )
 )
 
 transaction_services = models.Registry.import_transaction_services()

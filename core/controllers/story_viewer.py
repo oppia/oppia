@@ -246,7 +246,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             return
 
-        next_exp_ids, next_node_id, _ = self._record_node_completion(
+        (next_exp_ids, next_node_id, _) = self._record_node_completion(
             story_id, node_id, [], ordered_nodes
         )
         if next_node_id is None:
@@ -304,7 +304,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         ]
         ordered_nodes = story.story_contents.get_ordered_nodes()
 
-        next_exp_ids, next_node_id, completed_node_ids = (
+        (next_exp_ids, next_node_id, completed_node_ids) = (
             self._record_node_completion(
                 story_id, node_id, completed_node_ids, ordered_nodes
             )

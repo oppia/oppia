@@ -88,33 +88,7 @@ module.exports = {
       template: commonPrefix + '/pages/oppia-root/oppia-root.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false,
-      templateParameters: (compilation, assets, assetTags, options) => {
-        return {
-          compilation,
-          webpackConfig: compilation.options,
-          htmlWebpackPlugin: {
-            tags: assetTags,
-            files: assets,
-            options: options,
-          },
-          // Helper function to get hashed filename for CSS/JS assets.
-          getHashedFilename: filename => {
-            const parsedFile = path.parse(filename);
-            const assetKeys = Object.keys(compilation.assets);
-            for (const key of assetKeys) {
-              const parsedKey = path.parse(key);
-              // Match base name (without hash) and extension.
-              if (
-                parsedKey.name.split('.')[0] === parsedFile.name &&
-                parsedKey.ext === parsedFile.ext
-              ) {
-                return compilation.options.output.publicPath + key;
-              }
-            }
-            return filename; // Fallback to original filename.
-          },
-        };
-      },
+
     }),
     new HtmlWebpackPlugin({
       chunks: ['lightweight_oppia_root'],
@@ -126,33 +100,6 @@ module.exports = {
       minify: htmlMinifyConfig,
       inject: false,
       lightweight: true,
-      templateParameters: (compilation, assets, assetTags, options) => {
-        return {
-          compilation,
-          webpackConfig: compilation.options,
-          htmlWebpackPlugin: {
-            tags: assetTags,
-            files: assets,
-            options: options,
-          },
-          // Helper function to get hashed filename for CSS/JS assets.
-          getHashedFilename: filename => {
-            const parsedFile = path.parse(filename);
-            const assetKeys = Object.keys(compilation.assets);
-            for (const key of assetKeys) {
-              const parsedKey = path.parse(key);
-              // Match base name (without hash) and extension.
-              if (
-                parsedKey.name.split('.')[0] === parsedFile.name &&
-                parsedKey.ext === parsedFile.ext
-              ) {
-                return compilation.options.output.publicPath + key;
-              }
-            }
-            return filename; // Fallback to original filename.
-          },
-        };
-      },
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['**/*', '!*.html'],
