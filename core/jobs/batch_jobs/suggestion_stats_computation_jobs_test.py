@@ -44,7 +44,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import opportunity_models, suggestion_models
 
-(opportunity_models, suggestion_models) = models.Registry.import_models(
+opportunity_models, suggestion_models = models.Registry.import_models(
     [models.Names.OPPORTUNITY, models.Names.SUGGESTION]
 )
 

@@ -750,7 +750,7 @@ class LearnerGroupSearchLearnerHandler(
             return
         assert user_settings.username is not None
 
-        (valid_invitation, error) = learner_group_services.can_user_be_invited(
+        valid_invitation, error = learner_group_services.can_user_be_invited(
             user_settings.user_id, user_settings.username, learner_group_id
         )
 

@@ -340,7 +340,7 @@ class CopyFile(beam.PTransform):  # type: ignore[misc]
             the error message if the copy operation failed, or a success string
             if the copy succeeded.
         """
-        (src_path, dest_path) = file_paths
+        src_path, dest_path = file_paths
         try:
             storage_services.copy(self.bucket, src_path, dest_path)
             return result.Ok((src_path, dest_path, 'Copied'))
