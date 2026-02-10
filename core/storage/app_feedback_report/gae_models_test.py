@@ -30,7 +30,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import app_feedback_report_models, base_models
 
-base_models, app_feedback_report_models = models.Registry.import_models(
+(base_models, app_feedback_report_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.APP_FEEDBACK_REPORT]
 )
 

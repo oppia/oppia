@@ -54,7 +54,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-user_models, topic_models, story_models = models.Registry.import_models(
+(user_models, topic_models, story_models) = models.Registry.import_models(
     [models.Names.USER, models.Names.TOPIC, models.Names.STORY]
 )
 datastore_services = models.Registry.import_datastore_services()
@@ -687,7 +687,7 @@ def add_collection_to_learner_playlist(
         and collection_id not in incomplete_collection_ids
     ):
 
-        playlist_limit_exceeded, belongs_to_subscribed_activities = (
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_collection_to_be_played_later(
                 user_id,
                 collection_id,
@@ -742,7 +742,7 @@ def add_exp_to_learner_playlist(
         and exploration_id not in incomplete_exploration_ids
     ):
 
-        playlist_limit_exceeded, belongs_to_subscribed_activities = (
+        (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_exploration_to_be_played_later(
                 user_id,
                 exploration_id,
