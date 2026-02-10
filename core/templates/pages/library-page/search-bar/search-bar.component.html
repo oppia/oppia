@@ -26,6 +26,8 @@
   <div [ngClass]="{'open' : activeMenuName === 'category', 'dropup' : enableDropup}"
        ngbDropdown
        autoClose="outside"
+       [container]="'body'"
+       [placement]="enableDropup ? 'top-start' : 'bottom-start'"
        (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-category-selector e2e-test-search-bar-category-selector dropdown">
     <button ngbDropdownToggle
@@ -126,6 +128,8 @@
   <div ngbDropdown
        autoClose="outside"
        [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}"
+       [container]="'body'"
+       [placement]="enableDropup ? 'top-start' : 'bottom-start'"
        (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-language-selector e2e-test-search-bar-language-selector dropdown">
     <button ngbDropdownToggle
@@ -260,15 +264,11 @@
 /* stylelint-disable order/properties-alphabetical-order */
 .search-bar-float-start .oppia-search-bar-dropdown-toggle.catbtn {
   font-size: 13px;
-  position: relative;
-  left: 5rem;
-  width: 11em;
+  width: 100%;
 }
 .oppia-search-bar-language-selector .langbtn {
   font-size: 13px;
-  position: relative;
-  left: 3rem;
-  width: 11em;
+  width: 100%;
 }
   /* stylelint-enable order/properties-alphabetical-order */
   :lang(ar) .classroom-page-input-group.inptcls {
@@ -277,26 +277,18 @@
   }
   :lang(ar) .search-bar-float-start .oppia-search-bar-dropdown-toggle.catbtn {
  font-size: 13px;
- position: relative;
- right: 9rem;
- width: 10em;
+ width: 100%;
   }
   :lang(ar) .oppia-search-bar-language-selector .langbtn {
  font-size: 13px;
- padding-left: 3rem;
- position: relative;
- right: 8rem;
- width: 10em;
+ width: 100%;
   }
 }
 @media (max-width : 340px) {
 
  :lang(ar) .oppia-search-bar-language-selector .langbtn {
  font-size: 13px;
- padding-left: 3rem;
- position: relative;
- right: 8rem;
- width: 10em;
+ width: 100%;
   }
 }
 @media (max-width : 285px) {
@@ -306,13 +298,11 @@
   }
   .search-bar-float-start .oppia-search-bar-dropdown-toggle.catbtn {
   font-size: 10px;
- left: 10rem;
- width: 12em;
+  width: 100%;
   }
   .oppia-search-bar-language-selector .langbtn {
     font-size: 10px;
-    left: 4.8rem;
-    width: 12em;
+    width: 100%;
   }
 }
 </style>
