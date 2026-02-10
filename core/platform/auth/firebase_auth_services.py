@@ -176,6 +176,14 @@ def get_auth_claims_from_request(
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
 
+def get_all_external_accounts() -> List[auth_domain.ExternalAccount]:
+    """Returns all accounts registered with Firebase."""
+    return [
+        auth_domain.ExternalAccount(user.uid, user.email, user.disabled)
+        for user in firebase_auth.list_users().iterate_all()
+    ]
+
+
 def mark_user_for_deletion(user_id: str) -> None:
     """Marks the user, and all of their auth associations, as deleted.
 

@@ -34,7 +34,7 @@ describe('Maintenance page', () => {
       providers: [DocumentAttributeCustomizationService],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    documentAttributeCustomizationService = TestBed.get(
+    documentAttributeCustomizationService = TestBed.inject(
       DocumentAttributeCustomizationService
     );
   }));
