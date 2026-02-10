@@ -1849,18 +1849,14 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = datastore_services.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
-    # Here we use MyPy ignore because the inferred type of the property
-    # does not match the type annotation.
-    commit_cmds_user_ids: List[str] = datastore_services.StringProperty(
+    commit_cmds_user_ids = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )  # type: ignore[assignment]
+    )
     # The user ids that are enclosed inside the 'content' field in the relevant
     # snapshot content model.
-    # Here we use MyPy ignore because the inferred type of the property
-    # does not match the type annotation.
-    content_user_ids: List[str] = datastore_services.StringProperty(
+    content_user_ids = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )  # type: ignore[assignment]
+    )
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:
@@ -1903,18 +1899,8 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.query(
                 datastore_services.any_of(
                     cls.committer_id == user_id,
-                    # Here we use type Any because we need to cast the property
-                    # to Any to allow comparison with a string in the NDB query.
-                    # Here we use cast because the comparison of a list property
-                    # with a string via equality operator is valid in NDB but causes
-                    # a type mismatch.
-                    cast(Any, cls.commit_cmds_user_ids) == user_id,
-                    # Here we use type Any because we need to cast the property
-                    # to Any to allow comparison with a string in the NDB query.
-                    # Here we use cast because the comparison of a list property
-                    # with a string via equality operator is valid in NDB but causes
-                    # a type mismatch.
-                    cast(Any, cls.content_user_ids) == user_id,
+                    cls.commit_cmds_user_ids == user_id,
+                    cls.content_user_ids == user_id,
                 )
             ).get(keys_only=True)
             is not None
