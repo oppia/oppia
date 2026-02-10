@@ -57,7 +57,7 @@ describe('Contributor dashboard admin navbar component', () => {
 
     fixture = TestBed.createComponent(ContributorDashboardAdminNavbarComponent);
     component = fixture.componentInstance;
-    userService = TestBed.get(UserService);
+    userService = TestBed.inject(UserService);
     fixture.detectChanges();
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
       'default-image-url-png',
