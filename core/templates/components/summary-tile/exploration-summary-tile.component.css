@@ -133,30 +133,3 @@ oppia-exploration-summary-tile .oppia-exploration-dashboard-card .layout-row {
 
 }
 
-/* Checkpoint progress bar styles */
-oppia-exploration-summary-tile .oppia-checkpoint-progress-container,
-oppia-exploration-summary-tile .oppia-checkpoint-progress-container-mobile {
-  margin-top: 12px;
-  padding: 0 12px;
-}
-
-oppia-exploration-summary-tile .oppia-checkpoint-progress-bar {
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  height: 8px;
-  overflow: hidden;
-  width: 100%;
-}
-
-oppia-exploration-summary-tile .oppia-checkpoint-progress-fill {
-  background-color: #4caf50;
-  height: 100%;
-  transition: width 0.3s ease;
-}
-
-oppia-exploration-summary-tile .oppia-checkpoint-progress-text {
-  color: #666;
-  display: block;
-  font-size: 12px;
-  margin-top: 4px;
-}

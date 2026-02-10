@@ -987,7 +987,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         incomplete_exps = response['incomplete_explorations_list']
         self.assertEqual(len(incomplete_exps), 1)
         self.assertEqual(incomplete_exps[0]['id'], self.EXP_ID_1)
-        self.assertEqual(incomplete_exps[0]['progress'], 0)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 1)
 
         self.logout()
 
@@ -1038,8 +1039,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         response = self.get_json(feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL)
         incomplete_exps = response['incomplete_explorations_list']
         self.assertEqual(len(incomplete_exps), 1)
-        # Progress = floor((1-1)/1 * 100) = 0.
-        self.assertEqual(incomplete_exps[0]['progress'], 0)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 1)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 1)
 
         self.logout()
 
@@ -1080,7 +1081,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         completed_exps = response['completed_explorations_list']
         self.assertEqual(len(completed_exps), 1)
         self.assertEqual(completed_exps[0]['id'], self.EXP_ID_1)
-        self.assertEqual(completed_exps[0]['progress'], 100)
+        self.assertEqual(completed_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(completed_exps[0]['total_checkpoints_count'], 1)
 
         self.logout()
 
@@ -1121,8 +1123,8 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         playlist = response['exploration_playlist']
         self.assertEqual(len(playlist), 1)
         self.assertEqual(playlist[0]['id'], self.EXP_ID_1)
-        # Playlist items should have progress = 0 if not started.
-        self.assertEqual(playlist[0]['progress'], 0)
+        self.assertEqual(playlist[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(playlist[0]['total_checkpoints_count'], 1)
 
         self.logout()
 
@@ -1180,13 +1182,17 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         incomplete_exps = response['incomplete_explorations_list']
         self.assertEqual(len(incomplete_exps), 3)
 
-        # Find each exploration and check its progress.
-        exp_progress_map = {
-            exp['id']: exp['progress'] for exp in incomplete_exps
+        # Find each exploration and check its checkpoint counts.
+        exp_counts_map = {
+            exp['id']: (
+                exp['visited_checkpoints_count'],
+                exp['total_checkpoints_count'],
+            )
+            for exp in incomplete_exps
         }
-        self.assertEqual(exp_progress_map[self.EXP_ID_1], 0)
-        self.assertEqual(exp_progress_map[self.EXP_ID_2], 0)
-        self.assertEqual(exp_progress_map[self.EXP_ID_3], 0)
+        self.assertEqual(exp_counts_map[self.EXP_ID_1], (0, 1))
+        self.assertEqual(exp_counts_map[self.EXP_ID_2], (0, 1))
+        self.assertEqual(exp_counts_map[self.EXP_ID_3], (1, 1))
 
         self.logout()
 
@@ -1239,6 +1245,7 @@ class LearnerDashboardExplorationsProgressHandlerTests(
 
         incomplete_exps = response['incomplete_explorations_list']
         self.assertEqual(len(incomplete_exps), 1)
-        self.assertEqual(incomplete_exps[0]['progress'], 0)
+        self.assertEqual(incomplete_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 0)
 
         self.logout()
