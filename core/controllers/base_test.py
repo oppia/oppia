@@ -1099,7 +1099,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
             )
         )
         for filename in filenames:
-            with utils.open_file(
+            with open(
                 os.path.join(os.getcwd(), 'assets', 'i18n', filename), mode='r'
             ) as f:
                 lines = f.readlines()
@@ -2515,7 +2515,7 @@ class ImageUploadHandlerTest(test_utils.GenericTestBase):
         user_id = user_services.get_user_id_from_username('testlearneruser')
         csrf_token = base.CsrfTokenManager.create_csrf_token(user_id)
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
