@@ -71,4 +71,187 @@ describe('Exploration summary model', () => {
     expect(expSummaryObject.category).toEqual('Algebra');
     expect(expSummaryObject.title).toEqual('Test Title');
   });
+
+  it('should correctly calculate progress with no checkpoints', () => {
+    let backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      visited_checkpoints_count: 0,
+      total_checkpoints_count: 0,
+    };
+
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
+
+    expect(expSummaryObject.progress).toEqual(0);
+    expect(expSummaryObject.visitedCheckpointsCount).toEqual(0);
+    expect(expSummaryObject.totalCheckpointsCount).toEqual(0);
+  });
+
+  it('should correctly calculate progress with partial checkpoint completion', () => {
+    let backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      visited_checkpoints_count: 3,
+      total_checkpoints_count: 5,
+    };
+
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
+
+    // Progress = floor((3-1)/5 * 100) = floor(40) = 40.
+    expect(expSummaryObject.progress).toEqual(40);
+    expect(expSummaryObject.visitedCheckpointsCount).toEqual(3);
+    expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
+  });
+
+  it('should correctly calculate progress when starting an exploration', () => {
+    let backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      visited_checkpoints_count: 1,
+      total_checkpoints_count: 5,
+    };
+
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
+
+    // Progress = floor((1-1)/5 * 100) = 0 (just started, visited initial state)
+    expect(expSummaryObject.progress).toEqual(0);
+    expect(expSummaryObject.visitedCheckpointsCount).toEqual(1);
+    expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
+  });
+
+  it('should correctly calculate progress with all checkpoints visited', () => {
+    let backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      visited_checkpoints_count: 5,
+      total_checkpoints_count: 5,
+    };
+
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
+
+    // Progress = floor((5-1)/5 * 100) = floor(80) = 80.
+    expect(expSummaryObject.progress).toEqual(80);
+    expect(expSummaryObject.visitedCheckpointsCount).toEqual(5);
+    expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
+  });
+
+  it('should use backend progress value when provided', () => {
+    let backendDict = {
+      last_updated_msec: 1591296737470.528,
+      community_owned: false,
+      objective: 'Test Objective',
+      id: '44LKoKLlIbGe',
+      num_views: 0,
+      thumbnail_icon_url: '/subjects/Algebra.svg',
+      human_readable_contributors_summary: {},
+      language_code: 'en',
+      thumbnail_bg_color: '#cc4b00',
+      created_on_msec: 1591296635736.666,
+      ratings: {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+      },
+      status: 'public',
+      tags: [],
+      activity_type: 'exploration',
+      category: 'Algebra',
+      title: 'Test Title',
+      progress: 50,
+      visited_checkpoints_count: 0,
+      total_checkpoints_count: 0,
+    };
+
+    let expSummaryObject =
+      LearnerExplorationSummary.createFromBackendDict(backendDict);
+
+    // When totalCheckpointsCount is 0, use backend progress value.
+    expect(expSummaryObject.progress).toEqual(50);
+  });
 });
