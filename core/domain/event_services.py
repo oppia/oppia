@@ -37,7 +37,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import stats_models, transaction_services, user_models
 
-stats_models, user_models = models.Registry.import_models(
+(stats_models, user_models) = models.Registry.import_models(
     [models.Names.STATISTICS, models.Names.USER]
 )
 

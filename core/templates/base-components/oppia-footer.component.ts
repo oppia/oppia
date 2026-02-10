@@ -134,15 +134,17 @@ export class OppiaFooterComponent {
     }
   }
 
-  onAboutLinkClick(): void {
+  navigateToAboutPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.ABOUT
     );
+    this.windowRef.nativeWindow.location.href = '/about';
   }
 
-  onTeachLinkClick(): void {
+  navigateToTeachPage(): void {
     this.siteAnalyticsService.registerClickFooterButtonEvent(
       NavbarAndFooterGATrackingPages.TEACH
     );
+    this.windowRef.nativeWindow.location.href = '/teach';
   }
 }

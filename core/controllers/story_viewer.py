@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import logging
 
-from core import feature_flag_list, feconf, utils
+from core import feconf, utils
 from core.constants import constants
 from core.controllers import acl_decorators, base
 from core.domain import (
-    feature_flag_services,
     learner_progress_services,
     question_services,
     skill_fetchers,
@@ -80,9 +79,7 @@ class StoryPageDataHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         # 'FrontendStoryNodeDict', and this is done because below we
         # are adding new keys that are not defined on the 'StoryNodeDict'.
         ordered_node_dicts: List[FrontendStoryNodeDict] = [
-            node.to_dict()  # type: ignore[misc]
-            for node in story.story_contents.get_ordered_nodes()
-            if node.status != constants.STORY_NODE_STATUS_DRAFT
+            node.to_dict() for node in story.story_contents.get_ordered_nodes()  # type: ignore[misc]
         ]
         for node in ordered_node_dicts:
             node['completed'] = False
@@ -246,7 +243,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             )
             return
 
-        next_exp_ids, next_node_id, _ = self._record_node_completion(
+        (next_exp_ids, next_node_id, _) = self._record_node_completion(
             story_id, node_id, [], ordered_nodes
         )
         if next_node_id is None:
@@ -304,7 +301,7 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         ]
         ordered_nodes = story.story_contents.get_ordered_nodes()
 
-        next_exp_ids, next_node_id, completed_node_ids = (
+        (next_exp_ids, next_node_id, completed_node_ids) = (
             self._record_node_completion(
                 story_id, node_id, completed_node_ids, ordered_nodes
             )
@@ -338,14 +335,8 @@ class StoryProgressHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             len(completed_node_ids) & constants.NUM_EXPLORATIONS_PER_REVIEW_TEST
             == 0
         )
-
-        # Gated Review Test redirection.
-        if feature_flag_services.is_feature_flag_enabled(
-            feature_flag_list.FeatureNames.ENABLE_READY_FOR_REVIEW_TEST.value,
-            self.user_id,
-        ) and (
-            questions_available
-            and (learner_at_review_point_in_story or learner_completed_story)
+        if questions_available and (
+            learner_at_review_point_in_story or learner_completed_story
         ):
             ready_for_review_test = True
 

@@ -182,10 +182,7 @@ def send_email_to_recipients(
             [
                 (
                     'attachment',
-                    (
-                        attachment['filename'],
-                        open(attachment['path'], 'rb', encoding=None),
-                    ),
+                    (attachment['filename'], open(attachment['path'], 'rb')),
                 )
                 for attachment in attachments
             ]

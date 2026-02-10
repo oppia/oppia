@@ -1811,11 +1811,25 @@ export class TopicManager extends BaseUser {
         await this.waitForElementToBeClickable(deleteButton);
         await deleteButton.click();
 
-        await this.page.waitForSelector(modalDiv, {visible: true});
-        await this.clickOnElementWithSelector(
+        await this.page.waitForSelector(
           removeQuestionConfirmationButtonSelector
         );
-        await this.page.waitForSelector(modalDiv, {hidden: true});
+        const removeQuestionConfirmationButtonElement = await this.page.$(
+          removeQuestionConfirmationButtonSelector
+        );
+        if (!removeQuestionConfirmationButtonElement) {
+          throw new Error('Remove question confirmation button not found');
+        }
+
+        await this.waitForElementToBeClickable(
+          removeQuestionConfirmationButtonElement
+        );
+        await removeQuestionConfirmationButtonElement.click();
+
+        await this.expectElementToBeVisible(
+          removeQuestionConfirmationButtonSelector,
+          false
+        );
         return;
       }
 

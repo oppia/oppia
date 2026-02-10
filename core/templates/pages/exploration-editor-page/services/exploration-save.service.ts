@@ -52,13 +52,6 @@ import {DiffNodeData} from 'components/version-diff-visualization/version-diff-v
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 import {PageContextService} from 'services/page-context.service';
-import {VoiceoverRegenerationTaskMappingService} from 'services/voiceover-regeneration-task-mapping-service';
-import {
-  ExplorationChange,
-  ExplorationChangeEditStateProperty,
-  ExplorationChangeEditTranslation,
-} from 'domain/exploration/exploration-draft.model';
-import {SubtitledHtmlBackendDict} from 'domain/exploration/subtitled-html.model';
 
 @Injectable({
   providedIn: 'root',
@@ -102,8 +95,7 @@ export class ExplorationSaveService {
     private siteAnalyticsService: SiteAnalyticsService,
     private windowRef: WindowRef,
     private platformFeatureService: PlatformFeatureService,
-    private pageContextService: PageContextService,
-    private voiceoverRegenerationTaskMappingService: VoiceoverRegenerationTaskMappingService
+    private pageContextService: PageContextService
   ) {}
 
   showCongratulatorySharingModal(): void {
@@ -188,9 +180,6 @@ export class ExplorationSaveService {
             'Changes to this exploration were saved successfully.'
           );
 
-          let changeListAffectsAutoVoiceovers =
-            this.changeListService.doesChangeListAffectAutoVoiceovers();
-
           this.changeListService.discardAllChanges().then(
             () => {
               this._initExplorationPageEventEmitter.emit();
@@ -210,8 +199,7 @@ export class ExplorationSaveService {
 
               if (
                 isExplorationLinkedToStory &&
-                voiceoverRegenerationInBackgroundIsEnabled &&
-                changeListAffectsAutoVoiceovers
+                voiceoverRegenerationInBackgroundIsEnabled
               ) {
                 this.voiceoverBackendApiService.regenerateVoiceoverOnExplorationUpdateAsync(
                   this.explorationDataService.explorationId as string,
@@ -223,12 +211,6 @@ export class ExplorationSaveService {
                     'background, please reload the page after a few minutes to ' +
                     'see the changes.',
                   10000
-                );
-
-                const updatedContentIds =
-                  this.getChangeListContentIds(changeList);
-                this.voiceoverRegenerationTaskMappingService.updateNewlyAddedRegenerationTasks(
-                  updatedContentIds
                 );
               }
             },
@@ -252,23 +234,6 @@ export class ExplorationSaveService {
         }
       );
     });
-  }
-
-  getChangeListContentIds(changeList: ExplorationChange[]): string[] {
-    let contentIds: string[] = [];
-    for (let change of changeList) {
-      if (change.hasOwnProperty('content_id')) {
-        let contentId = (change as ExplorationChangeEditTranslation)
-          .content_id as string;
-        contentIds.push(contentId);
-      }
-      if (change.hasOwnProperty('new_value')) {
-        let newValue = (change as ExplorationChangeEditStateProperty)
-          .new_value as SubtitledHtmlBackendDict;
-        contentIds.push(newValue.content_id as string);
-      }
-    }
-    return contentIds;
   }
 
   isAdditionalMetadataNeeded(): boolean {

@@ -19,7 +19,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.domain import (
     question_fetchers,
@@ -435,7 +435,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             'filenames': json.dumps(['img.png']),
         }
 
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -553,7 +553,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5
         )
-        question_summaries, merged_question_skill_links = (
+        (question_summaries, merged_question_skill_links) = (
             question_services.get_displayable_question_skill_link_details(
                 5, [self.skill_id], 0
             )
@@ -588,7 +588,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             },
             csrf_token=csrf_token,
         )
-        question_summaries, merged_question_skill_links = (
+        (question_summaries, merged_question_skill_links) = (
             question_services.get_displayable_question_skill_link_details(
                 5, [self.skill_id, 'skill_2'], 0
             )
@@ -676,7 +676,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             },
             csrf_token=csrf_token,
         )
-        question_summaries, merged_question_skill_links = (
+        (question_summaries, merged_question_skill_links) = (
             question_services.get_displayable_question_skill_link_details(
                 5, [self.skill_id], 0
             )

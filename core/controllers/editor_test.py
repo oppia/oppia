@@ -58,7 +58,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-exp_models, stats_models, translation_models, user_models = (
+(exp_models, stats_models, translation_models, user_models) = (
     models.Registry.import_models(
         [
             models.Names.EXPLORATION,
@@ -578,7 +578,8 @@ param_changes: []
 solicit_answer_details: false
 """
         ),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""card_is_checkpoint: true
+        feconf.DEFAULT_INIT_STATE_NAME: (
+            """card_is_checkpoint: true
 classifier_model_id: null
 content:
   content_id: content_0
@@ -612,7 +613,9 @@ interaction:
 linked_skill_id: null
 param_changes: []
 solicit_answer_details: false
-""") % feconf.DEFAULT_INIT_STATE_NAME,
+"""
+        )
+        % feconf.DEFAULT_INIT_STATE_NAME,
     }
 
     SAMPLE_STATE_STRING = """card_is_checkpoint: false
@@ -867,7 +870,7 @@ solicit_answer_details: false
             feconf.TESTS_DATA_DIR,
             'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip',
         )
-        with open(golden_zip_filepath, 'rb', encoding=None) as f:
+        with utils.open_file(golden_zip_filepath, 'rb', encoding=None) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(io.BytesIO(golden_zipfile))
         # Compare saved with golden file.
@@ -4280,7 +4283,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertFalse(fs.isfile(filepath))
 
         # Read raw image for testing.
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4338,7 +4341,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         filepath = '%s/%s' % (filename_prefix, filename)
         self.assertFalse(fs.isfile(filepath))
         # Read raw image for testing.
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4404,7 +4407,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             exp_id,
         )
 
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -4452,7 +4455,7 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
             exp_id,
         )
 
-        with open(
+        with utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()

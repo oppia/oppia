@@ -638,7 +638,7 @@ export class Contributor extends ExplorationEditor {
    * Checks if the featured languages are present or not.
    * @param expectedLanguages - The expected languages.
    */
-  async expectFeaturedLanguagesToContain(
+  async expectFeaturedLangaugesToContain(
     expectedLanguages: string[]
   ): Promise<void> {
     await this.expectElementToBeVisible(featuredLanguageContainerSelector);

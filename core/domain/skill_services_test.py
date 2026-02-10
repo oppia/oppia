@@ -42,7 +42,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import question_models, skill_models
 
-skill_models, question_models = models.Registry.import_models(
+(skill_models, question_models) = models.Registry.import_models(
     [models.Names.SKILL, models.Names.QUESTION]
 )
 

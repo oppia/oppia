@@ -33,7 +33,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-base_models, beam_job_models, job_models, user_models = (
+(base_models, beam_job_models, job_models, user_models) = (
     models.Registry.import_models(
         [
             models.Names.BASE_MODEL,

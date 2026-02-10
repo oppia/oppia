@@ -616,7 +616,7 @@ interface TopicDeleteSubtopicChange {
 
 export interface TopicMoveSkillToSubtopicChange {
   cmd: 'move_skill_id_to_subtopic';
-  old_subtopic_id: number | null;
+  old_subtopic_id: number;
   new_subtopic_id: number;
   skill_id: string;
 }

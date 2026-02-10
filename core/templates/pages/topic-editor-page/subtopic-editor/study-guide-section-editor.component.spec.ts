@@ -80,7 +80,7 @@ describe('Study Guide Section editor component', () => {
     platformFeatureService = TestBed.inject(PlatformFeatureService);
 
     sampleStudyGuide = new StudyGuide(
-      '10',
+      '1',
       'topic1',
       [
         {
@@ -207,7 +207,7 @@ describe('Study Guide Section editor component', () => {
         content_id: 'section_content_1',
         html: 'content',
       },
-      10
+      1
     );
 
     component.saveSection(false);
@@ -223,7 +223,7 @@ describe('Study Guide Section editor component', () => {
         content_id: 'section_content_1',
         html: 'content',
       },
-      10
+      1
     );
   });
 
