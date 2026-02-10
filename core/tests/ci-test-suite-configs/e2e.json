@@ -49,10 +49,6 @@
       "module": "core/tests/webdriverio/learnerFlow.js"
     },
     {
-      "name": "navigation",
-      "module": "core/tests/webdriverio_desktop/navigation.js"
-    },
-    {
       "name": "publication",
       "module": "core/tests/webdriverio_desktop/publicationAndLibrary.js"
     },

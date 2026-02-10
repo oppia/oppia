@@ -30,141 +30,52 @@ describe('Site Navigation', function () {
   }, DEFAULT_SPEC_TIMEOUT);
 
   it('should verify the navigation to the About page and check meta tags', async function () {
-    const aboutSelector = 'a[href="/about"]';
-    await guestUser.page.waitForSelector(aboutSelector);
-    await guestUser.page.click(aboutSelector);
-
-    await guestUser.page.waitForFunction(
-      (url: string) => window.location.href === url,
-      {},
-      testConstants.URLs.About
-    );
-
-    const title = await guestUser.page.title();
-    expect(title).toContain('About');
-
-    const appName = await guestUser.page.$eval(
-      'meta[name="application-name"]',
-      element => element.getAttribute('content')
-    );
-    expect(appName).toBe('Oppia.org');
-
-    const description = await guestUser.page.$eval(
-      'meta[name="description"]',
-      element => element.getAttribute('content')
-    );
-    expect(description).not.toBeNull();
-    expect(description?.length).toBeGreaterThan(0);
-
-    const itempropName = await guestUser.page.$eval(
-      'meta[itemprop="name"]',
-      element => element.getAttribute('content')
-    );
-    expect(itempropName).not.toBeNull();
+    await guestUser.clickOnAboutButton();
+    await guestUser.expectPageTitleToContain('About');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
   });
 
   it('should verify the navigation to the Get Started page and check meta tags', async function () {
-    const getStartedSelector = 'a[href="/get-started"]';
-    await guestUser.page.waitForSelector(getStartedSelector);
-    await guestUser.page.click(getStartedSelector);
-
-    await guestUser.page.waitForFunction(
-      (url: string) => window.location.href === url,
-      {},
-      testConstants.URLs.GetStarted
-    );
-
-    const title = await guestUser.page.title();
-    expect(title).toContain('Get Started');
-
-    const appName = await guestUser.page.$eval(
-      'meta[name="application-name"]',
-      element => element.getAttribute('content')
-    );
-    expect(appName).toBe('Oppia.org');
-
-    const description = await guestUser.page.$eval(
-      'meta[name="description"]',
-      element => element.getAttribute('content')
-    );
-    expect(description).not.toBeNull();
-    expect(description?.length).toBeGreaterThan(0);
-
-    const itempropName = await guestUser.page.$eval(
-      'meta[itemprop="name"]',
-      element => element.getAttribute('content')
-    );
-    expect(itempropName).not.toBeNull();
+    await guestUser.clickOnGetStartedButton();
+    await guestUser.expectPageTitleToContain('Get Started');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
   });
 
   it('should verify the navigation to the Donate page and check meta tags', async function () {
-    const donateSelector = 'a[href="/donate"]';
-    await guestUser.page.waitForSelector(donateSelector);
-    await guestUser.page.click(donateSelector);
-
-    await guestUser.page.waitForFunction(
-      (url: string) => window.location.href === url,
-      {},
-      testConstants.URLs.Donate
-    );
-
-    const title = await guestUser.page.title();
-    expect(title).toContain('Donate');
-
-    const appName = await guestUser.page.$eval(
-      'meta[name="application-name"]',
-      element => element.getAttribute('content')
-    );
-    expect(appName).toBe('Oppia.org');
-
-    const description = await guestUser.page.$eval(
-      'meta[name="description"]',
-      element => element.getAttribute('content')
-    );
-    expect(description).not.toBeNull();
-    expect(description?.length).toBeGreaterThan(0);
-
-    const itempropName = await guestUser.page.$eval(
-      'meta[itemprop="name"]',
-      element => element.getAttribute('content')
-    );
-    expect(itempropName).not.toBeNull();
+    await guestUser.clickOnDonateButton();
+    await guestUser.expectPageTitleToContain('Donate');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
   });
 
   it('should verify the navigation to the Contact page and check meta tags', async function () {
-    await guestUser.page.goto(testConstants.URLs.Home);
+    await guestUser.gotoHome();
+    await guestUser.clickOnContactButton();
+    await guestUser.expectPageTitleToContain('Contact');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
+  });
 
-    const contactSelector = 'a[href="/contact"]';
-    await guestUser.page.waitForSelector(contactSelector);
-    await guestUser.page.click(contactSelector);
+  it('should verify the navigation to the Android page and check meta tags', async function () {
+    await guestUser.navigateToAndroidPage();
+    await guestUser.expectPageTitleToContain('Android');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
+  });
 
-    await guestUser.page.waitForFunction(
-      (url: string) => window.location.href === url,
-      {},
-      testConstants.URLs.Contact
-    );
-
-    const title = await guestUser.page.title();
-    expect(title).toContain('Contact');
-
-    const appName = await guestUser.page.$eval(
-      'meta[name="application-name"]',
-      element => element.getAttribute('content')
-    );
-    expect(appName).toBe('Oppia.org');
-
-    const description = await guestUser.page.$eval(
-      'meta[name="description"]',
-      element => element.getAttribute('content')
-    );
-    expect(description).not.toBeNull();
-    expect(description?.length).toBeGreaterThan(0);
-
-    const itempropName = await guestUser.page.$eval(
-      'meta[itemprop="name"]',
-      element => element.getAttribute('content')
-    );
-    expect(itempropName).not.toBeNull();
+  it('should verify the navigation to the Math page and check meta tags', async function () {
+    await guestUser.navigateToMathPage();
+    await guestUser.expectPageTitleToContain('Math');
+    await guestUser.expectMetaTagToHaveContent('application-name', 'Oppia.org');
+    await guestUser.expectMetaTagToBeNotEmpty('description');
+    await guestUser.expectMetaTagWithItempropToExist('name');
   });
 
   afterAll(async function () {

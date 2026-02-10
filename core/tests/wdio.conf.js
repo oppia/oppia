@@ -77,10 +77,6 @@ var suites = {
     './core/tests/webdriverio/learnerFlow.js'
   ],
 
-  navigation: [
-    './core/tests/webdriverio_desktop/navigation.js'
-  ],
-
   publication: [
     './core/tests/webdriverio_desktop/publicationAndLibrary.js'
   ],
@@ -236,7 +232,7 @@ exports.config = {
    * @param {Array.<String>} specs   List of spec file paths that are to be run
    * @param {Object}         browser instance of created browser/device session
    */
-  before: async function() {
+  before: async function () {
     // eslint-disable-next-line eqeqeq
     mobileViewportArg = process.env.MOBILE == 'true';
 
@@ -252,16 +248,16 @@ exports.config = {
 
     // Configure the Firebase Admin SDK to communicate with the emulator.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-    FirebaseAdmin.initializeApp({projectId: 'dev-project-id'});
+    FirebaseAdmin.initializeApp({ projectId: 'dev-project-id' });
   },
   /**
     * Function to be executed before a test (in Mocha/Jasmine only)
     * @param {Object} test    test object
     * @param {Object} context scope object the test was executed with
     */
-  beforeTest: function(test, context) {
+  beforeTest: function (test, context) {
     if (// eslint-disable-next-line eqeqeq
-    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       let ffmpegArgs = [
         '-y',
         '-r', '30',
@@ -280,7 +276,7 @@ exports.config = {
         '__dirname', '..', '..', 'webdriverio-video/');
       try {
         fs.mkdirSync(dirPath, { recursive: true });
-      } catch (err) {}
+      } catch (err) { }
       videoPath = path.resolve(dirPath, name);
       ffmpegArgs.push(videoPath);
       ffmpegProcess = childProcess.spawn('ffmpeg', ffmpegArgs);
@@ -305,17 +301,17 @@ exports.config = {
    * @param {Object}  test             test object
    * @param {Object}  context          scope object the test was executed with
    * @param {Error}   result.error     error object in case the test fails,
-   *                                   otherwise `undefined`
+   * otherwise `undefined`
    * @param {Any}     result.result    return object of test function
    * @param {Number}  result.duration  duration of test
    * @param {Boolean} result.passed    true if test has passed, otherwise false
    * @param {Object}  result.retries   informations to spec related retries,
-   *                                   e.g. `{ attempts: 0, limit: 0 }`
+   * e.g. `{ attempts: 0, limit: 0 }`
    */
-  afterTest: async function(
-      test, context, { error, result, duration, passed, retries }) {
+  afterTest: async function (
+    test, context, { error, result, duration, passed, retries }) {
     if (// eslint-disable-next-line eqeqeq
-    process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
+      process.env.VIDEO_RECORDING_IS_ENABLED == 1) {
       ffmpegProcess.kill();
       if (passed === true && !ALL_VIDEOS && fs.existsSync(videoPath)) {
         fs.unlinkSync(videoPath);
@@ -333,7 +329,7 @@ exports.config = {
       try {
         fs.mkdirSync(dirPath, { recursive: true });
         var screenshotPath = '../webdriverio-screenshots';
-      } catch (err) {}
+      } catch (err) { }
 
       var testName = encodeURIComponent(test.fullName.replace(/\s+/g, '-'));
       var fileName = testName + '.png';

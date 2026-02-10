@@ -49,6 +49,7 @@ describe('Logged-in User', function () {
   it(
     'should edit profile avatar via preferences',
     async function () {
+      await loggedInUser.goto(testConstants.URLs.Login);
       await loggedInUser.navigateToPreferencesPageUsingProfileDropdown();
       await loggedInUser.updateProfilePicture(PROFILE_PICTURE);
       await loggedInUser.saveChangesInPreferencesPage();

@@ -7133,6 +7133,69 @@ export class LoggedOutUser extends BaseUser {
   async clearUsernameInput(): Promise<void> {
     await this.clearAllTextFrom(signUpUsernameInputField);
   }
+  async clickOnAboutButton(): Promise<void> {
+    await this.page.waitForSelector('a[href="/about"]');
+    await this.page.click('a[href="/about"]');
+  }
+  async clickOnGetStartedButton(): Promise<void> {
+    await this.page.waitForSelector('a[href="/get-started"]');
+    await this.page.click('a[href="/get-started"]');
+  }
+  async clickOnDonateButton(): Promise<void> {
+    await this.page.waitForSelector('a[href="/donate"]');
+    await this.page.click('a[href="/donate"]');
+  }
+  async clickOnContactButton(): Promise<void> {
+    await this.page.waitForSelector('a[href="/contact"]');
+    await this.page.click('a[href="/contact"]');
+  }
+  async gotoHome(): Promise<void> {
+    await this.page.goto(homeUrl);
+  }
+  async navigateToAndroidPage(): Promise<void> {
+    await this.page.goto(androidUrl);
+  }
+  async navigateToMathPage(): Promise<void> {
+    await this.page.goto(mathClassroomUrl);
+  }
+  async expectPageTitleToContain(titleFragment: string): Promise<void> {
+    const title = await this.page.title();
+    if (!title.includes(titleFragment)) {
+      throw new Error(
+        `Expected title to contain "${titleFragment}", but got "${title}"`
+      );
+    }
+  }
+  async expectMetaTagToHaveContent(
+    name: string,
+    expectedContent: string
+  ): Promise<void> {
+    const content = await this.page.$eval(`meta[name="${name}"]`, element =>
+      element.getAttribute('content')
+    );
+    if (content !== expectedContent) {
+      throw new Error(
+        `Expected meta[name="${name}"] to be "${expectedContent}", but got "${content}"`
+      );
+    }
+  }
+  async expectMetaTagToBeNotEmpty(name: string): Promise<void> {
+    const content = await this.page.$eval(`meta[name="${name}"]`, element =>
+      element.getAttribute('content')
+    );
+    if (!content || content.length === 0) {
+      throw new Error(`Expected meta[name="${name}"] to be not empty`);
+    }
+  }
+  async expectMetaTagWithItempropToExist(itemprop: string): Promise<void> {
+    const content = await this.page.$eval(
+      `meta[itemprop="${itemprop}"]`,
+      element => element.getAttribute('content')
+    );
+    if (content === null) {
+      throw new Error(`Expected meta[itemprop="${itemprop}"] to exist`);
+    }
+  }
 }
 
 export let LoggedOutUserFactory = (): LoggedOutUser => new LoggedOutUser();
