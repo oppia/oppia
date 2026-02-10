@@ -27,7 +27,7 @@
        ngbDropdown
        autoClose="outside"
        [container]="'body'"
-       [placement]="enableDropup ? 'top-start' : 'bottom-start'"
+       placement="auto-start"
        (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-category-selector e2e-test-search-bar-category-selector dropdown">
     <button ngbDropdownToggle
@@ -129,7 +129,7 @@
        autoClose="outside"
        [ngClass]="{'open' : activeMenuName === 'language', 'dropup' : enableDropup}"
        [container]="'body'"
-       [placement]="enableDropup ? 'top-start' : 'bottom-start'"
+       placement="auto-start"
        (openChange)="triggerSearchOnDropdownClose($event)"
        class="search-bar-float-start oppia-navbar-button-container oppia-search-bar-language-selector e2e-test-search-bar-language-selector dropdown">
     <button ngbDropdownToggle

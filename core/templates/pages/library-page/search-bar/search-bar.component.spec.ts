@@ -527,27 +527,4 @@ describe('Search bar component', () => {
     component.openSubmenu(null, null);
   });
 
-  it('should not check dropup if enableDropup is already true', () => {
-    // This test is no longer needed as we removed the checkDropupNeeded logic
-    expect(component.enableDropup).toBeFalse();
-  });
 
-  it('should set shouldShowCategoryDropup to true when space is insufficient', () => {
-    // This test is no longer needed as ng-bootstrap handles positioning
-    expect(component.enableDropup).toBeDefined();
-  });
-
-  it('should set shouldShowCategoryDropup to false when space is sufficient', () => {
-    // This test is no longer needed as ng-bootstrap handles positioning
-    expect(component.enableDropup).toBeDefined();
-  });
-
-  it('should set shouldShowLanguageDropup correctly', () => {
-    // This test is no longer needed as ng-bootstrap handles positioning
-    expect(component.enableDropup).toBeDefined();
-  });
-
-  it('should handle case when dropdown element is not found', () => {
-    // This test is no longer needed as ng-bootstrap handles positioning
-    expect(component).toBeTruthy();
-  });
