@@ -2632,10 +2632,7 @@ class UserGroupModel(base_models.BaseModel):
 
     # The name of the user group.
     name = datastore_services.StringProperty(required=True, indexed=True)
-    # The list of user_ids of the members of the user group.
-    # Here we use MyPy ignore because the inferred type of the property
-    # does not match the type annotation.
-    user_ids: List[str] = datastore_services.StringProperty(repeated=True)  # type: ignore[assignment]
+    user_ids = datastore_services.StringProperty(repeated=True)
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

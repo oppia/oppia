@@ -88,7 +88,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     entity_id = datastore_services.StringProperty(required=True, indexed=True)
     # ID of the user who started the thread. This may be None if the feedback
     # was given anonymously by a learner.
-    original_author_id: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
+    original_author_id = datastore_services.StringProperty(indexed=True)
     # Latest status of the thread.
     status = datastore_services.StringProperty(
         default=STATUS_CHOICES_OPEN,
@@ -99,7 +99,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # Latest subject of the thread.
     subject = datastore_services.StringProperty(indexed=True, required=True)
     # Summary text of the thread.
-    summary: Optional[str] = datastore_services.TextProperty(indexed=False)  # type: ignore[assignment]
+    summary = datastore_services.TextProperty(indexed=False)
     # Specifies whether this thread has a related suggestion.
     has_suggestion = datastore_services.BooleanProperty(
         indexed=True, default=False, required=True
@@ -109,13 +109,13 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     message_count = datastore_services.IntegerProperty(indexed=True, default=0)
     # Cached text of the last message in the thread with non-empty content, or
     # None if there is no such message.
-    last_nonempty_message_text: Optional[str] = datastore_services.TextProperty(indexed=False)  # type: ignore[assignment]
+    last_nonempty_message_text = datastore_services.TextProperty(indexed=False)
     # Cached ID for the user of the last message in the thread with non-empty
     # content, or None if the message was made anonymously or if there is no
     # such message.
-    last_nonempty_message_author_id: Optional[str] = datastore_services.StringProperty(
+    last_nonempty_message_author_id = datastore_services.StringProperty(
         indexed=True
-    )  # type: ignore[assignment]
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:
@@ -316,15 +316,15 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     message_id = datastore_services.IntegerProperty(required=True, indexed=True)
     # ID of the user who posted this message. This may be None if the feedback
     # was given anonymously by a learner.
-    author_id: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
+    author_id = datastore_services.StringProperty(indexed=True)
     # New thread status. Must exist in the first message of a thread. For the
     # rest of the thread, should exist only when the status changes.
-    updated_status: Optional[str] = datastore_services.StringProperty(  # type: ignore[assignment]
+    updated_status = datastore_services.StringProperty(
         choices=STATUS_CHOICES, indexed=True
     )
     # New thread subject. Must exist in the first message of a thread. For the
     # rest of the thread, should exist only when the subject changes.
-    updated_subject: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
+    updated_subject = datastore_services.StringProperty(indexed=True)
     # Message text. Allowed not to exist (e.g. post only to update the status).
     text = datastore_services.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
@@ -687,9 +687,9 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     user_id = datastore_services.StringProperty(required=True, indexed=True)
     thread_id = datastore_services.StringProperty(required=True, indexed=True)
-    message_ids_read_by_user: List[int] = datastore_services.IntegerProperty(
+    message_ids_read_by_user = datastore_services.IntegerProperty(
         repeated=True, indexed=True
-    )  # type: ignore[assignment]
+    )
 
     @staticmethod
     def get_deletion_policy() -> base_models.DELETION_POLICY:

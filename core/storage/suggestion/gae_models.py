@@ -213,7 +213,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     # The ID of the author of the suggestion.
     author_id = datastore_services.StringProperty(required=True, indexed=True)
     # The ID of the reviewer who accepted/rejected the suggestion.
-    final_reviewer_id: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
+    final_reviewer_id = datastore_services.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
     # change.
     change_cmd = datastore_services.JsonProperty(required=True)
@@ -225,7 +225,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     )
     # The ISO 639-1 code used to query suggestions by language, or None if the
     # suggestion type is not queryable by language.
-    language_code: Optional[str] = datastore_services.StringProperty(indexed=True)  # type: ignore[assignment]
+    language_code = datastore_services.StringProperty(indexed=True)
     # A flag that indicates whether the suggestion is edited by the reviewer.
     edited_by_reviewer = datastore_services.BooleanProperty(
         default=False, indexed=True
