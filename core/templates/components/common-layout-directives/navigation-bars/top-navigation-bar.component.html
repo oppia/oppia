@@ -372,7 +372,7 @@
     <li [ngClass]="{'show' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         #profileDropdown="ngbDropdown"
-        *ngIf="userIsLoggedIn && !pageIsIframed"
+        *ngIf="authStatusResolved && userIsLoggedIn && !pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
@@ -473,6 +473,22 @@
           </a>
         </li>
         <li class="nav-item">
+          <a *ngIf="(isReleaseCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/release-coordinator"
+             class="dropdown-item nav-link e2e-release-coordinator-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_RELEASE_COORDINATOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a *ngIf="(isTranslationAdmin || isTranslationCoordinator || isQuestionAdmin || isQuestionCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/contributor-admin-dashboard"
+             class="dropdown-item nav-link e2e-test-contributor-admin-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_ADMIN_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/blog-dashboard"
@@ -525,7 +541,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="!userIsLoggedIn && username !== '' && !pageIsIframed"
+        *ngIf="authStatusResolved && !userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
@@ -553,7 +569,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="username === '' && !pageIsIframed"
+        *ngIf="authStatusResolved && username === '' && !pageIsIframed"
         class="oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
       </div>
