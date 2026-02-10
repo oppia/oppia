@@ -38,7 +38,7 @@ MYPY = False
 if MYPY:
     from mypy_imports import exp_models, suggestion_models
 
-exp_models, suggestion_models = models.Registry.import_models(
+(exp_models, suggestion_models) = models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.SUGGESTION]
 )
 
