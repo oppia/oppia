@@ -1132,7 +1132,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         test_url = 'https://example.com/test'
         attempts = []
 
-        def mock_urlopen(url: str, context: ssl.SSLContext) -> NoReturn:
+        def mock_urlopen(
+            url: str, context: ssl.SSLContext
+        ) -> NoReturn:  # pylint: disable=unused-argument
             attempts.append(url)
             # On the final attempt, raise a non-rate-limited error (500)
             raise urlerror.HTTPError(
@@ -1151,7 +1153,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 urlerror.HTTPError, 'Internal Server Error'
             ):
-                # Use max_attempts=1 to ensure error is raised immediately
+                # Use max_attempts=1 to ensure error is raised immediately.
                 install_dependencies_json_packages.url_open(
                     test_url, max_attempts=1
                 )
@@ -1178,7 +1180,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
             self.assertEqual(url, test_url)
             self._assert_ssl_context_matches_default(context)
             if len(attempts) == 1:
-                # Rate limit error with no retry header
+                # Rate limit error with no retry header.
                 raise urlerror.HTTPError(
                     url,
                     429,
@@ -1210,7 +1212,7 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         self.assertEqual(response.getcode(), 200)
         self.assertEqual(response.url, test_url)
         self.assertEqual(attempts, [test_url, test_url])
-        # Should use exponential backoff: 2^attempt = 2^1 = 2 seconds
+        # Should use exponential backoff: 2^attempt = 2^1 = 2 seconds.
         self.assertEqual(sleep_calls, [2])
 
     def test_url_open_with_zero_max_attempts(self) -> None:
