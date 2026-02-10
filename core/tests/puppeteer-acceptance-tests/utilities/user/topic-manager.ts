@@ -32,7 +32,7 @@ const saveChangesMessageInput = 'textarea.e2e-test-commit-message-input';
 // Photo Upload Modal.
 const chapterPhotoBoxButton = '.e2e-test-photo-button';
 const uploadPhotoButton = 'button.e2e-test-photo-upload-submit';
-const photoUploadModal = 'edit-thumbnail-modal';
+const photoUploadModal = '.e2e-test-image-uploader-modal';
 
 // Topic and Skills Dashboard Page.
 const topicsTab = 'a.e2e-test-topics-tab';
