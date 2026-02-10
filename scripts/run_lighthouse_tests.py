@@ -47,11 +47,13 @@ LIGHTHOUSE_PAGES_JSON_FILEPATH = os.path.join(
     'core', 'tests', 'lighthouse-pages.json'
 )
 
-_PARSER: Final = argparse.ArgumentParser(description="""
+_PARSER: Final = argparse.ArgumentParser(
+    description="""
 Run the script from the oppia root folder:
     python -m scripts.run_lighthouse_tests
 Note that the root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--mode',
