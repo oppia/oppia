@@ -301,9 +301,7 @@ describe('Blog Pages functionality', function () {
       async () => {
         await blogPages.get();
         await blogPages.expectBlogHomePageWelcomeHeadingToBeVisible();
-
         await blogPages.submitSearchQuery('Pineapple');
-
         await blogPages.getBlogPostSearchPage('Pineapple');
 
         try {
