@@ -60,7 +60,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(app_feedback_report_models, exp_models, suggestion_models, user_models) = (
+app_feedback_report_models, exp_models, suggestion_models, user_models = (
     models.Registry.import_models(
         [
             models.Names.APP_FEEDBACK_REPORT,

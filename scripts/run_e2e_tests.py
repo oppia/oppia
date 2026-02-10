@@ -29,8 +29,7 @@ from typing import Final, List, Optional, Tuple
 
 MAX_RETRY_COUNT: Final = 3
 
-_PARSER: Final = argparse.ArgumentParser(
-    description="""
+_PARSER: Final = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
    python -m scripts.run_e2e_tests
 
@@ -38,8 +37,7 @@ The root folder MUST be named 'oppia'.
 
 NOTE: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
 single test or test suite.
-"""
-)
+""")
 
 _PARSER.add_argument(
     '--skip_install',

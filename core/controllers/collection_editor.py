@@ -168,7 +168,7 @@ class CollectionRightsHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         Raises:
             Exception. No collection found for the given collection_id.
         """
-        (collection, collection_rights) = (
+        collection, collection_rights = (
             collection_services.get_collection_and_collection_rights_by_id(
                 collection_id
             )

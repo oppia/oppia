@@ -45,7 +45,7 @@ if MYPY:  # pragma: no cover
         topic_models,
     )
 
-(opportunity_models, suggestion_models, topic_models) = (
+opportunity_models, suggestion_models, topic_models = (
     models.Registry.import_models(
         [models.Names.OPPORTUNITY, models.Names.SUGGESTION, models.Names.TOPIC]
     )

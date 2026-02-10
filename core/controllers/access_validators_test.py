@@ -1109,6 +1109,63 @@ class FacilitatorDashboardPageAccessValidationHandlerTests(
         )
 
 
+class StoryViewerPageAccessValidationHandlerTests(test_utils.GenericTestBase):
+    """Checks the access to the story viewer page."""
+
+    def setUp(self) -> None:
+        super().setUp()
+        self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.CURRICULUM_ADMIN_EMAIL)
+        self.set_curriculum_admins([self.CURRICULUM_ADMIN_USERNAME])
+        self.topic_id = topic_fetchers.get_new_topic_id()
+        self.story_id = story_services.get_new_story_id()
+        self.skill_id = 'skill_1'
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description'
+        )
+        self.save_new_story(
+            self.story_id,
+            self.admin_id,
+            self.topic_id,
+            url_fragment='story-one',
+        )
+        subtopic = topic_domain.Subtopic.create_default_subtopic(
+            1, 'Subtopic Title', 'url-frag'
+        )
+        subtopic.skill_ids = [self.skill_id]
+        self.save_new_topic(
+            self.topic_id,
+            self.admin_id,
+            name='Topic Name',
+            abbreviated_name='topic-name',
+            url_fragment='topic-name',
+            description='Description',
+            canonical_story_ids=[self.story_id],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic],
+            next_subtopic_id=2,
+        )
+        topic_services.publish_topic(self.topic_id, self.admin_id)
+        topic_services.publish_story(
+            self.topic_id, self.story_id, self.admin_id
+        )
+
+    def test_validation_returns_true_if_story_exists(self) -> None:
+        self.get_html_response(
+            '%s/can_access_story_viewer_page/staging/topic-name/story/story-one'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=200,
+        )
+
+    def test_validation_returns_false_if_story_does_not_exist(self) -> None:
+        self.get_json(
+            '%s/can_access_story_viewer_page/staging/topic-name/story/invalid-story'
+            % ACCESS_VALIDATION_HANDLER_PREFIX,
+            expected_status_int=404,
+        )
+
+
 class CreateLearnerGroupPageAccessValidationHandlerTests(
     test_utils.GenericTestBase
 ):

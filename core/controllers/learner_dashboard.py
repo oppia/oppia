@@ -203,7 +203,7 @@ class LearnerDashboardCollectionsProgressHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        (learner_progress, number_of_nonexistent_collections) = (
+        learner_progress, number_of_nonexistent_collections = (
             learner_progress_services.get_collection_progress(self.user_id)
         )
 
@@ -253,7 +253,7 @@ class LearnerDashboardExplorationsProgressHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        (learner_progress, number_of_nonexistent_explorations) = (
+        learner_progress, number_of_nonexistent_explorations = (
             learner_progress_services.get_exploration_progress(self.user_id)
         )
 
