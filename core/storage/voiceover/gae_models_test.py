@@ -28,7 +28,7 @@ if MYPY:  # pragma: no cover
     from core.domain import state_domain
     from mypy_imports import base_models, voiceover_models
 
-(base_models, voiceover_models) = models.Registry.import_models(
+base_models, voiceover_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.VOICEOVER]
 )
 

@@ -29,7 +29,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import base_models, learner_group_models
 
-(base_models, learner_group_models) = models.Registry.import_models(
+base_models, learner_group_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.LEARNER_GROUP]
 )
 

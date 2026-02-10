@@ -64,7 +64,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(auth_models, user_models, audit_models, suggestion_models) = (
+auth_models, user_models, audit_models, suggestion_models = (
     models.Registry.import_models(
         [
             models.Names.AUTH,

@@ -30,7 +30,7 @@ if MYPY:  # pragma: no cover
     from core.domain import platform_parameter_domain
     from mypy_imports import base_models, config_models
 
-(base_models, config_models) = models.Registry.import_models(
+base_models, config_models = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.CONFIG]
 )
 

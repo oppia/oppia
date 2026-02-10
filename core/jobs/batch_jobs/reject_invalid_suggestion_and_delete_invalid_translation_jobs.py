@@ -42,7 +42,7 @@ if MYPY:  # pragma: no cover
         translation_models,
     )
 
-(exp_models, opportunity_models, suggestion_models, translation_models) = (
+exp_models, opportunity_models, suggestion_models, translation_models = (
     models.Registry.import_models(
         [
             models.Names.EXPLORATION,

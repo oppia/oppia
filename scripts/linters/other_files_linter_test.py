@@ -82,7 +82,7 @@ class CustomLintChecksManagerTests(test_utils.LinterTestBase):
             return (
                 '# Just a comment',
                 '# Third party files:',
-                '- third_party/static/bootstrap-5.3.3/',
+                '- third_party/static/ckeditor-4.12.1/',
             )
 
         readlines_swap = self.swap(
