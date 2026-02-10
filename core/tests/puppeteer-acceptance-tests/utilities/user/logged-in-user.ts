@@ -2211,13 +2211,16 @@ export class LoggedInUser extends BaseUser {
     );
 
     const errorHeading = await this.page.$(errorPageHeadingSelector);
-    const errorHeadingText = errorHeading
-      ? await this.page.evaluate(element => element.textContent, errorHeading)
-      : '';
-    if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
-      throw new Error(
-        `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+    if (errorHeading) {
+      const errorHeadingText = await this.page.evaluate(
+        element => element.textContent,
+        errorHeading
       );
+      if (!errorHeadingText?.includes(`Error ${statusCode}`)) {
+        throw new Error(
+          `Expected "Error ${statusCode}" to be present on the page, but it was not.`
+        );
+      }
     }
 
     showMessage(`User is on error page with status code ${statusCode}.`);
