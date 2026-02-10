@@ -1903,8 +1903,18 @@ class BaseSnapshotMetadataModel(BaseModel):
             cls.query(
                 datastore_services.any_of(
                     cls.committer_id == user_id,
-                    cls.commit_cmds_user_ids == user_id,  # type: ignore[comparison-overlap]
-                    cls.content_user_ids == user_id,  # type: ignore[comparison-overlap]
+                    # Here we use type Any because we need to cast the property
+                    # to Any to allow comparison with a string in the NDB query.
+                    # Here we use cast because the comparison of a list property
+                    # with a string via equality operator is valid in NDB but causes
+                    # a type mismatch.
+                    cast(Any, cls.commit_cmds_user_ids) == user_id,
+                    # Here we use type Any because we need to cast the property
+                    # to Any to allow comparison with a string in the NDB query.
+                    # Here we use cast because the comparison of a list property
+                    # with a string via equality operator is valid in NDB but causes
+                    # a type mismatch.
+                    cast(Any, cls.content_user_ids) == user_id,
                 )
             ).get(keys_only=True)
             is not None

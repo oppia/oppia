@@ -63,10 +63,10 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
-    # Here we use type Any because the list content is a dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     rules: List[Any] = datastore_services.JsonProperty(
         repeated=True
     )  # type: ignore[assignment]

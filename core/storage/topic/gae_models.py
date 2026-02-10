@@ -129,19 +129,19 @@ class TopicModel(base_models.VersionedModel):
     description = datastore_services.TextProperty(indexed=False)
     # This consists of the list of objects referencing canonical stories that
     # are part of this topic.
-    # Here we use type Any because the list content is a dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     canonical_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
     # This consists of the list of objects referencing additional stories that
     # are part of this topic.
-    # Here we use type Any because the list content is a dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     additional_story_references: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
@@ -158,10 +158,10 @@ class TopicModel(base_models.VersionedModel):
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # The list of subtopics that are part of the topic.
-    # Here we use type Any because the list content is a dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     subtopics: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
@@ -201,7 +201,9 @@ class TopicModel(base_models.VersionedModel):
     # questions should be fetched for the diagnostic test.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
-    skill_ids_for_diagnostic_test: List[str] = datastore_services.StringProperty(
+    skill_ids_for_diagnostic_test: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
 
@@ -511,10 +513,13 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         """
         return (
             TopicRightsSnapshotMetadataModel.query(
-                # Here we use MyPy ignore because the comparison of a list
-                # property with a string via equality operator is valid in NDB
-                # but causes a type mismatch.
-                TopicRightsSnapshotMetadataModel.content_user_ids == user_id  # type: ignore[comparison-overlap]
+                # Here we use cast because the comparison of a list property
+                # with a string via equality operator is valid in NDB but causes
+                # a type mismatch.
+                # Here we use object because we need to cast to a type that allows
+                # comparison with string.
+                cast(object, TopicRightsSnapshotMetadataModel.content_user_ids)
+                == user_id
             ).get(keys_only=True)
             is not None
         )
@@ -560,10 +565,14 @@ class TopicRightsModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return (
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.manager_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.manager_ids) == user_id).get(
+                keys_only=True
+            )
             is not None
         )
 
@@ -578,10 +587,12 @@ class TopicRightsModel(base_models.VersionedModel):
             list(TopicRightsModel). The list of TopicRightsModel objects in
             which the given user is a manager.
         """
-        # Here we use MyPy ignore because the comparison of a list
-        # property with a string via equality operator is valid in NDB
-        # but causes a type mismatch.
-        return cls.query(cls.manager_ids == user_id).fetch()  # type: ignore[comparison-overlap]
+        # Here we use cast because the comparison of a list property
+        # with a string via equality operator is valid in NDB but causes
+        # a type mismatch.
+        # Here we use object because we need to cast to a type that allows
+        # comparison with string.
+        return cls.query(cast(object, cls.manager_ids) == user_id).fetch()
 
     def compute_models_to_commit(
         self,
@@ -713,10 +724,14 @@ class TopicRightsModel(base_models.VersionedModel):
             format. In this case, we are returning all the ids of the topics
             this user manages.
         """
-        # Here we use MyPy ignore because the comparison of a list
-        # property with a string via equality operator is valid in NDB
-        # but causes a type mismatch.
-        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)  # type: ignore[comparison-overlap]
+        # Here we use cast because the comparison of a list property
+        # with a string via equality operator is valid in NDB but causes
+        # a type mismatch.
+        # Here we use object because we need to cast to a type that allows
+        # comparison with string.
+        managed_topics = cls.get_all().filter(
+            cast(object, cls.manager_ids) == user_id
+        )
         managed_topic_ids = [right.id for right in managed_topics]
 
         return {'managed_topic_ids': managed_topic_ids}

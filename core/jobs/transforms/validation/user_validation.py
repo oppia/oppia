@@ -141,8 +141,8 @@ def completed_activities_model_relationships(
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
-    yield model.exploration_ids, [exp_models.ExplorationModel]
-    yield model.collection_ids, [collection_models.CollectionModel]
+    yield model.exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
+    yield model.collection_ids, [collection_models.CollectionModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.IncompleteActivitiesModel)
@@ -162,15 +162,18 @@ def incomplete_activities_model_relationships(
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
-    yield model.exploration_ids, [exp_models.ExplorationModel]
-    yield model.collection_ids, [collection_models.CollectionModel]
+    yield model.exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
+    yield model.collection_ids, [collection_models.CollectionModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.ExpUserLastPlaythroughModel)
 def exp_user_last_playthrough_model_relationships(
     model: Type[user_models.ExpUserLastPlaythroughModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
+    Tuple[
+        datastore_services.Property[Any],
+        List[Type[exp_models.ExplorationModel]],
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
     yield model.exploration_id, [exp_models.ExplorationModel]
@@ -193,19 +196,22 @@ def learner_playlist_model_relationships(
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
-    yield model.exploration_ids, [exp_models.ExplorationModel]
-    yield model.collection_ids, [collection_models.CollectionModel]
+    yield model.exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
+    yield model.collection_ids, [collection_models.CollectionModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserContributionsModel)
 def user_contributions_model_relationships(
     model: Type[user_models.UserContributionsModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
+    Tuple[
+        datastore_services.Property[Any],
+        List[Type[exp_models.ExplorationModel]],
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
-    yield model.created_exploration_ids, [exp_models.ExplorationModel]
-    yield model.edited_exploration_ids, [exp_models.ExplorationModel]
+    yield model.created_exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
+    yield model.edited_exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserEmailPreferencesModel)
@@ -240,13 +246,13 @@ def user_subscriptions_model_relationships(
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
-    yield model.exploration_ids, [exp_models.ExplorationModel]
-    yield model.collection_ids, [collection_models.CollectionModel]
+    yield model.exploration_ids, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
+    yield model.collection_ids, [collection_models.CollectionModel]  # type: ignore[misc]  # type: ignore[misc]
     yield (
         model.general_feedback_thread_ids,
         [feedback_models.GeneralFeedbackThreadModel],
-    )
-    yield model.creator_ids, [user_models.UserSubscribersModel]
+    )  # type: ignore[misc]  # type: ignore[misc]
+    yield model.creator_ids, [user_models.UserSubscribersModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserSubscribersModel)
@@ -260,7 +266,7 @@ def user_subscribers_model_relationships(
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
-    yield model.subscriber_ids, [user_models.UserSubscriptionsModel]
+    yield model.subscriber_ids, [user_models.UserSubscriptionsModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserRecentChangesBatchModel)
@@ -293,7 +299,10 @@ def user_stats_model_relationships(
 def exploration_user_data_model_relationships(
     model: Type[user_models.ExplorationUserDataModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property[Any], List[Type[exp_models.ExplorationModel]]]
+    Tuple[
+        datastore_services.Property[Any],
+        List[Type[exp_models.ExplorationModel]],
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -320,7 +329,7 @@ def collection_progress_model_relationships(
     """Yields how the properties of the model relates to the ID of others."""
 
     yield model.collection_id, [collection_models.CollectionModel]
-    yield model.completed_explorations, [exp_models.ExplorationModel]
+    yield model.completed_explorations, [exp_models.ExplorationModel]  # type: ignore[misc]  # type: ignore[misc]
     yield model.user_id, [user_models.CompletedActivitiesModel]
 
 
@@ -339,7 +348,10 @@ def story_progress_model_relationships(
 def user_query_model_relationships(
     model: Type[user_models.UserQueryModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property[Any], List[Type[email_models.BulkEmailModel]]]
+    Tuple[
+        datastore_services.Property[Any],
+        List[Type[email_models.BulkEmailModel]],
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
@@ -350,11 +362,14 @@ def user_query_model_relationships(
 def user_bulk_emails_model_relationships(
     model: Type[user_models.UserBulkEmailsModel],
 ) -> Iterator[
-    Tuple[datastore_services.Property[Any], List[Type[email_models.BulkEmailModel]]]
+    Tuple[
+        datastore_services.Property[Any],
+        List[Type[email_models.BulkEmailModel]],
+    ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""
 
-    yield model.sent_email_model_ids, [email_models.BulkEmailModel]
+    yield model.sent_email_model_ids, [email_models.BulkEmailModel]  # type: ignore[misc]  # type: ignore[misc]
 
 
 @validation_decorators.RelationshipsOf(user_models.UserSkillMasteryModel)
@@ -375,7 +390,8 @@ def user_contribution_proficiency_model_relationships(
     model: Type[user_models.UserContributionProficiencyModel],
 ) -> Iterator[
     Tuple[
-        datastore_services.Property, List[Type[user_models.UserSettingsModel]]
+        datastore_services.Property[Any],
+        List[Type[user_models.UserSettingsModel]],
     ]
 ]:
     """Yields how the properties of the model relates to the ID of others."""

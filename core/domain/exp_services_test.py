@@ -9947,7 +9947,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         )
         self.assertTrue(
             exp_services.is_version_of_draft_valid(
-                self.EXP_ID1, exp_user_data.draft_change_list_exp_version
+                self.EXP_ID1, exp_user_data.draft_change_list_exp_version  # type: ignore[arg-type]
             )
         )
 
@@ -9957,7 +9957,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         )
         self.assertFalse(
             exp_services.is_version_of_draft_valid(
-                self.EXP_ID2, exp_user_data.draft_change_list_exp_version
+                self.EXP_ID2, exp_user_data.draft_change_list_exp_version  # type: ignore[arg-type]
             )
         )
 
@@ -9967,7 +9967,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         )
         self.assertFalse(
             exp_services.is_version_of_draft_valid(
-                self.EXP_ID3, exp_user_data.draft_change_list_exp_version
+                self.EXP_ID3, exp_user_data.draft_change_list_exp_version  # type: ignore[arg-type]
             )
         )
 

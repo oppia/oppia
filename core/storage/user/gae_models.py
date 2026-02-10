@@ -38,6 +38,7 @@ from typing import (
     Tuple,
     TypedDict,
     Union,
+    cast,
     overload,
 )
 
@@ -430,9 +431,12 @@ class UserSettingsModel(base_models.BaseModel):
             list(UserSettingsModel). The UserSettingsModel instances which
             have the given role ID.
         """
-        # Here we use MyPy ignore because the roles property is a list of
-        # strings, but we are querying against a single string.
-        return cls.query(cls.roles == role).fetch()  # type: ignore[comparison-overlap]
+        # Here we use cast because the comparison of a list property
+        # with a string via equality operator is valid in NDB but causes
+        # a type mismatch.
+        # Here we use object because we need to cast to a type that allows
+        # comparison with string.
+        return cls.query(cast(object, cls.roles) == role).fetch()
 
 
 class CompletedActivitiesModel(base_models.BaseModel):
@@ -1250,10 +1254,12 @@ class UserSubscriptionsModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_subscriptions_models: List[UserSubscriptionsModel] = list(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.creator_ids == user_id).fetch()  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.creator_ids) == user_id).fetch()
         )
 
         for user_subscribers_model in user_subscriptions_models:
@@ -1279,10 +1285,14 @@ class UserSubscriptionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return (
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.creator_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.creator_ids) == user_id).get(
+                keys_only=True
+            )
             is not None
             or cls.get_by_id(user_id) is not None
         )
@@ -1333,10 +1343,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
             ),
         }
 
-        # Here we use MyPy ignore because the return value is a dict with
+        # Here we use cast because the return value is a dict with
         # heterogeneous values, which MyPy interprets as Dict[str, object],
         # causing a type mismatch with the signature.
-        return user_data  # type: ignore[return-value]
+        return cast(Dict[str, Union[List[str], float, None]], user_data)
 
 
 class UserSubscribersModel(base_models.BaseModel):
@@ -1365,10 +1375,12 @@ class UserSubscribersModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_subscribers_models: List[UserSubscribersModel] = list(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.subscriber_ids == user_id).fetch()  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.subscriber_ids) == user_id).fetch()
         )
 
         for user_subscribers_model in user_subscribers_models:
@@ -1393,10 +1405,14 @@ class UserSubscribersModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return (
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.subscriber_ids == user_id).get(keys_only=True)  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.subscriber_ids) == user_id).get(
+                keys_only=True
+            )
             is not None
             or cls.get_by_id(user_id) is not None
         )
@@ -1522,10 +1538,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     #   }
     #  },
     # ]
-    # Here we use type Any because the list content is a dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     weekly_creator_stats_list: List[Any] = datastore_services.JsonProperty(repeated=True)  # type: ignore[assignment]
     # The version of dashboard stats schema.
     schema_version = datastore_services.IntegerProperty(
@@ -1638,10 +1654,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             'weekly_creator_stats_list': weekly_stats_constructed,
         }
 
-        # Here we use MyPy ignore because the return value is a dict with
+        # Here we use cast because the return value is a dict with
         # heterogeneous values, which MyPy interprets as Dict[str, object],
         # causing a type mismatch with the signature.
-        return user_data  # type: ignore[return-value]
+        return cast(
+            Dict[str, Union[float, List[Dict[str, Dict[str, float]]]]],
+            user_data,
+        )
 
 
 class ExplorationUserDataModel(base_models.BaseModel):
@@ -1670,10 +1689,10 @@ class ExplorationUserDataModel(base_models.BaseModel):
         default=None, indexed=False
     )  # type: ignore[assignment]
     # List of uncommitted changes made by the user to the exploration.
-    # Here we use type Any because the change list can contain various types
-    # of modifications.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the change list can contain various types
+    # of modifications.
     draft_change_list: Optional[List[Any]] = datastore_services.JsonProperty(
         default=None
     )  # type: ignore[assignment]
@@ -2656,10 +2675,13 @@ class UserGroupModel(base_models.BaseModel):
             bool. Whether the models for user_id exists.
         """
         return (
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.user_ids == user_id).get(keys_only=True) is not None  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.user_ids) == user_id).get(keys_only=True)
+            is not None
         )
 
     @classmethod
@@ -2670,10 +2692,12 @@ class UserGroupModel(base_models.BaseModel):
             user_id: str. The ID of the user whose data should be deleted.
         """
         user_group_models: List[UserGroupModel] = list(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.user_ids) == user_id).fetch()
         )
 
         for user_group_model in user_group_models:
@@ -2695,10 +2719,12 @@ class UserGroupModel(base_models.BaseModel):
         """
         user_data = {}
         user_group_models: List[UserGroupModel] = list(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.query(cls.user_ids == user_id).fetch()  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cls.query(cast(object, cls.user_ids) == user_id).fetch()
         )
         for user_group_model in user_group_models:
             user_data[user_group_model.id] = {
@@ -3064,12 +3090,16 @@ class UserContributionRightsModel(base_models.BaseModel):
 
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
-    can_review_translation_for_language_codes: List[str] = datastore_services.StringProperty(
+    can_review_translation_for_language_codes: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
-    can_review_voiceover_for_language_codes: List[str] = datastore_services.StringProperty(
+    can_review_voiceover_for_language_codes: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     can_review_questions = datastore_services.BooleanProperty(indexed=True)
@@ -3165,10 +3195,13 @@ class UserContributionRightsModel(base_models.BaseModel):
             translations in the given language code.
         """
         reviewer_keys = cls.query(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.can_review_translation_for_language_codes == language_code  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cast(object, cls.can_review_translation_for_language_codes)
+            == language_code
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -3185,10 +3218,13 @@ class UserContributionRightsModel(base_models.BaseModel):
             voiceovers in the given language code.
         """
         reviewer_keys = cls.query(
-            # Here we use MyPy ignore because the comparison of a list
-            # property with a string via equality operator is valid in NDB
-            # but causes a type mismatch.
-            cls.can_review_voiceover_for_language_codes == language_code  # type: ignore[comparison-overlap]
+            # Here we use cast because the comparison of a list property
+            # with a string via equality operator is valid in NDB but causes
+            # a type mismatch.
+            # Here we use object because we need to cast to a type that allows
+            # comparison with string.
+            cast(object, cls.can_review_voiceover_for_language_codes)
+            == language_code
         ).fetch(keys_only=True)
         return [reviewer_key.id() for reviewer_key in reviewer_keys]
 
@@ -3477,15 +3513,17 @@ class LearnerGroupsUserModel(base_models.BaseModel):
     # List of learner group ids which the learner has been invited to join.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
-    invited_to_learner_groups_ids: List[str] = datastore_services.StringProperty(
+    invited_to_learner_groups_ids: List[
+        str
+    ] = datastore_services.StringProperty(
         repeated=True, indexed=True
     )  # type: ignore[assignment]
     # List of LearnerGroupUserDetailsDict, each dict corresponds to a learner
     # group and has details of the user correspoding to that group.
-    # Here we use type Any because the list contains dictionary with
-    # dynamic keys.
     # Here we use MyPy ignore because the inferred type of the property
     # does not match the type annotation.
+    # Here we use type Any because the list contains dictionary with
+    # dynamic keys.
     learner_groups_user_details: List[Any] = datastore_services.JsonProperty(
         repeated=True, indexed=False
     )  # type: ignore[assignment]
