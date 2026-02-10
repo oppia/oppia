@@ -109,15 +109,15 @@ describe('Story Viewer Page component', () => {
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    httpTestingController = TestBed.get(HttpTestingController);
-    pageTitleService = TestBed.get(PageTitleService);
-    assetsBackendApiService = TestBed.get(AssetsBackendApiService);
-    urlService = TestBed.get(UrlService);
+    httpTestingController = TestBed.inject(HttpTestingController);
+    pageTitleService = TestBed.inject(PageTitleService);
+    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
+    urlService = TestBed.inject(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    userService = TestBed.get(UserService);
-    alertsService = TestBed.get(AlertsService);
-    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
-    windowRef = TestBed.get(WindowRef);
+    userService = TestBed.inject(UserService);
+    alertsService = TestBed.inject(AlertsService);
+    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
+    windowRef = TestBed.inject(WindowRef);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateService = TestBed.inject(TranslateService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
