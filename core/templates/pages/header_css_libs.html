@@ -4,8 +4,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://storage.googleapis.com" crossorigin>
 
-<link rel="preload" href="/third_party/generated/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/third_party/generated/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Font Awesome webfonts are provided via Angular assets pipeline -->
 
 <link rel="preload"
       media="screen"
@@ -19,22 +18,14 @@
         as="style"
         onload="this.onload=null;this.rel='stylesheet'">
 <% } %>
-<% if (webpackConfig.mode == 'production') { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.min.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
+
+<!-- Angular CLI global styles (Bootstrap, Font Awesome, oppia.css, oppia-material.css, toastr) -->
+<!-- This replaces the old third_party.css from dependencies.json -->
+<!-- Loaded synchronously to ensure Bootstrap styles are available before Angular initializes -->
+<!-- Note: In production, styles.css is automatically replaced with the hashed filename -->
+<!-- (e.g., styles.abc123.css) by webpack's AngularStylesHashPlugin during the build. -->
+<% if (webpackConfig.mode === 'production') { %>
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular-prod/styles.css">
 <% } else { %>
-  <link rel="preload"
-        href="/third_party/generated/css/third_party.css"
-        as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-<% } %>
-
-<link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/css/oppia.css">
-
-<% if (!htmlWebpackPlugin.options.lightweight) { %>
-  <link rel="stylesheet" type="text/css" media="screen"
-        href="/templates/css/oppia-material.css">
+  <link rel="stylesheet" type="text/css" href="/dist/oppia-angular/styles.css">
 <% } %>

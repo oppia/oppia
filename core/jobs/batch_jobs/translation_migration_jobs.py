@@ -36,7 +36,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import datastore_services, exp_models, translation_models
 
-(exp_models, translation_models) = models.Registry.import_models(
+exp_models, translation_models = models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.TRANSLATION]
 )
 
@@ -65,7 +65,7 @@ class EntityTranslationsModelGenerationOneOffJob(base_jobs.JobBase):
         """
         try:
             lang_code_to_translation = {}
-            (old_content_id_to_new_content_id, _) = (
+            old_content_id_to_new_content_id, _ = (
                 state_domain.State.generate_old_content_id_to_new_content_id_in_v54_states(
                     exploration.states
                 )

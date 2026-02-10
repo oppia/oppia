@@ -516,7 +516,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_can_already_invited_user_be_invited_to_learner_group(self) -> None:
-        (is_valid_invite, error_message) = (
+        is_valid_invite, error_message = (
             learner_group_services.can_user_be_invited(
                 self.LEARNER_ID, 'username1', self.LEARNER_GROUP_ID
             )
@@ -529,7 +529,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_can_user_be_invited_to_a_new_learner_group(self) -> None:
-        (is_valid_invite, error_message) = (
+        is_valid_invite, error_message = (
             learner_group_services.can_user_be_invited(
                 self.LEARNER_ID, 'username1', ''
             )
@@ -538,7 +538,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(error_message, '')
 
     def test_can_facilitator_be_invited_to_learner_group(self) -> None:
-        (is_valid_invite, error_message) = (
+        is_valid_invite, error_message = (
             learner_group_services.can_user_be_invited(
                 self.FACILITATOR_ID, 'facilitator_name', self.LEARNER_GROUP_ID
             )
@@ -553,7 +553,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         learner_group_services.add_learner_to_learner_group(
             self.LEARNER_GROUP_ID, self.LEARNER_ID, True
         )
-        (is_valid_invite, error_message) = (
+        is_valid_invite, error_message = (
             learner_group_services.can_user_be_invited(
                 self.LEARNER_ID, 'username1', self.LEARNER_GROUP_ID
             )
@@ -564,7 +564,7 @@ class LearnerGroupServicesUnitTests(test_utils.GenericTestBase):
         )
 
     def test_can_uninvolved_user_be_invited_to_learner_group(self) -> None:
-        (is_valid_invite, error_message) = (
+        is_valid_invite, error_message = (
             learner_group_services.can_user_be_invited(
                 'uninvolved_user_id', 'username2', self.LEARNER_GROUP_ID
             )

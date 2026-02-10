@@ -27,7 +27,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import email_models, user_models
 
-(email_models, user_models) = models.Registry.import_models(
+email_models, user_models = models.Registry.import_models(
     [models.Names.EMAIL, models.Names.USER]
 )
 

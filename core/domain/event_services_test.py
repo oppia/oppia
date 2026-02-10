@@ -45,7 +45,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(stats_models, feedback_models, user_models) = models.Registry.import_models(
+stats_models, feedback_models, user_models = models.Registry.import_models(
     [models.Names.STATISTICS, models.Names.FEEDBACK, models.Names.USER]
 )
 
