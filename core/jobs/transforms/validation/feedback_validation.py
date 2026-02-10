@@ -31,7 +31,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import exp_models, feedback_models
 
-(exp_models, feedback_models) = models.Registry.import_models(
+exp_models, feedback_models = models.Registry.import_models(
     [models.Names.EXPLORATION, models.Names.FEEDBACK]
 )
 

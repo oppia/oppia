@@ -28,7 +28,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import audit_models, base_models
 
-(audit_models, base_models) = models.Registry.import_models(
+audit_models, base_models = models.Registry.import_models(
     [models.Names.AUDIT, models.Names.BASE_MODEL]
 )
 

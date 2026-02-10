@@ -53,7 +53,7 @@ if MYPY:  # pragma: no cover
         translation_models,
     )
 
-(exp_models, opportunity_models, stats_models, translation_models) = (
+exp_models, opportunity_models, stats_models, translation_models = (
     models.Registry.import_models(
         [
             models.Names.EXPLORATION,
@@ -65,8 +65,7 @@ if MYPY:  # pragma: no cover
 )
 
 
-EXP_V46_DICT = utils.dict_from_yaml(
-    """
+EXP_V46_DICT = utils.dict_from_yaml("""
 author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -183,8 +182,7 @@ states:
 states_schema_version: 41
 tags: []
 title: Title of exploration
-"""
-)
+""")
 # Exploration migration backend tests with BEAM jobs involves creating and
 # publishing the exploration. This requires a ElasticSearch stub for running
 # while the backend tests run. JobTestBase does not initialize a

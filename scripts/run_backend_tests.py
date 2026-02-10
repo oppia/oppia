@@ -97,14 +97,12 @@ AVERAGE_TEST_CASE_TIME: Final = 2
 # this error are retried to handle potential flakiness.
 ERROR_RETRY_CODE: Final = 'Error -11'
 
-_PARSER: Final = argparse.ArgumentParser(
-    description="""
+_PARSER: Final = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
 IMPORTANT: Only one of --test_path, --test_targets, --run_on_changed_files,
 and --test_shard should be specified.
-"""
-)
+""")
 
 _EXCLUSIVE_GROUP: Final = _PARSER.add_mutually_exclusive_group()
 _EXCLUSIVE_GROUP.add_argument(
