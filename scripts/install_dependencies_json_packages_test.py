@@ -1132,9 +1132,9 @@ class InstallThirdPartyTests(test_utils.GenericTestBase):
         test_url = 'https://example.com/test'
         attempts = []
 
-        def mock_urlopen(
+        def mock_urlopen(  # pylint: disable=unused-argument
             url: str, context: ssl.SSLContext
-        ) -> NoReturn:  # pylint: disable=unused-argument
+        ) -> NoReturn:
             attempts.append(url)
             # On the final attempt, raise a non-rate-limited error (500)
             raise urlerror.HTTPError(
