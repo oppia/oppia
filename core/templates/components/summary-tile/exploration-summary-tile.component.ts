@@ -74,6 +74,9 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
   @Input() showLearnerDashboardIconsIfPossible!: string;
   @Input() isContainerNarrow: boolean = false;
   @Input() isOwnedByCurrentUser: boolean = false;
+  @Input() progress: number = 0;
+  @Input() visitedCheckpointsCount: number = 0;
+  @Input() totalCheckpointsCount: number = 0;
 
   activityType!: string;
   resizeSubscription!: Subscription;
@@ -156,6 +159,15 @@ export class ExplorationSummaryTileComponent implements OnInit, OnDestroy {
         this.explorationId,
         TranslationKeyType.DESCRIPTION
       );
+
+    // Calculate progress percentage following classroom lessons pattern:
+    // floor((visited - 1) / total * 100)
+    if (this.totalCheckpointsCount > 0) {
+      const visitedCheckpoints = Math.max(this.visitedCheckpointsCount - 1, 0);
+      this.progress = Math.floor(
+        (visitedCheckpoints / this.totalCheckpointsCount) * 100
+      );
+    }
   }
 
   ngOnDestroy(): void {

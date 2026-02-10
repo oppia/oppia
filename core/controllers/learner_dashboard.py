@@ -16,8 +16,6 @@
 
 from __future__ import annotations
 
-import math
-
 from core import feconf
 from core.controllers import acl_decorators, base
 from core.domain import (
@@ -205,7 +203,7 @@ class LearnerDashboardCollectionsProgressHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        (learner_progress, number_of_nonexistent_collections) = (
+        learner_progress, number_of_nonexistent_collections = (
             learner_progress_services.get_collection_progress(self.user_id)
         )
 
@@ -255,7 +253,7 @@ class LearnerDashboardExplorationsProgressHandler(
     def get(self) -> None:
         """Handles GET requests."""
         assert self.user_id is not None
-        (learner_progress, number_of_nonexistent_explorations) = (
+        learner_progress, number_of_nonexistent_explorations = (
             learner_progress_services.get_exploration_progress(self.user_id)
         )
 
@@ -291,36 +289,46 @@ class LearnerDashboardExplorationsProgressHandler(
             )
         )
 
-        def _get_progress_percent(
-            exploration_id: str, is_completed: bool
-        ) -> int:
-            if is_completed:
-                return 100
-            progress_data = progress_by_exp_id.get(exploration_id)
-            if progress_data is None:
-                return 0
-            total_checkpoints = progress_data['total_checkpoints_count']
-            visited_checkpoints = max(
-                progress_data['visited_checkpoints_count'] - 1, 0
-            )
-            return int(
-                math.floor((visited_checkpoints / total_checkpoints) * 100)
-            )
-
+        # Add checkpoint progress counts to each exploration summary.
+        # Frontend will calculate percentage using the classroom lessons pattern.
         for summary_dict in incomplete_exp_summary_dicts:
-            summary_dict['progress'] = _get_progress_percent(
-                summary_dict['id'], False
-            )
+            progress_data = progress_by_exp_id.get(summary_dict['id'])
+            if progress_data:
+                summary_dict['visited_checkpoints_count'] = progress_data[
+                    'visited_checkpoints_count'
+                ]
+                summary_dict['total_checkpoints_count'] = progress_data[
+                    'total_checkpoints_count'
+                ]
+            else:
+                summary_dict['visited_checkpoints_count'] = 0
+                summary_dict['total_checkpoints_count'] = 0
 
         for summary_dict in completed_exp_summary_dicts:
-            summary_dict['progress'] = _get_progress_percent(
-                summary_dict['id'], True
-            )
+            progress_data = progress_by_exp_id.get(summary_dict['id'])
+            if progress_data:
+                summary_dict['visited_checkpoints_count'] = progress_data[
+                    'visited_checkpoints_count'
+                ]
+                summary_dict['total_checkpoints_count'] = progress_data[
+                    'total_checkpoints_count'
+                ]
+            else:
+                summary_dict['visited_checkpoints_count'] = 0
+                summary_dict['total_checkpoints_count'] = 0
 
         for summary_dict in exploration_playlist_summary_dicts:
-            summary_dict['progress'] = _get_progress_percent(
-                summary_dict['id'], False
-            )
+            progress_data = progress_by_exp_id.get(summary_dict['id'])
+            if progress_data:
+                summary_dict['visited_checkpoints_count'] = progress_data[
+                    'visited_checkpoints_count'
+                ]
+                summary_dict['total_checkpoints_count'] = progress_data[
+                    'total_checkpoints_count'
+                ]
+            else:
+                summary_dict['visited_checkpoints_count'] = 0
+                summary_dict['total_checkpoints_count'] = 0
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id)
