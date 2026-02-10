@@ -12,8 +12,8 @@
             Eg: formControlName="userBio".
         -->
         <div class="container">
-          <div class="form-group row">
-            <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0" [attr.aria-label]="'Username: ' + username">
+          <div class="mb-3 row">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0" [attr.aria-label]="'Username: ' + username">
               {{ 'I18N_PREFERENCES_USERNAME' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -29,8 +29,8 @@
             </div>
           </div>
 
-          <div class="form-group row">
-            <label class="col-lg-4 col-md-4 col-sm-4">
+          <div class="mb-3 row">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label">
               {{ 'I18N_PREFERENCES_PICTURE' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -65,8 +65,8 @@
             </div>
           </div>
 
-          <div class="form-group row">
-            <label class="col-lg-4 col-md-4 col-sm-4">
+          <div class="mb-3 row">
+            <label class="col-lg-4 col-md-4 col-sm-4 form-label">
               {{ 'I18N_PREFERENCES_BIO' | translate }}
             </label>
             <div class="col-lg-8 col-md-8 col-sm-8">
@@ -76,15 +76,15 @@
                         rows="5"
                         maxlength="2000">
               </textarea>
-              <span class="form-text oppia-form-text">
+              <span class="form-text d-block oppia-form-text">
                 {{ 'I18N_PREFERENCES_BIO_EXPLAIN_TEXT' | translate }}
               </span>
             </div>
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+        <div class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate) + ('I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD' | translate }}
@@ -126,15 +126,15 @@
                 {{ 'I18N_TOPNAV_CONTRIBUTOR_DASHBOARD' | translate }}
               </span>
             </div>
-            <span class="form-text oppia-form-text">
+            <span class="form-text d-block oppia-form-text">
               {{ 'I18N_PREFERENCES_PREFERRED_DASHBOARD_EXPLAIN' | translate }}
             </span>
           </div>
         </div>
 
-        <div class="form-group row">
+        <div class="mb-3 row">
           <label for="label-target-interests-dropdown"
-                 class="col-lg-4 col-md-4 col-sm-4"
+                 class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_SUBJECT_INTERESTS' | translate) + ('I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate)">
             {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS' | translate }}
@@ -144,18 +144,18 @@
               <oppia-subject-interests formControlName="subjectInterests">
               </oppia-subject-interests>
             </div>
-            <span class="form-text oppia-form-text">
+            <span class="form-text d-block oppia-form-text">
               {{ 'I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK' | translate }}
             </span>
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+        <div class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
             {{ 'I18N_PREFERENCES_SUBSCRIBED_CREATORS' | translate }}
           </label>
           <div class="col-lg-8 col-md-8 col-sm-8">
-            <span *ngIf="subscriptionList?.length === 0" class="form-text oppia-form-text" tabindex="0">
+            <span *ngIf="subscriptionList?.length === 0" class="form-text d-block oppia-form-text" tabindex="0">
               {{ 'I18N_PREFERENCES_NO_SUBSCRIPTIONS' | translate }}
             </span>
             <mat-grid-list *ngIf="subscriptionList?.length > 0" cols="2" rowHeight="100px">
@@ -199,8 +199,8 @@
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+        <div class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE' | translate }}
@@ -211,14 +211,14 @@
                                          [choices]="LANGUAGE_CHOICES">
               </oppia-preferred-languages>
             </div>
-            <span class="form-text oppia-form-text">
+            <span class="form-text d-blockt oppia-form-text">
               {{ 'I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN' | translate }}
             </span>
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+        <div class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate)">
             {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE' | translate }}
@@ -231,14 +231,14 @@
                                                  entity="{{ 'I18N_PREFERENCES_SITE_LANGUAGE_LABEL' | translate }}">
               </oppia-preferred-language-selector>
             </div>
-            <span class="form-text oppia-form-text">
+            <span class="form-text d-block oppia-form-text">
               {{ 'I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN' | translate }}
             </span>
           </div>
         </div>
 
-        <div class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4"
+        <div class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label"
                  tabindex="0"
                  [attr.aria-label]="('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE' | translate) + ('I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate)">
             {{ "I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE" | translate }}
@@ -251,14 +251,14 @@
                                                  entity="{{ 'I18N_PREFERENCES_AUDIO_LANGUAGE_LABEL' | translate }}">
               </oppia-preferred-language-selector>
             </div>
-            <span class="form-text oppia-form-text">
+            <span class="form-text d-block oppia-form-text">
               {{ 'I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN' | translate }}
             </span>
           </div>
         </div>
         <hr>
-        <div role="form" class="form-group row">
-          <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+        <div role="form" class="mb-3 row">
+          <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
             {{ 'I18N_PREFERENCES_EMAIL' | translate }}
           </label>
           <div class="col-lg-8 col-md-8 col-sm-8" formGroupName="emailPreferences">
@@ -328,8 +328,8 @@
       </div>
 
       <hr>
-      <div role="form" class="form-group row">
-        <label class="col-lg-4 col-md-4 col-sm-4" tabindex="0">
+      <div role="form" class="mb-3 row">
+        <label class="col-lg-4 col-md-4 col-sm-4 form-label" tabindex="0">
           {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8">
@@ -340,7 +340,7 @@
               {{ 'I18N_DELETE_ACCOUNT_PAGE_HEADING' | translate }}
             </button>
           </a>
-          <span class="form-text oppia-form-text">
+          <span class="form-text d-block oppia-form-text">
             {{ 'I18N_DELETE_ACCOUNT_PAGE_REDIRECT_INFO' | translate }}
           </span>
         </div>
@@ -348,8 +348,8 @@
 
       <hr>
 
-      <div role="form" class="form-group row">
-        <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize" tabindex="0">
+      <div role="form" class="mb-3 row">
+        <label class="col-lg-4 col-md-4 col-sm-4 text-capitalize form-label" tabindex="0">
           {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
         </label>
         <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="!exportingData">
@@ -365,12 +365,12 @@
                     {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT' | translate }}
             </button>
           </a>
-          <span class="form-text oppia-form-text">
+          <span class="form-text d-block oppia-form-text">
             {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_INFO_TEXT' | translate }}
           </span>
         </div>
         <div class="col-lg-8 col-md-8 col-sm-8" *ngIf="exportingData">
-          <span class="form-text oppia-form-text">
+          <span class="form-text d-block oppia-form-text">
             {{ 'I18N_PREFERENCES_EXPORT_ACCOUNT_WARNING_TEXT' | translate }} <a href="mailto:support@oppia.org">support@oppia.org</a>.
           </span>
         </div>

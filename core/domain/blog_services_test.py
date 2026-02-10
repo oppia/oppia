@@ -32,15 +32,14 @@ from core.domain import (
 from core.platform import models
 from core.tests import test_utils
 
-from typing import Dict, List
+from typing import Any, Dict, List, Tuple
 
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import blog_models
 
 (blog_models,) = models.Registry.import_models([models.Names.BLOG])
-
-search_services = models.Registry.import_search_services()
+elastic_search_services = models.Registry.import_search_services()
 
 
 class BlogServicesUnitTests(test_utils.GenericTestBase):
@@ -391,6 +390,14 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(updated_blog_post.tags, ['one', 'two'])
 
+        blog_services.update_blog_post(
+            self.blog_post_a_id, self.change_dict_one
+        )
+
+        updated_blog_post = blog_services.get_blog_post_by_id(
+            self.blog_post_a_id
+        )
+        self.assertEqual(updated_blog_post.title, 'Sample Title')
         with self.assertRaisesRegex(
             Exception,
             ('Blog Post with given title already exists: %s' % 'Sample Title'),
@@ -712,7 +719,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter
+            elastic_search_services, 'add_documents_to_index', add_docs_counter
         )
 
         for i in range(5):
@@ -724,15 +731,24 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             }
             blog_services.update_blog_post(all_blog_post_ids[i], change_dict)
 
-        # We're only publishing the first 4 blog posts, so we're not
-        # expecting the last blog post to be indexed.
+        # Publish first 4 blog posts.
         for i in range(4):
             blog_services.publish_blog_post(all_blog_post_ids[i])
 
         with add_docs_swap:
             blog_services.index_blog_post_summaries_given_ids(all_blog_post_ids)
-
         self.assertEqual(add_docs_counter.times_called, 1)
+
+        mock_index_func = test_utils.CallCounter(lambda _: None)
+        with self.swap(
+            blog_services, 'get_blog_post_summary_models_by_ids', lambda ids: []
+        ), self.swap(
+            search_services, 'index_blog_post_summaries', mock_index_func
+        ):
+            blog_services.index_blog_post_summaries_given_ids(
+                ['nonexistent_id']
+            )
+        self.assertEqual(mock_index_func.times_called, 0)
 
     def test_updated_blog_post_is_added_correctly_to_index(self) -> None:
         blog_post = blog_services.create_new_blog_post(self.user_id_a)
@@ -762,7 +778,7 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
         add_docs_swap = self.swap(
-            search_services, 'add_documents_to_index', add_docs_counter
+            elastic_search_services, 'add_documents_to_index', add_docs_counter
         )
 
         with add_docs_swap:
@@ -820,6 +836,89 @@ class BlogServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(actual_docs, [updated_blog_post_doc])
             self.assertEqual(add_docs_counter.times_called, 2)
 
+    def test_update_blog_post_with_each_field_individually(self) -> None:
+        blog_post = blog_services.create_new_blog_post(self.user_id_a)
+
+        initial_dict: blog_services.BlogPostChangeDict = {
+            'title': 'Initial Title',
+            'thumbnail_filename': 'thumb_old.svg',
+            'content': '<p>Old Content</p>',
+            'tags': ['tag0'],
+        }
+        blog_services.update_blog_post(blog_post.id, initial_dict)
+        blog_services.publish_blog_post(blog_post.id)
+
+        expected = {
+            'title': 'Initial Title',
+            'thumbnail_filename': 'thumb_old.svg',
+            'content': '<p>Old Content</p>',
+            'tags': ['tag0'],
+        }
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
+        title_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
+            'title': 'New Title'
+        }
+        blog_services.update_blog_post(blog_post.id, title_dict)
+        updated = blog_services.get_blog_post_by_id(blog_post.id)
+        expected['title'] = 'New Title'
+        self.assertEqual(updated.title, expected['title'])
+        self.assertEqual(
+            updated.thumbnail_filename, expected['thumbnail_filename']
+        )
+        self.assertEqual(updated.content, expected['content'])
+        self.assertEqual(updated.tags, expected['tags'])
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
+        thumbnail_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
+            'thumbnail_filename': 'thumb_new.svg'
+        }
+        blog_services.update_blog_post(blog_post.id, thumbnail_dict)
+        updated = blog_services.get_blog_post_by_id(blog_post.id)
+        expected['thumbnail_filename'] = 'thumb_new.svg'
+        self.assertEqual(
+            updated.thumbnail_filename, expected['thumbnail_filename']
+        )
+        self.assertEqual(updated.title, expected['title'])
+        self.assertEqual(updated.content, expected['content'])
+        self.assertEqual(updated.tags, expected['tags'])
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
+        content_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
+            'content': '<p>Updated Content</p>'
+        }
+        blog_services.update_blog_post(blog_post.id, content_dict)
+        updated = blog_services.get_blog_post_by_id(blog_post.id)
+        expected['content'] = '<p>Updated Content</p>'
+        self.assertEqual(updated.content, expected['content'])
+        self.assertEqual(updated.title, expected['title'])
+        self.assertEqual(
+            updated.thumbnail_filename, expected['thumbnail_filename']
+        )
+        self.assertEqual(updated.tags, expected['tags'])
+        # Here we use MyPy ignore because dictionary of type BlogPostChangeDict
+        # should contain 'content','title','thumbnail_filename' key but for testing purpose here we are not
+        # providing some keys, which causes MyPy to throw error. Thus to
+        # silent the error, we used ignore here.
+        tags_dict: blog_services.BlogPostChangeDict = {  # type: ignore[typeddict-item]
+            'tags': ['new1', 'new2']
+        }
+        blog_services.update_blog_post(blog_post.id, tags_dict)
+        updated = blog_services.get_blog_post_by_id(blog_post.id)
+        expected['tags'] = ['new1', 'new2']
+        self.assertEqual(updated.tags, expected['tags'])
+        self.assertEqual(updated.title, expected['title'])
+        self.assertEqual(
+            updated.thumbnail_filename, expected['thumbnail_filename']
+        )
+        self.assertEqual(updated.content, expected['content'])
+
 
 class BlogAuthorDetailsTests(test_utils.GenericTestBase):
 
@@ -855,6 +954,40 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             with self.assertRaisesRegex(
                 Exception,
                 ('Unable to fetch author details for the given user.'),
+            ):
+                blog_services.get_blog_author_details(self.user_id)
+
+    def test_get_blog_author_details_create_fails(self) -> None:
+        """Tests that get_blog_author_details raises an error when user details cannot be fetched."""
+
+        def _mock_get_by_author(unused_user_id: str) -> None:
+            """Always returns None to simulate missing author details."""
+            return None
+
+        # Here we use type Any because this mock replaces the real get_user_settings function,
+        # which accepts flexible keyword arguments (like 'strict')
+        # whose types vary and are not relevant to the test.
+        def _mock_get_user_settings(
+            unused_user_id: str, **_kwargs: Any
+        ) -> None:
+            """Mocked get_user_settings that always returns None."""
+            return None
+
+        get_by_author_swap = self.swap(
+            blog_models.BlogAuthorDetailsModel,
+            'get_by_author',
+            _mock_get_by_author,
+        )
+
+        get_user_settings_swap = self.swap(
+            user_services,
+            'get_user_settings',
+            _mock_get_user_settings,
+        )
+
+        with get_by_author_swap, get_user_settings_swap:
+            with self.assertRaisesRegex(
+                Exception, 'Unable to fetch user details for the given user'
             ):
                 blog_services.get_blog_author_details(self.user_id)
 
@@ -908,6 +1041,28 @@ class BlogAuthorDetailsTests(test_utils.GenericTestBase):
             blog_services.update_blog_author_details(
                 self.user_id, new_author_name, new_author_bio
             )
+
+    def test_update_blog_author_details_raises_exception(self) -> None:
+        """Test that updating blog author details raises an exception if author not found."""
+
+        def _mock_get_by_author(unused_user_id: str) -> None:
+            return None
+
+        get_by_author_swap = self.swap(
+            blog_models.BlogAuthorDetailsModel,
+            'get_by_author',
+            _mock_get_by_author,
+        )
+
+        with get_by_author_swap:
+            with self.assertRaisesRegex(
+                Exception, 'Unable to fetch author details for the given user.'
+            ):
+                blog_services.update_blog_author_details(
+                    self.user_id,
+                    displayed_author_name='new name',
+                    author_bio='new bio',
+                )
 
 
 class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
@@ -1226,7 +1381,7 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             pass
 
         with self.swap(
-            search_services,
+            elastic_search_services,
             'delete_documents_from_index',
             _mock_delete_documents_from_index,
         ):
@@ -1251,3 +1406,46 @@ class BlogPostSummaryQueriesUnitTests(test_utils.GenericTestBase):
             ],
         )
         self.assertEqual(len(blog_post_ids), 3)
+
+    def test_get_blog_post_ids_matching_query_continues_when_no_invalid_ids(
+        self,
+    ) -> None:
+        """Covers the branch where len(invalid_blog_post_ids) == 0 and loop continues."""
+        observed_calls = []
+
+        def mock_search_blog_post_summaries(
+            _query: str,
+            _tags: List[str],
+            _size: int,
+            offset: int | None = None,
+        ) -> Tuple[List[str], str]:
+            """Mock search function for blog post summaries."""
+            observed_calls.append(offset)
+            return (['valid_id_1'], 'next_offset')
+
+        # Here we use type Any because this mocks the original get_multi method,
+        # which can accept and return various model types.
+        def mock_get_multi(_ids: Any) -> Any:
+            """Mock get_multi function returning dummy models."""
+
+            class DummyModel:
+                """Dummy model used for mocking get_multi return value."""
+
+                pass
+
+            return [DummyModel()]
+
+        with self.swap(
+            search_services,
+            'search_blog_post_summaries',
+            mock_search_blog_post_summaries,
+        ), self.swap(
+            blog_models.BlogPostSummaryModel, 'get_multi', mock_get_multi
+        ), self.swap(
+            feconf, 'MAX_NUM_CARDS_TO_DISPLAY_ON_BLOG_SEARCH_RESULTS_PAGE', 3
+        ), self.swap(
+            blog_services, 'MAX_ITERATIONS', 2
+        ):
+            blog_services.get_blog_post_ids_matching_query('', [], 3)
+
+        self.assertGreater(len(observed_calls), 1)

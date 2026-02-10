@@ -4,7 +4,7 @@
 
 <div class="modal-body oppia-learner-dashboard-suggestion-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container float-left">
+    <div class="oppia-suggestion-review-panel-container float-start">
       <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER' | translate"></strong>
       <div class="oppia-suggestion-review-panel">
         <div>
@@ -14,7 +14,7 @@
         <div *ngIf="!oldContent" class="oppia-no-current-state" [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE' | translate"></div>
       </div>
     </div>
-    <div class="oppia-suggestion-review-panel-container float-right">
+    <div class="oppia-suggestion-review-panel-container float-end">
       <strong [innerHTML]="'I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER' | translate"></strong>
       <div class="oppia-suggestion-review-panel">
         <oppia-rte-output-display [rteString]="newContent">

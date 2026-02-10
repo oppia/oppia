@@ -8,10 +8,9 @@
       {{ skillWithDifficulty.getDescription() }}
     </h3>
     <button type="button"
-            class="close oppia-close-button-position"
+            class="btn-close oppia-close-button-position"
             (click)="cancel()"
             aria-label="Close">
-      <span aria-hidden="true">&times;</span>
     </button>
   </div>
   <div class="modal-body select-skill-modal">
@@ -24,7 +23,7 @@
           Select the difficulty per skill according to the specified rubrics
         </label>
         <oppia-question-difficulty-selector [skillIdToRubricsObject]="skillIdToRubricsObject"
-                                            [(skillWithDifficulty)]="skillWithDifficulty">
+          [(skillWithDifficulty)]="linkedSkillsWithDifficulty[0]">
         </oppia-question-difficulty-selector>
       </div>
     </div>

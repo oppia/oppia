@@ -47,11 +47,13 @@ describe('Logged-in User', function () {
       await loggedInUser2.expectAdminEmailSuggestion('testadmin@example.com');
 
       // Entering invalid email.
-      await loggedInUser2.enterEmail('123@gmail.');
+      await loggedInUser2.enterEmailAndProceedToNextPage('123@gmail.');
       await loggedInUser2.expectValidationError('Invalid email address');
 
       // Entering valid email.
-      await loggedInUser2.enterEmail('logged_in_user2@example.com');
+      await loggedInUser2.enterEmailAndProceedToNextPage(
+        'logged_in_user2@example.com'
+      );
 
       // Checking username availability via entering username that already exists.
       await loggedInUser2.signInWithUsername('loggedInUser1', false);

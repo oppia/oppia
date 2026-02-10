@@ -112,6 +112,7 @@ topic-viewer-page .topic-viewer-page-content .tab-title {
 }
 
 topic-viewer-page .oppia-topic-viewer-tabs-container .topic-viewer-tabs .topic-viewer-tabs-text .tab-title {
+  color: #fff;
   font-size: 1em;
   text-decoration: none;
   text-transform: uppercase;

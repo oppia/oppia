@@ -19,6 +19,17 @@
 type MessageType = 'log' | 'browser';
 
 /**
+ * Returns current timestamp in MM:SS.mmm format for log messages.
+ */
+const getTimestamp = function (): string {
+  const now = new Date();
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  const seconds = now.getSeconds().toString().padStart(2, '0');
+  const millis = now.getMilliseconds().toString().padStart(3, '0');
+  return `${minutes}:${seconds}.${millis}`;
+};
+
+/**
  * Function to log the progress of the tests.
  * @param {string} message - The message to log.
  * @param {MessageType} messageType - The type of message to log.
@@ -31,7 +42,9 @@ export let showMessage = function (
     log: '[test-log]',
     browser: '[browser-log]',
   };
-  // We use console statements to log the progress or feedback of the tests.
-  // eslint-disable-next-line no-console
-  console.log(`${messagePrefixes[messageType]}: ` + message);
+  // Write directly to stdout to avoid Jest's console interception which adds
+  // noisy stack traces to every log message.
+  process.stdout.write(
+    `${messagePrefixes[messageType]} ${getTimestamp()}: ${message}\n`
+  );
 };

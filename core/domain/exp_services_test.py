@@ -3055,7 +3055,7 @@ version: 3
             'Add state name',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3213,7 +3213,7 @@ version: 3
             'Add state name',
         )
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3222,7 +3222,7 @@ version: 3
         )
         fs.commit('image/abc.png', raw_image)
         # Audio files should not be included in asset downloads.
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
         ) as f:
             raw_audio = f.read()
@@ -3340,7 +3340,7 @@ version: 3
                 }
             ),
         ]
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()
@@ -3695,7 +3695,7 @@ solicit_answer_details: false
             ),
         ]
         exploration.objective = 'The objective'
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             raw_image = f.read()

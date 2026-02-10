@@ -65,4 +65,30 @@ describe('Voiceover regeneration information modal', () => {
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith(error);
   });
+
+  it('should get frontend function id text', () => {
+    const functionId1 = 'regenerate_voiceovers_on_exploration_update';
+    const expectedText1 =
+      'regenerate_voiceovers_on_exploration_update \n ("Exploration content updated")';
+    expect(componentInstance.getFunctionIdText(functionId1)).toBe(
+      expectedText1
+    );
+
+    const functionId2 = 'regenerate_voiceovers_on_exploration_added_to_topic';
+    const expectedText2 =
+      'regenerate_voiceovers_on_exploration_added_to_topic \n ("Exploration added to topic")';
+    expect(componentInstance.getFunctionIdText(functionId2)).toBe(
+      expectedText2
+    );
+
+    const functionId3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent';
+    const expectedText3 =
+      'regenerate_voiceovers_of_exploration_for_given_language_accent \n ("Voiceover regeneration for the exploration in the chosen language accent")';
+    expect(componentInstance.getFunctionIdText(functionId3)).toBe(
+      expectedText3
+    );
+
+    expect(componentInstance.getFunctionIdText('unknown_function_id')).toBe('');
+  });
 });

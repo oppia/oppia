@@ -21,7 +21,7 @@ from __future__ import annotations
 import json
 import os
 
-from core import feconf, schema_utils, utils
+from core import feconf, schema_utils
 from core.domain import interaction_registry
 from core.tests import test_utils
 from extensions.interactions import base
@@ -120,7 +120,7 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         spec_file = os.path.join(
             'extensions', 'interactions', 'interaction_specs.json'
         )
-        with utils.open_file(spec_file, 'r') as f:
+        with open(spec_file, 'r', encoding='utf-8') as f:
             specs_from_json = json.loads(f.read())
 
         self.assertDictEqual(all_specs, specs_from_json)

@@ -802,9 +802,9 @@ describe('Feedback updates page', () => {
     }));
 
     it('should get css classes based on status', () => {
-      expect(component.getLabelClass('open')).toBe('badge badge-info');
-      expect(component.getLabelClass('compliment')).toBe('badge badge-success');
-      expect(component.getLabelClass('another')).toBe('badge badge-secondary');
+      expect(component.getLabelClass('open')).toBe('badge bg-info');
+      expect(component.getLabelClass('compliment')).toBe('badge bg-success');
+      expect(component.getLabelClass('another')).toBe('badge bg-secondary');
     });
 
     it('should get human readable status from provided status', () => {

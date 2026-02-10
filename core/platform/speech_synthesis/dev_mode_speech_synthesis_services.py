@@ -76,7 +76,7 @@ def regenerate_speech_from_text(
         feconf.SAMPLE_AUTO_VOICEOVERS_DATA_DIR, voiceover_filename
     )
 
-    with open(voiceover_path, 'rb') as file:
+    with open(voiceover_path, 'rb', encoding=None) as file:
         binary_audio_data = file.read()
 
     error_details = None

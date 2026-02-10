@@ -31,7 +31,6 @@ import string
 import time
 import unicodedata
 import urllib.parse
-import urllib.request
 
 from core import feconf
 from core.constants import constants
@@ -41,7 +40,6 @@ import yaml
 from PIL import Image
 from typing import (
     Any,
-    BinaryIO,
     Callable,
     Dict,
     Iterable,
@@ -50,11 +48,9 @@ from typing import (
     Literal,
     Mapping,
     Optional,
-    TextIO,
     Tuple,
     TypeVar,
     Union,
-    cast,
     overload,
 )
 
@@ -67,8 +63,49 @@ SECONDS_IN_MINUTE = 60
 
 T = TypeVar('T')
 
-TextModeTypes = Literal['r', 'w', 'a', 'x', 'r+', 'w+', 'a+']
-BinaryModeTypes = Literal['rb', 'wb', 'ab', 'xb', 'r+b', 'w+b', 'a+b', 'x+b']
+
+class SingletonMeta(type):
+    """Metaclass for creating singleton classes.
+
+    This metaclass ensures that only one instance of a class is created. It is
+    thread-safe and uses a dictionary to store instances per class type. This
+    is useful for managing shared resources like database connections, cache
+    clients, or configuration objects.
+    """
+
+    # Here we use object because the metaclass needs to store instances of any
+    # class type that uses it, and we cannot know the specific types at the
+    # metaclass definition level.
+    _instances: Dict[type, object] = {}
+
+    # Here we use object because the metaclass needs to work with any class
+    # type that uses it as a metaclass, and we cannot know the specific return
+    # type at the metaclass level.
+    def __call__(cls, *args: object, **kwargs: Dict[str, object]) -> object:
+        """Create or return the singleton instance of the class.
+
+        Args:
+            *args: list(*). Positional arguments for class initialization.
+            **kwargs: dict. Keyword arguments for class initialization.
+
+        Returns:
+            object. The singleton instance of the class.
+
+        Raises:
+            ValueError. If the singleton instance already exists and new
+                initialization arguments are provided.
+        """
+        if cls not in cls._instances:
+            cls._instances[cls] = super(SingletonMeta, cls).__call__(
+                *args, **kwargs
+            )
+        elif args or kwargs:
+            raise ValueError(
+                f'Singleton instance of {cls.__name__} already exists. '
+                f'Cannot reinitialize with new arguments: args={args}, '
+                f'kwargs={kwargs}'
+            )
+        return cls._instances[cls]
 
 
 class InvalidInputException(Exception):
@@ -97,57 +134,6 @@ class ExplorationConversionError(Exception):
     """
 
     pass
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: TextModeTypes,
-    encoding: str = 'utf-8',
-    newline: Union[str, None] = None,
-) -> TextIO: ...
-
-
-@overload
-def open_file(
-    filename: str,
-    mode: BinaryModeTypes,
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> BinaryIO: ...
-
-
-def open_file(
-    filename: str,
-    mode: Union[TextModeTypes, BinaryModeTypes],
-    encoding: Union[str, None] = 'utf-8',
-    newline: Union[str, None] = None,
-) -> Union[BinaryIO, TextIO]:
-    """Open file and return a corresponding file object.
-
-    Args:
-        filename: str. The file to be opened.
-        mode: Literal. Mode in which the file is opened.
-        encoding: str. Encoding in which the file is opened.
-        newline: None|str. Controls how universal newlines work.
-
-    Returns:
-        IO[Any]. The file object.
-
-    Raises:
-        FileNotFoundError. The file cannot be found.
-    """
-    # Here we use cast because we are narrowing down the type from IO[Any]
-    # to Union[BinaryIO, TextIO].
-    file = cast(
-        Union[BinaryIO, TextIO],
-        open(filename, mode, encoding=encoding, newline=newline),
-    )
-    return file
-
-
-@overload
-def get_file_contents(filepath: str) -> str: ...
 
 
 @overload

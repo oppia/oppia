@@ -11,7 +11,7 @@
       </span>
 
       <span *ngIf="stateNameService.isStateNameEditorShown()">
-        <form class="form-horizontal" role="form" #f="ngForm" (ngSubmit)="saveStateNameAndRefresh(tmpStateName)">
+        <form class="row mb-3" role="form" #f="ngForm" (ngSubmit)="saveStateNameAndRefresh(tmpStateName)">
           <input type="text" name="tmpStateName" [(ngModel)]="tmpStateName" [maxlength]="maxLen" (focus)="stateNameEditorOpened" autofocus class="e2e-test-state-name-input">
           <button type="submit" class="btn btn-success btn-sm e2e-test-state-name-submit">Save</button>
         </form>
