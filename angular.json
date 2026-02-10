@@ -20,6 +20,8 @@
             "allowedCommonJsDependencies": ["path", "stream", "zlib"],
             "outputPath": "dist/oppia-angular",
             "index": "src/index.html",
+            "indexTransform": "scripts/transform-header.js",
+            "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "core/templates/Polyfills.ts",
             "tsConfig": "tsconfig.json",

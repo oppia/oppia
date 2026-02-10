@@ -23,9 +23,11 @@ import os
 
 from typing import Dict, Final, List, Optional, TypedDict
 
-_PARSER: Final = argparse.ArgumentParser(description="""
+_PARSER: Final = argparse.ArgumentParser(
+    description="""
 Checks the status of a GitHub workflow run using the status of its jobs.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--jobs',
