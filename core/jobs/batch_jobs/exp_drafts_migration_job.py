@@ -40,6 +40,11 @@ if MYPY:  # pragma: no cover.
 )
 
 
+# TODO(#15613): Here we use MyPy ignore because the incomplete typing of
+# apache_beam library and absences of stubs in Typeshed, forces MyPy to
+# assume that PTransform class is of type Any. Thus to avoid MyPy's error
+# (Class cannot subclass 'PTransform' (has type 'Any')), we added an
+# ignore here.
 class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
     """Transform that gets all ExplorationUserDataModels, checks if they have
     valid drafts, and performs migration if the schema is outdated.
@@ -128,7 +133,9 @@ class MigrateExplorationDrafts(beam.PTransform):  # type: ignore[misc]
         user_models_keyed_by_exp_id = (
             user_data_models
             | 'Key UserData by Exp ID'
-            >> beam.WithKeys(lambda m: m.exploration_id)
+            >> beam.WithKeys(  # pylint: disable=no-value-for-parameter
+                lambda m: m.exploration_id
+            )
         )
 
         joined_models = {

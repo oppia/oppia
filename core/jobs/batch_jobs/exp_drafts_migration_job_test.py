@@ -19,12 +19,12 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain
-from core.domain import state_domain
+from core.domain import exp_domain, rights_manager, state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_drafts_migration_job
 from core.jobs.types import job_run_result
 from core.platform import models
+from core.tests import test_utils
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -35,7 +35,9 @@ if MYPY:  # pragma: no cover
 )
 
 
-class MigrateExplorationDraftsJobTests(job_test_utils.JobTestBase):
+class MigrateExplorationDraftsJobTests(
+    job_test_utils.JobTestBase, test_utils.GenericTestBase
+):
 
     JOB_CLASS = exp_drafts_migration_job.MigrateExplorationDraftsJob
 
@@ -63,8 +65,12 @@ class MigrateExplorationDraftsJobTests(job_test_utils.JobTestBase):
                 ).to_dict()
             },
         )
-        exp_model.update_timestamps()
-        exp_model.put()
+        rights_manager.create_new_exploration_rights(self.EXP_ID, self.USER_ID)
+        exp_model.commit(
+            self.USER_ID,
+            'Create exploration',
+            [{'cmd': exp_domain.CMD_CREATE_NEW}],
+        )
 
         draft_id = '%s.%s' % (self.USER_ID, self.EXP_ID)
         user_data_model = self.create_model(
@@ -114,8 +120,12 @@ class MigrateExplorationDraftsJobTests(job_test_utils.JobTestBase):
                 ).to_dict()
             },
         )
-        exp_model.update_timestamps()
-        exp_model.put()
+        rights_manager.create_new_exploration_rights(self.EXP_ID, self.USER_ID)
+        exp_model.commit(
+            self.USER_ID,
+            'Create exploration',
+            [{'cmd': exp_domain.CMD_CREATE_NEW}],
+        )
 
         no_draft_id = 'user_2.%s' % self.EXP_ID
         no_draft_model = self.create_model(
