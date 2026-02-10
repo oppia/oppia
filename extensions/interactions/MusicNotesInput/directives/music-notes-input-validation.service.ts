@@ -39,7 +39,14 @@ export class MusicNotesInputValidationService {
     customizationArgs: MusicNotesInputCustomizationArgs
   ): Warning[] {
     // TODO(#20442): Implement customization args validations.
-    return [];
+    const warningsList: Warning[] = [];
+    if (customizationArgs.initialSequence.value.length === 0) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'Initial sequence should not be empty.',
+
+      });}
+    return warningsList;
   }
 
   getAllWarnings(
