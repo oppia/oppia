@@ -1,8 +1,18 @@
-# TODO(firebase/firebase-admin-python#569): Depend on official stubs rather than maintaining our own.
+# TODO(#24855): Depend on official stubs rather than maintaining our own.
+
 from core.domain import auth_domain
 
 import datetime
-from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Union,
+)
 
 from . import App
 
@@ -24,9 +34,8 @@ class UserProvider:
         provider_id: str,
         email: Optional[str],
         display_name: Optional[str],
-        photo_url: Optional[str]
-    ):
-        ...
+        photo_url: Optional[str],
+    ): ...
     @property
     def uid(self) -> str: ...
     @property
@@ -44,9 +53,8 @@ class UserMetadata:
         self,
         creation_timestamp: Optional[int] = None,
         last_sign_in_timestamp: Optional[int] = None,
-        last_refresh_timestamp: Optional[int] = None
-    ):
-        ...
+        last_refresh_timestamp: Optional[int] = None,
+    ): ...
     @property
     def creation_timestamp(self) -> int: ...
     @property
@@ -68,9 +76,8 @@ class ImportUserRecord:
         provider_data: Optional[List[UserProvider]] = None,
         custom_claims: Optional[Dict[str, Any]] = None,
         password_hash: Optional[bytes] = None,
-        password_salt: Optional[bytes] = None
-    ):
-        ...
+        password_salt: Optional[bytes] = None,
+    ): ...
     @property
     def uid(self) -> str: ...
     @property
@@ -122,7 +129,7 @@ class ListUsersPage:
         self,
         download: Callable[[Optional[str], int], Dict[str, Any]],
         page_token: Optional[str],
-        max_results: int
+        max_results: int,
     ) -> None: ...
     @property
     def users(self) -> List[ExportedUserRecord]: ...
@@ -186,11 +193,23 @@ class UserImportHash:
     @classmethod
     def pbkdf2_sha256(cls, rounds: int) -> UserImportHash: ...
     @classmethod
-    def scrypt(cls, key: bytes, rounds: int, memory_cost: int, salt_separator: Optional[bytes] = None) -> UserImportHash: ...
+    def scrypt(
+        cls,
+        key: bytes,
+        rounds: int,
+        memory_cost: int,
+        salt_separator: Optional[bytes] = None,
+    ) -> UserImportHash: ...
     @classmethod
     def bcrypt(cls) -> UserImportHash: ...
     @classmethod
-    def standard_scrypt(cls, memory_cost: int, parallelization: int, block_size: int, derived_key_length: int) -> UserImportHash: ...
+    def standard_scrypt(
+        cls,
+        memory_cost: int,
+        parallelization: int,
+        block_size: int,
+        derived_key_length: int,
+    ) -> UserImportHash: ...
 
 def create_session_cookie(
     id_token: Optional[str],
@@ -201,11 +220,13 @@ def create_user(**kwargs: Any) -> UserRecord: ...
 def import_users(
     users: List[ImportUserRecord],
     hash_alg: Optional[UserImportHash] = None,
-    app: Optional[App] = None
+    app: Optional[App] = None,
 ) -> UserImportResult: ...
 def update_user(uid: str, **kwargs: Any) -> UserRecord: ...
 def delete_user(uid: str) -> None: ...
-def delete_users(uids: List[str], app: Optional[App] = None) -> DeleteUsersResult: ...
+def delete_users(
+    uids: List[str], app: Optional[App] = None
+) -> DeleteUsersResult: ...
 def get_user(uid: str) -> UserRecord: ...
 def get_users(uids: List[UserIdentifier]) -> GetUsersResult: ...
 def set_custom_user_claims(
