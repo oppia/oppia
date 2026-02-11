@@ -10303,6 +10303,49 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exp_user_data.update_timestamps()
         exp_user_data.put()
 
+    def test_migrate_draft_change_list_logs_error_on_failure(self) -> None:
+        """Test that the migration function catches exceptions and logs warnings."""
+        exploration = self.save_new_valid_exploration('exp_id_fail', 'owner_id')
+        valid_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New Title',
+            }
+        ]
+        with self.swap_to_always_raise(
+            exp_services,
+            'apply_change_list',
+            Exception('Mocked migration error'),
+        ), self.capture_logging() as captured_logs:
+
+            returned_list = (
+                exp_services.migrate_draft_change_list_to_latest_schema(
+                    valid_change_list, exploration
+                )
+            )
+            self.assertEqual(returned_list, valid_change_list)
+            self.assertEqual(len(captured_logs), 1)
+            self.assertIn('Draft migration warning', captured_logs[0])
+
+    def test_migrate_draft_change_list_success(self) -> None:
+        """Test that the migration function works correctly when data is valid."""
+        exploration = self.save_new_valid_exploration(
+            'exp_id_success', 'owner_id'
+        )
+        valid_change_list = [
+            {
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'title',
+                'new_value': 'New Title',
+            }
+        ]
+        returned_list = exp_services.migrate_draft_change_list_to_latest_schema(
+            valid_change_list, exploration
+        )
+
+        self.assertEqual(returned_list, valid_change_list)
+
     def test_get_exp_with_draft_applied_after_draft_upgrade(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])

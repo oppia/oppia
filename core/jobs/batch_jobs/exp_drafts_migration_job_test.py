@@ -161,10 +161,8 @@ class MigrateExplorationDraftsJobTests(
             draft_change_list=[],
         )
 
-        result_item = (
-            exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(
-                user_model, exp_model
-            )
+        result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(  # pylint: disable=protected-access
+            user_model, exp_model
         )
 
         self.assertTrue(result_item.is_ok())
@@ -200,7 +198,7 @@ class MigrateExplorationDraftsJobTests(
             'migrate_draft_change_list_to_latest_schema',
             mock_migrate_error,
         ):
-            result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(
+            result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(  # pylint: disable=protected-access
                 user_model, exp_model
             )
 
