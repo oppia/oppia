@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import mimetypes
 
 from core import feconf
@@ -221,6 +222,10 @@ class CloudStorageEmulator:
             filepath: str. Filepath to upload the blob to.
             blob: EmulatorBlob. The blob to upload.
         """
+        logging.info(
+            'Voiceover synthesis log: Uploading blob in Emulator mode, with filepath: %s, content_type: %s'
+            % (filepath, blob.content_type)
+        )
         REDIS_CLIENT.hset(self._get_redis_key(filepath), mapping=blob.to_dict())
 
     def delete_blob(self, filepath: str) -> None:

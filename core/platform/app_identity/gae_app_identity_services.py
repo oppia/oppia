@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import logging
 import os
 
 from typing import Optional
@@ -66,4 +67,8 @@ def get_gcs_resource_bucket_name(oppia_project_id: Optional[str] = None) -> str:
         str. The bucket name for the application's GCS resources.
     """
     project_id = oppia_project_id or get_application_id()
+    logging.info(
+        'Voiceover synthesis log: Getting GCS resource bucket name for project_id: %s'
+        % project_id
+    )
     return '%s%s' % (project_id, _GCS_RESOURCE_BUCKET_NAME_SUFFIX)

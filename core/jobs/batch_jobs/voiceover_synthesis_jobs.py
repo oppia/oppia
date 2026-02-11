@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import logging
+import traceback
 
 from core import feconf
 from core.domain import (
@@ -445,6 +446,11 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                                 language_accent_code,
                                 error,
                             )
+                        )
+                        stack_trace = traceback.format_exc()
+                        logging.error(
+                            'Voiceover synthesis log: Stack trace: %s',
+                            stack_trace,
                         )
                         logging.error(
                             'Voiceover synthesis log: Error generating voiceover for exploration ID: %s, language_accent_code: %s, content_id: %s. Error: %s'

@@ -306,6 +306,9 @@ def synthesize_voiceover_for_html_string(
     """
     # Audio files are stored to the datastore in the dev env, and to GCS
     # in production.
+    logging.info(
+        'Voiceover synthesis log: About to create GCS file system object.'
+    )
     fs = fs_services.GcsFileSystem(
         feconf.ENTITY_TYPE_EXPLORATION,
         exploration_id,
