@@ -470,11 +470,18 @@ class BlogPostSearchHandler(
         )
         list_of_default_tags = constants.LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST
 
+        total_matching_blog_posts = (
+            blog_services.get_total_number_of_matching_blog_posts(
+                query_string, tags
+            )
+        )
+
         self.values.update(
             {
                 'blog_post_summaries_list': blog_post_summary_dicts,
                 'search_offset': new_search_offset,
                 'list_of_default_tags': list_of_default_tags,
+                'total_matching_blog_posts': total_matching_blog_posts,
             }
         )
 
