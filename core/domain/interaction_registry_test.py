@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import os
+import importlib
 
 from core import feconf, schema_utils
 from core.domain import interaction_registry
@@ -236,3 +237,68 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             Exception, 'No interaction exists for the None interaction_id.'
         ):
             interaction_registry.Registry.get_interaction_by_id(None)
+
+    def test_refresh_skips_classes_not_inheriting_base_interaction(
+        self,
+    ) -> None:
+        """Test that _refresh skips classes whose base class is not
+        BaseInteraction."""
+
+        class NotAnInteraction:
+            """A dummy class that does not inherit from BaseInteraction."""
+
+            pass
+
+        original_import = importlib.import_module
+
+        def mock_import_module(name: str) -> Any:
+            module = original_import(name)
+            # Add a fake class that does not inherit from BaseInteraction.
+            setattr(module, 'FakeNonInteraction', NotAnInteraction)
+            return module
+
+        import_swap = self.swap_with_checks(
+            importlib, 'import_module', mock_import_module
+        )
+
+        with import_swap:
+            interaction_registry.Registry._refresh()  # pylint: disable=protected-access
+
+        # FakeNonInteraction should NOT be in the registry.
+        self.assertNotIn(
+            'FakeNonInteraction',
+            interaction_registry.Registry._interactions,  # pylint: disable=protected-access
+        )
+        # But real interactions should still be registered.
+        self.assertTrue(
+            len(interaction_registry.Registry._interactions)
+            > 0  # pylint: disable=protected-access
+        )
+
+    def test_get_all_specs_for_state_schema_version_with_can_fetch_latest(
+        self,
+    ) -> None:
+        """Test that get_all_specs_for_state_schema_version returns latest
+        specs when the file is not found and can_fetch_latest_specs is True."""
+        result = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            0, can_fetch_latest_specs=True
+        )
+        expected = interaction_registry.Registry.get_all_specs()
+        self.assertEqual(result, expected)
+
+    def test_get_all_specs_for_state_schema_version_returns_cached(
+        self,
+    ) -> None:
+        """Test that get_all_specs_for_state_schema_version returns cached
+        specs on second call for the same version."""
+        # Use a valid state schema version that has a specs file.
+        version = feconf.CURRENT_STATE_SCHEMA_VERSION
+        # First call — reads from file and caches.
+        result_first = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            version, can_fetch_latest_specs=True
+        )
+        # Second call — should return from cache (line 193).
+        result_second = interaction_registry.Registry.get_all_specs_for_state_schema_version(
+            version, can_fetch_latest_specs=True
+        )
+        self.assertEqual(result_first, result_second)
