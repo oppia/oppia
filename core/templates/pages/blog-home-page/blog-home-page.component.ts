@@ -313,13 +313,26 @@ export class BlogHomePageComponent implements OnInit {
       currentTags.join(',') !== this.selectedTags.join(',');
 
     if (this.searchQuery === '' && this.selectedTags.length === 0) {
-      this.loadInitialBlogHomePageData();
-      url.searchParams.delete('q');
-      url.searchParams.delete('page');
+      this.searchPageIsActive = false;
+      this.filterWasUsed = false;
+      this.page = 1;
+      this.firstPostOnPageNum = 1;
+      this.blogPostSummaries = [];
+      this.totalBlogPosts = 0;
 
-      this.windowRef.nativeWindow.history.pushState({}, '', url.toString());
+      const path = '/blog';
+      const finalUrl = `${url.origin}${path}`;
+
+      if (this.windowRef.nativeWindow.location.pathname !== path) {
+        this.windowRef.nativeWindow.location.href = finalUrl;
+      } else {
+        this.windowRef.nativeWindow.history.pushState({}, '', finalUrl);
+        this.loadInitialBlogHomePageData();
+      }
       return;
     }
+
+    this.searchPageIsActive = true;
 
     this.blogPostSearchService.executeSearchQuery(
       this.searchQuery,
