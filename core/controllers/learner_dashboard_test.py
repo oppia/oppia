@@ -1249,3 +1249,111 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         self.assertEqual(incomplete_exps[0]['total_checkpoints_count'], 0)
 
         self.logout()
+
+    def test_completed_exploration_without_progress_data(self) -> None:
+        """Test completed explorations when no progress data is available."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Mark as completed.
+        learner_progress_services.mark_exploration_as_completed(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        def mock_get_checkpoint_progress_for_explorations(
+            *_args: str, **_kwargs: str
+        ) -> dict[str, dict[str, int]]:
+            return {}
+
+        with self.swap(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            mock_get_checkpoint_progress_for_explorations,
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        completed_exps = response['completed_explorations_list']
+        self.assertEqual(len(completed_exps), 1)
+        self.assertEqual(completed_exps[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(completed_exps[0]['total_checkpoints_count'], 0)
+
+        self.logout()
+
+    def test_exploration_playlist_without_progress_data(self) -> None:
+        """Test exploration playlist when no progress data is available."""
+        self.login(self.VIEWER_EMAIL)
+
+        # Create and publish an exploration.
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID_1,
+            self.owner_id,
+            title=self.EXP_TITLE_1,
+            category='Test',
+        )
+        exp_services.update_exploration(
+            self.owner_id,
+            self.EXP_ID_1,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                        'state_name': exploration.init_state_name,
+                        'property_name': exp_domain.STATE_PROPERTY_CARD_IS_CHECKPOINT,
+                        'new_value': True,
+                    }
+                ),
+            ],
+            'Mark initial state as checkpoint',
+        )
+        self.publish_exploration(self.owner_id, self.EXP_ID_1)
+
+        # Add to playlist.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.viewer_id, self.EXP_ID_1
+        )
+
+        def mock_get_checkpoint_progress_for_explorations(
+            *_args: str, **_kwargs: str
+        ) -> dict[str, dict[str, int]]:
+            return {}
+
+        with self.swap(
+            learner_progress_services,
+            'get_checkpoint_progress_for_explorations',
+            mock_get_checkpoint_progress_for_explorations,
+        ):
+            response = self.get_json(
+                feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
+            )
+
+        playlist = response['exploration_playlist']
+        self.assertEqual(len(playlist), 1)
+        self.assertEqual(playlist[0]['visited_checkpoints_count'], 0)
+        self.assertEqual(playlist[0]['total_checkpoints_count'], 0)
+
+        self.logout()
