@@ -57,7 +57,6 @@ import {UserInfo} from '../../../../domain/user/user-info.model';
 import {VoiceoverPlayerService} from '../../services/voiceover-player.service';
 import {ConversationFlowService} from '../../services/conversation-flow.service';
 import {ChapterProgressService} from '../../services/chapter-progress.service';
-import {of} from 'rxjs';
 
 class MockWindowRef {
   nativeWindow = {
@@ -225,8 +224,6 @@ describe('Tutor card component', () => {
     let mockOnOppiaFeedbackAvailableEventEmitter = new EventEmitter<void>();
     let isIframed = false;
 
-    chapterProgressService.completedChaptersCount$ = of(1);
-
     spyOn(pageContextService, 'isInExplorationEditorPage').and.returnValues(
       true,
       false
@@ -254,7 +251,6 @@ describe('Tutor card component', () => {
     );
 
     componentInstance.ngOnInit();
-    tick();
     componentInstance.isAudioBarExpandedOnMobileDevice();
     mockOnOppiaFeedbackAvailableEventEmitter.emit();
     mockOnActiveCardChangedEventEmitter.emit();
@@ -277,7 +273,6 @@ describe('Tutor card component', () => {
     expect(deviceInfoService.isMobileDevice).toHaveBeenCalled();
     expect(audioBarStatusService.isAudioBarExpanded).toHaveBeenCalled();
     expect(urlInterpolationService.getStaticImageUrl).toHaveBeenCalled();
-    expect(componentInstance.completedChaptersCount).toBe(1);
     expect(componentInstance.getInputResponsePairId).toHaveBeenCalled();
   }));
 
@@ -515,7 +510,7 @@ describe('Tutor card component', () => {
   it('should correctly generate the milestone message', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(true);
-    componentInstance.completedChaptersCount = 1;
+    chapterProgressService.setCompletedChaptersCount(1);
     spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
     spyOn(translateService, 'instant').and.callThrough();
 
@@ -526,7 +521,7 @@ describe('Tutor card component', () => {
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_1'
     );
 
-    componentInstance.completedChaptersCount = 5;
+    chapterProgressService.setCompletedChaptersCount(5);
 
     expect(componentInstance.generateMilestoneMessage()).toBe(
       'I18N_END_CHAPTER_MILESTONE_MESSAGE_2'
@@ -539,7 +534,7 @@ describe('Tutor card component', () => {
   it('should generate an empty message if the milestone is not to be displayed', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    componentInstance.completedChaptersCount = 1;
+    chapterProgressService.setCompletedChaptersCount(1);
     spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
     spyOn(translateService, 'instant').and.callThrough();
 
@@ -564,7 +559,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      componentInstance.completedChaptersCount = 2;
+      chapterProgressService.setCompletedChaptersCount(2);
       spyOn(componentInstance, 'generateMilestoneMessage').and.callThrough();
       spyOn(translateService, 'instant').and.callThrough();
 
@@ -584,25 +579,10 @@ describe('Tutor card component', () => {
     ).toHaveBeenCalled();
   });
 
-  it('should make sure setNextMilestoneAndCheckIfProgressBarIsShown returns false if completedChapterCountGreaterThanLastMilestone', fakeAsync(() => {
-    componentInstance.completedChaptersCount = 55;
-    spyOn(chapterProgressService, 'getCompletedChaptersCount').and.returnValue(
-      55
-    );
-
-    spyOn(
-      componentInstance,
-      'isCompletedChaptersCountGreaterThanLastMilestone'
-    ).and.returnValue(false);
-
-    expect(
-      componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
-    ).toBe(false);
-  }));
   it('should correctly show milestone progress bar', () => {
     componentInstance.inStoryMode = true;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    componentInstance.completedChaptersCount = 2;
+    chapterProgressService.setCompletedChaptersCount(2);
     spyOn(
       componentInstance,
       'setNextMilestoneAndCheckIfProgressBarIsShown'
@@ -613,7 +593,7 @@ describe('Tutor card component', () => {
     ).toBe(true);
     expect(componentInstance.nextMilestoneChapterCount).toBe(5);
 
-    componentInstance.completedChaptersCount = 4;
+    chapterProgressService.setCompletedChaptersCount(4);
 
     expect(
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
@@ -629,7 +609,7 @@ describe('Tutor card component', () => {
       'isMilestoneReachedAndMilestoneMessageToBeDisplayed'
     ).and.returnValue(false);
     chapterProgressService.setChapterCompletedForTheFirstTime(true);
-    componentInstance.completedChaptersCount = 55;
+    chapterProgressService.setCompletedChaptersCount(55);
 
     expect(
       componentInstance.setNextMilestoneAndCheckIfProgressBarIsShown()
@@ -642,7 +622,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      componentInstance.completedChaptersCount = 51;
+      chapterProgressService.setCompletedChaptersCount(51);
 
       spyOn(
         componentInstance,
@@ -659,7 +639,7 @@ describe('Tutor card component', () => {
   it('should not show milestone progress bar if not in story mode', () => {
     componentInstance.inStoryMode = false;
     chapterProgressService.setChapterCompletedForTheFirstTime(false);
-    componentInstance.completedChaptersCount = 1;
+    chapterProgressService.setCompletedChaptersCount(1);
 
     spyOn(
       componentInstance,
@@ -678,7 +658,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      componentInstance.completedChaptersCount = 1;
+      chapterProgressService.setCompletedChaptersCount(1);
 
       spyOn(
         componentInstance,
@@ -698,7 +678,7 @@ describe('Tutor card component', () => {
     () => {
       componentInstance.inStoryMode = true;
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      componentInstance.completedChaptersCount = 10;
+      chapterProgressService.setCompletedChaptersCount(10);
 
       spyOn(
         componentInstance,
@@ -717,20 +697,20 @@ describe('Tutor card component', () => {
       'to be displayed',
     () => {
       chapterProgressService.setChapterCompletedForTheFirstTime(true);
-      componentInstance.completedChaptersCount = 1;
+      chapterProgressService.setCompletedChaptersCount(1);
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
       ).toBe(true);
 
-      componentInstance.completedChaptersCount = 2;
+      chapterProgressService.setCompletedChaptersCount(2);
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
       ).toBe(false);
 
       chapterProgressService.setChapterCompletedForTheFirstTime(false);
-      componentInstance.completedChaptersCount = 1;
+      chapterProgressService.setCompletedChaptersCount(1);
 
       expect(
         componentInstance.isMilestoneReachedAndMilestoneMessageToBeDisplayed()
@@ -742,13 +722,13 @@ describe('Tutor card component', () => {
     'should correctly determine if completed chapters count is greater than ' +
       'last milestone',
     () => {
-      componentInstance.completedChaptersCount = 1;
+      chapterProgressService.setCompletedChaptersCount(1);
 
       expect(
         componentInstance.isCompletedChaptersCountGreaterThanLastMilestone()
       ).toBe(false);
 
-      componentInstance.completedChaptersCount = 51;
+      chapterProgressService.setCompletedChaptersCount(51);
 
       expect(
         componentInstance.isCompletedChaptersCountGreaterThanLastMilestone()

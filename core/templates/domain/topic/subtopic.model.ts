@@ -93,10 +93,7 @@ export class Subtopic {
     return this._urlFragment;
   }
 
-  // In order to allow restoring unset state during undo operations (see
-  // topic-update.service), null must be an acceptable value for the input
-  // parameter.
-  setUrlFragment(urlFragment: string | null): void {
+  setUrlFragment(urlFragment: string): void {
     this._urlFragment = urlFragment;
   }
 
@@ -178,10 +175,7 @@ export class Subtopic {
     }
   }
 
-  // In order to allow restoring unset state during undo operations (see
-  // topic-update.service), null must be an acceptable value for the input
-  // parameter.
-  setThumbnailFilename(thumbnailFilename: string | null): void {
+  setThumbnailFilename(thumbnailFilename: string): void {
     this._thumbnailFilename = thumbnailFilename;
   }
 
@@ -190,10 +184,7 @@ export class Subtopic {
     return this._thumbnailFilename;
   }
 
-  // In order to allow restoring unset state during undo operations (see
-  // topic-update.service), null must be an acceptable value for the input
-  // parameter.
-  setThumbnailBgColor(thumbnailBgColor: string | null): void {
+  setThumbnailBgColor(thumbnailBgColor: string): void {
     this._thumbnailBgColor = thumbnailBgColor;
   }
 

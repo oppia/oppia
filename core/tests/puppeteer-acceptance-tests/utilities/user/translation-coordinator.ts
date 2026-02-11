@@ -21,7 +21,7 @@ import {BaseUser} from '../common/puppeteer-utils';
 
 const languageSelectorModalSelector = '.e2e-test-language-selector-modal-body';
 const addLanguageButtonSelector = '.e2e-test-language-selector-add-button';
-const selectedLanguageContainerSelector =
+const selectedLangaugeContainerSelector =
   '.e2e-test-selected-language-container';
 const selectedLanguageSelector = '.e2e-test-selected-language';
 const closeButtonSelector = '.e2e-test-close-button';
@@ -140,10 +140,10 @@ export class TranslationCoordinator extends BaseUser {
   async removeLanguageFromLanguageSelectorModal(
     language: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selectedLanguageContainerSelector);
+    await this.expectElementToBeVisible(selectedLangaugeContainerSelector);
 
     const languageContainers = await this.page.$$(
-      selectedLanguageContainerSelector
+      selectedLangaugeContainerSelector
     );
     let languageContainer: ElementHandle<Element> | null = null;
     for (const container of languageContainers) {

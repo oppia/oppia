@@ -153,7 +153,9 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             )
             self.assertEqual(generated_image_filepath, defined_image_filepath)
 
-            with open(generated_image_filepath, 'rb', encoding=None) as f:
+            with utils.open_file(
+                generated_image_filepath, 'rb', encoding=None
+            ) as f:
                 img_data = f.read()
                 width, height = struct.unpack('>LL', img_data[16:24])
                 self.assertEqual(int(width), RTE_THUMBNAIL_WIDTH_PX)
@@ -251,7 +253,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts'
         )
-        with open(rtc_ts_file, 'r', encoding='utf-8') as f:
+        with utils.open_file(rtc_ts_file, 'r') as f:
             rtc_require_file_contents = f.read()
 
         for rtc_ts_filename in rtc_ts_filenames:

@@ -4,7 +4,6 @@ var argv = require('yargs').positional('terminalEnabled', {
 }).argv;
 var path = require('path');
 var webpack = require('webpack');
-var karma = require('karma');
 
 // Here we are checking if the specs_to_run flag is provided or not. If it is
 // provided, we are splitting the comma separated string into an array of
@@ -20,22 +19,19 @@ if (argv.specs_to_run !== undefined) {
 const SPECS_PATTERN =
   /^(?!.*(puppeteer-acceptance-tests|((valid|invalid)[_-][\w\d.\-])|@nodelib|openapi3-ts|@bcoe)).*((\.s|S)pec\.ts$|(?<!services_sources)\/[\w\d.\-]*(component|controller|directive|service|Factory)\.ts$)(?<!combined-tests\.spec\.ts)(?<!state-content-editor\.directive\.spec\.ts)(?<!music-notes-input\.spec\.ts)(?<!state-interaction-editor\.directive\.spec\.ts)/;
 
-let context: RegExp | Record<string, string> = SPECS_PATTERN;
+let context = SPECS_PATTERN;
 if (argv.specs_to_run !== undefined) {
-  context = specsToRun.reduce(
-    (context: Record<string, string>, file: string) => {
-      if (!SPECS_PATTERN.test(file)) {
-        return context;
-      }
-      const relativeFile: string = `./${file}`;
-      context[relativeFile] = relativeFile;
+  context = specsToRun.reduce((context, file) => {
+    if (!SPECS_PATTERN.test(file)) {
       return context;
-    },
-    {}
-  );
+    }
+    const relativeFile = `./${file}`;
+    context[relativeFile] = relativeFile;
+    return context;
+  }, {});
 }
 
-const webpackPlugins: InstanceType<typeof webpack.DefinePlugin>[] = [];
+const webpackPlugins = [];
 if (argv.specs_to_run !== undefined) {
   webpackPlugins.push(
     new webpack.ContextReplacementPlugin(
@@ -53,14 +49,15 @@ let jasmineSeed = Math.floor(Math.random() * 1000);
 // eslint-disable-next-line no-console
 console.log(`Seed for Frontend Test Execution Order ${jasmineSeed}`);
 
-module.exports = function (config: InstanceType<typeof karma.Config>) {
+module.exports = function (config) {
   config.set({
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
       // Constants must be loaded before everything else.
-      // Since angular-mocks and math-expressions
+      // Since jquery, angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
+      'third_party/static/jquery-3.5.1/jquery.min.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.

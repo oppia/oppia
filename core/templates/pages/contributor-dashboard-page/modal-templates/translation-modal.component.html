@@ -15,9 +15,10 @@
       </div>
     </div>
     <button type="button"
-            class="btn-close oppia-close-button-position e2e-test-close-modal-button"
+            class="close oppia-close-button-position e2e-test-close-modal-button"
             (click)="close()"
             aria-label="Close">
+      <span aria-hidden="true">&times;</span>
     </button>
   </div>
 </div>
@@ -131,7 +132,7 @@
   </div>
 </div>
 <div *ngIf="opportunity && !modifyTranslationOpportunity" class="oppia-translate-modal-footer modal-footer">
-  <button class="btn btn-secondary"
+  <button class="btn btn-default"
           (click)="close()">
     Cancel
   </button>
@@ -153,7 +154,7 @@
   </button>
 </div>
 <div *ngIf="modifyTranslationOpportunity && !opportunity" class="oppia-translate-modal-footer modal-footer">
-  <button class="btn btn-secondary"
+  <button class="btn btn-default"
           (click)="close()">
     Cancel
   </button>

@@ -52,11 +52,11 @@ export class ThreadStatusDisplayService {
 
   getLabelClass(status: string): string {
     if (status === 'open') {
-      return 'badge bg-info';
+      return 'badge badge-info';
     } else if (status === 'compliment') {
-      return 'badge bg-success';
+      return 'badge badge-success';
     } else {
-      return 'badge bg-secondary';
+      return 'badge badge-secondary';
     }
   }
 

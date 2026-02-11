@@ -1140,7 +1140,6 @@ class UpdateQuestionSuggestionHandlerNormalizedPayloadDict(TypedDict):
     skill_difficulty: float
     question_state_data: state_domain.StateDict
     next_content_id_index: int
-    inapplicable_skill_misconception_ids: List[str]
 
 
 class UpdateQuestionSuggestionHandler(
@@ -1178,10 +1177,6 @@ class UpdateQuestionSuggestionHandler(
                 }
             },
             'next_content_id_index': {'schema': {'type': 'int'}},
-            'inapplicable_skill_misconception_ids': {
-                'schema': {'type': 'list', 'items': {'type': 'basestring'}},
-                'default_value': None,
-            },
         }
     }
 
@@ -1205,7 +1200,6 @@ class UpdateQuestionSuggestionHandler(
             self.normalized_payload['skill_difficulty'],
             self.normalized_payload['question_state_data'],
             self.normalized_payload['next_content_id_index'],
-            self.normalized_payload.get('inapplicable_skill_misconception_ids'),
         )
 
         self.render_json(self.values)

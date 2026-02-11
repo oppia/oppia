@@ -135,7 +135,7 @@ var ContributorDashboardPage = function () {
 
   var _expectUserToBeReviewer = async function (
     reviewCategory,
-    languageDescription = null
+    langaugeDescription = null
   ) {
     await waitFor.visibilityOf(
       reviewRightsDiv,
@@ -144,8 +144,8 @@ var ContributorDashboardPage = function () {
         reviewCategory
     );
     var reviewRightsElementClassName = `.e2e-test-${reviewCategory}`;
-    if (languageDescription !== null) {
-      let language = _convertlanguageToKebabCase(languageDescription);
+    if (langaugeDescription !== null) {
+      let language = _convertlanguageToKebabCase(langaugeDescription);
       reviewRightsElementClassName += '-' + language;
     }
     reviewRightsElementClassName += '-reviewer';
@@ -158,13 +158,13 @@ var ContributorDashboardPage = function () {
   };
 
   this.expectUserToBeTranslationReviewer = async function (
-    languageDescription
+    langaugeDescription
   ) {
-    await _expectUserToBeReviewer('translation', languageDescription);
+    await _expectUserToBeReviewer('translation', langaugeDescription);
   };
 
-  this.expectUserToBeVoiceoverReviewer = async function (languageDescription) {
-    await _expectUserToBeReviewer('voiceover', languageDescription);
+  this.expectUserToBeVoiceoverReviewer = async function (langaugeDescription) {
+    await _expectUserToBeReviewer('voiceover', langaugeDescription);
   };
 
   this.expectUserToBeQuestionReviewer = async function () {

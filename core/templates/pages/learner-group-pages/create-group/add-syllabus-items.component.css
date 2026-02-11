@@ -25,17 +25,17 @@
   display: flex;
 }
 
-.oppia-add-learner-group-syllabus .search-bar-float-start {
+.oppia-add-learner-group-syllabus .search-bar-float-left {
   border: 0.5px solid #bdbdbc;
   margin-top: 10px;
   width: 100%;
 }
 
-.oppia-add-learner-group-syllabus .search-bar-float-end .dropdown-toggle {
+.oppia-add-learner-group-syllabus .search-bar-float-left .dropdown-toggle {
   width: 100%;
 }
 
-.oppia-add-learner-group-syllabus .mb-3 {
+.oppia-add-learner-group-syllabus .form-group {
   margin-bottom: 0;
 }
 

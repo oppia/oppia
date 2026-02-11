@@ -610,13 +610,10 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Selects multiple options from the item selection input.
-   * This function will uncheck any currently checked options that are not in
-   * the provided list, and check any options that should be selected.
    * @param options The options to select.
    */
   async selectItemSelectionOptions(options: string[]): Promise<void> {
     const optionElementSelector = '.e2e-test-item-selection-input-item';
-    const checkboxSelector = '.e2e-test-item-selection-input-checkbox';
 
     await this.expectElementToBeVisible(optionElementSelector);
     const optionElements = await this.page.$$(optionElementSelector);
@@ -628,41 +625,16 @@ export class ExplorationEditor extends BaseUser {
       if (!optionText) {
         continue;
       }
+      if (options.includes(optionText)) {
+        await optionElement.click();
 
-      // Click on the mat-checkbox element inside the label.
-      const checkboxElement = await optionElement.$(checkboxSelector);
-      if (!checkboxElement) {
-        throw new Error(`Checkbox not found for option: ${optionText}`);
-      }
-
-      // Check if the checkbox is currently checked.
-      const checkboxIsCurrentlyChecked = await checkboxElement.evaluate(el =>
-        el.classList.contains('mat-checkbox-checked')
-      );
-
-      const shouldBeChecked = options.includes(optionText);
-
-      if (shouldBeChecked && !checkboxIsCurrentlyChecked) {
-        // Need to check this checkbox. Use clickOnElement to ensure the element
-        // is stable and clickable before clicking.
-        await this.clickOnElement(checkboxElement);
+        const inputElement = await optionElement.$('input');
         await this.page.waitForFunction(
-          (element: Element) => {
-            return element.classList.contains('mat-checkbox-checked');
+          (element: HTMLInputElement) => {
+            return element.checked;
           },
           {},
-          checkboxElement
-        );
-      } else if (!shouldBeChecked && checkboxIsCurrentlyChecked) {
-        // Need to uncheck this checkbox. Use clickOnElement to ensure the
-        // element is stable and clickable before clicking.
-        await this.clickOnElement(checkboxElement);
-        await this.page.waitForFunction(
-          (element: Element) => {
-            return !element.classList.contains('mat-checkbox-checked');
-          },
-          {},
-          checkboxElement
+          inputElement
         );
       }
     }
@@ -1711,10 +1683,6 @@ export class ExplorationEditor extends BaseUser {
     await algebricExpressionEditor.click();
     await algebricExpressionEditor.type(solution);
 
-    if (await this.isOnScreenKeyboardVisible()) {
-      await this.hideOSK();
-    }
-
     await this.clickOnElementWithSelector(submitAnswerButton);
 
     // Add explanation.
@@ -1769,10 +1737,6 @@ export class ExplorationEditor extends BaseUser {
 
     await numericExpressionEditor.click();
     await numericExpressionEditor.type(solution);
-
-    if (await this.isOnScreenKeyboardVisible()) {
-      await this.hideOSK();
-    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2054,10 +2018,6 @@ export class ExplorationEditor extends BaseUser {
     await this.waitForElementToStabilize(equationBox);
     await equationBox.click();
     await equationBox.type(solution);
-
-    if (await this.isOnScreenKeyboardVisible()) {
-      await this.hideOSK();
-    }
 
     await this.clickOnElementWithSelector(submitAnswerButton);
 
@@ -2768,42 +2728,22 @@ export class ExplorationEditor extends BaseUser {
 
   /**
    * Function to dismiss exploration editor welcome modal.
-   * @param failIfMissing - Whether to fail if the welcome modal is not found.
    */
-  async dismissWelcomeModal(failIfMissing: boolean = false): Promise<void> {
+  async dismissWelcomeModal(): Promise<void> {
     try {
       await this.page.waitForSelector(dismissWelcomeModalSelector, {
         visible: true,
-        // If we know the modal should appear, we can wait longer.
-        timeout: failIfMissing ? 20000 : 5000,
+        timeout: 5000,
       });
       await this.clickOnElementWithSelector(dismissWelcomeModalSelector);
-      await this.expectElementToBeVisible(dismissWelcomeModalSelector, false);
+      await this.page.waitForSelector(dismissWelcomeModalSelector, {
+        hidden: true,
+      });
       showMessage('Tutorial pop-up closed successfully.');
     } catch (error) {
-      if (!failIfMissing) {
-        showMessage(
-          'Welcome Modal not found, but test can be continued.\n' +
-            `Error: ${error.message}`
-        );
-      } else {
-        throw new Error(
-          'Welcome Modal not found.\n' + 'Actual Error:\n' + error.message
-        );
-      }
+      showMessage(`Welcome Modal not found, but test can be continued.
+        Error: ${error.message}`);
     }
-  }
-
-  /**
-   * Function to dismiss welcome modal if it is present. This is useful when
-   * the modal may or may not appear due to race conditions or when it has
-   * already been dismissed earlier in the test flow.
-   */
-  async dismissWelcomeModalIfPresent(): Promise<void> {
-    // The existing dismissWelcomeModal() in this class already handles the
-    // case where the modal is not present (via try/catch), so we just
-    // delegate to it.
-    await this.dismissWelcomeModal();
   }
 
   /**
@@ -2854,9 +2794,6 @@ export class ExplorationEditor extends BaseUser {
    * @param {string} content - The content to be added to the card.
    */
   async updateCardContent(content: string): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.page.waitForSelector(stateEditSelector, {
       visible: true,
     });
@@ -3700,37 +3637,18 @@ export class ExplorationEditor extends BaseUser {
   async navigateToCard(cardName: string, retry: boolean = true): Promise<void> {
     let elements;
     if (this.isViewportAtMobileWidth()) {
-      // Check if the state graph modal is already open before clicking the
-      // resize button.
-      const stateGraphModalIsOpen = await this.page.$(
-        explorationStateGraphModalSelector
-      );
-      if (!stateGraphModalIsOpen) {
-        // Wait for any blocking modal to close first before clicking the
-        // resize button.
-        const blockingModal = await this.page.$('div.modal-content');
-        if (blockingModal) {
-          await this.page.waitForSelector('div.modal-content', {hidden: true});
-        }
-        await this.page.waitForSelector(mobileStateGraphResizeButton, {
-          visible: true,
-        });
-        await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
-      }
+      await this.page.waitForSelector(mobileStateGraphResizeButton, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileStateGraphResizeButton);
     }
 
-    // Get all state node groups (not just labels) since we need to click the
-    // background rect which has the click handler.
-    const stateNodeGroupSelector = '.e2e-test-node';
-    await this.page.waitForSelector(stateNodeGroupSelector);
-    elements = await this.page.$$(stateNodeGroupSelector);
+    await this.page.waitForSelector(stateNodeSelector);
+    elements = await this.page.$$(stateNodeSelector);
 
     const cardNames = await Promise.all(
       elements.map(element =>
-        element.$eval(
-          '.e2e-test-node-label',
-          node => node.textContent?.trim() || ''
-        )
+        element.$eval('tspan', node => node.textContent?.trim() || '')
       )
     );
     const cardIndex = cardNames.indexOf(cardName);
@@ -3739,25 +3657,18 @@ export class ExplorationEditor extends BaseUser {
       throw new Error(`Card name ${cardName} not found in the graph.`);
     }
 
-    let nodeGroup: ElementHandle<Element> | null = null;
+    let cardButton: ElementHandle<Element> | null = null;
     if (this.isViewportAtMobileWidth()) {
-      nodeGroup = elements[cardIndex + elements.length / 2];
+      cardButton = elements[cardIndex + elements.length / 2];
     } else {
-      nodeGroup = elements[cardIndex];
+      cardButton = elements[cardIndex];
     }
 
-    if (!nodeGroup) {
+    if (!cardButton) {
       throw new Error(`Could not find card button for card: ${cardName}`);
     }
 
-    // Click on the node background rect which has the click handler.
-    const nodeBackground = await nodeGroup.$('.e2e-test-node-background');
-    if (!nodeBackground) {
-      throw new Error(
-        `Could not find clickable background for card: ${cardName}`
-      );
-    }
-    await this.clickOnElement(nodeBackground);
+    await cardButton.click();
     await this.waitForNetworkIdle({idleTime: 1000});
 
     const headingName = !cardName.trimEnd().endsWith('...')
@@ -6579,9 +6490,6 @@ export class ExplorationEditor extends BaseUser {
     imageDescription: string,
     imageCaption: string | null
   ): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     await this.expectElementToBeVisible(stateEditSelector);
     await this.clickOnElementWithSelector(stateEditSelector);
     await this.addImageRTE(imageFilePath, imageDescription, imageCaption);
@@ -6595,9 +6503,6 @@ export class ExplorationEditor extends BaseUser {
    * Block Quote, Image, Math Formula, and Concept Card.
    */
   async addExplorationDescriptionContainingBasicRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);
@@ -6683,9 +6588,6 @@ export class ExplorationEditor extends BaseUser {
    * Updates an exploration description containing all RTE elements.
    */
   async addExplorationDescriptionContainingAllRTEComponents(): Promise<void> {
-    // Dismiss the welcome modal if it appears (handles race condition where
-    // modal appears after previous dismissWelcomeModal call).
-    await this.dismissWelcomeModalIfPresent();
     // Click on RTE.
     await this.page.waitForSelector(stateEditSelector, {visible: true});
     await this.clickOnElementWithSelector(stateEditSelector);

@@ -868,15 +868,11 @@ class AdminHandler(
 
         blog_post = blog_services.create_new_blog_post(self.user_id)
         fs = fs_services.GcsFileSystem('blog_post', blog_post.id)
-        with open(
-            './assets/images/general/learner1.png', 'rb', encoding=None
-        ) as thumbnail:
+        with open('./assets/images/general/learner1.png', 'rb') as thumbnail:
             fs.commit(
                 'thumbnail/blog_thumbnail.png', thumbnail.read(), 'image/png'
             )
-        with open(
-            './assets/images/subjects/Art.svg', 'rb', encoding=None
-        ) as image:
+        with open('./assets/images/subjects/Art.svg', 'rb') as image:
             fs.commit(
                 'image/blog_post_image_height_326_width_490.svg',
                 image.read(),
@@ -1915,9 +1911,7 @@ class AdminHandler(
             )
 
             banner_image = b''
-            with open(
-                'core/tests/data/classroom-banner.png', 'rb', encoding=None
-            ) as png_file:
+            with open('core/tests/data/classroom-banner.png', 'rb') as png_file:
                 banner_image = png_file.read()
             fs_services.save_original_and_compressed_versions_of_image(
                 'banner.png',
@@ -3010,8 +3004,16 @@ class SendDummyMailToAdminHandler(
         """
         username = self.username
         assert username is not None
-        email_manager.send_dummy_mail_to_admin(username)
-        self.render_json({})
+        server_can_send_emails = (
+            parameter_services.get_platform_parameter_value(
+                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
+            )
+        )
+        if server_can_send_emails:
+            email_manager.send_dummy_mail_to_admin(username)
+            self.render_json({})
+        else:
+            raise self.InvalidInputException('This app cannot send emails.')
 
 
 class UpdateUsernameHandlerNormalizedPayloadDict(TypedDict):
@@ -3313,91 +3315,6 @@ class RegenerateTopicSummariesHandler(
             topic_services.generate_topic_summary(topic.id)
 
         self.render_json({})
-
-
-class GenerateStudyGuideModelsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler to generate study guide models for all subtopic pages."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'POST': {}}
-
-    @acl_decorators.can_access_admin_page
-    def post(self) -> None:
-        """Generates study guide models for all subtopic pages."""
-
-        # Fetched topics are sorted only to make the backend tests pass.
-        topics = sorted(
-            topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'),
-        )
-
-        for topic in topics:
-            study_guide_services.generate_study_guide_models(
-                topic.id, topic.subtopics
-            )
-
-        self.render_json({})
-
-
-class DeleteStudyGuideModelsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler to delete all study guide models."""
-
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'DELETE': {}}
-
-    @acl_decorators.can_access_admin_page
-    def delete(self) -> None:
-        """Deletes all study guide models."""
-
-        # Fetched topics are sorted only to make the backend tests pass.
-        topics = sorted(
-            topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'),
-        )
-
-        for topic in topics:
-            study_guide_services.delete_study_guide_models(
-                topic.id, topic.subtopics
-            )
-
-        self.render_json({})
-
-
-class VerifyStudyGuideModelsHandler(
-    base.BaseHandler[Dict[str, str], Dict[str, str]]
-):
-    """Handler to verify all study guide models have the correct
-    corresponding snapshot and commitlog models."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-    URL_PATH_ARGS_SCHEMAS: Dict[str, str] = {}
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
-
-    @acl_decorators.can_access_admin_page
-    def get(self) -> None:
-        """Verifies all study guide models have the correct snapshot and
-        commitlog models.
-        """
-
-        # Fetched topics are sorted only to make the backend tests pass.
-        topics = sorted(
-            topic_fetchers.get_all_topics(),
-            key=operator.attrgetter('created_on'),
-        )
-
-        issues = []
-        for topic in topics:
-            issues.append(
-                study_guide_services.verify_study_guide_models(
-                    topic.id, topic.subtopics
-                )
-            )
-
-        self.render_json({'issues': issues})
 
 
 class TranslationCoordinatorRoleHandlerNormalizedPayloadDict(TypedDict):

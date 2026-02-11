@@ -45,27 +45,27 @@ describe('Thread Status Display Service', () => {
   it('should give appropriate label class for status id', () => {
     let mockStatusID = 'open';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge bg-info'
+      'badge badge-info'
     );
 
     mockStatusID = 'fixed';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge bg-secondary'
+      'badge badge-secondary'
     );
 
     mockStatusID = 'ignored';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge bg-secondary'
+      'badge badge-secondary'
     );
 
     mockStatusID = 'not_actionable';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge bg-secondary'
+      'badge badge-secondary'
     );
 
     mockStatusID = 'compliment';
     expect(threadStatusDisplayService.getLabelClass(mockStatusID)).toBe(
-      'badge bg-success'
+      'badge badge-success'
     );
   });
 });

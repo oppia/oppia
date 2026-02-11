@@ -27,7 +27,7 @@ import {AppConstants} from 'app.constants';
 import {MisconceptionSkillMap} from 'domain/skill/misconception.model';
 import {Question} from 'domain/question/question.model';
 import {QuestionUndoRedoService} from 'domain/editor/undo_redo/question-undo-redo.service';
-import {Skill} from 'domain/skill/skill.model';
+import {Skill} from 'domain/skill/skill.model.ts';
 import {State} from 'domain/state/state.model';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {ConfirmQuestionExitModalComponent} from 'components/question-directives/modal-templates/confirm-question-exit-modal.component';
@@ -38,7 +38,6 @@ import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {QuestionSuggestionBackendApiService} from 'pages/contributor-dashboard-page/services/question-suggestion-backend-api.service';
 import {QuestionValidationService} from 'services/question-validation.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {SkillDifficulty} from 'domain/skill/skill-difficulty.model';
 
 @Component({
   selector: 'oppia-question-suggestion-editor-modal',
@@ -114,13 +113,6 @@ export class QuestionSuggestionEditorModalComponent
     );
 
     modalRef.componentInstance.skillId = this.skillId;
-    modalRef.componentInstance.linkedSkillsWithDifficulty = [
-      SkillDifficulty.create(
-        this.skillId,
-        this.skill.getDescription(),
-        this.skillDifficulty
-      ),
-    ];
     modalRef.result.then(
       result => {
         if (this.alertsService.warnings.length === 0) {
@@ -172,7 +164,6 @@ export class QuestionSuggestionEditorModalComponent
         this.skillDifficulty,
         questionDict.question_state_data,
         questionDict.next_content_id_index,
-        questionDict.inapplicable_skill_misconception_ids,
         imagesData,
         () => {
           this.alertsService.addSuccessMessage('Updated question.');

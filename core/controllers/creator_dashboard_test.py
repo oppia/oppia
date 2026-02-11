@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf
+from core import feconf, utils
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import (
@@ -581,7 +581,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
 
 class CreationButtonsTests(test_utils.GenericTestBase):
-    with open(
+    with utils.open_file(
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, 'welcome', 'welcome.yaml'),
         'rb',
         encoding=None,

@@ -197,11 +197,10 @@
   padding: 50px;
 }
 
-.invite-successful-modal .btn-close {
+.invite-successful-modal .close {
   cursor: pointer;
   font-size: 2.7rem;
   font-weight: 400;
-  opacity: 0.5;
   position: absolute;
   right: 15px;
   top: 15px;

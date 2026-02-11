@@ -8,7 +8,8 @@
       <span *ngIf="first !== last"> and {{username}}</span>
     </span>
   </p>
-  <div class="btn-close" (click)="cancel()">
+  <div class="close" (click)="cancel()">
+    <span aria-hidden="true">&times;</span>
   </div>
 </div>
 

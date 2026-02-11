@@ -65,14 +65,13 @@ class MockContributionAndReviewService {
     suggestionId: string,
     skillDifficulty: string,
     questionStateData: string,
-    nextContentIdIndex: string,
-    inapplicableSkillMisconceptionIds: string[],
-    imagesData: File[],
-    onSuccess: (suggestionId: string) => void,
-    onFailure: (suggestionId: string) => void
+    imagesData: File[]
   ) {
-    onSuccess(suggestionId);
-    return Promise.resolve();
+    return {
+      then: (successCallback: () => void, errorCallback: () => void) => {
+        successCallback();
+      },
+    };
   }
 }
 
@@ -337,7 +336,6 @@ describe('Question Suggestion Editor Modal Component', () => {
         skillDifficulty,
         questionStateData,
         nextContentIdIndex,
-        inapplicableSkillMisconceptionIds,
         imagesData,
         successCallback,
         errorCallback

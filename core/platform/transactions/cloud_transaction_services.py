@@ -20,74 +20,36 @@ from __future__ import annotations
 
 import functools
 
-from core import utils
-
 from google.cloud import datastore
-from typing import Callable, TypeVar
+from typing import Any, Callable
 
-# TypeVar for the decorator to maintain function return type.
-ReturnType = TypeVar('ReturnType')
-
-
-class DatastoreClientSingleton(metaclass=utils.SingletonMeta):
-    """Singleton wrapper for the Datastore client."""
-
-    def __init__(self) -> None:
-        """Initialize the Datastore client."""
-        self._client: datastore.Client = datastore.Client()
-
-    def get_client(self) -> datastore.Client:
-        """Return the Datastore client instance.
-
-        Returns:
-            datastore.Client. The Datastore client instance.
-        """
-        return self._client
+CLIENT = datastore.Client()
 
 
-def get_client() -> datastore.Client:
-    """Get or create the datastore client lazily.
-
-    Returns:
-        datastore.Client. The Datastore client instance.
-    """
-    return DatastoreClientSingleton().get_client()
-
-
-def run_in_transaction_wrapper(
-    fn: Callable[..., ReturnType],
-) -> Callable[..., ReturnType]:
+# Here we use type Any because the method `wrapper` is used as a decorator for
+# other functions, and these functions can have almost any types of arguments.
+def run_in_transaction_wrapper(fn: Callable[..., Any]) -> Callable[..., Any]:
     """Runs a decorated function in a transaction. Either all of the operations
     in the transaction are applied, or none of them are applied.
 
     If an exception is raised, the transaction is likely not safe to
     commit, since TransactionOptions.ALLOWED is used.
 
-    Args:
-        fn: Callable[..., ReturnType]. The function to wrap in a transaction.
-
     Returns:
-        Callable[..., ReturnType]. Function wrapped in transaction.
+        function. Function wrapped in transaction.
 
     Raises:
         Exception. Whatever fn() raises.
         datastore_errors.TransactionFailedError. The transaction failed.
     """
 
-    # Here we use object because the wrapper needs to accept any argument types
-    # that the wrapped function accepts.
+    # Here we use type Any because this function is used as a decorator for
+    # other functions, and these functions can have almost any types of
+    # arguments.
     @functools.wraps(fn)
-    def wrapper(*args: object, **kwargs: object) -> ReturnType:
-        """Wrapper for the transaction.
-
-        Args:
-            *args: list(*). Variable positional arguments.
-            **kwargs: object. Variable keyword arguments.
-
-        Returns:
-            ReturnType. The return value from the wrapped function.
-        """
-        with get_client().transaction():
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
+        """Wrapper for the transaction."""
+        with CLIENT.transaction():
             return fn(*args, **kwargs)
 
     return wrapper

@@ -203,7 +203,7 @@ export class StateEditorComponent implements OnInit, OnDestroy {
 
     this.directiveSubscriptions.add(
       this.stateEditorService.onStateEditorInitialized.subscribe(stateData => {
-        if (!stateData || Object.keys(stateData).length === 0) {
+        if (stateData === undefined || $.isEmptyObject(stateData)) {
           throw new Error(
             'Expected stateData to be defined but ' + 'received ' + stateData
           );

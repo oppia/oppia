@@ -469,7 +469,6 @@ export class ContributionAndReviewService {
     skillDifficulty: number,
     questionStateData: StateBackendDict,
     nextContentIdIndex: number,
-    inapplicableSkillMisconceptionIds: string[],
     imagesData: ImagesData[],
     onSuccess: (suggestionId: string) => void,
     onFailure: (suggestionId: string) => void
@@ -478,7 +477,6 @@ export class ContributionAndReviewService {
       skill_difficulty: skillDifficulty,
       question_state_data: questionStateData,
       next_content_id_index: nextContentIdIndex,
-      inapplicable_skill_misconception_ids: inapplicableSkillMisconceptionIds,
     };
     const requestBody = new FormData();
     requestBody.append('payload', JSON.stringify(payload));

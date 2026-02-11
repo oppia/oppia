@@ -27,6 +27,7 @@ import {
   tick,
 } from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import $ from 'jquery';
 import {PageContextService} from 'services/page-context.service';
 import {ExplorationImprovementsService} from 'services/exploration-improvements.service';
 import {ExplorationStatesService} from './exploration-states.service';
@@ -112,9 +113,17 @@ describe('Router Service', () => {
   });
 
   it('should not navigate to main tab when already there', fakeAsync(() => {
-    spyOn(document, 'querySelector')
+    let jQuerySpy = spyOn(window, '$');
+    jQuerySpy
       .withArgs('.oppia-editor-cards-container')
-      .and.returnValue(document.createElement('div'));
+      .and.returnValue($(document.createElement('div')));
+    jQuerySpy.and.callThrough();
+
+    spyOn($.fn, 'fadeOut').and.callFake(cb => {
+      cb();
+      setTimeout(() => {});
+      return null;
+    });
 
     expect(routerService.getActiveTabName()).toBe('main');
     routerService.navigateToPreviewTab();

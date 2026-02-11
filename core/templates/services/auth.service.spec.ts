@@ -65,15 +65,21 @@ describe('Auth service', function () {
     };
   });
 
-  it('should return emulator config when emulator is enabled', () => {
-    spyOnProperty(
-      AuthService,
-      'firebaseEmulatorIsEnabled',
-      'get'
-    ).and.returnValue(true);
+  it(
+    'should return emulator config when using firebase endpoint in ' +
+      'docker environment',
+    () => {
+      spyOnProperty(
+        AuthService,
+        'firebaseEmulatorIsEnabled',
+        'get'
+      ).and.returnValue(true);
 
-    expect(AuthService.firebaseEmulatorConfig).toEqual(['localhost', 9099]);
-  });
+      // TODO(#18260): Change this when we permanently move to the Docker Setup.
+      process.env.USE_FIREBASE_ENDPOINT = 'true';
+      expect(AuthService.firebaseEmulatorConfig).toEqual(['firebase', 9099]);
+    }
+  );
 
   it('should return undefined when emulator is disabled', () => {
     spyOnProperty(
