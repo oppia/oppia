@@ -149,9 +149,7 @@ export class BlogHomePageComponent implements OnInit {
   }
 
   loadSearchResultsPageData(data: SearchResponseData): void {
-    this.blogPostSummaries = this.blogPostSummaries.concat(
-      data.blogPostSummariesList
-    );
+    this.blogPostSummaries = data.blogPostSummariesList;
     this.searchOffset = data.searchOffset;
     this.calculateLastPostOnPageNum(
       this.page,
