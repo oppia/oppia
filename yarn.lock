@@ -16048,13 +16048,6 @@ postcss-resolve-nested-selector@^0.1.1:
   resolved "https://registry.yarnpkg.com/postcss-resolve-nested-selector/-/postcss-resolve-nested-selector-0.1.1.tgz#29ccbc7c37dedfac304e9fff0bf1596b3f6a0e4e"
   integrity sha512-HvExULSwLqHLgUy1rl3ANIqCsvMS0WHss2UOsXhXnQaZ9VCc2oBvIpXrl00IUFT5ZDITME0o6oiXeiHr2SAIfw==
 
-postcss-rtlcss@^3.7.2:
-  version "3.7.2"
-  resolved "https://registry.yarnpkg.com/postcss-rtlcss/-/postcss-rtlcss-3.7.2.tgz#01e16f3933c0953a6f1981cc2f62363b7df08976"
-  integrity sha512-H7jshCajvUuPba71A6O7oM26i0Hqsh4n9h/tN5U/D9Rj0/05698S5yLp8YV7w5vIOnY8q7f5S6XfL3lU/A==
-  dependencies:
-    rtlcss "^3.5.0"
-
 postcss-safe-parser@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/postcss-safe-parser/-/postcss-safe-parser-6.0.0.tgz#bb4c29894171a94bc5c996b9a30317ef402adaa1"
