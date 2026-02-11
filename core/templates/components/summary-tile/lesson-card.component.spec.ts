@@ -78,7 +78,8 @@ describe('LessonCardComponent', () => {
     activity_type: 'exploration',
     category: 'Algebra',
     title: 'Test Title',
-    progress: 40,
+    visited_checkpoints_count: 5,
+    total_checkpoints_count: 10,
   };
 
   const sampleNode = {
@@ -378,6 +379,7 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
     expect(component.title).toEqual(sampleExploration.title);
 
+    // Progress = floor((5 - 1) / 10 * 100) = 40
     expect(component.progress).toEqual(40);
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));

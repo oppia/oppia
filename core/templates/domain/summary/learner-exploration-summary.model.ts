@@ -43,7 +43,6 @@ export interface LearnerExplorationSummaryBackendDict {
   thumbnail_bg_color: string;
   thumbnail_icon_url: string;
   title: string;
-  progress?: number;
   visited_checkpoints_count?: number;
   total_checkpoints_count?: number;
 }
@@ -66,7 +65,6 @@ export class LearnerExplorationSummary {
     public createdOnMsec: number,
     public ratings: ExplorationRatings,
     public humanReadableContributorsSummary: HumanReadableContributorsSummary,
-    public progress: number = 0,
     public visitedCheckpointsCount: number = 0,
     public totalCheckpointsCount: number = 0
   ) {}
@@ -78,12 +76,6 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.visited_checkpoints_count ?? 0;
     const totalCheckpointsCount =
       expSummaryBacknedDict.total_checkpoints_count ?? 0;
-
-    let progress = expSummaryBacknedDict.progress ?? 0;
-    if (totalCheckpointsCount > 0) {
-      const visitedCheckpoints = Math.max(visitedCheckpointsCount - 1, 0);
-      progress = Math.floor((visitedCheckpoints / totalCheckpointsCount) * 100);
-    }
 
     return new LearnerExplorationSummary(
       expSummaryBacknedDict.category,
@@ -102,7 +94,6 @@ export class LearnerExplorationSummary {
       expSummaryBacknedDict.created_on_msec,
       expSummaryBacknedDict.ratings,
       expSummaryBacknedDict.human_readable_contributors_summary,
-      progress,
       visitedCheckpointsCount,
       totalCheckpointsCount
     );

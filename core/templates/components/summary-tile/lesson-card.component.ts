@@ -218,9 +218,20 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    this.progress = this.isCommunityLessonComplete
-      ? 100
-      : explorationModel.progress ?? 0;
+    // Calculate progress from checkpoint counts
+    let progress = 0;
+    if (this.isCommunityLessonComplete) {
+      progress = 100;
+    } else if (explorationModel.totalCheckpointsCount > 0) {
+      const visitedCheckpoints = Math.max(
+        explorationModel.visitedCheckpointsCount - 1,
+        0
+      );
+      progress = Math.floor(
+        (visitedCheckpoints / explorationModel.totalCheckpointsCount) * 100
+      );
+    }
+    this.progress = progress;
     this.title = explorationModel.title;
     this.lessonUrl = `/explore/${explorationModel.id}`;
     this.lessonTopic = 'Community Lesson';

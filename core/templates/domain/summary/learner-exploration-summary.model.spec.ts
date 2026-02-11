@@ -176,13 +176,12 @@ describe('Exploration summary model', () => {
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    // Progress = floor((1-1)/5 * 100) = 0 (just started, visited initial state)
-    expect(expSummaryObject.progress).toEqual(0);
+    // Just verify checkpoint counts are set correctly
     expect(expSummaryObject.visitedCheckpointsCount).toEqual(1);
     expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
   });
 
-  it('should correctly calculate progress with all checkpoints visited', () => {
+  it('should correctly set checkpoint counts with all checkpoints visited', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -213,13 +212,11 @@ describe('Exploration summary model', () => {
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    // Progress = floor((5-1)/5 * 100) = floor(80) = 80.
-    expect(expSummaryObject.progress).toEqual(80);
     expect(expSummaryObject.visitedCheckpointsCount).toEqual(5);
     expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
   });
 
-  it('should use backend progress value when provided', () => {
+  it('should set default checkpoint counts when not provided in backend dict', () => {
     let backendDict = {
       last_updated_msec: 1591296737470.528,
       community_owned: false,
@@ -243,15 +240,12 @@ describe('Exploration summary model', () => {
       activity_type: 'exploration',
       category: 'Algebra',
       title: 'Test Title',
-      progress: 50,
-      visited_checkpoints_count: 0,
-      total_checkpoints_count: 0,
     };
 
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    // When totalCheckpointsCount is 0, use backend progress value.
-    expect(expSummaryObject.progress).toEqual(50);
+    expect(expSummaryObject.visitedCheckpointsCount).toEqual(0);
+    expect(expSummaryObject.totalCheckpointsCount).toEqual(0);
   });
 });
