@@ -19,7 +19,7 @@
 from __future__ import annotations
 
 from core import feconf
-from core.domain import exp_domain, rights_manager, state_domain
+from core.domain import exp_domain, exp_services, rights_manager, state_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import exp_drafts_migration_job
 from core.jobs.types import job_run_result
@@ -101,6 +101,111 @@ class MigrateExplorationDraftsJobTests(
 
         assert migrated_model is not None
         self.assertIsNotNone(migrated_model.draft_change_list)
+
+    def test_migrates_draft_updates_model_when_changes_detected(self) -> None:
+        self.save_new_valid_exploration(self.EXP_ID, self.USER_ID)
+        old_draft_list = [{'cmd': 'old_cmd'}]
+        user_data_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            draft_change_list=old_draft_list,
+            draft_change_list_last_updated=None,
+        )
+        user_data_model.update_timestamps()
+        user_data_model.put()
+        new_change_list = [{'cmd': 'new_cmd'}]
+        with self.swap_to_always_return(
+            exp_services,
+            'migrate_draft_change_list_to_latest_schema',
+            new_change_list,
+        ):
+            self.assert_job_output_is(
+                [
+                    job_run_result.JobRunResult(
+                        stdout='DRAFT PROCESSED SUCCESS: 1'
+                    )
+                ]
+            )
+
+        migrated_model = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, self.EXP_ID
+        )
+        self.assertEqual(migrated_model.draft_change_list, new_change_list)
+
+    def test_migrate_draft_with_empty_change_list_returns_ok(self) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_ID,
+            title='title',
+            category='category',
+            language_code='en',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            init_state_name='Introduction',
+            states={
+                'Introduction': state_domain.State.create_default_state(
+                    'Introduction',
+                    content_id_for_state_content='content_0',
+                    content_id_for_default_outcome='default_outcome_1',
+                    is_initial_state=True,
+                ).to_dict()
+            },
+        )
+
+        user_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            draft_change_list=[],
+        )
+
+        result_item = (
+            exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(
+                user_model, exp_model
+            )
+        )
+
+        self.assertTrue(result_item.is_ok())
+        self.assertEqual(
+            result_item.unwrap(),
+            ('%s.%s' % (self.USER_ID, self.EXP_ID), user_model),
+        )
+
+    def test_migrate_draft_returns_error_on_failure(self) -> None:
+        exp_model = self.create_model(
+            exp_models.ExplorationModel,
+            id=self.EXP_ID,
+            title='title',
+            category='category',
+            language_code='en',
+            states_schema_version=feconf.CURRENT_STATE_SCHEMA_VERSION,
+            init_state_name='Introduction',
+            states={},
+        )
+        user_model = self.create_model(
+            user_models.ExplorationUserDataModel,
+            id='%s.%s' % (self.USER_ID, self.EXP_ID),
+            user_id=self.USER_ID,
+            exploration_id=self.EXP_ID,
+            draft_change_list=[{'cmd': 'some_cmd'}],
+        )
+
+        def mock_migrate_error(*args):
+            raise Exception('Migration failed')
+
+        with self.swap(
+            exp_services,
+            'migrate_draft_change_list_to_latest_schema',
+            mock_migrate_error,
+        ):
+            result_item = exp_drafts_migration_job.MigrateExplorationDrafts._migrate_draft(
+                user_model, exp_model
+            )
+
+        self.assertTrue(result_item.is_err())
+        self.assertIn('Migration failed', str(result_item.unwrap_err()[1]))
 
     def test_skips_users_without_drafts(self) -> None:
         exp_model = self.create_model(
