@@ -63,6 +63,7 @@ var constants = {
   DEFAULT_COLOR: '#a33f40',
   DEFAULT_THUMBNAIL_ICON: 'Lightbulb',
   DEFAULT_CATEGORY_ICON: 'Lightbulb',
+  I18N_PLAYER_LOADING: 'I18N_PLAYER_LOADING',
 
   // These categories are shown in the library navbar. The categories should
   // be in sorted order.
