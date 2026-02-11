@@ -4,6 +4,8 @@ on:
     types:
       - opened
       - reopened
+      - edited
+      - synchronize
 permissions: read-all
 jobs:
   check_pr_description:
