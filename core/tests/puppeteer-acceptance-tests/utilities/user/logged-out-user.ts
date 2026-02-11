@@ -4247,11 +4247,30 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
+   * Opens the story viewer from the end chapter card in a new tab and switches
+   * to the new tab.
+   */
+  private async openReturnToStoryPageInNewTab(): Promise<void> {
+    await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
+      visible: true,
+    });
+
+    const currentPage = this.page;
+    const newPagePromise = this.waitForNewPage(currentPage);
+    await this.clickOnElementWithSelector(returnToStoryFromLastStateSelector);
+
+    const newStoryPage = await newPagePromise;
+    this.page = newStoryPage;
+    this.pages.push(newStoryPage);
+    await this.page.bringToFront();
+  }
+
+  /**
    * Navigates back to the topic page after completing an exploration.
    */
   async returnToTopicPageAfterCompletingExploration(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      await this.clickAndWaitForNavigation('Return to Story');
+      await this.openReturnToStoryPageInNewTab();
       await this.clickAndWaitForNavigation(NavbarBackButton, true);
     } else {
       await this.clickAndWaitForNavigation(oppiaTopicTitleSelector, true);
@@ -4488,10 +4507,7 @@ export class LoggedOutUser extends BaseUser {
    * Returns to the story from the last state of an exploration.
    */
   async returnToStoryFromLastState(): Promise<void> {
-    await this.page.waitForSelector(returnToStoryFromLastStateSelector, {
-      visible: true,
-    });
-    await this.page.click(returnToStoryFromLastStateSelector);
+    await this.openReturnToStoryPageInNewTab();
 
     await this.page.waitForSelector(storyViewerContainerSelector, {
       visible: true,

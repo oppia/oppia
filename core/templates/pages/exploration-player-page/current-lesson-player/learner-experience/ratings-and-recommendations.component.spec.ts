@@ -433,4 +433,52 @@ describe('Ratings and recommendations component', () => {
 
     expect(componentInstance.isSignUpSectionHidden()).toBe(false);
   });
+
+  it('should open return to story in a new tab', fakeAsync(() => {
+    spyOn(explorationModeService, 'isInStoryChapterMode').and.returnValue(true);
+    spyOn(urlInterpolationService, 'interpolateUrl').and.returnValue(
+      '/learn/classroom/topic/story/story'
+    );
+    spyOn(urlService, 'getUrlParams').and.returnValue({
+      story_url_fragment: 'story',
+      topic_url_fragment: 'topic',
+      classroom_url_fragment: 'classroom',
+      node_id: 'node_1',
+    });
+    spyOn(storyViewerBackendApiService, 'fetchStoryDataAsync').and.returnValue(
+      Promise.resolve(
+        new StoryPlaythrough('story_id', [], '', '', 'topic_name', '')
+      )
+    );
+    spyOn(topicViewerBackendApiService, 'fetchTopicDataAsync').and.returnValue(
+      Promise.resolve(
+        new ReadOnlyTopic(
+          'topic_name',
+          'topic_Id',
+          'description',
+          [],
+          [],
+          [],
+          [],
+          {},
+          {},
+          true,
+          'metatag',
+          'page_title_fragment'
+        )
+      )
+    );
+
+    fixture.detectChanges();
+    tick();
+    fixture.detectChanges();
+
+    const returnToStoryLink: HTMLAnchorElement =
+      fixture.nativeElement.querySelector(
+        '.e2e-test-end-chapter-return-to-story'
+      );
+
+    expect(returnToStoryLink.getAttribute('target')).toBe('_blank');
+    expect(returnToStoryLink.getAttribute('rel')).toBe('noopener');
+  }));
 });
