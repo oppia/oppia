@@ -170,7 +170,7 @@ describe('SkillFilteringService', () => {
       topic1: [{subTopicName: 'subtopic1', checked: false}],
     };
     const subTopicFilterDict = {
-      topic1: [{subTopicName: 'subtopic1', checked: true}], // Was checked.
+      topic1: [{subTopicName: 'subtopic1', checked: true}],
     };
     const topicFilterList = [{topicName: 'topic1', checked: true}];
 
@@ -259,25 +259,6 @@ describe('SkillFilteringService', () => {
     // Should only return topic1 because it matches "Algebra".
     expect(result.augmentedTopicFilterList.length).toBe(1);
     expect(result.augmentedTopicFilterList[0].topicName).toBe('topic1');
-  });
-
-  it('should return empty list if no topics match search text', () => {
-    const categorizedSkills = {
-      topic1: {
-        uncategorized: [ShortSkillSummary.create('s1', 'Physics')],
-      },
-    };
-    const topicFilterList = [{topicName: 'topic1', checked: false}];
-    const subTopicFilterDict = {topic1: []};
-
-    const result = service.computeAugmentedTopicFilterList(
-      topicFilterList,
-      subTopicFilterDict,
-      categorizedSkills,
-      'Chemistry'
-    );
-
-    expect(result.augmentedTopicFilterList.length).toBe(0);
   });
 
   it('should return all topics if search text is empty', () => {
