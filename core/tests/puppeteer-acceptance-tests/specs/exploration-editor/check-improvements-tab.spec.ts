@@ -64,8 +64,8 @@ describe('Improvements Tab', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  // TODO(#13352): The test for improvements tab visibility in published explorations
-  // is marked as TODO in the original E2E tests. This required
+  // TODO(#13352): The test for improvements tab visibility in published explorations.
+  // Originally marked as a pending task in the original E2E tests. This required
   // testing the tab after learner interactions generate improvement suggestions,
   // which involves complex setup for generating answer statistics incrementally.
   // This acceptance test focuses on the core functionality: verifying the tab
