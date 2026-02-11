@@ -266,6 +266,11 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
     this.userService.getUserInfoAsync().then(userInfo => {
       this.isModerator = userInfo.isModerator();
       this.isCurriculumAdmin = userInfo.isCurriculumAdmin();
+      this.isTranslationAdmin = userInfo.isTranslationAdmin();
+      this.isTranslationCoordinator = userInfo.isTranslationCoordinator();
+      this.isQuestionAdmin = userInfo.isQuestionAdmin();
+      this.isQuestionCoordinator = userInfo.isQuestionCoordinator();
+      this.isReleaseCoordinator = userInfo.isReleaseCoordinator();
       this.isTopicManager = userInfo.isTopicManager();
       this.isSuperAdmin = userInfo.isSuperAdmin();
       this.isBlogAdmin = userInfo.isBlogAdmin();
@@ -291,22 +296,6 @@ export class TopNavigationBarComponent implements OnInit, OnDestroy {
             }
           }
         );
-      }
-      if (usernameFromUserInfo) {
-        this.username = usernameFromUserInfo;
-        this.profilePageUrl = this.urlInterpolationService.interpolateUrl(
-          '/profile/<username>',
-          {
-            username: this.username,
-          }
-        );
-        [this.profilePicturePngDataUrl, this.profilePictureWebpDataUrl] =
-          this.userService.getProfileImageDataUrl(this.username);
-      } else {
-        this.profilePicturePngDataUrl =
-          this.urlInterpolationService.getStaticImageUrl(
-            AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
-          );
         this.profilePictureWebpDataUrl =
           this.urlInterpolationService.getStaticImageUrl(
             AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH

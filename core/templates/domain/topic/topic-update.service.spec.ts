@@ -123,8 +123,8 @@ describe('Topic update service', function () {
   };
 
   beforeEach(() => {
-    topicUpdateService = TestBed.get(TopicUpdateService);
-    undoRedoService = TestBed.get(UndoRedoService);
+    topicUpdateService = TestBed.inject(TopicUpdateService);
+    undoRedoService = TestBed.inject(UndoRedoService);
 
     _firstSkillSummary = ShortSkillSummary.create('skill_1', 'Description 1');
     _secondSkillSummary = ShortSkillSummary.create('skill_2', 'Description 2');
