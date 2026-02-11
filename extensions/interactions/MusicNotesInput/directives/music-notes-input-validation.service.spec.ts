@@ -19,14 +19,12 @@
 import {TestBed} from '@angular/core/testing';
 
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-import {MusicNotesInputValidationService} from
-  'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
+import {MusicNotesInputValidationService} from 'interactions/MusicNotesInput/directives/music-notes-input-validation.service';
 import {Outcome} from 'domain/exploration/outcome.model';
 
 import {AppConstants} from 'app.constants';
 import {Rule} from 'domain/exploration/rule.model';
-import {MusicNotesInputCustomizationArgs} from
-  'extensions/interactions/customization-args-defs';
+import {MusicNotesInputCustomizationArgs} from 'extensions/interactions/customization-args-defs';
 import cloneDeep from 'lodash/cloneDeep';
 
 describe('MusicNotesInputValidationService', () => {

@@ -44,8 +44,8 @@ export class MusicNotesInputValidationService {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.ERROR,
         message: 'Initial sequence should not be empty.',
-
-      });}
+      });
+    }
     return warningsList;
   }
 
