@@ -27,8 +27,6 @@ import {
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {AlertsService} from 'services/alerts.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
-import {ImageUploadHelperService} from 'services/image-upload-helper.service';
 import {LoaderService} from 'services/loader.service';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {
@@ -42,7 +40,6 @@ import {UserService} from 'services/user.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 
 import {EditProfilePictureModalComponent} from './modal-templates/edit-profile-picture-modal.component';
-import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 require('cropperjs/dist/cropper.min.css');
 
 import './preferences-page.component.css';
@@ -106,8 +103,6 @@ export class PreferencesPageComponent {
     private windowRef: WindowRef,
     private alertsService: AlertsService,
     private i18nLanguageCodeService: I18nLanguageCodeService,
-    private imageLocalStorageService: ImageLocalStorageService,
-    private imageUploadHelperService: ImageUploadHelperService,
     private languageUtilService: LanguageUtilService,
     private loaderService: LoaderService,
     private preventPageUnloadEventService: PreventPageUnloadEventService,
@@ -151,25 +146,6 @@ export class PreferencesPageComponent {
     // The following line is needed to emit the statusChanges observable.
     pngControl.updateValueAndValidity();
     webpControl.updateValueAndValidity();
-  }
-
-  // TODO(#19737): Remove the following function.
-  private _saveProfileImageToLocalStorage(image: string): void {
-    const newImageFile =
-      this.imageUploadHelperService.convertImageDataToImageFile(image);
-    if (newImageFile === null) {
-      this.alertsService.addWarning('Image uploaded is not valid.');
-      return;
-    }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const imageData = reader.result as string;
-      this.imageLocalStorageService.saveImage(
-        this.username + '_profile_picture.png',
-        imageData
-      );
-    };
-    reader.readAsDataURL(newImageFile);
   }
 
   showEditProfilePictureModal(): void {
@@ -355,16 +331,6 @@ export class PreferencesPageComponent {
       });
     }
 
-    // TODO(#19737): Remove the following condition.
-    if (AssetsBackendApiService.EMULATOR_MODE) {
-      // Remove 'profile_picture_data_url' from updates if the emulator mode is
-      // on because the backend doesn't support updating profile picture in
-      // emulator mode.
-      updates = updates.filter(update => {
-        return update.update_type !== 'profile_picture_data_url';
-      });
-    }
-
     this.userBackendApiService
       .updateMultiplePreferencesDataAsync(updates)
       .then(returnData => {
@@ -382,12 +348,6 @@ export class PreferencesPageComponent {
           this.alertsService.addInfoMessage('Saved!', 3000);
         }
         if (this.preferencesForm.controls.profilePicturePngDataUrl.dirty) {
-          // TODO(#19737): Remove the following 'if' condition.
-          if (AssetsBackendApiService.EMULATOR_MODE) {
-            this._saveProfileImageToLocalStorage(
-              this.preferencesForm.controls.profilePicturePngDataUrl.value
-            );
-          }
           // The reload is needed in order to update the profile picture
           // in the top-right corner(Nav Bar).
           this.preventPageUnloadEventService.removeListener();

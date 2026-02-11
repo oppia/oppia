@@ -22,9 +22,7 @@ import {
 } from '@angular/common/http/testing';
 import {fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 
-import {AppConstants} from 'app.constants';
 import {UserInfo} from 'domain/user/user-info.model';
-import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {CsrfTokenService} from 'services/csrf-token.service';
 import {UserService} from 'services/user.service';
@@ -33,28 +31,12 @@ import {
   PreferencesBackendDict,
   UserBackendApiService,
 } from './user-backend-api.service';
-import {ImageLocalStorageService} from 'services/image-local-storage.service';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
 
 class MockWindowRef {
-  imageData: Record<string, string> = {};
   _window = {
     location: {
       pathname: 'home',
-    },
-    sessionStorage: {
-      removeItem: (name: string) => {
-        this.imageData = {};
-      },
-      setItem: (filename: string, rawImage: string) => {
-        this.imageData[filename] = rawImage;
-      },
-      getItem: (filename: string) => {
-        if (this.imageData[filename] === undefined) {
-          return null;
-        }
-        return this.imageData[filename];
-      },
     },
   };
 
@@ -66,13 +48,11 @@ class MockWindowRef {
 describe('User Api Service', () => {
   describe('on dev mode', () => {
     let userService: UserService;
-    let urlInterpolationService: UrlInterpolationService;
     let urlService: UrlService;
     let httpTestingController: HttpTestingController;
     let csrfService: CsrfTokenService;
     let windowRef: MockWindowRef;
     let userBackendApiService: UserBackendApiService;
-    let imageLocalStorageService: ImageLocalStorageService;
 
     beforeEach(() => {
       windowRef = new MockWindowRef();
@@ -82,11 +62,9 @@ describe('User Api Service', () => {
       });
       httpTestingController = TestBed.inject(HttpTestingController);
       userService = TestBed.inject(UserService);
-      urlInterpolationService = TestBed.inject(UrlInterpolationService);
       urlService = TestBed.inject(UrlService);
       csrfService = TestBed.inject(CsrfTokenService);
       userBackendApiService = TestBed.inject(UserBackendApiService);
-      imageLocalStorageService = TestBed.inject(ImageLocalStorageService);
 
       spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
         return new Promise((resolve, reject) => {
@@ -215,31 +193,18 @@ describe('User Api Service', () => {
       flushMicrotasks();
     }));
 
-    it('should return image stored in session storage while in emulator mode', fakeAsync(() => {
-      let filename = 'tester_profile_picture.png';
-      const imageData = 'data:image/png;base64,JUMzJTg3JTJD';
-      imageLocalStorageService.saveImage(filename, imageData);
-      let [profileImagePng, profileImageWebp] =
-        userService.getProfileImageDataUrl('tester');
-      expect(profileImagePng).toEqual(imageData);
-      expect(profileImageWebp).toEqual(imageData);
-      imageLocalStorageService.deleteImage(filename);
-
-      flushMicrotasks();
-    }));
-
-    it('should return the default profile image path when in emulator mode', fakeAsync(() => {
-      let defaultUrlWebp = urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_WEBP_PATH
-      );
-      let defaultUrlPng = urlInterpolationService.getStaticImageUrl(
-        AppConstants.DEFAULT_PROFILE_IMAGE_PNG_PATH
-      );
+    it('should return profile image path when in emulator mode', fakeAsync(() => {
+      let expectedPngImage =
+        '/assetsdevhandler/user/tester/assets/profile_picture.png';
+      let expectedWebpImage =
+        '/assetsdevhandler/user/tester/assets/profile_picture.webp';
       let [profileImagePng, profileImageWebp] =
         userService.getProfileImageDataUrl('tester');
       let prformanceTime = profileImagePng.split('?')[1];
-      expect(profileImagePng).toEqual(defaultUrlPng + '?' + prformanceTime);
-      expect(profileImageWebp).toEqual(defaultUrlWebp + '?' + prformanceTime);
+      expect(profileImagePng).toEqual(expectedPngImage + '?' + prformanceTime);
+      expect(profileImageWebp).toEqual(
+        expectedWebpImage + '?' + prformanceTime
+      );
 
       flushMicrotasks();
     }));

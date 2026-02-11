@@ -52,7 +52,6 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {AssetsBackendApiService} from 'services/assets-backend-api.service';
-import {ImageUploadHelperService} from '../../services/image-upload-helper.service';
 
 describe('Preferences Page Component', () => {
   @Pipe({name: 'truncate'})
@@ -74,7 +73,6 @@ describe('Preferences Page Component', () => {
     let ngbModal: NgbModal;
     let mockWindowRef: MockWindowRef;
     let mockUserBackendApiService: MockUserBackendApiService;
-    let imageUploadHelperService: ImageUploadHelperService;
 
     let preferencesData: PreferencesBackendDict = {
       preferred_language_codes: ['en'],
@@ -187,7 +185,6 @@ describe('Preferences Page Component', () => {
       i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
       ngbModal = TestBed.inject(NgbModal);
       mockUserBackendApiService = TestBed.inject(UserBackendApiService);
-      imageUploadHelperService = TestBed.inject(ImageUploadHelperService);
 
       spyOn(userService, 'getProfileImageDataUrl').and.returnValue([
         'profile-image-url-png',
@@ -497,6 +494,14 @@ describe('Preferences Page Component', () => {
       spyOn(ngbModal, 'open').and.returnValue({
         result: Promise.resolve(profilePictureDataUrl),
       } as NgbModalRef);
+      spyOn(
+        mockUserBackendApiService,
+        'updateMultiplePreferencesDataAsync'
+      ).and.returnValue(
+        Promise.resolve({
+          bulk_email_signup_message_should_be_shown: false,
+        })
+      );
       spyOn(mockWindowRef.nativeWindow.location, 'reload');
       spyOn(userService, 'getUserInfoAsync').and.returnValue(
         Promise.resolve(
@@ -520,46 +525,41 @@ describe('Preferences Page Component', () => {
       tick();
       componentInstance.savePreferences();
       tick();
-      expect(mockWindowRef.nativeWindow.sessionStorage.getItem('file')).toEqual(
-        profilePictureDataUrl
+      expect(
+        componentInstance.preferencesForm.controls.profilePicturePngDataUrl
+          .value
+      ).toEqual(profilePictureDataUrl);
+      expect(
+        mockUserBackendApiService.updateMultiplePreferencesDataAsync
+      ).toHaveBeenCalledWith(
+        jasmine.arrayContaining([
+          jasmine.objectContaining({
+            update_type: 'profile_picture_data_url',
+            data: profilePictureDataUrl,
+          }),
+        ])
       );
+      expect(
+        componentInstance.preferencesForm.controls.profilePictureWebpDataUrl
+          .value
+      ).toEqual(profilePictureDataUrl);
+      expect(
+        componentInstance.preferencesForm.controls.profilePicturePngDataUrl
+          .dirty
+      ).toBeFalse();
+      expect(
+        componentInstance.preferencesForm.controls.profilePictureWebpDataUrl
+          .dirty
+      ).toBeFalse();
+      expect(
+        componentInstance.preferencesForm.controls.profilePicturePngDataUrl
+          .pristine
+      ).toBeTrue();
+      expect(
+        componentInstance.preferencesForm.controls.profilePictureWebpDataUrl
+          .pristine
+      ).toBeTrue();
       expect(mockWindowRef.nativeWindow.location.reload).toHaveBeenCalled();
-    }));
-
-    it('should edit profile picture modal raise error when image is invalid', fakeAsync(() => {
-      let error = 'Image uploaded is not valid.';
-      let profilePictureDataUrl = 'data:text/plain;base64,JUMzJTg3JTJD';
-      spyOn(ngbModal, 'open').and.returnValue({
-        result: Promise.resolve(profilePictureDataUrl),
-      } as NgbModalRef);
-      spyOn(
-        imageUploadHelperService,
-        'convertImageDataToImageFile'
-      ).and.returnValue(null);
-      spyOn(alertsService, 'addWarning');
-      spyOn(userService, 'getUserInfoAsync').and.returnValue(
-        Promise.resolve(
-          new UserInfo(
-            ['USER_ROLE'],
-            false,
-            false,
-            false,
-            false,
-            false,
-            'en',
-            'test',
-            'test_email@example.com',
-            true
-          )
-        )
-      );
-      componentInstance.ngOnInit();
-      tick();
-      componentInstance.showEditProfilePictureModal();
-      tick();
-      componentInstance.savePreferences();
-      tick();
-      expect(alertsService.addWarning).toHaveBeenCalledWith(error);
     }));
 
     it('should handle edit profile picture modal is canceled', fakeAsync(() => {
