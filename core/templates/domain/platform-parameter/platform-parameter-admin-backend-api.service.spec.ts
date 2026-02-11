@@ -34,10 +34,10 @@ describe('PlatformParameterAdminBackendApiService', () => {
       imports: [HttpClientTestingModule],
     });
 
-    parameterAdminService = TestBed.get(
+    parameterAdminService = TestBed.inject(
       PlatformParameterAdminBackendApiService
     );
-    httpTestingController = TestBed.get(HttpTestingController);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

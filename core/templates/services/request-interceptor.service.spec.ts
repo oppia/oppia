@@ -50,10 +50,10 @@ describe('Request Interceptor Service', () => {
       ],
     });
 
-    requestInterceptor = TestBed.get(RequestInterceptor);
-    csrfTokenService = TestBed.get(CsrfTokenService);
-    httpClient = TestBed.get(HttpClient);
-    httpTestingController = TestBed.get(HttpTestingController);
+    requestInterceptor = TestBed.inject(RequestInterceptor);
+    csrfTokenService = TestBed.inject(CsrfTokenService);
+    httpClient = TestBed.inject(HttpClient);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
