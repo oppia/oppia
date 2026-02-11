@@ -34,9 +34,11 @@ FULL_STACK_TEST_DOWNLOAD_DIR = os.path.join(
     CURR_DIR, '..', 'oppia_acceptance_test_downloads'
 )
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Deletes temporary and installed files.
-""")
+"""
+)
 
 
 def delete_directory_tree(directory_path: str) -> None:

@@ -27,12 +27,14 @@ from scripts import build, common, servers
 
 from typing import Final, List, Optional, Tuple
 
-_PARSER: Final = argparse.ArgumentParser(description="""
+_PARSER: Final = argparse.ArgumentParser(
+    description="""
 Run this script from the oppia root folder:
    python -m scripts.run_acceptance_tests
 
 The root folder MUST be named 'oppia'.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--skip_build',
@@ -108,10 +110,12 @@ def compile_test_ts_files() -> None:
 def run_tests(args: argparse.Namespace) -> Tuple[List[bytes], int]:
     """Run the scripts to start acceptance tests."""
     if common.is_oppia_server_already_running():
-        sys.exit("""
+        sys.exit(
+            """
             Oppia server is already running. Try shutting all the servers down
             before running the script.
-        """)
+        """
+        )
 
     with contextlib.ExitStack() as stack:
         dev_mode = not args.prod_env
