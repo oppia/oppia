@@ -48,10 +48,12 @@ import apache_beam as beam
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import base_models
-    from mypy_imports import blog_models
-    from mypy_imports import datastore_services
-    from mypy_imports import user_models
+    from mypy_imports import (
+        base_models,
+        blog_models,
+        datastore_services,
+        user_models,
+    )
 
 (base_models, blog_models, user_models) = models.Registry.import_models(
     [models.Names.BASE_MODEL, models.Names.BLOG, models.Names.USER]
@@ -98,7 +100,8 @@ class AuditBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             >> beam.Filter(lambda model: model.published_on is not None)
             | 'Key by author_id from summaries'
             >> beam.Map(lambda model: (model.author_id, None))
-            | 'Deduplicate author_id pairs' >> beam.Distinct()
+            | 'Deduplicate author_id pairs'
+            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
         )
 
         existing_author_detail_pairs = (
@@ -246,7 +249,8 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             >> beam.Filter(lambda model: model.published_on is not None)
             | 'Key by author_id from summaries'
             >> beam.Map(lambda model: (model.author_id, None))
-            | 'Deduplicate author_id pairs' >> beam.Distinct()
+            | 'Deduplicate author_id pairs'
+            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
         )
 
         existing_author_detail_pairs = (

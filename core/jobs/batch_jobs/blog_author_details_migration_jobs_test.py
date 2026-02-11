@@ -29,8 +29,7 @@ from typing import Final, Type
 
 MYPY = False
 if MYPY:  # pragma: no cover
-    from mypy_imports import blog_models
-    from mypy_imports import user_models
+    from mypy_imports import blog_models, user_models
 
 (blog_models, user_models) = models.Registry.import_models(
     [models.Names.BLOG, models.Names.USER]
