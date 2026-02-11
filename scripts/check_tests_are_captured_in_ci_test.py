@@ -353,15 +353,38 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             mock_get_e2e_test_modules_from_webdriverio_config_file,
         )
 
-        with get_e2e_test_modules_from_webdriverio_directory_swap:
-            with get_e2e_test_modules_from_webdriverio_config_file_swap:
-                with self.assertRaisesRegex(
-                    Exception,
-                    'One or more test module from webdriverio or '
-                    'webdriverio_desktop directory is missing from '
-                    'wdio.conf.js',
-                ):
-                    check_tests_are_captured_in_ci.main()
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
+            List[check_tests_are_captured_in_ci.TestSuiteDict]
+        ):  # pylint: disable=line-too-long
+            return []
+
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
+            List[check_tests_are_captured_in_ci.TestSuiteDict]
+        ):  # pylint: disable=line-too-long
+            return []
+
+        get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_acceptance_test_suites_from_ci_config_file',
+            mock_get_acceptance_test_suites_from_ci_config_file,
+        )
+        get_acceptance_test_suites_from_acceptance_directory_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_acceptance_test_suites_from_acceptance_directory',
+            mock_get_acceptance_test_suites_from_acceptance_directory,
+        )
+
+        with get_acceptance_test_suites_from_ci_config_file_swap:
+            with get_acceptance_test_suites_from_acceptance_directory_swap:
+                with get_e2e_test_modules_from_webdriverio_directory_swap:
+                    with get_e2e_test_modules_from_webdriverio_config_file_swap:
+                        with self.assertRaisesRegex(
+                            Exception,
+                            'One or more test module from webdriverio or '
+                            'webdriverio_desktop directory is missing from '
+                            'wdio.conf.js',
+                        ):
+                            check_tests_are_captured_in_ci.main()
 
     def test_check_tests_are_captured_in_ci_with_e2e_error(self) -> None:
         def mock_get_e2e_test_suites_from_ci_config_file() -> (
@@ -385,19 +408,63 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             mock_get_e2e_test_suites_from_webdriverio_config_file,
         )
 
-        with get_e2e_test_suites_from_ci_config_file_swap:
-            with get_e2e_test_suites_from_webdriverio_config_file_swap:
-                with self.assertRaisesRegex(
-                    Exception,
-                    re.escape(
-                        'E2E test suites and CI test suites are not in sync. '
-                        'The following suites are not in sync: %s. Please '
-                        'update the CI config file for e2e tests at core/tests/'
-                        'ci-test-suite-configs/e2e.json with the suites listed '
-                        'above.' % (json.dumps(E2E_TEST_SUITES[1:2]))
-                    ),
-                ):
-                    check_tests_are_captured_in_ci.main()
+        def mock_get_acceptance_test_suites_from_ci_config_file() -> (
+            List[check_tests_are_captured_in_ci.TestSuiteDict]
+        ):  # pylint: disable=line-too-long
+            return []
+
+        def mock_get_acceptance_test_suites_from_acceptance_directory() -> (
+            List[check_tests_are_captured_in_ci.TestSuiteDict]
+        ):  # pylint: disable=line-too-long
+            return []
+
+        def mock_get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
+            return []
+
+        def mock_get_e2e_test_modules_from_webdriverio_config_file() -> (
+            List[str]
+        ):
+            return []
+
+        get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_acceptance_test_suites_from_ci_config_file',
+            mock_get_acceptance_test_suites_from_ci_config_file,
+        )
+        get_acceptance_test_suites_from_acceptance_directory_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_acceptance_test_suites_from_acceptance_directory',
+            mock_get_acceptance_test_suites_from_acceptance_directory,
+        )
+        get_e2e_test_modules_from_webdriverio_directory_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_e2e_test_modules_from_webdriverio_directory',
+            mock_get_e2e_test_modules_from_webdriverio_directory,
+        )
+        get_e2e_test_modules_from_webdriverio_config_file_swap = self.swap(
+            check_tests_are_captured_in_ci,
+            'get_e2e_test_modules_from_webdriverio_config_file',
+            mock_get_e2e_test_modules_from_webdriverio_config_file,
+        )
+
+        with get_acceptance_test_suites_from_ci_config_file_swap:
+            with get_acceptance_test_suites_from_acceptance_directory_swap:
+                with get_e2e_test_modules_from_webdriverio_directory_swap:
+                    with get_e2e_test_modules_from_webdriverio_config_file_swap:
+                        with get_e2e_test_suites_from_ci_config_file_swap:
+                            with get_e2e_test_suites_from_webdriverio_config_file_swap:
+                                with self.assertRaisesRegex(
+                                    Exception,
+                                    re.escape(
+                                        'E2E test suites and CI test suites are not in sync. '
+                                        'The following suites are not in sync: %s. Please '
+                                        'update the CI config file for e2e tests at core/tests/'
+                                        'ci-test-suite-configs/e2e.json with the suites listed '
+                                        'above.'
+                                        % (json.dumps(E2E_TEST_SUITES[1:2]))
+                                    ),
+                                ):
+                                    check_tests_are_captured_in_ci.main()
 
     def test_check_tests_are_captured_in_ci_with_no_error(self) -> None:
         def mock_get_acceptance_test_suites_from_ci_config_file() -> (

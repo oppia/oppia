@@ -4330,7 +4330,7 @@ export class ExplorationEditor extends BaseUser {
    */
   async navigateToImprovementsTab(): Promise<void> {
     if (this.isViewportAtMobileWidth()) {
-      // Handle mobile navigation
+      // Handle mobile navigation.
       const element = await this.page.$(mobileNavbarOptions);
       if (!element) {
         await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
@@ -4341,10 +4341,10 @@ export class ExplorationEditor extends BaseUser {
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
       // Note: Mobile improvements tab button would go here if needed
-      // For now, fall through to desktop logic
+      // For now, fall through to desktop logic.
     }
 
-    // Desktop navigation
+    // Desktop navigation.
     await this.page.waitForSelector(improvementsTabButton, {
       visible: true,
     });
@@ -4368,10 +4368,10 @@ export class ExplorationEditor extends BaseUser {
    * Function to verify that the improvements tab is visible.
    */
   async expectImprovementsTabToBeVisible(): Promise<void> {
-    // Wait a bit for the page to fully render after reload
+    // Wait a bit for the page to fully render after reload.
     await this.page.waitForTimeout(2000);
 
-    // Check with retry logic
+    // Check with retry logic.
     let isVisible = false;
     let attempts = 0;
     const maxAttempts = 5;

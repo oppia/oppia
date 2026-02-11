@@ -18,10 +18,7 @@
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
-import {
-  ExplorationEditor,
-  INTERACTION_TYPES,
-} from '../../utilities/user/exploration-editor';
+import {ExplorationEditor} from '../../utilities/user/exploration-editor';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 
 const DEFAULT_SPEC_TIMEOUT_MSECS = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -67,8 +64,8 @@ describe('Improvements Tab', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
-  // Note: The test for improvements tab visibility in published explorations
-  // is marked as TODO in the original E2E tests (issue #13352). This required
+  // TODO(#13352): The test for improvements tab visibility in published explorations
+  // is marked as TODO in the original E2E tests. This required
   // testing the tab after learner interactions generate improvement suggestions,
   // which involves complex setup for generating answer statistics incrementally.
   // This acceptance test focuses on the core functionality: verifying the tab
