@@ -65,12 +65,12 @@ export default {
       "explanation": "For learners in Nigeria."
     }],
 
-    "RTE_COMPONENT_CONFIGS": {
-      "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
-      "BLOG_COMPONENTS": ["image", "link", "video"],
-      "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
-      "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
-    },
+  "RTE_COMPONENT_CONFIGS": {
+    "ALL_COMPONENTS": ["tabs", "skillreview", "collapsible", "math", "image", "link", "video"],
+    "BLOG_COMPONENTS": ["image", "link", "video"],
+    "SKILL_AND_STUDY_GUIDE_EDITOR_COMPONENTS": ["skillreview", "math", "image", "workedexample"],
+    "CURATED_LESSON_COMPONENTS": ["image", "math", "skillreview"]
+  },
 
   "LIST_OF_DEFAULT_TAGS_FOR_BLOG_POST": [
     "News", "International", "Educators", "Learners", "Community",
@@ -6755,7 +6755,7 @@ export default {
     },
     "COLLECTION_PLAYER": {
       "ROUTE": "collection/:collection_id",
-      "TITLE": "",
+      "TITLE": "I18N_PLAYER_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6911,7 +6911,7 @@ export default {
     },
     "EXPLORATION_PLAYER": {
       "ROUTE": "explore/:exploration_id",
-      "TITLE": "",
+      "TITLE": "I18N_PLAYER_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6920,7 +6920,7 @@ export default {
     },
     "EXPLORATION_PLAYER_EMBED": {
       "ROUTE": "embed/exploration/:exploration_id",
-      "TITLE": "",
+      "TITLE": "I18N_PLAYER_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6929,7 +6929,7 @@ export default {
     },
     "LESSON_PLAYER_EMBED": {
       "ROUTE": "embed/lesson/:exploration_id",
-      "TITLE": "",
+      "TITLE": "I18N_PLAYER_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
@@ -6938,7 +6938,7 @@ export default {
     },
     "NEW_LESSON_PLAYER": {
       "ROUTE": "lesson/:exploration_id",
-      "TITLE": "",
+      "TITLE": "I18N_PLAYER_LOADING",
       // Some routes contain url fragments, as syntax for url fragments are
       // different for angular router and backend. They have to be registered
       // manually in the backend. Please use angular router syntax here.
