@@ -15,11 +15,13 @@
 /**
  * @fileoverview Topic manager utility file.
  */
+import {promises} from 'dns';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import {ElementHandle, Page} from 'puppeteer';
 import puppeteer from 'puppeteer';
+import {CurriculumAdmin} from './curriculum-admin';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const curriculumAdminThumbnailImage =
@@ -372,6 +374,11 @@ const mobileReadyToPublishButton = '.ready-to-publish-mobile-option';
 const markAsReadyToPublishButton = '.e2e-test-mark-as-ready-to-publish-button';
 const mobileSaveStoryChangesDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
+const mobilePublishStoryButton =
+  'div.navbar-mobile-options .e2e-test-mobile-publish-button';
+const storyNodeSelector = 'tr.story-node';
+const publishChapterButton = '.e2e-test-publish-chapters-button';
+const chapterStatusSelector = '.e2e-test-chapter-status';
 export class TopicManager extends BaseUser {
   /**
    * Closes navigation in mobile view.
@@ -3395,9 +3402,10 @@ export class TopicManager extends BaseUser {
             if (elements.length < 5) {
               throw new Error('Not enough elements collapsible headers found,');
             }
-            await elements[2].click();
-            await elements[3].click();
             await elements[4].click();
+            await elements[3].click();
+            await elements[2].click();
+            await elements[1].click();
           }
           return;
         }
@@ -4398,7 +4406,7 @@ export class TopicManager extends BaseUser {
    * @param storyName - The name of the story containing the chapter.
    * @param topicName - The name of the topic under which the story exists.
    */
-  async makeChapterReadtToPublish(
+  async readyToPublish(
     chapterName: string,
     storyName: string,
     topicName: string
@@ -4448,15 +4456,7 @@ export class TopicManager extends BaseUser {
       'This is a chapter description.'
     );
 
-    const today = new Date();
-    let futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + 3);
-    const dateString = futureDate.toLocaleDateString('en-US');
-
-    await this.setNodePlannedPublicationDate(
-      plannedPublicationDateInput,
-      dateString
-    );
+    await this.setNodePlannedPublicationDate();
 
     await this.typeInInputField(outlineEditorInput, 'This is an outline.');
     await this.clickOnElementWithSelector(saveOutlineButton);
@@ -4506,20 +4506,20 @@ export class TopicManager extends BaseUser {
       }
       await elements[1].click();
     }
-    await this.page.waitForSelector('tr.story-node');
+    await this.page.waitForSelector(storyNodeSelector);
 
-    const rows = await this.page.$$('tr.story-node');
+    const rows = await this.page.$$(storyNodeSelector);
     const found = new Set<string>();
 
     for (const row of rows) {
-      const title = await row.$eval('.e2e-test-chapter-title', el =>
+      const title = await row.$eval(chapterTitleSelector, el =>
         el.textContent?.trim()
       );
       if (!title) {
         throw new Error(`${title} is Missing`);
       }
       if (chapterNames.includes(title)) {
-        const status = await row.$eval('.e2e-test-chapter-status', el =>
+        const status = await row.$eval(chapterStatusSelector, el =>
           el.textContent?.trim()
         );
         if (!status) {
@@ -4534,6 +4534,33 @@ export class TopicManager extends BaseUser {
     if (missing.length) {
       throw new Error(`Chapters not found: ${missing.join(', ')}`);
     }
+  }
+
+  /**
+   * Publishes the draft of a serial chapter.
+   */
+  async publishStoryDraftSerialChapter(): Promise<void> {
+    if (this.isViewportAtMobileWidth()) {
+      await this.clickOnElementWithSelector(mobileOptionsSelector);
+      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
+        visible: true,
+      });
+      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
+      await this.page.waitForSelector(mobilePublishStoryButton);
+      await this.clickOnElementWithSelector(mobilePublishStoryButton);
+    } else {
+      await this.clickOnElementWithSelector(publishChapterButton);
+    }
+  }
+
+  async publishChapter(
+    storyName: string,
+    topicName: string,
+    dropdownValue: string
+  ): Promise<void> {
+    await this.openStoryEditor(storyName, topicName);
+    await this.publishStoryDraftChapterUpto(dropdownValue);
+    await this.publishStoryDraftSerialChapter();
   }
 }
 export let TopicManagerFactory = (): TopicManager => new TopicManager();

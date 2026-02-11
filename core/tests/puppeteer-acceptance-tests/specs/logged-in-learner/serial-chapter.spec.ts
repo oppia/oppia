@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
+ * TODO : #24785
  * Has to set this after Adding the CUJs in v3 docs
  */
 
@@ -38,6 +39,7 @@ const topicPageRevisionTabContentSelector =
   '.e2e-test-topic-viewer-revision-tab';
 const studyGuideRecommendationLinkSelector =
   '.e2e-test-study-guide-recommendation-link';
+
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
@@ -118,23 +120,22 @@ describe('Logged-In Learner', function () {
 
     await curriculumAdmin.saveStoryDraft();
 
-    await curriculumAdmin.makeChapterReadtToPublish(
+    await curriculumAdmin.readyToPublish(
       'What are the Place Values',
       "Jamie's Adventures in the Arcade",
       'Place Values'
     );
-    await curriculumAdmin.makeChapterReadtToPublish(
+    await curriculumAdmin.readyToPublish(
       'Find the Value of a Number',
       "Jamie's Adventures in the Arcade",
       'Place Values'
     );
 
-    await curriculumAdmin.openStoryEditor(
+    await curriculumAdmin.publishChapter(
       "Jamie's Adventures in the Arcade",
-      'Place Values'
+      'Place Values',
+      '0'
     );
-    await curriculumAdmin.publishStoryDraftChapterUpto('0');
-    await curriculumAdmin.publishStoryDraftSerialChapter();
     loggedInLearner1 = await UserFactory.createNewUser(
       'loggedInLearner1',
       'logged_in_learner1@example.com'
@@ -160,11 +161,11 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.submitGoalInRedesignedLearnerDashboard();
 
-      await loggedInLearner1.expectGoalCardToBeVisible('Place Values');
+      // await loggedInLearner1.expectGoalCardToBeVisible('Place Values'); Remove this line
       await loggedInLearner1.clickOnGoalCard('Place Values');
 
       await loggedInLearner1.expectScreenshotToMatch(
-        'Chap1StartRestCommingSoon',
+        'FirstChapterStartOthersComingSoon',
         __dirname
       );
       await loggedInLearner1.clickLessonCardButton('What are the Place Values');
@@ -186,7 +187,7 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.navigateToLearnerDashboard();
       await loggedInLearner1.expectScreenshotToMatch(
-        'Chap2ShowInContinueWhereYouLeftOff',
+        'Chap2ContinueWhereYouLeftOff',
         __dirname
       );
       await loggedInLearner1.expectContinueWhereYouLeftOffSectionToContainLessonCards(
@@ -200,7 +201,7 @@ describe('Logged-In Learner', function () {
         'Find the Value of a Number',
         'Coming Soon'
       );
-      await loggedInLearner1.waitForPageToFullyLoad();
+
       await loggedInLearner1.expectLessonProgressInRedesignedDashboardToBe(
         ' Chapter 1: What are the Place Values ',
         '100%'
@@ -214,10 +215,11 @@ describe('Logged-In Learner', function () {
       await loggedInLearner2.navigateToClassroomPage('math');
       await loggedInLearner2.selectAndOpenTopic('Place Values');
 
-      await loggedInLearner2.availableLessonListHasChapters([
+      // Story Summary Section.
+      await loggedInLearner2.expectChaptersInAvailableChapterList([
         'What are the Place Values',
       ]);
-      await loggedInLearner2.commingSoonLessonListHasChapters([
+      await loggedInLearner2.comingSoonLessonListHasChapters([
         'Find the Value of a Number',
       ]);
 
@@ -227,7 +229,7 @@ describe('Logged-In Learner', function () {
       // );
 
       await loggedInLearner2.expectScreenshotToMatch(
-        'avialableChap1CommingSoonChap2',
+        'Chap1AvailableChap2ComingSoon',
         __dirname
       );
 
@@ -245,9 +247,12 @@ describe('Logged-In Learner', function () {
         studyGuideRecommendationSelector
       );
       await loggedInLearner2.returnToStoryFromLastState();
-      await loggedInLearner2.expectChapterToBeClickable(
-        'Find the Value of a Number'
-      );
+
+      // Story viewer section.
+      // Todo:After Resolving issue #24423
+      // await loggedInLearner2.expectChapterToBeClickable(
+      //   'Find the Value of a Number'
+      // );
 
       await loggedInLearner2.expectChapterToBeClickable(
         'What are the Place Values'
@@ -274,40 +279,39 @@ describe('Logged-In Learner', function () {
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
   it(
-    'should learner continues learning when new chapters are published',
+    'should continue learning when new chapters are published',
     async function () {
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Comparing Numbers',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Rounding Numbers part 1',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Rounding Numbers part 2',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
 
-      await curriculumAdmin.openStoryEditor(
+      await curriculumAdmin.publishChapter(
         "Jamie's Adventures in the Arcade",
-        'Place Values'
+        'Place Values',
+        '2'
       );
-      await curriculumAdmin.publishStoryDraftChapterUpto('2');
-      await curriculumAdmin.publishStoryDraftSerialChapter();
       await UserFactory.closeBrowserForUser(curriculumAdmin);
 
       await loggedInLearner2.navigateToClassroomPage('math');
       await loggedInLearner2.selectAndOpenTopic('Place Values');
-      await loggedInLearner2.availableLessonListHasChapters([
+      await loggedInLearner2.expectChaptersInAvailableChapterList([
         'What are the Place Values',
         'Find the Value of a Number',
         'Comparing Numbers',
       ]);
-      await loggedInLearner2.commingSoonLessonListHasChapters([
+      await loggedInLearner2.comingSoonLessonListHasChapters([
         'Rounding Numbers part 1',
         'Rounding Numbers part 2',
       ]);

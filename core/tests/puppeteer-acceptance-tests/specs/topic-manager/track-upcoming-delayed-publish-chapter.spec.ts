@@ -1,4 +1,4 @@
-// Copyright 2025 The Oppia Authors. All Rights Reserved.
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
+ * TODO : #24785
  * Has to set this after Adding the CUJs in v3 docs
  */
 
@@ -50,6 +51,7 @@ const mobilePublishStoryButton =
   'div.navbar-mobile-options .e2e-test-mobile-publish-button';
 const publishUptoChaptersDropdownSelector =
   'select.e2e-test-publish-up-to-chapter-dropdown';
+
 describe('Logged-In Learner', function () {
   let curriculumAdmin: CurriculumAdmin & ExplorationEditor & TopicManager;
   let releaseCoordinator: ReleaseCoordinator;
@@ -130,64 +132,17 @@ describe('Logged-In Learner', function () {
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.waitForPageToFullyLoad();
-      if (curriculumAdmin.isViewportAtMobileWidth()) {
-        await curriculumAdmin.waitForStaticAssetsToLoad();
-        const addChapterButtonElement =
-          await curriculumAdmin.page.$(addChapterButton);
-        if (!addChapterButtonElement) {
-          await curriculumAdmin.clickOnElementWithSelector(
-            mobileChapterCollapsibleCard
-          );
-        }
-      }
-      await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
-      let chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
-
-      for (const titleElement of chapterTitles) {
-        const title = await curriculumAdmin.page.evaluate(
-          el => el.textContent.trim(),
-          titleElement
-        );
-
-        if (title === 'What are the Place Values') {
-          await titleElement.click();
-          await curriculumAdmin.waitForStaticAssetsToLoad();
-          await curriculumAdmin.expectElementToBeVisible(
-            chapterEditorContainerSelector
-          );
-
-          if (curriculumAdmin.isViewportAtMobileWidth()) {
-            await curriculumAdmin.page.waitForSelector(
-              mobileCollapsibleCardHeaderSelector
-            );
-            const elements = await curriculumAdmin.page.$$(
-              mobileCollapsibleCardHeaderSelector
-            );
-            if (elements.length < 5) {
-              throw new Error('Not enough elements collapsible headers found,');
-            }
-            await elements[1].click();
-            await elements[2].click();
-            await elements[3].click();
-            await elements[4].click();
-          }
-        }
-      }
+      await curriculumAdmin.openChapterEditor(
+        'What are the Place Values',
+        "Jamie's Adventures in the Arcade",
+        'Place Values'
+      );
       await curriculumAdmin.typeInInputField(
         chapterDescriptionField,
         'This is a chapter description.'
       );
 
-      const futureDate = new Date();
-      futureDate.setMonth(futureDate.getMonth() + 3);
-
-      const dateString = futureDate.toLocaleDateString('en-US');
-
-      await curriculumAdmin.setNodePlannedPublicationDate(
-        plannedPublicationDateInput,
-        dateString
-      );
+      await curriculumAdmin.setNodePlannedPublicationDate();
 
       await curriculumAdmin.typeInInputField(
         outlineEditorInput,
@@ -199,23 +154,17 @@ describe('Logged-In Learner', function () {
 
       await curriculumAdmin.saveStoryDraft();
       await curriculumAdmin.clickReadyToPublishButton();
-
+      await curriculumAdmin.scrollToTopOfPage();
       await curriculumAdmin.expectScreenshotToMatch(
         'chapterMarkedAsReadyToPublish',
         __dirname
       );
 
-      await curriculumAdmin.openStoryEditor(
+      await curriculumAdmin.publishChapter(
         "Jamie's Adventures in the Arcade",
-        'Place Values'
+        'Place Values',
+        '0'
       );
-      await curriculumAdmin.publishStoryDraftChapterUpto('0');
-      await curriculumAdmin.expectScreenshotToMatch(
-        'publishChapterUpto1',
-        __dirname
-      );
-      await curriculumAdmin.publishStoryDraftSerialChapter();
-
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
@@ -242,6 +191,10 @@ describe('Logged-In Learner', function () {
       } else {
         await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
       }
+      await curriculumAdmin.expectScreenshotToMatch(
+        'ConfirmationModalOpen',
+        __dirname
+      );
       await curriculumAdmin.clickOnElementWithSelector(
         cancelUnpublishModalButton
       );
@@ -253,6 +206,7 @@ describe('Logged-In Learner', function () {
         ['What are the Place Values'],
         'Published'
       );
+
       await curriculumAdmin.clickOnElementWithSelector(
         publishUptoChaptersDropdownSelector
       );
@@ -278,9 +232,11 @@ describe('Logged-In Learner', function () {
         'Draft'
       );
 
+      // A previously unpublished chapter can be marked ready to publish
+      // by setting only the publication date.
       await curriculumAdmin.waitForPageToFullyLoad();
       await curriculumAdmin.page.waitForSelector(chapterTitleSelector);
-      chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
+      const chapterTitles = await curriculumAdmin.page.$$(chapterTitleSelector);
 
       for (const titleElement of chapterTitles) {
         const title = await curriculumAdmin.page.evaluate(
@@ -296,42 +252,38 @@ describe('Logged-In Learner', function () {
           );
         }
       }
-      await curriculumAdmin.setNodePlannedPublicationDate(
-        plannedPublicationDateInput,
-        dateString
-      );
+      await curriculumAdmin.setNodePlannedPublicationDate();
       await curriculumAdmin.saveStoryDraft();
       await curriculumAdmin.clickReadyToPublishButton();
 
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Find the Value of a Number',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Comparing Numbers',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
-      await curriculumAdmin.makeChapterReadtToPublish(
+      await curriculumAdmin.readyToPublish(
         'Rounding Numbers part 1',
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
 
-      await curriculumAdmin.openStoryEditor(
+      await curriculumAdmin.publishChapter(
         "Jamie's Adventures in the Arcade",
-        'Place Values'
+        'Place Values',
+        '3'
       );
-      await curriculumAdmin.publishStoryDraftChapterUpto('3');
-      await curriculumAdmin.publishStoryDraftSerialChapter();
       await curriculumAdmin.openStoryEditor(
         "Jamie's Adventures in the Arcade",
         'Place Values'
       );
       await curriculumAdmin.waitForPageToFullyLoad();
       await curriculumAdmin.expectScreenshotToMatch(
-        'allChapterInPublishedState',
+        'allChaptersInPublishedState',
         __dirname
       );
     },

@@ -1928,23 +1928,6 @@ export class CurriculumAdmin extends TopicManager {
   }
 
   /**
-   * Publishes the draft of a serial chapter.
-   */
-  async publishStoryDraftSerialChapter(): Promise<void> {
-    if (this.isViewportAtMobileWidth()) {
-      await this.clickOnElementWithSelector('.e2e-test-mobile-options-base');
-      await this.page.waitForSelector(mobileSaveStoryChangesDropdown, {
-        visible: true,
-      });
-      await this.clickOnElementWithSelector(mobileSaveStoryChangesDropdown);
-      await this.page.waitForSelector(mobilePublishStoryButton);
-      await this.clickOnElementWithSelector(mobilePublishStoryButton);
-    } else {
-      await this.clickOnElementWithSelector(publishChapterButton);
-    }
-  }
-
-  /**
    * Function to verify the unpublish topic button is visible.
    */
   async expectUnpublishTopicButtonToBeVisible(): Promise<void> {

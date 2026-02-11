@@ -246,6 +246,7 @@ const classroomButtonOnRedesignedLearnerDashboard =
   '.e2e-test-learner-dash-classroom-button';
 const sidebarSelector = '.e2e-test-learner-dashboard-sidebar';
 const sidebarSelectorPic = '.e2e-test-learner-dash-sidebar-pic';
+const newLabelSelector = '.e2e-test-new-label';
 const learnerDashSelectors: Record<string, Record<string, string>> = {
   tabSection: {
     content: '.e2e-test-learner-dash-section',
@@ -373,7 +374,8 @@ const usernameSelector = '.e2e-test-username';
 const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 const availableChapters = '.e2e-test-available-chapters';
-const coomingSoonLessonListSelector = '.e2e-test-cooming-soon-chapters';
+const comingSoonChaptersListSelector = '.e2e-test-coming-soon-chapters';
+const chapterSelector = '.e2e-test-chapter-title';
 export class LoggedInUser extends BaseUser {
   /**
    * Clicks on the given button in the remove activity modal.
@@ -3480,37 +3482,6 @@ export class LoggedInUser extends BaseUser {
     throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
   }
 
-  async hoverLessonCardButton(lessonTitle: string): Promise<void> {
-    await this.page.waitForSelector(lessonCardContainer, {visible: true});
-    const lessonCards = await this.page.$$(lessonCardContainer);
-
-    for (const card of lessonCards) {
-      const titles = await card.$$eval(lessonTitleSelector, els =>
-        els.map(el => el.textContent?.trim())
-      );
-
-      if (titles.some(text => text && text.includes(lessonTitle))) {
-        const button = await card.$('a.oppia-learner-dash-button--goals-list');
-
-        if (!button) {
-          throw new Error(`Button not found for lesson "${lessonTitle}".`);
-        }
-
-        await button.evaluate(el => {
-          if (el instanceof HTMLElement) {
-            el.scrollIntoView({behavior: 'auto', block: 'center'});
-          }
-        });
-
-        await button.hover();
-
-        return;
-      }
-    }
-
-    throw new Error(`Lesson card with title "${lessonTitle}" not found.`);
-  }
-
   /**
    * Expects the exploration player to be loaded.
    */
@@ -4452,37 +4423,10 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Function to Verifiy that a specific chapter is present in the recommended section.
+   * Function to verify that a specific chapter is present in the recommended section.
    * @param chapterTitle - The title of the chapter to verify.
    */
   async expectChapterToBePresentInRecommendedSection(
-    chapterTitle: string
-  ): Promise<void> {
-    await this.expectElementToBeVisible(recommendationsSectionSelector);
-    // Wait for lesson cards to load if they exist.
-    try {
-      await this.page.waitForSelector(commonLessonCardContainerSelector, {
-        visible: true,
-        timeout: 5000,
-      });
-    } catch (error) {
-      // Lesson cards may not be present if section is empty (no untracked topics).
-      // This is expected for new users.
-      showMessage(
-        'Recommended section is empty (no lesson cards found). This is expected for new users.'
-      );
-      return;
-    }
-    const recommendationSection = await this.page.$(
-      recommendationsSectionSelector
-    );
-    if (!recommendationSection) {
-      throw new Error('Recommended section not found.');
-    }
-    await this.expectLessonCardToBePresent(chapterTitle, recommendationSection);
-  }
-
-  async expectChapterToBePresentInProgressSection(
     chapterTitle: string
   ): Promise<void> {
     await this.expectElementToBeVisible(recommendationsSectionSelector);
@@ -4544,6 +4488,7 @@ export class LoggedInUser extends BaseUser {
     lessonTitle: string,
     progress: string
   ): Promise<void> {
+    await this.waitForPageToFullyLoad();
     await this.page.waitForSelector(lessonCardContainer);
     const lessonCards = await this.page.$$(lessonCardContainer);
 
@@ -4668,6 +4613,10 @@ export class LoggedInUser extends BaseUser {
     await this.expectTextContentToBe(usernameSelector, expectedUsername);
   }
 
+  /**
+   * Verifies that the specified lesson card displays the "New" label.
+   * @param {string} chapterName - The name of the lesson to check.
+   */
   async expectLessonCardToHaveNewLabel(chapterName: string): Promise<void> {
     const lessonSel = learnerDashSelectors.lessonCard;
 
@@ -4682,14 +4631,14 @@ export class LoggedInUser extends BaseUser {
         : '';
 
       if (titleText?.includes(chapterName)) {
-        const newLabel = await card.$('.e2e-test-new-label');
+        const newLabel = await card.$(newLabelSelector);
 
         if (!newLabel) {
           throw new Error(
-            `Lesson "${chapterName}" found but does NOT have New label`
+            `Lesson "${chapterName}" found but does NOT have a new label`
           );
         }
-        showMessage(`Lesson "${chapterName}" has New label`);
+        showMessage(`Lesson "${chapterName}" has a new label`);
         return;
       }
     }
@@ -4698,11 +4647,12 @@ export class LoggedInUser extends BaseUser {
   }
 
   /**
-   * Check if available lesson list has chapters
+   * Check if the available chapter list has all the specified chapters
    * @param chapterNames - The array of chapter names
    */
-  async availableLessonListHasChapters(chapterNames: string[]): Promise<void> {
-    const chapterSelector = 'a';
+  async expectChaptersInAvailableChapterList(
+    chapterNames: string[]
+  ): Promise<void> {
     await this.page.waitForSelector(availableChapters);
     const containers = await this.page.$$(availableChapters);
 
@@ -4731,19 +4681,18 @@ export class LoggedInUser extends BaseUser {
       }
     }
 
-    showMessage('All specified Available chapters are present.');
+    showMessage(
+      'All specified chapters are present in the available chapters list.'
+    );
   }
 
   /**
-   * Check if comming soon lesson list has chapters
+   * Check if coming soon lesson list has chapters
    * @param chapterNames - The array of chapter names
    */
-  async commingSoonLessonListHasChapters(
-    chapterNames: string[]
-  ): Promise<void> {
-    const chapterSelector = 'a';
-    await this.page.waitForSelector(coomingSoonLessonListSelector);
-    const containers = await this.page.$$(coomingSoonLessonListSelector);
+  async comingSoonLessonListHasChapters(chapterNames: string[]): Promise<void> {
+    await this.page.waitForSelector(comingSoonChaptersListSelector);
+    const containers = await this.page.$$(comingSoonChaptersListSelector);
 
     for (const chapterName of chapterNames) {
       let chapterFound = false;
@@ -4755,7 +4704,9 @@ export class LoggedInUser extends BaseUser {
           const text = await el.evaluate(node => node.textContent?.trim());
           if (text && text.includes(chapterName)) {
             chapterFound = true;
-            showMessage(`Chapter "${chapterName}" found in Coming Soon list.`);
+            showMessage(
+              `Chapter "${chapterName}" found in coming soon chapters list`
+            );
             break;
           }
         }
@@ -4767,12 +4718,14 @@ export class LoggedInUser extends BaseUser {
 
       if (!chapterFound) {
         throw new Error(
-          `Chapter "${chapterName}" not found in Coming Soon list`
+          `Chapter "${chapterName}" not found in coming soon chapters list`
         );
       }
     }
 
-    showMessage('All specified Coming Soon chapters are present.');
+    showMessage(
+      'All specified chapters are present in the coming soon chapters list'
+    );
   }
 }
 

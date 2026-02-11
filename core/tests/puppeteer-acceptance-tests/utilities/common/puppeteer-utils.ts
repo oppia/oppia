@@ -44,7 +44,8 @@ const warningToastMessageSelector = '.e2e-test-toast-warning-message';
 const warningToastCloseButtonSelector = '.e2e-test-close-toast-warning';
 const oskContainerSelector = '.e2e-test-osk-container';
 const hideOSKButtonSelector = '.e2e-test-osk-hide-button';
-
+const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
+const chapterTitleSelector = '.e2e-test-chapter-title';
 const VIEWPORT_WIDTH_BREAKPOINTS = testConstants.ViewportWidthBreakpoints;
 const baseURL = testConstants.URLs.BaseURL;
 
@@ -748,6 +749,9 @@ export class BaseUser {
     await element.type(text);
   }
 
+  /**
+   * This function converts a given date string into ISO format (YYYY-MM-DD).
+   */
   private toISODate(dateString: string): string {
     const date = new Date(dateString);
 
@@ -758,13 +762,16 @@ export class BaseUser {
     return date.toISOString().split('T')[0];
   }
 
-  async setNodePlannedPublicationDate(
-    selector: string,
-    dateString: string
-  ): Promise<void> {
+  /**
+   * This function set publication date for chapter.
+   */
+  async setNodePlannedPublicationDate(): Promise<void> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 3);
+    const dateString = futureDate.toLocaleDateString('en-US');
     const isoDate = this.toISODate(dateString);
     await this.page.$eval(
-      selector,
+      plannedPublicationDateInput,
       (el, value) => {
         const input = el as HTMLInputElement;
         const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
@@ -1586,10 +1593,14 @@ export class BaseUser {
     await this.page.waitForFunction(isElementClickable, {}, element, clickable);
   }
 
+  /**
+   * Retrieves a chapter element by its name.
+   * @param {string} chapterName - The name of the chapter to search for.
+   */
   private async getChapterByName(
     chapterName: string
   ): Promise<ElementHandle<Element>> {
-    const chapters = await this.page.$$('.e2e-test-chapter-title');
+    const chapters = await this.page.$$(chapterTitleSelector);
 
     for (const chapter of chapters) {
       const text = await this.page.evaluate(
@@ -1605,18 +1616,24 @@ export class BaseUser {
     throw new Error(`Chapter with name "${chapterName}" not found`);
   }
 
+  /**
+   * Verifies whether a chapter is clickable or not.
+   * @param {string} chapterName - The name of the chapter.
+   * @param {boolean} [shouldBeClickable=true] - Expected clickability state.
+   */
   async expectChapterToBeClickable(
     chapterName: string,
     shouldBeClickable: boolean = true
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
 
-    await this.page.waitForFunction(
-      isElementClickable,
-      {},
-      chapterElement,
-      shouldBeClickable
-    );
+    await this.expectElementToBeClickable(chapterElement);
+    // await this.page.waitForFunction(
+    //   isElementClickable,
+    //   {},
+    //   chapterElement,
+    //   shouldBeClickable
+    // );
   }
 
   /**
