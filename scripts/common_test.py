@@ -1409,15 +1409,20 @@ class UrlRetrieveTests(CommonTests):
     def test_url_open(self) -> None:
         # Mock the response to avoid making real HTTP requests.
         class MockResponse:
+            """Mock response object for urlopen."""
+
             def __init__(self, url: str) -> None:
+                """Initialize the mock response."""
                 self.url = url
 
             def getcode(self) -> int:
+                """Return HTTP status code."""
                 return 200
 
         test_url = 'https://api.github.com/repos/oppia/oppia/releases/latest'
 
         def mock_urlopen(url: str, context: ssl.SSLContext) -> MockResponse:
+            """Mock urlopen for testing."""
             self.assertEqual(url, test_url)
             self._assert_ssl_context_matches_default(context)
             return MockResponse(test_url)
