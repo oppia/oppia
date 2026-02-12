@@ -1,9 +1,12 @@
 <div class="oppia-blog-home-page d-flex justify-content-center">
-  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card">
+  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card" style="width: 55%;">
     <div class="d-flex" [ngClass]="{'flex-column-reverse': isSmallScreenViewActive()}">
       <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
            class="oppia-blog-post-card-container"
-           [ngClass]="{'col-8': !isSmallScreenViewActive()}">
+           [ngClass]="{
+            'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
+            'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
+            }">
         <div *ngIf="!searchPageIsActive">
           <div class="d-flex align-items-baseline">
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
@@ -31,8 +34,13 @@
               </ng-template>
             </ngb-pagination>
           </div>
-          <div class="ps-3 posts-display-heading">
+          <div class="ps-3 posts-display-heading d-flex justify-content-between align-items-center">
             {{ 'I18N_BLOG_HOME_PAGE_POSTS_HEADING' | translate }}
+            <button (click)="toggleSearchPanel()" 
+                class="btn btn-secondary search-toggle-button e2e-test-toggle-search-panel me-3">
+              <i class="fas" [ngClass]="searchPanelIsCollapsed ? 'fa-search' : 'fa-times'"></i>
+              <span class="ms-2">{{ searchPanelIsCollapsed ? 'Search' : 'Hide' }}</span>
+            </button>
           </div>
         </div>
         <div *ngIf="searchPageIsActive">
@@ -76,7 +84,10 @@
       </div>
       <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen"
            class="posts-display-heading text-center e2e-test-no-results-found"
-           [ngClass]="{'col-8': !isSmallScreenViewActive()}">
+           [ngClass]="{
+            'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
+            'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
+            }">
         <picture>
           <source type="image/webp"
                   [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
@@ -91,9 +102,8 @@
       <div *ngIf="showBlogPostCardsLoadingScreen" class="col-8 my-auto">
         <mat-spinner class="mx-auto"></mat-spinner>
       </div>
-      <div [ngClass]="{'col-4': !isSmallScreenViewActive()}">
-        <div class="blog-home-page-search-column pt-4 mt-2 d-inline-block"
-             [ngClass]="{'ps-5': !isSmallScreenViewActive(), 'mobile-view-columns-separator': isSmallScreenViewActive()}">
+      <div *ngIf="!searchPanelIsCollapsed || isSmallScreenViewActive()" 
+          [ngClass]="{'col-4': !isSmallScreenViewActive()}" style="padding-top: 125px; padding-left: 30px;">
           <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
             <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
                  class="me-auto ms-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
@@ -116,15 +126,6 @@
                      [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
                      aria-label="Search bar"
                      (keydown.enter)="onSearchQueryChangeExec()">
-              <div class="input-group oppia-input-group">
-                <div class="input-group-text oppia-search-bar-icon" [ngClass]="{'d-block': isSmallScreenViewActive()}">
-                  <i class="fas fa-search material-icons oppia-translate-icon-down md-18" *ngIf="!isSearchInProgress()">
-                  </i>
-                  <span *ngIf="isSearchInProgress()">
-                    <i class="fas fa-sync material-icons md-18 oppia-animate-spin"></i>
-                  </span>
-                </div>
-              </div>
             </div>
           </form>
           <h4 class="d-flex flex-grow-1 search-heading">

@@ -74,15 +74,15 @@ oppia-blog-home-page .oppia-blog-home-page-card-avatar {
   width: 96px;
 }
 
-oppia-blog-home-page .blog-home-page-search-column {
-  border-left: 2px solid #999;
-  flex-flow: column;
-  min-width: 200px;
+oppia-blog-home-page .blog-card {
+  width: 98% !important;
+  max-width: none !important;
+  height: 60% !important;
 }
 
 oppia-blog-home-page .mobile-view-columns-separator {
   border-bottom: 2px solid #999;
-  border-left: unset;
+  border-left: unset; 
   margin-bottom: 10px;
 }
 
@@ -117,11 +117,9 @@ oppia-blog-home-page .search-heading {
 .oppia-search-bar-input {
   border-color: #333;
   border-left-width: 1px;
-  border-radius: 4px 0 0 4px;
-  border-right-width: 0;
+  border-radius: 4px;
   color: #333;
   width: 100%;
-
 }
 
 .input-group-addon.oppia-search-bar-icon {
@@ -214,10 +212,6 @@ mat-chip-list .mat-standard-chip {
 mat-chip-list .mat-standard-chip .mat-chip-remove {
   color: #555;
   display: contents;
-}
-
-oppia-blog-home-page .blog-post-card {
-  margin-top: 30px;
 }
 
 .blog-homepage .oppia-navbar-breadcrumb-separator:after {

@@ -74,6 +74,7 @@ export class BlogHomePageComponent implements OnInit {
   searchOffset: number | null = 0;
   disableNextPageButton: boolean = false;
   filterWasUsed: boolean = false;
+  searchPanelIsCollapsed: boolean = true;
 
   constructor(
     private urlInterpolationService: UrlInterpolationService,
@@ -367,5 +368,9 @@ export class BlogHomePageComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+  }
+
+  toggleSearchPanel(): void {
+    this.searchPanelIsCollapsed = !this.searchPanelIsCollapsed;
   }
 }
