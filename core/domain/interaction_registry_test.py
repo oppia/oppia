@@ -253,23 +253,23 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         def mock_import_module(name: str) -> Any:
             module = original_import(name)
-            # Add a fake class that does not inherit from BaseInteraction.
-            setattr(module, 'FakeNonInteraction', NotAnInteraction)
+            # For one specific interaction, replace the class with one that
+            # does not inherit from BaseInteraction. getattr(module,
+            # interaction_id) will then return NotAnInteraction for that id.
+            if name.endswith('.Continue.Continue'):
+                setattr(module, 'Continue', NotAnInteraction)
             return module
 
-        import_swap = self.swap_with_checks(
-            importlib, 'import_module', mock_import_module
-        )
-
-        with import_swap:
+        with self.swap(importlib, 'import_module', mock_import_module):
             interaction_registry.Registry._refresh()  # pylint: disable=protected-access
 
-        # FakeNonInteraction should NOT be in the registry.
+        # 'Continue' should NOT be in the registry since its mock class
+        # does not inherit from BaseInteraction.
         self.assertNotIn(
-            'FakeNonInteraction',
+            'Continue',
             interaction_registry.Registry._interactions,  # pylint: disable=protected-access
         )
-        # But real interactions should still be registered.
+        # But other real interactions should still be registered.
         self.assertTrue(
             len(interaction_registry.Registry._interactions)
             > 0  # pylint: disable=protected-access
@@ -286,19 +286,34 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         expected = interaction_registry.Registry.get_all_specs()
         self.assertEqual(result, expected)
 
-    def test_get_all_specs_for_state_schema_version_returns_cached(
+    def test_get_all_specs_for_state_schema_version_loads_from_file(
         self,
     ) -> None:
-        """Test that get_all_specs_for_state_schema_version returns cached
-        specs on second call for the same version."""
-        # Use a valid state schema version that has a specs file.
-        version = feconf.CURRENT_STATE_SCHEMA_VERSION
-        # First call — reads from file and caches.
+        """Test that get_all_specs_for_state_schema_version successfully
+        loads specs from a legacy JSON file and caches them."""
+        # Use a version that has an actual legacy specs file.
+        version = 52
+        # Ensure it's not already cached.
+        if (
+            version
+            in interaction_registry.Registry._state_schema_version_to_interaction_specs
+        ):  # pylint: disable=protected-access,line-too-long
+            del interaction_registry.Registry._state_schema_version_to_interaction_specs[
+                version
+            ]  # pylint: disable=protected-access,line-too-long
+
+        # First call — reads from file and caches (lines 176-182).
         result_first = interaction_registry.Registry.get_all_specs_for_state_schema_version(
-            version, can_fetch_latest_specs=True
+            version
         )
+        self.assertTrue(len(result_first) > 0)
+        self.assertIn(
+            version,
+            interaction_registry.Registry._state_schema_version_to_interaction_specs,  # pylint: disable=protected-access,line-too-long
+        )
+
         # Second call — should return from cache (line 193).
         result_second = interaction_registry.Registry.get_all_specs_for_state_schema_version(
-            version, can_fetch_latest_specs=True
+            version
         )
         self.assertEqual(result_first, result_second)
