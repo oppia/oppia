@@ -415,6 +415,25 @@ def main(args: Optional[List[str]] = None) -> None:
                 files_to_lint
             )
             if js_or_ts_files:
+                # We should exclude files that are not unit tests.
+                # Acceptance tests and WebDriverIO tests are run in a separate
+                # CI check and they don't have associated unit tests. Running
+                # them through Karma runner will always fail as it looks for
+                # unit tests for those files.
+                non_unit_test_directories = [
+                    'core/tests/puppeteer-acceptance-tests',
+                    'core/tests/webdriverio',
+                    'core/tests/protractor',
+                ]
+                js_or_ts_files = [
+                    f
+                    for f in js_or_ts_files
+                    if not any(
+                        dir_path in f for dir_path in non_unit_test_directories
+                    )
+                ]
+
+            if js_or_ts_files:
                 print('Running frontend tests ...')
                 frontend_test_cmds = FRONTEND_TEST_CMDS.copy()
                 frontend_test_cmds.append('--allow_no_spec')
