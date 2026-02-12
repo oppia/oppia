@@ -23,7 +23,7 @@ describe('Translation tab active mode service', () => {
   let translationTabActiveModeService: TranslationTabActiveModeService;
 
   beforeEach(() => {
-    translationTabActiveModeService = TestBed.get(
+    translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
   });

@@ -42,9 +42,11 @@ import {
   I18nLanguageCodeService,
   TranslationKeyType,
 } from 'services/i18n-language-code.service';
+import {PlatformFeatureService} from 'services/platform-feature.service';
 
 import './story-viewer-page.component.css';
 import {StoryNode} from 'domain/story/story-node.model';
+import constants from 'assets/constants';
 
 interface IconParametersArray {
   thumbnailIconUrl: string;
@@ -96,7 +98,8 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
     private storyViewerBackendApiService: StoryViewerBackendApiService,
     private pageTitleService: PageTitleService,
     private alertsService: AlertsService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private platformFeatureService: PlatformFeatureService
   ) {}
 
   focusSkipButton(eventTarget: Element, isLoggedIn: boolean): void {
@@ -319,5 +322,32 @@ export class StoryViewerPageComponent implements OnInit, OnDestroy {
         this.storyNodesDescTranslationKeys[index]
       ) && !this.i18nLanguageCodeService.isCurrentLanguageEnglish()
     );
+  }
+
+  isSerialChapterFeatureLearnerFlagEnabled(): boolean {
+    return this.platformFeatureService.status.SerialChapterLaunchLearnerView
+      .isEnabled;
+  }
+
+  isChapterPublished(node: ReadOnlyStoryNode): boolean {
+    return node.getStatus() === constants.STORY_NODE_STATUS_PUBLISHED;
+  }
+
+  isChapterReadyToPublish(node: ReadOnlyStoryNode): boolean {
+    return node.getStatus() === constants.STORY_NODE_STATUS_READY_TO_PUBLISH;
+  }
+
+  isChapterDisplayedAsComingSoon(node: ReadOnlyStoryNode): boolean {
+    return (
+      this.isSerialChapterFeatureLearnerFlagEnabled() &&
+      this.isChapterReadyToPublish(node)
+    );
+  }
+
+  getChapterExplorationUrl(node: ReadOnlyStoryNode): string | null {
+    if (this.isChapterDisplayedAsComingSoon(node)) {
+      return null;
+    }
+    return this.getExplorationUrl(node as unknown as StoryNode);
   }
 }

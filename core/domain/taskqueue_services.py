@@ -79,7 +79,7 @@ def defer(
         ValueError. The arguments and keyword arguments that are passed in are
             not JSON serializable.
     """
-    new_cloud_task_model_id = cloud_task_models.CloudTaskRunModel.get_new_id()
+    new_cloud_task_model_id = get_new_cloud_task_run_id()
 
     payload = {
         'fn_identifier': fn_identifier,
@@ -218,6 +218,28 @@ def get_cloud_task_run_by_model_id(
     if cloud_task_model is None:
         return None
     return convert_cloud_task_run_model_to_domain_object(cloud_task_model)
+
+
+def get_new_cloud_task_run_id() -> str:
+    """Generates and returns a new unique ID for a CloudTaskRunModel.
+
+    Returns:
+        str. A new unique ID for a CloudTaskRunModel.
+    """
+    return cloud_task_models.CloudTaskRunModel.get_new_id()
+
+
+def get_all_cloud_task_runs() -> List[cloud_task_domain.CloudTaskRun]:
+    """Fetches all CloudTaskRunModels.
+
+    Returns:
+        List[CloudTaskRun]. A list of all CloudTaskRun domain objects.
+    """
+    cloud_task_run_models = cloud_task_models.CloudTaskRunModel.get_all()
+    return [
+        convert_cloud_task_run_model_to_domain_object(model)
+        for model in cloud_task_run_models
+    ]
 
 
 def convert_cloud_task_run_model_to_domain_object(

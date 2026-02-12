@@ -462,4 +462,219 @@ describe('Voiceover backend API service', function () {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
   }));
+
+  it('should be able to fetch exploration data for voiceover regeneration', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+
+    voiceoverBackendApiService
+      .fetchExplorationDataForVoiceoverAsync(explorationId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/exploration_voiceovers_data/' + explorationId
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      exploration_data: {
+        exploration_title: 'Test Exploration',
+        autogeneratable_language_accent_codes: ['en-US'],
+      },
+      response_message: null,
+    });
+    flushMicrotasks();
+
+    let expectedResponse = {
+      explorationData: {
+        explorationTitle: 'Test Exploration',
+        autogeneratableLanguageAccentCodes: ['en-US'],
+      },
+      responseMessage: null,
+    };
+
+    expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should be able to handle null exploration data for voiceover regeneration', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+
+    voiceoverBackendApiService
+      .fetchExplorationDataForVoiceoverAsync(explorationId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/exploration_voiceovers_data/' + explorationId
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    req.flush({
+      exploration_data: null,
+      response_message: 'Exploration ID is invalid.',
+    });
+    flushMicrotasks();
+
+    let expectedResponse = {
+      explorationData: null,
+      responseMessage: 'Exploration ID is invalid.',
+    };
+
+    expect(successHandler).toHaveBeenCalledWith(expectedResponse);
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should able to handle error callback while fetching exp data', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+
+    voiceoverBackendApiService
+      .fetchExplorationDataForVoiceoverAsync(explorationId)
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/exploration_voiceovers_data/' + explorationId
+    );
+
+    expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalledWith();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to fetch exploration data for voiceover regeneration', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+    let languageAccentCode: string = 'en-US';
+
+    voiceoverBackendApiService
+      .regenerateVoiceoversForExplorationAsync(
+        explorationId,
+        languageAccentCode
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/regenerate_voiceovers_for_exploration/' +
+        explorationId +
+        '/' +
+        languageAccentCode
+    );
+
+    expect(req.request.method).toEqual('POST');
+
+    req.flush({});
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith({});
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should able to handle error callback while regenerating exp voiceovers', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+    let explorationId: string = 'exp_id';
+    let languageAccentCode: string = 'en-US';
+
+    voiceoverBackendApiService
+      .regenerateVoiceoversForExplorationAsync(
+        explorationId,
+        languageAccentCode
+      )
+      .then(successHandler, failHandler);
+
+    let req = httpTestingController.expectOne(
+      '/regenerate_voiceovers_for_exploration/' +
+        explorationId +
+        '/' +
+        languageAccentCode
+    );
+
+    expect(req.request.method).toEqual('POST');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalledWith();
+    expect(failHandler).toHaveBeenCalled();
+  }));
+
+  it('should be able to fetch voiceover regeneration status', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    const explorationID = 'exp_123';
+
+    voiceoverBackendApiService
+      .fetchLatestVoiceoverRegenerationStatusAsync(explorationID)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/exploration_voiceover_regeneration_status_url/${explorationID}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
+
+    let backendResponse = {
+      language_accent_to_content_status_map: {
+        'en-US': {content_0: 'FAILED', content_1: 'SUCCEEDED'},
+      },
+    };
+
+    let expectedVoiceoverRegenerationStatus = {
+      'en-US': {content_0: 'FAILED', content_1: 'SUCCEEDED'},
+    };
+
+    req.flush(backendResponse);
+
+    flushMicrotasks();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      expectedVoiceoverRegenerationStatus
+    );
+    expect(failHandler).not.toHaveBeenCalled();
+  }));
+
+  it('should handle error callback while fetching voiceover regeneration status', fakeAsync(() => {
+    let successHandler = jasmine.createSpy('success');
+    let failHandler = jasmine.createSpy('fail');
+
+    const explorationID = 'exp_123';
+
+    voiceoverBackendApiService
+      .fetchLatestVoiceoverRegenerationStatusAsync(explorationID)
+      .then(successHandler, failHandler);
+
+    const expectedUrl = `/exploration_voiceover_regeneration_status_url/${explorationID}`;
+
+    let req = httpTestingController.expectOne(expectedUrl);
+    expect(req.request.method).toEqual('GET');
+
+    req.flush('Invalid request', {
+      status: 400,
+      statusText: 'Invalid request',
+    });
+
+    flushMicrotasks();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
+  }));
 });

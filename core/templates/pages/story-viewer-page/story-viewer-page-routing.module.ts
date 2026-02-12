@@ -19,11 +19,13 @@
 import {NgModule} from '@angular/core';
 import {Route, RouterModule} from '@angular/router';
 import {StoryViewerPageRootComponent} from './story-viewer-page-root.component';
+import {StoryViewerAccessGuard} from './story-viewer-page-auth.guard';
 
 const routes: Route[] = [
   {
     path: '',
     component: StoryViewerPageRootComponent,
+    canActivate: [StoryViewerAccessGuard],
   },
 ];
 
