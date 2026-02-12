@@ -901,7 +901,7 @@ export class LoggedInUser extends BaseUser {
       await this.clickOnElementWithSelector(agreeToTermsCheckbox);
       await this.page.waitForSelector(registerNewUserButton);
       await Promise.all([
-        this.page.waitForNavigation({waitUntil: 'networkidle0'}),
+        this.page.waitForNavigation({waitUntil: 'networkidle2'}),
         this.clickOnElementWithText(LABEL_FOR_SUBMIT_BUTTON),
       ]);
 
@@ -932,8 +932,10 @@ export class LoggedInUser extends BaseUser {
       invalidEmailErrorContainer
     );
     if (!invalidEmailErrorContainerElement) {
-      await this.clickOnElementWithText('Sign In');
-      await this.page.waitForNavigation({waitUntil: 'networkidle0'});
+      await Promise.all([
+        this.page.waitForNavigation({waitUntil: 'networkidle2'}),
+        this.clickOnElementWithText('Sign In'),
+      ]);
 
       // Post Check: Check if the login page is closed. We can't check if user
       // is redirected to the home page it is dependent to "redirects" in URL.
