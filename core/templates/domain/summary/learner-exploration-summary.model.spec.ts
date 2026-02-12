@@ -103,7 +103,6 @@ describe('Exploration summary model', () => {
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    expect(expSummaryObject.progress).toEqual(0);
     expect(expSummaryObject.visitedCheckpointsCount).toEqual(0);
     expect(expSummaryObject.totalCheckpointsCount).toEqual(0);
   });
@@ -139,8 +138,6 @@ describe('Exploration summary model', () => {
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    // Progress = floor((3-1)/5 * 100) = floor(40) = 40.
-    expect(expSummaryObject.progress).toEqual(40);
     expect(expSummaryObject.visitedCheckpointsCount).toEqual(3);
     expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
   });
@@ -176,7 +173,7 @@ describe('Exploration summary model', () => {
     let expSummaryObject =
       LearnerExplorationSummary.createFromBackendDict(backendDict);
 
-    // Just verify checkpoint counts are set correctly
+    // Just verify checkpoint counts are set correctly.
     expect(expSummaryObject.visitedCheckpointsCount).toEqual(1);
     expect(expSummaryObject.totalCheckpointsCount).toEqual(5);
   });

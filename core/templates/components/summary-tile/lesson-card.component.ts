@@ -218,7 +218,7 @@ export class LessonCardComponent implements OnInit {
       explorationModel.thumbnailIconUrl
     );
 
-    // Calculate progress from checkpoint counts
+    // Calculate progress from checkpoint counts.
     let progress = 0;
     if (this.isCommunityLessonComplete) {
       progress = 100;

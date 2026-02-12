@@ -379,7 +379,7 @@ describe('LessonCardComponent', () => {
     expect(component.imgColor).toEqual(sampleExploration.thumbnail_bg_color);
     expect(component.title).toEqual(sampleExploration.title);
 
-    // Progress = floor((5 - 1) / 10 * 100) = 40
+    // Progress = floor((5 - 1) / 10 * 100) = 40.
     expect(component.progress).toEqual(40);
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
