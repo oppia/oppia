@@ -47,8 +47,8 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.get(InsertScriptService);
-    rendererFactory = TestBed.get(RendererFactory2);
+    insertScriptService = TestBed.inject(InsertScriptService);
+    rendererFactory = TestBed.inject(RendererFactory2);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
