@@ -384,6 +384,54 @@ describe('LessonCardComponent', () => {
     expect(component.lessonTopic).toEqual('Community Lesson');
   }));
 
+  it('should calculate progress as 0 when no checkpoints are visited', fakeAsync(() => {
+    const explorationWithNoCheckpoints = {
+      ...sampleExploration,
+      visited_checkpoints_count: 0,
+      total_checkpoints_count: 5,
+    };
+
+    component.story = LearnerExplorationSummary.createFromBackendDict(
+      explorationWithNoCheckpoints
+    );
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(0);
+    expect(component.lessonTopic).toEqual('Community Lesson');
+  }));
+
+  it('should calculate progress as 0 when total checkpoints is 0', fakeAsync(() => {
+    const explorationWithNoCheckpoints = {
+      ...sampleExploration,
+      visited_checkpoints_count: 0,
+      total_checkpoints_count: 0,
+    };
+
+    component.story = LearnerExplorationSummary.createFromBackendDict(
+      explorationWithNoCheckpoints
+    );
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(0);
+    expect(component.lessonTopic).toEqual('Community Lesson');
+  }));
+
+  it('should set progress to 100 when community lesson is complete', fakeAsync(() => {
+    component.isCommunityLessonComplete = true;
+    component.story =
+      LearnerExplorationSummary.createFromBackendDict(sampleExploration);
+
+    fixture.detectChanges();
+    tick();
+
+    expect(component.progress).toEqual(100);
+    expect(component.lessonTopic).toEqual('Community Lesson');
+  }));
+
   it('should set story to complete StorySummary and its non-url values to the respective fields', fakeAsync(() => {
     chapterProgressLoaderService.computeLessonProgress.and.returnValue(100);
 
