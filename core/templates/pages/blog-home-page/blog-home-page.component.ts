@@ -231,7 +231,7 @@ export class BlogHomePageComponent implements OnInit {
     this.showBlogPostCardsLoadingScreen = true;
 
     if (!this.searchPageIsActive) {
-      const offset = this.firstPostOnPageNum - 1;
+      let offset = this.firstPostOnPageNum - 1;
       this.loadBlogPostsForPage(offset);
     } else {
       this.blogPostSearchService.loadMoreData(
@@ -300,13 +300,13 @@ export class BlogHomePageComponent implements OnInit {
   onSearchQueryChangeExec(): void {
     this.loaderService.showLoadingScreen('Loading');
 
-    const url = new URL(this.windowRef.nativeWindow.location.toString());
+    let url = new URL(this.windowRef.nativeWindow.location.toString());
 
-    const currentQuery = url.searchParams.get('q') || '';
-    const currentTags = url.searchParams.get('tags')?.split(',') || [];
-    const currentPage = url.searchParams.get('page') || '1';
+    let currentQuery = url.searchParams.get('q') || '';
+    let currentTags = url.searchParams.get('tags')?.split(',') || [];
+    let currentPage = url.searchParams.get('page') || '1';
 
-    const isQueryChanged =
+    let isQueryChanged =
       currentQuery !== this.searchQuery ||
       currentTags.join(',') !== this.selectedTags.join(',');
 
@@ -318,8 +318,8 @@ export class BlogHomePageComponent implements OnInit {
       this.blogPostSummaries = [];
       this.totalBlogPosts = 0;
 
-      const path = '/blog';
-      const finalUrl = `${url.origin}${path}`;
+      let path = '/blog';
+      let finalUrl = `${url.origin}${path}`;
 
       if (this.windowRef.nativeWindow.location.pathname !== path) {
         this.windowRef.nativeWindow.location.href = finalUrl;
@@ -336,20 +336,20 @@ export class BlogHomePageComponent implements OnInit {
       this.searchQuery,
       this.selectedTags,
       () => {
-        const searchUrlQueryString =
+        let searchUrlQueryString =
           this.blogPostSearchService.getSearchUrlQueryString(
             this.searchQuery,
             this.selectedTags
           );
 
-        const pageToUse = isQueryChanged ? '1' : currentPage;
+        let pageToUse = isQueryChanged ? '1' : currentPage;
 
-        const params = new URLSearchParams();
+        let params = new URLSearchParams();
         params.set('q', searchUrlQueryString);
         params.set('page', pageToUse);
 
-        const path = '/blog/search/find';
-        const finalUrl = `${url.origin}${path}?${params.toString()}`;
+        let path = '/blog/search/find';
+        let finalUrl = `${url.origin}${path}?${params.toString()}`;
 
         if (this.windowRef.nativeWindow.location.pathname !== path) {
           this.windowRef.nativeWindow.location.href = finalUrl;
