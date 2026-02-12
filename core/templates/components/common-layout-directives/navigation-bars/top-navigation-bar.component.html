@@ -1,7 +1,7 @@
 <div class="navbar-header e2e-test-navbar-header oppia-top-navigation-bar">
   <a *ngIf="windowIsNarrow && !pageIsIframed && menuIconIsShown"
      (click)="toggleSidebar($event)"
-     class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ml-0"
+     class="navbar-brand oppia-navbar-menu oppia-transition-200 e2e-mobile-test-navbar-button ms-0"
      tabindex="0">
     <i class="fas fa-bars oppia-navbar-menu-icon"
        *ngIf="!isSidebarShown()"
@@ -28,7 +28,7 @@
     </ng-container>
     <ng-template #anchorTemplate>
       <a href="/"
-         [ngClass]="windowIsNarrow ? 'oppia-logo-small ml-0' : 'oppia-logo-wide'">
+         [ngClass]="windowIsNarrow ? 'oppia-logo-small ms-0' : 'oppia-logo-wide'">
         <picture>
           <source type="image/webp"
                   [srcset]="getStaticImageUrl('/logo/288x128_logo_white.webp')">
@@ -53,7 +53,7 @@
     {{ subheaderText }}
   </span>
 </div>
-<div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}"
+<div [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}"
      class="navbar-header oppia-top-navigation-bar"
      *ngIf="userMenuIsShown">
   <ul class="nav oppia-navbar-nav"
@@ -61,7 +61,7 @@
     <li>
       <ul *ngIf="!windowIsNarrow && !pageIsIframed"
           class="nav oppia-navbar-tabs">
-        <li [ngClass]="{'open' : activeMenuName === 'homeMenu'}"
+        <li [ngClass]="{'show' : activeMenuName === 'homeMenu'}"
             *ngIf="!userIsLoggedIn"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_HOME"
             aria-hidden="false"
@@ -77,7 +77,7 @@
             </span>
           </a>
         </li>
-        <li [ngClass]="{'open' : activeMenuName === 'learnMenu'}"
+        <li [ngClass]="{'show' : activeMenuName === 'learnMenu'}"
             ngbDropdown
             #learnDropdown="ngbDropdown"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_LEARN"
@@ -156,7 +156,7 @@
             </li>
           </ul>
         </li>
-        <li [ngClass]="{'open': activeMenuName === 'aboutMenu'}"
+        <li [ngClass]="{'show': activeMenuName === 'aboutMenu'}"
             ngbDropdown
             #aboutDropdown="ngbDropdown"
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_ABOUT"
@@ -228,7 +228,7 @@
             </li>
           </ul>
         </li>
-        <li [ngClass]="{'open': activeMenuName === 'getInvolvedMenu'}"
+        <li [ngClass]="{'show': activeMenuName === 'getInvolvedMenu'}"
             ngbDropdown
             #getInvolvedDropdown="ngbDropdown"
             [hidden]="navElementsVisibilityStatus.I18N_TOPNAV_GET_INVOLVED"
@@ -315,7 +315,7 @@
             </div>
           </ul>
         </li>
-        <li [ngClass]="{'open': activeMenuName === 'donateMenu'}"
+        <li [ngClass]="{'show': activeMenuName === 'donateMenu'}"
             ngbDropdown
             [hidden]="!navElementsVisibilityStatus.I18N_TOPNAV_DONATE"
             class="nav-item e2e-test-about-oppia-list-item">
@@ -336,7 +336,7 @@
         #languageDropdown="ngbDropdown"
         class="nav-item oppia-navbar-clickable-dropdown dropdown"
         *ngIf="showLanguageSelector"
-        [ngClass]="{'open': activeMenuName === 'languageMenu'}"
+        [ngClass]="{'show': activeMenuName === 'languageMenu'}"
         (mouseover)="openSubmenu($event, 'languageMenu')"
         (mouseleave)="closeSubmenuIfNotMobile($event)">
       <div class="oppia-navbar-button-container dropdown langbtnContainer">
@@ -369,10 +369,10 @@
         </li>
       </ul>
     </li>
-    <li [ngClass]="{'open' : activeMenuName === 'profileMenu'}"
+    <li [ngClass]="{'show' : activeMenuName === 'profileMenu'}"
         ngbDropdown
         #profileDropdown="ngbDropdown"
-        *ngIf="authStatusResolved && userIsLoggedIn && !pageIsIframed"
+        *ngIf="userIsLoggedIn && !pageIsIframed"
         class="nav-item e2e-test-profile-dropdown oppia-navbar-clickable-dropdown profile-dropdown pfl">
       <a [attr.aria-expanded]="profileDropdown.isOpen() ? 'true' : 'false'"
          (click)="profileDropdown.isOpen() ? profileDropdown.close() : profileDropdown.open();"
@@ -473,6 +473,22 @@
           </a>
         </li>
         <li class="nav-item">
+          <a *ngIf="(isReleaseCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/release-coordinator"
+             class="dropdown-item nav-link e2e-release-coordinator-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_RELEASE_COORDINATOR_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a *ngIf="(isTranslationAdmin || isTranslationCoordinator || isQuestionAdmin || isQuestionCoordinator)"
+             (click)="closeSubmenuIfNotMobile($event)"
+             href="/contributor-admin-dashboard"
+             class="dropdown-item nav-link e2e-test-contributor-admin-dashboard-link">
+            <span [innerHTML]="'I18N_TOPNAV_CONTRIBUTOR_ADMIN_DASHBOARD' | translate"></span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a *ngIf="(isBlogAdmin || isBlogPostEditor)"
              (click)="closeSubmenuIfNotMobile($event)"
              href="/blog-dashboard"
@@ -525,7 +541,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="authStatusResolved && !userIsLoggedIn && username !== '' && !pageIsIframed"
+        *ngIf="!userIsLoggedIn && username !== '' && !pageIsIframed"
         class="nav-item oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container dropdown oppia-navbar-button-container-extra-info sinin">
         <button ngbDropdownToggle
@@ -553,7 +569,7 @@
     </li>
 
     <li ngbDropdown
-        *ngIf="authStatusResolved && username === '' && !pageIsIframed"
+        *ngIf="username === '' && !pageIsIframed"
         class="oppia-navbar-clickable-dropdown dropdown">
       <div class="oppia-navbar-button-container oppia-navbar-button-container-extra-info">
       </div>

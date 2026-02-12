@@ -49,8 +49,8 @@ describe('State Interaction Stats Service', () => {
       ],
     });
 
-    httpTestingController = TestBed.inject(HttpTestingController);
-    stateInteractionStatsService = TestBed.inject(StateInteractionStatsService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    stateInteractionStatsService = TestBed.get(StateInteractionStatsService);
   });
 
   afterEach(() => httpTestingController.verify());

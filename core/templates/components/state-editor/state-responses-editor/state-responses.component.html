@@ -42,7 +42,7 @@
               <div class="oppia-rule-header-warning-placement e2e-test-response-self-loop-warning" *ngIf="isSelfLoopThatIsMarkedCorrect(answerGroup.outcome) || isSelfLoopWithNoFeedback(answerGroup.outcome)" (click)="changeActiveAnswerGroupIndex(index)"
                    ngbTooltip="{{getOutcomeTooltip(answerGroup.outcome)}}"
                    tabindex="0"
-                   data-container="body"
+                   data-bs-container="body"
                    placement="auto">
                 <div class="oppia-rule-header-warning-style">
                   ⚠
@@ -159,21 +159,21 @@
         <div *ngIf="!isInQuestionMode()" class="solicit-answer-checkbox">
           <span *ngIf="!isCurrentInteractionTrivial()" [hidden]="!enableSolicitAnswerDetailsFeature" class="solicit-answer-details-span">
             <input id="label-target-solicit-answer-details-checkbox" type="checkbox" class="e2e-test-solicit-answer-details-checkbox" (change)="onChangeSolicitAnswerDetails()" [(ngModel)]="stateSolicitAnswerDetailsService.displayed" [disabled]="!editabilityService.isEditable()">
-            <label for="label-target-solicit-answer-details-checkbox">Solicit Answer Details</label>
+            <label for="label-target-solicit-answer-details-checkbox" class="form-label">Solicit Answer Details</label>
           </span>
         </div>
         <div *ngIf="isInQuestionMode() && answerGroups && answerGroups.length > 0 && (containsOptionalMisconceptions || getUnaddressedMisconceptionNames(misconceptionsBySkill).length) || (tagMisconceptionsFeatureFlagIsEnabled && answerGroups && answerGroups.length > 0 && getUnaddressedMisconceptionNames().length !== 0)" class="misconception-parent-card">
           <h3>Misconceptions</h3>
           <small class="text-muted">The following must be addressed by tagging to an incorrect answer. If a misconception is not relevant to this question, mark it as "Not Applicable".</small>
           <div class="pt-4" *ngIf="getUnaddressedMisconceptionNames(misconceptionsBySkill).length">
-            <h4 class="pl-3">Compulsory</h4>
+            <h4 class="ps-3">Compulsory</h4>
             <p *ngFor="let misconceptionName of getUnaddressedMisconceptionNames(misconceptionsBySkill)"
                class="misconception-list-item">
               {{misconceptionName}}
             </p>
           </div>
           <div class="pt-4">
-            <h4 class="pl-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
+            <h4 class="ps-3" *ngIf="containsOptionalMisconceptions">Optional</h4>
             <div *ngFor="let skillWithMisconceptions of misconceptionsBySkill | keyvalue">
               <div *ngFor="let misconception of skillWithMisconceptions.value">
                 <div *ngIf="!misconception.isMandatory()"
@@ -182,7 +182,7 @@
                   <div>
                     <div>
                       {{misconception.getName()}}
-                      <span class="pl-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
+                      <span class="ps-3" *ngIf="!isNoActionExpected(skillWithMisconceptions.key + '-' + misconception.getId())">⚠️</span>
                     </div>
                     <div class="small text-muted">
                       {{ getOptionalSkillMisconceptionStatus(skillId + '-' + misconception.getId()) }}

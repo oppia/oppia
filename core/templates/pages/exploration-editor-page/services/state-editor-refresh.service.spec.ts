@@ -25,7 +25,7 @@ describe('State Editor Refresh Service', () => {
   let stateEditorRefreshService: StateEditorRefreshService;
 
   beforeEach(() => {
-    stateEditorRefreshService = TestBed.inject(StateEditorRefreshService);
+    stateEditorRefreshService = TestBed.get(StateEditorRefreshService);
   });
 
   it('should fetch refreshStateEditor event emitter', () => {

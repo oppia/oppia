@@ -159,7 +159,7 @@ export class StudyGuideSectionEditorComponent implements OnInit {
 
     if (contentHasChanged) {
       let studyGuide = this.topicEditorStateService.getStudyGuide();
-      let subtopicId = studyGuide.getId().slice(-1);
+      let subtopicId = studyGuide.getId().split('-').pop();
       this.topicUpdateService.updateSection(
         studyGuide,
         this.index,

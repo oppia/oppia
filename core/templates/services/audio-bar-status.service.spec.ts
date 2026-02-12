@@ -24,7 +24,7 @@ describe('AudioBarStatusService', () => {
   let audioBarStatusService: AudioBarStatusService;
 
   beforeEach(() => {
-    audioBarStatusService = TestBed.inject(AudioBarStatusService);
+    audioBarStatusService = TestBed.get(AudioBarStatusService);
   });
   // This is because by default the audio bar is collapsed.
   it('should be collapsed by default', () => {

@@ -37,7 +37,7 @@ describe('State Param Changes Editor directive', () => {
       providers: [],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    stateParamChangesService = TestBed.inject(StateParamChangesService);
+    stateParamChangesService = TestBed.get(StateParamChangesService);
   }));
 
   beforeEach(() => {

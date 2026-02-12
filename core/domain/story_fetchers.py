@@ -26,6 +26,7 @@ import copy
 import itertools
 
 from core import feconf
+from core.constants import constants
 from core.domain import (
     caching_services,
     classroom_config_services,
@@ -42,7 +43,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import story_models, user_models
 
-(story_models, user_models) = models.Registry.import_models(
+story_models, user_models = models.Registry.import_models(
     [models.Names.STORY, models.Names.USER]
 )
 
@@ -708,9 +709,13 @@ def get_pending_and_all_nodes_in_story(
     for node in story.story_contents.nodes:
         if node.id not in completed_node_ids:
             pending_nodes.append(node)
+    all_nodes = []
 
+    for node in story.story_contents.nodes:
+        if node.status != constants.STORY_NODE_STATUS_DRAFT:
+            all_nodes.append(node)
     return {
-        'all_nodes': story.story_contents.nodes,
+        'all_nodes': all_nodes,
         'pending_nodes': pending_nodes,
     }
 

@@ -50,7 +50,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import collection_models, datastore_services, exp_models
 
-(collection_models, exp_models) = models.Registry.import_models(
+collection_models, exp_models = models.Registry.import_models(
     [models.Names.COLLECTION, models.Names.EXPLORATION]
 )
 

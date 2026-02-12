@@ -32,11 +32,11 @@ describe('Graph Data Service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    graphDataService = TestBed.inject(GraphDataService);
-    explorationInitStateNameService = TestBed.inject(
+    graphDataService = TestBed.get(GraphDataService);
+    explorationInitStateNameService = TestBed.get(
       ExplorationInitStateNameService
     );
-    explorationStatesService = TestBed.inject(ExplorationStatesService);
+    explorationStatesService = TestBed.get(ExplorationStatesService);
 
     explorationStatesService.init(
       {

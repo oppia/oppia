@@ -19,7 +19,7 @@ from __future__ import annotations
 import logging
 import os
 
-from core import feconf, utils
+from core import feconf
 from core.constants import constants
 from core.controllers import creator_dashboard
 from core.domain import (
@@ -42,10 +42,8 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import feedback_models, suggestion_models, user_models
 
-(user_models, suggestion_models, feedback_models) = (
-    models.Registry.import_models(
-        [models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK]
-    )
+user_models, suggestion_models, feedback_models = models.Registry.import_models(
+    [models.Names.USER, models.Names.SUGGESTION, models.Names.FEEDBACK]
 )
 
 
@@ -581,7 +579,7 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
 
 
 class CreationButtonsTests(test_utils.GenericTestBase):
-    with utils.open_file(
+    with open(
         os.path.join(feconf.SAMPLE_EXPLORATIONS_DIR, 'welcome', 'welcome.yaml'),
         'rb',
         encoding=None,

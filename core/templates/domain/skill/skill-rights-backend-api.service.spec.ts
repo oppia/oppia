@@ -41,8 +41,8 @@ describe('Skill rights backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.inject(HttpTestingController);
-    skillRightsBackendApiService = TestBed.inject(SkillRightsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    skillRightsBackendApiService = TestBed.get(SkillRightsBackendApiService);
 
     skillRightsObject = SkillRights.createFromBackendDict(sampleSkillRights);
   });

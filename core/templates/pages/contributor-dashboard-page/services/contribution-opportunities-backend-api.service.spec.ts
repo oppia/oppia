@@ -133,12 +133,12 @@ describe('Contribution Opportunities backend API service', function () {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    contributionOpportunitiesBackendApiService = TestBed.inject(
+    contributionOpportunitiesBackendApiService = TestBed.get(
       ContributionOpportunitiesBackendApiService
     );
-    httpTestingController = TestBed.inject(HttpTestingController);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
-    userService = TestBed.inject(UserService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    urlInterpolationService = TestBed.get(UrlInterpolationService);
+    userService = TestBed.get(UserService);
     userInfo = [
       UserInfo.createFromBackendDict(userInfoDict[0]),
       UserInfo.createFromBackendDict(userInfoDict[1]),

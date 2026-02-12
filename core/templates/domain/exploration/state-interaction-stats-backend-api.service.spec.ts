@@ -34,8 +34,8 @@ describe('State interaction stats backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    sisbas = TestBed.inject(StateInteractionStatsBackendApiService);
-    httpTestingController = TestBed.inject(HttpTestingController);
+    sisbas = TestBed.get(StateInteractionStatsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

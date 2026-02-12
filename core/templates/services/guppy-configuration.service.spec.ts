@@ -72,7 +72,7 @@ let guppyConfigurationService: GuppyConfigurationService;
 
 describe('GuppyConfigurationService', () => {
   beforeEach(() => {
-    guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
+    guppyConfigurationService = TestBed.get(GuppyConfigurationService);
     window.Guppy = MockGuppy as unknown as Guppy;
   });
 
@@ -103,7 +103,7 @@ describe('GuppyConfigurationService', () => {
         imports: [HttpClientTestingModule],
         declarations: [MockComponentB],
       }).compileComponents();
-      guppyConfigurationService = TestBed.inject(GuppyConfigurationService);
+      guppyConfigurationService = TestBed.get(GuppyConfigurationService);
       window.Guppy = MockGuppy as unknown as Guppy;
     }));
     beforeEach(() => {

@@ -79,10 +79,10 @@ describe('Editable collection backend API service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    editableCollectionBackendApiService = TestBed.inject(
+    editableCollectionBackendApiService = TestBed.get(
       EditableCollectionBackendApiService
     );
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

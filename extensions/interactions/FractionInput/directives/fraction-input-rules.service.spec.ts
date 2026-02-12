@@ -26,7 +26,7 @@ describe('Fraction Input rules service', () => {
     TestBed.configureTestingModule({
       providers: [FractionInputRulesService],
     });
-    firs = TestBed.inject(FractionInputRulesService);
+    firs = TestBed.get(FractionInputRulesService);
   });
 
   let createNegativeFractionDict = (

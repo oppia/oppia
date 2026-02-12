@@ -31,8 +31,8 @@ describe('Exploration edits allowed backend API service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    eeabas = TestBed.inject(ExplorationEditsAllowedBackendApiService);
-    httpTestingController = TestBed.inject(HttpTestingController);
+    eeabas = TestBed.get(ExplorationEditsAllowedBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

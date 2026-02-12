@@ -113,11 +113,11 @@ describe('Editable topic backend API service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.inject(HttpTestingController);
-    editableTopicBackendApiService = TestBed.inject(
+    httpTestingController = TestBed.get(HttpTestingController);
+    editableTopicBackendApiService = TestBed.get(
       EditableTopicBackendApiService
     );
-    csrfService = TestBed.inject(CsrfTokenService);
+    csrfService = TestBed.get(CsrfTokenService);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('sample-csrf-token');

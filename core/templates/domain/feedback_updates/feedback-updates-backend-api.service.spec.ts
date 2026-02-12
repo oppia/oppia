@@ -60,10 +60,10 @@ describe('Feedback Updates Backend API Service', () => {
       imports: [HttpClientTestingModule],
       providers: [FeedbackUpdatesBackendApiService],
     });
-    feedbackUpdatesBackendApiService = TestBed.inject(
+    feedbackUpdatesBackendApiService = TestBed.get(
       FeedbackUpdatesBackendApiService
     );
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

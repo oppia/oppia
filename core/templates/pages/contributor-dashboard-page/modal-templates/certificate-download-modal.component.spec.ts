@@ -147,11 +147,11 @@ describe('Contributor Certificate Download Modal Component', () => {
     tomorrow.setDate(today.getDate() + 1);
 
     component.fromDate = '2023-10-01';
-    component.toDate = tomorrow.toISOString().split('T')[0];
+    component.toDate = tomorrow.toDateString();
     component.validateDate();
     expect(component.errorsFound).toBe(true);
     expect(component.errorMessage).toBe(
-      "Please select a 'To' date that is earlier than today's date"
+      "Please select a 'To' date that is not in the future."
     );
   });
 
@@ -166,7 +166,7 @@ describe('Contributor Certificate Download Modal Component', () => {
 
     expect(component.errorsFound).toBeTrue();
     expect(component.errorMessage).toEqual(
-      "Please select a 'To' date that is earlier than " + "today's date"
+      "Please select a 'To' date that is not in the future."
     );
   });
 

@@ -1,7 +1,7 @@
 <div *ngIf="!conceptCardExplanationEditorIsShown" class="review-material">
   <div [ngClass]="oppia-editable-section"
        (click)="openConceptCardExplanationEditor()">
-    <i class="material-icons oppia-editor-edit-icon float-right e2e-test-edit-concept-card"
+    <i class="material-icons oppia-editor-edit-icon float-end e2e-test-edit-concept-card"
        title="Edit Concept Card Explanation">&#xE254;
     </i>
     <div class="oppia-state-content-display oppia-transition-200 e2e-test-concept-card-explanation"
@@ -30,12 +30,12 @@
   </div>
   <div class="editor-buttons">
     <button type="button"
-            class="btn btn-success oppia-save-state-item-button float-right e2e-test-save-concept-card"
+            class="btn btn-success oppia-save-state-item-button float-end e2e-test-save-concept-card"
             (click)="saveConceptCardExplanation()"
             [disabled]="workedExampleLimitExceeded">
       Save
     </button>
-    <button type="button" class="btn btn-secondary float-right e2e-test-cancel-concept-card-save" (click)="closeConceptCardExplanationEditor()">Cancel</button>
+    <button type="button" class="btn btn-secondary float-end e2e-test-cancel-concept-card-save" (click)="closeConceptCardExplanationEditor()">Cancel</button>
     <div class="oppia-clear"></div>
   </div>
 </div>

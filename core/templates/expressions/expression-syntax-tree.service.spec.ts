@@ -30,7 +30,7 @@ describe('Expression syntax tree service', () => {
     let expressionSyntaxTreeService: ExpressionSyntaxTreeService;
 
     beforeEach(() => {
-      expressionSyntaxTreeService = TestBed.inject(ExpressionSyntaxTreeService);
+      expressionSyntaxTreeService = TestBed.get(ExpressionSyntaxTreeService);
     });
 
     it('should throw if environment is not found', () => {

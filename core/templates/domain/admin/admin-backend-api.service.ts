@@ -58,6 +58,10 @@ interface PendingDeletionRequestBackendResponse {
   number_of_pending_deletion_models: string;
 }
 
+interface StudyGuideModelsIssuesBackendResponse {
+  issues: string[];
+}
+
 export interface ModelsRelatedToUserBackendResponse {
   related_models_exist: boolean;
 }
@@ -376,6 +380,63 @@ export class AdminBackendApiService {
     return new Promise((resolve, reject) => {
       this.http
         .put<void>(AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL, {})
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async generateStudyGuideModelsAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<void>(
+          AdminPageConstants.ADMIN_GENERATE_STUDY_GUIDE_MODELS_URL,
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async deleteStudyGuideModelsAsync(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .delete<void>(
+          AdminPageConstants.ADMIN_DELETE_STUDY_GUIDE_MODELS_URL,
+          {}
+        )
+        .toPromise()
+        .then(
+          response => {
+            resolve(response);
+          },
+          errorResponse => {
+            reject(errorResponse.error.error);
+          }
+        );
+    });
+  }
+
+  async verifyStudyGuideModelsAsync(): Promise<StudyGuideModelsIssuesBackendResponse> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<StudyGuideModelsIssuesBackendResponse>(
+          AdminPageConstants.ADMIN_VERIFY_STUDY_GUIDE_MODELS_URL,
+          {}
+        )
         .toPromise()
         .then(
           response => {

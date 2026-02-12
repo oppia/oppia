@@ -465,6 +465,8 @@ export class LibraryPageComponent {
             response.preferred_language_codes
           );
 
+          this.keyboardShortcutService.bindLibraryPageShortcuts();
+
           // Check if actual and expected widths are the same.
           // If not produce an error that would be caught by e2e tests.
           setTimeout(() => {

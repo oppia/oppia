@@ -32,7 +32,7 @@ describe('State Interaction Id Service', () => {
       providers: [StateInteractionIdService],
     });
 
-    stateInteractionIdService = TestBed.inject(StateInteractionIdService);
+    stateInteractionIdService = TestBed.get(StateInteractionIdService);
   });
 
   it('should fetch event emitter for change in interaction id', () => {

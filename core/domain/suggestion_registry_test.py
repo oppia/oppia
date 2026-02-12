@@ -49,7 +49,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, suggestion_models
 
-(suggestion_models, opportunity_models) = models.Registry.import_models(
+suggestion_models, opportunity_models = models.Registry.import_models(
     [models.Names.SUGGESTION, models.Names.OPPORTUNITY]
 )
 
@@ -3255,7 +3255,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'default_state', content_id_generator
         ).to_dict()
         question_state_dict['content']['html'] = html_content
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_svg.svg'),
             'rb',
             encoding=None,
@@ -3316,7 +3316,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         suggestion.accept('commit_message')
 
     def test_accept_suggestion_with_image_region_interactions(self) -> None:
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
         ) as f:
             original_image_content = f.read()

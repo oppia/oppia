@@ -55,11 +55,11 @@ describe('LearnerAnswerInfoCard', () => {
   }));
 
   beforeEach(() => {
-    explorationHtmlFormatter = TestBed.inject(ExplorationHtmlFormatterService);
-    learnerAnswerInfoService = TestBed.inject(LearnerAnswerInfoService);
-    playerTranscriptService = TestBed.inject(PlayerTranscriptService);
+    explorationHtmlFormatter = TestBed.get(ExplorationHtmlFormatterService);
+    learnerAnswerInfoService = TestBed.get(LearnerAnswerInfoService);
+    playerTranscriptService = TestBed.get(PlayerTranscriptService);
     conversationFlowService = TestBed.inject(ConversationFlowService);
-    explorationEngineService = TestBed.inject(ExplorationEngineService);
+    explorationEngineService = TestBed.get(ExplorationEngineService);
     spyOn(explorationEngineService, 'getState').and.returnValue(
       State.createFromBackendDict('stateName', {
         classifier_model_id: null,

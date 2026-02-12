@@ -93,8 +93,8 @@ describe('InteractiveCodeReplComponent', () => {
   }));
 
   beforeEach(() => {
-    playerPositionService = TestBed.inject(PlayerPositionService);
-    currentInteractionService = TestBed.inject(CurrentInteractionService);
+    playerPositionService = TestBed.get(PlayerPositionService);
+    currentInteractionService = TestBed.get(CurrentInteractionService);
     fixture = TestBed.createComponent(InteractiveCodeReplComponent);
     component = fixture.componentInstance;
     component.lastAnswer = null;

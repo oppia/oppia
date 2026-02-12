@@ -27,9 +27,9 @@ describe('Translation language service', () => {
   let localStorageService: LocalStorageService;
 
   beforeEach(() => {
-    translationLanguageService = TestBed.inject(TranslationLanguageService);
-    languageUtilService = TestBed.inject(LanguageUtilService);
-    localStorageService = TestBed.inject(LocalStorageService);
+    translationLanguageService = TestBed.get(TranslationLanguageService);
+    languageUtilService = TestBed.get(LanguageUtilService);
+    localStorageService = TestBed.get(LocalStorageService);
     spyOn(languageUtilService, 'getAllVoiceoverLanguageCodes').and.returnValue([
       'en',
       'hi',

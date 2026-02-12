@@ -459,7 +459,7 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
         user_settings = user_services.get_user_settings(self.owner_id)
         # Ruling out the possibility of different types for mypy type checking.
         assert isinstance(user_settings.username, str)
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
             encoding=None,
@@ -1731,13 +1731,13 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
             deleted=user_settings.deleted,
         ).put()
 
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.png'),
             'rb',
             encoding=None,
         ) as f:
             raw_image_png = f.read()
-        with utils.open_file(
+        with open(
             os.path.join(feconf.TESTS_DATA_DIR, 'test_png_img.webp'),
             'rb',
             encoding=None,

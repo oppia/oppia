@@ -88,10 +88,10 @@ describe('Read only collection backend API service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    readOnlyCollectionBackendApiService = TestBed.inject(
+    readOnlyCollectionBackendApiService = TestBed.get(
       ReadOnlyCollectionBackendApiService
     );
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
     onCollectionLoadSpy = jasmine.createSpy('onCollectionLoadSpy');
     subscriptions = new Subscription();
     subscriptions.add(

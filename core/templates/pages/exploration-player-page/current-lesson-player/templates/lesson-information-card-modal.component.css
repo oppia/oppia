@@ -194,7 +194,12 @@
 }
 
 .oppia-lesson-info-card .row-item {
+  flex: 0 0 auto;
   flex-grow: 1;
+  max-width: none;
+  padding-left: 0;
+  padding-right: 0;
+  width: auto;
 }
 
 .oppia-lesson-info-card .named-contributors-container {

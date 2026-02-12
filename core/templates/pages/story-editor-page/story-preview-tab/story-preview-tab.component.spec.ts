@@ -71,7 +71,7 @@ describe('Story Preview tab', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(StoryPreviewTabComponent);
     component = fixture.componentInstance;
-    storyEditorStateService = TestBed.inject(StoryEditorStateService);
+    storyEditorStateService = TestBed.get(StoryEditorStateService);
     story = Story.createFromBackendDict({
       id: 'storyId_0',
       title: 'Story title',

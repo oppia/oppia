@@ -40,8 +40,8 @@ describe('Collection update service', () => {
     TestBed.configureTestingModule({
       imports: [],
     });
-    collectionUpdateService = TestBed.inject(CollectionUpdateService);
-    undoRedoService = TestBed.inject(UndoRedoService);
+    collectionUpdateService = TestBed.get(CollectionUpdateService);
+    undoRedoService = TestBed.get(UndoRedoService);
   });
 
   beforeEach(() => {

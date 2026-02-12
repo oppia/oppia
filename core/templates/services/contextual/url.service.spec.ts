@@ -42,8 +42,8 @@ describe('Url Service', () => {
       search: '',
     };
 
-    urlService = TestBed.inject(UrlService);
-    windowRef = TestBed.inject(WindowRef);
+    urlService = TestBed.get(UrlService);
+    windowRef = TestBed.get(WindowRef);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(
       () =>
         ({

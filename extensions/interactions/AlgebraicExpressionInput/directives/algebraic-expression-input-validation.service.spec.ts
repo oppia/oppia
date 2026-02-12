@@ -44,9 +44,7 @@ describe('AlgebraicExpressionInputValidationService', () => {
       providers: [AlgebraicExpressionInputValidationService],
     });
 
-    validatorService = TestBed.inject(
-      AlgebraicExpressionInputValidationService
-    );
+    validatorService = TestBed.get(AlgebraicExpressionInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';

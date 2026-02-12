@@ -22,7 +22,7 @@ describe('Logger Service', () => {
   let ls: LoggerService;
 
   beforeEach(() => {
-    ls = TestBed.inject(LoggerService);
+    ls = TestBed.get(LoggerService);
   });
 
   it('should display debug message on the console', () => {

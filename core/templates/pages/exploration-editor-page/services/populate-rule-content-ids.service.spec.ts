@@ -28,9 +28,7 @@ describe('Populate Rule Content Ids Service', () => {
   let generateContentIdService: GenerateContentIdService;
 
   beforeEach(() => {
-    populateRuleContentIdsService = TestBed.inject(
-      PopulateRuleContentIdsService
-    );
+    populateRuleContentIdsService = TestBed.get(PopulateRuleContentIdsService);
     generateContentIdService = TestBed.inject(GenerateContentIdService);
     generateContentIdService.init(
       () => 0,

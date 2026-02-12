@@ -46,7 +46,7 @@ MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import opportunity_models, user_models
 
-(opportunity_models, user_models) = models.Registry.import_models(
+opportunity_models, user_models = models.Registry.import_models(
     [models.Names.OPPORTUNITY, models.Names.USER]
 )
 
@@ -435,7 +435,7 @@ def update_translation_opportunity_with_accepted_suggestion(
 
     Args:
         exploration_id: str. The ID of the exploration.
-        language_code: str. The langauge code of the accepted translation
+        language_code: str. The language code of the accepted translation
             suggestion.
     """
     model = opportunity_models.ExplorationOpportunitySummaryModel.get(

@@ -49,7 +49,7 @@ describe('retrieving threads service', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

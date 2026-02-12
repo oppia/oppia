@@ -37,7 +37,7 @@ describe('BottomNavbarStatusService', () => {
       ],
     });
 
-    bss = TestBed.inject(BottomNavbarStatusService);
+    bss = TestBed.get(BottomNavbarStatusService);
   });
 
   it('should have bottom navbar disabled by default', () => {

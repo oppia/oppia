@@ -146,9 +146,9 @@ describe('Admin backend api service', () => {
       imports: [HttpClientTestingModule],
     });
 
-    abas = TestBed.inject(AdminBackendApiService);
-    httpTestingController = TestBed.inject(HttpTestingController);
-    csrfService = TestBed.inject(CsrfTokenService);
+    abas = TestBed.get(AdminBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    csrfService = TestBed.get(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
     adminDataObject = {
@@ -456,6 +456,117 @@ describe('Admin backend api service', () => {
         AdminPageConstants.ADMIN_REGENERATE_TOPIC_SUMMARIES_URL
       );
       expect(req.request.method).toEqual('PUT');
+
+      req.flush(
+        {error: errorMessage},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    }));
+  });
+
+  describe('generateStudyGuideModelsAsync', () => {
+    it('should make request to generate study guide models', fakeAsync(() => {
+      abas.generateStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_GENERATE_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('POST');
+
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      const errorMessage = 'Failed to generate all study guide models.';
+
+      abas.generateStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_GENERATE_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('POST');
+
+      req.flush(
+        {error: errorMessage},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    }));
+  });
+
+  describe('deleteStudyGuideModelsAsync', () => {
+    it('should make request to delete all study guide models', fakeAsync(() => {
+      abas.deleteStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_DELETE_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('DELETE');
+
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      const errorMessage = 'Failed to delete all study guide models.';
+
+      abas.deleteStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_DELETE_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('DELETE');
+
+      req.flush(
+        {error: errorMessage},
+        {status: 500, statusText: 'Internal Server Error'}
+      );
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(errorMessage);
+    }));
+  });
+
+  describe('verifyStudyGuideModelsAsync', () => {
+    it('should make request to verify all study guide models', fakeAsync(() => {
+      abas.verifyStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_VERIFY_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('GET');
+
+      req.flush({status: 200, statusText: 'Success.'});
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }));
+
+    it('should call fail handler if the request fails', fakeAsync(() => {
+      const errorMessage = 'Failed to verify all study guide models.';
+
+      abas.verifyStudyGuideModelsAsync().then(successHandler, failHandler);
+
+      const req = httpTestingController.expectOne(
+        AdminPageConstants.ADMIN_VERIFY_STUDY_GUIDE_MODELS_URL
+      );
+      expect(req.request.method).toEqual('GET');
 
       req.flush(
         {error: errorMessage},

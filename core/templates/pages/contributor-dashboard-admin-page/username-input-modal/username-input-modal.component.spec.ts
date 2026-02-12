@@ -47,7 +47,7 @@ describe('UsernameInputModal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UsernameInputModal);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
     signupPageBackendApiService = TestBed.inject(SignupPageBackendApiService);
     fixture.detectChanges();
     component.ngOnInit();

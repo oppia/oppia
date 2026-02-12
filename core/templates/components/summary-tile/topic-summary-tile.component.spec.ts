@@ -44,7 +44,7 @@ describe('TopicSummaryTileCompoennt', () => {
     fixture = TestBed.createComponent(TopicSummaryTileComponent);
     component = fixture.componentInstance;
     abas = TestBed.inject(AssetsBackendApiService);
-    urlInterpolationService = TestBed.inject(UrlInterpolationService);
+    urlInterpolationService = TestBed.get(UrlInterpolationService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
 
     component.topicSummary = CreatorTopicSummary.createFromBackendDict({

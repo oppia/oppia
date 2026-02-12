@@ -204,11 +204,11 @@ describe('Creator Dashboard backend API service', () => {
       imports: [HttpClientTestingModule],
       providers: [CreatorDashboardBackendApiService],
     });
-    creatorDashboardBackendApiService = TestBed.inject(
+    creatorDashboardBackendApiService = TestBed.get(
       CreatorDashboardBackendApiService
     );
 
-    httpTestingController = TestBed.inject(HttpTestingController);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
   afterEach(() => {

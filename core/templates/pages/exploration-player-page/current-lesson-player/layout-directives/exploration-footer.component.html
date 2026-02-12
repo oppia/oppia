@@ -28,17 +28,16 @@
       </button>
     </div>
     <div class="col-sm-7">
-      <div [ngClass]="{'float-left': isLanguageRTL(), 'float-right': !isLanguageRTL()}">
+      <div [ngClass]="{'float-start': isLanguageRTL(), 'float-end': !isLanguageRTL()}">
         <oppia-hint-and-solution-buttons *ngIf="hintsAndSolutionsAreSupported">
         </oppia-hint-and-solution-buttons>
         <div class="hint-container">
           <div class="hint-box hint-box-add-ons" *ngIf="isVisible && isTooltipVisible()">
             <span [innerHTML]="'I18N_CONCEPT_CARD_NEED_HELP' | translate"></span>
             <button type="button"
-                    class="btn close"
+                    class="btn-close"
                     aria-label="Close Concept Card Button"
                     (click)="isVisible = !isVisible">
-              <span aria-hidden="true">&times;</span>
             </button>
           </div>
         </div>
@@ -98,7 +97,7 @@
   .hint-box-add-ons {
     left: -5.5px;
   }
-  .hint-box-add-ons .close {
+  .hint-box-add-ons .btn-close {
     left: 0;
   }
   .hint-box-add-ons::after {
@@ -146,7 +145,7 @@
     border-right: 7px solid transparent;
     border-top: 32px solid #2d4a9d;
   }
-  .close {
+  .btn-close {
     bottom: 10px;
     font-size: 22px;
     margin-left: 10px;

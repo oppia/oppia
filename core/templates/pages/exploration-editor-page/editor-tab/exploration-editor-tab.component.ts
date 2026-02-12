@@ -156,6 +156,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             .querySelector<HTMLElement>('.e2e-test-joyride-title')
             .focus();
 
+          if (value.number === 1) {
+            this.smoothScrollTo(0, 1000);
+          }
+
           if (value.number === 2) {
             this.smoothScrollTo(0, 1000);
 
@@ -185,6 +189,10 @@ export class ExplorationEditorTabComponent implements OnInit, OnDestroy {
             document
               .querySelector<HTMLElement>('.e2e-test-joyride-title')
               .focus();
+          }
+
+          if (value.number === 5) {
+            this.smoothScrollTo(0, 1000);
           }
 
           if (value.number === 6) {

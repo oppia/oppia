@@ -104,8 +104,10 @@ describe('Exploration editor tab component', () => {
     startTour() {
       return {
         subscribe: (value1, value2, value3) => {
+          value1({number: 1});
           value1({number: 2});
           value1({number: 4});
+          value1({number: 5});
           value1({number: 6});
           value1({number: 8});
           value2();

@@ -38,7 +38,6 @@ import {WindowRef} from 'services/contextual/window-ref.service';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
 import {ReadOnlyStoryNode} from 'domain/story_viewer/read-only-story-node.model';
-import {PlatformFeatureService} from 'services/platform-feature.service';
 
 class MockAssetsBackendApiService {
   getThumbnailUrlForPreview() {
@@ -53,14 +52,6 @@ class MockTranslateService {
   }
 }
 
-class MockPlatformFeatureService {
-  status = {
-    SerialChapterLaunchLearnerView: {
-      isEnabled: false,
-    },
-  };
-}
-
 describe('Story Viewer Page component', () => {
   let httpTestingController: HttpTestingController;
   let component: StoryViewerPageComponent;
@@ -73,7 +64,6 @@ describe('Story Viewer Page component', () => {
   let windowRef: WindowRef;
   let i18nLanguageCodeService: I18nLanguageCodeService;
   let translateService: TranslateService;
-  let mockPlatformFeatureService: MockPlatformFeatureService;
   let _samplePlaythroughObject: StoryPlaythrough;
   const UserInfoObject = {
     roles: ['USER_ROLE'],
@@ -89,7 +79,6 @@ describe('Story Viewer Page component', () => {
   };
 
   beforeEach(fakeAsync(() => {
-    mockPlatformFeatureService = new MockPlatformFeatureService();
     TestBed.configureTestingModule({
       declarations: [StoryViewerPageComponent, MockTranslatePipe],
       imports: [HttpClientTestingModule],
@@ -102,22 +91,18 @@ describe('Story Viewer Page component', () => {
           provide: TranslateService,
           useClass: MockTranslateService,
         },
-        {
-          provide: PlatformFeatureService,
-          useValue: mockPlatformFeatureService,
-        },
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
-    httpTestingController = TestBed.inject(HttpTestingController);
-    pageTitleService = TestBed.inject(PageTitleService);
-    assetsBackendApiService = TestBed.inject(AssetsBackendApiService);
-    urlService = TestBed.inject(UrlService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    pageTitleService = TestBed.get(PageTitleService);
+    assetsBackendApiService = TestBed.get(AssetsBackendApiService);
+    urlService = TestBed.get(UrlService);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
-    userService = TestBed.inject(UserService);
-    alertsService = TestBed.inject(AlertsService);
-    storyViewerBackendApiService = TestBed.inject(StoryViewerBackendApiService);
-    windowRef = TestBed.inject(WindowRef);
+    userService = TestBed.get(UserService);
+    alertsService = TestBed.get(AlertsService);
+    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    windowRef = TestBed.get(WindowRef);
     i18nLanguageCodeService = TestBed.inject(I18nLanguageCodeService);
     translateService = TestBed.inject(TranslateService);
     let fixture = TestBed.createComponent(StoryViewerPageComponent);
@@ -132,6 +117,7 @@ describe('Story Viewer Page component', () => {
       },
     } as Window);
   }));
+
   beforeEach(() => {
     spyOn(assetsBackendApiService, 'getThumbnailUrlForPreview').and.returnValue(
       'thumbnail-url'
@@ -179,7 +165,6 @@ describe('Story Viewer Page component', () => {
       completed: true,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename',
-      status: 'Published',
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
@@ -218,7 +203,6 @@ describe('Story Viewer Page component', () => {
       completed: false,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: 'filename',
-      status: 'Published',
     };
     var storyPlaythroughBackendObject = {
       story_id: 'qwerty',
@@ -294,7 +278,7 @@ describe('Story Viewer Page component', () => {
 
     component.ngOnInit();
 
-    expect(component.showChapters()).toBe(false);
+    expect(component.showChapters()).toBeFalse();
   });
 
   it('should throw error if story url fragment is not present', () => {
@@ -393,7 +377,7 @@ describe('Story Viewer Page component', () => {
       'node_2'
     );
 
-    expect(component.showChapters()).toBe(true);
+    expect(component.showChapters()).toBeTrue();
   });
 
   it('should sign in correctly', fakeAsync(() => {
@@ -551,7 +535,6 @@ describe('Story Viewer Page component', () => {
       completed: true,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
-      status: 'Published',
     };
     var secondSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_2',
@@ -590,7 +573,6 @@ describe('Story Viewer Page component', () => {
       completed: false,
       thumbnail_bg_color: '#927117',
       thumbnail_filename: '',
-      status: 'Published',
     };
 
     var storyPlaythroughBackendObject = {
@@ -688,287 +670,5 @@ describe('Story Viewer Page component', () => {
     let hackyStoryNodeDescTranslationIsDisplayed =
       component.isHackyStoryNodeDescTranslationDisplayed(0);
     expect(hackyStoryNodeDescTranslationIsDisplayed).toBe(true);
-  });
-
-  it('should get status of Serial Chapter Launch Learner Feature flag', () => {
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      false;
-    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(false);
-
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.isSerialChapterFeatureLearnerFlagEnabled()).toBe(true);
-  });
-
-  it('should correctly identify published chapters', () => {
-    const publishedNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Published',
-    });
-
-    expect(component.isChapterPublished(publishedNode)).toBe(true);
-    expect(component.isChapterReadyToPublish(publishedNode)).toBe(false);
-  });
-
-  it('should correctly identify ready to publish chapters', () => {
-    const readyToPublishNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Ready To Publish',
-    });
-
-    expect(component.isChapterPublished(readyToPublishNode)).toBe(false);
-    expect(component.isChapterReadyToPublish(readyToPublishNode)).toBe(true);
-  });
-
-  it('should display chapter as coming soon when feature flag is enabled and chapter is ready to publish', () => {
-    const readyToPublishNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Ready To Publish',
-    });
-
-    // Feature flag disabled - should not show as coming soon.
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      false;
-    expect(component.isChapterDisplayedAsComingSoon(readyToPublishNode)).toBe(
-      false
-    );
-
-    // Feature flag enabled - should show as coming soon.
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.isChapterDisplayedAsComingSoon(readyToPublishNode)).toBe(
-      true
-    );
-  });
-
-  it('should not display published chapter as coming soon', () => {
-    const publishedNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Published',
-    });
-
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.isChapterDisplayedAsComingSoon(publishedNode)).toBe(false);
-  });
-
-  it('should return null for chapter URL when chapter is displayed as coming soon', () => {
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'topic'
-    );
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math'
-    );
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-      'story'
-    );
-
-    const readyToPublishNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Ready To Publish',
-    });
-
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.getChapterExplorationUrl(readyToPublishNode)).toBeNull();
-  });
-
-  it('should return exploration URL for published chapters', () => {
-    spyOn(urlService, 'getTopicUrlFragmentFromLearnerUrl').and.returnValue(
-      'topic'
-    );
-    spyOn(urlService, 'getClassroomUrlFragmentFromLearnerUrl').and.returnValue(
-      'math'
-    );
-    spyOn(urlService, 'getStoryUrlFragmentFromLearnerUrl').and.returnValue(
-      'story'
-    );
-
-    const publishedNode = ReadOnlyStoryNode.createFromBackendDict({
-      id: 'node_1',
-      description: 'description',
-      title: 'Title 1',
-      prerequisite_skill_ids: [],
-      acquired_skill_ids: [],
-      destination_node_ids: [],
-      outline: 'Outline',
-      exploration_id: 'exp_id',
-      outline_is_finalized: false,
-      exp_summary_dict: {
-        title: 'Title',
-        status: 'private',
-        last_updated_msec: 1591296737470.528,
-        community_owned: false,
-        objective: 'Test Objective',
-        id: '44LKoKLlIbGe',
-        num_views: 0,
-        thumbnail_icon_url: '/subjects/Algebra.svg',
-        human_readable_contributors_summary: {},
-        language_code: 'en',
-        thumbnail_bg_color: '#cc4b00',
-        created_on_msec: 1591296635736.666,
-        ratings: {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
-        tags: [],
-        activity_type: 'exploration',
-        category: 'Algebra',
-      },
-      completed: false,
-      thumbnail_bg_color: '#927117',
-      thumbnail_filename: 'filename',
-      status: 'Published',
-    });
-
-    mockPlatformFeatureService.status.SerialChapterLaunchLearnerView.isEnabled =
-      true;
-    expect(component.getChapterExplorationUrl(publishedNode)).toBe(
-      '/explore/exp_id?topic_url_fragment=topic&' +
-        'classroom_url_fragment=math&story_url_fragment=story&' +
-        'node_id=node_1'
-    );
   });
 });

@@ -39,7 +39,7 @@ describe('Guest collection progress service', () => {
       providers: [GuestCollectionProgressService],
     });
 
-    guestCollectionProgressService = TestBed.inject(
+    guestCollectionProgressService = TestBed.get(
       GuestCollectionProgressService
     );
 

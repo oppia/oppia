@@ -30,7 +30,7 @@ describe('Ratio expression input rules service', () => {
     TestBed.configureTestingModule({
       providers: [RatioExpressionInputRulesService],
     });
-    reirs = TestBed.inject(RatioExpressionInputRulesService);
+    reirs = TestBed.get(RatioExpressionInputRulesService);
   });
 
   it('should have a correct Equals rule', () => {

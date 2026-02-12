@@ -10,7 +10,7 @@
       <a aria-label="Progress" class="info-tooltip" href="#/" tabindex="-1">
         <img [src]="getStaticImageUrl('/learner_dashboard/info.svg')" alt="info image" class="oppia-svg-info-image" *ngIf="!emptySkillProficiency">
         <span>
-          <div class="badge-info">
+          <div class="text-bg-info">
             <img [src]="goldBadgeImageUrl" alt="gold badge image" class="oppia-badge-image">
             <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_GOLD_BADGE' | translate">
             </p>
@@ -18,7 +18,7 @@
               100%
             </p>
           </div>
-          <div class="badge-info">
+          <div class="text-bg-info">
             <img [src]="silverBadgeImageUrl" alt="silver badge image" class="oppia-badge-image">
             <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_SILVER_BADGE' | translate">
             </p>
@@ -26,7 +26,7 @@
               80-99%
             </p>
           </div>
-          <div class="badge-info">
+          <div class="text-bg-info">
             <img [src]="bronzeBadgeImageUrl" alt="bronze badge image" class="oppia-badge-image">
             <p class="badge-type" [innerHTML]="'I18N_LEARNER_DASHBOARD_BRONZE_BADGE' | translate">
             </p>
@@ -296,7 +296,7 @@
     font-style: italic;
     text-align: left;
   }
-  .progress-tab .badge-info {
+  .progress-tab .bg-info {
     background-color: #fff;
     color: #000;
     margin-bottom: 16px;

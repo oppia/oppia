@@ -61,7 +61,7 @@ if MYPY:  # pragma: no cover
         user_models,
     )
 
-(skill_models, user_models, question_models, topic_models) = (
+skill_models, user_models, question_models, topic_models = (
     models.Registry.import_models(
         [
             models.Names.SKILL,

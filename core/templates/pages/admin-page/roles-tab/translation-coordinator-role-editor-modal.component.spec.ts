@@ -53,7 +53,7 @@ describe('TranslationCoordinatorRoleEditorModalComponent', () => {
       TranslationCoordinatorRoleEditorModalComponent
     );
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
     adminBackendApiService = TestBed.inject(AdminBackendApiService);
     alertsService = TestBed.inject(AlertsService);
     component.coordinatedLanguageIds = ['en', 'hi', 'ak'];

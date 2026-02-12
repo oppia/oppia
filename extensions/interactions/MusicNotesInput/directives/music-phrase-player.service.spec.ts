@@ -23,7 +23,7 @@ describe('MusicPhrasePlayerService', () => {
   let musicPhrasePlayerService: MusicPhrasePlayerService;
 
   beforeEach(() => {
-    musicPhrasePlayerService = TestBed.inject(MusicPhrasePlayerService);
+    musicPhrasePlayerService = TestBed.get(MusicPhrasePlayerService);
 
     window.MIDI = {
       // This throws "Type '{ stop: () => void; }' is missing the following

@@ -38,10 +38,10 @@ describe('StateTopAnswersStatsService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({imports: [HttpClientTestingModule]});
 
-    stateTopAnswersStatsBackendApiService = TestBed.inject(
+    stateTopAnswersStatsBackendApiService = TestBed.get(
       StateTopAnswersStatsBackendApiService
     );
-    stateTopAnswersStatsService = TestBed.inject(StateTopAnswersStatsService);
+    stateTopAnswersStatsService = TestBed.get(StateTopAnswersStatsService);
   });
 
   const expId = '7';

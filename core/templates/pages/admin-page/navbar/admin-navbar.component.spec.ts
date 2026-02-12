@@ -61,8 +61,8 @@ describe('Admin Navbar component', () => {
 
     fixture = TestBed.createComponent(AdminNavbarComponent);
     component = fixture.componentInstance;
-    userService = TestBed.inject(UserService);
-    adminRouterService = TestBed.inject(AdminRouterService);
+    userService = TestBed.get(UserService);
+    adminRouterService = TestBed.get(AdminRouterService);
     fixture.detectChanges();
 
     spyOn(userService, 'getProfileImageDataUrl').and.returnValue([

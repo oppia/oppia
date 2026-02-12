@@ -24,7 +24,7 @@ describe('SuggestionsService', () => {
   let suggestionService: SuggestionsService;
 
   beforeEach(() => {
-    suggestionService = TestBed.inject(SuggestionsService);
+    suggestionService = TestBed.get(SuggestionsService);
   });
 
   describe('getThreadIdFromSuggestionBackendDict', () => {

@@ -55,7 +55,7 @@ describe('CdAdminTranslationRoleEditorModal', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(CdAdminTranslationRoleEditorModal);
     component = fixture.componentInstance;
-    ngbActiveModal = TestBed.inject(NgbActiveModal);
+    ngbActiveModal = TestBed.get(NgbActiveModal);
     contributorDashboardAdminBackendApiService = TestBed.inject(
       ContributorDashboardAdminBackendApiService
     );
