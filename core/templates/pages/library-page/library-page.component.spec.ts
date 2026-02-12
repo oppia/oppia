@@ -965,6 +965,88 @@ describe('Library Page Component', () => {
     flush();
   }));
 
+  it('should normalize scrollLeft for RTL negative mode', () => {
+    const mockCarouselElement = {
+      scrollLeft: -250,
+      scrollWidth: 0,
+      clientWidth: 0,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
+      'negative'
+    );
+
+    const normalizedScrollLeft = (
+      componentInstance as any
+    ).getNormalizedScrollLeft(mockCarouselElement);
+    expect(normalizedScrollLeft).toBe(250);
+  });
+
+  it('should normalize scrollLeft for RTL reverse mode', () => {
+    const mockCarouselElement = {
+      scrollLeft: 200,
+      scrollWidth: 1000,
+      clientWidth: 400,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
+      'reverse'
+    );
+
+    const normalizedScrollLeft = (
+      componentInstance as any
+    ).getNormalizedScrollLeft(mockCarouselElement);
+    expect(normalizedScrollLeft).toBe(400);
+  });
+
+  it('should set normalized scrollLeft for RTL negative mode', () => {
+    const mockCarouselElement = {
+      scrollLeft: 0,
+      scrollWidth: 0,
+      clientWidth: 0,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
+      'negative'
+    );
+
+    (componentInstance as any).setNormalizedScrollLeft(
+      mockCarouselElement,
+      300
+    );
+    expect(mockCarouselElement.scrollLeft).toBe(-300);
+  });
+
+  it('should set normalized scrollLeft for RTL reverse mode', () => {
+    const mockCarouselElement = {
+      scrollLeft: 0,
+      scrollWidth: 900,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
+      'reverse'
+    );
+
+    (componentInstance as any).setNormalizedScrollLeft(
+      mockCarouselElement,
+      250
+    );
+    expect(mockCarouselElement.scrollLeft).toBe(350);
+  });
+
   it('should not scroll if activity count is too small to allow scrolling', () => {
     const ind = 0;
     const shouldScrollLeft = false;

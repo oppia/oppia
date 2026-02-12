@@ -49,6 +49,8 @@ interface MobileLibraryGroupProperties {
   buttonText: string;
 }
 
+type RtlScrollType = 'default' | 'negative' | 'reverse';
+
 @Component({
   selector: 'oppia-library-page',
   templateUrl: './library-page.component.html',
@@ -102,6 +104,7 @@ export class LibraryPageComponent {
   currentCardIndex: number = 0;
   cardsToShow: number = 3;
   dots: number[] = [];
+  rtlScrollType: RtlScrollType | null = null;
 
   constructor(
     private loggerService: LoggerService,
@@ -128,6 +131,79 @@ export class LibraryPageComponent {
 
   clearActiveGroup(): void {
     this.activeGroupIndex = null;
+  }
+
+  private getRtlScrollType(): RtlScrollType {
+    if (this.rtlScrollType !== null) {
+      return this.rtlScrollType;
+    }
+
+    const dummy = document.createElement('div');
+    const container = document.createElement('div');
+
+    container.dir = 'rtl';
+    container.style.width = '4px';
+    container.style.height = '1px';
+    container.style.overflow = 'scroll';
+    container.style.position = 'absolute';
+    container.style.top = '-1000px';
+
+    dummy.style.width = '10px';
+    dummy.style.height = '1px';
+    container.appendChild(dummy);
+    document.body.appendChild(container);
+
+    if (container.scrollLeft > 0) {
+      this.rtlScrollType = 'default';
+    } else {
+      container.scrollLeft = 1;
+      this.rtlScrollType = container.scrollLeft === 0 ? 'negative' : 'reverse';
+    }
+
+    document.body.removeChild(container);
+    return this.rtlScrollType;
+  }
+
+  private getNormalizedScrollLeft(carouselElement: HTMLElement): number {
+    const scrollLeft = carouselElement.scrollLeft;
+    if (!this.i18nLanguageCodeService.isCurrentLanguageRTL()) {
+      return scrollLeft;
+    }
+
+    const rtlScrollType = this.getRtlScrollType();
+    if (rtlScrollType === 'negative') {
+      return -scrollLeft;
+    }
+    if (rtlScrollType === 'reverse') {
+      return (
+        carouselElement.scrollWidth - carouselElement.clientWidth - scrollLeft
+      );
+    }
+    return scrollLeft;
+  }
+
+  private setNormalizedScrollLeft(
+    carouselElement: HTMLElement,
+    normalizedScrollLeft: number
+  ): void {
+    if (!this.i18nLanguageCodeService.isCurrentLanguageRTL()) {
+      carouselElement.scrollLeft = normalizedScrollLeft;
+      return;
+    }
+
+    const rtlScrollType = this.getRtlScrollType();
+    if (rtlScrollType === 'negative') {
+      carouselElement.scrollLeft = -normalizedScrollLeft;
+      return;
+    }
+    if (rtlScrollType === 'reverse') {
+      carouselElement.scrollLeft =
+        carouselElement.scrollWidth -
+        carouselElement.clientWidth -
+        normalizedScrollLeft;
+      return;
+    }
+    carouselElement.scrollLeft = normalizedScrollLeft;
   }
 
   initCarousels(): void {
@@ -170,7 +246,12 @@ export class LibraryPageComponent {
     for (let i = 0; i < this.libraryGroups.length; i++) {
       const carouselTileElem = carouselTileElems[i] as HTMLElement;
       if (carouselTileElem) {
-        const scrollLeft = carouselTileElem.scrollLeft;
+        const currentLeftmostIndex = this.leftmostCardIndices[i] || 0;
+        this.setNormalizedScrollLeft(
+          carouselTileElem,
+          currentLeftmostIndex * AppConstants.LIBRARY_TILE_WIDTH_PX
+        );
+        const scrollLeft = this.getNormalizedScrollLeft(carouselTileElem);
         const index = Math.ceil(
           scrollLeft / AppConstants.LIBRARY_TILE_WIDTH_PX
         );
@@ -194,7 +275,7 @@ export class LibraryPageComponent {
     }
 
     const direction = isLeftScroll ? -1 : 1;
-    let scrollLeft = carouselElement.scrollLeft;
+    let scrollLeft = this.getNormalizedScrollLeft(carouselElement);
 
     if (
       this.libraryGroups[ind].activity_summary_dicts.length <=
@@ -203,7 +284,11 @@ export class LibraryPageComponent {
       return;
     }
 
-    scrollLeft = Math.max(0, scrollLeft);
+    const maxScrollPx = Math.max(
+      0,
+      carouselElement.scrollWidth - carouselElement.clientWidth
+    );
+    scrollLeft = Math.max(0, Math.min(scrollLeft, maxScrollPx));
 
     if (isLeftScroll) {
       this.leftmostCardIndices[ind] = Math.max(
@@ -219,12 +304,17 @@ export class LibraryPageComponent {
       );
     }
 
-    const newScrollPositionPx =
-      scrollLeft +
-      this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction;
+    const newScrollPositionPx = Math.max(
+      0,
+      Math.min(
+        maxScrollPx,
+        scrollLeft +
+          this.tileDisplayCount * AppConstants.LIBRARY_TILE_WIDTH_PX * direction
+      )
+    );
 
     const duration = 800;
-    const start = carouselElement.scrollLeft;
+    const start = scrollLeft;
     const distance = newScrollPositionPx - start;
     const startTime = performance.now();
 
@@ -236,7 +326,7 @@ export class LibraryPageComponent {
           ? 2 * progress * progress
           : -1 + (4 - 2 * progress) * progress;
 
-      carouselElement.scrollLeft = start + distance * ease;
+      this.setNormalizedScrollLeft(carouselElement, start + distance * ease);
 
       if (progress < 1) {
         requestAnimationFrame(animateScroll);
@@ -354,6 +444,7 @@ export class LibraryPageComponent {
     this.translateSubscription = this.translateService.onLangChange.subscribe(
       () => {
         this.setPageTitle();
+        this.initCarousels();
       }
     );
 
