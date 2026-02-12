@@ -16,8 +16,7 @@
  * @fileoverview Acceptance test from CUJv3 Doc
  * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
  *
- * TODO : #24785
- * Has to set this after Adding the CUJs in v3 docs
+ * TODO(#24785): This has to set this after adding the CUJs in v3 docs.
  */
 
 import {UserFactory} from '../../utilities/common/user-factory';
