@@ -368,6 +368,40 @@ const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
+
+  /** star Rate the exploration using star */
+  async starRateExploration(stars: number): Promise<void> {
+  // Wait until rating stars are rendered
+   await this.page.waitForSelector(
+      '.e2e-test-rating-star',
+       { visible: true }
+    );
+
+    const ratingStars = await this.page.$$('.e2e-test-rating-star');
+
+    if (ratingStars.length < stars) {
+     throw new Error(`Only ${ratingStars.length} stars found`);
+    }
+
+    await ratingStars[stars - 1].click();
+  }
+  /**submit the feedback for the exploration */
+  async submitFeedback(): Promise<void> {
+    await this.clickOnElementWithSelector(submitButtonSelector);
+
+    await this.page.waitForSelector(submittedMessageSelector, {
+      visible: true,});
+
+    const submittedMessageText = await this.page.$eval(
+      submittedMessageSelector,
+      (el: Element) => el.textContent
+    );
+
+    if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
+     throw new Error(
+       `Unexpected submitted message text: ${submittedMessageText}`
+      );
+    }
   /**
    * Clicks on the given button in the remove activity modal.
    * @param {'Remove' | 'Cancel'} button - The button to click.
@@ -537,6 +571,12 @@ export class LoggedInUser extends BaseUser {
     await this.page.waitForSelector(homeTabSectionInLearnerDashboard, {
       visible: true,
     });
+  }
+
+  /**navigate to community library */
+  async navigateToCommunityLibrary(): Promise<void> {
+    await this.goto(testConstants.URLs.CommunityLibrary);
+    await this.waitForPageToFullyLoad();
   }
 
   /**

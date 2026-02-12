@@ -1,6 +1,10 @@
 {
   "suites": [
     {
+       "name":"collection-creator/create-a-collection",
+       "module":"core/tests/puppeteer-acceptance-tests/specs/collection-creator/create-a-collection.spec.ts"
+    },
+    {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-user/deny-access-to-dashboards-and-actions-without-login.spec.ts"
     },
