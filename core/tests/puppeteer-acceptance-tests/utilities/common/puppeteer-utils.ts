@@ -1627,13 +1627,7 @@ export class BaseUser {
   ): Promise<void> {
     const chapterElement = await this.getChapterByName(chapterName);
 
-    await this.expectElementToBeClickable(chapterElement);
-    // await this.page.waitForFunction(
-    //   isElementClickable,
-    //   {},
-    //   chapterElement,
-    //   shouldBeClickable
-    // );
+    await this.expectElementToBeClickable(chapterElement, shouldBeClickable);
   }
 
   /**
