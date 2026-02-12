@@ -4340,7 +4340,7 @@ export class ExplorationEditor extends BaseUser {
       });
       await this.clickOnElementWithSelector(mobileNavbarDropdown);
       await this.page.waitForSelector(mobileNavbarPane);
-      // Note: Mobile improvements tab button would go here if needed
+      // Note: Mobile improvements tab button would go here if needed.
       // For now, fall through to desktop logic.
     }
 

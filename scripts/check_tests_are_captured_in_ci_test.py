@@ -419,12 +419,12 @@ class CheckTestsAreCapturedInCiTest(test_utils.GenericTestBase):
             return []
 
         def mock_get_e2e_test_modules_from_webdriverio_directory() -> List[str]:
-            return []
+            return ['suiteA.js', 'suiteB.js']
 
         def mock_get_e2e_test_modules_from_webdriverio_config_file() -> (
             List[str]
         ):
-            return []
+            return ['suiteA.js', 'suiteB.js']
 
         get_acceptance_test_suites_from_ci_config_file_swap = self.swap(
             check_tests_are_captured_in_ci,
