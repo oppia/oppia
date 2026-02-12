@@ -36,6 +36,7 @@ export interface StoryNodeBackendDict {
   completed: boolean;
   thumbnail_bg_color: string;
   thumbnail_filename: string;
+  status: string;
 }
 
 export class ReadOnlyStoryNode {
@@ -52,6 +53,7 @@ export class ReadOnlyStoryNode {
   completed: boolean;
   thumbnailBgColor: string;
   thumbnailFilename: string;
+  status: string;
 
   constructor(
     id: string,
@@ -66,7 +68,8 @@ export class ReadOnlyStoryNode {
     explorationSummary: LearnerExplorationSummary,
     completed: boolean,
     thumbnailBgColor: string,
-    thumbnailFilename: string
+    thumbnailFilename: string,
+    status: string
   ) {
     this.id = id;
     this.title = title;
@@ -81,6 +84,7 @@ export class ReadOnlyStoryNode {
     this.completed = completed;
     this.thumbnailBgColor = thumbnailBgColor;
     this.thumbnailFilename = thumbnailFilename;
+    this.status = status;
   }
 
   static createFromBackendDict(
@@ -103,7 +107,8 @@ export class ReadOnlyStoryNode {
       explorationSummary,
       storyNodeBackendDict.completed,
       storyNodeBackendDict.thumbnail_bg_color,
-      storyNodeBackendDict.thumbnail_filename
+      storyNodeBackendDict.thumbnail_filename,
+      storyNodeBackendDict.status
     );
   }
 
@@ -145,5 +150,9 @@ export class ReadOnlyStoryNode {
 
   getThumbnailBgColor(): string {
     return this.thumbnailBgColor;
+  }
+
+  getStatus(): string {
+    return this.status;
   }
 }
