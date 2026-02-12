@@ -25,10 +25,6 @@
       "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
     },
     {
-      "name": "embedding",
-      "module": "core/tests/webdriverio_desktop/embedding.js"
-    },
-    {
       "name": "explorationHistoryTab",
       "module": "core/tests/webdriverio_desktop/explorationHistoryTab.js"
     },

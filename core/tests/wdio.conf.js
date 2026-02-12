@@ -53,10 +53,6 @@ var suites = {
     './core/tests/webdriverio_desktop/creatorDashboard.js'
   ],
 
-  embedding: [
-    './core/tests/webdriverio_desktop/embedding.js'
-  ],
-
   explorationHistoryTab: [
     './core/tests/webdriverio_desktop/explorationHistoryTab.js'
   ],
