@@ -47,9 +47,9 @@ describe('Answer Classification Service', () => {
     });
 
     alertsService = TestBed.inject(AlertsService);
-    answerClassificationService = TestBed.get(AnswerClassificationService);
-    interactionSpecsService = TestBed.get(InteractionSpecsService);
-    textInputRulesService = TestBed.get(TextInputRulesService);
+    answerClassificationService = TestBed.inject(AnswerClassificationService);
+    interactionSpecsService = TestBed.inject(InteractionSpecsService);
+    textInputRulesService = TestBed.inject(TextInputRulesService);
   });
 
   describe('with string classifier disabled', () => {
