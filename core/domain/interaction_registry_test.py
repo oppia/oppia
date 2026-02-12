@@ -18,9 +18,9 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import os
-import importlib
 
 from core import feconf, schema_utils
 from core.domain import interaction_registry
@@ -242,7 +242,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that _refresh skips classes whose base class is not
-        BaseInteraction."""
+        BaseInteraction.
+        """
 
         class NotAnInteraction:
             """A dummy class that does not inherit from BaseInteraction."""
@@ -251,6 +252,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
 
         original_import = importlib.import_module
 
+        # Here we use type Any because the mock_import_module function
+        # needs to return different module types depending on the name,
+        # so a specific return type cannot be used.
         def mock_import_module(name: str) -> Any:
             module = original_import(name)
             # For one specific interaction, replace the class with one that
@@ -271,15 +275,18 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         )
         # But other real interactions should still be registered.
         self.assertTrue(
-            len(interaction_registry.Registry._interactions)
-            > 0  # pylint: disable=protected-access
+            len(
+                interaction_registry.Registry._interactions  # pylint: disable=protected-access
+            )
+            > 0
         )
 
     def test_get_all_specs_for_state_schema_version_with_can_fetch_latest(
         self,
     ) -> None:
         """Test that get_all_specs_for_state_schema_version returns latest
-        specs when the file is not found and can_fetch_latest_specs is True."""
+        specs when the file is not found and can_fetch_latest_specs is True.
+        """
         result = interaction_registry.Registry.get_all_specs_for_state_schema_version(
             0, can_fetch_latest_specs=True
         )
@@ -290,7 +297,8 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that get_all_specs_for_state_schema_version successfully
-        loads specs from a legacy JSON file and caches them."""
+        loads specs from a legacy JSON file and caches them.
+        """
         # Use a version that has an actual legacy specs file.
         version = 52
         # Ensure it's not already cached.
@@ -298,9 +306,9 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
             version
             in interaction_registry.Registry._state_schema_version_to_interaction_specs
         ):  # pylint: disable=protected-access,line-too-long
-            del interaction_registry.Registry._state_schema_version_to_interaction_specs[
+            del interaction_registry.Registry._state_schema_version_to_interaction_specs[  # pylint: disable=protected-access,line-too-long
                 version
-            ]  # pylint: disable=protected-access,line-too-long
+            ]
 
         # First call — reads from file and caches (lines 176-182).
         result_first = interaction_registry.Registry.get_all_specs_for_state_schema_version(

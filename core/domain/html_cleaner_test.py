@@ -457,8 +457,10 @@ class IsHtmlEmptyTests(test_utils.GenericTestBase):
     def test_single_quotes_only_is_empty(self) -> None:
         """Test that '' is considered empty."""
         self.assertTrue(
-            html_cleaner.is_html_empty("''")
-        )  # pylint: disable=invalid-string-quote
+            html_cleaner.is_html_empty(
+                "''"
+            )  # pylint: disable=invalid-string-quote
+        )
 
 
 class ValidateRteTagsTests(test_utils.GenericTestBase):

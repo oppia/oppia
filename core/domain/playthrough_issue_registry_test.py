@@ -84,16 +84,21 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that _refresh skips classes whose base class is not
-        BaseExplorationIssueSpec."""
+        BaseExplorationIssueSpec.
+        """
 
         class NotAnIssue:
             """A dummy class that does not inherit from
-            BaseExplorationIssueSpec."""
+            BaseExplorationIssueSpec.
+            """
 
             pass
 
         original_import = importlib.import_module
 
+        # Here we use type Any because the mock_import_module function
+        # needs to return different module types depending on the name,
+        # so a specific return type cannot be used.
         def mock_import_module(name: str) -> Any:
             module = original_import(name)
             if name.endswith('.EarlyQuit.EarlyQuit'):
@@ -108,15 +113,18 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
             playthrough_issue_registry.Registry._issues,  # pylint: disable=protected-access
         )
         self.assertTrue(
-            len(playthrough_issue_registry.Registry._issues)
-            > 0  # pylint: disable=protected-access
+            len(
+                playthrough_issue_registry.Registry._issues  # pylint: disable=protected-access
+            )
+            > 0
         )
 
     def test_get_all_issues_returns_cached_when_already_populated(
         self,
     ) -> None:
         """Test that get_all_issues skips _refresh when _issues is already
-        populated."""
+        populated.
+        """
         # First call populates _issues.
         first_result = playthrough_issue_registry.Registry.get_all_issues()
         self.assertTrue(len(first_result) > 0)

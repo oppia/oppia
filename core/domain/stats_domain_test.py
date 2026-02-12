@@ -2741,7 +2741,8 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def test_state_reference_valid_for_question(self) -> None:
         """Test that validation passes for a valid question state reference
-        with a single segment (no colon)."""
+        with a single segment (no colon).
+        """
         self.learner_answer_details.entity_type = 'question'
         self.learner_answer_details.state_reference = 'question_id'
         self.learner_answer_details.validate()
@@ -2943,6 +2944,9 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def test_validate_with_int_answer(self) -> None:
         """Test that validation passes when the answer is an int."""
+        # Here we use MyPy ignore because we remove this test after
+        # the backend is fully type-annotated. Here ignore[assignment]
+        # is used to test method validate() input type.
         self.learner_answer_info.answer = 42  # type: ignore[assignment]
         self.learner_answer_info.validate()
 

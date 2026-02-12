@@ -576,7 +576,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that mark_exploration_to_be_played_later returns the correct
-        flags when the exploration is subscribed to by the user."""
+        flags when the exploration is subscribed to by the user.
+        """
         swap_get_exp_ids = self.swap(
             subscription_services,
             'get_exploration_ids_subscribed_to',
@@ -595,7 +596,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that adding an exploration already in the playlist with no
-        position specified does nothing."""
+        position specified does nothing.
+        """
         # First add the exploration to the playlist.
         learner_playlist_services.mark_exploration_to_be_played_later(
             self.user_id, self.EXP_ID_0
@@ -618,7 +620,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that mark_collection_to_be_played_later returns the correct
-        flags when the collection is subscribed to by the user."""
+        flags when the collection is subscribed to by the user.
+        """
         swap_get_col_ids = self.swap(
             subscription_services,
             'get_collection_ids_subscribed_to',
@@ -637,7 +640,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that adding a collection already in the playlist with no
-        position specified does nothing."""
+        position specified does nothing.
+        """
         # First add the collection to the playlist.
         learner_playlist_services.mark_collection_to_be_played_later(
             self.user_id, self.COL_ID_0
@@ -660,7 +664,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that remove_exploration_from_learner_playlist does nothing
-        when the user has no learner playlist model."""
+        when the user has no learner playlist model.
+        """
         # Ensure no playlist model exists for a fresh user.
         self.signup('noplaylist@example.com', 'noplaylistuser')
         no_playlist_user_id = self.get_user_id_from_email(
@@ -675,7 +680,8 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         """Test that remove_collection_from_learner_playlist does nothing
-        when the user has no learner playlist model."""
+        when the user has no learner playlist model.
+        """
         self.signup('noplaylist2@example.com', 'noplaylistuser2')
         no_playlist_user_id = self.get_user_id_from_email(
             'noplaylist2@example.com'
