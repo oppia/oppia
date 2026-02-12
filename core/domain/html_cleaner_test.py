@@ -458,8 +458,8 @@ class IsHtmlEmptyTests(test_utils.GenericTestBase):
         """Test that '' is considered empty."""
         self.assertTrue(
             html_cleaner.is_html_empty(
-                "''"
-            )  # pylint: disable=invalid-string-quote
+                "''"  # pylint: disable=invalid-string-quote
+            )
         )
 
 

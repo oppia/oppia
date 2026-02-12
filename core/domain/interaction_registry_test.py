@@ -305,10 +305,10 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
         if (
             version
             in interaction_registry.Registry._state_schema_version_to_interaction_specs
-        ):  # pylint: disable=protected-access,line-too-long
-            del interaction_registry.Registry._state_schema_version_to_interaction_specs[  # pylint: disable=protected-access,line-too-long
+        ):  # pylint: disable=protected-access
+            del interaction_registry.Registry._state_schema_version_to_interaction_specs[
                 version
-            ]
+            ]  # pylint: disable=protected-access
 
         # First call — reads from file and caches (lines 176-182).
         result_first = interaction_registry.Registry.get_all_specs_for_state_schema_version(
