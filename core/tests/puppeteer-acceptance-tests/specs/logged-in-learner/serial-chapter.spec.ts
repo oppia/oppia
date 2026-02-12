@@ -161,7 +161,6 @@ describe('Logged-In Learner', function () {
 
       await loggedInLearner1.submitGoalInRedesignedLearnerDashboard();
 
-      // await loggedInLearner1.expectGoalCardToBeVisible('Place Values'); Remove this line
       await loggedInLearner1.clickOnGoalCard('Place Values');
 
       await loggedInLearner1.expectScreenshotToMatch(

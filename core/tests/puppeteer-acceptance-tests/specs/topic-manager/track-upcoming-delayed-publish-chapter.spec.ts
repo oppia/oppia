@@ -34,17 +34,12 @@ const publishChapterButton = '.e2e-test-publish-chapters-button';
 const chapterTitleSelector = '.e2e-test-chapter-title';
 const chapterEditorContainerSelector = '.e2e-test-chapter-editor';
 const chapterDescriptionField = '.e2e-test-add-chapter-description';
-const mobileCollapsibleCardHeaderSelector =
-  '.oppia-mobile-collapsible-card-header';
-const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
 const cancelUnpublishModalButton = '.e2e-test-cancel-unpublish-modal-button';
 const chapterConfirmAndUnpublishButton =
   '.e2e-test-confirm-unpublish-modal-button';
-const addChapterButton = 'button.e2e-test-add-chapter-button';
-const mobileChapterCollapsibleCard = '.e2e-test-mobile-add-chapter';
 const mobileSaveStoryChangesDropdown =
   'div.navbar-mobile-options .e2e-test-mobile-changes-dropdown';
 const mobilePublishStoryButton =

@@ -15,13 +15,11 @@
 /**
  * @fileoverview Topic manager utility file.
  */
-import {promises} from 'dns';
 import {BaseUser} from '../common/puppeteer-utils';
 import {showMessage} from '../common/show-message';
 import testConstants from '../common/test-constants';
 import {ElementHandle, Page} from 'puppeteer';
 import puppeteer from 'puppeteer';
-import {CurriculumAdmin} from './curriculum-admin';
 
 const topicAndSkillsDashboardUrl = testConstants.URLs.TopicAndSkillsDashboard;
 const curriculumAdminThumbnailImage =
@@ -364,7 +362,6 @@ const activeTabClass = 'e2e-test-active-tab';
 const previewQuestionSelector = '.e2e-test-preview-question';
 const toggleSkillEditOptionsButton =
   'div.e2e-test-mobile-toggle-skill-nav-dropdown-icon';
-const plannedPublicationDateInput = '.e2e-test-planned-publication-date-input';
 const outlineEditorInput = '.e2e-test-rte';
 const saveOutlineButton = '.e2e-test-node-outline-save-button';
 const finalizeOutlineCheckbox = '.e2e-test-finalize-outline';
