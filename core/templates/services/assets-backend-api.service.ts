@@ -58,17 +58,23 @@ export class AssetsBackendApiService {
     private urlInterpolationService: UrlInterpolationService
   ) {
     let urlPrefix = '/assetsdevhandler';
+    let profileImagePngUrlTemplate =
+      '/assetsdevhandler/user/<username>/assets/image/profile_picture.png';
+    let profileImageWebpUrlTemplate =
+      '/assetsdevhandler/user/<username>/assets/image/profile_picture.webp';
     if (!AssetsBackendApiService.EMULATOR_MODE) {
       urlPrefix =
         'https://storage.googleapis.com/' +
         AssetsBackendApiService.GCS_RESOURCE_BUCKET_NAME;
+      profileImagePngUrlTemplate =
+        urlPrefix + '/user/<username>/assets/profile_picture.png';
+      profileImageWebpUrlTemplate =
+        urlPrefix + '/user/<username>/assets/profile_picture.webp';
     }
     this.downloadUrlTemplate =
       urlPrefix + '/<entity_type>/<entity_id>/assets/<asset_type>/<filename>';
-    this.profileImagePngUrlTemplate =
-      urlPrefix + '/user/<username>/assets/profile_picture.png';
-    this.profileImageWebpUrlTemplate =
-      urlPrefix + '/user/<username>/assets/profile_picture.webp';
+    this.profileImagePngUrlTemplate = profileImagePngUrlTemplate;
+    this.profileImageWebpUrlTemplate = profileImageWebpUrlTemplate;
   }
 
   static get EMULATOR_MODE(): boolean {

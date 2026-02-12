@@ -195,15 +195,17 @@ describe('User Api Service', () => {
 
     it('should return profile image path when in emulator mode', fakeAsync(() => {
       let expectedPngImage =
-        '/assetsdevhandler/user/tester/assets/profile_picture.png';
+        '/assetsdevhandler/user/tester/assets/image/profile_picture.png';
       let expectedWebpImage =
-        '/assetsdevhandler/user/tester/assets/profile_picture.webp';
+        '/assetsdevhandler/user/tester/assets/image/profile_picture.webp';
       let [profileImagePng, profileImageWebp] =
         userService.getProfileImageDataUrl('tester');
-      let prformanceTime = profileImagePng.split('?')[1];
-      expect(profileImagePng).toEqual(expectedPngImage + '?' + prformanceTime);
+      let performanceTime = profileImagePng.split('?v=')[1];
+      expect(profileImagePng).toEqual(
+        expectedPngImage + '?v=' + performanceTime
+      );
       expect(profileImageWebp).toEqual(
-        expectedWebpImage + '?' + prformanceTime
+        expectedWebpImage + '?v=' + performanceTime
       );
 
       flushMicrotasks();
@@ -404,10 +406,12 @@ describe('User Api Service', () => {
         'tester/assets/profile_picture.webp';
       let [profileImagePng, profileImageWebp] =
         userService.getProfileImageDataUrl('tester');
-      let prformanceTime = profileImagePng.split('?')[1];
-      expect(profileImagePng).toEqual(expectedPngImage + '?' + prformanceTime);
+      let performanceTime = profileImagePng.split('?v=')[1];
+      expect(profileImagePng).toEqual(
+        expectedPngImage + '?v=' + performanceTime
+      );
       expect(profileImageWebp).toEqual(
-        expectedWebpImage + '?' + prformanceTime
+        expectedWebpImage + '?v=' + performanceTime
       );
 
       flushMicrotasks();

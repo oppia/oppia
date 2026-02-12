@@ -742,6 +742,12 @@ URLS = [
         resources.AssetDevHandler,
     ),
     get_redirect_route(
+        r'/assetsdevhandler/<page_context>/<page_identifier>/'
+        'assets/<encoded_filename>',
+        resources.AssetDevHandler,
+        defaults={'asset_type': 'image'},
+    ),
+    get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler,
     ),

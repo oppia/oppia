@@ -70,6 +70,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
         feconf.ENTITY_TYPE_BLOG_POST,
         feconf.ENTITY_TYPE_TOPIC,
         feconf.ENTITY_TYPE_STORY,
+        feconf.ENTITY_TYPE_USER,
         feconf.ENTITY_TYPE_QUESTION,
         feconf.IMAGE_CONTEXT_QUESTION_SUGGESTIONS,
         feconf.IMAGE_CONTEXT_EXPLORATION_SUGGESTIONS,
@@ -97,7 +98,16 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             }
         },
     }
-    HANDLER_ARGS_SCHEMAS: Dict[str, Dict[str, str]] = {'GET': {}}
+    HANDLER_ARGS_SCHEMAS = {
+        'GET': {
+            # This optional arg is used as a cache-buster query param
+            # by profile image URLs.
+            'v': {
+                'schema': {'type': 'basestring'},
+                'default_value': None,
+            }
+        }
+    }
 
     @acl_decorators.open_access
     def get(
@@ -118,6 +128,7 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
                 story: story_id
                 topic: topic_id
                 skill: skill_id
+                user: username
                 subtopic: topic_name of the topic that it is part of.
             asset_type: str. Type of the asset, either image or audio.
             encoded_filename: str. The asset filename. This
@@ -144,7 +155,12 @@ class AssetDevHandler(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             self.response.headers['Content-Type'] = content_type
 
             fs = fs_services.GcsFileSystem(page_context, page_identifier)
-            raw = fs.get('%s/%s' % (asset_type, filename))
+            if page_context == feconf.ENTITY_TYPE_USER:
+                # User profile pictures are stored directly in the user assets
+                # namespace without an "image/" prefix.
+                raw = fs.get(filename)
+            else:
+                raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None
             self.response.cache_control.public = True

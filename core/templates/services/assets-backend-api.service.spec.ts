@@ -92,6 +92,15 @@ describe('Assets Backend API Service', () => {
       );
     });
 
+    it('should correctly formulate profile image url templates in dev mode', () => {
+      expect(assetsBackendApiService.profileImagePngUrlTemplate).toEqual(
+        '/assetsdevhandler/user/<username>/assets/image/profile_picture.png'
+      );
+      expect(assetsBackendApiService.profileImageWebpUrlTemplate).toEqual(
+        '/assetsdevhandler/user/<username>/assets/image/profile_picture.webp'
+      );
+    });
+
     it('should successfully fetch and cache audio', fakeAsync(() => {
       const successHandler = jasmine.createSpy('success');
       const failHandler = jasmine.createSpy('fail');
@@ -528,6 +537,15 @@ describe('Assets Backend API Service', () => {
         )
       ).toEqual(
         gcsPrefix + '/exploration/expid12345/assets/thumbnail/thumbnail.png'
+      );
+    });
+
+    it('should correctly formulate profile image url templates in prod mode', () => {
+      expect(assetsBackendApiService.profileImagePngUrlTemplate).toEqual(
+        gcsPrefix + '/user/<username>/assets/profile_picture.png'
+      );
+      expect(assetsBackendApiService.profileImageWebpUrlTemplate).toEqual(
+        gcsPrefix + '/user/<username>/assets/profile_picture.webp'
       );
     });
 

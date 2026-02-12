@@ -50,6 +50,17 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             filename,
         )
 
+    def _get_legacy_image_url(
+        self, entity_type: str, entity_id: str, filename: str
+    ) -> str:
+        """Gets the legacy image URL without explicit asset type."""
+        return '%s/%s/%s/assets/%s' % (
+            self.ASSET_HANDLER_URL_PREFIX,
+            entity_type,
+            entity_id,
+            filename,
+        )
+
     def setUp(self) -> None:
         """Load a demo exploration and register self.EDITOR_EMAIL."""
         super().setUp()
@@ -96,6 +107,73 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             expected_status_int=400,
         )
         self.logout()
+
+    def test_can_fetch_user_profile_picture(self) -> None:
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
+        response = self.get_custom_response(
+            self._get_image_url(
+                feconf.ENTITY_TYPE_USER,
+                self.EDITOR_USERNAME,
+                'profile_picture.png',
+            ),
+            'image/png',
+        )
+        self.assertEqual(response.body, raw_image)
+
+    def test_can_fetch_user_profile_picture_from_legacy_url(self) -> None:
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
+        response = self.get_custom_response(
+            self._get_legacy_image_url(
+                feconf.ENTITY_TYPE_USER,
+                self.EDITOR_USERNAME,
+                'profile_picture.png',
+            ),
+            'image/png',
+        )
+        self.assertEqual(response.body, raw_image)
+
+    def test_can_fetch_user_profile_picture_with_cache_buster(self) -> None:
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb', encoding=None
+        ) as f:
+            raw_image = f.read()
+
+        fs = fs_services.GcsFileSystem(
+            feconf.ENTITY_TYPE_USER, self.EDITOR_USERNAME
+        )
+        fs.commit('profile_picture.png', raw_image, mimetype='image/png')
+
+        response = self.get_custom_response(
+            '%s?v=%s'
+            % (
+                self._get_image_url(
+                    feconf.ENTITY_TYPE_USER,
+                    self.EDITOR_USERNAME,
+                    'profile_picture.png',
+                ),
+                '12345',
+            ),
+            'image/png',
+        )
+        self.assertEqual(response.body, raw_image)
 
     def test_image_upload_with_invalid_filename_raises_error(self) -> None:
         """Test that filenames starting with dot are rejected."""

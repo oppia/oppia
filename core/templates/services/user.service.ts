@@ -64,9 +64,9 @@ export class UserService {
   getProfileImageDataUrl(username: string): [string, string] {
     // TODO(#17663): Remove use of performance.now with a long term fix
     // in order to avoid cache problems.
-    // Here we are using prformanceTime in order to avoid cache problems.
+    // Here we are using performanceTime in order to avoid cache problems.
     // For details have a look at - https://stackoverflow.com/a/126831
-    let prformanceTime = '?' + performance.now().toString();
+    const performanceTime = '?v=' + performance.now().toString();
     let pngImageUrl = this.urlInterpolationService.interpolateUrl(
       this.assetsBackendApiService.profileImagePngUrlTemplate,
       {username: username}
@@ -75,7 +75,7 @@ export class UserService {
       this.assetsBackendApiService.profileImageWebpUrlTemplate,
       {username: username}
     );
-    return [pngImageUrl + prformanceTime, WebpImageUrl + prformanceTime];
+    return [pngImageUrl + performanceTime, WebpImageUrl + performanceTime];
   }
 
   async setProfileImageDataUrlAsync(
