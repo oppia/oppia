@@ -143,7 +143,7 @@ describe('Voiceover Submitter', function () {
     );
     await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
     await voiceoverSubmitter.expectUploadErrorMessageToBe(
-      'Audio files must be under 300 seconds in length.'
+      'Audio must be under 300 seconds'
     );
   });
 

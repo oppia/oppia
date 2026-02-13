@@ -347,7 +347,7 @@ var ExplorationEditorTranslationTab = function () {
         'Audio over five minutes error message element',
         audioOverFiveMinutesErrorMessageElement
       )
-    ).toContain('Audio files must be under 300 seconds in length.');
+    ).toContain('Audio must be under 300 seconds');
   };
 
   this.openUploadAudioModal = async function () {

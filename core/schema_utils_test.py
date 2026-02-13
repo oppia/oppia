@@ -19,8 +19,10 @@
 from __future__ import annotations
 
 import inspect
+import os
 import re
 
+from core import feconf
 from core import schema_utils
 from core.tests import test_utils
 
@@ -849,6 +851,145 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         self.assertFalse(is_supported_audio_language_code(''))
         self.assertFalse(is_supported_audio_language_code('zz'))
         self.assertFalse(is_supported_audio_language_code('test'))
+
+    def test_is_valid_audio_file_with_valid_mp3_under_duration_limit(
+        self
+    ) -> None:
+        """Test validation of valid MP3 file under 300 seconds."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+
+        # Should not raise any exception.
+        self.assertTrue(is_valid_audio_file(raw_audio))
+
+    def test_is_valid_audio_file_with_mp3_over_duration_limit(self) -> None:
+        """Test validation rejects MP3 over 300 seconds."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        with open(
+            os.path.join(
+                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'
+            ),
+            'rb',
+            encoding=None,
+        ) as f:
+            raw_audio = f.read()
+
+        with self.assertRaisesRegex(
+            Exception, 'Audio must be under 300 seconds'
+        ):
+            is_valid_audio_file(raw_audio)
+
+    def test_is_valid_audio_file_with_invalid_format(self) -> None:
+        """Test validation rejects non-MP3 audio formats."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.flac'),
+            'rb',
+            encoding=None,
+        ) as f:
+            raw_audio = f.read()
+
+        with self.assertRaisesRegex(
+            Exception, 'Invalid audio format. Only MP3 files are supported.'
+        ):
+            is_valid_audio_file(raw_audio)
+
+    def test_is_valid_audio_file_with_corrupted_data(self) -> None:
+        """Test validation rejects corrupted MP3 data."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        # Corrupted/invalid audio data (>100 bytes to pass size check).
+        corrupted_audio = b'not_valid_audio_data_' * 10
+
+        with self.assertRaisesRegex(
+            Exception, 'Invalid audio format. Only MP3 files are supported.'
+        ):
+            is_valid_audio_file(corrupted_audio)
+
+    def test_is_valid_audio_file_with_empty_data(self) -> None:
+        """Test validation rejects empty audio data."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        empty_audio = b''
+
+        with self.assertRaisesRegex(Exception, 'No audio supplied'):
+            is_valid_audio_file(empty_audio)
+
+    def test_is_valid_audio_file_with_extremely_small_file(self) -> None:
+        """Test validation rejects files smaller than minimum size."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        # File with only 50 bytes is too small to be a valid MP3.
+        tiny_audio = b'A' * 50
+
+        with self.assertRaisesRegex(
+            Exception, 'Audio file is too small to be valid'
+        ):
+            is_valid_audio_file(tiny_audio)
+
+    def test_is_valid_audio_file_with_truncated_mp3(self) -> None:
+        """Test validation rejects truncated MP3 files."""
+        is_valid_audio_file = schema_utils.get_validator('is_valid_audio_file')
+
+        # Read a valid MP3 and truncate it.
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+
+        # Truncate to first 500 bytes - has valid header but incomplete data.
+        truncated_audio = raw_audio[:500]
+
+        # Should still be recognized as MP3 format but may fail duration check.
+        # Mutagen may or may not handle truncated files gracefully.
+        with self.assertRaisesRegex(
+            Exception, '(Invalid audio format|corrupted|invalid metadata)'
+        ):
+            is_valid_audio_file(truncated_audio)
+
+    def test_validate_audio_file_returns_structured_result(self) -> None:
+        """Test validate_audio_file returns structured validation results."""
+        # Access the internal validation function directly.
+        from core import utils as core_utils
+
+        with open(
+            os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3'), 'rb', encoding=None
+        ) as f:
+            raw_audio = f.read()
+
+        # Call the dedicated validation function.
+        result = schema_utils._Validators.validate_audio_file(raw_audio)
+
+        # Verify structured result.
+        self.assertIn('is_valid', result)
+        self.assertIn('duration_secs', result)
+        self.assertIn('error_message', result)
+        self.assertTrue(result['is_valid'])
+        self.assertIsNone(result['error_message'])
+        self.assertIsNotNone(result['duration_secs'])
+        self.assertGreater(result['duration_secs'], 0)
+        self.assertLess(result['duration_secs'], feconf.MAX_AUDIO_FILE_LENGTH_SEC)
+
+    def test_validate_audio_file_raises_validation_error_for_invalid_file(
+        self
+    ) -> None:
+        """Test validate_audio_file raises ValidationError for invalid files."""
+        from core import utils as core_utils
+
+        # Use >100 bytes to pass size check but still be invalid MP3.
+        corrupted_audio = b'invalid_mp3_data_' * 10
+
+        with self.assertRaisesRegex(
+            core_utils.ValidationError,
+            'Invalid audio format. Only MP3 files are supported.'
+        ):
+            schema_utils._Validators.validate_audio_file(corrupted_audio)
 
     def test_is_url_fragment(self) -> None:
         validate_url_fragment = schema_utils.get_validator('is_url_fragment')

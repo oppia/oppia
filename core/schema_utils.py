@@ -27,6 +27,7 @@ following Python types: bool, dict, float, int, list, unicode.
 from __future__ import annotations
 
 import io
+import logging
 import numbers
 import re
 import urllib
@@ -36,7 +37,7 @@ from core.constants import constants
 from core.domain import expression_parser, html_cleaner, user_domain
 from extensions.objects.models import objects
 
-import mutagen
+import mutagen.mp3
 from typing import Any, Callable, Dict, List, Optional, cast
 
 SCHEMA_KEY_ITEMS = 'items'
@@ -817,37 +818,120 @@ class _Validators:
         return True
 
     @staticmethod
+    def validate_audio_file(raw_audio_file: bytes) -> Dict[str, Any]:
+        """Validates an audio file for format, integrity, and duration.
+
+        This function performs comprehensive validation of audio files intended
+        for voiceover upload. It checks:
+        1. File is not empty
+        2. File is a valid MP3 format
+        3. File is not corrupted
+        4. File duration does not exceed the maximum allowed length
+
+        The validation is separated from the schema validator to provide
+        clearer error messages and better separation of concerns. This allows
+        for more maintainable code and easier testing of validation logic.
+
+        Args:
+            raw_audio_file: bytes. The raw audio file content to validate.
+
+        Returns:
+            dict. A dictionary containing validation results with keys:
+                - 'is_valid': bool. Whether the file passed all validations.
+                - 'error_message': str|None. Error message if validation failed.
+                - 'duration_secs': float|None. Audio duration in seconds if
+                    successfully parsed.
+
+        Raises:
+            utils.ValidationError. If the audio file fails any validation
+                check, with a specific error message indicating the failure
+                reason.
+        """
+        # Check for empty file.
+        if not raw_audio_file:
+            logging.warning('Audio validation failed: No audio data supplied')
+            raise utils.ValidationError('No audio supplied')
+
+        # Check for extremely small file that might be corrupted.
+        if len(raw_audio_file) < 100:  # Minimum viable MP3 header size.
+            logging.warning(
+                'Audio validation failed: File too small (%d bytes)',
+                len(raw_audio_file)
+            )
+            raise utils.ValidationError(
+                'Audio file is too small to be valid. '
+                'Minimum size is 100 bytes.'
+            )
+
+        # Create buffer for efficient audio parsing without loading entire
+        # file into memory multiple times.
+        tempbuffer = io.BytesIO(raw_audio_file)
+
+        # Validate MP3 format and integrity.
+        try:
+            audio = mutagen.mp3.MP3(tempbuffer)
+        except mutagen.MutagenError as e:
+            logging.warning(
+                'Audio validation failed: Invalid MP3 format - %s',
+                str(e)
+            )
+            raise utils.ValidationError(
+                'Invalid audio format. Only MP3 files are supported.'
+            ) from e
+
+        # Extract duration information.
+        try:
+            duration_secs = audio.info.length
+        except (AttributeError, ValueError) as e:
+            logging.warning(
+                'Audio validation failed: Cannot determine duration - %s',
+                str(e)
+            )
+            raise utils.ValidationError(
+                'Audio file is corrupted or has invalid metadata.'
+            ) from e
+
+        # Validate audio duration against maximum limit.
+        max_duration = feconf.MAX_AUDIO_FILE_LENGTH_SEC
+        if duration_secs > max_duration:
+            logging.warning(
+                'Audio validation failed: Duration %.2f exceeds limit of %d',
+                duration_secs, max_duration
+            )
+            raise utils.ValidationError(
+                'Audio must be under %s seconds. Uploaded file is %.2f '
+                'seconds.' % (max_duration, duration_secs)
+            )
+
+        return {
+            'is_valid': True,
+            'error_message': None,
+            'duration_secs': duration_secs
+        }
+
+    @staticmethod
     def is_valid_audio_file(obj: bytes) -> bool:
         """Checks if given audio file is a valid audio file.
 
+        This is a wrapper around validate_audio_file() to maintain backward
+        compatibility with the existing schema validation infrastructure.
+        It converts ValidationError exceptions to generic Exception to match
+        the expected schema validator behavior.
+
         Args:
-            obj: str. The raw audio file to validate.
+            obj: bytes. The raw audio file to validate.
 
         Returns:
             bool. Returns True if obj is a valid audio file.
 
         Raises:
-            Exception. The obj is not a valid audio file.
+            Exception. If the audio file is not valid, with a descriptive
+                error message.
         """
-        if not obj:
-            raise Exception('No audio supplied')
-        tempbuffer = io.BytesIO()
-        tempbuffer.write(obj)
-        tempbuffer.seek(0)
-
-        # .mp3 is the only allowed extension.
-        extension = 'mp3'
         try:
-            audio = mutagen.mp3.MP3(tempbuffer)
-        except mutagen.MutagenError as e:
-            raise Exception(
-                'Audio not recognized as a %s file' % extension
-            ) from e
-
-        if audio.info.length > feconf.MAX_AUDIO_FILE_LENGTH_SEC:
-            raise Exception(
-                'Audio files must be under %s seconds in length. The uploaded '
-                'file is %.2f seconds long.'
-                % (feconf.MAX_AUDIO_FILE_LENGTH_SEC, audio.info.length)
-            )
-        return True
+            _Validators.validate_audio_file(obj)
+            return True
+        except utils.ValidationError as e:
+            # Convert to Exception for backward compatibility with schema
+            # validation error handling.
+            raise Exception(str(e)) from e

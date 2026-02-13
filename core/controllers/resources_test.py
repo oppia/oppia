@@ -696,7 +696,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/audioupload/0\' '
             'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
-            'Audio not recognized as a mp3 file\n'
+            'Invalid audio format. Only MP3 files are supported.\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
             '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac'
@@ -731,7 +731,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/audioupload/0\' '
             'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
-            'Audio not recognized as a mp3 file'
+            'Invalid audio format. Only MP3 files are supported.'
         )
         self.assertEqual(response_dict['error'], error_msg)
 
@@ -761,7 +761,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/audioupload/0\' '
             'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\' failed: '
-            'Audio not recognized as a mp3 file\n'
+            'Invalid audio format. Only MP3 files are supported.\n'
             'Schema validation for \'filename\' failed: Validation failed: '
             'is_regex_matched ({\'regex_pattern\': '
             '\'[^\\\\s]+(\\\\.(?i)(mp3))$\'}) for object cafe.flac'
@@ -870,7 +870,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/audioupload/0\' '
             'these errors are happening:\n'
             'Schema validation for \'raw_audio_file\''
-            ' failed: Audio not recognized as a mp3 file',
+            ' failed: Invalid audio format. Only MP3 files are supported.',
         )
 
     def test_missing_extensions_are_detected(self) -> None:
@@ -928,7 +928,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
-            'Audio files must be under %s seconds in length'
+            'Audio must be under %s seconds'
             % feconf.MAX_AUDIO_FILE_LENGTH_SEC,
             response_dict['error'],
         )
@@ -964,7 +964,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'At \'http://localhost/createhandler/audioupload/0\' these '
             'errors are happening:\n'
             'Schema validation for \'raw_audio_file\' '
-            'failed: Audio not recognized as a mp3 file',
+            'failed: Invalid audio format. Only MP3 files are supported.',
         )
 
     def test_upload_check_for_duration_sec_as_response(self) -> None:
