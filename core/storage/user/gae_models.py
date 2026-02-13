@@ -1077,24 +1077,19 @@ class UserEmailPreferencesModel(base_models.BaseModel):
             feedback_message_notifications=self.feedback_message_notifications,
             subscription_notifications=self.subscription_notifications,
         )
-    def update_from_domain_object(
-        self, domain_object: user_domain.UserEmailPreferences
-    ) -> None:
-         """Updates this model from the given domain object."""
-         self.site_updates = domain_object.site_updates
-         self.editor_role_notifications = (
-             domain_object.editor_role_notifications
-         )
-         self.feedback_message_notifications = (
-             domain_object.feedback_message_notifications
-         
-         )
-         self.subscription_notifications = (
-             domain_object.subscription_notifications
-         
-        )
-         
 
+    def update_from_domain_object(self, domain_object: user_domain.UserEmailPreferences) -> None:
+        """Updates this model from the given domain object."""
+        self.site_updates = domain_object.site_updates
+        self.editor_role_notifications = (
+        domain_object.editor_role_notifications
+    )
+        self.feedback_message_notifications = (
+        domain_object.feedback_message_notifications
+    )
+        self.subscription_notifications = (
+        domain_object.subscription_notifications
+    )
 
 
     @staticmethod

@@ -1954,7 +1954,7 @@ def update_email_preferences(
     email_preferences_model.subscription_notifications = (
         email_preferences.subscription_notifications
     )
-
+    email_preferences_model.update_timestamps()
     email_preferences_model.put()
 
 
@@ -1992,7 +1992,7 @@ def update_email_preferences(
         email_preferences.subscription_notifications
     )
 
-     
+    email_preferences_model.update_timestamps() 
     email_preferences_model.put()
     return True
  
