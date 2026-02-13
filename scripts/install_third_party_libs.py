@@ -499,7 +499,12 @@ def main() -> None:
         'You can regenerate this folder by deleting it and then running '
         'the start.py script.\n',
     )
-    subprocess.check_call(['yarn', 'install', '--pure-lockfile'])
+    subprocess.check_call([
+    '/Users/yashbahuguna/.nvm/versions/node/v20.20.0/bin/yarn',
+    'install',
+    '--pure-lockfile'
+])
+
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
