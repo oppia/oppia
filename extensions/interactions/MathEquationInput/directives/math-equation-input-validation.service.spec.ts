@@ -44,7 +44,7 @@ describe('MathEquationInputValidationService', () => {
       providers: [MathEquationInputValidationService],
     });
 
-    validatorService = TestBed.get(MathEquationInputValidationService);
+    validatorService = TestBed.inject(MathEquationInputValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
     currentState = 'First State';
