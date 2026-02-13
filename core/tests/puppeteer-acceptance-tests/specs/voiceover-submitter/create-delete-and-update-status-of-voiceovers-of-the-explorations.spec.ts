@@ -14,15 +14,18 @@
 
 /**
  * @fileoverview Acceptance test from CUJv3 Doc
- * https://docs.google.com/document/d/1D7kkFTzg3rxUe3QJ_iPlnxUzBFNElmRkmAWss00nFno/
+ * https://docs.google.com/spreadsheets/d/1DIZ0_Gmf9uhjTbhuDpA495PTjYZW9ZE97r6urS-iXwg/edit?gid=1494217687#gid=1494217687
  *
- * VS.EE. Create, delete, and update status of voiceovers of explorations.
+ * VS.1. Add, remove, and update the status of a single voiceover.
  */
 
 import testConstants from '../../utilities/common/test-constants';
 import {UserFactory} from '../../utilities/common/user-factory';
 import {CurriculumAdmin} from '../../utilities/user/curriculum-admin';
-import {ExplorationEditor} from '../../utilities/user/exploration-editor';
+import {
+  ExplorationEditor,
+  INTERACTION_TYPES,
+} from '../../utilities/user/exploration-editor';
 import {LoggedOutUser} from '../../utilities/user/logged-out-user';
 import {ReleaseCoordinator} from '../../utilities/user/release-coordinator';
 import {VoiceoverAdmin} from '../../utilities/user/voiceover-admin';
@@ -56,10 +59,61 @@ describe('Voiceover Submitter', function () {
       'show_voiceover_tab_for_non_curated_explorations'
     );
 
-    // Create an exploration for the voiceover submitter.
-    explorationId = await curriculumAdm.createAndPublishExplorationWithCards(
-      'Exploration for voiceover submitter'
+    // Creating exploration manually.
+    await curriculumAdm.navigateToCreatorDashboardPage();
+    await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
+    await curriculumAdm.waitForPageToFullyLoad();
+    await curriculumAdm.waitForNetworkIdle();
+    await curriculumAdm.dismissWelcomeModalIfPresent();
+
+    // Card 1 (Introduction).
+    await curriculumAdm.updateCardContent('What is 2 + 3?');
+
+    // Text input interaction.
+    await curriculumAdm.addTextInputInteraction();
+
+    // Correct answer feedback.
+    await curriculumAdm.addResponsesToTheInteraction(
+      INTERACTION_TYPES.TEXT_INPUT,
+      '5',
+      'Great!',
+      'End',
+      true,
+      true
     );
+
+    await curriculumAdm.updateTextInputInteraction('Type your answer here.');
+
+    // Default feedback.
+    await curriculumAdm.editDefaultResponseFeedbackInExplorationEditorPage(
+      'Try Again'
+    );
+
+    // Hint.
+    await curriculumAdm.addHintToState(
+      'If you have 2 apples and someone gives you 3 apples, how many apples you have?'
+    );
+
+    // Solution.
+    await curriculumAdm.addSolutionToState('5', '2 + 3 = 5', false);
+
+    await curriculumAdm.saveExplorationDraft();
+
+    // Card 2 (End).
+
+    await curriculumAdm.navigateToCard('End');
+    await curriculumAdm.addInteraction(INTERACTION_TYPES.END_EXPLORATION);
+
+    await curriculumAdm.saveExplorationDraft();
+
+    // Publish.
+
+    explorationId = await curriculumAdm.publishExplorationWithMetadata(
+      'Exploration for voiceover submitter',
+      'Testing voiceover translations',
+      'Mathematics'
+    );
+
     await curriculumAdm.addSupportedLanguageAccentPair('English (India)');
 
     // Create a voiceover submitter.
@@ -71,14 +125,112 @@ describe('Voiceover Submitter', function () {
     );
   }, 600000);
 
-  it('should be able to add and remove voiceovers to explorations', async function () {
+  it('should display correct content for voiceover in exploration language', async function () {
     // Navigate to the exploration editor.
     await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
-    await voiceoverSubmitter.dismissWelcomeModal();
+    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
 
     // Navigate to translation tab.
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.dismissTranslationTabWelcomeModal();
+
+    // Content.
+    await voiceoverSubmitter.selectVoiceoverContentType('Content');
+    await voiceoverSubmitter.expectVoiceoverTextToContain(
+      '.e2e-test-content-text',
+      'What is 2 + 3?'
+    );
+
+    // Interaction.
+    await voiceoverSubmitter.selectVoiceoverContentType('Interaction');
+    await voiceoverSubmitter.expectVoiceoverTextToContain(
+      '.e2e-test-interaction-text',
+      'Type your answer here.'
+    );
+
+    // Feedback.
+    await voiceoverSubmitter.selectVoiceoverContentType('Feedback');
+    await voiceoverSubmitter.expectVisibleFeedbackTextsToContain([
+      'Great!',
+      'Try Again',
+    ]);
+
+    // Hints.
+    await voiceoverSubmitter.selectVoiceoverContentType('Hints');
+    await voiceoverSubmitter.expectVisibleHintTextsToContain([
+      'If you have 2 apples and someone gives you 3 apples, how many apples you have?',
+    ]);
+
+    // Solution.
+    await voiceoverSubmitter.selectVoiceoverContentType('Solution');
+    await voiceoverSubmitter.expectVoiceoverTextToContain(
+      '.e2e-test-solution-text',
+      '5'
+    );
+  });
+
+  it('should display correct accessibility labels in the voiceover translation tab', async function () {
+    // Navigate to the exploration editor.
+    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
+    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
+
+    // Navigate to the translations tab.
+    await voiceoverSubmitter.navigateToTranslationsTab();
+
+    // 1. Numerical status accessibility.
+    await voiceoverSubmitter.expectTranslationProgressAriaLabelToMatch(
+      '0 items translated out of 7 items'
+    );
+
+    // 2. Sub-tab accessibility.
+    await voiceoverSubmitter.expectTranslationSubTabAriaLabelToBe(
+      'Content',
+      'Content of the card'
+    );
+    await voiceoverSubmitter.expectTranslationSubTabAriaLabelToBe(
+      'Feedback',
+      'Feedback responses for answer groups'
+    );
+    await voiceoverSubmitter.expectTranslationSubTabAriaLabelToBe(
+      'Hints',
+      'Hints for the state'
+    );
+    await voiceoverSubmitter.expectTranslationSubTabAriaLabelToBe(
+      'Solution',
+      'Solutions for the state'
+    );
+
+    // Select "Content" voiceover option.
+    await voiceoverSubmitter.selectVoiceoverContentType('Content');
+    await voiceoverSubmitter.expectUploadVoiceoverButtonAccessibleNameToBe(
+      'Upload voiceovered file'
+    );
+
+    await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
+
+    // Upload a voiceover file to make play button visible.
+    await voiceoverSubmitter.uploadFile(
+      testConstants.data.VoiceoverEnglishIndia
+    );
+    await voiceoverSubmitter.clickOnSaveUploadVoiceoverButton();
+
+    // 4. Play button accessibility.
+    await voiceoverSubmitter.expectPlayVoiceoverButtonAccessibleNameToBe(
+      'Play recorded audio'
+    );
+
+    await voiceoverSubmitter.deleteVoiceoverInCurrentCard();
+
+    await voiceoverSubmitter.saveExplorationDraft();
+  });
+
+  it('should add, play, and delete a voiceover correctly', async function () {
+    // Navigate to the exploration editor.
+    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
+    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
+
+    // Navigate to translation tab.
+    await voiceoverSubmitter.navigateToTranslationsTab();
 
     // Add voiceover in English (India).
     await voiceoverSubmitter.addVoiceoverToContent(
@@ -90,7 +242,7 @@ describe('Voiceover Submitter', function () {
     // TODO(#23129): Once fixed remove the unnecessary navigation to editor
     // tab to change the card.
     await voiceoverSubmitter.navigateToEditorTab();
-    await voiceoverSubmitter.navigateToCard('Card 1');
+    await voiceoverSubmitter.navigateToCard('End');
     await voiceoverSubmitter.navigateToTranslationsTab();
     await voiceoverSubmitter.addVoiceoverToContent(
       'English',
@@ -103,14 +255,15 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.navigateToEditorTab();
     await voiceoverSubmitter.navigateToCard('Introduction');
     await voiceoverSubmitter.navigateToTranslationsTab();
+
     await voiceoverSubmitter.expectScreenshotToMatch(
       'voiceoverPageWithOneVoiceoverAddEnIndia',
       __dirname
     );
     await voiceoverSubmitter.expectVoiceoverIsPlayableInTranslationTab();
-
-    // Check voiceover is visible in the preivew tab.
     await voiceoverSubmitter.saveExplorationDraft();
+
+    // Check voiceover is visible in the preview tab.
     await voiceoverSubmitter.navigateToPreviewTab();
     await voiceoverSubmitter.expectAudioExpandButtonToBeVisible();
     await voiceoverSubmitter.expandVoiceoverBar();
@@ -156,7 +309,7 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.toggleAudioNeedsUpdateButton();
     await voiceoverSubmitter.expectCurrentVoiceStatusButtonToBe('needs update');
     // Stale voiceovers should count as incomplete.
-    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('1/3');
+    await voiceoverSubmitter.expectTranslationNumericalStatusToBe('1/7');
     await voiceoverSubmitter.expectNodeWariningSignToBeVisible(true);
 
     // Mark voiceover as up to date.

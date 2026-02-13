@@ -35,6 +35,21 @@ const audioDoesNotNeedUpdateIconSelector = '.does-not-needs-update-button-icon';
 const translationNumericalStatusSelector =
   '.e2e-test-translation-numerical-status';
 
+const TRANSLATION_TAB_SELECTORS = {
+  Content: '.e2e-test-translation-content-tab',
+  Interaction: '.e2e-test-translation-interaction-tab',
+  Feedback: '.e2e-test-translation-feedback-tab',
+  Hints: '.e2e-test-translation-hints-tab',
+  Solution: '.e2e-test-translation-solution-tab',
+};
+
+const ACCESSIBLE_TAB_SELECTORS = {
+  Content: '.e2e-test-accessibility-translation-content',
+  Feedback: '.e2e-test-accessibility-translation-feedback',
+  Hints: '.e2e-test-accessibility-translation-hint',
+  Solution: '.e2e-test-accessibility-translation-solution',
+};
+
 export class VoiceoverSubmitter extends BaseUser {
   /**
    * Checks if the voiceover is playable in the translation tab by playing and pausing it.
@@ -156,6 +171,152 @@ export class VoiceoverSubmitter extends BaseUser {
       translationNumericalStatusSelector,
       `(${status})`
     );
+  }
+
+  async selectVoiceoverContentType(
+    type: 'Content' | 'Interaction' | 'Feedback' | 'Hints' | 'Solution'
+  ): Promise<void> {
+    const selector = TRANSLATION_TAB_SELECTORS[type];
+
+    // Ensure the tab exists.
+    await this.expectElementToBeVisible(selector);
+
+    // Click the tab.
+    await this.clickOnElementWithSelector(selector);
+
+    // Wait until it becomes active.
+    await this.page.waitForFunction(
+      (sel: string) => {
+        const el = document.querySelector(sel);
+        return el?.parentElement?.classList.contains(
+          'oppia-active-translation-tab'
+        );
+      },
+      {},
+      selector
+    );
+    await this.waitForNetworkIdle();
+  }
+
+  async expectVoiceoverTextToContain(
+    selector: string,
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(selector);
+    await this.expectTextContentToContain(selector, expectedText);
+  }
+
+  async expectVisibleFeedbackTextsToContain(
+    expectedTexts: string[]
+  ): Promise<void> {
+    for (let i = 0; i < expectedTexts.length; i++) {
+      // Click anywhere on the feedback card to expand it.
+      const cardSelector = `.e2e-test-feedback-${i}`;
+      const textSelector = `.e2e-test-feedback-${i}-text`;
+
+      await this.expectElementToBeVisible(cardSelector);
+      await this.waitForElementToStabilize(cardSelector);
+
+      await this.clickOnElementWithSelector(cardSelector);
+
+      await this.expectElementToBeVisible(textSelector);
+      await this.expectTextContentToContain(textSelector, expectedTexts[i]);
+    }
+  }
+
+  async expectVisibleHintTextsToContain(
+    expectedTexts: string[]
+  ): Promise<void> {
+    for (let i = 0; i < expectedTexts.length; i++) {
+      const hintSelector = `.e2e-test-hint-${i}`;
+      const hintTextSelector = `.e2e-test-hint-${i}-text`;
+
+      await this.expectElementToBeVisible(hintSelector);
+      await this.waitForElementToStabilize(hintSelector);
+
+      await this.clickOnElementWithSelector(hintSelector);
+
+      await this.expectElementToBeVisible(hintTextSelector);
+      await this.expectTextContentToContain(hintTextSelector, expectedTexts[i]);
+    }
+  }
+
+  async expectTranslationProgressAriaLabelToMatch(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(translationNumericalStatusSelector);
+
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const el = document.querySelector(selector);
+        const label = el?.getAttribute('aria-label') || '';
+
+        return (
+          label.includes('items translated') &&
+          !label.includes('NaN') &&
+          !label.includes('undefined')
+        );
+      },
+      {},
+      translationNumericalStatusSelector
+    );
+
+    const ariaLabel = await this.page.$eval(
+      translationNumericalStatusSelector,
+      el => el.getAttribute('aria-label') || el.textContent
+    );
+
+    expect(ariaLabel).toMatch(expectedText);
+  }
+
+  async expectTranslationSubTabAriaLabelToBe(
+    tabName: 'Content' | 'Feedback' | 'Hints' | 'Solution',
+    expectedAriaLabel: string
+  ): Promise<void> {
+    const selector = ACCESSIBLE_TAB_SELECTORS[tabName];
+
+    await this.expectElementToBeVisible(selector);
+
+    await this.page.waitForFunction(
+      (sel: string) => {
+        const el = document.querySelector(sel);
+        return el?.getAttribute('aria-label');
+      },
+      {},
+      selector
+    );
+
+    const ariaLabel = await this.page.$eval(selector, el =>
+      el.getAttribute('aria-label')
+    );
+
+    expect(ariaLabel).toBe(expectedAriaLabel);
+  }
+
+  async expectUploadVoiceoverButtonAccessibleNameToBe(
+    expectedAccessibleName: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(addManualVoiceoverBtnSelector);
+
+    const accessibleName = await this.page.$eval(
+      addManualVoiceoverBtnSelector,
+      el => (el.getAttribute('aria-label') || el.textContent || '').trim()
+    );
+
+    expect(accessibleName).toBe(expectedAccessibleName);
+  }
+
+  async expectPlayVoiceoverButtonAccessibleNameToBe(
+    expectedAccessibleName: string
+  ): Promise<void> {
+    await this.expectElementToBeVisible(voiceoverPlayPauseBtnSelector);
+
+    const accessibleName = await this.page.$eval(
+      voiceoverPlayPauseBtnSelector,
+      el => (el.getAttribute('aria-label') || '').trim()
+    );
+
+    expect(accessibleName).toBe(expectedAccessibleName);
   }
 }
 

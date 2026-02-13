@@ -24,7 +24,9 @@
     <div class="manual-voiceovers">
       <h4 class="voiceover-type-heading">Manual Voiceover</h4>
       <div class="voiceovers-component" *ngIf="manualVoiceover">
-        <button class="btn btn-secondary audio-button e2e-test-play-voiceover-button" (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
+        <button class="btn btn-secondary audio-button e2e-test-play-voiceover-button"
+                [attr.aria-label]="isManualVoiceoverPlaying ? 'Pause recorded audio' : 'Play recorded audio'"
+                (click)="playAndPauseVoiceover(manualVoiceover.filename, 'manual')">
           <mat-icon *ngIf="!isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Play" class="e2e-test-play">play_arrow</mat-icon>
           <mat-icon *ngIf="isManualVoiceoverPlaying && !manualVoiceoverIsLoading" matTooltip="Pause" class="e2e-test-pause">pause_arrow</mat-icon>
           <mat-spinner class="mx-auto" [diameter]="30" *ngIf="manualVoiceoverIsLoading"></mat-spinner>
@@ -68,10 +70,10 @@
         <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
       <div class="add-voiceover-button-container" *ngIf="!manualVoiceover">
-        <button (click)="addManualVoiceover()"
+        <button aria-label="Upload voiceovered file" (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
                 [disabled]="!contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
-          <mat-icon>attach_file</mat-icon>
+          <mat-icon aria-hidden="true">attach_file</mat-icon>
           ADD MANUAL VOICEOVER
         </button>
       </div>
