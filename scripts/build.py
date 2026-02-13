@@ -161,11 +161,13 @@ APP_YAML_FILEPATH = 'app.yaml'
 
 MAX_OLD_SPACE_SIZE_FOR_WEBPACK_BUILD = 8192
 
-_PARSER = argparse.ArgumentParser(description="""
+_PARSER = argparse.ArgumentParser(
+    description="""
 Builds the production version of Oppia. Generates hashes for assets,
 minifies files, and creates the build directory. Angular CLI handles
 CSS bundling including third-party dependencies.
-""")
+"""
+)
 
 _PARSER.add_argument(
     '--prod_env', action='store_true', default=False, dest='prod_env'
