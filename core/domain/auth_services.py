@@ -314,7 +314,7 @@ def upload_multi_auth_provider_records(
 
     WARNING: This operation DOES NOT protect against duplicate records! The ONLY
     way to guarantee that this function is used safely is by running it on an
-    empty server, where collisions are impossible.
+    empty auth provider, where collisions are impossible.
 
     Args:
         records: List[auth_domain.AuthProviderRecord]. The records to upload.
