@@ -39,7 +39,7 @@ describe('ContinueValidationService', () => {
       providers: [ContinueValidationService],
     });
 
-    validatorService = TestBed.get(ContinueValidationService);
+    validatorService = TestBed.inject(ContinueValidationService);
     WARNING_TYPES = AppConstants.WARNING_TYPES;
     currentState = 'First State';
     goodDefaultOutcome = Outcome.createFromBackendDict({

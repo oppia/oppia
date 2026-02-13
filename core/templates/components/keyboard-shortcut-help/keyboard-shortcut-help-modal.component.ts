@@ -43,19 +43,19 @@ export class KeyboardShortcutHelpModalComponent implements OnInit {
     const continueShortcutDescription = 'Select the continue button';
     const backShortcutDescription = 'Select the back button';
 
-    if (this.urlService.getPathname() === '/community-library') {
-      this.KEYBOARD_SHORTCUTS = {
-        '?': helpShortcutDescription,
-        '/': searchShortcutDescription,
-        s: skipShortcutDescription,
-        c: categoryShortcutDescription,
-      };
-    } else if (this.pageContextService.isInExplorationPlayerPage()) {
+    if (this.pageContextService.isInExplorationPlayerPage()) {
       this.KEYBOARD_SHORTCUTS = {
         '?': helpShortcutDescription,
         s: skipShortcutDescription,
         j: continueShortcutDescription,
         k: backShortcutDescription,
+      };
+    } else {
+      this.KEYBOARD_SHORTCUTS = {
+        '?': helpShortcutDescription,
+        '/': searchShortcutDescription,
+        s: skipShortcutDescription,
+        c: categoryShortcutDescription,
       };
     }
   }
