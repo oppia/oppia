@@ -270,7 +270,8 @@ describe('create new subtopic modal', function () {
   });
 
   it('should return ALL_COMPONENTS schema when EnableWorkedExamplesRteComponent is disabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
     let SUBTOPIC_PAGE_SCHEMA = component.getSchema();
     expect(SUBTOPIC_PAGE_SCHEMA).toEqual(AllComponentsSchema);
   });
@@ -390,12 +391,14 @@ describe('create new subtopic modal', function () {
   });
 
   it('should check if worked examples RTE component feature is enabled', () => {
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = true;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      true;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       true
     );
 
-    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled = false;
+    platformFeatureService.status.EnableWorkedExamplesRteComponent.isEnabled =
+      false;
     expect(component.isEnableWorkedexamplesRteComponentFeatureEnabled()).toBe(
       false
     );
