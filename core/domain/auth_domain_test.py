@@ -18,7 +18,7 @@
 
 from __future__ import annotations
 
-from core import utils
+from core import feconf, utils
 from core.domain import auth_domain, auth_services
 from core.platform import models
 from core.tests import test_utils
@@ -42,13 +42,16 @@ class AuthIdUserIdPairTests(test_utils.TestBase):
 
 class AuthProviderRecordTests(test_utils.TestBase):
 
-    def test_unpacking(self) -> None:
-        auth_id, email, disabled = auth_domain.AuthProviderRecord(
-            'a', 'a@a.com', True
+    def test_init(self) -> None:
+        record = auth_domain.AuthProviderRecord(
+            'a', feconf.FIREBASE_AUTH_PROVIDER_ID, 'a@a.com', disabled=True
         )
-        self.assertEqual(auth_id, 'a')
-        self.assertEqual(email, 'a@a.com')
-        self.assertTrue(disabled)
+        self.assertEqual(record.auth_id, 'a')
+        self.assertEqual(
+            record.auth_provider_id, feconf.FIREBASE_AUTH_PROVIDER_ID
+        )
+        self.assertEqual(record.email, 'a@a.com')
+        self.assertTrue(record.disabled)
 
 
 class AuthClaimsTests(test_utils.TestBase):

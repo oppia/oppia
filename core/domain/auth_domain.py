@@ -22,7 +22,7 @@ import collections
 
 from core import utils
 
-from typing import Any, NamedTuple, Optional, TypedDict
+from typing import Any, Literal, NamedTuple, Optional, TypedDict
 
 # Auth ID refers to an identifier that links many Identity Providers to a single
 # user. For example, an individual user's Facebook, Google, and Apple profiles
@@ -35,6 +35,12 @@ from typing import Any, NamedTuple, Optional, TypedDict
 AuthIdUserIdPair = collections.namedtuple(
     'AuthIdUserIdPair', ['auth_id', 'user_id']
 )
+
+
+# Type for the identifiers used by Oppia to distinguish between auth providers.
+# These MUST match with the identifiers defined in feconf.py:
+# FIREBASE_AUTH_PROVIDER_ID and GAE_AUTH_PROVIDER_ID.
+AuthProviderId = Literal['Firebase', 'gae']
 
 
 class AuthProviderError(Exception):
@@ -131,6 +137,8 @@ class AuthProviderRecord(NamedTuple):
         auth_id: str. The unique identifier (with respect to the auth provider)
             that is assigned to a specific user. Must be a string between 1-128
             characters long, inclusive.
+        auth_provider_id: AuthProviderId. The identifier used by Oppia to
+            distinguish between different auth providers.
         email: str. The user's primary email. The email address must be valid.
         disabled: bool. Whether the user is able to sign in to their account.
             Oppia uses this field to prevent users from making changes to data
@@ -138,6 +146,7 @@ class AuthProviderRecord(NamedTuple):
     """
 
     auth_id: str
+    auth_provider_id: AuthProviderId
     email: str
     disabled: bool = False
 

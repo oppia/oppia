@@ -1,7 +1,5 @@
 # TODO(#24855): Depend on official stubs rather than maintaining our own.
 
-from core.domain import auth_domain
-
 import datetime
 from typing import (
     Any,
@@ -13,6 +11,8 @@ from typing import (
     Sequence,
     Union,
 )
+
+from core.domain import auth_domain
 
 from . import App
 

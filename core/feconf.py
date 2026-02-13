@@ -25,7 +25,7 @@ import os
 
 from core.constants import constants
 
-from typing import Callable, Dict, Final, List, TypedDict, Union
+from typing import Callable, Dict, Final, List, Literal, TypedDict, Union
 
 # The datastore model ID for the list of featured activity references. This
 # value should not be changed.
@@ -1355,13 +1355,14 @@ RTE_CONTENT_SPEC: Dict[str, RteTypeTextAngularDict] = {
 # CLASSROOM_PAGES_DATA property in config_domain.
 CLASSROOM_PAGES = ['math']
 
-# Authentication method using GAE ID (google sign in).
-GAE_AUTH_PROVIDER_ID = 'gae'
+# Authentication method using GAE ID (google app engine's built-in sign in).
+GAE_AUTH_PROVIDER_ID: Literal['gae'] = 'gae'
 # Authentication method using Firebase authentication. Firebase signs its ID
 # Tokens with iss='Firebase' (iss: issuer, public API refers to this as
 # "provider id"), so using this naming convention helps us stay consistent with
 # the status quo.
-FIREBASE_AUTH_PROVIDER_ID = 'Firebase'
+FIREBASE_AUTH_PROVIDER_ID: Literal['Firebase'] = 'Firebase'
+
 # Firebase-specific role specified for users with super admin privileges.
 FIREBASE_ROLE_SUPER_ADMIN = 'super_admin'
 

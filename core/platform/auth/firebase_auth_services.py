@@ -69,7 +69,7 @@ import firebase_admin
 import webapp2
 from firebase_admin import auth as firebase_auth
 from firebase_admin import exceptions as firebase_exceptions
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -188,7 +188,12 @@ def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
     """
     try:
         return [
-            auth_domain.AuthProviderRecord(user.uid, user.email, user.disabled)
+            auth_domain.AuthProviderRecord(
+                user.uid,
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                user.email,
+                user.disabled,
+            )
             for user in firebase_auth.list_users().iterate_all()
         ]
     except firebase_exceptions.FirebaseError as e:
@@ -196,22 +201,27 @@ def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
 
 
 def delete_multi_auth_provider_records(
-    records: Iterable[auth_domain.AuthProviderRecord],
+    records: List[auth_domain.AuthProviderRecord],
 ) -> None:
     """Deletes the given records from Firebase.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to delete.
+        records: List[auth_domain.AuthProviderRecord]. The records to delete.
 
     Raises:
-        ValueError. If any record is malformed.
+        ValueError. If any record is malformed or not provided by Firebase.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
+    sources = {record.auth_provider_id for record in records}
+    if sources and sources != {feconf.FIREBASE_AUTH_PROVIDER_ID}:
+        raise ValueError(
+            'Refusing to delete records from %r in Firebase' % sources
+        )
+
+    auth_ids = (r.auth_id for r in records)
     errors = []
     error_count = 0
     batch_offset = 0
-
-    auth_ids = (record.auth_id for record in records)
 
     while batch := list(itertools.islice(auth_ids, feconf.FIREBASE_BATCH_SIZE)):
         try:
@@ -239,31 +249,36 @@ def delete_multi_auth_provider_records(
 
 
 def upload_multi_auth_provider_records(
-    records: Iterable[auth_domain.AuthProviderRecord],
+    records: List[auth_domain.AuthProviderRecord],
 ) -> None:
     """Uploads the given records into Firebase WITHOUT safety checks.
 
     WARNING: This operation DOES NOT protect against duplicate records! The ONLY
     way to guarantee that this function is used safely is by running it on an
-    empty server, where collisions are impossible.
+    empty auth server, where collisions are impossible.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to upload.
+        records: List[auth_domain.AuthProviderRecord]. The records to upload.
 
     Raises:
-        ValueError. If any record is malformed.
+        ValueError. If any record is malformed or not provided by Firebase.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    errors = []
-    error_count = 0
-    batch_offset = 0
+    sources = {r.auth_provider_id for r in records}
+    if sources and sources != {feconf.FIREBASE_AUTH_PROVIDER_ID}:
+        raise ValueError(
+            'Refusing to upload records from %r to Firebase' % sources
+        )
 
     users = (
         firebase_auth.ImportUserRecord(
-            record.auth_id, email=record.email, disabled=record.disabled
+            r.auth_id, email=r.email, disabled=r.disabled
         )
-        for record in records
+        for r in records
     )
+    errors = []
+    error_count = 0
+    batch_offset = 0
 
     while batch := list(itertools.islice(users, feconf.FIREBASE_BATCH_SIZE)):
         try:

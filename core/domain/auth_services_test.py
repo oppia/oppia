@@ -20,6 +20,7 @@ from __future__ import annotations
 
 from unittest import mock
 
+from core import feconf
 from core.constants import constants
 from core.domain import (
     auth_domain,
@@ -257,9 +258,24 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_get_all_auth_provider_records(self) -> None:
         mock_accounts = [
-            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', True),
-            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
-            auth_domain.AuthProviderRecord('aid3', 'email3@example.com', True),
+            auth_domain.AuthProviderRecord(
+                'aid1',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email1@example.com',
+                disabled=True,
+            ),
+            auth_domain.AuthProviderRecord(
+                'aid2',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email2@example.com',
+                disabled=False,
+            ),
+            auth_domain.AuthProviderRecord(
+                'aid3',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email3@example.com',
+                disabled=True,
+            ),
         ]
 
         with self.swap(
@@ -273,8 +289,18 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_delete_multi_auth_provider_records(self) -> None:
         accounts = [
-            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
-            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
+            auth_domain.AuthProviderRecord(
+                'aid1',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email1@example.com',
+                disabled=False,
+            ),
+            auth_domain.AuthProviderRecord(
+                'aid2',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email2@example.com',
+                disabled=False,
+            ),
         ]
 
         with mock.patch.object(
@@ -286,7 +312,12 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_delete_multi_auth_provider_records_raises_in_prod(self) -> None:
         accounts = [
-            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+            auth_domain.AuthProviderRecord(
+                'aid1',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email1@example.com',
+                disabled=False,
+            ),
         ]
 
         with (
@@ -304,8 +335,18 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_upload_multi_auth_provider_records(self) -> None:
         accounts = [
-            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
-            auth_domain.AuthProviderRecord('aid2', 'email2@example.com', False),
+            auth_domain.AuthProviderRecord(
+                'aid1',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email1@example.com',
+                disabled=False,
+            ),
+            auth_domain.AuthProviderRecord(
+                'aid2',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email2@example.com',
+                disabled=False,
+            ),
         ]
 
         with mock.patch.object(
@@ -317,7 +358,12 @@ class AuthServicesTests(test_utils.GenericTestBase):
 
     def test_upload_multi_auth_provider_records_raises_in_prod(self) -> None:
         accounts = [
-            auth_domain.AuthProviderRecord('aid1', 'email1@example.com', False),
+            auth_domain.AuthProviderRecord(
+                'aid1',
+                feconf.FIREBASE_AUTH_PROVIDER_ID,
+                'email1@example.com',
+                disabled=False,
+            ),
         ]
 
         with (

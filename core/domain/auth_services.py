@@ -26,7 +26,7 @@ from core.platform import models
 from core.platform.auth import firebase_auth_services
 
 import webapp2
-from typing import Final, Iterable, List, Optional
+from typing import Final, List, Optional
 
 MYPY = False
 if MYPY:  # pragma: no cover
@@ -287,12 +287,12 @@ def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
 
 
 def delete_multi_auth_provider_records(
-    records: Iterable[auth_domain.AuthProviderRecord],
+    records: List[auth_domain.AuthProviderRecord],
 ) -> None:
     """Deletes the given records from our auth provider.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to delete.
+        records: List[auth_domain.AuthProviderRecord]. The records to delete.
 
     Raises:
         PermissionError. If this function is called from the production server.
@@ -308,7 +308,7 @@ def delete_multi_auth_provider_records(
 
 
 def upload_multi_auth_provider_records(
-    records: Iterable[auth_domain.AuthProviderRecord],
+    records: List[auth_domain.AuthProviderRecord],
 ) -> None:
     """Uploads the given records into our auth provider WITHOUT safety checks.
 
@@ -317,7 +317,7 @@ def upload_multi_auth_provider_records(
     empty server, where collisions are impossible.
 
     Args:
-        records: Iterable[auth_domain.AuthProviderRecord]. Records to upload.
+        records: List[auth_domain.AuthProviderRecord]. The records to upload.
 
     Raises:
         PermissionError. If this function is called from the production server.
