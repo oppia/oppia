@@ -45,6 +45,7 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import
     audit_topics_with_hanging_stories_job,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
+    cloud_task_run_migration_jobs,
     collection_info_jobs,
     contributor_admin_stats_jobs,
     delete_duplicate_content_ids_jobs,

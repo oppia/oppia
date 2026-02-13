@@ -1,0 +1,632 @@
+# coding: utf-8
+#
+# Copyright 2026 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for cloud_task_run_migration_jobs."""
+
+from __future__ import annotations
+
+import datetime
+
+from core import feconf
+from core.jobs import job_test_utils
+from core.jobs.batch_jobs import cloud_task_run_migration_jobs
+from core.jobs.types import job_run_result
+from core.platform import models
+
+from typing import Type
+from unittest import mock
+
+MYPY = False
+if MYPY:  # pragma: no cover
+    from mypy_imports import cloud_task_models, datastore_services
+
+(cloud_task_models,) = models.Registry.import_models([models.Names.CLOUD_TASK])
+datastore_services = models.Registry.import_datastore_services()
+
+
+class MarkStaleCloudTaskRunModelsAsFailedJobTests(job_test_utils.JobTestBase):
+    """Tests for MarkStaleCloudTaskRunModelsAsFailedJob."""
+
+    JOB_CLASS: Type[
+        cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedJob
+    ] = cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedJob
+
+    def test_empty_storage(self) -> None:
+        """Test that the job runs successfully with empty storage."""
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 0.'
+                )
+            ]
+        )
+
+    def test_no_stale_models(self) -> None:
+        """Test that the job doesn't update models that are not stale."""
+        # Create a recent model in RUNNING state (should not be updated).
+        recent_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='recent_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task1',
+            task_id='task1',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow(),
+        )
+
+        # Create a model in SUCCEEDED state (should not be updated).
+        succeeded_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='succeeded_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task2',
+            task_id='task2',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.SUCCEEDED.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([recent_model, succeeded_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 0.'
+                )
+            ]
+        )
+
+        # Verify models were not updated.
+        updated_recent_model = cloud_task_models.CloudTaskRunModel.get(
+            'recent_model_id'
+        )
+        updated_succeeded_model = cloud_task_models.CloudTaskRunModel.get(
+            'succeeded_model_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_recent_model is not None
+        assert updated_succeeded_model is not None
+
+        self.assertEqual(
+            updated_recent_model.latest_job_state,
+            cloud_task_models.CloudTaskState.RUNNING.value,
+        )
+        self.assertEqual(
+            updated_succeeded_model.latest_job_state,
+            cloud_task_models.CloudTaskState.SUCCEEDED.value,
+        )
+
+    def test_updates_stale_running_model(self) -> None:
+        """Test that the job updates a model that has been RUNNING for more than 3 days."""
+        stale_running_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_running_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task3',
+            task_id='task3',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=2,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([stale_running_model])
+
+        self.assert_job_output_is_ordered(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: stale_running_model_id.'
+                ),
+            ]
+        )
+
+        # Verify the model was updated correctly.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_running_model_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        self.assertEqual(
+            len(updated_model.exception_messages_for_failed_runs), 1
+        )
+        self.assertIn(
+            'This CloudTaskRunModel was marked as PERMANENTLY_FAILED '
+            'automatically since it has been in the RUNNING state for more than '
+            'three days.',
+            updated_model.exception_messages_for_failed_runs[0],
+        )
+
+    def test_updates_stale_pending_model(self) -> None:
+        """Test that the job updates a model that has been PENDING for more than 3 days."""
+        stale_pending_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_pending_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task4',
+            task_id='task4',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.PENDING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=5),
+        )
+
+        self.put_multi([stale_pending_model])
+
+        self.assert_job_output_is_ordered(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: stale_pending_model_id.'
+                ),
+            ]
+        )
+
+        # Verify the model was updated correctly.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_pending_model_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        self.assertEqual(
+            len(updated_model.exception_messages_for_failed_runs), 1
+        )
+        self.assertIn(
+            'This CloudTaskRunModel was marked as PERMANENTLY_FAILED '
+            'automatically since it has been in the PENDING state for more than '
+            'three days.',
+            updated_model.exception_messages_for_failed_runs[0],
+        )
+
+    def test_updates_multiple_stale_models(self) -> None:
+        """Test that the job updates multiple stale models correctly."""
+        # Create multiple stale models.
+        stale_running_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_running_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task5',
+            task_id='task5',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=1,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        stale_pending_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_pending_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task6',
+            task_id='task6',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.PENDING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=6),
+        )
+
+        # Create a non-stale model that should not be updated.
+        fresh_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='fresh_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task7',
+            task_id='task7',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(hours=12),
+        )
+
+        self.put_multi([stale_running_model, stale_pending_model, fresh_model])
+
+        self.assert_job_output_is_ordered(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 2.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: stale_running_model_id.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: stale_pending_model_id.'
+                ),
+            ]
+        )
+
+        # Verify the stale models were updated.
+        updated_running_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_running_model_id'
+        )
+        updated_pending_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_pending_model_id'
+        )
+        updated_fresh_model = cloud_task_models.CloudTaskRunModel.get(
+            'fresh_model_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_running_model is not None
+        assert updated_pending_model is not None
+        assert updated_fresh_model is not None
+
+        # Check that stale models were updated.
+        self.assertEqual(
+            updated_running_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        self.assertEqual(
+            updated_pending_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+
+        # Check that the fresh model was not updated.
+        self.assertEqual(
+            updated_fresh_model.latest_job_state,
+            cloud_task_models.CloudTaskState.RUNNING.value,
+        )
+
+    def test_preserves_existing_exception_messages(self) -> None:
+        """Test that the job preserves existing exception messages when updating a model."""
+        existing_exception_message = 'Previous error occurred'
+        stale_model_with_exceptions = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_model_with_exceptions_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task8',
+            task_id='task8',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[existing_exception_message],
+            current_retry_attempt=3,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([stale_model_with_exceptions])
+
+        self.assert_job_output_is_ordered(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: stale_model_with_exceptions_id.'
+                ),
+            ]
+        )
+
+        # Verify the model was updated and existing exception message was preserved.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_model_with_exceptions_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        self.assertEqual(
+            len(updated_model.exception_messages_for_failed_runs), 2
+        )
+        self.assertEqual(
+            updated_model.exception_messages_for_failed_runs[0],
+            existing_exception_message,
+        )
+        self.assertIn(
+            'This CloudTaskRunModel was marked as PERMANENTLY_FAILED '
+            'automatically since it has been in the RUNNING state for more than '
+            'three days.',
+            updated_model.exception_messages_for_failed_runs[1],
+        )
+
+    def test_mark_stale_model_as_permanently_failed_method(self) -> None:
+        """Test the mark_stale_model_as_permanently_failed method directly."""
+        job = (
+            cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedJob()
+        )
+
+        # Create a test model.
+        test_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='test_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task9',
+            task_id='task9',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=['Original error'],
+            current_retry_attempt=2,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        # Mock the NDB context.
+        with mock.patch.object(datastore_services, 'get_ndb_context'):
+            updated_model = job.mark_stale_model_as_permanently_failed(
+                test_model
+            )
+
+        # Verify the model was updated correctly.
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        self.assertEqual(
+            len(updated_model.exception_messages_for_failed_runs), 2
+        )
+        self.assertEqual(
+            updated_model.exception_messages_for_failed_runs[0],
+            'Original error',
+        )
+        expected_new_message = (
+            'This CloudTaskRunModel was marked as PERMANENTLY_FAILED '
+            'automatically since it has been in the RUNNING state for more than '
+            'three days.'
+        )
+        self.assertEqual(
+            updated_model.exception_messages_for_failed_runs[1],
+            expected_new_message,
+        )
+
+    def test_edge_case_exactly_three_days_old(self) -> None:
+        """Test that a model that is exactly 3 days old gets updated."""
+        exactly_three_days_old_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='exactly_three_days_old_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task10',
+            task_id='task10',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.PENDING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=3),
+        )
+
+        self.put_multi([exactly_three_days_old_model])
+
+        self.assert_job_output_is_ordered(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Updated state of CloudTaskRunModel with ID: exactly_three_days_old_id.'
+                ),
+            ]
+        )
+
+    def test_edge_case_just_under_three_days_old(self) -> None:
+        """Test that a model that is just under 3 days old does not get updated."""
+        just_under_three_days_old_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='just_under_three_days_old_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task11',
+            task_id='task11',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=(
+                datetime.datetime.utcnow()
+                - datetime.timedelta(days=3)
+                + datetime.timedelta(minutes=1)
+            ),
+        )
+
+        self.put_multi([just_under_three_days_old_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 0.'
+                )
+            ]
+        )
+
+        # Verify the model was not updated.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'just_under_three_days_old_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.RUNNING.value,
+        )
+
+    def test_model_with_failed_and_awaiting_retry_state_not_updated(
+        self,
+    ) -> None:
+        """Test that models in FAILED_AND_AWAITING_RETRY state are not updated."""
+        failed_and_awaiting_retry_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='failed_and_awaiting_retry_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task12',
+            task_id='task12',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.FAILED_AND_AWAITING_RETRY.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=['Failed but will retry'],
+            current_retry_attempt=1,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=5),
+        )
+
+        self.put_multi([failed_and_awaiting_retry_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 0.'
+                )
+            ]
+        )
+
+        # Verify the model was not updated.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'failed_and_awaiting_retry_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.FAILED_AND_AWAITING_RETRY.value,
+        )
+
+    def test_model_with_permanently_failed_state_not_updated(self) -> None:
+        """Test that models already in PERMANENTLY_FAILED state are not updated."""
+        permanently_failed_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='permanently_failed_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task13',
+            task_id='task13',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=['Already failed permanently'],
+            current_retry_attempt=3,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=10),
+        )
+
+        self.put_multi([permanently_failed_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 0.'
+                )
+            ]
+        )
+
+        # Verify the model was not updated.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'permanently_failed_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.PERMANENTLY_FAILED.value,
+        )
+        # Should still have only the original exception message.
+        self.assertEqual(
+            len(updated_model.exception_messages_for_failed_runs), 1
+        )
+        self.assertEqual(
+            updated_model.exception_messages_for_failed_runs[0],
+            'Already failed permanently',
+        )
+
+
+class MarkStaleCloudTaskRunModelsAsFailedAuditJobTests(
+    job_test_utils.JobTestBase
+):
+    """Tests for MarkStaleCloudTaskRunModelsAsFailedAuditJob."""
+
+    JOB_CLASS: Type[
+        cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedAuditJob
+    ] = (
+        cloud_task_run_migration_jobs.MarkStaleCloudTaskRunModelsAsFailedAuditJob
+    )
+
+    def test_audit_job_does_not_update_models(self) -> None:
+        """Test that the audit job does not update any models and only logs the IDs of stale models."""
+        # Create a stale model in RUNNING state (should be logged but not updated).
+        stale_model = self.create_model(
+            cloud_task_models.CloudTaskRunModel,
+            id='stale_model_id',
+            cloud_task_name='projects/test/locations/us-central1/queues/default/tasks/task14',
+            task_id='task14',
+            queue_id='default',
+            latest_job_state=cloud_task_models.CloudTaskState.RUNNING.value,
+            function_id='regenerate_voiceovers_on_exploration_update',
+            exception_messages_for_failed_runs=[],
+            current_retry_attempt=0,
+            last_updated=datetime.datetime.utcnow()
+            - datetime.timedelta(days=4),
+        )
+
+        self.put_multi([stale_model])
+
+        self.assert_job_output_is(
+            [
+                job_run_result.JobRunResult.as_stdout(
+                    'Number of CloudTaskRunModels updated to PERMANENTLY_FAILED: 1.'
+                ),
+                job_run_result.JobRunResult.as_stdout(
+                    'Stale CloudTaskRunModel found with ID: stale_model_id.'
+                ),
+            ]
+        )
+
+        # Verify the model was not updated.
+        updated_model = cloud_task_models.CloudTaskRunModel.get(
+            'stale_model_id'
+        )
+
+        # Ruling out the possibility of None for mypy type checking.
+        assert updated_model is not None
+
+        self.assertEqual(
+            updated_model.latest_job_state,
+            cloud_task_models.CloudTaskState.RUNNING.value,
+        )

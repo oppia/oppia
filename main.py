@@ -1553,6 +1553,10 @@ URLS.extend(
             r'/cron/blog_posts/search_rank', cron.CronBlogPostSearchRankHandler
         ),
         get_redirect_route(
+            r'/cron/cloud_task/mark_stale_run_as_failed',
+            cron.CronMarkStaleCloudTaskRunModelsAsFailedHandler,
+        ),
+        get_redirect_route(
             r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler
         ),
         get_redirect_route(
