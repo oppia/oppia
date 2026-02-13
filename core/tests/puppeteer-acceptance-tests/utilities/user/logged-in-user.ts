@@ -402,6 +402,7 @@ export class LoggedInUser extends BaseUser {
        `Unexpected submitted message text: ${submittedMessageText}`
       );
     }
+  }
   /**
    * Clicks on the given button in the remove activity modal.
    * @param {'Remove' | 'Cancel'} button - The button to click.
