@@ -193,7 +193,7 @@ describe('Contribution Admin dashboard stats service', () => {
     cdasbas = TestBed.inject(ContributorDashboardAdminStatsBackendApiService);
     http = TestBed.inject(HttpTestingController);
     crbas = TestBed.inject(ClassroomBackendApiService);
-    csrfService = TestBed.get(CsrfTokenService);
+    csrfService = TestBed.inject(CsrfTokenService);
     successHandler = jasmine.createSpy('success');
     failHandler = jasmine.createSpy('fail');
 
