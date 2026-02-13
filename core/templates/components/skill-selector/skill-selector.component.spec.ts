@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for SkillSelectorComponent.
  */
 
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { NO_ERRORS_SCHEMA } from '@angular/core';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
   ComponentFixture,
   TestBed,
@@ -25,12 +25,12 @@ import {
   tick,
   waitForAsync,
 } from '@angular/core/testing';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { UserService } from 'services/user.service';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import { SkillSelectorComponent } from './skill-selector.component';
-import { SkillFilteringService } from 'domain/skill/skill-filtering.service';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {UserService} from 'services/user.service';
+import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {SkillSelectorComponent} from './skill-selector.component';
+import {SkillFilteringService} from 'domain/skill/skill-filtering.service';
 
 describe('SkillSelectorComponent', () => {
   let component: SkillSelectorComponent;
@@ -473,8 +473,8 @@ describe('SkillSelectorComponent', () => {
     expect(component.augmentedTopicFilterList.length).toBe(1);
     expect(component.augmentedTopicFilterList[0].topicName).toBe('topic1');
     expect(component.augmentedSubTopicFilterDict.topic1.length).toBe(1);
-    expect(
-      component.augmentedSubTopicFilterDict.topic1[0].subTopicName
-    ).toBe('uncategorized');
+    expect(component.augmentedSubTopicFilterDict.topic1[0].subTopicName).toBe(
+      'uncategorized'
+    );
   });
 });

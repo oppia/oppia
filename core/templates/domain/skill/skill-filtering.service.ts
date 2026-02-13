@@ -16,15 +16,15 @@
  * @fileoverview Service for filtering skills by topic and search text.
  */
 
-import { Injectable } from '@angular/core';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {Injectable} from '@angular/core';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
 import cloneDeep from 'lodash/cloneDeep';
 
 export interface SubTopicFilterDict {
-  [topicName: string]: { subTopicName: string; checked: boolean }[];
+  [topicName: string]: {subTopicName: string; checked: boolean}[];
 }
 
 @Injectable({
@@ -33,7 +33,7 @@ export interface SubTopicFilterDict {
 export class SkillFilteringService {
   constructor(
     private filterForMatchingSubstringPipe: FilterForMatchingSubstringPipe
-  ) { }
+  ) {}
 
   checkIfEmpty(skills: Object[]): boolean {
     return skills.length === 0;
@@ -89,7 +89,7 @@ export class SkillFilteringService {
   updateSkillsListOnSubtopicFilterChange(
     categorizedSkills: CategorizedSkills,
     subTopicFilterDict: SubTopicFilterDict,
-    topicFilterList: { topicName: string; checked: boolean }[]
+    topicFilterList: {topicName: string; checked: boolean}[]
   ): CategorizedSkills {
     let updatedSkillsDict: CategorizedSkills = {};
     let isAnySubTopicChecked: boolean = false;
@@ -99,7 +99,7 @@ export class SkillFilteringService {
       for (var i = 0; i < subTopics.length; i++) {
         if (subTopics[i].checked) {
           if (!updatedSkillsDict.hasOwnProperty(topicName)) {
-            updatedSkillsDict[topicName] = { uncategorized: [] };
+            updatedSkillsDict[topicName] = {uncategorized: []};
           }
           let tempCategorizedSkills: CategorizedSkills = categorizedSkills;
           let subTopicName: string = subTopics[i].subTopicName;
@@ -134,7 +134,7 @@ export class SkillFilteringService {
     categorizedSkills: CategorizedSkills,
     initialSubTopicFilterDict: SubTopicFilterDict,
     subTopicFilterDict: SubTopicFilterDict,
-    topicFilterList: { topicName: string; checked: boolean }[]
+    topicFilterList: {topicName: string; checked: boolean}[]
   ): {
     subTopicFilterDict: SubTopicFilterDict;
     currCategorizedSkills: CategorizedSkills;
@@ -178,12 +178,12 @@ export class SkillFilteringService {
   }
 
   computeAugmentedTopicFilterList(
-    topicFilterList: { topicName: string; checked: boolean }[],
+    topicFilterList: {topicName: string; checked: boolean}[],
     subTopicFilterDict: SubTopicFilterDict,
     categorizedSkills: CategorizedSkills,
     skillFilterText: string
   ): {
-    augmentedTopicFilterList: { topicName: string; checked: boolean }[];
+    augmentedTopicFilterList: {topicName: string; checked: boolean}[];
     augmentedSubTopicFilterDict: SubTopicFilterDict;
   } {
     if (!skillFilterText) {
@@ -200,13 +200,13 @@ export class SkillFilteringService {
       const topicName = topic.topicName;
       const matchingSubtopics = subTopicFilterDict[topicName]
         ? subTopicFilterDict[topicName].filter(subtopic =>
-          this.checkSubtopicHasMatchingSkills(
-            topicName,
-            subtopic.subTopicName,
-            categorizedSkills,
-            skillFilterText
+            this.checkSubtopicHasMatchingSkills(
+              topicName,
+              subtopic.subTopicName,
+              categorizedSkills,
+              skillFilterText
+            )
           )
-        )
         : [];
 
       if (matchingSubtopics.length > 0) {

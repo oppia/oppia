@@ -310,7 +310,11 @@ describe('SkillFilteringService', () => {
       },
     };
     expect(
-      service.checkTopicHasMatchingSkills('topic1', categorizedSkills, 'Physics')
+      service.checkTopicHasMatchingSkills(
+        'topic1',
+        categorizedSkills,
+        'Physics'
+      )
     ).toBe(false);
   });
 
@@ -318,6 +322,7 @@ describe('SkillFilteringService', () => {
   it('should return true for all subtopics when no search text is provided', () => {
     const categorizedSkills = {
       topic1: {
+        uncategorized: [],
         subtopic1: [ShortSkillSummary.create('s1', 'Anything')],
       },
     };
@@ -371,9 +376,7 @@ describe('SkillFilteringService', () => {
       },
     };
     const subTopicFilterDict = {
-      topic1: [
-        { subTopicName: 'subtopic1', checked: false },
-      ],
+      topic1: [{ subTopicName: 'subtopic1', checked: false }],
     };
     const topicFilterList = [{ topicName: 'topic1', checked: false }];
 
@@ -398,7 +401,7 @@ describe('SkillFilteringService', () => {
       },
     };
     const topicFilterList = [{ topicName: 'topic1', checked: false }];
-    // subTopicFilterDict has no entry for topic1.
+    // SubTopicFilterDict has no entry for topic1.
     const subTopicFilterDict = {};
 
     const result = service.computeAugmentedTopicFilterList(
@@ -480,8 +483,6 @@ describe('SkillFilteringService', () => {
     );
 
     expect(result.augmentedTopicFilterList.length).toBe(0);
-    expect(
-      Object.keys(result.augmentedSubTopicFilterDict).length
-    ).toBe(0);
+    expect(Object.keys(result.augmentedSubTopicFilterDict).length).toBe(0);
   });
 });
