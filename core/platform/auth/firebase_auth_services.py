@@ -177,15 +177,23 @@ def get_auth_claims_from_request(
     return _get_auth_claims_from_session_cookie(_get_session_cookie(request))
 
 
-def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
+def get_all_auth_provider_records(
+    source: auth_domain.AuthProviderId,
+) -> List[auth_domain.AuthProviderRecord]:
     """Returns all of the records from Firebase.
+
+    Args:
+        source: auth_domain.AuthProviderId. The source to get records from.
 
     Returns:
         List[auth_domain.AuthProviderRecord]. A list of all records.
 
     Raises:
+        ValueError. If the source is unsupported.
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
+    if source != feconf.FIREBASE_AUTH_PROVIDER_ID:
+        raise ValueError('Unsupported source: %r' % source)
     try:
         return [
             auth_domain.AuthProviderRecord(

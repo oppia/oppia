@@ -274,8 +274,14 @@ def associate_multi_auth_ids_with_user_ids(
     )
 
 
-def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
+def get_all_auth_provider_records(
+    source: auth_domain.AuthProviderId,
+) -> List[auth_domain.AuthProviderRecord]:
     """Returns all of the records from our auth provider.
+
+    Args:
+        source: auth_domain.AuthProviderId. The source to get records from.
+            Must be Firebase.
 
     Returns:
         List[auth_domain.AuthProviderRecord]. A list of all records.
@@ -283,7 +289,7 @@ def get_all_auth_provider_records() -> List[auth_domain.AuthProviderRecord]:
     Raises:
         auth_domain.AuthProviderError. If an error occurs during the operation.
     """
-    return platform_auth_services.get_all_auth_provider_records()
+    return platform_auth_services.get_all_auth_provider_records(source)
 
 
 def delete_multi_auth_provider_records(

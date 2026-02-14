@@ -278,13 +278,16 @@ class AuthServicesTests(test_utils.GenericTestBase):
             ),
         ]
 
-        with self.swap(
+        with self.swap_to_always_return(
             platform_auth_services,
             'get_all_auth_provider_records',
-            lambda: mock_accounts,
+            mock_accounts,
         ):
             self.assertItemsEqual(
-                auth_services.get_all_auth_provider_records(), mock_accounts
+                auth_services.get_all_auth_provider_records(
+                    feconf.FIREBASE_AUTH_PROVIDER_ID
+                ),
+                mock_accounts,
             )
 
     def test_delete_multi_auth_provider_records(self) -> None:

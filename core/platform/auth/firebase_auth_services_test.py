@@ -1651,7 +1651,9 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         self.firebase_sdk_stub.create_user('aid3', 'user3@example.com', True)
 
         self.assertItemsEqual(
-            firebase_auth_services.get_all_auth_provider_records(),
+            firebase_auth_services.get_all_auth_provider_records(
+                feconf.FIREBASE_AUTH_PROVIDER_ID
+            ),
             [
                 auth_domain.AuthProviderRecord(
                     self.AUTH_ID,
@@ -1681,9 +1683,19 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
         firebase_auth.delete_user(self.AUTH_ID)
 
         self.assertEqual(
-            firebase_auth_services.get_all_auth_provider_records(),
+            firebase_auth_services.get_all_auth_provider_records(
+                feconf.FIREBASE_AUTH_PROVIDER_ID
+            ),
             [],
         )
+
+    def test_get_all_auth_provider_records_raises_error_when_source_invalid(
+        self,
+    ) -> None:
+        with self.assertRaisesRegex(ValueError, 'Unsupported source'):
+            firebase_auth_services.get_all_auth_provider_records(
+                feconf.GAE_AUTH_PROVIDER_ID
+            )
 
     def test_get_all_auth_provider_records_raises_error_when_firebase_fails(
         self,
@@ -1698,7 +1710,9 @@ class FirebaseSpecificAssociationTests(FirebaseAuthServicesTestBase):
                 auth_domain.AuthProviderError, 'Failed to list accounts'
             ),
         ):
-            firebase_auth_services.get_all_auth_provider_records()
+            firebase_auth_services.get_all_auth_provider_records(
+                feconf.FIREBASE_AUTH_PROVIDER_ID
+            )
 
 
 class DeleteAuthAssociationsTests(FirebaseAuthServicesTestBase):
