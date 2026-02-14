@@ -646,7 +646,7 @@ describe('Settings Tab Component', () => {
 
   it('should not delete exploration when dismissing delete exploration modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           result: Promise.reject(),
         } as NgbModalRef;
@@ -666,7 +666,7 @@ describe('Settings Tab Component', () => {
 
   it('should open a modal when removeRole is called', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -685,7 +685,7 @@ describe('Settings Tab Component', () => {
 
   it('should remove role when resolving remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -704,7 +704,7 @@ describe('Settings Tab Component', () => {
 
   it('should not remove role when rejecting remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.reject(),
@@ -721,7 +721,7 @@ describe('Settings Tab Component', () => {
 
   it('should remove role when user accept remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -740,7 +740,7 @@ describe('Settings Tab Component', () => {
 
   it('should open a modal when removeVoiceArtist is called', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -762,7 +762,7 @@ describe('Settings Tab Component', () => {
 
   it('should remove voice artist when resolving remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -784,7 +784,7 @@ describe('Settings Tab Component', () => {
 
   it('should not remove voice artist when rejecting remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.reject(),
@@ -803,7 +803,7 @@ describe('Settings Tab Component', () => {
 
   it('should open a modal when reassignRole is called', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -830,7 +830,7 @@ describe('Settings Tab Component', () => {
 
   it('should reassign role when resolving reassign-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -861,7 +861,7 @@ describe('Settings Tab Component', () => {
 
   it('should not reassign role when rejecting remove-role-modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.reject(),
@@ -905,7 +905,7 @@ describe('Settings Tab Component', () => {
       ' ownership modal',
     fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake(
-        (_dlg: Type<any>, _opt: NgbModalOptions) => {
+        (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
           return {
             componentInstance: NgbModalRef,
             result: Promise.reject(),
@@ -944,7 +944,7 @@ describe('Settings Tab Component', () => {
 
   it('should open preview summary tile modal with ngbModal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.resolve(),
@@ -968,7 +968,7 @@ describe('Settings Tab Component', () => {
       ' tile modal',
     fakeAsync(() => {
       spyOn(ngbModal, 'open').and.callFake(
-        (_dlg: Type<any>, _opt: NgbModalOptions) => {
+        (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
           return {
             componentInstance: NgbModalRef,
             result: Promise.resolve(),
@@ -1005,7 +1005,7 @@ describe('Settings Tab Component', () => {
 
   it('should clear alerts warning when dismissing preview summary tile modal', fakeAsync(() => {
     spyOn(ngbModal, 'open').and.callFake(
-      (_dlg: Type<any>, _opt: NgbModalOptions) => {
+      (_dlg: Type<unknown>, _opt: NgbModalOptions) => {
         return {
           componentInstance: NgbModalRef,
           result: Promise.reject(),
