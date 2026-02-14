@@ -16,12 +16,12 @@
  * @fileoverview Unit tests for SkillFilteringService.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ShortSkillSummary } from 'domain/skill/short-skill-summary.model';
-import { SkillSummary } from 'domain/skill/skill-summary.model';
-import { FilterForMatchingSubstringPipe } from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
-import { SkillFilteringService } from 'domain/skill/skill-filtering.service';
-import { CategorizedSkills } from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
+import {TestBed} from '@angular/core/testing';
+import {ShortSkillSummary} from 'domain/skill/short-skill-summary.model';
+import {SkillSummary} from 'domain/skill/skill-summary.model';
+import {FilterForMatchingSubstringPipe} from 'filters/string-utility-filters/filter-for-matching-substring.pipe';
+import {SkillFilteringService} from 'domain/skill/skill-filtering.service';
+import {CategorizedSkills} from 'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
 describe('SkillFilteringService', () => {
   let service: SkillFilteringService;
@@ -122,11 +122,11 @@ describe('SkillFilteringService', () => {
     };
     const subTopicFilterDict = {
       topic1: [
-        { subTopicName: 'subtopic1', checked: true },
-        { subTopicName: 'subtopic2', checked: false },
+        {subTopicName: 'subtopic1', checked: true},
+        {subTopicName: 'subtopic2', checked: false},
       ],
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: true }];
+    const topicFilterList = [{topicName: 'topic1', checked: true}];
 
     const result = service.updateSkillsListOnSubtopicFilterChange(
       categorizedSkills,
@@ -146,9 +146,9 @@ describe('SkillFilteringService', () => {
       },
     };
     const subTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: false }],
+      topic1: [{subTopicName: 'subtopic1', checked: false}],
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: true }];
+    const topicFilterList = [{topicName: 'topic1', checked: true}];
 
     const result = service.updateSkillsListOnSubtopicFilterChange(
       categorizedSkills,
@@ -168,12 +168,12 @@ describe('SkillFilteringService', () => {
       },
     };
     const initialSubTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: false }],
+      topic1: [{subTopicName: 'subtopic1', checked: false}],
     };
     const subTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: true }],
+      topic1: [{subTopicName: 'subtopic1', checked: true}],
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: true }];
+    const topicFilterList = [{topicName: 'topic1', checked: true}];
 
     // This simulates re-checking the topic, which should reset subtopics to initial state.
     const result = service.updateSkillsListOnTopicFilterChange(
@@ -203,18 +203,18 @@ describe('SkillFilteringService', () => {
     };
 
     const initialSubTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: false }],
-      topic2: [{ subTopicName: 'uncategorized', checked: false }],
+      topic1: [{subTopicName: 'subtopic1', checked: false}],
+      topic2: [{subTopicName: 'uncategorized', checked: false}],
     };
 
     const subTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: false }],
-      topic2: [{ subTopicName: 'uncategorized', checked: false }],
+      topic1: [{subTopicName: 'subtopic1', checked: false}],
+      topic2: [{subTopicName: 'uncategorized', checked: false}],
     };
 
     const topicFilterList = [
-      { topicName: 'topic1', checked: true },
-      { topicName: 'topic2', checked: false },
+      {topicName: 'topic1', checked: true},
+      {topicName: 'topic2', checked: false},
     ];
 
     const result = service.updateSkillsListOnTopicFilterChange(
@@ -242,17 +242,17 @@ describe('SkillFilteringService', () => {
       },
     };
     const topicFilterList = [
-      { topicName: 'topic1', checked: false },
-      { topicName: 'topic2', checked: false },
+      {topicName: 'topic1', checked: false},
+      {topicName: 'topic2', checked: false},
     ];
     const subTopicFilterDict = {
       topic1: [
-        { subTopicName: 'uncategorized', checked: false },
-        { subTopicName: 'subtopic1', checked: false },
+        {subTopicName: 'uncategorized', checked: false},
+        {subTopicName: 'subtopic1', checked: false},
       ],
       topic2: [
-        { subTopicName: 'uncategorized', checked: false },
-        { subTopicName: 'subtopic1', checked: false },
+        {subTopicName: 'uncategorized', checked: false},
+        {subTopicName: 'subtopic1', checked: false},
       ],
     };
 
@@ -269,7 +269,7 @@ describe('SkillFilteringService', () => {
   });
 
   it('should return all topics if search text is empty', () => {
-    const topicFilterList = [{ topicName: 'topic1', checked: false }];
+    const topicFilterList = [{topicName: 'topic1', checked: false}];
     const result = service.computeAugmentedTopicFilterList(
       topicFilterList,
       {},
@@ -376,9 +376,9 @@ describe('SkillFilteringService', () => {
       },
     };
     const subTopicFilterDict = {
-      topic1: [{ subTopicName: 'subtopic1', checked: false }],
+      topic1: [{subTopicName: 'subtopic1', checked: false}],
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: false }];
+    const topicFilterList = [{topicName: 'topic1', checked: false}];
 
     const result = service.updateSkillsListOnSubtopicFilterChange(
       categorizedSkills,
@@ -400,7 +400,7 @@ describe('SkillFilteringService', () => {
         uncategorized: [ShortSkillSummary.create('s1', 'Algebra equation')],
       },
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: false }];
+    const topicFilterList = [{topicName: 'topic1', checked: false}];
     // SubTopicFilterDict has no entry for topic1.
     const subTopicFilterDict = {};
 
@@ -470,9 +470,9 @@ describe('SkillFilteringService', () => {
         uncategorized: [ShortSkillSummary.create('s1', 'Physics motion')],
       },
     };
-    const topicFilterList = [{ topicName: 'topic1', checked: false }];
+    const topicFilterList = [{topicName: 'topic1', checked: false}];
     const subTopicFilterDict = {
-      topic1: [{ subTopicName: 'uncategorized', checked: false }],
+      topic1: [{subTopicName: 'uncategorized', checked: false}],
     };
 
     const result = service.computeAugmentedTopicFilterList(
