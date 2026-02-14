@@ -90,12 +90,18 @@ export class SkillSelectorComponent implements OnInit {
   }
 
   checkIfEmpty(skills: ShortSkillSummary[]): boolean {
+    // This method now depends on the search query (skillFilterText).
+    // If a skill matches the search query, it will be displayed.
+    // Otherwise, it will be hidden.
     return (
       this.searchInSubtopicSkills(skills, this.skillFilterText).length === 0
     );
   }
 
   checkTopicIsNotEmpty(topicName: string): boolean {
+    // This method now depends on the search query (skillFilterText).
+    // If a topic has at least one skill that matches the search query,
+    // it will be displayed. Otherwise, it will be hidden.
     for (let subtopicName in this.currCategorizedSkills[topicName]) {
       let skills = this.currCategorizedSkills[topicName][subtopicName];
       if (
