@@ -1,0 +1,297 @@
+name: Handle PR Review
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+permissions: read-all
+
+jobs:
+  handle-review:
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Handle PR review
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const sanitizeUsername = (input) => {
+              const allowed = /^[a-z\d](?:[a-z\d]|-(?=[a-z\d])){0,38}$/i;
+              if (typeof input !== 'string') return '';
+              return allowed.test(input) ? input : '';
+            };
+
+            const sanitizeRepo = (input) => {
+              const allowed = /^[A-Za-z0-9_.-]{1,100}$/;
+              if (typeof input !== 'string') return '';
+              return allowed.test(input) ? input : '';
+            };
+
+            const sanitizePrNumber = (num) => {
+              const n = Number(num);
+              return Number.isInteger(n) && n > 0 ? n : NaN;
+            };
+
+            if (!context.payload?.review || !context.payload?.pull_request) {
+              core.setFailed('Invalid event payload: missing review or pull_request');
+              return;
+            }
+
+            const review = context.payload.review;
+            const pr = context.payload.pull_request;
+
+            if (
+              !review.user ||
+              review.user.type === 'Bot' ||
+              (typeof review.user.login === 'string' &&
+                review.user.login.endsWith('[bot]'))
+            ) {
+              console.log('Skipping review from bot.');
+              return;
+            }
+
+            const owner = sanitizeUsername(
+              context.payload.repository?.owner?.login
+            );
+            const repo = sanitizeRepo(context.payload.repository?.name);
+            const prNumber = sanitizePrNumber(pr.number);
+
+            if (!owner || !repo) {
+              core.setFailed(`Invalid repo (${repo}) or owner (${owner})`);
+              return;
+            }
+            if (isNaN(prNumber)) {
+              core.setFailed(`Invalid PR number: ${pr.number}`);
+              return;
+            }
+
+            const reviewState = review.state;
+            const reviewer = review.user.login;
+            const prAuthor = pr.user.login;
+            const LGTM_LABEL = 'PR: LGTM';
+
+            console.log(
+              `Review "${reviewState}" by ${reviewer} on PR #${prNumber}.`
+            );
+
+            if (reviewState === 'approved') {
+
+              const { data: requestedReviewersData } =
+                await github.rest.pulls.listRequestedReviewers({
+                  owner,
+                  repo,
+                  pull_number: prNumber
+                });
+
+              const pendingUsers = (requestedReviewersData.users || [])
+                .map((u) => u.login);
+              const pendingTeams = (requestedReviewersData.teams || [])
+                .map((t) => t.slug);
+
+              const { data: reviews } = await github.rest.pulls.listReviews({
+                owner,
+                repo,
+                pull_number: prNumber
+              });
+
+              const latestReviewByUser = {};
+              for (const r of reviews) {
+                if (!r.user || r.user.type === 'Bot') continue;
+                if (
+                  r.state === 'APPROVED' ||
+                  r.state === 'CHANGES_REQUESTED'
+                ) {
+                  latestReviewByUser[r.user.login] = r.state;
+                }
+              }
+
+              const reviewersWithChangesRequested =
+                Object.entries(latestReviewByUser)
+                  .filter(([, state]) => state === 'CHANGES_REQUESTED')
+                  .map(([login]) => login);
+
+              const allApproved =
+                pendingUsers.length === 0 &&
+                pendingTeams.length === 0 &&
+                reviewersWithChangesRequested.length === 0;
+
+              if (allApproved) {
+                console.log(
+                  'All reviewers have approved. Adding LGTM label ' +
+                  'and assigning PR author.'
+                );
+
+                try {
+                  await github.rest.issues.addLabels({
+                    owner,
+                    repo,
+                    issue_number: prNumber,
+                    labels: [LGTM_LABEL]
+                  });
+                } catch (error) {
+                  core.warning(
+                    `Failed to add label "${LGTM_LABEL}": ${error.message}`
+                  );
+                }
+
+                const authorUsername = sanitizeUsername(prAuthor);
+                if (authorUsername) {
+                  await github.rest.issues.addAssignees({
+                    owner,
+                    repo,
+                    issue_number: prNumber,
+                    assignees: [authorUsername]
+                  });
+                }
+
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body:
+                    `Hi @${authorUsername}, all reviewers have approved ` +
+                    `this PR! The \`${LGTM_LABEL}\` label has been ` +
+                    'added. Please merge this PR once all CI checks ' +
+                    'pass. Thanks!'
+                });
+              } else {
+                const allPending = [
+                  ...new Set([
+                    ...pendingUsers,
+                    ...reviewersWithChangesRequested
+                  ])
+                ];
+
+                if (allPending.length > 0) {
+                  const sanitized = allPending
+                    .map(sanitizeUsername)
+                    .filter((u) => u);
+                  if (sanitized.length > 0) {
+                    await github.rest.issues.addAssignees({
+                      owner,
+                      repo,
+                      issue_number: prNumber,
+                      assignees: sanitized
+                    });
+                  }
+                }
+                
+                const pendingMentions = [];
+                for (const username of allPending) {
+                  const safe = sanitizeUsername(username);
+                  if (safe) pendingMentions.push(`@${safe}`);
+                }
+                for (const team of pendingTeams) {
+                  pendingMentions.push(`@oppia/${team}`);
+                }
+
+                if (pendingMentions.length > 0) {
+                  const message =
+                    'This PR has been partially approved. The ' +
+                    'following reviewers still need to review: ' +
+                    `${pendingMentions.join(', ')}. ` +
+                    'Assigning them for review. Thanks!';
+
+                  if (message.length <= 500) {
+                    await github.rest.issues.createComment({
+                      owner,
+                      repo,
+                      issue_number: prNumber,
+                      body: message
+                    });
+                  } else {
+                    await github.rest.issues.createComment({
+                      owner,
+                      repo,
+                      issue_number: prNumber,
+                      body:
+                        'This PR has been partially approved but ' +
+                        'there are still pending reviewers. ' +
+                        'Assigning them for review. Thanks!'
+                    });
+                  }
+                }
+
+                console.log(
+                  `Pending reviewers notified: ${allPending.join(', ')}`
+                );
+              }
+
+            } else if (reviewState === 'changes_requested') {
+              const reviewerUsername = sanitizeUsername(reviewer);
+              const authorUsername = sanitizeUsername(prAuthor);
+
+              if (reviewerUsername) {
+                try {
+                  await github.rest.issues.removeAssignees({
+                    owner,
+                    repo,
+                    issue_number: prNumber,
+                    assignees: [reviewerUsername]
+                  });
+                } catch (error) {
+                  core.warning(
+                    `Failed to unassign ${reviewerUsername}: ` +
+                    error.message
+                  );
+                }
+              }
+
+              if (authorUsername) {
+                await github.rest.issues.addAssignees({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  assignees: [authorUsername]
+                });
+              }
+
+              try {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  name: LGTM_LABEL
+                });
+                console.log(`Removed "${LGTM_LABEL}" label.`);
+              } catch (error) {
+                if (error.status !== 404) {
+                  core.warning(
+                    `Failed to remove label "${LGTM_LABEL}": ` +
+                    error.message
+                  );
+                }
+              }
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body:
+                  `Hi @${authorUsername}, @${reviewerUsername} has ` +
+                  'requested changes on this PR. Please address ' +
+                  'the review comments and submit a follow-up. Thanks!'
+              });
+
+              console.log(
+                `Changes requested by ${reviewerUsername}. ` +
+                `Author ${authorUsername} assigned.`
+              );
+            } else {
+              console.log(
+                `Review state "${reviewState}" does not require action.`
+              );
+            }
+  report-failure:
+    needs: handle-review
+    runs-on: ubuntu-24.04
+    if: ${{ always() && needs.handle-review.result == 'failure' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Send notification
+        uses: ./.github/actions/send-webhook-notification
+        with:
+          message: "Failed to handle PR review in on_pr_reviewed workflow"
+          webhook-url: ${{ secrets.BUILD_FAILURE_ROOM_WEBHOOK_URL }}
