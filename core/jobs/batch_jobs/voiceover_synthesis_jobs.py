@@ -418,7 +418,7 @@ class VoiceoverSynthesisJob(base_jobs.JobBase):
                             )
 
                             voiceover = voiceover_regeneration_services.fetch_voiceover_by_filename(
-                                entity_id, voiceover_filename
+                                entity_id, voiceover_filename, oppia_project_id
                             )
 
                         number_of_characters += len(content_html)

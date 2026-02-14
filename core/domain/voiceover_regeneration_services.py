@@ -580,19 +580,31 @@ def regenerate_voiceover_for_exploration_content(
 
 
 def fetch_voiceover_by_filename(
-    exploration_id: str, filename: str
+    exploration_id: str, filename: str, oppia_project_id: Optional[str] = None
 ) -> state_domain.Voiceover:
     """Fetches the voiceover by filename from the GCS file system.
 
     Args:
         exploration_id: str. The ID of the exploration.
         filename: str. The filename of the voiceover to be fetched.
+        oppia_project_id: Optional[str]. The Google Cloud Project ID. Explicitly
+            required when running on Beam Dataflow, as workers cannot
+            retrieve the ID from environment variables.
 
     Returns:
         Voiceover. The fetched voiceover object.
     """
+    logging.info(
+        'Voiceover synthesis log: Fetching voiceover from GCS with filename: %s.'
+        % filename
+    )
+    logging.info(
+        'Voiceover synthesis log: About to create GCS file system object.'
+    )
     fs = fs_services.GcsFileSystem(
-        feconf.ENTITY_TYPE_EXPLORATION, exploration_id
+        feconf.ENTITY_TYPE_EXPLORATION,
+        exploration_id,
+        oppia_project_id=oppia_project_id,
     )
 
     binary_audio_data = fs.get('%s/%s' % ('audio', filename))
