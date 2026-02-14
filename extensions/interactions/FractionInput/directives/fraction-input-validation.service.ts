@@ -167,9 +167,19 @@ export class FractionInputValidationService {
           case 'IsExactlyEqualTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
+
+              // Normalize to plain object if it's a Fraction instance.
+              var fractionDictPlain =
+                fractionDict instanceof Fraction
+                  ? fractionDict.toDict()
+                  : fractionDict;
+
               var fractionInSimplestForm =
-                Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
+
+              if (
+                !isEqual(fractionDictPlain, fractionInSimplestForm.toDict())
+              ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -222,9 +232,19 @@ export class FractionInputValidationService {
           case 'IsEquivalentTo':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
+
+              // Normalize to plain object if it's a Fraction instance.
+              var fractionDictPlain =
+                fractionDict instanceof Fraction
+                  ? fractionDict.toDict()
+                  : fractionDict;
+
               var fractionInSimplestForm =
-                Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
+
+              if (
+                !isEqual(fractionDictPlain, fractionInSimplestForm.toDict())
+              ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -241,9 +261,19 @@ export class FractionInputValidationService {
           case 'IsEquivalentToAndInSimplestForm':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
+
+              // Normalize to plain object if it's a Fraction instance.
+              var fractionDictPlain =
+                fractionDict instanceof Fraction
+                  ? fractionDict.toDict()
+                  : fractionDict;
+
               var fractionInSimplestForm =
-                Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
+
+              if (
+                !isEqual(fractionDictPlain, fractionInSimplestForm.toDict())
+              ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -262,9 +292,19 @@ export class FractionInputValidationService {
           case 'IsGreaterThan':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
+
+              // Normalize to plain object if it's a Fraction instance.
+              var fractionDictPlain =
+                fractionDict instanceof Fraction
+                  ? fractionDict.toDict()
+                  : fractionDict;
+
               var fractionInSimplestForm =
-                Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
+
+              if (
+                !isEqual(fractionDictPlain, fractionInSimplestForm.toDict())
+              ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
@@ -283,9 +323,19 @@ export class FractionInputValidationService {
           case 'IsLessThan':
             if (shouldBeInSimplestForm) {
               var fractionDict = rule.inputs.f as FractionAnswer;
+
+              // Normalize to plain object if it's a Fraction instance.
+              var fractionDictPlain =
+                fractionDict instanceof Fraction
+                  ? fractionDict.toDict()
+                  : fractionDict;
+
               var fractionInSimplestForm =
-                Fraction.fromDict(fractionDict).convertToSimplestForm();
-              if (!isEqual(fractionDict, fractionInSimplestForm)) {
+                Fraction.fromDict(fractionDictPlain).convertToSimplestForm();
+
+              if (
+                !isEqual(fractionDictPlain, fractionInSimplestForm.toDict())
+              ) {
                 warningsList.push({
                   type: AppConstants.WARNING_TYPES.ERROR,
                   message:
