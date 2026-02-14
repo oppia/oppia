@@ -1,7 +1,6 @@
 import testConstants from '../../utilities/common/test-constants';
 import { UserFactory } from '../../utilities/common/user-factory';
 import { ExplorationEditor } from '../../utilities/user/exploration-editor';
-import { ExplorationLearner } from '../../utilities/user/exploration-learner';
 import { LoggedInUser } from '../../utilities/user/logged-in-user';
 
 const DEFAULT_TIMEOUT = testConstants.DEFAULT_SPEC_TIMEOUT_MSECS;
@@ -11,7 +10,7 @@ enum INTERACTION_TYPES {
 
 describe('Exploration Learner Flow', function () {
   let explorationEditor: ExplorationEditor & LoggedInUser;
-  let learner: ExplorationLearner & LoggedInUser;
+  let learner:LoggedInUser;
   let explorationId1: string | null;
   let explorationId2: string | null;
   
