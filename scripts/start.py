@@ -29,6 +29,7 @@ from core import feconf
 # We need to import install_python_dev_dependencies and install dependencies
 # before importing any other modules.
 from . import install_python_dev_dependencies
+
 install_python_dev_dependencies.main()
 
 import psutil
