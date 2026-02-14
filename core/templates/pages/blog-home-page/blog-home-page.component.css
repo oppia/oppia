@@ -66,7 +66,7 @@ oppia-blog-home-page .oppia-blog-home-page-card {
   max-width: 1400px;
   padding-left: 3rem;
   padding-right: 3rem;
-  width: 100%
+  width: 55%;
 }
 
 oppia-blog-home-page .oppia-blog-home-page-card-avatar {
@@ -75,9 +75,9 @@ oppia-blog-home-page .oppia-blog-home-page-card-avatar {
 }
 
 oppia-blog-home-page .blog-card {
-  width: 98% !important;
-  max-width: none !important;
   height: 60% !important;
+  max-width: none !important;
+  width: 98% !important;
 }
 
 oppia-blog-home-page .mobile-view-columns-separator {
@@ -112,6 +112,11 @@ oppia-blog-home-page .search-heading {
   letter-spacing: 0;
   line-height: 19px;
   text-align: left;
+}
+
+oppia-blog-home-page .oppia-blog-search-container{
+  padding-top: 125px; 
+  padding-left: 30px;
 }
 
 .oppia-search-bar-input {

@@ -1,16 +1,16 @@
 <div class="oppia-blog-home-page d-flex justify-content-center">
-  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card" style="width: 55%;">
+  <mat-card class="oppia-blog-home-page-card oppia-page-card py-5 e2e-test-oppia-blog-home-page-card">
     <div class="d-flex" [ngClass]="{'flex-column-reverse': isSmallScreenViewActive()}">
       <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen"
            class="oppia-blog-post-card-container"
            [ngClass]="{
-            'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
-            'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
-            }">
+             'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
+             'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
+           }">
         <div *ngIf="!searchPageIsActive">
           <div class="d-flex align-items-baseline">
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
-                [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
+                [innerHTML]="'I18N_BLOG_HOME_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts }">
             </h3>
             <ngb-pagination [collectionSize]="totalBlogPosts"
                             [(page)]="page"
@@ -19,7 +19,7 @@
                             [rotate]="true"
                             (pageChange)="onPageChange($event)"
                             class="ms-auto e2e-test-pagination">
-              <ng-template ngbPaginationPrevious >
+              <ng-template ngbPaginationPrevious>
                 <i class="fa fa-angle-left text-center w-100 e2e-test-pagination-prev-button align-middle"
                    aria-hidden="true">
                 </i>
@@ -36,8 +36,8 @@
           </div>
           <div class="ps-3 posts-display-heading d-flex justify-content-between align-items-center">
             {{ 'I18N_BLOG_HOME_PAGE_POSTS_HEADING' | translate }}
-            <button (click)="toggleSearchPanel()" 
-                class="btn btn-secondary search-toggle-button e2e-test-toggle-search-panel me-3">
+            <button (click)="toggleSearchPanel()"
+                    class="btn btn-secondary search-toggle-button e2e-test-toggle-search-panel me-3">
               <i class="fas" [ngClass]="searchPanelIsCollapsed ? 'fa-search' : 'fa-times'"></i>
               <span class="ms-2">{{ searchPanelIsCollapsed ? 'Search' : 'Hide' }}</span>
             </button>
@@ -47,11 +47,11 @@
           <div class="d-flex align-items-baseline">
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 *ngIf="searchOffset"
-                [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum}">
+                [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum }">
             </h3>
             <h3 class="my-0 ps-3 blog-home-page-posts-number-display"
                 *ngIf="!searchOffset"
-                [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts}">
+                [innerHTML]="'I18N_BLOG_HOME_SEARCH_PAGE_POSTS_NUMBER_OUT_OF_TOTAL_DISPLAY' | translate: { startingNumber: firstPostOnPageNum, endingNumber: lastPostOnPageNum, totalNumber: totalBlogPosts }">
             </h3>
             <ngb-pagination [collectionSize]="totalBlogPosts"
                             [(page)]="page"
@@ -60,12 +60,12 @@
                             (pageChange)="onPageChange($event)"
                             class="ms-auto text-center">
               <ng-template ngbPaginationPrevious>
-                <i class="fa fa-angle-left  align-middle"
+                <i class="fa fa-angle-left align-middle"
                    aria-hidden="true">
                 </i>
               </ng-template>
               <ng-template ngbPaginationNext>
-                <i class="fa fa-angle-right  align-middle"
+                <i class="fa fa-angle-right align-middle"
                    aria-hidden="true">
                 </i>
               </ng-template>
@@ -85,9 +85,9 @@
       <div *ngIf="noResultsFound && !showBlogPostCardsLoadingScreen"
            class="posts-display-heading text-center e2e-test-no-results-found"
            [ngClass]="{
-            'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
-            'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
-            }">
+             'col-8': !searchPanelIsCollapsed && !isSmallScreenViewActive(),
+             'col-12': searchPanelIsCollapsed && !isSmallScreenViewActive()
+           }">
         <picture>
           <source type="image/webp"
                   [srcset]="getStaticCopyrightedImageUrl('/general/no_explorations_found.webp')">
@@ -102,43 +102,41 @@
       <div *ngIf="showBlogPostCardsLoadingScreen" class="col-8 my-auto">
         <mat-spinner class="mx-auto"></mat-spinner>
       </div>
-      <div *ngIf="!searchPanelIsCollapsed || isSmallScreenViewActive()" 
-          [ngClass]="{'col-4': !isSmallScreenViewActive()}" style="padding-top: 125px; padding-left: 30px;">
-          <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
-            <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
-                 class="me-auto ms-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
-            <h1 class="d-flex flex-grow-1 blog-home-page-welcome e2e-test-blog-welcome-heading"
-                [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ms-5 my-auto': isSmallScreenViewActive()}">
-              {{ 'I18N_BLOG_HOME_PAGE_WELCOME_HEADING' | translate }}
-            </h1>
-          </span>
-          <h2 class="d-flex flex-grow-1 blog-home-page-oppia-description mx-auto">
-            {{ 'I18N_BLOG_HOME_PAGE_OPPIA_DESCRIPTION' | translate }}
-          </h2>
-          <h4 class="d-flex flex-grow-1 search-heading">
-            {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
-          </h4>
-          <form class="navbar-form oppia-search-bar-form ps-0 e2e-test-search-field" role="search">
-            <div class="mb-3 d-flex">
-              <input type="text"
-                     class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
-                     [(ngModel)]="searchQuery"
-                     [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
-                     aria-label="Search bar"
-                     (keydown.enter)="onSearchQueryChangeExec()">
-            </div>
-          </form>
-          <h4 class="d-flex flex-grow-1 search-heading">
+      <div *ngIf="!searchPanelIsCollapsed || isSmallScreenViewActive()"
+           [ngClass]="{'col-4': !isSmallScreenViewActive()}" class="oppia-blog-search-container">
+        <span [ngClass]="{'d-inline-flex': isSmallScreenViewActive()}">
+          <img [src]="oppiaAvatarImgUrl" alt="image of Oppia Avatar"
+               class="me-auto ms-auto oppia-blog-home-page-card-avatar d-flex flex-grow-1 e2e-test-oppia-avatar-image">
+          <h1 class="d-flex flex-grow-1 blog-home-page-welcome e2e-test-blog-welcome-heading"
+              [ngClass]="{'mx-auto my-2': !isSmallScreenViewActive(), 'ms-5 my-auto': isSmallScreenViewActive()}">
+            {{ 'I18N_BLOG_HOME_PAGE_WELCOME_HEADING' | translate }}
+          </h1>
+        </span>
+        <h2 class="d-flex flex-grow-1 blog-home-page-oppia-description mx-auto">
+          {{ 'I18N_BLOG_HOME_PAGE_OPPIA_DESCRIPTION' | translate }}
+        </h2>
+        <h4 class="d-flex flex-grow-1 search-heading">
+          {{ 'I18N_BLOG_HOME_PAGE_QUERY_SEARCH_HEADING' | translate }}
+        </h4>
+        <form class="navbar-form oppia-search-bar-form ps-0 e2e-test-search-field" role="search">
+          <div class="mb-3 d-flex">
+            <input type="text"
+                   class="form-control oppia-search-bar-input oppia-search-bar-text-input e2e-test-search-input"
+                   [(ngModel)]="searchQuery"
+                   [ngModelOptions]="{ updateOn: 'change', standalone: 'true' }"
+                   aria-label="Search bar"
+                   (keydown.enter)="onSearchQueryChangeExec()">
+          </div>
+        </form>
+        <h4 class="d-flex flex-grow-1 search-heading">
           {{ 'I18N_BLOG_HOME_PAGE_TAGS_SEARCH_HEADING' | translate }}
-          </h4>
-          <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0" [(listOfDefaultTags)]="listOfDefaultTags"
-          [(selectedTags)]="selectedTags" [smallScreenViewIsActive]="isSmallScreenViewActive()"
-          >
-          </oppia-tag-filter>
-          <button class="e2e-test-search-submit-btn btn primary-button" (click)="onSearchQueryChangeExec()">
-            <span>Search</span>
-          </button>
-        </div>
+        </h4>
+        <oppia-tag-filter *ngIf="listOfDefaultTags.length > 0" [(listOfDefaultTags)]="listOfDefaultTags"
+                          [(selectedTags)]="selectedTags" [smallScreenViewIsActive]="isSmallScreenViewActive()">
+        </oppia-tag-filter>
+        <button class="e2e-test-search-submit-btn btn primary-button" (click)="onSearchQueryChangeExec()">
+          <span>Search</span>
+        </button>
       </div>
     </div>
     <div *ngIf="!noResultsFound && !showBlogPostCardsLoadingScreen" class="d-flex">
@@ -150,7 +148,7 @@
                       [rotate]="true"
                       (pageChange)="onPageChange($event)"
                       class="ms-auto me-auto">
-        <ng-template ngbPaginationPrevious >
+        <ng-template ngbPaginationPrevious>
           <i class="fa fa-angle-left text-center w-100" aria-hidden="true"></i>
         </ng-template>
         <ng-template ngbPaginationNumber let-p>
