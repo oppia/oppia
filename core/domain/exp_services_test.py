@@ -10306,7 +10306,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     def test_migrate_draft_change_list_logs_error_on_failure(self) -> None:
         """Test that the migration function catches exceptions and logs warnings."""
         exploration = self.save_new_valid_exploration('exp_id_fail', 'owner_id')
-        valid_change_list = [
+        valid_change_list: List[exp_domain.ExplorationChangeDict] = [
             {
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
@@ -10333,7 +10333,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id_success', 'owner_id'
         )
-        valid_change_list = [
+        valid_change_list: List[exp_domain.ExplorationChangeDict] = [
             {
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',

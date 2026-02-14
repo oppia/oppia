@@ -132,6 +132,9 @@ class MigrateExplorationDraftsJobTests(
         migrated_model = user_models.ExplorationUserDataModel.get(
             self.USER_ID, self.EXP_ID
         )
+
+        assert migrated_model is not None
+
         self.assertEqual(migrated_model.draft_change_list, new_change_list)
 
     def test_migrate_draft_with_empty_change_list_returns_ok(self) -> None:
@@ -190,7 +193,7 @@ class MigrateExplorationDraftsJobTests(
             draft_change_list=[{'cmd': 'some_cmd'}],
         )
 
-        def mock_migrate_error(*args):
+        def mock_migrate_error(*args: object) -> None:
             raise Exception('Migration failed')
 
         with self.swap(
