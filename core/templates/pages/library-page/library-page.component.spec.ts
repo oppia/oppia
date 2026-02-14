@@ -93,6 +93,17 @@ class MockTranslateService {
   }
 }
 
+type RtlScrollType = 'default' | 'negative' | 'reverse';
+
+interface LibraryPageComponentPrivateMethods {
+  getRtlScrollType: () => RtlScrollType;
+  getNormalizedScrollLeft: (carouselElement: HTMLElement) => number;
+  setNormalizedScrollLeft: (
+    carouselElement: HTMLElement,
+    normalizedScrollLeft: number
+  ) => void;
+}
+
 describe('Library Page Component', () => {
   let fixture: ComponentFixture<LibraryPageComponent>;
   let componentInstance: LibraryPageComponent;
@@ -971,17 +982,16 @@ describe('Library Page Component', () => {
       scrollWidth: 0,
       clientWidth: 0,
     } as HTMLElement;
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
-      'negative'
-    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('negative');
 
-    const normalizedScrollLeft = (
-      componentInstance as any
-    ).getNormalizedScrollLeft(mockCarouselElement);
+    const normalizedScrollLeft =
+      privateMethods.getNormalizedScrollLeft(mockCarouselElement);
     expect(normalizedScrollLeft).toBe(250);
   });
 
@@ -991,17 +1001,16 @@ describe('Library Page Component', () => {
       scrollWidth: 1000,
       clientWidth: 400,
     } as HTMLElement;
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
-      'reverse'
-    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('reverse');
 
-    const normalizedScrollLeft = (
-      componentInstance as any
-    ).getNormalizedScrollLeft(mockCarouselElement);
+    const normalizedScrollLeft =
+      privateMethods.getNormalizedScrollLeft(mockCarouselElement);
     expect(normalizedScrollLeft).toBe(400);
   });
 
@@ -1011,18 +1020,15 @@ describe('Library Page Component', () => {
       scrollWidth: 0,
       clientWidth: 0,
     } as HTMLElement;
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
-      'negative'
-    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('negative');
 
-    (componentInstance as any).setNormalizedScrollLeft(
-      mockCarouselElement,
-      300
-    );
+    privateMethods.setNormalizedScrollLeft(mockCarouselElement, 300);
     expect(mockCarouselElement.scrollLeft).toBe(-300);
   });
 
@@ -1032,18 +1038,15 @@ describe('Library Page Component', () => {
       scrollWidth: 900,
       clientWidth: 300,
     } as HTMLElement;
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
 
     spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
       true
     );
-    spyOn<any>(componentInstance, 'getRtlScrollType').and.returnValue(
-      'reverse'
-    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('reverse');
 
-    (componentInstance as any).setNormalizedScrollLeft(
-      mockCarouselElement,
-      250
-    );
+    privateMethods.setNormalizedScrollLeft(mockCarouselElement, 250);
     expect(mockCarouselElement.scrollLeft).toBe(350);
   });
 
