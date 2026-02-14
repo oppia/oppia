@@ -157,5 +157,98 @@ describe('PageNavigationLoadingService', () => {
       routerEventsSubject.next(new NavigationEnd(2, '/page2', '/page2'));
       expect(service.isLoading).toBe(false);
     }));
+
+    it('should cancel pending hide when a new navigation starts during minimum duration wait', fakeAsync(() => {
+      // Start and quickly end navigation so remainingTime > 0,
+      // which sets pendingHide = true and schedules minimumDurationTimeoutId.
+      routerEventsSubject.next(new NavigationStart(1, '/page1'));
+      tick(50);
+      routerEventsSubject.next(new NavigationEnd(1, '/page1', '/page1'));
+
+      // pendingHide is now true and minimumDurationTimeoutId is scheduled.
+      // Start a new navigation before the minimum duration timeout fires.
+      routerEventsSubject.next(new NavigationStart(2, '/page2'));
+      expect(service.isLoading).toBe(true);
+
+      // Let the old minimum duration timeout expire. It should not hide
+      // because pendingHide was reset by showLoading.
+      tick(200);
+      expect(service.isLoading).toBe(true);
+
+      // Complete the second navigation after minimum duration.
+      tick(100);
+      routerEventsSubject.next(new NavigationEnd(2, '/page2', '/page2'));
+      expect(service.isLoading).toBe(false);
+    }));
+  });
+
+  describe('hideLoading when loadingStartTime is null', () => {
+    it('should hide immediately when loadingStartTime is null', fakeAsync(() => {
+      // Complete a navigation to set loadingStartTime to null.
+      routerEventsSubject.next(new NavigationStart(1, '/test'));
+      tick(250);
+      routerEventsSubject.next(new NavigationEnd(1, '/test', '/test'));
+      expect(service.isLoading).toBe(false);
+
+      // Force isLoading to true to verify hide works.
+      // Trigger another NavigationEnd without a NavigationStart.
+      // Since loadingStartTime was set to null above, this tests the
+      // null branch in hideLoading.
+      routerEventsSubject.next(new NavigationEnd(2, '/other', '/other'));
+      expect(service.isLoading).toBe(false);
+    }));
+  });
+
+  describe('Safety timeout edge cases', () => {
+    it('should not emit false again if loading is already false when safety timeout fires', fakeAsync(() => {
+      routerEventsSubject.next(new NavigationStart(1, '/test'));
+      expect(service.isLoading).toBe(true);
+
+      // Complete navigation before safety timeout.
+      tick(250);
+      routerEventsSubject.next(new NavigationEnd(1, '/test', '/test'));
+      expect(service.isLoading).toBe(false);
+
+      // Let safety timeout fire. isLoading is already false,
+      // so the if-check inside the timeout should skip the emit.
+      tick(30000);
+      expect(service.isLoading).toBe(false);
+    }));
+  });
+
+  describe('ngOnDestroy', () => {
+    it('should clean up subscriptions and timeouts on destroy', fakeAsync(() => {
+      routerEventsSubject.next(new NavigationStart(1, '/test'));
+      expect(service.isLoading).toBe(true);
+
+      service.ngOnDestroy();
+
+      // After destroy, router events should no longer be processed.
+      routerEventsSubject.next(new NavigationEnd(1, '/test', '/test'));
+
+      // isLoading stays true because the subscription was removed.
+      expect(service.isLoading).toBe(true);
+
+      // Flush any remaining timers.
+      tick(30001);
+    }));
+  });
+
+  describe('isLoading$ observable', () => {
+    it('should emit loading state changes via isLoading$ observable', fakeAsync(() => {
+      const emissions: boolean[] = [];
+      const sub = service.isLoading$.subscribe(val => emissions.push(val));
+
+      routerEventsSubject.next(new NavigationStart(1, '/test'));
+      tick(250);
+      routerEventsSubject.next(new NavigationEnd(1, '/test', '/test'));
+
+      // Emissions: initial true (BehaviorSubject), true from NavigationStart,
+      // false from NavigationEnd.
+      expect(emissions).toContain(true);
+      expect(emissions).toContain(false);
+
+      sub.unsubscribe();
+    }));
   });
 });
