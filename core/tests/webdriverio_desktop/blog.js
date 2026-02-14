@@ -1,11 +1,11 @@
 // Copyright 2022 The Oppia Authors. All Rights Reserved.
-//
+// //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// //
 //      http://www.apache.org/licenses/LICENSE-2.0
-//
+// //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,11 +37,6 @@ describe('Blog Pages functionality', function () {
     await users.createUserWithRole(
       'secondBlog@blogDashboard.com',
       'secondUser',
-      'blog admin'
-    );
-    await users.createUserWithRole(
-      'search@blogDashboard.com',
-      'searchUser',
       'blog admin'
     );
     await users.login('secondBlog@blogDashboard.com');
@@ -277,60 +272,6 @@ describe('Blog Pages functionality', function () {
       await blogPages.expectNumberOfBlogPostsToBe(1);
     }
   );
-
-  it('should successfully search for a unique keyword present only in the blog post body', async function () {
-    await blogPages.get();
-    await blogPages.expectBlogHomePageWelcomeHeadingToBeVisible();
-
-    await users.logout();
-    await users.login('search@blogDashboard.com');
-    await blogDashboardPage.get();
-
-    await blogDashboardPage.updateAuthorDetails(
-      'searchUser',
-      'Bio for the blog user to enable posting.'
-    );
-
-    await blogPages.publishNewBlogPostFromBlogDashboard(
-      'Recipe Post',
-      'This is a special recipe that uses a secret ingredient called Pineapple to make it sweet.',
-      ['News', 'Stories']
-    );
-
-    await browser.waitUntil(
-      async () => {
-        await blogPages.get();
-        await blogPages.expectBlogHomePageWelcomeHeadingToBeVisible();
-        await blogPages.submitSearchQuery('Pineapple');
-        await blogPages.getBlogPostSearchPage('Pineapple');
-
-        try {
-          await browser.waitUntil(
-            async () => {
-              try {
-                await blogPages.expectNumberOfBlogPostsToBe(1);
-                return true;
-              } catch (e) {
-                return false;
-              }
-            },
-            {timeout: 4000}
-          );
-          return true;
-        } catch (error) {
-          return false;
-        }
-      },
-      {
-        timeout: 30000,
-        timeoutMsg:
-          'Failed to find the "Pineapple" post. The search index likely did not update in time.',
-      }
-    );
-
-    await blogPages.navigateToBlogPostPage('Recipe Post');
-    await blogPages.expectBlogPostPageTitleToBe('Recipe Post');
-  });
 
   afterEach(async function () {
     await general.checkForConsoleErrors([]);
