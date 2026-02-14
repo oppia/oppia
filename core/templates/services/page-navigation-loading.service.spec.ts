@@ -165,7 +165,7 @@ describe('PageNavigationLoadingService', () => {
       tick(50);
       routerEventsSubject.next(new NavigationEnd(1, '/page1', '/page1'));
 
-      // pendingHide is now true and minimumDurationTimeoutId is scheduled.
+      // PendingHide is now true and minimumDurationTimeoutId is scheduled.
       // Start a new navigation before the minimum duration timeout fires.
       routerEventsSubject.next(new NavigationStart(2, '/page2'));
       expect(service.isLoading).toBe(true);
@@ -226,7 +226,7 @@ describe('PageNavigationLoadingService', () => {
       // After destroy, router events should no longer be processed.
       routerEventsSubject.next(new NavigationEnd(1, '/test', '/test'));
 
-      // isLoading stays true because the subscription was removed.
+      // IsLoading stays true because the subscription was removed.
       expect(service.isLoading).toBe(true);
 
       // Flush any remaining timers.

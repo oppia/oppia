@@ -85,6 +85,6 @@ describe('LightweightOppiaRootComponent', () => {
 
   it('should handle ngOnDestroy when no subscription exists', () => {
     // Call ngOnDestroy without ngOnInit, so loadingSubscription is null.
-    expect(() => component.ngOnDestroy()).not.toThrow();
+    expect(() => component.ngOnDestroy()).not.toThrowError();
   });
 });
