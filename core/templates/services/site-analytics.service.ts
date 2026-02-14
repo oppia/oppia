@@ -50,6 +50,11 @@ export class SiteAnalyticsService {
       SiteAnalyticsService.googleAnalyticsIsInitialized = true;
     }
 
+    this._initializeLoginStatus();
+  }
+
+  private async _initializeLoginStatus(): Promise<void> {
+    await this.userService.getUserInfoAsync();
     this._pushLoginStatusToDataLayer();
   }
 
@@ -78,14 +83,6 @@ export class SiteAnalyticsService {
       ...eventParameters,
       login_status: loginStatus,
     };
-
-    this.windowRef.nativeWindow.dataLayer =
-      this.windowRef.nativeWindow.dataLayer || [];
-
-    this.windowRef.nativeWindow.dataLayer.push({
-      event: eventName,
-      ...updatedEventParameters,
-    });
 
     this.windowRef.nativeWindow.gtag(
       'event',
