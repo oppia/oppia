@@ -1,3 +1,23 @@
+// Copyright 2026 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Acceptance test for "LC.12. Visit Creator Dashboard".
+ * This test covers the exploration creation, adding interaction, and publishing exploration
+ * previously tested in E2E tests:
+ * - creatorDashboard.js (visiting the creator dashboard)
+ */
 import testConstants from '../../utilities/common/test-constants';
 import { UserFactory } from '../../utilities/common/user-factory';
 import { ExplorationEditor } from '../../utilities/user/exploration-editor';
@@ -47,7 +67,7 @@ describe('Exploration Learner Flow', function () {
       await explorationEditor.waitForPageToFullyLoad();
       await explorationEditor.navigateToCreatorDashboardUsingProfileDropdown();
 
-      // second exploration
+      // Second exploration
       
       await explorationEditor.navigateToExplorationEditorFromCreatorDashboard();
       await explorationEditor.dismissWelcomeModal();
@@ -83,7 +103,7 @@ describe('Exploration Learner Flow', function () {
     await learner.playExploration(explorationId2);
     await learner.starRateExploration(5);
     await learner.giveFeedback('Super ,fantastic,explorations!!! I loves them',false);
-    //await learner.submitFeedback();
+    // Await learner.submitFeedback();
     await learner.navigateToCommunityLibrary();
     await learner.waitForPageToFullyLoad();
     await learner.playExploration(explorationId1);
