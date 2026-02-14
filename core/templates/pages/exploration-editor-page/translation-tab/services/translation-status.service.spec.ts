@@ -348,7 +348,7 @@ describe('Translation status service', () => {
       {}
     );
 
-    entityVoiceoversService.init('exp_id', 'exploration', 5, '');
+    entityVoiceoversService.init('exp_id', 'exploration', 5, 'en');
     entityVoiceoversService.setLanguageCode('en');
     entityVoiceoversService.setActiveLanguageAccentCode('en-US');
     entityVoiceoversService.addEntityVoiceovers('en-US', entityVoiceovers);
