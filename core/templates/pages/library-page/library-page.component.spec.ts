@@ -102,6 +102,7 @@ interface LibraryPageComponentPrivateMethods {
     carouselElement: HTMLElement,
     normalizedScrollLeft: number
   ) => void;
+  rtlScrollType: RtlScrollType | null;
 }
 
 describe('Library Page Component', () => {
@@ -1111,7 +1112,7 @@ describe('Library Page Component', () => {
   it('should return cached rtl scroll type if already computed', () => {
     const privateMethods =
       componentInstance as unknown as LibraryPageComponentPrivateMethods;
-    (componentInstance as any).rtlScrollType = 'negative';
+    privateMethods.rtlScrollType = 'negative';
 
     const result = privateMethods.getRtlScrollType();
 
@@ -1121,7 +1122,7 @@ describe('Library Page Component', () => {
   it('should detect default rtl scroll type when scrollLeft is positive', () => {
     const privateMethods =
       componentInstance as unknown as LibraryPageComponentPrivateMethods;
-    (componentInstance as any).rtlScrollType = null;
+    privateMethods.rtlScrollType = null;
 
     const mockContainer = document.createElement('div');
     const mockDummy = document.createElement('div');
@@ -1147,7 +1148,7 @@ describe('Library Page Component', () => {
   it('should detect negative rtl scroll type when scrollLeft is 0 after setting to 1', () => {
     const privateMethods =
       componentInstance as unknown as LibraryPageComponentPrivateMethods;
-    (componentInstance as any).rtlScrollType = null;
+    privateMethods.rtlScrollType = null;
 
     const mockContainer = document.createElement('div');
     const mockDummy = document.createElement('div');
@@ -1181,7 +1182,7 @@ describe('Library Page Component', () => {
   it('should detect reverse rtl scroll type when scrollLeft is non-zero after setting to 1', () => {
     const privateMethods =
       componentInstance as unknown as LibraryPageComponentPrivateMethods;
-    (componentInstance as any).rtlScrollType = null;
+    privateMethods.rtlScrollType = null;
 
     const mockContainer = document.createElement('div');
     const mockDummy = document.createElement('div');
