@@ -1107,4 +1107,254 @@ describe('Library Page Component', () => {
 
     expect(componentInstance.leftmostCardIndices[ind]).toBe(2);
   });
+
+  it('should return cached rtl scroll type if already computed', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    (componentInstance as any).rtlScrollType = 'negative';
+
+    const result = privateMethods.getRtlScrollType();
+
+    expect(result).toBe('negative');
+  });
+
+  it('should detect default rtl scroll type when scrollLeft is positive', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    (componentInstance as any).rtlScrollType = null;
+
+    const mockContainer = document.createElement('div');
+    const mockDummy = document.createElement('div');
+    let appendChildCalled = false;
+
+    spyOn(document, 'createElement').and.callFake((tagName: string) => {
+      if (!appendChildCalled) {
+        appendChildCalled = true;
+        return mockDummy;
+      }
+      return mockContainer;
+    });
+
+    spyOnProperty(mockContainer, 'scrollLeft', 'get').and.returnValue(1);
+    spyOn(document.body, 'appendChild');
+    spyOn(document.body, 'removeChild');
+
+    const result = privateMethods.getRtlScrollType();
+
+    expect(result).toBe('default');
+  });
+
+  it('should detect negative rtl scroll type when scrollLeft is 0 after setting to 1', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    (componentInstance as any).rtlScrollType = null;
+
+    const mockContainer = document.createElement('div');
+    const mockDummy = document.createElement('div');
+    let appendChildCalled = false;
+    let scrollLeftValue = 0;
+
+    spyOn(document, 'createElement').and.callFake((tagName: string) => {
+      if (!appendChildCalled) {
+        appendChildCalled = true;
+        return mockDummy;
+      }
+      return mockContainer;
+    });
+
+    spyOnProperty(mockContainer, 'scrollLeft', 'get').and.returnValue(
+      scrollLeftValue
+    );
+    spyOnProperty(mockContainer, 'scrollLeft', 'set').and.callFake(
+      (value: number) => {
+        scrollLeftValue = 0;
+      }
+    );
+    spyOn(document.body, 'appendChild');
+    spyOn(document.body, 'removeChild');
+
+    const result = privateMethods.getRtlScrollType();
+
+    expect(result).toBe('negative');
+  });
+
+  it('should detect reverse rtl scroll type when scrollLeft is non-zero after setting to 1', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    (componentInstance as any).rtlScrollType = null;
+
+    const mockContainer = document.createElement('div');
+    const mockDummy = document.createElement('div');
+    let appendChildCalled = false;
+    let scrollLeftValue = 0;
+
+    spyOn(document, 'createElement').and.callFake((tagName: string) => {
+      if (!appendChildCalled) {
+        appendChildCalled = true;
+        return mockDummy;
+      }
+      return mockContainer;
+    });
+
+    spyOnProperty(mockContainer, 'scrollLeft', 'get').and.callFake(
+      () => scrollLeftValue
+    );
+    spyOnProperty(mockContainer, 'scrollLeft', 'set').and.callFake(
+      (value: number) => {
+        scrollLeftValue = 1;
+      }
+    );
+    spyOn(document.body, 'appendChild');
+    spyOn(document.body, 'removeChild');
+
+    const result = privateMethods.getRtlScrollType();
+
+    expect(result).toBe('reverse');
+  });
+
+  it('should normalize scroll left for ltr mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 100,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+
+    const result = privateMethods.getNormalizedScrollLeft(mockElement);
+
+    expect(result).toBe(100);
+  });
+
+  it('should normalize scroll left for rtl negative mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: -200,
+      scrollWidth: 1000,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('negative');
+
+    const result = privateMethods.getNormalizedScrollLeft(mockElement);
+
+    expect(result).toBe(200);
+  });
+
+  it('should normalize scroll left for rtl reverse mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 150,
+      scrollWidth: 1000,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('reverse');
+
+    const result = privateMethods.getNormalizedScrollLeft(mockElement);
+
+    expect(result).toBe(550);
+  });
+
+  it('should normalize scroll left for rtl default mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 75,
+      scrollWidth: 1000,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('default');
+
+    const result = privateMethods.getNormalizedScrollLeft(mockElement);
+
+    expect(result).toBe(75);
+  });
+
+  it('should set normalized scroll left for ltr mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 0,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      false
+    );
+
+    privateMethods.setNormalizedScrollLeft(mockElement, 250);
+
+    expect(mockElement.scrollLeft).toBe(250);
+  });
+
+  it('should set normalized scroll left for rtl negative mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 0,
+      scrollWidth: 1000,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('negative');
+
+    privateMethods.setNormalizedScrollLeft(mockElement, 150);
+
+    expect(mockElement.scrollLeft).toBe(-150);
+  });
+
+  it('should set normalized scroll left for rtl reverse mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 0,
+      scrollWidth: 900,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('reverse');
+
+    privateMethods.setNormalizedScrollLeft(mockElement, 200);
+
+    expect(mockElement.scrollLeft).toBe(400);
+  });
+
+  it('should set normalized scroll left for rtl default mode', () => {
+    const privateMethods =
+      componentInstance as unknown as LibraryPageComponentPrivateMethods;
+    const mockElement = {
+      scrollLeft: 0,
+      scrollWidth: 900,
+      clientWidth: 300,
+    } as HTMLElement;
+
+    spyOn(i18nLanguageCodeService, 'isCurrentLanguageRTL').and.returnValue(
+      true
+    );
+    spyOn(privateMethods, 'getRtlScrollType').and.returnValue('default');
+
+    privateMethods.setNormalizedScrollLeft(mockElement, 180);
+
+    expect(mockElement.scrollLeft).toBe(180);
+  });
 });
