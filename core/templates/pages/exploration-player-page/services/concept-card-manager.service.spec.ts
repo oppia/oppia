@@ -44,8 +44,6 @@ describe('ConceptCardManager service', () => {
   let pps: PlayerPositionService;
   let ees: ExplorationEngineService;
   let pts: PlayerTranscriptService;
-  let mockNewCardOpenedEmitter = new EventEmitter<StateCard>();
-  let mockNewCardAvailableEmitter = new EventEmitter();
   let stateCard: StateCard;
   let stateCardWithHints: StateCard;
   let ngbModal: NgbModal;
@@ -68,10 +66,6 @@ describe('ConceptCardManager service', () => {
     pps = TestBed.inject(PlayerPositionService);
     ees = TestBed.inject(ExplorationEngineService);
     pts = TestBed.inject(PlayerTranscriptService);
-    spyOn(pps, 'onNewCardAvailable').and.returnValue(
-      mockNewCardAvailableEmitter
-    );
-    spyOn(pps, 'onNewCardOpened').and.returnValue(mockNewCardOpenedEmitter);
     ccms = TestBed.inject(ConceptCardManagerService);
     ngbModal = TestBed.inject(NgbModal);
   }));
@@ -221,13 +215,12 @@ describe('ConceptCardManager service', () => {
 
   it('should not show concept card when hints exist', fakeAsync(() => {
     // Case when hints exist.
-    ccms.hintsAvailable = 1;
     spyOn(ccms, 'conceptCardForStateExists').and.returnValue(true);
     expect(ccms.isConceptCardTooltipOpen()).toBe(false);
     expect(ccms.isConceptCardViewable()).toBe(false);
     expect(ccms.isConceptCardConsumed()).toBe(false);
 
-    ccms.reset(stateCard);
+    ccms.reset(stateCardWithHints);
 
     // Time delay before concept card is released.
     tick(WAIT_FOR_CONCEPT_CARD_MSEC);
@@ -341,8 +334,7 @@ describe('ConceptCardManager service', () => {
   });
 
   it('should set the number of hints available', fakeAsync(() => {
-    spyOn(pps.onNewCardOpened, 'subscribe');
-    pps.onNewCardOpened.emit(stateCardWithHints);
+    ccms.reset(stateCardWithHints);
     expect(ccms.hintsAvailable).toEqual(1);
   }));
 

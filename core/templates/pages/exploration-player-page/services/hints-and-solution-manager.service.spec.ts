@@ -22,7 +22,6 @@ import {TestBed, fakeAsync, flush, tick} from '@angular/core/testing';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {HintsAndSolutionManagerService} from 'pages/exploration-player-page/services/hints-and-solution-manager.service';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 
 describe('HintsAndSolutionManager service', () => {
   let hasms: HintsAndSolutionManagerService;
@@ -30,9 +29,6 @@ describe('HintsAndSolutionManager service', () => {
   let secondHint: Hint;
   let thirdHint: Hint;
   let solution: Solution;
-  let pps: PlayerPositionService;
-
-  let mockNewCardAvailableEmitter = new EventEmitter();
 
   const ACCELERATED_HINT_WAIT_TIME_MSEC: number = 10000;
   const WAIT_FOR_FIRST_HINT_MSEC: number = 60000;
@@ -40,10 +36,6 @@ describe('HintsAndSolutionManager service', () => {
   const WAIT_FOR_TOOLTIP_TO_BE_SHOWN_MSEC: number = 500;
 
   beforeEach(fakeAsync(() => {
-    pps = TestBed.inject(PlayerPositionService);
-    spyOnProperty(pps, 'onNewCardAvailable').and.returnValue(
-      mockNewCardAvailableEmitter
-    );
     hasms = TestBed.inject(HintsAndSolutionManagerService);
 
     firstHint = Hint.createFromBackendDict({
@@ -154,7 +146,7 @@ describe('HintsAndSolutionManager service', () => {
       expect(hasms.isHintConsumed(0)).toBe(true);
       expect(hasms.isHintConsumed(1)).toBe(false);
 
-      mockNewCardAvailableEmitter.emit();
+      hasms.onNewCardAvailable();
       tick(WAIT_FOR_SUBSEQUENT_HINTS_MSEC);
 
       expect(hasms.isHintViewable(0)).toBe(true);

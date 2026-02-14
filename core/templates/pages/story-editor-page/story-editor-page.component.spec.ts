@@ -626,24 +626,23 @@ describe('Story Editor Page Component', () => {
       "when the 'storage' event is triggered",
     () => {
       spyOn(
-        storyEditorStalenessDetectionService.staleTabEventEmitter,
-        'emit'
-      ).and.callThrough();
+        storyEditorStalenessDetectionService,
+        'showStaleTabInfoModal'
+      ).and.stub();
       spyOn(
-        storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter,
-        'emit'
-      ).and.callThrough();
+        storyEditorStalenessDetectionService,
+        'showPresenceOfUnsavedChangesModal'
+      ).and.stub();
 
       component.onCreateOrUpdateStoryEditorBrowserTabsInfo({
         key: 'opened_story_editor_browser_tabs',
       });
 
       expect(
-        storyEditorStalenessDetectionService.staleTabEventEmitter.emit
+        storyEditorStalenessDetectionService.showStaleTabInfoModal
       ).toHaveBeenCalled();
       expect(
-        storyEditorStalenessDetectionService
-          .presenceOfUnsavedChangesEventEmitter.emit
+        storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
       ).toHaveBeenCalled();
     }
   );

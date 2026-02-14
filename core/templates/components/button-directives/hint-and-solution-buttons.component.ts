@@ -95,6 +95,11 @@ export class HintAndSolutionButtonsComponent implements OnInit, OnDestroy {
       })
     );
     this.directiveSubscriptions.add(
+      this.playerPositionService.onNewCardAvailable.subscribe(() => {
+        this.hintsAndSolutionManagerService.onNewCardAvailable();
+      })
+    );
+    this.directiveSubscriptions.add(
       this.hintsAndSolutionManagerService.onHintConsumed.subscribe(() => {
         this.changeDetectorRef.detectChanges();
       })

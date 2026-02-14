@@ -160,7 +160,7 @@ describe('Story editor staleness detection service', () => {
     spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
 
     storyEditorStalenessDetectionService.init();
-    storyEditorStalenessDetectionService.staleTabEventEmitter.emit();
+    storyEditorStalenessDetectionService.showStaleTabInfoModal();
 
     expect(
       storyEditorStalenessDetectionService.showStaleTabInfoModal
@@ -170,11 +170,7 @@ describe('Story editor staleness detection service', () => {
     );
     expect(ngbModal.open).toHaveBeenCalled();
 
-    storyEditorStateService.onStoryInitialized.emit();
-
-    expect(
-      storyEditorStalenessDetectionService.showStaleTabInfoModal
-    ).toHaveBeenCalled();
+    storyEditorStalenessDetectionService.showStaleTabInfoModal();
   });
 
   it(
@@ -213,14 +209,14 @@ describe('Story editor staleness detection service', () => {
       ).and.returnValues(true, false);
 
       storyEditorStalenessDetectionService.init();
-      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(
         storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
       ).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
 
-      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(ngbModalRef.dismiss).toHaveBeenCalled();
     }
@@ -241,7 +237,7 @@ describe('Story editor staleness detection service', () => {
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       storyEditorStalenessDetectionService.init();
-      storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(ngbModal.open).not.toHaveBeenCalled();
     }

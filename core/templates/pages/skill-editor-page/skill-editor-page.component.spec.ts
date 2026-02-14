@@ -644,27 +644,23 @@ describe('Skill editor page', () => {
         localStorageService,
         'getEntityEditorBrowserTabsInfo'
       ).and.returnValue(BrowserTabsInfo);
-      let staleTabEventEmitter = new EventEmitter();
-      let presenceOfUnsavedChangesEventEmitter = new EventEmitter();
       let storageEvent = new StorageEvent('storage', {
         key: EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
       });
 
       spyOn(
         skillEditorStalenessDetectionService,
-        'staleTabEventEmitter'
-      ).and.returnValue(staleTabEventEmitter);
+        'showStaleTabInfoModal'
+      ).and.stub();
       spyOn(
         skillEditorStalenessDetectionService,
-        'presenceOfUnsavedChangesEventEmitter'
-      ).and.returnValue(presenceOfUnsavedChangesEventEmitter);
+        'showPresenceOfUnsavedChangesModal'
+      ).and.stub();
       spyOn(skillEditorStateService, 'loadSkill').and.stub();
       spyOn(urlService, 'getSkillIdFromUrl').and.returnValue('skill_1');
 
       component.ngOnInit();
 
-      staleTabEventEmitter.emit();
-      presenceOfUnsavedChangesEventEmitter.emit();
       windowRef.nativeWindow.dispatchEvent(storageEvent);
 
       expect(component.skillIsInitialized).toBeFalse();
@@ -686,10 +682,10 @@ describe('Skill editor page', () => {
         localStorageService,
         'getEntityEditorBrowserTabsInfo'
       ).and.returnValue(BrowserTabsInfo);
-      spyOn(skillEditorStalenessDetectionService.staleTabEventEmitter, 'emit');
+      spyOn(skillEditorStalenessDetectionService, 'showStaleTabInfoModal');
       spyOn(
-        skillEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter,
-        'emit'
+        skillEditorStalenessDetectionService,
+        'showPresenceOfUnsavedChangesModal'
       );
       let storageEvent = new StorageEvent('storage', {
         key: EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS,
@@ -697,11 +693,10 @@ describe('Skill editor page', () => {
       component.onCreateOrUpdateSkillEditorBrowserTabsInfo(storageEvent);
 
       expect(
-        skillEditorStalenessDetectionService.staleTabEventEmitter.emit
+        skillEditorStalenessDetectionService.showStaleTabInfoModal
       ).toHaveBeenCalled();
       expect(
-        skillEditorStalenessDetectionService
-          .presenceOfUnsavedChangesEventEmitter.emit
+        skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
       ).toHaveBeenCalled();
     }
   );

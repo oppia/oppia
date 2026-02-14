@@ -210,8 +210,8 @@ export class SkillEditorPageComponent implements OnInit {
       event.key ===
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_SKILL_EDITOR_BROWSER_TABS
     ) {
-      this.skillEditorStalenessDetectionService.staleTabEventEmitter.emit();
-      this.skillEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      this.skillEditorStalenessDetectionService.showStaleTabInfoModal();
+      this.skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
     }
   }
 

@@ -22,7 +22,6 @@ import {Hint} from 'domain/exploration/hint-object.model';
 import {Solution} from 'domain/exploration/solution.model';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
 import {ExplorationPlayerConstants} from 'pages/exploration-player-page/current-lesson-player/exploration-player-page.constants';
-import {PlayerPositionService} from 'pages/exploration-player-page/services/player-position.service';
 import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
@@ -74,13 +73,12 @@ export class HintsAndSolutionManagerService {
   // tooltip has been triggered.
   solutionDiscovered: boolean = false;
 
-  constructor(private playerPositionService: PlayerPositionService) {
-    // TODO(#10904): Refactor to move subscriptions into components.
-    playerPositionService.onNewCardAvailable.subscribe(() => {
-      this.correctAnswerSubmitted = true;
-      this.tooltipIsOpen = false;
-      this.solutionTooltipIsOpen = false;
-    });
+  constructor() {}
+
+  onNewCardAvailable(): void {
+    this.correctAnswerSubmitted = true;
+    this.tooltipIsOpen = false;
+    this.solutionTooltipIsOpen = false;
   }
 
   // This replaces any timeouts that are already queued.

@@ -160,6 +160,9 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     spyOn(playerPositionService, 'onActiveCardChanged').and.returnValue(
       new EventEmitter<void>()
     );
+    spyOn(playerPositionService, 'onNewCardAvailable').and.returnValue(
+      new EventEmitter<void>()
+    );
     spyOn(hintsAndSolutionManagerService, 'onHintConsumed').and.returnValue(
       new EventEmitter<void>()
     );
@@ -278,6 +281,7 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
   it('should subscribe to events on initialization', () => {
     spyOn(playerPositionService.onNewCardOpened, 'subscribe');
     spyOn(playerPositionService.onActiveCardChanged, 'subscribe');
+    spyOn(playerPositionService.onNewCardAvailable, 'subscribe');
     spyOn(hintsAndSolutionManagerService.onHintConsumed, 'subscribe');
     spyOn(
       hintsAndSolutionManagerService.onSolutionViewedEventEmitter,
@@ -289,6 +293,9 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
     expect(playerPositionService.onNewCardOpened.subscribe).toHaveBeenCalled();
     expect(
       playerPositionService.onActiveCardChanged.subscribe
+    ).toHaveBeenCalled();
+    expect(
+      playerPositionService.onNewCardAvailable.subscribe
     ).toHaveBeenCalled();
     expect(
       hintsAndSolutionManagerService.onHintConsumed.subscribe
@@ -362,6 +369,18 @@ describe('HintSolutionAndConceptCardDisplayComponent', () => {
       component.ngOnDestroy();
     })
   );
+
+  it('should notify hints manager when new card is available', () => {
+    const onNewCardAvailableSpy = spyOn(
+      hintsAndSolutionManagerService,
+      'onNewCardAvailable'
+    );
+
+    component.ngOnInit();
+    playerPositionService.onNewCardAvailable.emit();
+
+    expect(onNewCardAvailableSpy).toHaveBeenCalled();
+  });
 
   it('should fire change detection when hint is used', fakeAsync(() => {
     const changeDetectorRef =

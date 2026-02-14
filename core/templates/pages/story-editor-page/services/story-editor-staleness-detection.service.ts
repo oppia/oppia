@@ -16,7 +16,7 @@
  * @fileoverview Service for emitting events when a story editor tab is stale.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {StalenessDetectionService} from 'services/staleness-detection.service';
@@ -33,8 +33,6 @@ import {UnsavedChangesStatusInfoModalComponent} from 'components/unsaved-changes
   providedIn: 'root',
 })
 export class StoryEditorStalenessDetectionService {
-  _staleTabEventEmitter = new EventEmitter<void>();
-  _presenceOfUnsavedChangesEventEmitter = new EventEmitter<void>();
   // This property is initialized using init method and we need to do
   // non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -51,16 +49,7 @@ export class StoryEditorStalenessDetectionService {
   ) {}
 
   init(): void {
-    this.staleTabEventEmitter.subscribe(() => {
-      this.showStaleTabInfoModal();
-    });
-    this.presenceOfUnsavedChangesEventEmitter.subscribe(() => {
-      this.showPresenceOfUnsavedChangesModal();
-    });
-    this.storyEditorStateService.onStoryInitialized.subscribe(() => {
-      this.showStaleTabInfoModal();
-      this.showPresenceOfUnsavedChangesModal();
-    });
+    // Intentionally left blank.
   }
 
   showStaleTabInfoModal(): void {
@@ -119,13 +108,5 @@ export class StoryEditorStalenessDetectionService {
     } else if (this.unsavedChangesWarningModalRef) {
       this.unsavedChangesWarningModalRef.dismiss();
     }
-  }
-
-  get staleTabEventEmitter(): EventEmitter<void> {
-    return this._staleTabEventEmitter;
-  }
-
-  get presenceOfUnsavedChangesEventEmitter(): EventEmitter<void> {
-    return this._presenceOfUnsavedChangesEventEmitter;
   }
 }

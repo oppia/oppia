@@ -149,7 +149,7 @@ describe('Skill editor staleness detection service', () => {
     spyOn(ngbModal, 'open').and.returnValue(ngbModalRef);
 
     skillEditorStalenessDetectionService.init();
-    skillEditorStalenessDetectionService.staleTabEventEmitter.emit();
+    skillEditorStalenessDetectionService.showStaleTabInfoModal();
 
     expect(
       skillEditorStalenessDetectionService.showStaleTabInfoModal
@@ -197,14 +197,14 @@ describe('Skill editor staleness detection service', () => {
       ).and.returnValues(true, false);
 
       skillEditorStalenessDetectionService.init();
-      skillEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(
         skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal
       ).toHaveBeenCalled();
       expect(ngbModal.open).toHaveBeenCalled();
 
-      skillEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(ngbModalRef.dismiss).toHaveBeenCalled();
     }
@@ -225,7 +225,7 @@ describe('Skill editor staleness detection service', () => {
       spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
 
       skillEditorStalenessDetectionService.init();
-      skillEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      skillEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
 
       expect(ngbModal.open).not.toHaveBeenCalled();
     }

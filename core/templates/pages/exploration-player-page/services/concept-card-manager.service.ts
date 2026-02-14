@@ -63,15 +63,7 @@ export class ConceptCardManagerService {
     private explorationEngineService: ExplorationEngineService,
     private ngbModal: NgbModal,
     private playerTranscriptService: PlayerTranscriptService
-  ) {
-    // TODO(#10904): Refactor to move subscriptions into components.
-
-    this.playerPositionService.onNewCardOpened.subscribe(
-      (displayedCard: StateCard) => {
-        this.hintsAvailable = displayedCard.getHints().length;
-      }
-    );
-  }
+  ) {}
 
   // This replaces any timeouts that are already queued.
   enqueueTimeout(func: () => void, timeToWaitMsec: number): void {
@@ -131,6 +123,7 @@ export class ConceptCardManagerService {
   }
 
   reset(newCard: StateCard): void {
+    this.hintsAvailable = newCard.getHints().length;
     this.conceptCardReleased = false;
     this.conceptCardConsumed = false;
     this.wrongAnswersSinceConceptCardConsumed = 0;

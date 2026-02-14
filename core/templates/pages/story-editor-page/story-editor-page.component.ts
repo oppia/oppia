@@ -297,8 +297,8 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
       event.key ===
       EntityEditorBrowserTabsInfoDomainConstants.OPENED_STORY_EDITOR_BROWSER_TABS
     ) {
-      this.storyEditorStalenessDetectionService.staleTabEventEmitter.emit();
-      this.storyEditorStalenessDetectionService.presenceOfUnsavedChangesEventEmitter.emit();
+      this.storyEditorStalenessDetectionService.showStaleTabInfoModal();
+      this.storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
     }
   }
 
@@ -308,6 +308,8 @@ export class StoryEditorPageComponent implements OnInit, OnDestroy {
       this.storyEditorStateService.onStoryInitialized.subscribe(() => {
         this._initPage();
         this.createStoryEditorBrowserTabsInfo();
+        this.storyEditorStalenessDetectionService.showStaleTabInfoModal();
+        this.storyEditorStalenessDetectionService.showPresenceOfUnsavedChangesModal();
         this.loaderService.hideLoadingScreen();
       })
     );
