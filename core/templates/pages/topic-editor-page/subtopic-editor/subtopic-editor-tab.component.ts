@@ -108,15 +108,9 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   initEditor(): void {
     this.hostname = this.windowRef.nativeWindow.location.hostname;
     this.topic = this.topicEditorStateService.getTopic();
-    if (!this.topic) {
-      return;
-    }
     this.classroomUrlFragment =
       this.topicEditorStateService.getClassroomUrlFragment() || '';
     const topicUrlFragment = this.topic.getUrlFragment();
-    if (!topicUrlFragment) {
-      return;
-    }
     this.generatedUrlPrefix = `${this.hostname}/learn/${this.classroomUrlFragment}/${topicUrlFragment}/studyguide`;
     this.subtopicId = this.topicEditorRoutingService.getSubtopicIdFromUrl();
     const subtopicResult = this.topic.getSubtopicById(this.subtopicId);
@@ -190,9 +184,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateSubtopicTitle(title: string): void {
-    if (!this.topic || !this.subtopic) {
-      return;
-    }
     if (title === this.subtopic.getTitle()) {
       return;
     }
@@ -211,9 +202,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   drop(event: CdkDragDrop<string[]>): void {
-    if (!this.topic || !this.subtopic) {
-      return;
-    }
     moveItemInArray(
       this.subtopic.getSkillSummaries(),
       event.previousIndex,
@@ -233,9 +221,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateSubtopicUrlFragment(urlFragment: string): void {
-    if (!this.topic || !this.subtopic) {
-      return;
-    }
     this.subtopicUrlFragmentIsValid =
       this.subtopicValidationService.isUrlFragmentValid(urlFragment);
     if (urlFragment === this.initialSubtopicUrlFragment) {
@@ -260,9 +245,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateSubtopicThumbnailFilename(newThumbnailFilename: string): void {
-    if (!this.topic || !this.subtopic) {
-      return;
-    }
     var oldThumbnailFilename = this.subtopic.getThumbnailFilename();
     if (newThumbnailFilename === oldThumbnailFilename) {
       return;
@@ -276,9 +258,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateSubtopicThumbnailBgColor(newThumbnailBgColor: string): void {
-    if (!this.topic || !this.subtopic) {
-      return;
-    }
     var oldThumbnailBgColor = this.subtopic.getThumbnailBgColor();
     if (newThumbnailBgColor === oldThumbnailBgColor) {
       return;
@@ -314,9 +293,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   updateHtmlData(): void {
-    if (!this.subtopicPage || !this.subtopic) {
-      return;
-    }
     if (this.htmlData !== this.subtopicPage.getPageContents().getHtml()) {
       var subtitledHtml = cloneDeep(
         this.subtopicPage.getPageContents().getSubtitledHtml()
@@ -374,9 +350,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   removeSkillFromSubtopic(skillSummary: ShortSkillSummary): void {
-    if (!this.topic) {
-      return;
-    }
     this.selectedSkillEditOptionsIndex = -1;
     this.topicUpdateService.removeSkillFromSubtopic(
       this.topic,
@@ -387,9 +360,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   removeSkillFromTopic(skillSummary: ShortSkillSummary): void {
-    if (!this.topic) {
-      return;
-    }
     this.selectedSkillEditOptionsIndex = -1;
     this.topicUpdateService.removeSkillFromSubtopic(
       this.topic,
@@ -405,9 +375,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   changeActiveSectionIndex(idx: number): void {
-    if (!this.studyGuide) {
-      return;
-    }
     if (idx === this.activeSectionIndex) {
       this.sections = this.studyGuide.getSections();
       this.activeSectionIndex = -1;
@@ -417,9 +384,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   openAddSectionModal(): void {
-    if (!this.studyGuide) {
-      return;
-    }
     this.ngbModal
       .open(AddStudyGuideSectionModalComponent, {
         backdrop: 'static',
@@ -452,9 +416,6 @@ export class SubtopicEditorTabComponent implements OnInit, OnDestroy {
   }
 
   deleteSection(index: number, evt: string): void {
-    if (!this.studyGuide) {
-      return;
-    }
     this.ngbModal
       .open(DeleteStudyGuideSectionComponent, {
         backdrop: 'static',
