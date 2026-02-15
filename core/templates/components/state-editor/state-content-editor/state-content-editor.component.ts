@@ -19,6 +19,8 @@
 import {
   Component,
   OnInit,
+  AfterViewChecked,
+  OnDestroy,
   ChangeDetectorRef,
   Input,
   Output,
@@ -47,7 +49,9 @@ interface HTMLSchema {
   selector: 'oppia-state-content-editor',
   templateUrl: './state-content-editor.component.html',
 })
-export class StateContentEditorComponent implements OnInit {
+export class StateContentEditorComponent
+  implements OnInit, AfterViewChecked, OnDestroy
+{
   @Output() intialize: EventEmitter<void> = new EventEmitter();
   @Output() saveStateContent = new EventEmitter<SubtitledHtml>();
 
@@ -119,6 +123,7 @@ export class StateContentEditorComponent implements OnInit {
       this.cardHeightLimitReached = cardHeightLimitReached;
       this.changeDetectorRef.detectChanges();
     }
+    this.detectContentChangeAndAutosave();
   }
 
   hideCardHeightLimitWarning(): void {
@@ -126,15 +131,23 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   saveContent(): void {
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+    }
     this.stateContentService.saveDisplayedValue();
     this.saveStateContent.emit(this.stateContentService.displayed);
     this.contentEditorIsOpen = false;
     this.intialize.emit();
+    this.autosaveInitialized = false;
   }
 
   openStateContentEditor(): void {
     this.editorFirstTimeEventsService.registerFirstOpenContentBoxEvent();
     this.contentEditorIsOpen = true;
+    this.lastSavedHtml = this.stateContentService.displayed.html;
+    setTimeout(() => {
+      this.autosaveInitialized = true;
+    });
   }
 
   onSaveContentButtonClicked(): void {
@@ -143,8 +156,12 @@ export class StateContentEditorComponent implements OnInit {
   }
 
   cancelEdit(): void {
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+    }
     this.stateContentService.restoreFromMemento();
     this.contentEditorIsOpen = false;
+    this.autosaveInitialized = false;
   }
 
   isContentEditable(): boolean {
@@ -153,5 +170,41 @@ export class StateContentEditorComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.directiveSubscriptions.unsubscribe();
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+    }
+  }
+
+  private autosaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly AUTOSAVE_DELAY_MS = 1500;
+  private lastSavedHtml: string = '';
+  private autosaveInitialized: boolean = false;
+  private detectContentChangeAndAutosave(): void {
+    if (!this.contentEditorIsOpen || !this.autosaveInitialized) {
+      return;
+    }
+    const currentHtml = this.stateContentService.displayed.html;
+    if (currentHtml === this.lastSavedHtml) {
+      return;
+    }
+    this.scheduleAutosave(currentHtml);
+  }
+
+  private scheduleAutosave(newHtml: string): void {
+    if (this.autosaveTimer) {
+      clearTimeout(this.autosaveTimer);
+    }
+    this.autosaveTimer = setTimeout(() => {
+      this.autoSaveContent(newHtml);
+    }, this.AUTOSAVE_DELAY_MS);
+  }
+
+  private autoSaveContent(newHtml: string): void {
+    if (!this.contentEditorIsOpen) {
+      return;
+    }
+    this.lastSavedHtml = newHtml;
+    this.stateContentService.saveDisplayedValue();
+    this.saveStateContent.emit(this.stateContentService.displayed);
   }
 }
