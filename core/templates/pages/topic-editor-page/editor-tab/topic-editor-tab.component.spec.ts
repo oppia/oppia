@@ -396,14 +396,12 @@ describe('Topic editor tab directive', () => {
       };
     }
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     component.createSkill();
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -658,14 +656,12 @@ describe('Topic editor tab directive', () => {
       };
     }
     spyOn(undoRedoService, 'getChangeCount').and.returnValue(1);
-    const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-      (dlg: unknown, opt: unknown) => {
-        return {
-          componentInstance: MockNgbModalRef,
-          result: Promise.resolve(),
-        } as NgbModalRef;
-      }
-    );
+    const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+      return {
+        componentInstance: MockNgbModalRef,
+        result: Promise.resolve(),
+      } as NgbModalRef;
+    });
     component.createCanonicalStory();
     expect(modalSpy).toHaveBeenCalled();
   });
@@ -748,14 +744,12 @@ describe('Topic editor tab directive', () => {
         };
       }
 
-      const modalSpy = spyOn(ngbModal, 'open').and.callFake(
-        (dlg: unknown, opt: unknown) => {
-          return {
-            componentInstance: MockNgbModalRef,
-            result: Promise.resolve(1),
-          } as NgbModalRef;
-        }
-      );
+      const modalSpy = spyOn(ngbModal, 'open').and.callFake((dlg, opt) => {
+        return {
+          componentInstance: MockNgbModalRef,
+          result: Promise.resolve(),
+        } as NgbModalRef;
+      });
       component.changeSubtopicAssignment(1, skillSummary);
       expect(modalSpy).toHaveBeenCalled();
     }
