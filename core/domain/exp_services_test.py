@@ -10306,17 +10306,23 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
     def test_migrate_draft_change_list_logs_error_on_failure(self) -> None:
         """Test that the migration function catches exceptions and logs warnings."""
         exploration = self.save_new_valid_exploration('exp_id_fail', 'owner_id')
-        valid_change_list: List[exp_domain.ExplorationChangeDict] = [
-            {
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New Title',
-            }
+
+        valid_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New Title',
+                }
+            ).to_dict()
         ]
+
+        mock_error_msg = 'Mocked migration error'
+
         with self.swap_to_always_raise(
             exp_services,
             'apply_change_list',
-            Exception('Mocked migration error'),
+            Exception(mock_error_msg),
         ), self.capture_logging() as captured_logs:
 
             returned_list = (
@@ -10325,26 +10331,39 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
                 )
             )
             self.assertEqual(returned_list, valid_change_list)
-            self.assertEqual(len(captured_logs), 1)
-            self.assertIn('Draft migration warning', captured_logs[0])
+            self.assertTrue(
+                any(
+                    'Draft migration warning: Could not apply draft to exploration exp_id_fail'
+                    in log
+                    and mock_error_msg in log
+                    for log in captured_logs
+                )
+            )
 
     def test_migrate_draft_change_list_success(self) -> None:
         """Test that the migration function works correctly when data is valid."""
         exploration = self.save_new_valid_exploration(
             'exp_id_success', 'owner_id'
         )
-        valid_change_list: List[exp_domain.ExplorationChangeDict] = [
-            {
-                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'title',
-                'new_value': 'New Title',
-            }
+        valid_change_list = [
+            exp_domain.ExplorationChange(
+                {
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'New Title',
+                }
+            ).to_dict()
         ]
-        returned_list = exp_services.migrate_draft_change_list_to_latest_schema(
-            valid_change_list, exploration
-        )
 
-        self.assertEqual(returned_list, valid_change_list)
+        with self.capture_logging() as captured_logs:
+            returned_list = (
+                exp_services.migrate_draft_change_list_to_latest_schema(
+                    valid_change_list, exploration
+                )
+            )
+
+            self.assertEqual(returned_list, valid_change_list)
+            self.assertEqual(captured_logs, [])
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self) -> None:
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)

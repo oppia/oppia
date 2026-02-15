@@ -17,7 +17,7 @@
 """Unit tests for exp_drafts_migration_job."""
 
 from __future__ import annotations
-
+from typing import List
 from core import feconf
 from core.domain import exp_domain, exp_services, rights_manager, state_domain
 from core.jobs import job_test_utils
@@ -193,7 +193,10 @@ class MigrateExplorationDraftsJobTests(
             draft_change_list=[{'cmd': 'some_cmd'}],
         )
 
-        def mock_migrate_error(*args: object) -> None:
+        def mock_migrate_error(
+            unused_change_list: List[dict],
+            unused_exploration: exp_domain.Exploration,
+        ) -> None:
             raise Exception('Migration failed')
 
         with self.swap(
