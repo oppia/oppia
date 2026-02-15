@@ -39,7 +39,7 @@ import {ProgressUrlService} from '../../services/progress-url.service';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {CheckpointCelebrationUtilityService} from 'pages/exploration-player-page/services/checkpoint-celebration-utility.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
-import {AuthService} from 'services/auth.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 interface ExplorationTagSummary {
   tagsToShow: string[];
@@ -109,7 +109,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
     private checkpointCelebrationUtilityService: CheckpointCelebrationUtilityService,
     private playerPositionService: PlayerPositionService,
     private siteAnalyticsService: SiteAnalyticsService,
-    private authService: AuthService
+    private signInEventService: SignInEventService
   ) {
     super(ngbActiveModal);
   }
@@ -281,7 +281,7 @@ export class LessonInformationCardModalComponent extends ConfirmOrCancelModal {
             'loggedOutProgressUniqueUrlId is not null.'
         );
       }
-      this.authService.onUserSignIn.emit();
+      this.signInEventService.onUserSignIn.emit();
       // TODO(#24754): Site Analytics should subscribe to AuthService's "onUserSignIn" event
       // rather than manually being triggered by buttons.
       this.siteAnalyticsService.registerStartLoginEvent(

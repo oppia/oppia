@@ -22,7 +22,7 @@ import {md5} from 'hash-wasm';
 
 import {AuthService} from 'services/auth.service';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import firebase from 'firebase';
 
 describe('Auth service', function () {
@@ -33,7 +33,7 @@ describe('Auth service', function () {
   let creds: firebase.auth.UserCredential;
   let authBackendApiService: jasmine.SpyObj<AuthBackendApiService>;
   let angularFireAuth: jasmine.SpyObj<AngularFireAuth>;
-  let preventPageUnloadEventService: jasmine.SpyObj<PreventPageUnloadEventService>;
+  let signInEventService: jasmine.SpyObj<SignInEventService>;
 
   beforeEach(async () => {
     angularFireAuth = jasmine.createSpyObj<AngularFireAuth>([
@@ -47,19 +47,19 @@ describe('Auth service', function () {
       beginSessionAsync: Promise.resolve(),
       endSessionAsync: Promise.resolve(),
     });
-    preventPageUnloadEventService =
-      jasmine.createSpyObj<PreventPageUnloadEventService>(
-        'PreventPageUnloadEventService',
-        ['removeListener']
-      );
+    signInEventService = jasmine.createSpyObj<SignInEventService>(
+      'SignInEventService',
+      [],
+      {onUserSignIn: new (await import('@angular/core')).EventEmitter<void>()}
+    );
 
     TestBed.configureTestingModule({
       providers: [
         {provide: AngularFireAuth, useValue: angularFireAuth},
         {provide: AuthBackendApiService, useValue: authBackendApiService},
         {
-          provide: PreventPageUnloadEventService,
-          useValue: preventPageUnloadEventService,
+          provide: SignInEventService,
+          useValue: signInEventService,
         },
       ],
     });
@@ -113,7 +113,7 @@ describe('Auth service', function () {
       new AuthService(
         null,
         authBackendApiService,
-        preventPageUnloadEventService
+        signInEventService
       ).signOutAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
@@ -123,7 +123,7 @@ describe('Auth service', function () {
       new AuthService(
         null,
         authBackendApiService,
-        preventPageUnloadEventService
+        signInEventService
       ).signInWithRedirectAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
@@ -133,7 +133,7 @@ describe('Auth service', function () {
       new AuthService(
         null,
         authBackendApiService,
-        preventPageUnloadEventService
+        signInEventService
       ).handleRedirectResultAsync()
     ).toBeRejectedWithError('AngularFireAuth is not available');
   });
@@ -144,7 +144,7 @@ describe('Auth service', function () {
     });
     angularFireAuth.createUserWithEmailAndPassword.and.resolveTo(creds);
 
-    spyOn(authService.onUserSignIn, 'emit');
+    spyOn(signInEventService.onUserSignIn, 'emit');
     await expectAsync(authService.signInWithEmail(email)).toBeResolvedTo();
 
     expect(angularFireAuth.signInWithEmailAndPassword).toHaveBeenCalledWith(
@@ -158,7 +158,7 @@ describe('Auth service', function () {
     expect(authBackendApiService.beginSessionAsync).toHaveBeenCalledWith(
       idToken
     );
-    expect(authService.onUserSignIn.emit).toHaveBeenCalled();
+    expect(signInEventService.onUserSignIn.emit).toHaveBeenCalled();
   });
 
   it('should propogate signInWithEmailAndPassword errors', async () => {
@@ -203,7 +203,7 @@ describe('Auth service', function () {
       authService = new AuthService(
         angularFireAuth,
         authBackendApiService,
-        preventPageUnloadEventService
+        signInEventService
       );
     });
 
@@ -271,7 +271,7 @@ describe('Auth service', function () {
       authService = new AuthService(
         angularFireAuth,
         authBackendApiService,
-        preventPageUnloadEventService
+        signInEventService
       );
     });
 
@@ -305,11 +305,6 @@ describe('Auth service', function () {
         messagingSenderId: '',
         appId: '',
       });
-    });
-
-    it('should remove listener on user sign in', () => {
-      authService.onUserSignIn.emit();
-      expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
     });
   });
 });

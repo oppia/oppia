@@ -32,7 +32,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import {EventEmitter} from '@angular/core';
-import {AuthService} from 'services/auth.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 describe('Login required message component', () => {
   let component: LoginRequiredMessageComponent;
@@ -47,7 +47,7 @@ describe('Login required message component', () => {
       declarations: [LoginRequiredMessageComponent],
       providers: [
         {
-          provide: AuthService,
+          provide: SignInEventService,
           useValue: {
             onUserSignIn: new EventEmitter<void>(),
           },

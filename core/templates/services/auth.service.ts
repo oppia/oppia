@@ -16,7 +16,7 @@
  * @fileoverview Service for managing the authorizations of logged-in users.
  */
 
-import {EventEmitter, Injectable, Optional} from '@angular/core';
+import {Injectable, Optional} from '@angular/core';
 import {FirebaseOptions} from '@angular/fire';
 import {AngularFireAuth} from '@angular/fire/auth';
 import firebase from 'firebase/app';
@@ -25,7 +25,7 @@ import {md5} from 'hash-wasm';
 
 import {AppConstants} from 'app.constants';
 import {AuthBackendApiService} from 'services/auth-backend-api.service';
-import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 
 abstract class AuthServiceImpl {
   abstract getRedirectResultAsync(): Promise<firebase.auth.UserCredential | null>;
@@ -97,12 +97,11 @@ class ProdAuthServiceImpl extends AuthServiceImpl {
 export class AuthService {
   private authServiceImpl: AuthServiceImpl;
   creds!: firebase.auth.UserCredential;
-  onUserSignIn: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(
     @Optional() private angularFireAuth: AngularFireAuth | null,
     private authBackendApiService: AuthBackendApiService,
-    private preventPageUnloadEventService: PreventPageUnloadEventService
+    private signInEventService: SignInEventService
   ) {
     if (!this.angularFireAuth) {
       this.authServiceImpl = new NullAuthServiceImpl();
@@ -111,10 +110,6 @@ export class AuthService {
     } else {
       this.authServiceImpl = new ProdAuthServiceImpl(this.angularFireAuth);
     }
-
-    this.onUserSignIn.subscribe(() => {
-      this.preventPageUnloadEventService.removeListener();
-    });
   }
 
   static get firebaseEmulatorIsEnabled(): boolean {
@@ -191,7 +186,7 @@ export class AuthService {
     if (this.creds?.user !== null) {
       const idToken = await this.creds.user.getIdToken();
       await this.authBackendApiService.beginSessionAsync(idToken);
-      this.onUserSignIn.emit();
+      this.signInEventService.onUserSignIn.emit();
     }
   }
 

@@ -38,7 +38,7 @@ import {MockTranslatePipe} from '../../../../tests/unit-test-utils';
 import {ExplorationEngineService} from '../../services/exploration-engine.service';
 import {PlayerTranscriptService} from '../../services/player-transcript.service';
 import {LessonInformationCardModalComponent} from './lesson-information-card-modal.component';
-import {AuthService} from 'services/auth.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {LocalStorageService} from '../../../../services/local-storage.service';
 import {DateTimeFormatService} from '../../../../services/date-time-format.service';
 import {ProgressUrlService} from '../../services/progress-url.service';
@@ -101,7 +101,7 @@ class MockPlayerPositionService {
   }
 }
 
-class MockAuthService {
+class MockSignInEventService {
   onUserSignIn = new EventEmitter<void>();
 }
 
@@ -194,8 +194,8 @@ describe('Lesson Information card modal component', () => {
           useClass: MockTranslateService,
         },
         {
-          provide: AuthService,
-          useClass: MockAuthService,
+          provide: SignInEventService,
+          useClass: MockSignInEventService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],

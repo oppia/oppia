@@ -28,7 +28,7 @@ import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {SaveProgressModalComponent} from './save-progress-modal.component';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {NO_ERRORS_SCHEMA, EventEmitter} from '@angular/core';
-import {AuthService} from 'services/auth.service';
+import {SignInEventService} from 'services/sign-in-event.service';
 import {UserService} from 'services/user.service';
 import {LocalStorageService} from 'services/local-storage.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
@@ -62,7 +62,7 @@ class MockWindowRef {
   };
 }
 
-class MockAuthService {
+class MockSignInEventService {
   onUserSignIn = new EventEmitter<void>();
 }
 
@@ -94,8 +94,8 @@ describe('SaveProgressModalComponent', () => {
           useClass: MockWindowRef,
         },
         {
-          provide: AuthService,
-          useClass: MockAuthService,
+          provide: SignInEventService,
+          useClass: MockSignInEventService,
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
