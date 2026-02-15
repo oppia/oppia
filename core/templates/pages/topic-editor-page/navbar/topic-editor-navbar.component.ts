@@ -81,9 +81,6 @@ export class TopicEditorNavbarComponent
   }
 
   _validateTopic(): void {
-    if (!this.topic) {
-      return;
-    }
     this.validationIssues = this.topic.validate();
     if (this.topicEditorStateService.getTopicWithNameExists()) {
       this.validationIssues.push('A topic with this name already exists.');
@@ -105,9 +102,6 @@ export class TopicEditorNavbarComponent
   }
 
   publishTopic(): void {
-    if (!this.topic || !this.topicRights) {
-      return;
-    }
     if (!this.topicRights.canPublishTopic()) {
       this.ngbModal
         .open(TopicEditorSendMailComponent, {
@@ -149,9 +143,6 @@ export class TopicEditorNavbarComponent
   }
 
   discardChanges(): void {
-    if (!this.topicId) {
-      return;
-    }
     this.undoRedoService.clearChanges();
     this.discardChangesButtonIsShown = false;
     this.topicEditorStateService.loadTopic(this.topicId);
@@ -162,9 +153,6 @@ export class TopicEditorNavbarComponent
   }
 
   isTopicSaveable(): boolean {
-    if (!this.topicRights) {
-      return false;
-    }
     return (
       this.getChangeListLength() > 0 &&
       this.getWarningsCount() === 0 &&
@@ -190,9 +178,6 @@ export class TopicEditorNavbarComponent
   }
 
   saveChanges(): void {
-    if (!this.topicRights) {
-      return;
-    }
     let isTopicPublished = this.topicRights.isPublished();
     const modelRef = this.ngbModal.open(TopicEditorSaveModalComponent, {
       backdrop: 'static',
@@ -213,9 +198,6 @@ export class TopicEditorNavbarComponent
   }
 
   unpublishTopic(): boolean {
-    if (!this.topicId || !this.topicRights) {
-      return false;
-    }
     const classroomName = this.topicEditorStateService.getClassroomName();
     if (classroomName) {
       const errorMessage =
@@ -313,15 +295,9 @@ export class TopicEditorNavbarComponent
         );
         return;
       }
-      if (!this.topic) {
-        return;
-      }
       const topicUrlFragment = this.topic.getUrlFragment();
       const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
-      if (!classroomUrlFragment) {
-        return;
-      }
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
           ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,

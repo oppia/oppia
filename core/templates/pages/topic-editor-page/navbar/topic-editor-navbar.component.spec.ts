@@ -963,45 +963,6 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
   });
 
-  it('should return early from _validateTopic when topic is null', () => {
-    componentInstance.topic = null as unknown as Topic;
-    componentInstance.validationIssues = [];
-    componentInstance.prepublishValidationIssues = [];
-
-    componentInstance._validateTopic();
-
-    expect(componentInstance.validationIssues).toEqual([]);
-    expect(componentInstance.prepublishValidationIssues).toEqual([]);
-  });
-
-  it('should return early from publishTopic when topic is null', () => {
-    componentInstance.topic = null as unknown as Topic;
-    componentInstance.topicRights = TopicRights.createFromBackendDict({
-      published: false,
-      can_publish_topic: true,
-      can_edit_topic: true,
-    });
-    spyOn(topicRightsBackendApiService, 'publishTopicAsync');
-
-    componentInstance.publishTopic();
-
-    expect(
-      topicRightsBackendApiService.publishTopicAsync
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should return early from publishTopic when topicRights is null', () => {
-    componentInstance.topic = topic;
-    componentInstance.topicRights = null as unknown as TopicRights;
-    spyOn(topicRightsBackendApiService, 'publishTopicAsync');
-
-    componentInstance.publishTopic();
-
-    expect(
-      topicRightsBackendApiService.publishTopicAsync
-    ).not.toHaveBeenCalled();
-  });
-
   it('should return early from discardChanges when topicId is empty', () => {
     componentInstance.topicId = '';
     spyOn(undoRedoService, 'clearChanges');
@@ -1011,21 +972,6 @@ describe('Topic Editor Navbar', () => {
 
     expect(undoRedoService.clearChanges).not.toHaveBeenCalled();
     expect(topicEditorStateService.loadTopic).not.toHaveBeenCalled();
-  });
-
-  it('should return false from isTopicSaveable when topicRights is null', () => {
-    componentInstance.topicRights = null as unknown as TopicRights;
-
-    expect(componentInstance.isTopicSaveable()).toBeFalse();
-  });
-
-  it('should return early from saveChanges when topicRights is null', () => {
-    componentInstance.topicRights = null as unknown as TopicRights;
-    spyOn(ngbModal, 'open');
-
-    componentInstance.saveChanges();
-
-    expect(ngbModal.open).not.toHaveBeenCalled();
   });
 
   it('should return false from unpublishTopic when topicId is empty', () => {
@@ -1043,48 +989,6 @@ describe('Topic Editor Navbar', () => {
     expect(
       topicRightsBackendApiService.unpublishTopicAsync
     ).not.toHaveBeenCalled();
-  });
-
-  it('should return false from unpublishTopic when topicRights is null', () => {
-    componentInstance.topicId = 'topic_1';
-    componentInstance.topicRights = null as unknown as TopicRights;
-    spyOn(topicRightsBackendApiService, 'unpublishTopicAsync');
-
-    const result = componentInstance.unpublishTopic();
-
-    expect(result).toBeFalse();
-    expect(
-      topicRightsBackendApiService.unpublishTopicAsync
-    ).not.toHaveBeenCalled();
-  });
-
-  it('should return early from _navigateToPreview when topic is null', () => {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'main'
-    );
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-    componentInstance.topic = null as unknown as Topic;
-    spyOn(windowRef.nativeWindow, 'open');
-
-    componentInstance.openTopicViewer();
-
-    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
-  });
-
-  it('should return early from _navigateToPreview when classroomUrlFragment is null', () => {
-    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
-      'main'
-    );
-    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
-    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
-      null as unknown as string
-    );
-    componentInstance.topic = topic;
-    spyOn(windowRef.nativeWindow, 'open');
-
-    componentInstance.openTopicViewer();
-
-    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
   });
 
   it('should publish already published topic without redirecting to dashboard', fakeAsync(() => {
