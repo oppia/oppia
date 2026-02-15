@@ -17,18 +17,12 @@
  * the training modal used for unresolved answers.
  */
 
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AlertsService} from 'services/alerts.service';
 import {ExternalSaveService} from 'services/external-save.service';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {TrainingModalComponent} from './training-modal.component';
 import {InteractionAnswer} from 'interactions/answer-defs';
-
-interface FinishTrainingResult {
-  answer: InteractionAnswer;
-  interactionId: string;
-  answerIndex: number;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -40,12 +34,6 @@ export class TrainingModalService {
     private ngbModal: NgbModal
   ) {}
 
-  private _finishTrainingCallbackEmitter = new EventEmitter();
-
-  get onFinishTrainingCallback(): EventEmitter<FinishTrainingResult> {
-    return this._finishTrainingCallbackEmitter;
-  }
-
   /**
   * Opens unresolved answer trainer modal for given answer.
   * @param {Object} unhandledAnswer - The answer to be trained.
@@ -56,7 +44,7 @@ export class TrainingModalService {
     unhandledAnswer: InteractionAnswer,
     interactionId: string,
     answerIndex: number
-  ): void {
+  ): NgbModalRef {
     this.alertsService.clearWarnings();
 
     let modalRef: NgbModalRef = this.ngbModal.open(TrainingModalComponent, {
@@ -66,22 +54,11 @@ export class TrainingModalService {
     });
 
     modalRef.componentInstance.unhandledAnswer = unhandledAnswer;
-    modalRef.componentInstance.finishTrainingCallback.subscribe(() => {
-      let finishTrainingResult: FinishTrainingResult = {
-        answer: unhandledAnswer,
-        interactionId: interactionId,
-        answerIndex: answerIndex,
-      };
-
-      this.onFinishTrainingCallback.emit(finishTrainingResult);
-    });
-
-    modalRef.result.then(
-      () => {},
-      () => {}
-    );
+    modalRef.componentInstance.answerIndex = answerIndex;
+    modalRef.componentInstance.interactionId = interactionId;
 
     // Save the modified training data externally in state content.
     this.externalSaveService.onExternalSave.emit();
+    return modalRef;
   }
 }

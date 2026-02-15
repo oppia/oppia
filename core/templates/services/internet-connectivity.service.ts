@@ -17,8 +17,6 @@
  */
 
 import {EventEmitter, Injectable, NgZone} from '@angular/core';
-import {Subscription, timer, throwError} from 'rxjs';
-import {delay, retryWhen, switchMap, tap} from 'rxjs/operators';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {ServerConnectionBackendApiService} from './server-connection-backend-api.service';
 
@@ -27,21 +25,47 @@ import {ServerConnectionBackendApiService} from './server-connection-backend-api
 })
 export class InternetConnectivityService {
   private INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS: number = 3500;
-  private MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK: number = 7000;
   private _internetAccessible: boolean = true;
   private _connectedToNetwork: boolean;
 
   private _connectionStateChangeEventEmitter = new EventEmitter<boolean>();
 
-  private httpSubscription: Subscription;
+  private connectivityCheckIntervalId: ReturnType<typeof setInterval> | null =
+    null;
 
   constructor(
     private windowRef: WindowRef,
     private _serverConnectionBackendApiService: ServerConnectionBackendApiService,
     private ngZone: NgZone
   ) {
-    this.httpSubscription = new Subscription();
     this._connectedToNetwork = this.windowRef.nativeWindow.navigator.onLine;
+  }
+
+  private _emitConnectionState(internetAccessible: boolean): void {
+    this.ngZone.run(() => {
+      this._connectionStateChangeEventEmitter.emit(internetAccessible);
+    });
+  }
+
+  private _setInternetAccessible(internetAccessible: boolean): void {
+    if (this._internetAccessible === internetAccessible) {
+      return;
+    }
+    this._internetAccessible = internetAccessible;
+    this._emitConnectionState(internetAccessible);
+  }
+
+  private async _checkInternetStateOnce(): Promise<void> {
+    if (!this._connectedToNetwork) {
+      this._setInternetAccessible(false);
+      return;
+    }
+    try {
+      await this._serverConnectionBackendApiService.fetchConnectionCheckResultAsync();
+      this._setInternetAccessible(true);
+    } catch {
+      this._setInternetAccessible(false);
+    }
   }
 
   private checkInternetState(): void {
@@ -50,43 +74,13 @@ export class InternetConnectivityService {
     // browser has Internet access and emits the current state of the
     // connection.
     this.ngZone.runOutsideAngular(() => {
-      this.httpSubscription.add(
-        timer(0, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS)
-          .pipe(
-            switchMap(() => {
-              if (this._connectedToNetwork) {
-                return this._serverConnectionBackendApiService.fetchConnectionCheckResultAsync();
-              } else {
-                return throwError('No Internet');
-              }
-            }),
-            retryWhen(errors =>
-              errors.pipe(
-                tap(val => {
-                  if (this._internetAccessible) {
-                    this._internetAccessible = false;
-                    this.ngZone.run(() => {
-                      this._connectionStateChangeEventEmitter.emit(
-                        this._internetAccessible
-                      );
-                    });
-                  }
-                }),
-                delay(this.MAX_MILLISECS_TO_WAIT_UNTIL_NEXT_CONNECTIVITY_CHECK)
-              )
-            )
-          )
-          .subscribe(result => {
-            if (!this._internetAccessible) {
-              this._internetAccessible = true;
-              this.ngZone.run(() => {
-                this._connectionStateChangeEventEmitter.emit(
-                  this._internetAccessible
-                );
-              });
-            }
-          })
-      );
+      if (this.connectivityCheckIntervalId) {
+        clearInterval(this.connectivityCheckIntervalId);
+      }
+      this.connectivityCheckIntervalId = setInterval(() => {
+        void this._checkInternetStateOnce();
+      }, this.INTERNET_CONNECTIVITY_CHECK_INTERVAL_MILLISECS);
+      void this._checkInternetStateOnce();
     });
   }
 
@@ -100,8 +94,7 @@ export class InternetConnectivityService {
 
     this.windowRef.nativeWindow.onoffline = () => {
       this._connectedToNetwork = false;
-      this._internetAccessible = false;
-      this._connectionStateChangeEventEmitter.emit(this._internetAccessible);
+      this._setInternetAccessible(false);
     };
   }
 

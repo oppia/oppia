@@ -17,7 +17,6 @@
  */
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
-import {EventEmitter} from '@angular/core';
 import {
   fakeAsync,
   flushMicrotasks,
@@ -327,16 +326,10 @@ describe('I18n service', () => {
   );
 
   it('should update site language', fakeAsync(() => {
-    let mockI18nLanguageCodeService = new EventEmitter<string>();
     spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
       'http://localhost:8181'
     );
-    spyOnProperty(
-      i18nLanguageCodeService,
-      'onI18nLanguageCodeChange'
-    ).and.returnValue(mockI18nLanguageCodeService);
-    i18nService.initialize();
-    mockI18nLanguageCodeService.emit('en');
+    i18nService.onI18nLanguageCodeChange('en');
     tick();
     flushMicrotasks();
   }));
@@ -345,29 +338,23 @@ describe('I18n service', () => {
     'should reload the website if language direction changes with lang param' +
       ' when cookies are not acknowledged',
     fakeAsync(() => {
-      let mockI18nLanguageCodeServiceSubject = new EventEmitter<string>();
       spyOn(windowRef.nativeWindow.location, 'toString').and.returnValue(
         'http://localhost:8181'
       );
-      spyOnProperty(
-        i18nLanguageCodeService,
-        'onI18nLanguageCodeChange'
-      ).and.returnValue(mockI18nLanguageCodeServiceSubject);
       const prevLangCode = I18nLanguageCodeService.prevLangCode;
       I18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
-      i18nService.initialize();
-      mockI18nLanguageCodeServiceSubject.emit('ar');
+      i18nService.onI18nLanguageCodeChange('ar');
       tick();
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181/?dir=rtl'
       );
-      mockI18nLanguageCodeServiceSubject.emit('en');
+      i18nService.onI18nLanguageCodeChange('en');
       tick();
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181/?dir=ltr'
       );
-      mockI18nLanguageCodeServiceSubject.emit('es');
+      i18nService.onI18nLanguageCodeChange('es');
       tick();
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181/?dir=ltr'
@@ -396,26 +383,20 @@ describe('I18n service', () => {
         String(currentDateInUnixTimeMsecs),
         cookieOptions
       );
-      let mockI18nLanguageCodeServiceSubject = new EventEmitter<string>();
-      spyOnProperty(
-        i18nLanguageCodeService,
-        'onI18nLanguageCodeChange'
-      ).and.returnValue(mockI18nLanguageCodeServiceSubject);
       const prevLangCode = I18nLanguageCodeService.prevLangCode;
       I18nLanguageCodeService.prevLangCode = 'en';
       spyOn(windowRef.nativeWindow.location, 'reload');
-      i18nService.initialize();
       // In our code, we check if the dir cookie is set and use it to determine
       // the window reload. If this test is run after a test that emits a rtl
       // language in the end, we get a failed expectation. The failed expect is
       // because we emit 'ar' which is also a 'rtl' language and hence we don't
       // reload. To get around this in the short term we emit 'en' first and
       // then 'ar' so that the dir value in cookie changes.
-      mockI18nLanguageCodeServiceSubject.emit('en');
+      i18nService.onI18nLanguageCodeChange('en');
       expect(windowRef.nativeWindow.location.href).toBe(
         'http://localhost:8181'
       );
-      mockI18nLanguageCodeServiceSubject.emit('ar');
+      i18nService.onI18nLanguageCodeChange('ar');
       I18nLanguageCodeService.prevLangCode = prevLangCode;
       expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
       expect(windowRef.nativeWindow.location.href).toBe(

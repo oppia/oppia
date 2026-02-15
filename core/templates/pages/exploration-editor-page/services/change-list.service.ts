@@ -24,7 +24,6 @@ import {Observable} from 'rxjs';
 import {AutosaveInfoModalsService} from 'pages/exploration-editor-page/services/autosave-info-modals.service';
 import {ExplorationDataService} from 'pages/exploration-editor-page/services/exploration-data.service';
 import {AlertsService} from 'services/alerts.service';
-import {LoaderService} from 'services/loader.service';
 import {LoggerService} from 'services/contextual/logger.service';
 import {
   ExplorationChange,
@@ -151,26 +150,21 @@ export class ChangeListService {
     private alertsService: AlertsService,
     private autosaveInfoModalsService: AutosaveInfoModalsService,
     private explorationDataService: ExplorationDataService,
-    private loaderService: LoaderService,
     private loggerService: LoggerService,
     private internetConnectivityService: InternetConnectivityService
-  ) {
-    // We have added subscriptions in the constructor.
-    // Since, ngOnInit does not work in angular services.
-    // Ref: https://github.com/angular/angular/issues/23235.
-    this.loaderService.onLoadingMessageChange.subscribe(
-      (message: string) => (this.loadingMessage = message)
-    );
-    this.internetConnectivityService.onInternetStateChange.subscribe(
-      internetAccessible => {
-        if (internetAccessible && this.temporaryListOfChanges.length > 0) {
-          for (let change of this.temporaryListOfChanges) {
-            this.addChange(change);
-          }
-          this.temporaryListOfChanges = [];
-        }
+  ) {}
+
+  setLoadingMessage(message: string): void {
+    this.loadingMessage = message;
+  }
+
+  onInternetStateChange(internetAccessible: boolean): void {
+    if (internetAccessible && this.temporaryListOfChanges.length > 0) {
+      for (let change of this.temporaryListOfChanges) {
+        this.addChange(change);
       }
-    );
+      this.temporaryListOfChanges = [];
+    }
   }
 
   private autosaveChangeListOnChange(

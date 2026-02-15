@@ -86,12 +86,18 @@ describe('Connection Service', () => {
     expect(internetConnectivityService).toBeTruthy();
   });
 
-  it('should report network status false when disconnected from network', () => {
+  it('should report network status false when disconnected from network', fakeAsync(() => {
     internetConnectivityService.startCheckingConnection();
-    spyOn(internetConnectivityService, 'startCheckingConnection');
+    const req = httpTestingController.expectOne('/internetconnectivityhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush({
+      isInternetConnected: true,
+    });
+    flushMicrotasks();
     mockWindowRef.nativeWindow.onoffline();
     expect(connectionStateSpy).toHaveBeenCalledWith(false);
-  });
+    discardPeriodicTasks();
+  }));
 
   it('should report internet status as online when internet is available', fakeAsync(() => {
     internetConnectivityService.startCheckingConnection();
@@ -123,8 +129,7 @@ describe('Connection Service', () => {
     tick(8000);
     // Connecting window to the network.
     mockWindowRef.nativeWindow.ononline();
-    tick(3000);
-    discardPeriodicTasks();
+    tick(3500);
     let req2 = httpTestingController.expectOne('/internetconnectivityhandler');
     expect(req2.request.method).toEqual('GET');
     req2.flush({
@@ -132,5 +137,6 @@ describe('Connection Service', () => {
     });
     flushMicrotasks();
     expect(connectionStateSpy).toHaveBeenCalledWith(true);
+    discardPeriodicTasks();
   }));
 });

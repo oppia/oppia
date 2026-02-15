@@ -19,8 +19,6 @@
 import {async, fakeAsync, flush, TestBed} from '@angular/core/testing';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ChangeListService} from './change-list.service';
-import {LoaderService} from 'services/loader.service';
-import {EventEmitter} from '@angular/core';
 import {InternetConnectivityService} from 'services/internet-connectivity.service';
 import {ExplorationDataService} from './exploration-data.service';
 import {AutosaveInfoModalsService} from './autosave-info-modals.service';
@@ -139,8 +137,6 @@ describe('Change List Service when changes are mergable', () => {
 
   let alertsSpy: jasmine.Spy;
   let mockExplorationDataService: MockExplorationDataService1;
-  let mockEventEmitter = new EventEmitter();
-
   beforeEach(async(() => {
     mockWindowRef = new MockWindowRef();
     mockExplorationDataService = new MockExplorationDataService1();
@@ -154,12 +150,6 @@ describe('Change List Service when changes are mergable', () => {
         {
           provide: WindowRef,
           useValue: mockWindowRef,
-        },
-        {
-          provide: LoaderService,
-          useValue: {
-            onLoadingMessageChange: mockEventEmitter,
-          },
         },
       ],
     });
@@ -182,8 +172,8 @@ describe('Change List Service when changes are mergable', () => {
     alertsSpy = spyOn(alertsService, 'addWarning').and.returnValue();
   });
 
-  it('should set loading message when initialized', () => {
-    mockEventEmitter.emit('loadingMessage');
+  it('should set loading message', () => {
+    changeListService.setLoadingMessage('loadingMessage');
 
     expect(changeListService.loadingMessage).toBe('loadingMessage');
   });
@@ -749,8 +739,6 @@ describe('Change List Service when internet is available', () => {
   let changeListService: ChangeListService;
   let alertsService: AlertsService;
   let mockWindowRef: MockWindowRef;
-  let onInternetStateChangeEventEmitter = new EventEmitter();
-
   let alertsSpy: jasmine.Spy;
   let mockExplorationDataService: MockExplorationDataService3;
   let mockAutosaveInfoModalsService: MockAutosaveInfoModalsService;
@@ -777,7 +765,6 @@ describe('Change List Service when internet is available', () => {
         {
           provide: InternetConnectivityService,
           useValue: {
-            onInternetStateChange: onInternetStateChangeEventEmitter,
             isOnline() {
               return true;
             },
@@ -808,7 +795,7 @@ describe('Change List Service when internet is available', () => {
     ];
     changeListService.explorationChangeList.length = 2;
 
-    onInternetStateChangeEventEmitter.emit(true);
+    changeListService.onInternetStateChange(true);
     changeListService.undoLastChange();
 
     expect(saveSpy).toHaveBeenCalled();

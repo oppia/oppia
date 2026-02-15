@@ -42,6 +42,7 @@ import {State} from 'domain/state/state.model';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {TeachOppiaModalBackendApiService} from './teach-oppia-modal-backend-api.service';
 import {AnswerClassificationResult} from 'domain/classifier/answer-classification-result.model';
+import {FinishTrainingResult} from '../../training-panel/training-modal.component';
 
 export interface UnresolvedAnswer {
   answer: InteractionAnswer;
@@ -207,35 +208,29 @@ export class TeachOppiaModalComponent
     const answer = unresolvedAnswer.answer;
 
     let interactionId = this.stateInteractionIdService.savedMemento;
-    this.trainingModalService.openTrainUnresolvedAnswerModal(
+    const modalRef = this.trainingModalService.openTrainUnresolvedAnswerModal(
       answer,
       interactionId,
       answerIndex
     );
+    modalRef.componentInstance.finishTrainingCallback.subscribe(
+      (finishTrainingResult: FinishTrainingResult) => {
+        this.unresolvedAnswers.splice(finishTrainingResult.answerIndex, 1);
+        const truncatedAnswer =
+          this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
+            finishTrainingResult.answer,
+            this.interactionId,
+            12
+          );
+        const successToast =
+          'The response for ' + truncatedAnswer + ' has been fixed.';
+
+        this.alertsService.addSuccessMessage(successToast, this.TOAST_TIMEOUT);
+      }
+    );
   }
 
   ngOnInit(): void {
-    this.directiveSubscriptions.add(
-      this.trainingModalService.onFinishTrainingCallback.subscribe(
-        finishTrainingResult => {
-          this.unresolvedAnswers.splice(finishTrainingResult.answerIndex, 1);
-          const truncatedAnswer =
-            this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
-              finishTrainingResult.answer,
-              this.interactionId,
-              12
-            );
-          const successToast =
-            'The response for ' + truncatedAnswer + ' has been fixed.';
-
-          this.alertsService.addSuccessMessage(
-            successToast,
-            this.TOAST_TIMEOUT
-          );
-        }
-      )
-    );
-
     this._explorationId = this.pageContextService.getExplorationId();
     let stateName = this.stateEditorService.getActiveStateName();
     if (stateName) {

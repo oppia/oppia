@@ -22,8 +22,7 @@ import {AudioTranslations} from 'pages/exploration-player-page/services/audio-tr
 import {AssetsBackendApiService} from './assets-backend-api.service';
 import {PageContextService} from './page-context.service';
 import {Howl} from 'howler';
-import {interval, Subject} from 'rxjs';
-import {takeUntil} from 'rxjs/operators';
+import {Subject} from 'rxjs';
 
 export interface AutoPlayAudioEvent {
   audioTranslations: AudioTranslations;
@@ -45,6 +44,7 @@ export class AudioPlayerService {
     new EventEmitter<void | AutoPlayAudioEvent>();
 
   private _stopIntervalSubject = new Subject<void>();
+  private _viewUpdateIntervalId: ReturnType<typeof setInterval> | null = null;
   constructor(
     private assetsBackendApiService: AssetsBackendApiService,
     private pageContextService: PageContextService,
@@ -75,6 +75,7 @@ export class AudioPlayerService {
           });
           this._currentTrack.on('end', () => {
             this._stopIntervalSubject.next();
+            this._clearViewUpdateInterval();
             this._currentTrack = null;
             this._currentTrackFilename = null;
             this._lastPauseOrSeekPos = null;
@@ -101,13 +102,12 @@ export class AudioPlayerService {
         // We can safely typecast it to 'number'.
         this._currentTrack.seek(this._lastPauseOrSeekPos as number);
       }
-      interval(500)
-        .pipe(takeUntil(this._stopIntervalSubject))
-        .subscribe(() => {
-          this.ngZone.run(() => {
-            this._updateViewEventEmitter.emit();
-          });
+      this._clearViewUpdateInterval();
+      this._viewUpdateIntervalId = setInterval(() => {
+        this.ngZone.run(() => {
+          this._updateViewEventEmitter.emit();
         });
+      }, 500);
       // 'currentTrack' is not null since the audio event has been emitted
       // and that is why we use '?'.
       this._currentTrack?.play();
@@ -123,6 +123,7 @@ export class AudioPlayerService {
     // and that is why we use '?'.
     this._currentTrack?.pause();
     this._stopIntervalSubject.next();
+    this._clearViewUpdateInterval();
   }
 
   stop(): void {
@@ -131,6 +132,7 @@ export class AudioPlayerService {
     }
     this._currentTrack.stop();
     this._stopIntervalSubject.next();
+    this._clearViewUpdateInterval();
     this._currentTrack = null;
     this._currentTrackFilename = null;
     this._lastPauseOrSeekPos = null;
@@ -208,8 +210,16 @@ export class AudioPlayerService {
     if (this.isPlaying()) {
       this.stop();
     }
+    this._clearViewUpdateInterval();
     this._currentTrackFilename = null;
     this._currentTrack = null;
+  }
+
+  private _clearViewUpdateInterval(): void {
+    if (this._viewUpdateIntervalId) {
+      clearInterval(this._viewUpdateIntervalId);
+      this._viewUpdateIntervalId = null;
+    }
   }
 
   get viewUpdate(): EventEmitter<void> {

@@ -17,10 +17,9 @@
  *               ck editor
  */
 
-import {Injectable, EventEmitter} from '@angular/core';
+import {Injectable} from '@angular/core';
 
 import {HtmlEscaperService} from 'services/html-escaper.service';
-import {Subscription} from 'rxjs';
 
 interface CkEditorCopyEvent {
   rootElement?: HTMLElement;
@@ -45,8 +44,9 @@ export class CkEditorCopyContentService {
     'oppia-noninteractive-workedexample',
   ]);
 
-  private copyEventEmitter = new EventEmitter<CkEditorCopyEvent>();
-  private ckEditorIdToSubscription: {[id: string]: Subscription} = {};
+  private ckEditorIdToPasteHandler: {
+    [id: string]: (copyEvent: CkEditorCopyEvent) => void;
+  } = {};
 
   copyModeActive = false;
 
@@ -193,7 +193,10 @@ export class CkEditorCopyContentService {
       return;
     }
 
-    this.copyEventEmitter.emit(this._handleCopy(target));
+    const copyEvent = this._handleCopy(target);
+    Object.values(this.ckEditorIdToPasteHandler).forEach(handlePaste => {
+      handlePaste(copyEvent);
+    });
   }
 
   /**
@@ -201,18 +204,18 @@ export class CkEditorCopyContentService {
    * @param {CKEDITOR.editor} editor The editor to add copied content to.
    */
   bindPasteHandler(editor: CKEDITOR.editor): void {
-    this.ckEditorIdToSubscription[editor.id] = this.copyEventEmitter.subscribe(
-      ({rootElement, containedWidgetTagName}: CkEditorCopyEvent) => {
-        if (!rootElement) {
-          return;
-        }
-        if (editor.status === 'destroyed') {
-          this.ckEditorIdToSubscription[editor.id].unsubscribe();
-          delete this.ckEditorIdToSubscription[editor.id];
-          return;
-        }
-        this._handlePaste(editor, rootElement, containedWidgetTagName);
+    this.ckEditorIdToPasteHandler[editor.id] = ({
+      rootElement,
+      containedWidgetTagName,
+    }: CkEditorCopyEvent) => {
+      if (!rootElement) {
+        return;
       }
-    );
+      if (editor.status === 'destroyed') {
+        delete this.ckEditorIdToPasteHandler[editor.id];
+        return;
+      }
+      this._handlePaste(editor, rootElement, containedWidgetTagName);
+    };
   }
 }

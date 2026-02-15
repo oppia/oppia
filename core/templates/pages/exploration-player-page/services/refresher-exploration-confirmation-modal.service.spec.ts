@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for refresher exploration confirmation modal service
  */
 
-import {EventEmitter} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {RefresherExplorationConfirmationModalService} from './refresher-exploration-confirmation-modal.service';
@@ -36,7 +35,7 @@ describe('Refresher exploration confirmation modal service', () => {
       () => {}
     );
     const mockComponentInstance = {
-      confirmRedirectEventEmitter: new EventEmitter(),
+      confirmRedirectCallback: (() => {}) as () => void,
       refresherExplorationId: '',
     };
     const modalSpy = spyOn(ngbModal, 'open').and.callFake(() => {
@@ -49,7 +48,7 @@ describe('Refresher exploration confirmation modal service', () => {
     recms.displayRedirectConfirmationModal('abc', redirectConfirmationCallback);
     expect(modalSpy).toHaveBeenCalled();
 
-    mockComponentInstance.confirmRedirectEventEmitter.emit();
+    mockComponentInstance.confirmRedirectCallback();
     expect(redirectConfirmationCallback).toHaveBeenCalled();
     expect(mockComponentInstance.refresherExplorationId).toEqual('abc');
   });

@@ -142,9 +142,13 @@ describe('Teach Oppia Modal Component', () => {
   }
 
   class MockTrainingModalService {
-    openTrainUnresolvedAnswerModal() {}
-
-    onFinishTrainingCallback = onchange;
+    openTrainUnresolvedAnswerModal() {
+      return {
+        componentInstance: {
+          finishTrainingCallback: onchange,
+        },
+      };
+    }
   }
 
   class MockActiveModal {
@@ -274,6 +278,7 @@ describe('Teach Oppia Modal Component', () => {
           answer: 'answer Data for truncateInputBasedOnInteractionAnswerType',
         };
         component.interactionId = 'TextInput';
+        component.openTrainUnresolvedAnswerModal(0);
 
         onchange.emit(finishTrainingResult);
         tick();
@@ -369,9 +374,13 @@ describe('Teach Oppia Modal Component', () => {
       spyOn(
         trainingModalService,
         'openTrainUnresolvedAnswerModal'
-      ).and.callFake(
-        function (InteractionAnswer, interactionId, answerIndex) {}
-      );
+      ).and.callFake(function (InteractionAnswer, interactionId, answerIndex) {
+        return {
+          componentInstance: {
+            finishTrainingCallback: new EventEmitter(),
+          },
+        };
+      });
 
       component.openTrainUnresolvedAnswerModal(0);
 

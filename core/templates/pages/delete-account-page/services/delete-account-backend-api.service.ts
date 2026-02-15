@@ -18,6 +18,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
 import {WindowRef} from 'services/contextual/window-ref.service';
 import {SiteAnalyticsService} from 'services/site-analytics.service';
 import analyticsConstants from 'analytics-constants';
@@ -32,16 +33,18 @@ export class DeleteAccountBackendApiService {
     private http: HttpClient
   ) {}
 
-  deleteAccount(): void {
-    this.http.delete('/delete-account-handler').subscribe(() => {
-      this.siteAnalyticsService.registerAccountDeletion();
-      setTimeout(
-        () => {
-          this.windowRef.nativeWindow.location.href =
-            '/logout?redirect_url=/pending-account-deletion';
-        },
-        analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0
-      );
-    });
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>('/delete-account-handler');
+  }
+
+  redirectAfterAccountDeletion(): void {
+    this.siteAnalyticsService.registerAccountDeletion();
+    setTimeout(
+      () => {
+        this.windowRef.nativeWindow.location.href =
+          '/logout?redirect_url=/pending-account-deletion';
+      },
+      analyticsConstants.CAN_SEND_ANALYTICS_EVENTS ? 150 : 0
+    );
   }
 }

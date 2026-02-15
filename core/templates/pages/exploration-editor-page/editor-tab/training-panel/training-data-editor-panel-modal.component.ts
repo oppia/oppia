@@ -53,6 +53,7 @@ import {TrainingModalService} from './training-modal.service';
 import {TruncateInputBasedOnInteractionAnswerTypePipe} from 'filters/truncate-input-based-on-interaction-answer-type.pipe';
 import {InteractionAnswer} from 'interactions/answer-defs';
 import {SubtitledHtml} from 'domain/exploration/subtitled-html.model';
+import {FinishTrainingResult} from './training-modal.component';
 
 export const RULES_SERVICE_MAPPING = {
   AlgebraicExpressionInputRulesService: AlgebraicExpressionInputRulesService,
@@ -149,23 +150,6 @@ export class TrainingDataEditorPanelComponent
         null
       );
 
-    this.directiveSubscriptions.add(
-      this.trainingModalService.onFinishTrainingCallback.subscribe(
-        finishTrainingResult => {
-          let truncatedAnswer =
-            this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
-              finishTrainingResult.answer,
-              finishTrainingResult.interactionId,
-              12
-            );
-          let successToast =
-            'The answer ' + truncatedAnswer + ' has been successfully trained.';
-          this.alertsService.addSuccessMessage(successToast, 1000);
-          this._rebuildTrainingData();
-        }
-      )
-    );
-
     this.currentInteractionService.setOnSubmitFn(this.submitAnswer);
     this.init();
   }
@@ -191,10 +175,24 @@ export class TrainingDataEditorPanelComponent
     ) {
       let answer = this.trainingData[answerIndex].answer;
       let interactionId = this.stateInteractionIdService.savedMemento;
-      this.trainingModalService.openTrainUnresolvedAnswerModal(
+      const modalRef = this.trainingModalService.openTrainUnresolvedAnswerModal(
         answer,
         interactionId,
         answerIndex
+      );
+      modalRef.componentInstance.finishTrainingCallback.subscribe(
+        (finishTrainingResult: FinishTrainingResult) => {
+          let truncatedAnswer =
+            this.truncateInputBasedOnInteractionAnswerTypePipe.transform(
+              finishTrainingResult.answer,
+              finishTrainingResult.interactionId,
+              12
+            );
+          let successToast =
+            'The answer ' + truncatedAnswer + ' has been successfully trained.';
+          this.alertsService.addSuccessMessage(successToast, 1000);
+          this._rebuildTrainingData();
+        }
       );
     }
   }

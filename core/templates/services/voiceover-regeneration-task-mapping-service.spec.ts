@@ -25,7 +25,6 @@ import {
   flush,
   discardPeriodicTasks,
 } from '@angular/core/testing';
-import {Subscription} from 'rxjs';
 import {VoiceoverRegenerationTaskMappingService} from './voiceover-regeneration-task-mapping-service';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {VoiceoverBackendApiService} from 'domain/voiceover/voiceover-backend-api.service';
@@ -121,7 +120,7 @@ describe('Voiceover regeneration task mapping service', () => {
     ).toBe('SUCCEEDED');
   });
 
-  it('should unsubscribe previous polling, call initial fetch, and poll repeatedly', fakeAsync(() => {
+  it('should clear previous polling, call initial fetch, and poll repeatedly', fakeAsync(() => {
     const status2 = {'en-US': {content_0: 'SUCCEEDED'}};
 
     const fetchLatestVoiceoverRegenerationStatusSpy = spyOn(
@@ -132,9 +131,11 @@ describe('Voiceover regeneration task mapping service', () => {
       Promise.resolve(status2)
     );
 
-    const fakeSub = new Subscription();
-    spyOn(fakeSub, 'unsubscribe');
-    voiceoverRegenerationTaskMappingService.pollingSub = fakeSub;
+    const clearIntervalSpy = spyOn(window, 'clearInterval');
+    voiceoverRegenerationTaskMappingService.pollingIntervalId = setInterval(
+      () => {},
+      1000
+    );
 
     spyOn(
       voiceoverRegenerationTaskMappingService,
@@ -143,7 +144,7 @@ describe('Voiceover regeneration task mapping service', () => {
 
     voiceoverRegenerationTaskMappingService.startPolling();
 
-    expect(fakeSub.unsubscribe).toHaveBeenCalled();
+    expect(clearIntervalSpy).toHaveBeenCalled();
 
     expect(
       voiceoverRegenerationTaskMappingService.getLatestVoiceoverRegenerationStatus
@@ -154,7 +155,6 @@ describe('Voiceover regeneration task mapping service', () => {
     ).toHaveBeenCalledTimes(1);
 
     tick(5000);
-    discardPeriodicTasks();
 
     expect(
       voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync
@@ -173,9 +173,9 @@ describe('Voiceover regeneration task mapping service', () => {
 
     tick(5000);
     tick();
-    discardPeriodicTasks();
 
     expect(emittedValue).toEqual(status2);
+    discardPeriodicTasks();
   }));
 
   it('should be able to update newly added regeneration tasks', () => {

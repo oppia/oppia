@@ -88,44 +88,6 @@ export class I18nService {
   }
 
   initialize(): void {
-    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(code => {
-      const cookieSetDateMsecs = this.cookieService.get(
-        this.COOKIE_NAME_COOKIES_ACKNOWLEDGED
-      );
-      const langDirection = this.i18nLanguageCodeService.isLanguageRTL(code)
-        ? 'rtl'
-        : 'ltr';
-      let prevLangDirection = this.i18nLanguageCodeService.isLanguageRTL(
-        I18nLanguageCodeService.prevLangCode
-      )
-        ? 'rtl'
-        : 'ltr';
-      this.translateService.use(code);
-      this.documentAttributeCustomizationService.addAttribute('lang', code);
-      if (
-        !!cookieSetDateMsecs &&
-        +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
-      ) {
-        prevLangDirection = this.cookieService.get('dir') || prevLangDirection;
-        this.cookieService.put('dir', langDirection);
-        this.cookieService.put('lang', code);
-        if (prevLangDirection !== langDirection) {
-          this.windowRef.nativeWindow.location.reload();
-        }
-      } else {
-        const parser = new URL(this.windowRef.nativeWindow.location.href);
-        let urlParamDir = parser.searchParams.get('dir');
-        if (urlParamDir === null) {
-          urlParamDir = 'ltr';
-        }
-        if (urlParamDir === langDirection) {
-          return;
-        }
-        parser.searchParams.set('dir', langDirection);
-        this.windowRef.nativeWindow.location.href = parser.href;
-      }
-    });
-
     // Loads site language according to the language parameter in URL
     // if present.
     this.url = new URL(this.windowRef.nativeWindow.location.href);
@@ -165,6 +127,44 @@ export class I18nService {
       this._updateDirection(
         this.supportedSiteLanguageCodes[cachedLanguageCode]
       );
+    }
+  }
+
+  onI18nLanguageCodeChange(code: string): void {
+    const cookieSetDateMsecs = this.cookieService.get(
+      this.COOKIE_NAME_COOKIES_ACKNOWLEDGED
+    );
+    const langDirection = this.i18nLanguageCodeService.isLanguageRTL(code)
+      ? 'rtl'
+      : 'ltr';
+    let prevLangDirection = this.i18nLanguageCodeService.isLanguageRTL(
+      I18nLanguageCodeService.prevLangCode
+    )
+      ? 'rtl'
+      : 'ltr';
+    this.translateService.use(code);
+    this.documentAttributeCustomizationService.addAttribute('lang', code);
+    if (
+      !!cookieSetDateMsecs &&
+      +cookieSetDateMsecs > AppConstants.COOKIE_POLICY_LAST_UPDATED_MSECS
+    ) {
+      prevLangDirection = this.cookieService.get('dir') || prevLangDirection;
+      this.cookieService.put('dir', langDirection);
+      this.cookieService.put('lang', code);
+      if (prevLangDirection !== langDirection) {
+        this.windowRef.nativeWindow.location.reload();
+      }
+    } else {
+      const parser = new URL(this.windowRef.nativeWindow.location.href);
+      let urlParamDir = parser.searchParams.get('dir');
+      if (urlParamDir === null) {
+        urlParamDir = 'ltr';
+      }
+      if (urlParamDir === langDirection) {
+        return;
+      }
+      parser.searchParams.set('dir', langDirection);
+      this.windowRef.nativeWindow.location.href = parser.href;
     }
   }
 

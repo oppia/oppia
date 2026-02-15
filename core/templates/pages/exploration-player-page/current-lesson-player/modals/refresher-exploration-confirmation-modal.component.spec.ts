@@ -97,9 +97,9 @@ describe('Refresher Exploration Confirmation Modal', () => {
 
   it('should confirm redirect', fakeAsync(() => {
     let callbackSpy = jasmine.createSpy();
-    componentInstance.confirmRedirectEventEmitter.subscribe(() => {
+    componentInstance.confirmRedirectCallback = () => {
       callbackSpy();
-    });
+    };
     spyOn(mockUrlService, 'addField');
     spyOn(windowRef.nativeWindow, 'open');
     spyOn(ngbActiveModal, 'close');

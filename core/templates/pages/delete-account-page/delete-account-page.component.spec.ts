@@ -16,13 +16,19 @@
  * @fileoverview Unit tests for delete account page.
  */
 
-import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flushMicrotasks,
+  TestBed,
+} from '@angular/core/testing';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {DeleteAccountPageComponent} from './delete-account-page.component';
 import {DeleteAccountBackendApiService} from './services/delete-account-backend-api.service';
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {MockTranslatePipe} from 'tests/unit-test-utils';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {of} from 'rxjs';
 
 describe('Delete account page', () => {
   let component: DeleteAccountPageComponent;
@@ -44,7 +50,8 @@ describe('Delete account page', () => {
     component = fixture.componentInstance;
     ngbModal = TestBed.inject(NgbModal);
     deleteAccountService = TestBed.inject(DeleteAccountBackendApiService);
-    spyOn(deleteAccountService, 'deleteAccount').and.callThrough();
+    spyOn(deleteAccountService, 'deleteAccount').and.returnValue(of(undefined));
+    spyOn(deleteAccountService, 'redirectAfterAccountDeletion').and.stub();
   });
 
   it('should open a delete account modal', fakeAsync(() => {
@@ -54,7 +61,12 @@ describe('Delete account page', () => {
       } as NgbModalRef;
     });
     component.deleteAccount();
+    flushMicrotasks();
     expect(modalSpy).toHaveBeenCalled();
+    expect(deleteAccountService.deleteAccount).toHaveBeenCalled();
+    expect(
+      deleteAccountService.redirectAfterAccountDeletion
+    ).toHaveBeenCalled();
   }));
 
   it('should do nothing when cancel button is clicked', () => {

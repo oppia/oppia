@@ -284,6 +284,9 @@ export class OppiaAngularRootComponent implements AfterViewInit {
     this.i18nService.directionChangeEventEmitter.subscribe(direction => {
       this.direction = direction;
     });
+    this.i18nLanguageCodeService.onI18nLanguageCodeChange.subscribe(code => {
+      this.i18nService.onI18nLanguageCodeChange(code);
+    });
     this.i18nService.initialize();
 
     // This emit triggers ajs to start its app.

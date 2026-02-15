@@ -27,6 +27,7 @@ import {EventEmitter} from '@angular/core';
 describe('Training Modal Service', () => {
   let trainingModalService: TrainingModalService;
   let alertsService: AlertsService;
+  let externalSaveService: ExternalSaveService;
   let ngbModal: NgbModal;
 
   beforeEach(() => {
@@ -42,18 +43,20 @@ describe('Training Modal Service', () => {
 
     trainingModalService = TestBed.inject(TrainingModalService);
     alertsService = TestBed.inject(AlertsService);
+    externalSaveService = TestBed.inject(ExternalSaveService);
     ngbModal = TestBed.inject(NgbModal);
   });
 
   it('should open NgbModal', fakeAsync(() => {
-    let emitter = new EventEmitter<void>();
     let MockComponentInstance = {
       unhandledAnswer: 'unhandledAnswer',
-      finishTrainingCallback: emitter,
+      finishTrainingCallback: new EventEmitter(),
+      answerIndex: -1,
+      interactionId: '',
     };
 
-    spyOn(trainingModalService.onFinishTrainingCallback, 'emit');
     spyOn(alertsService, 'clearWarnings').and.stub();
+    spyOn(externalSaveService.onExternalSave, 'emit').and.stub();
     spyOn(ngbModal, 'open').and.callFake(() => {
       return {
         componentInstance: MockComponentInstance,
@@ -61,15 +64,18 @@ describe('Training Modal Service', () => {
       } as NgbModalRef;
     });
 
-    trainingModalService.openTrainUnresolvedAnswerModal('Test', 'textInput', 2);
-
-    emitter.emit();
+    const modalRef = trainingModalService.openTrainUnresolvedAnswerModal(
+      'Test',
+      'textInput',
+      2
+    );
     tick();
 
     expect(alertsService.clearWarnings).toHaveBeenCalled();
-    expect(
-      trainingModalService.onFinishTrainingCallback.emit
-    ).toHaveBeenCalled();
+    expect(modalRef.componentInstance.unhandledAnswer).toBe('Test');
+    expect(modalRef.componentInstance.interactionId).toBe('textInput');
+    expect(modalRef.componentInstance.answerIndex).toBe(2);
+    expect(externalSaveService.onExternalSave.emit).toHaveBeenCalled();
     expect(ngbModal.open).toHaveBeenCalled();
   }));
 });

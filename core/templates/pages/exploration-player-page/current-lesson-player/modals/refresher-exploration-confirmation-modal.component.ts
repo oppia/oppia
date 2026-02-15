@@ -16,7 +16,7 @@
  * @fileoverview Component for refresher exploration confirmation modal.
  */
 
-import {Component, EventEmitter} from '@angular/core';
+import {Component} from '@angular/core';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ConfirmOrCancelModal} from 'components/common-layout-directives/common-elements/confirm-or-cancel-modal.component';
 import {UrlInterpolationService} from 'domain/utilities/url-interpolation.service';
@@ -29,7 +29,7 @@ import {PageContextService} from 'services/page-context.service';
   templateUrl: './refresher-exploration-confirmation-modal.component.html',
 })
 export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal {
-  confirmRedirectEventEmitter: EventEmitter<void> = new EventEmitter();
+  confirmRedirectCallback: (() => void) | null = null;
   // This property is initialized using Angular lifecycle hooks
   // and we need to do non-null assertion. For more information, see
   // https://github.com/oppia/oppia/wiki/Guide-on-defining-types#ts-7-1
@@ -45,7 +45,9 @@ export class RefresherExplorationConfirmationModal extends ConfirmOrCancelModal 
   }
 
   confirmRedirect(): void {
-    this.confirmRedirectEventEmitter.emit();
+    if (this.confirmRedirectCallback) {
+      this.confirmRedirectCallback();
+    }
 
     let collectionId: string = this.urlService.getUrlParams().collection_id;
     let parentIdList: string[] =

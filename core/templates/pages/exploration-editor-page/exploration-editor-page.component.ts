@@ -709,6 +709,7 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
     this.directiveSubscriptions.add(
       this.internetConnectivityService.onInternetStateChange.subscribe(
         internetAccessible => {
+          this.changeListService.onInternetStateChange(internetAccessible);
           this.connectedToInternet = internetAccessible;
           if (internetAccessible) {
             this.alertsService.addSuccessMessage(
@@ -730,6 +731,11 @@ export class ExplorationEditorPageComponent implements OnInit, OnDestroy {
           }
         }
       )
+    );
+    this.directiveSubscriptions.add(
+      this.loaderService.onLoadingMessageChange.subscribe((message: string) => {
+        this.changeListService.setLoadingMessage(message);
+      })
     );
 
     this.directiveSubscriptions.add(

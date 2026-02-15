@@ -143,10 +143,6 @@ describe('Training Data Editor Panel Component', () => {
   let trainingModalServiceeventEmitter = new EventEmitter();
 
   class MockTrainingModalService {
-    get onFinishTrainingCallback() {
-      return trainingModalServiceeventEmitter;
-    }
-
     getTrainingDataOfAnswerGroup(index1: string) {
       return ['name', 'class'];
     }
@@ -155,7 +151,13 @@ describe('Training Data Editor Panel Component', () => {
       item1: string,
       item2: string,
       item3: string
-    ) {}
+    ) {
+      return {
+        componentInstance: {
+          finishTrainingCallback: trainingModalServiceeventEmitter,
+        },
+      };
+    }
   }
 
   beforeEach(waitForAsync(() => {
@@ -239,10 +241,12 @@ describe('Training Data Editor Panel Component', () => {
 
   it('should initialize component properties after component is initialized', fakeAsync(() => {
     component.ngOnInit();
+    component.openTrainUnresolvedAnswerModal(1);
 
     trainingModalServiceeventEmitter.emit({
       answer: 'answer',
       interactionId: 'interactionId',
+      answerIndex: 1,
     });
     tick();
 
@@ -330,7 +334,14 @@ describe('Training Data Editor Panel Component', () => {
   it('should open train unresolved answer modal', () => {
     component.answerGroupHasNonEmptyRules = true;
 
-    spyOn(trainingModalService, 'openTrainUnresolvedAnswerModal').and.stub();
+    spyOn(
+      trainingModalService,
+      'openTrainUnresolvedAnswerModal'
+    ).and.returnValue({
+      componentInstance: {
+        finishTrainingCallback: new EventEmitter(),
+      },
+    });
 
     component.openTrainUnresolvedAnswerModal(1);
     expect(

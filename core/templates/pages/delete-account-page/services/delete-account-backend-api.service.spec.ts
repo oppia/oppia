@@ -65,11 +65,15 @@ describe('Delete Account Service', () => {
   });
 
   it('should delete account when closing the modal', fakeAsync(() => {
-    deleteAccountBackendApiService.deleteAccount();
+    deleteAccountBackendApiService.deleteAccount().subscribe();
 
     let req = http.expectOne('/delete-account-handler');
     expect(req.request.method).toEqual('DELETE');
     req.flush(null);
+  }));
+
+  it('should redirect user after successful account deletion', fakeAsync(() => {
+    deleteAccountBackendApiService.redirectAfterAccountDeletion();
 
     flushMicrotasks();
     tick(150);

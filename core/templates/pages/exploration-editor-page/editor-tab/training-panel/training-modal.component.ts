@@ -73,6 +73,11 @@ interface classification {
   answerGroupIndex: number;
   newOutcome: Outcome;
 }
+export interface FinishTrainingResult {
+  answer: InteractionAnswer;
+  interactionId: string;
+  answerIndex: number;
+}
 
 @Component({
   selector: 'oppia-training-modal',
@@ -83,7 +88,10 @@ export class TrainingModalComponent
   implements OnInit
 {
   @Input() unhandledAnswer: InteractionAnswer;
-  @Output() finishTrainingCallback: EventEmitter<void> = new EventEmitter();
+  @Input() answerIndex: number;
+  @Input() interactionId: string;
+  @Output() finishTrainingCallback: EventEmitter<FinishTrainingResult> =
+    new EventEmitter();
 
   trainingDataAnswer: InteractionAnswer | string = '';
   // See the training panel directive in ExplorationEditorTab for an
@@ -171,7 +179,11 @@ export class TrainingModalComponent
       );
     }
 
-    this.finishTrainingCallback.emit();
+    this.finishTrainingCallback.emit({
+      answer: this.unhandledAnswer,
+      interactionId: this.interactionId,
+      answerIndex: this.answerIndex,
+    });
     this.ngbActiveModal.close();
   }
 

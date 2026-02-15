@@ -18,8 +18,7 @@
  */
 
 import {EventEmitter, Injectable} from '@angular/core';
-import {BehaviorSubject, interval, from, Subscription} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {BehaviorSubject} from 'rxjs';
 import {
   VoiceoverBackendApiService,
   LanguageAccentToContentStatusMap,
@@ -41,7 +40,7 @@ export class VoiceoverRegenerationTaskMappingService {
   );
   public status$ = this.statusSubject.asObservable();
 
-  public pollingSub: Subscription | null = null;
+  public pollingIntervalId: ReturnType<typeof setInterval> | null = null;
   private _newRegenerationRequestEventEmitter = new EventEmitter<void>();
 
   constructor(
@@ -87,27 +86,21 @@ export class VoiceoverRegenerationTaskMappingService {
   }
 
   startPolling(): void {
-    if (this.pollingSub) {
-      this.pollingSub.unsubscribe();
+    if (this.pollingIntervalId) {
+      clearInterval(this.pollingIntervalId);
     }
 
     this.getLatestVoiceoverRegenerationStatus();
 
     // Updates the voiceover regeneration status every 5 seconds.
-    this.pollingSub = interval(5000)
-      .pipe(
-        switchMap(() =>
-          from(
-            this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
-              this.explorationID
-            )
-          )
-        )
-      )
-      .subscribe(status => {
-        this.languageAccentToContentStatusMap = status;
-        this.statusSubject.next(status);
-      });
+    this.pollingIntervalId = setInterval(async () => {
+      const status =
+        await this.voiceoverBackendApiService.fetchLatestVoiceoverRegenerationStatusAsync(
+          this.explorationID
+        );
+      this.languageAccentToContentStatusMap = status;
+      this.statusSubject.next(status);
+    }, 5000);
   }
 
   updateNewlyAddedRegenerationTasks(contentIds: string[]): void {

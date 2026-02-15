@@ -37,7 +37,9 @@ export class DeleteAccountPageComponent {
     });
     modelRef.result.then(
       () => {
-        this.deleteAccountBackendApiService.deleteAccount();
+        this.deleteAccountBackendApiService.deleteAccount().subscribe(() => {
+          this.deleteAccountBackendApiService.redirectAfterAccountDeletion();
+        });
       },
       () => {
         // Note to developers:
