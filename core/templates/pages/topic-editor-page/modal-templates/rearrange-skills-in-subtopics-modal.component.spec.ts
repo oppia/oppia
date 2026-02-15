@@ -357,7 +357,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
         data: ['3'],
       },
       item: {},
-    } as CdkDragDrop<ShortSkillSummary[]>;
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
@@ -465,7 +465,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
         data: ['2'],
       },
       item: {},
-    } as CdkDragDrop<ShortSkillSummary[]>;
+    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
 
     spyOn(topicUpdateService, 'moveSkillToSubtopic');
     spyOn(component, 'initEditor').and.callThrough();
