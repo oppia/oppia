@@ -9,7 +9,7 @@
   margin-right: auto;
   padding: 30px 0;
   text-align: left;
-  width: 1140px;
+  width: 1160px;
 }
 
 .oppia-footer-container a {
@@ -32,6 +32,7 @@
   /* Ensures text is white */
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .oppia-footer-container a:focus {
@@ -94,7 +95,7 @@
   gap: 4rem;
   margin: 0 auto;
   position: relative;
-  width: 1140px;
+  width: 1160px;
 }
 
 .oppia-newsletter-content {
