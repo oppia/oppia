@@ -6594,7 +6594,20 @@ export class ExplorationEditor extends BaseUser {
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);
-    await this.clickOnElementWithSelector(tagsField);
+    await this.page.$eval(tagsField, element =>
+      element.scrollIntoView({block: 'center'})
+    );
+    try {
+      await this.clickOnElementWithSelector(tagsField);
+    } catch (error) {
+      await this.page.evaluate(selector => {
+        const element = document.querySelector(selector) as HTMLElement | null;
+        if (element) {
+          element.focus();
+          element.click();
+        }
+      }, tagsField);
+    }
     for (const tag of tags) {
       await this.typeInInputField(tagsField, tag);
       await this.page.keyboard.press('Enter');
