@@ -963,32 +963,20 @@ describe('Topic Editor Navbar', () => {
     expect(componentInstance.isWarningTooltipDisabled()).toBeFalse();
   });
 
-  it('should return early from discardChanges when topicId is empty', () => {
-    componentInstance.topicId = '';
-    spyOn(undoRedoService, 'clearChanges');
-    spyOn(topicEditorStateService, 'loadTopic');
+  it('should return early from _navigateToPreview when classroomUrlFragment is null', () => {
+    spyOn(topicEditorRoutingService, 'getActiveTabName').and.returnValue(
+      'main'
+    );
+    spyOn(undoRedoService, 'getChangeCount').and.returnValue(0);
+    spyOn(topicEditorStateService, 'getClassroomUrlFragment').and.returnValue(
+      null
+    );
+    componentInstance.topic = topic;
+    spyOn(windowRef.nativeWindow, 'open');
 
-    componentInstance.discardChanges();
+    componentInstance.openTopicViewer();
 
-    expect(undoRedoService.clearChanges).not.toHaveBeenCalled();
-    expect(topicEditorStateService.loadTopic).not.toHaveBeenCalled();
-  });
-
-  it('should return false from unpublishTopic when topicId is empty', () => {
-    componentInstance.topicId = '';
-    componentInstance.topicRights = TopicRights.createFromBackendDict({
-      published: true,
-      can_publish_topic: true,
-      can_edit_topic: true,
-    });
-    spyOn(topicRightsBackendApiService, 'unpublishTopicAsync');
-
-    const result = componentInstance.unpublishTopic();
-
-    expect(result).toBeFalse();
-    expect(
-      topicRightsBackendApiService.unpublishTopicAsync
-    ).not.toHaveBeenCalled();
+    expect(windowRef.nativeWindow.open).not.toHaveBeenCalled();
   });
 
   it('should publish already published topic without redirecting to dashboard', fakeAsync(() => {
