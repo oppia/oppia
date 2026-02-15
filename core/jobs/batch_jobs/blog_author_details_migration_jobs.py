@@ -80,8 +80,6 @@ class AuditBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
     handles that case automatically.
     """
 
-    DATASTORE_UPDATES_ALLOWED = False
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         """Returns a PCollection of audit results.
 
@@ -200,12 +198,6 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
     ) -> blog_models.BlogAuthorDetailsModel:
         """Creates a new BlogAuthorDetailsModel for the given author_id.
 
-        When DATASTORE_UPDATES_ALLOWED is True, the model is persisted
-        directly via model.put() inside the NDB context. This avoids
-        using ndb_io.PutModels() which relies on WriteToDatastore and
-        its ramp-up throttling that can exceed the dev server's
-        gunicorn timeout.
-
         Args:
             author_id: str. The author_id of a deleted user who has no
                 BlogAuthorDetailsModel.
@@ -213,7 +205,6 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
         Returns:
             BlogAuthorDetailsModel. The newly created model instance.
         """
-
         instance_id = utils.convert_to_hash(
             str(utils.get_random_int(base_models.RAND_RANGE)),
             base_models.ID_LENGTH,
@@ -227,8 +218,6 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
                 author_bio=DELETED_USER_FALLBACK_AUTHOR_BIO,
             )
             model.update_timestamps()
-            if self.DATASTORE_UPDATES_ALLOWED:
-                model.put()
         return model
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
@@ -298,6 +287,13 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             | 'Create BlogAuthorDetailsModel'
             >> beam.Map(self._create_author_details_model)
         )
+
+        if self.DATASTORE_UPDATES_ALLOWED:
+            unused_put_result = (
+                new_author_details_models
+                | 'Save BlogAuthorDetailsModels to Datastore'
+                >> ndb_io.PutModels()
+            )
 
         migration_results = (
             new_author_details_models
