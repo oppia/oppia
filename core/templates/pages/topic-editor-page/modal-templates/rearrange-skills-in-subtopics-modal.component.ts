@@ -67,9 +67,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
 
   initEditor(): void {
     this.topic = this.topicEditorStateService.getTopic();
-    if (!this.topic) {
-      return;
-    }
     this.subtopics = this.topic.getSubtopics();
     this.uncategorizedSkillSummaries =
       this.topic.getUncategorizedSkillSummaries();
@@ -108,9 +105,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
     event: CdkDragDrop<ShortSkillSummary[]>,
     newSubtopicId: number | null
   ): void {
-    if (!this.topic || !this.skillSummaryToMove) {
-      return;
-    }
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
@@ -150,9 +144,6 @@ export class RearrangeSkillsInSubtopicsModalComponent
   }
 
   updateSubtopicTitle(subtopicId: number): void {
-    if (!this.topic) {
-      return;
-    }
     if (
       !this.subtopicValidationService.checkValidSubtopicName(this.editableName)
     ) {
