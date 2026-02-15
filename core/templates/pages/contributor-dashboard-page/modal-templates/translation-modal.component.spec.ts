@@ -1205,7 +1205,11 @@ describe('Translation Modal Component', () => {
                   Promise.resolve({
                     can_review_translation_for_language_codes: ['ar'],
                   }),
-                isLoggedIn: () => true,
+                getUserInfoAsync: () =>
+                  Promise.resolve({
+                    username: 'test',
+                    isLoggedIn: true,
+                  }),
               },
             },
             {

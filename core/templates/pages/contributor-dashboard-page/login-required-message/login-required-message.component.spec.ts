@@ -32,6 +32,12 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 
+class MockUserService {
+  isLoggedIn(): boolean {
+    return false;
+  }
+}
+
 describe('Login required message component', () => {
   let component: LoginRequiredMessageComponent;
   let fixture: ComponentFixture<LoginRequiredMessageComponent>;
@@ -43,6 +49,12 @@ describe('Login required message component', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       declarations: [LoginRequiredMessageComponent],
+      providers: [
+        {
+          provide: UserService,
+          useClass: MockUserService,
+        },
+      ],
     });
     httpTestingController = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginRequiredMessageComponent);
