@@ -325,11 +325,6 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
     expect(component.initEditor).toHaveBeenCalledTimes(2);
     topicReinitializedEventEmitter.emit();
     expect(component.initEditor).toHaveBeenCalledTimes(3);
-    let skillSummary = {
-      getDescription: () => {
-        return null;
-      },
-    };
   });
 
   it('should set oldSubtopicId to null when oldSubtopicId is falsy in onMoveSkillStart', () => {
