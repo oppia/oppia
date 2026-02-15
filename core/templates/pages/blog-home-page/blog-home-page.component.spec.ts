@@ -931,4 +931,89 @@ describe('Blog home page component', () => {
 
     expect(component.getStaticCopyrightedImageUrl('url')).toBe('image_url');
   });
+
+  describe('when toggling the search panel', () => {
+    let blogPostCardsContainer: HTMLElement;
+
+    beforeEach(() => {
+      // Force desktop view for these tests to ensure the toggle logic is active
+      spyOn(windowDimensionsService, 'getWidth').and.returnValue(1028);
+      spyOn(urlService, 'getUrlParams').and.returnValue({});
+
+      component.ngOnInit();
+      fixture.detectChanges();
+    });
+
+    it('should toggle searchPanelIsCollapsed property and update UI', () => {
+      expect(component.searchPanelIsCollapsed).toBeTrue();
+
+      component.toggleSearchPanel();
+      expect(component.searchPanelIsCollapsed).toBeFalse();
+
+      fixture.detectChanges();
+      let toggleButton = fixture.debugElement.nativeElement.querySelector(
+        '.e2e-test-toggle-search-panel'
+      );
+      expect(toggleButton.textContent).toContain('Hide');
+      expect(toggleButton.querySelector('i').classList).toContain('fa-times');
+
+      // Check if layout changed to col-8
+      let container = fixture.debugElement.nativeElement.querySelector(
+        '.oppia-blog-post-card-container'
+      );
+      expect(container.classList).toContain('col-8');
+    });
+
+    it('should show the search container only when expanded on desktop', () => {
+      let blogSearchContainer =
+        fixture.debugElement.nativeElement.querySelector(
+          '.oppia-blog-search-container'
+        );
+      expect(blogSearchContainer).toBeNull();
+
+      component.toggleSearchPanel();
+      fixture.detectChanges();
+
+      blogSearchContainer = fixture.debugElement.nativeElement.querySelector(
+        '.oppia-blog-search-container'
+      );
+      expect(blogSearchContainer).not.toBeNull();
+    });
+
+    it('should update blog post card container layout classes based on toggle', () => {
+      let container = fixture.debugElement.nativeElement.querySelector(
+        '.oppia-blog-post-card-container'
+      );
+
+      expect(container.classList).toContain('col-12');
+      expect(container.classList).not.toContain('col-8');
+
+      component.toggleSearchPanel();
+      fixture.detectChanges();
+
+      expect(container.classList).toContain('col-8');
+      expect(container.classList).not.toContain('col-12');
+    });
+
+    it('should always show search container on small screens regardless of toggle state', () => {
+      (windowDimensionsService.getWidth as jasmine.Spy).and.returnValue(766);
+      fixture.detectChanges();
+
+      expect(component.isSmallScreenViewActive()).toBeTrue();
+
+      let blogSearchContainer =
+        fixture.debugElement.nativeElement.querySelector(
+          '.oppia-blog-search-container'
+        );
+      expect(blogSearchContainer).not.toBeNull();
+
+      component.toggleSearchPanel();
+      fixture.detectChanges();
+
+      blogSearchContainer = fixture.debugElement.nativeElement.querySelector(
+        '.oppia-blog-search-container'
+      );
+      expect(blogSearchContainer).not.toBeNull();
+    });
+  });
 });
