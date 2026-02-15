@@ -3152,20 +3152,6 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
-"@types/jquery@*", "@types/jquery@^3.3.29":
-  version "3.5.14"
-  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.5.14.tgz#ac8e11ee591e94d4d58da602cb3a5a8320dee577"
-  integrity sha512-X1gtMRMbziVQkErhTQmSe2jFwwENA/Zr+PprCkF63vFq+Yt5PZ4AlKqgmeNlwgn7dhsXEK888eIW2520EpC+xg==
-  dependencies:
-    "@types/sizzle" "*"
-
-"@types/jqueryui@^1.12.1":
-  version "1.12.16"
-  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.16.tgz#9e319f7db39490db950cba77fe83887e0ad3e1d9"
-  integrity sha512-6huAQDpNlso9ayaUT9amBOA3kj02OCeUWs+UvDmbaJmwkHSg/HLsQOoap/D5uveN9ePwl72N45Bl+Frp5xyG1Q==
-  dependencies:
-    "@types/jquery" "*"
-
 "@types/js-yaml@^4.0.5":
   version "4.0.5"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-4.0.5.tgz#738dd390a6ecc5442f35e7f03fa1431353f7e138"
@@ -3189,6 +3175,14 @@
   integrity sha512-272FMnFGzAVMGtu9tkr29hRL6bZj4Zs1KZNeHLnKqAvp06tAIcarTMwOh8/8bz4FmKRcMxZhZNeUAQsNLoiPhg==
   dependencies:
     "@types/node" "*"
+
+"@types/karma@^6.3.8":
+  version "6.3.9"
+  resolved "https://registry.yarnpkg.com/@types/karma/-/karma-6.3.9.tgz#740a967b2662097e136a67f81c18699fbdfae457"
+  integrity sha512-sjE/MHnoAZAQYAKRXAbjTOiBKyGGErEM725bruRcmDdMa2vp1bjWPhApI7/i564PTyHlzc3vIGXLL6TFIpAxFg==
+  dependencies:
+    "@types/node" "*"
+    log4js "^6.4.1"
 
 "@types/keyv@^3.1.4":
   version "3.1.4"
@@ -3359,11 +3353,6 @@
   dependencies:
     "@types/mime" "*"
     "@types/node" "*"
-
-"@types/sizzle@*":
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.3.tgz#ff5e2f1902969d305225a047c8a0fd5c915cebef"
-  integrity sha512-JYM8x9EGF163bEyhdJBpR2QX1R5naCJHC8ucJylJ3w9/CVBaskdQ8WqBf8MmQrd1kRvp/a4TS8HJ+bxzR7ZJYQ==
 
 "@types/source-list-map@*":
   version "0.1.2"
@@ -5732,6 +5721,15 @@ cjson@^0.5.0:
   integrity sha512-D3CKJU9YnZNyerUQ1IzNUvMnToP3MGC2XbIAPi/7yqunJJW3rBwCVapousoFtaR9IbejeEM0KIshxC1n4HQcXw==
   dependencies:
     json-parse-helpfulerror "^1.0.3"
+
+"ckeditor4-bootstrapck@github:Kunstmaan/BootstrapCK4-Skin#v1.0.0":
+  version "1.0.0"
+  resolved "https://codeload.github.com/Kunstmaan/BootstrapCK4-Skin/tar.gz/469e58f825a9fa6201e3e3e778f824c8b355abf7"
+
+ckeditor4@4.16.2:
+  version "4.16.2"
+  resolved "https://registry.yarnpkg.com/ckeditor4/-/ckeditor4-4.16.2.tgz#322e0aa22cc79cfc825345b015b29bcdd8ada3a2"
+  integrity sha512-5x2FmI+yGpQIKISh24Wp4HwjQxN6C4Lw59yh68HbFwcnMu8DvSiZLJfeINGvRG1oQ1L9GzJ5Pqd0PL0KDH08Jw==
 
 class-utils@^0.3.5:
   version "0.3.6"
@@ -12246,11 +12244,6 @@ jpeg-js@^0.4.1, jpeg-js@^0.4.3:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.4.4.tgz#a9f1c6f1f9f0fa80cdb3484ed9635054d28936aa"
   integrity sha512-WZzeDOEtTOBK4Mdsar0IqEU5sMr3vSV2RqkAIzUEV2BHnUfKGyswWFPFwK5EeDo93K3FohSHbLAjj0s1Wzd+dg==
-
-jquery@^3.4.0:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.6.1.tgz#fab0408f8b45fc19f956205773b62b292c147a16"
-  integrity sha512-opJeO4nCucVnsjiXOE+/PcCgYw9Gwpvs/a6B1LL/lQhwWwpbVEVYDZ1FokFr8PRc7ghYlrFPuyHuiiDNTQxmcw==
 
 js-base64@^2.1.9:
   version "2.6.4"

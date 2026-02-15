@@ -31,23 +31,23 @@
                 "input": "./node_modules/midi/examples/soundfont/",
                 "output": "./midi/examples/soundfont/"
               },
-              {
-                "glob": "**/*",
-                "input": "node_modules/ckeditor4",
-                "output": "/assets/ckeditor4/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/ckeditor4-bootstrapck/skins/bootstrapck",
-                "output": "/assets/ckeditor-bootstrapck/"
-              }
+                {
+                  "glob": "**/*",
+                  "input": "./node_modules/ckeditor4",
+                  "output": "assets/ckeditor4"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "./node_modules/ckeditor4-bootstrapck",
+                  "output": "assets/ckeditor-bootstrapck"
+                }
             ],
             "styles": [
               "core/templates/css/oppia.css",
               "core/templates/css/oppia-material.css",
               "node_modules/ngx-toastr/toastr.css"
             ],
-            "scripts": []
+            "scripts": ["node_modules/ckeditor4/ckeditor.js"]
           },
           "configurations": {
             "production": {
@@ -113,20 +113,20 @@
             "assets": [
               "src/favicon.ico",
               "assets",
-              {
-                "glob": "**/*",
-                "input": "node_modules/ckeditor4",
-                "output": "/assets/ckeditor4/"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/ckeditor4-bootstrapck/skins/bootstrapck",
-                "output": "/assets/ckeditor-bootstrapck/"
-              }
-            ],
+                {
+                  "glob": "**/*",
+                  "input": "./node_modules/ckeditor4",
+                  "output": "assets/ckeditor4"
+                },
+                {
+                  "glob": "**/*",
+                  "input": "./node_modules/ckeditor4-bootstrapck",
+                  "output": "assets/ckeditor-bootstrapck"
+                }
+              ],
             "styles": [
             ],
-            "scripts": []
+            "scripts": ["node_modules/ckeditor4/ckeditor.js"]
           }
         },
         "lint": {
