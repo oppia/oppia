@@ -329,8 +329,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       getDescription: () => {
         return null;
       },
-    } as unknown as ShortSkillSummary;
-    component.isSkillDeleted(skillSummary);
+    };
   });
 
   it('should set oldSubtopicId to null when oldSubtopicId is falsy in onMoveSkillStart', () => {
@@ -363,7 +362,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
         data: ['3'],
       },
       item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    } as CdkDragDrop<ShortSkillSummary[]>;
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
@@ -388,7 +387,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
       previousContainer: container,
       container: container,
       item: {data: containerData[0]},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    } as CdkDragDrop<ShortSkillSummary[]>;
 
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
@@ -471,7 +470,7 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
         data: ['2'],
       },
       item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+    } as CdkDragDrop<ShortSkillSummary[]>;
 
     spyOn(topicUpdateService, 'moveSkillToSubtopic');
     spyOn(component, 'initEditor').and.callThrough();
