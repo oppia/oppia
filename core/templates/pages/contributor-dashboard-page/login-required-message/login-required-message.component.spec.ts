@@ -43,6 +43,10 @@ class MockUserService {
       isLoggedIn: () => true,
     } as UserInfo);
   }
+
+  getLoginUrlAsync(): Promise<string> {
+    return Promise.resolve('/login');
+  }
 }
 
 describe('Login required message component', () => {
