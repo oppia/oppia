@@ -16,5 +16,5 @@
  * @fileoverview This file imports the ckeditor library.
  */
 
-(window as any).CKEDITOR_BASEPATH = '/dist/oppia-angular/assets/ckeditor4/';
+window.CKEDITOR_BASEPATH = '/dist/oppia-angular/assets/ckeditor4/';
 require('ckeditor4/ckeditor.js');
