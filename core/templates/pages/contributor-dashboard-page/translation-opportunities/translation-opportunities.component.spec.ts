@@ -49,6 +49,10 @@ import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {EventEmitter} from '@angular/core';
 
 class MockUserService {
+  isLoggedIn(): boolean {
+    return false;
+  }
+
   getUserInfoAsync(): Promise<UserInfo> {
     return Promise.resolve({
       isLoggedIn: () => true,

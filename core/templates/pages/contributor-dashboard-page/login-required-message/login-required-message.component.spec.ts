@@ -34,6 +34,10 @@ import {
 import {UserInfo} from 'domain/user/user-info.model';
 
 class MockUserService {
+  isLoggedIn(): boolean {
+    return false;
+  }
+
   getUserInfoAsync(): Promise<UserInfo> {
     return Promise.resolve({
       isLoggedIn: () => true,
