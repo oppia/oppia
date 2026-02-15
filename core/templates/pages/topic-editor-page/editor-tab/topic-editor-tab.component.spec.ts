@@ -253,7 +253,7 @@ describe('Topic editor tab directive', () => {
   });
 
   it('should initialize the variables', () => {
-    expect(component.topic).toEqual(topic as Topic);
+    expect(component.topic).toEqual(topic);
     expect(component.allowedBgColors).toEqual(['#C6DCDA']);
     expect(component.topicDescriptionChanged).toEqual(false);
     expect(component.subtopicsListIsShown).toEqual(true);
@@ -338,11 +338,7 @@ describe('Topic editor tab directive', () => {
     expect(component.skillOptionDialogueBox).toBe(true);
 
     component.showSkillEditOptions(0, 1);
-    const selectedIndex = component.selectedSkillEditOptionsIndex[0] as Record<
-      number,
-      boolean
-    >;
-    expect(selectedIndex[1]).toEqual(true);
+    expect(component.selectedSkillEditOptionsIndex[0][1]).toEqual(true);
     expect(component.skillOptionDialogueBox).toBe(false);
 
     component.showSkillEditOptions(0, 1);
@@ -689,9 +685,9 @@ describe('Topic editor tab directive', () => {
 
   it('should return preview footer text for topic preview', () => {
     expect(component.getPreviewFooter()).toEqual('2 Stories');
-    (topic as Topic)._canonicalStoryReferences = [];
+    topic._canonicalStoryReferences = [];
     expect(component.getPreviewFooter()).toEqual('0 Stories');
-    (topic as Topic)._canonicalStoryReferences = [story1 as StoryReference];
+    topic._canonicalStoryReferences = [story1];
     expect(component.getPreviewFooter()).toEqual('1 Story');
   });
 

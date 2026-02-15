@@ -637,9 +637,7 @@ export class TopicUpdateService {
             // section, as a newly created subtopic wouldn't have any skills
             // of its own initially, and any skills moved into it have been
             // shifted to the uncategorized section.
-            (
-              changeDict as TopicChange & {old_subtopic_id: number | null}
-            ).old_subtopic_id = null;
+            changeDict.old_subtopic_id = null;
           }
         } else if (
           changeDict.cmd ===
@@ -661,9 +659,7 @@ export class TopicUpdateService {
         // Check presence of member equivalent of hasOwnProperty
         // https://www.typescriptlang.org/docs/handbook/advanced-types.html
         if ('subtopic_id' in backendChangeDict) {
-          const subtopicIdValue = (
-            backendChangeDict as TopicChange & {subtopic_id: number}
-          ).subtopic_id;
+          const subtopicIdValue = backendChangeDict.subtopic_id;
           if (subtopicIdValue === subtopicId) {
             // The indices in the change list corresponding to changes to
             // the currently deleted and newly created subtopic are to be
@@ -674,8 +670,7 @@ export class TopicUpdateService {
           // When a newly created subtopic is deleted, the subtopics created
           // after it would have their id reduced by 1.
           if (subtopicIdValue > subtopicId) {
-            (backendChangeDict as TopicChange & {subtopic_id: number})
-              .subtopic_id--;
+            backendChangeDict.subtopic_id--;
           }
         }
         if ('old_subtopic_id' in backendChangeDict) {
@@ -693,11 +688,7 @@ export class TopicUpdateService {
             backendChangeDict as TopicChange & {new_subtopic_id: number | null}
           ).new_subtopic_id;
           if (newSubtopicIdValue !== null && newSubtopicIdValue > subtopicId) {
-            (
-              backendChangeDict as TopicChange & {
-                new_subtopic_id: number | null;
-              }
-            ).new_subtopic_id = newSubtopicIdValue - 1;
+            backendChangeDict.new_subtopic_id = newSubtopicIdValue - 1;
           }
         }
         // Apply the above id reduction changes to the backend change.
