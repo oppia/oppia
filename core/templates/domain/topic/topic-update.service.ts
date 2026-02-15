@@ -684,11 +684,8 @@ export class TopicUpdateService {
           }
         }
         if ('new_subtopic_id' in backendChangeDict) {
-          const newSubtopicIdValue = (
-            backendChangeDict as TopicChange & {new_subtopic_id: number | null}
-          ).new_subtopic_id;
-          if (newSubtopicIdValue !== null && newSubtopicIdValue > subtopicId) {
-            backendChangeDict.new_subtopic_id = newSubtopicIdValue - 1;
+          if (backendChangeDict.new_subtopic_id > subtopicId) {
+            backendChangeDict.new_subtopic_id--;
           }
         }
         // Apply the above id reduction changes to the backend change.
