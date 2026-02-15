@@ -298,6 +298,9 @@ export class TopicEditorNavbarComponent
       const topicUrlFragment = this.topic.getUrlFragment();
       const classroomUrlFragment =
         this.topicEditorStateService.getClassroomUrlFragment();
+      if (!classroomUrlFragment) {
+        return;
+      }
       this.windowRef.nativeWindow.open(
         this.urlInterpolationService.interpolateUrl(
           ClassroomDomainConstants.TOPIC_VIEWER_URL_TEMPLATE,
