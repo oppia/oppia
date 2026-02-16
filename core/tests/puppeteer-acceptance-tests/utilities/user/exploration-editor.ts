@@ -2675,76 +2675,35 @@ export class ExplorationEditor extends BaseUser {
     title: string,
     goal: string,
     category: string,
-    tags?: string,
-    language: string = 'English'
+    tags?: string
   ): Promise<string> {
     const publishExploration = async () => {
       if (this.isViewportAtMobileWidth()) {
         await this.waitForPageToFullyLoad();
         await this.page.waitForSelector(mobileNavbarDropdown, {visible: true});
-        const element = await this.getElementInParent(
-          mobileNavbarOptions
-        ).catch(() => null);
+        const element = await this.page.$(mobileNavbarOptions);
         if (!element) {
           await this.clickOnElementWithSelector(mobileOptionsButtonSelector);
-          await this.page.waitForSelector(mobileNavbarDropdown, {
-            visible: true,
-          });
         }
-
-        // Click the mobile changes dropdown.
-        await this.page.waitForSelector(mobileChangesDropdownSelector, {
-          visible: true,
-          timeout: 15000,
-        });
         await this.clickOnElementWithSelector(mobileChangesDropdownSelector);
-
-        await this.page.waitForSelector(mobilePublishButtonSelector, {
-          visible: true,
-          timeout: 10000,
-        });
-
-        // Scroll the button into view and click it using direct JavaScript.
-        // This approach handles sticky footers that might occlude the button.
-        await this.page.evaluate(() => {
-          const button = document.querySelector(
-            'button.e2e-test-mobile-publish-button'
-          ) as HTMLElement | null;
-          if (button) {
-            button.scrollIntoView({block: 'end', inline: 'center'});
-            button.click();
-          }
-        });
-
-        await this.page.waitForSelector(explorationTitleInput, {
-          visible: true,
-        });
+        await this.clickOnElementWithSelector(mobilePublishButtonSelector);
       } else {
         await this.page.waitForSelector(publishExplorationButtonSelector, {
           visible: true,
         });
-        const publishButton = await this.getElementInParent(
-          publishExplorationButtonSelector
-        );
-        if (!publishButton) {
-          throw new Error('Publish button not found.');
-        }
-        // Allow extra time for the publish button to become clickable to avoid
-        // flakiness due to transient overlays or network delays.
-        await this.waitForElementToBeClickable(publishButton, 60000);
-        await publishButton.click();
+        await this.clickOnElementWithSelector(publishExplorationButtonSelector);
       }
     };
-
     const fillExplorationMetadataDetails = async () => {
-      const tagsArray = tags ? tags.split(',').map(tag => tag.trim()) : [];
-      await this.fillExplorationMetadataDetails(
-        title,
-        goal,
-        category,
-        language,
-        tagsArray
-      );
+      await this.clickOnElementWithSelector(explorationTitleInput);
+      await this.typeInInputField(explorationTitleInput, title);
+      await this.clickOnElementWithSelector(explorationGoalInput);
+      await this.typeInInputField(explorationGoalInput, goal);
+      await this.clickOnElementWithSelector(explorationCategoryDropdown);
+      await this.clickOnElementWithText(category);
+      if (tags) {
+        await this.typeInInputField(tagsField, tags);
+      }
     };
 
     const confirmPublish = async (): Promise<string> => {
@@ -2778,9 +2737,9 @@ export class ExplorationEditor extends BaseUser {
     } catch (error) {
       showMessage('Failed to publish the exploration.\n' + error.stack);
 
-      const errorSavingExplorationElement = await this.getElementInParent(
+      const errorSavingExplorationElement = await this.page.$(
         errorSavingExplorationModal
-      ).catch(() => null);
+      );
       if (errorSavingExplorationElement) {
         await this.clickOnElementWithSelector(errorSavingExplorationModal);
         await this.page.waitForNavigation({
@@ -6563,51 +6522,16 @@ export class ExplorationEditor extends BaseUser {
 
     await this.expectElementToBeVisible(explorationCategoryDropdown);
     await this.clickOnElementWithSelector(explorationCategoryDropdown);
-    // Wait for the dropdown options to render and find the matching category.
-    await this.page.waitForSelector('mat-option', {visible: true});
-    const categoryOptions = await this.page.$$('mat-option');
-    const categoryOptionTexts = await this.page.$$eval('mat-option', options =>
-      options.map(option => option.textContent?.trim())
-    );
-    const categoryIndex = categoryOptionTexts.indexOf(category);
-    if (categoryIndex !== -1) {
-      await categoryOptions[categoryIndex].click();
-    }
-    // Wait for the dropdown to close.
-    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.clickOnElementWithText(category);
     await this.expectTextContentToBe(categoryDropdown, category);
 
     await this.expectElementToBeVisible(explorationLanguageSelector);
     await this.clickOnElementWithSelector(explorationLanguageSelector);
-    // Wait for the dropdown options to render and find the matching language.
-    await this.page.waitForSelector('mat-option', {visible: true});
-    const languageOptions = await this.page.$$('mat-option');
-    const languageOptionTexts = await this.page.$$eval('mat-option', options =>
-      options.map(option => option.textContent?.trim())
-    );
-    const languageIndex = languageOptionTexts.indexOf(language);
-    if (languageIndex !== -1) {
-      await languageOptions[languageIndex].click();
-    }
-    // Wait for the dropdown to close.
-    await this.page.waitForSelector('mat-option', {visible: false});
+    await this.clickOnElementWithText(language);
     await this.expectTextContentToBe(explorationLanguageSelector, language);
 
     await this.expectElementToBeVisible(tagsField);
-    await this.page.$eval(tagsField, element =>
-      element.scrollIntoView({block: 'center'})
-    );
-    try {
-      await this.clickOnElementWithSelector(tagsField);
-    } catch (error) {
-      await this.page.evaluate(selector => {
-        const element = document.querySelector(selector) as HTMLElement | null;
-        if (element) {
-          element.focus();
-          element.click();
-        }
-      }, tagsField);
-    }
+    await this.clickOnElementWithSelector(tagsField);
     for (const tag of tags) {
       await this.typeInInputField(tagsField, tag);
       await this.page.keyboard.press('Enter');
