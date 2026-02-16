@@ -129,6 +129,20 @@ class WeakRecordTests(test_utils.GenericTestBase):
                 settings, auth_details
             )
 
+    def test_from_oppia_models_with_mismatched_deleted_field_raises_value_error(
+        self,
+    ) -> None:
+        settings = user_models.UserSettingsModel(
+            id='a', email='a@a.com', deleted=True
+        )
+        auth_details = auth_models.UserAuthDetailsModel(
+            id='a', firebase_auth_id='b', deleted=False
+        )
+        with self.assertRaisesRegex(ValueError, 'does not match'):
+            firebase_adapters.WeakRecord.from_oppia_models(
+                settings, auth_details
+            )
+
     def test_from_oppia_models_with_parent_user_id_returns_none(self) -> None:
         settings = user_models.UserSettingsModel(id='a', email='a@a.com')
         auth_details = auth_models.UserAuthDetailsModel(

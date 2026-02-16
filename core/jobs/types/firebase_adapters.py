@@ -92,6 +92,13 @@ class WeakRecord(StrongRecord):
                 f'UserSettingsModel.id={settings.id} does not match '
                 f'UserAuthDetailsModel.id={auth_details.id}'
             )
+        if settings.deleted != auth_details.deleted:
+            raise ValueError(
+                f'UserSettingsModel(id={settings.id})'
+                f'.deleted={settings.deleted} does not match '
+                f'UserAuthDetailsModel(id={auth_details.id})'
+                f'.deleted={auth_details.deleted}'
+            )
         if auth_details.parent_user_id is not None:
             return None
         return WeakRecord(
