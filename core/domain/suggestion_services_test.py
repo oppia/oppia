@@ -23,6 +23,7 @@ import string
 from core import feature_flag_list, feconf, utils
 from core.constants import constants
 from core.domain import (
+    caching_services,
     exp_domain,
     exp_fetchers,
     exp_services,
@@ -44,6 +45,7 @@ from core.domain import (
     topic_fetchers,
     topic_services,
     translation_domain,
+    translation_services,
     user_services,
 )
 from core.platform import models
@@ -314,6 +316,119 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.author_id,
                 add_translation_change_dict,
                 'test description',
+            )
+
+    def test_create_translation_suggestion_fails_if_duplicate_exists(
+        self,
+    ) -> None:
+
+        # Create an exploration with the content.
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp.states['Introduction'].update_content(
+            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': exp.states['Introduction'].content.html,
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            exp.version,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+
+        # Trying to subscribe a second suggestion for the same content should
+        # fail.
+        with self.assertRaisesRegex(
+            Exception,
+            'A translation suggestion for this content already exists '
+            'and is currently in review.',
+        ):
+            suggestion_services.create_suggestion(
+                feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.target_id,
+                exp.version,
+                'author_2',
+                change_dict,
+                'test description',
+            )
+
+    def test_accept_suggestion_fails_if_already_translated(self) -> None:
+
+        # Create an exploration with the content.
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.target_id, title='Title', category='Category'
+        )
+        exp.states['Introduction'].update_content(
+            state_domain.SubtitledHtml('content_0', '<p>The content html</p>')
+        )
+        exp_services.save_new_exploration(self.author_id, exp)
+        caching_services.flush_memory_caches()
+
+        change_dict = {
+            'cmd': exp_domain.CMD_ADD_WRITTEN_TRANSLATION,
+            'state_name': 'Introduction',
+            'content_id': 'content_0',
+            'language_code': 'hi',
+            'content_html': exp.states['Introduction'].content.html,
+            'translation_html': '<p>Translation for content.</p>',
+            'data_format': 'html',
+        }
+
+        suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            self.target_id,
+            exp.version,
+            self.author_id,
+            change_dict,
+            'test description',
+        )
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), ('target_id', self.target_id)]
+        )[0]
+
+        # Simulate that the content has already been translated (e.g. by another
+        # user).
+        translation_services.add_new_translation(
+            feconf.TranslatableEntityType.EXPLORATION,
+            self.target_id,
+            exp.version,
+            'hi',
+            'content_0',
+            translation_domain.TranslatedContent(
+                '<p>Old translation</p>',
+                translation_domain.TranslatableContentFormat.HTML,
+                False,
+            ),
+        )
+
+        with self.assertRaisesRegex(
+            Exception,
+            'The content with content_id content_0 has already been '
+            'translated to hi.',
+        ):
+            suggestion_services.accept_suggestion(
+                suggestion.suggestion_id,
+                self.reviewer_id,
+                self.COMMIT_MESSAGE,
+                'review message',
             )
 
     def test_get_submitted_submissions(self) -> None:
