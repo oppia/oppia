@@ -33,10 +33,6 @@ handlers:
   secure: always
 
 # DEVELOPMENT STATIC
-- url: /third_party/mathjax
-  static_dir: third_party/mathjax
-  secure: always
-  expiration: "0"
 - url: /webpack_bundles
   static_dir: webpack_bundles
   secure: always
