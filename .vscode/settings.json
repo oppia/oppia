@@ -14,5 +14,7 @@
             "karmaConfFilePath": "${workspaceFolder}/karma.conf.js"
         }
     ],
-    "testExplorer.codeLens": true
+    "testExplorer.codeLens": true,
+    "snyk.advanced.organization": "46c9764c-492b-4f74-aae7-f7fbbb9884c9",
+    "snyk.advanced.autoSelectOrganization": true
 }
