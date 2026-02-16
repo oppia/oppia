@@ -2817,9 +2817,9 @@ export class LoggedInUser extends BaseUser {
     );
     await this.waitForElementToBeClickable(addNewGoalButtonSelector);
     await this.page.click(addNewGoalButtonSelector);
-
+    await this.waitForNetworkIdle();
     await this.page.waitForSelector(newGoalsListInRedesignedLearnerDashboard, {
-      visible: false,
+      hidden: true,
     });
   }
 
