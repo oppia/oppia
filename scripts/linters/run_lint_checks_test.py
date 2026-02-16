@@ -68,10 +68,7 @@ def all_checks_passed(linter_stdout: List[str]) -> bool:
     Returns:
         bool. Whether all checks have passed or not.
     """
-    # Consider any run successful if the success marker appears anywhere in the
-    # captured output. Join stdout to tolerate cases where messages are printed
-    # as multi-line banners.
-    return 'All Linter Checks Passed.' in ' '.join(linter_stdout)
+    return 'All Linter Checks Passed.' in linter_stdout[-1]
 
 
 class PreCommitLinterTests(test_utils.LinterTestBase):
@@ -335,8 +332,9 @@ class PreCommitLinterTests(test_utils.LinterTestBase):
     def test_html_file(self) -> None:
         with self.print_swap, self.sys_swap, self.install_swap:
             run_lint_checks.main(args=['--path=%s' % VALID_HTML_FILEPATH])
-        # Allow extra log lines but require the success marker to appear.
-        self.assertIn('All Linter Checks Passed.', ' '.join(self.linter_stdout))
+        self.assert_same_list_elements(
+            ['All Linter Checks Passed.'], self.linter_stdout
+        )
 
     def test_get_changed_filepaths(self) -> None:
         def mock_check_output(unused_list: List[str]) -> Optional[str]:
