@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides PTransforms for operating on the records in our auth provider."""
+"""Provides PTransforms for operating on Firebase records."""
 
 from __future__ import annotations
 
@@ -43,17 +43,17 @@ auth_models, user_models = models.Registry.import_models(
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class GetStrongRecords(beam.PTransform):  # type: ignore[misc]
-    """Gets the collection of "strong" records directly from our auth provider.
+    """Gets the collection of "strong" records directly from Firebase.
 
-    These records are considered to be "strong" because they are based on our
-    auth provider's _real_ data. In other words, this collection represents the
+    These records are considered to be "strong" because they are based on
+    Firebase's _real_ data. In other words, this collection represents the
     source of truth.
     """
 
     def expand(
         self, pbegin: pvalue.PBegin
     ) -> beam.PCollection[firebase_adapters.StrongRecord]:
-        """Returns all of the records directly from our auth provider.
+        """Returns all of the records directly from Firebase.
 
         Args:
             pbegin: PBegin. The beginning of the pipeline.
@@ -88,7 +88,7 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
     def expand(
         self, pbegin: pvalue.PBegin
     ) -> beam.PCollection[firebase_adapters.WeakRecord]:
-        """Returns all of the records *assumed* to be in our auth provider.
+        """Returns all of the records *assumed* to be in Firebase.
 
         Args:
             pbegin: PBegin. The beginning of the pipeline.
@@ -148,12 +148,12 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class ImportRecords(beam.PTransform):  # type: ignore[misc]
-    """Creates auth provider records WITHOUT protecting against duplicates."""
+    """Imports records into Firebase WITHOUT protecting against duplicates."""
 
     def expand(
         self, weak_records: beam.PCollection[firebase_adapters.WeakRecord]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Creates records into our auth provider WITHOUT safety checks.
+        """Imports records into Firebase WITHOUT safety checks.
 
         WARNING: This operation DOES NOT protect against duplicate records!
         The ONLY way to guarantee this function is used safely is by running it
@@ -190,12 +190,12 @@ class ImportRecords(beam.PTransform):  # type: ignore[misc]
 
 # TODO(#15613): Here we use MyPy ignore because Apache Beam lacks type hints.
 class DeleteRecords(beam.PTransform):  # type: ignore[misc]
-    """Deletes auth provider records kept in our auth provider."""
+    """Deletes records from Firebase."""
 
     def expand(
         self, auth_ids: beam.PCollection[firebase_adapters.StrongRecord]
     ) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Deletes records from our auth provider.
+        """Deletes records from Firebase.
 
         Args:
             auth_ids: PCollection[str]. The Firebase account IDs to delete.
