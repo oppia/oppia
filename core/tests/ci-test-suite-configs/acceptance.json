@@ -1,8 +1,8 @@
 {
   "suites": [
     {
-      "name":"creator-dashboard-visitor/visit-creator-dashboard",
-      "module":"core/tests/puppeteer-acceptance-tests/specs/creator-dashboard-visitor/visit-creator-dashboard.spec.ts"
+      "name": "creator-dashboard-visitor/visit-creator-dashboard",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/creator-dashboard-visitor/visit-creator-dashboard.spec.ts"
     },
     {
       "name": "logged-out-user/deny-access-to-dashboards-and-actions-without-login",
