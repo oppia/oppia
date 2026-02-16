@@ -508,7 +508,9 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
- /**enables the list view of the exploration */
+ /**
+  * Enables the list view of the exploration.
+  */
   async switchToListView(): Promise<void> {
     await this.page.waitForSelector(listViewButtonSelector, {
       visible: true,

@@ -369,7 +369,9 @@ const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
 
-  /** star Rate the exploration using star */
+  /** 
+   * Star Rate the exploration using star.
+   */
   async starRateExploration(stars: number): Promise<void> {
   // Wait until rating stars are rendered
    await this.page.waitForSelector(
@@ -385,24 +387,7 @@ export class LoggedInUser extends BaseUser {
 
     await ratingStars[stars - 1].click();
   }
-  /**submit the feedback for the exploration */
-  async submitFeedback(): Promise<void> {
-    await this.clickOnElementWithSelector(submitButtonSelector);
-
-    await this.page.waitForSelector(submittedMessageSelector, {
-      visible: true,});
-
-    const submittedMessageText = await this.page.$eval(
-      submittedMessageSelector,
-      (el: Element) => el.textContent
-    );
-
-    if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
-     throw new Error(
-       `Unexpected submitted message text: ${submittedMessageText}`
-      );
-    }
-  }
+  
   /**
    * Clicks on the given button in the remove activity modal.
    * @param {'Remove' | 'Cancel'} button - The button to click.
@@ -574,7 +559,9 @@ export class LoggedInUser extends BaseUser {
     });
   }
 
-  /**navigate to community library */
+  /** 
+   * Navigate to community library.
+   */
   async navigateToCommunityLibrary(): Promise<void> {
     await this.goto(testConstants.URLs.CommunityLibrary);
     await this.waitForPageToFullyLoad();
@@ -2928,10 +2915,31 @@ export class LoggedInUser extends BaseUser {
     }
     await this.clickOnElementWithSelector(submitButtonSelector);
 
+    await this.page.waitForSelector(submittedMessageSelector, {
+      visible: true,});
+
+    const submittedMessageText = await this.page.$eval(
+      submittedMessageSelector,
+      (el: Element) => el.textContent
+    );
+    if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
+     throw new Error(
+       `Unexpected submitted message text: ${submittedMessageText}`
+      );
+    }
+    await this.page.waitForFunction(
+      (selector: string) => {
+        const el = document.querySelector(selector) as HTMLElement | null;
+        return !el || el.offsetParent === null;
+      },
+      {},
+      submittedMessageSelector
+    );
     await this.page.waitForSelector(feedbackTextareaSelector, {
       hidden: true,
     });
   }
+  
 
   /**
    * Function to start a goal from the goal section in the
