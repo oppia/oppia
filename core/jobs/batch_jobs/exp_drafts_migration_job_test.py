@@ -17,6 +17,7 @@
 """Unit tests for exp_drafts_migration_job."""
 
 from __future__ import annotations
+
 from core import feconf
 from core.domain import exp_domain, exp_services, rights_manager, state_domain
 from core.jobs import job_test_utils
