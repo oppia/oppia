@@ -19,10 +19,17 @@
 import {TestBed} from '@angular/core/testing';
 import {PreventPageUnloadEventService} from 'services/prevent-page-unload-event.service';
 import {WindowRef} from 'services/contextual/window-ref.service';
+import {EventEmitter} from '@angular/core';
+import {SignInEventService} from 'services/sign-in-event.service';
+
+class MockSignInEventService {
+  onUserSignIn = new EventEmitter<void>();
+}
 
 describe('Prevent page unload event service', function () {
   let preventPageUnloadEventService: PreventPageUnloadEventService;
   let windowRef: WindowRef;
+  let mockSignInEventService: MockSignInEventService;
 
   var reloadEvt = document.createEvent('Event');
   reloadEvt.initEvent('mockbeforeunload', true, true);
@@ -30,8 +37,15 @@ describe('Prevent page unload event service', function () {
   reloadEvt.preventDefault = () => {};
 
   beforeEach(() => {
+    mockSignInEventService = new MockSignInEventService();
     TestBed.configureTestingModule({
-      providers: [PreventPageUnloadEventService],
+      providers: [
+        PreventPageUnloadEventService,
+        {
+          provide: SignInEventService,
+          useValue: mockSignInEventService,
+        },
+      ],
     });
     preventPageUnloadEventService = TestBed.inject(
       PreventPageUnloadEventService
@@ -137,5 +151,12 @@ describe('Prevent page unload event service', function () {
 
     expect(reloadEvt.preventDefault).not.toHaveBeenCalled();
     expect(preventPageUnloadEventService.isListenerActive()).toBe(true);
+  });
+
+  it('should remove listener on sign in', () => {
+    spyOn(preventPageUnloadEventService, 'removeListener');
+    mockSignInEventService.onUserSignIn.emit();
+
+    expect(preventPageUnloadEventService.removeListener).toHaveBeenCalled();
   });
 });
