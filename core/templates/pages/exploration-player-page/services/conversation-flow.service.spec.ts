@@ -1568,6 +1568,10 @@ describe('Conversation flow service', () => {
       spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
         freshCard
       );
+      // Mock getNextStateCard to return a card with the stuck state name.
+      spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
+        getStateName: () => 'StuckState',
+      });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
 
@@ -1600,6 +1604,10 @@ describe('Conversation flow service', () => {
       spyOn(explorationEngineService, 'getStateCardByName').and.returnValue(
         freshCard
       );
+      // Mock getNextStateCard to return a card with the stuck state name.
+      spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
+        getStateName: () => 'StuckState',
+      });
       spyOn(conversationFlowService, 'setNextStateCard');
       spyOn(conversationFlowService, 'showPendingCard');
 
@@ -1629,6 +1637,41 @@ describe('Conversation flow service', () => {
       conversationFlowService.showUpcomingCard();
 
       // Should fall through to normal navigation.
+      expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
+    });
+    it('should ignore originalStuckStateName if next card is different (linear progression)', () => {
+      conversationFlowService.displayedCard = createCard('CurrentState');
+      conversationFlowService.setOriginalStuckStateName('StuckState');
+
+      spyOn(conceptCardManagerService, 'getConceptCard').and.returnValue(null);
+      spyOn(conversationFlowService, 'isLearnAgainButton').and.returnValue(
+        false
+      );
+      // Determine that the engine wants to go to 'EndState', NOT 'StuckState'.
+      spyOn(conversationFlowService, 'getNextStateCard').and.returnValue({
+        getStateName: () => 'EndState',
+      });
+      // Mock getStateCardByName just in case, though it shouldn't be called for the stuck state.
+      spyOn(explorationEngineService, 'getStateCardByName');
+      spyOn(conversationFlowService, 'setNextStateCard');
+      spyOn(conversationFlowService, 'showPendingCard');
+      // Helper spy.
+      spyOn(conversationFlowService, 'getAnswerIsCorrect').and.returnValue(
+        false
+      );
+      spyOn(conversationFlowService, 'setAnswerIsCorrect');
+
+      conversationFlowService.showUpcomingCard();
+
+      // Verify the stuck state name tracking is CLEARED.
+      expect(conversationFlowService.getOriginalStuckStateName()).toBeNull();
+
+      // Verify we did NOT try to create a fresh card for the stuck state.
+      expect(
+        explorationEngineService.getStateCardByName
+      ).not.toHaveBeenCalledWith('StuckState');
+
+      // Verify we proceeded with normal flow.
       expect(conversationFlowService.showPendingCard).toHaveBeenCalled();
     });
   });

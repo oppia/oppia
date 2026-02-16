@@ -967,9 +967,11 @@ describe('New Conversation skin component', () => {
       'getSolution',
       'getStateName',
       'getHints',
+      'getInteractionId',
     ]);
     mockStateCard.getSolution.and.returnValue(mockSolution);
     mockStateCard.getStateName.and.returnValue('LessonState');
+    mockStateCard.getInteractionId.and.returnValue('TextInput');
     mockStateCard.getHints.and.returnValue([]);
     spyOn(conversationFlowService, 'setSolutionForState');
     spyOn(playerTranscriptService, 'resetNumberOfIncorrectSubmissions');

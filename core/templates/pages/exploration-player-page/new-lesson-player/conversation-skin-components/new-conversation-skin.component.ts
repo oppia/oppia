@@ -210,6 +210,13 @@ export class NewConversationSkinComponent {
             }
           }
 
+          // The continueToReviseStateButtonIsVisible should not be set for 'Continue'
+          // interaction, because the Continue button is already visible and
+          // clicking it should simply move to the next state, not trigger
+          // potentially dangerous stuck redirection logic.
+          if (newCard.getInteractionId() === 'Continue') {
+            return;
+          }
           this.conversationFlowService.triggerIfLearnerStuckAction(true, () => {
             this.continueToReviseStateButtonIsVisible = true;
           });

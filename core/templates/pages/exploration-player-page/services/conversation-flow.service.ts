@@ -614,17 +614,29 @@ export class ConversationFlowService {
     // to an earlier card for revision. After completing it, create a fresh card
     // for the original stuck state so the learner can try again without seeing
     // their old failed attempts.
+    // Handle returning from a stuck state redirect.
+    // If we have an originalStuckStateName, it means the learner was redirected
+    // to an earlier card for revision.
     if (this.originalStuckStateName !== null) {
       const stuckStateName = this.originalStuckStateName;
       // Clear the tracking before navigating.
       this.originalStuckStateName = null;
-      // Create a fresh StateCard for the stuck state.
-      const freshStuckCard =
-        this.explorationEngineService.getStateCardByName(stuckStateName);
-      // Set it as the next card and show it.
-      this.setNextStateCard(freshStuckCard);
-      this.showPendingCard();
-      return;
+
+      // If the next card is indeed the stuck state, we apply the fix to create
+      // a fresh card.
+      if (nextCard.getStateName() === stuckStateName) {
+        // Create a fresh StateCard for the stuck state so the learner can try again
+        // without seeing their old failed attempts.
+        const freshStuckCard =
+          this.explorationEngineService.getStateCardByName(stuckStateName);
+        // Set it as the next card and show it.
+        this.setNextStateCard(freshStuckCard);
+        this.showPendingCard();
+        return;
+      }
+      // If nextCard is NOT the stuck state (e.g., the learner moved PAST the stuck state
+      // to the end of the lesson), we just proceed with the normal flow (displayed below),
+      // effectively ignoring the stuck state tracking since we have moved on.
     }
     /* This is for the following situation:
         if A->B->C is the arrangement of cards and C redirected to A,
