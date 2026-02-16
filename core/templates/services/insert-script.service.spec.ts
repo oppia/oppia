@@ -21,7 +21,6 @@ import {
   InsertScriptService,
   KNOWN_SCRIPTS,
 } from 'services/insert-script.service';
-import {AppConstants} from 'app.constants';
 
 class MockRenderer {
   createElement(tag: string) {
@@ -48,8 +47,8 @@ describe('InsertScriptService', () => {
         {provide: RendererFactory2, useClass: MockRendererFactory},
       ],
     });
-    insertScriptService = TestBed.get(InsertScriptService);
-    rendererFactory = TestBed.get(RendererFactory2);
+    insertScriptService = TestBed.inject(InsertScriptService);
+    rendererFactory = TestBed.inject(RendererFactory2);
   });
 
   it('should not reload script if already loaded', (done: jasmine.DoneFn) => {
@@ -141,12 +140,10 @@ describe('InsertScriptService', () => {
       }
     );
 
-    const expectedPath = AppConstants.DEV_MODE
-      ? '/third_party/mathjax/MathJax.js?config=default'
-      : '/build/third_party/mathjax/MathJax.js?config=default';
-
     const result = insertScriptService.loadScript(KNOWN_SCRIPTS.MATHJAX, () => {
-      expect(mockScriptElement.src).toBe(expectedPath);
+      expect(mockScriptElement.src).toContain(
+        'assets/mathjax/MathJax.js?config=TeX-AMS_HTML'
+      );
       done();
     });
 

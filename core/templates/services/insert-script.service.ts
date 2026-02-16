@@ -17,7 +17,6 @@
  */
 
 import {Injectable, Renderer2, RendererFactory2} from '@angular/core';
-import {AppConstants} from 'app.constants';
 
 export enum KNOWN_SCRIPTS {
   DONORBOX = 'DONORBOX',
@@ -69,16 +68,10 @@ export class InsertScriptService {
           scriptElement.setAttribute('paypalExpress', 'false');
           scriptElement.async = true;
           break;
-        case KNOWN_SCRIPTS.MATHJAX: {
-          // Serve MathJax from third_party in dev, from build in prod.
-          // MathJax is copied to third_party/mathjax during setup to avoid
-          // serving directly from node_modules.
-          const mathJaxBasePath = AppConstants.DEV_MODE
-            ? '/third_party/mathjax/'
-            : '/build/third_party/mathjax/';
-          scriptElement.src = `${mathJaxBasePath}MathJax.js?config=default`;
+        case KNOWN_SCRIPTS.MATHJAX:
+          scriptElement.src = 'assets/mathjax/MathJax.js?config=TeX-AMS_HTML';
+          scriptElement.async = true;
           break;
-        }
         case KNOWN_SCRIPTS.PENCILCODE:
           scriptElement.src = 'https://pencilcode.net/lib/pencilcodeembed.js';
           break;
