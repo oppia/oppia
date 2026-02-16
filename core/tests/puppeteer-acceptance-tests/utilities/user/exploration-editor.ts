@@ -433,8 +433,7 @@ const answerInputSelector = '.e2e-test-answer-description-fragment input';
 const saveAnswerButtonInResponseGroupSelector = '.e2e-test-save-answer';
 const activeRuleTabClass = 'oppia-rule-tab-active';
 const activeTabClass = 'e2e-test-active-tab';
-const listViewButtonSelector =
-      '.e2e-test-oppia-list-view-btn';
+const listViewButtonSelector = '.e2e-test-oppia-list-view-btn';
 
 export enum INTERACTION_TYPES {
   ALGEBRAIC_EXPRESSION = 'Algebraic Expression Input',
@@ -508,23 +507,21 @@ export class ExplorationEditor extends BaseUser {
     await this.clickOnElementWithSelector(feedbackResponseRemoveSelector);
     await this.expectElementToBeVisible(feedbackResponseRemoveSelector, false);
   }
- /**
-  * Enables the list view of the exploration.
-  */
+  /**
+   * Enables the list view of the exploration.
+   */
   async switchToListView(): Promise<void> {
     await this.page.waitForSelector(listViewButtonSelector, {
       visible: true,
     });
 
-     await this.clickOnElementWithSelector(listViewButtonSelector);
+    await this.clickOnElementWithSelector(listViewButtonSelector);
 
-  // Optional safety check: ensure list view is applied
+    // Optional safety check: ensure list view is applied.
     await this.page.waitForFunction(() => {
-    return document.querySelector(
-      '.e2e-test-oppia-list-view-btn'
-    ) !== null;
-  });
-}
+      return document.querySelector('.e2e-test-oppia-list-view-btn') !== null;
+    });
+  }
 
   /**
    * Click on the submit answer button.

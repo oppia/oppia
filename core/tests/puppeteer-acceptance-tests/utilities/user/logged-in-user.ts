@@ -368,26 +368,22 @@ const continueWhereYouLeftOffSection = '.e2e-test-continue-section';
 const nonEmptySectionSelector = '.e2e-test-non-empty-section';
 
 export class LoggedInUser extends BaseUser {
-
-  /** 
-   * Star Rate the exploration using star.
+  /**
+   * Star rate the exploration using star.
    */
   async starRateExploration(stars: number): Promise<void> {
-  // Wait until rating stars are rendered
-   await this.page.waitForSelector(
-      '.e2e-test-rating-star',
-       { visible: true }
-    );
+    // Wait until rating stars are rendered.
+    await this.page.waitForSelector('.e2e-test-rating-star', {visible: true});
 
     const ratingStars = await this.page.$$('.e2e-test-rating-star');
 
     if (ratingStars.length < stars) {
-     throw new Error(`Only ${ratingStars.length} stars found`);
+      throw new Error(`Only ${ratingStars.length} stars found`);
     }
 
     await ratingStars[stars - 1].click();
   }
-  
+
   /**
    * Clicks on the given button in the remove activity modal.
    * @param {'Remove' | 'Cancel'} button - The button to click.
@@ -559,7 +555,7 @@ export class LoggedInUser extends BaseUser {
     });
   }
 
-  /** 
+  /**
    * Navigate to community library.
    */
   async navigateToCommunityLibrary(): Promise<void> {
@@ -2916,15 +2912,16 @@ export class LoggedInUser extends BaseUser {
     await this.clickOnElementWithSelector(submitButtonSelector);
 
     await this.page.waitForSelector(submittedMessageSelector, {
-      visible: true,});
+      visible: true,
+    });
 
     const submittedMessageText = await this.page.$eval(
       submittedMessageSelector,
       (el: Element) => el.textContent
     );
     if (submittedMessageText.trim() !== 'Thank you for the feedback!') {
-     throw new Error(
-       `Unexpected submitted message text: ${submittedMessageText}`
+      throw new Error(
+        `Unexpected submitted message text: ${submittedMessageText}`
       );
     }
     await this.page.waitForFunction(
@@ -2939,7 +2936,6 @@ export class LoggedInUser extends BaseUser {
       hidden: true,
     });
   }
-  
 
   /**
    * Function to start a goal from the goal section in the
