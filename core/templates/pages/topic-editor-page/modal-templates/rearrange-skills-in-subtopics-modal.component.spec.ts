@@ -217,17 +217,26 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call TopicUpdateService when skill is moved', () => {
-    const event = {
+    const previousContainer = {
+      id: 'prev',
+      data: ['1', '2'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: ['3'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
       currentIndex: 2,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['3'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      previousContainer,
+      container,
+      item: {data: previousContainer.data[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
     let moveSkillSpy = spyOn(topicUpdateService, 'moveSkillToSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
@@ -237,17 +246,26 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call TopicUpdateService when skill is removed from subtopic', () => {
-    const event = {
+    const previousContainer = {
+      id: 'prev',
+      data: ['1', '2'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: ['1'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
       currentIndex: 1,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['1'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      previousContainer,
+      container,
+      item: {data: previousContainer.data[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
@@ -257,21 +275,28 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call TopicUpdateService when new Subtopic Id is null', () => {
-    const event = {
+    const previousContainer = {
+      id: 'prev',
+      data: ['1', '2'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: ['1'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
       currentIndex: 1,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['1'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      previousContainer,
+      container,
+      item: {data: previousContainer.data[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
 
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
-    // Must set skillSummaryToMove before setting oldSubtopicId to null.
     component.skillSummaryToMove = ShortSkillSummary.create('1', 'Skill 1');
     component.oldSubtopicId = null;
     component.onMoveSkillEnd(event, null);
@@ -347,17 +372,26 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should not call removeSkillFromSubtopic when newSubtopicId equals oldSubtopicId', () => {
-    const event = {
+    const previousContainer = {
+      id: 'prev',
+      data: ['1', '2'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: ['3'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 1,
       currentIndex: 2,
-      previousContainer: {
-        data: ['1', '2'],
-      },
-      container: {
-        data: ['3'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      previousContainer,
+      container,
+      item: {data: previousContainer.data[1]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
+
     let removeSkillSpy = spyOn(topicUpdateService, 'removeSkillFromSubtopic');
     component.ngOnInit();
     let skillSummary = ShortSkillSummary.create('1', 'Skill description');
@@ -455,17 +489,25 @@ describe('Rearrange Skills In Subtopic Modal Component', () => {
   });
 
   it('should call initEditor after onMoveSkillEnd completes skill transfer', () => {
-    const event = {
+    const previousContainer = {
+      id: 'prev',
+      data: ['1'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const container = {
+      id: 'curr',
+      data: ['2'] as unknown as ShortSkillSummary[],
+    } as CdkDropList<ShortSkillSummary[]>;
+
+    const event: CdkDragDrop<ShortSkillSummary[]> = {
       previousIndex: 0,
       currentIndex: 0,
-      previousContainer: {
-        data: ['1'],
-      },
-      container: {
-        data: ['2'],
-      },
-      item: {},
-    } as unknown as CdkDragDrop<ShortSkillSummary[]>;
+      previousContainer,
+      container,
+      item: {data: previousContainer.data[0]} as CdkDrag<ShortSkillSummary>,
+      isPointerOverContainer: true,
+      distance: {x: 0, y: 0},
+    };
 
     spyOn(topicUpdateService, 'moveSkillToSubtopic');
     spyOn(component, 'initEditor').and.callThrough();
