@@ -215,7 +215,7 @@ class ExplorationModel(base_models.VersionedModel):
     )
     # Tags (topics, skills, concepts, etc.) associated with this
     # exploration.
-    tags: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
     blurb = datastore_services.TextProperty(default='', indexed=False)
     # 'Author notes' for this exploration.
@@ -238,9 +238,9 @@ class ExplorationModel(base_models.VersionedModel):
     param_specs = datastore_services.JsonProperty(default={}, indexed=False)
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
-    param_changes: List[Any] = datastore_services.JsonProperty(
+    param_changes = datastore_services.JsonProperty(
         repeated=True, indexed=False
-    )  # type: ignore[assignment]
+    )
     # A boolean indicating whether automatic text-to-speech is enabled in
     # this exploration.
     auto_tts_enabled = datastore_services.BooleanProperty(
@@ -1097,7 +1097,7 @@ class ExpSummaryModel(base_models.BaseModel):
         required=True, indexed=True
     )
     # Tags associated with this exploration.
-    tags: List[str] = datastore_services.StringProperty(repeated=True, indexed=True)  # type: ignore[assignment]
+    tags = datastore_services.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the exploration.
     ratings = datastore_services.JsonProperty(default=None, indexed=False)
@@ -1136,23 +1136,23 @@ class ExpSummaryModel(base_models.BaseModel):
     )
 
     # The user_ids of owners of this exploration.
-    owner_ids: List[str] = datastore_services.StringProperty(indexed=True, repeated=True)  # type: ignore[assignment]
+    owner_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
-    editor_ids: List[str] = datastore_services.StringProperty(indexed=True, repeated=True)  # type: ignore[assignment]
+    editor_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to voiceover this exploration.
-    voice_artist_ids: List[str] = datastore_services.StringProperty(
+    voice_artist_ids = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
     # The user_ids of users who are allowed to view this exploration.
-    viewer_ids: List[str] = datastore_services.StringProperty(indexed=True, repeated=True)  # type: ignore[assignment]
+    viewer_ids = datastore_services.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
     # positive (not just a revert) change to the exploration's content).
     # NOTE TO DEVELOPERS: contributor_ids and contributors_summary need to be
     # synchronized, meaning that the keys in contributors_summary need be
     # equal to the contributor_ids list.
-    contributor_ids: List[str] = datastore_services.StringProperty(
+    contributor_ids = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
     # A dict representing the contributors of non-trivial commits to this
     # exploration. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
@@ -1400,9 +1400,9 @@ class ExplorationVersionHistoryModel(base_models.BaseModel):
     # The user ids of the users who did the 'previous commit' on each state
     # in this version of the exploration. It is required during the
     # wipeout process to query for the models efficiently.
-    committer_ids: List[str] = datastore_services.StringProperty(
+    committer_ids = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
 
     @classmethod
     def get_instance_id(cls, exp_id: str, exp_version: int) -> str:

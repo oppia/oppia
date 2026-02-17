@@ -1072,6 +1072,7 @@ class VersionedModel(BaseModel):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+
     def delete(  # type: ignore[override]
         self,
         committer_id: str,
@@ -1154,6 +1155,7 @@ class VersionedModel(BaseModel):
     # Here we use MyPy ignore because the signature of this method
     # doesn't match with BaseModel.delete_multi().
     # https://mypy.readthedocs.io/en/stable/error_code_list.html#check-validity-of-overrides-override
+
     @classmethod
     def delete_multi(  # type: ignore[override]
         cls,
@@ -1847,14 +1849,14 @@ class BaseSnapshotMetadataModel(BaseModel):
     # Represented as a list of dicts.
     commit_cmds = datastore_services.JsonProperty(indexed=False)
     # The user ids that are in some field in commit_cmds.
-    commit_cmds_user_ids: List[str] = datastore_services.StringProperty(
+    commit_cmds_user_ids = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )  # type: ignore[assignment]
+    )
     # The user ids that are enclosed inside the 'content' field in the relevant
     # snapshot content model.
-    content_user_ids: List[str] = datastore_services.StringProperty(
+    content_user_ids = datastore_services.StringProperty(
         repeated=True, indexed=True
-    )  # type: ignore[assignment]
+    )
 
     @staticmethod
     def get_deletion_policy() -> DELETION_POLICY:

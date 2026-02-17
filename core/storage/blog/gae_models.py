@@ -79,9 +79,9 @@ class BlogPostModel(base_models.BaseModel):
         indexed=True, required=True
     )
     # Tags associated with the blog post.
-    tags: List[str] = datastore_services.StringProperty(
+    tags = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
     # The thumbnail filename of the blog post. It's value will be None until
     # a thumbnail is added to the blog post. It can be None only when blog
     # post is a draft.
@@ -267,9 +267,9 @@ class BlogPostSummaryModel(base_models.BaseModel):
         indexed=True, required=True
     )
     # Tags associated with the blog post.
-    tags: List[str] = datastore_services.StringProperty(
+    tags = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
     # The thumbnail filename of the blog post.It's value will be none until
     # a thumbnail is added to the blog post.It can be None only when blog
     # post is a draft.
@@ -336,9 +336,9 @@ class BlogPostRightsModel(base_models.BaseModel):
     """
 
     # The user_ids of the blog editors of this blog post.
-    editor_ids: List[str] = datastore_services.StringProperty(
+    editor_ids = datastore_services.StringProperty(
         indexed=True, repeated=True
-    )  # type: ignore[assignment]
+    )
 
     # Whether this blog post is published or not.
     # False if blog post is a draft, True if published.

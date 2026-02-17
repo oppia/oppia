@@ -63,6 +63,10 @@ class PlatformParameterModel(base_models.VersionedModel):
     SNAPSHOT_METADATA_CLASS = PlatformParameterSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = PlatformParameterSnapshotContentModel
 
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
+    # Here we use type Any because the list content is a dictionary with
+    # dynamic keys.
     rules: List[Any] = datastore_services.JsonProperty(
         repeated=True
     )  # type: ignore[assignment]
@@ -153,6 +157,8 @@ class FeatureFlagConfigModel(base_models.BaseModel):
         default=0, indexed=True
     )
     # A list of IDs of user groups for which the feature flag will be enabled.
+    # Here we use MyPy ignore because the inferred type of the property
+    # does not match the type annotation.
     user_group_ids: List[str] = datastore_services.StringProperty(
         repeated=True
     )  # type: ignore[assignment]

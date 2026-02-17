@@ -112,7 +112,7 @@ class ModelPropertyTests(test_utils.TestBase):
         model = SubclassOfBaseModel(value='123')
 
         with self.assertRaisesRegex(TypeError, 'not an NDB Property'):
-            model_property.ModelProperty(SubclassOfBaseModel, model.value)
+            model_property.ModelProperty(SubclassOfBaseModel, model.value)  # type: ignore[arg-type]
 
     def test_init_raises_value_error_when_property_is_not_in_model(
         self,
