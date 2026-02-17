@@ -256,7 +256,7 @@ describe('Logged-In Learner', function () {
         'What are the Place Values'
       );
       await loggedInLearner2.expectScreenshotToMatch(
-        'Chap2GreadedOutHasComingSoonLabel',
+        'Chap2GrayedOut',
         __dirname
       );
 

@@ -186,7 +186,7 @@ describe('Logged-In Learner', function () {
         await curriculumAdmin.clickOnElementWithSelector(publishChapterButton);
       }
       await curriculumAdmin.expectScreenshotToMatch(
-        'ConfirmationModalOpen',
+        'unpublishConfirmationPopup',
         __dirname
       );
       await curriculumAdmin.clickOnElementWithSelector(
