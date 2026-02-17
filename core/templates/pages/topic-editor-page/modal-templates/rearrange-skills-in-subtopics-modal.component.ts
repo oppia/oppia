@@ -123,7 +123,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
       }
 
       if (newSubtopicId === null) {
-        if (this.oldSubtopicId == null) {
+        if (this.oldSubtopicId === null) {
           return;
         }
         // Note: oldSubtopicId cannot be null here because if both were null,
