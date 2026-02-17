@@ -1025,17 +1025,17 @@ describe('New Conversation skin component', () => {
     spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue({
       cardIsCheckpoint: false,
     });
-    // Spy on the stuck action trigger to verify it is NOT called
+    // Spy on the stuck action trigger to verify it is NOT called.
     spyOn(conversationFlowService, 'triggerIfLearnerStuckAction');
 
     componentInstance.ngOnInit();
 
-    // Ensure initial state
+    // Ensure initial state.
     componentInstance.continueToReviseStateButtonIsVisible = false;
 
     playerPositionService.onNewCardOpened.emit(mockStateCard);
 
-    // Verify the guard clause worked: stuck action should NOT be triggered
+    // Verify the guard clause worked: stuck action should NOT be triggered.
     expect(
       conversationFlowService.triggerIfLearnerStuckAction
     ).not.toHaveBeenCalled();
