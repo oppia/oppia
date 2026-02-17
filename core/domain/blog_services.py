@@ -459,7 +459,7 @@ def does_blog_post_with_url_fragment_exist(url_fragment: str) -> bool:
         url_fragment: str. The url fragment for the blog post.
 
     Returns:
-        bool. Whether the the url fragment for the blog post exists.
+        bool. Whether the url fragment for the blog post exists.
 
     Raises:
         Exception. Blog Post URL fragment is not a string.
