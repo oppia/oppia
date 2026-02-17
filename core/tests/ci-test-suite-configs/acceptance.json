@@ -349,6 +349,10 @@
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/access-the-lesson-player.spec.ts"
     },
     {
+      "name": "logged-out-learner/access-the-new-lesson-player",
+      "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/access-the-new-lesson-player.spec.ts"
+    },
+    {
       "name": "logged-out-learner/complete-the-embedded-lesson",
       "module": "core/tests/puppeteer-acceptance-tests/specs/logged-out-learner/complete-the-embedded-lesson.spec.ts"
     },
