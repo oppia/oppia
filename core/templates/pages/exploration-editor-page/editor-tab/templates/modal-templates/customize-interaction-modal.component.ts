@@ -236,8 +236,10 @@ export class CustomizeInteractionModalComponent
     this.stateInteractionIdService.displayed = newInteractionId;
     this.stateCustomizationArgsService.displayed = {};
     if (this.interactionDetailsCacheService.contains(newInteractionId)) {
-      this.stateCustomizationArgsService.displayed =
-        this.interactionDetailsCacheService.get(newInteractionId)!;
+      const cached = this.interactionDetailsCacheService.get(newInteractionId);
+      if (cached) {
+        this.stateCustomizationArgsService.displayed = cached;
+      }
     } else {
       const customizationArgsBackendDict: Record<
         string,
@@ -399,12 +401,16 @@ export class CustomizeInteractionModalComponent
 
       if (schemaIsSubtitledHtml) {
         const subtitledHtmlValue = value as SubtitledHtml;
-        contentIdToContent[subtitledHtmlValue.contentId!] =
-          subtitledHtmlValue.html;
+        if (subtitledHtmlValue.contentId !== null) {
+          contentIdToContent[subtitledHtmlValue.contentId] =
+            subtitledHtmlValue.html;
+        }
       } else if (schemaIsSubtitledUnicode) {
         const subtitledUnicodeValue = value as SubtitledUnicode;
-        contentIdToContent[subtitledUnicodeValue.contentId!] =
-          subtitledUnicodeValue.unicode;
+        if (subtitledUnicodeValue.contentId !== null) {
+          contentIdToContent[subtitledUnicodeValue.contentId] =
+            subtitledUnicodeValue.unicode;
+        }
       } else if (schema.type === SchemaConstants.SCHEMA_KEY_LIST) {
         for (let i = 0; i < (value as Object[]).length; i++) {
           traverseSchemaAndCollectContent(
