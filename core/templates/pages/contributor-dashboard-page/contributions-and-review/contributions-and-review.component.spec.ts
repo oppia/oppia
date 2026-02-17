@@ -100,7 +100,7 @@ describe('Contributions and review component', () => {
   let alertsService: AlertsService;
   let getUserCreatedTranslationSuggestionsAsyncSpy: jasmine.Spy;
   let getReviewableQuestionSuggestionsAsyncSpy: jasmine.Spy;
-  let getReviewableTranslationSuggestionsAsyncSpy: jasmine.Spy;
+
   let getUserCreatedQuestionSuggestionsAsyncSpy: jasmine.Spy;
   let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
@@ -537,7 +537,7 @@ describe('Contributions and review component', () => {
         groupedSkillSummaries: null,
       })
     );
-    getReviewableTranslationSuggestionsAsyncSpy = spyOn(
+    spyOn(
       contributionAndReviewService,
       'getReviewableTranslationSuggestionsAsync'
     ).and.returnValue(
@@ -1317,20 +1317,23 @@ describe('Contributions and review component', () => {
             },
           },
         };
-        const reviewableTranslation = Promise.resolve({
+        const contributionTranslation = Promise.resolve({
           suggestionIdToDetails: suggestion1,
           more: false,
         });
-        getReviewableTranslationSuggestionsAsyncSpy.and.returnValue(
-          reviewableTranslation
+        getUserCreatedTranslationSuggestionsAsyncSpy.and.returnValue(
+          contributionTranslation
         );
 
-        // Go to the review translations tab, to ensure that
-        // getReviewableTranslationSuggestionsAsyncSpy is
+        // Go to the contribution translations tab, to ensure that
+        // getUserCreatedTranslationSuggestionsAsyncSpy is
         // called by loadContributions.
-        component.switchToTab(component.TAB_TYPE_REVIEWS, 'translate_content');
+        component.switchToTab(
+          component.TAB_TYPE_CONTRIBUTIONS,
+          'translate_content'
+        );
 
-        // Set up contributions with a translation to be reviewed.
+        // Set up contributions with a translation.
         component
           .loadContributions(false)
           .then(({opportunitiesDicts, more}) => {
@@ -1344,19 +1347,19 @@ describe('Contributions and review component', () => {
                 subheading: 'topic_name / story_title / chapter_title',
                 labelText: 'Obsolete',
                 labelColor: '#e76c8c',
-                actionButtonTitle: 'Review',
+                actionButtonTitle: 'View',
                 translationWordCount: undefined,
               },
             ]);
             expect(more).toEqual(false);
 
-            // When opening the review modal for translations,
+            // When opening the contribution modal for translations,
             // only translations should be shown.
             spyOn(component, '_showTranslationSuggestionModal');
             component.onClickViewSuggestion('suggestion_1');
             expect(
               component._showTranslationSuggestionModal
-            ).toHaveBeenCalledWith(suggestion1, 'suggestion_1', true);
+            ).toHaveBeenCalledWith(suggestion1, 'suggestion_1', false);
           });
         // Wait for the first test to complete.
         tick();
@@ -1628,6 +1631,9 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 1',
               subheading: 'Topic 1 - Story 1',
               actionButtonTitle: 'Translations',
+              translationWordCount: 0,
+              labelText: '',
+              labelColor: '',
               isPinned: false,
               topicName: 'Topic 1',
             } as unknown as Opportunity,
@@ -1636,6 +1642,9 @@ describe('Contributions and review component', () => {
               heading: 'Chapter 2',
               subheading: 'Topic 2 - Story 2',
               actionButtonTitle: 'Translations',
+              translationWordCount: 0,
+              labelText: '',
+              labelColor: '',
               isPinned: false,
               topicName: 'Topic 2',
             } as unknown as Opportunity,
@@ -1841,8 +1850,8 @@ describe('Contributions and review component', () => {
       jasmine
         .createSpy('userReviewableSuggestionTypes.length')
         .and.returnValue(0);
-      component.SUGGESTION_TYPE_TRANSLATE = null as unknown as string;
-      component.SUGGESTION_TYPE_QUESTION = null as unknown as string;
+      component.SUGGESTION_TYPE_TRANSLATE = '';
+      component.SUGGESTION_TYPE_QUESTION = '';
       getUserContributionRightsDataAsyncSpy.and.returnValue(
         Promise.resolve({
           can_review_translation_for_language_codes: [],
@@ -1868,7 +1877,7 @@ describe('Contributions and review component', () => {
         contributionAndReviewService.getUserCreatedQuestionSuggestionsAsync
       ).toHaveBeenCalled();
       expect(
-        contributionAndReviewService.getReviewableTranslationSuggestionsAsync
+        contributionOpportunitiesService.getReviewableTranslationOpportunitiesAsync
       ).toHaveBeenCalled();
     }));
 
