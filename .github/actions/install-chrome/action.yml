@@ -19,21 +19,23 @@ runs:
           # Download Chrome for Testing
           wget -q "https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/${{ env.PLATFORM }}/chrome-${{ env.PLATFORM }}.zip"
           unzip -q chrome-${{ env.PLATFORM }}.zip
-          
+
           # Install Chrome
           sudo mkdir -p /opt/google/chrome
           sudo mv chrome-${{ env.PLATFORM }}/* /opt/google/chrome/
-          sudo ln -sf /opt/google/chrome/chrome /usr/bin/google-chrome
           sudo chmod +x /opt/google/chrome/chrome
-          
+
+          printf '#!/bin/bash\nexec /opt/google/chrome/chrome --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /usr/bin/google-chrome > /dev/null
+          sudo chmod +x /usr/bin/google-chrome
+
           # Download ChromeDriver
           wget -q "https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/${{ env.PLATFORM }}/chromedriver-${{ env.PLATFORM }}.zip"
           unzip -q chromedriver-${{ env.PLATFORM }}.zip
-          
+
           # Install ChromeDriver
           sudo mv chromedriver-${{ env.PLATFORM }}/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
-          
+
           # Verify installation
           chrome_version=$(google-chrome --version 2>&1 | grep -oP '\d+\.\d+\.\d+\.\d+')
           echo "Installed Chrome version: $chrome_version"
