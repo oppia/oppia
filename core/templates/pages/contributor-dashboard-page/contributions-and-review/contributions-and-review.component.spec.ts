@@ -89,7 +89,7 @@ class MockPlatformFeatureService {
 describe('Contributions and review component', () => {
   let component: ContributionsAndReview;
   let fixture: ComponentFixture<ContributionsAndReview>;
-  let ngbModal: NgbModal = null!;
+  let ngbModal: NgbModal;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
   var pageContextService: PageContextService;
   var contributionAndReviewService: ContributionAndReviewService;
@@ -98,11 +98,11 @@ describe('Contributions and review component', () => {
   var translationTopicService: TranslationTopicService;
   var userService: UserService;
   let alertsService: AlertsService;
-  var getUserCreatedTranslationSuggestionsAsyncSpy: jasmine.Spy = null!;
-  var getReviewableQuestionSuggestionsAsyncSpy: jasmine.Spy = null!;
-  var getReviewableTranslationSuggestionsAsyncSpy: jasmine.Spy = null!;
-  var getUserCreatedQuestionSuggestionsAsyncSpy: jasmine.Spy = null!;
-  let getUserContributionRightsDataAsyncSpy: jasmine.Spy = null!;
+  let getUserCreatedTranslationSuggestionsAsyncSpy: jasmine.Spy;
+  let getReviewableQuestionSuggestionsAsyncSpy: jasmine.Spy;
+  let getReviewableTranslationSuggestionsAsyncSpy: jasmine.Spy;
+  let getUserCreatedQuestionSuggestionsAsyncSpy: jasmine.Spy;
+  let getUserContributionRightsDataAsyncSpy: jasmine.Spy;
   let formatRtePreviewPipe: FormatRtePreviewPipe;
   let htmlEscaperService: HtmlEscaperService;
   const mockActiveTopicEventEmitter = new EventEmitter();
