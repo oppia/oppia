@@ -2445,6 +2445,7 @@ export class CurriculumAdmin extends TopicManager {
     await this.page.waitForSelector(openTopicDropdownButton);
 
     // Wait for the topic to appear in the classroom before adding prerequisites.
+    // Increased timeout to 60s because addTopicId makes an async API call that can take time.
     await this.page.waitForFunction(
       (
         topicBoxSelector: string,
@@ -2460,7 +2461,7 @@ export class CurriculumAdmin extends TopicManager {
         }
         return false;
       },
-      {},
+      {timeout: 60000},
       classroomTopicBoxSelector,
       classroomTopicNameSelector,
       topicName
