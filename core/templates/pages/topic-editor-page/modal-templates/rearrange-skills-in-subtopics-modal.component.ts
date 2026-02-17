@@ -128,7 +128,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
         // already returned.
         this.topicUpdateService.removeSkillFromSubtopic(
           this.topic,
-          this.oldSubtopicId as number,
+          this.oldSubtopicId,
           this.skillSummaryToMove
         );
       } else {
