@@ -52,10 +52,9 @@ export class EditLearnerGroupPageAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          // Store error message in sessionStorage since location.replaceState will clear router state.
           window.sessionStorage.setItem(
             'oppia_401_error_message',
-            'You must be a facilitator to access this page.'
+            'You do not have sufficient permissions to access this group.'
           );
           this.router
             .navigate([

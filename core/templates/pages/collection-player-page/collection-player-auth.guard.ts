@@ -51,10 +51,9 @@ export class CollectionPlayerAuthGuard implements CanActivate {
           resolve(true);
         })
         .catch(err => {
-          // Store error message in sessionStorage since location.replaceState will clear router state.
           window.sessionStorage.setItem(
             'oppia_401_error_message',
-            'You do not have permission to access this collection.'
+            'You do not have sufficient permissions to access this collection.'
           );
           this.router
             .navigate([
