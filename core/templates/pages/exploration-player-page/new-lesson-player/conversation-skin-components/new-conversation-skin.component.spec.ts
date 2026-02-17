@@ -1005,6 +1005,43 @@ describe('New Conversation skin component', () => {
     expect(componentInstance.checkpointCelebrationIsShown).toBeFalse();
   }));
 
+  it('should not trigger stuck redirection if interaction is Continue', fakeAsync(() => {
+    const mockStateCard = jasmine.createSpyObj('StateCard', [
+      'getSolution',
+      'getStateName',
+      'getHints',
+      'getInteractionId',
+    ]);
+    mockStateCard.getSolution.and.returnValue(null);
+    mockStateCard.getStateName.and.returnValue('LessonState');
+    mockStateCard.getInteractionId.and.returnValue('Continue');
+    mockStateCard.getHints.and.returnValue([]);
+
+    spyOn(conversationFlowService, 'setSolutionForState');
+    spyOn(playerTranscriptService, 'resetNumberOfIncorrectSubmissions');
+    spyOn(conversationFlowService, 'setNextCardIfStuck');
+    spyOn(urlService, 'getPathname').and.returnValue('/lesson/123');
+    spyOn(urlService, 'getUrlParams').and.returnValue({});
+    spyOn(explorationEngineService, 'getStateFromStateName').and.returnValue({
+      cardIsCheckpoint: false,
+    });
+    // Spy on the stuck action trigger to verify it is NOT called
+    spyOn(conversationFlowService, 'triggerIfLearnerStuckAction');
+
+    componentInstance.ngOnInit();
+
+    // Ensure initial state
+    componentInstance.continueToReviseStateButtonIsVisible = false;
+
+    playerPositionService.onNewCardOpened.emit(mockStateCard);
+
+    // Verify the guard clause worked: stuck action should NOT be triggered
+    expect(
+      conversationFlowService.triggerIfLearnerStuckAction
+    ).not.toHaveBeenCalled();
+    expect(componentInstance.continueToReviseStateButtonIsVisible).toBeFalse();
+  }));
+
   it('should initialize component as logged in user', fakeAsync(() => {
     let collectionId = 'id';
     let expId = 'exp_id';
