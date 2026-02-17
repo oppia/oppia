@@ -664,7 +664,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   refresher_exploration_id: null,
                 },
-                training_data: null,
+                training_data: [],
                 rule_specs: [
                   {
                     rule_type: 'Equals',
@@ -674,7 +674,7 @@ describe('Contributions and review component', () => {
                 tagged_skill_misconception_id: null,
               },
               {
-                training_data: null,
+                training_data: [],
                 outcome: {
                   missing_prerequisite_skill_id: null,
                   dest: 'outcome 1',
@@ -710,7 +710,7 @@ describe('Contributions and review component', () => {
               },
             },
             default_outcome: {
-              dest: null,
+              dest: 'default',
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -740,16 +740,8 @@ describe('Contributions and review component', () => {
             id: 'TextInput',
           },
           param_changes: [],
-          recorded_voiceovers: {
-            voiceovers_mapping: {
-              content_1: {},
-              content_2: {},
-              content_3: {},
-              content_4: {},
-              content_5: {},
-            },
-          },
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: null,
         },
         language_code: 'en',
         version: 1,
@@ -767,7 +759,7 @@ describe('Contributions and review component', () => {
       };
       component.openQuestionSuggestionModal(
         'suggestion_id',
-        suggestion as Suggestion,
+        suggestion as unknown as Suggestion,
         false,
         question
       );
@@ -959,7 +951,7 @@ describe('Contributions and review component', () => {
                   param_changes: [],
                   refresher_exploration_id: null,
                 },
-                training_data: null,
+                training_data: [],
                 rule_specs: [
                   {
                     rule_type: 'Equals',
@@ -969,7 +961,7 @@ describe('Contributions and review component', () => {
                 tagged_skill_misconception_id: null,
               },
               {
-                training_data: null,
+                training_data: [],
                 outcome: {
                   missing_prerequisite_skill_id: null,
                   dest: 'outcome 1',
@@ -1005,7 +997,7 @@ describe('Contributions and review component', () => {
               },
             },
             default_outcome: {
-              dest: null,
+              dest: 'default',
               refresher_exploration_id: null,
               missing_prerequisite_skill_id: null,
               dest_if_really_stuck: null,
@@ -1045,6 +1037,7 @@ describe('Contributions and review component', () => {
             },
           },
           solicit_answer_details: false,
+          inapplicable_skill_misconception_ids: null,
         },
         language_code: 'en',
         version: 1,
@@ -1182,8 +1175,8 @@ describe('Contributions and review component', () => {
           ActiveContributionDict
         >,
         false,
-        null,
-        null
+        undefined,
+        {}
       );
 
       let value = {
@@ -1546,6 +1539,7 @@ describe('Contributions and review component', () => {
                   question_state_data: {
                     content: {
                       html: 'html',
+                      content_id: 'content_1',
                     },
                   },
                 },
@@ -1557,7 +1551,7 @@ describe('Contributions and review component', () => {
               status: 'review',
               suggestion_type: 'string',
               exploration_content_html: 'html',
-            },
+            } as unknown as Suggestion,
             details: {
               skill_description: 'skill_description',
               topic_name: 'topic_name',
@@ -1682,7 +1676,7 @@ describe('Contributions and review component', () => {
           isPinned: false,
           topicName: 'Topic 1',
         },
-      ];
+      ] as unknown as ExplorationOpportunitySummary[];
       component.languageCode = 'en';
 
       component.pinReviewableTranslationOpportunity(dict);
@@ -1733,7 +1727,7 @@ describe('Contributions and review component', () => {
             isPinned: false,
             topicName: 'Topic 1',
           },
-        ];
+        ] as unknown as ExplorationOpportunitySummary[];
         component.languageCode = 'en';
 
         component.pinReviewableTranslationOpportunity(dict);
