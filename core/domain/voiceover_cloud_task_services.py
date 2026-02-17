@@ -378,6 +378,12 @@ def is_voiceover_regeneration_task_function(function_id: str) -> bool:
         feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
             'FUNCTION_ID_REGENERATE_VOICEOVERS_ON_EXP_UPDATE'
         ],
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_BY_LANGUAGE_ACCENT'
+        ],
+        feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[
+            'FUNCTION_ID_REGENERATE_VOICEOVERS_FOR_BATCH_CONTENTS'
+        ],
     ]
 
 
@@ -430,3 +436,129 @@ def create_voiceover_regeneration_task_with_status_generating(
     )
 
     return voiceover_regeneration_task_map
+
+
+def create_voiceover_regeneration_task_batch_model(
+    voiceover_regeneration_task_batch: cloud_task_domain.VoiceoverRegenerationTaskBatch,
+) -> cloud_task_models.VoiceoverRegenerationTaskBatchModel:
+    """Creates a new instance of VoiceoverRegenerationTaskBatchModel with the
+    given parent and child Cloud Task run IDs and exploration ID.
+
+    Args:
+        voiceover_regeneration_task_batch: VoiceoverRegenerationTaskBatch. The
+            domain object containing the details of the voiceover regeneration
+            task batch for which the model instance needs to be created.
+
+    Returns:
+        VoiceoverRegenerationTaskBatchModel. The newly created instance of
+        VoiceoverRegenerationTaskBatchModel.
+    """
+    return cloud_task_models.VoiceoverRegenerationTaskBatchModel.create_voiceover_regeneration_task_batch_model(
+        voiceover_regeneration_task_batch.parent_cloud_task_run_id,
+        voiceover_regeneration_task_batch.child_cloud_task_run_id,
+        voiceover_regeneration_task_batch.exploration_id,
+        voiceover_regeneration_task_batch.exploration_version,
+        voiceover_regeneration_task_batch.language_accent_code,
+        voiceover_regeneration_task_batch.content_id_to_contents_map,
+    )
+
+
+def get_voiceover_regeneration_task_batch_model_by_id(
+    parent_cloud_task_run_id: str, child_cloud_task_run_id: str
+) -> Optional[cloud_task_domain.VoiceoverRegenerationTaskBatch]:
+    """Returns the instance of VoiceoverRegenerationTaskBatchModel corresponding
+    to the given parent and child Cloud Task run IDs.
+
+    Args:
+        parent_cloud_task_run_id: str. The Cloud Task run ID of the parent task.
+        child_cloud_task_run_id: str. The Cloud Task run ID of the child task.
+
+    Returns:
+        VoiceoverRegenerationTaskBatch|None. The instance of
+        VoiceoverRegenerationTaskBatch corresponding to the given parent and
+        child Cloud Task run IDs, or None if no such model exists.
+    """
+    model_id = '%s:%s' % (parent_cloud_task_run_id, child_cloud_task_run_id)
+    model_instance = cloud_task_models.VoiceoverRegenerationTaskBatchModel.get(
+        model_id, strict=False
+    )
+
+    if model_instance is None:
+        return None
+
+    return convert_voiceover_regeneration_task_batch_model_to_domain_instance(
+        model_instance
+    )
+
+
+def convert_voiceover_regeneration_task_batch_model_to_domain_instance(
+    model_instance: cloud_task_models.VoiceoverRegenerationTaskBatchModel,
+) -> cloud_task_domain.VoiceoverRegenerationTaskBatch:
+    """Converts the given instance of VoiceoverRegenerationTaskBatchModel to its
+    corresponding domain object.
+
+    Args:
+        model_instance: VoiceoverRegenerationTaskBatchModel. The instance of
+            VoiceoverRegenerationTaskBatchModel to be converted.
+
+    Returns:
+        VoiceoverRegenerationTaskBatch. The corresponding domain object for the
+        given instance of VoiceoverRegenerationTaskBatchModel.
+    """
+    return cloud_task_domain.VoiceoverRegenerationTaskBatch(
+        model_instance.parent_cloud_task_run_id,
+        model_instance.child_cloud_task_run_id,
+        model_instance.exploration_id,
+        model_instance.exploration_version,
+        model_instance.language_accent_code,
+        model_instance.content_id_to_contents_map,
+    )
+
+
+def create_or_update_voiceover_regeneration_task_batch_model(
+    domain_instance: cloud_task_domain.VoiceoverRegenerationTaskBatch,
+) -> cloud_task_models.VoiceoverRegenerationTaskBatchModel:
+    """Creates or updates the instance of VoiceoverRegenerationTaskBatchModel
+    corresponding to the given domain object.
+
+    Args:
+        domain_instance: VoiceoverRegenerationTaskBatch. The instance of
+            VoiceoverRegenerationTaskBatch to be converted.
+
+    Returns:
+        VoiceoverRegenerationTaskBatchModel. The corresponding model object for
+        the given instance of VoiceoverRegenerationTaskBatch.
+    """
+    model_id = '%s:%s' % (
+        domain_instance.parent_cloud_task_run_id,
+        domain_instance.child_cloud_task_run_id,
+    )
+    model_instance = cloud_task_models.VoiceoverRegenerationTaskBatchModel.get(
+        model_id, strict=False
+    )
+
+    if model_instance is None:
+        cloud_task_models.VoiceoverRegenerationTaskBatchModel.create_voiceover_regeneration_task_batch_model(
+            parent_cloud_task_run_id=domain_instance.parent_cloud_task_run_id,
+            child_cloud_task_run_id=domain_instance.child_cloud_task_run_id,
+            exploration_id=domain_instance.exploration_id,
+            exploration_version=domain_instance.exploration_version,
+            language_accent_code=domain_instance.language_accent_code,
+            content_id_to_contents_map=domain_instance.content_id_to_contents_map,
+        )
+        return
+
+    model_instance.parent_cloud_task_run_id = (
+        domain_instance.parent_cloud_task_run_id
+    )
+    model_instance.child_cloud_task_run_id = (
+        domain_instance.child_cloud_task_run_id
+    )
+    model_instance.exploration_id = domain_instance.exploration_id
+    model_instance.exploration_version = domain_instance.exploration_version
+    model_instance.language_accent_code = domain_instance.language_accent_code
+    model_instance.content_id_to_contents_map = (
+        domain_instance.content_id_to_contents_map
+    )
+    model_instance.update_timestamps()
+    model_instance.put()

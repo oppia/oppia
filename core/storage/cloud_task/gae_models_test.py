@@ -285,3 +285,78 @@ class VoiceoverRegenerationTaskMappingModelUnitTest(test_utils.GenericTestBase):
         fetched_model_ids = [model.id for model in fetched_models]
         expected_model_ids = ['exp1:taskrun1', 'exp1:taskrun2']
         self.assertItemsEqual(fetched_model_ids, expected_model_ids)
+
+
+class VoiceoverRegenerationTaskBatchModelTests(test_utils.GenericTestBase):
+    """Test the VoiceoverRegenerationTaskBatchModel class."""
+
+    def test_get_export_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskBatchModel.get_export_policy(),
+            {
+                'parent_cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'child_cloud_task_run_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_id': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'exploration_version': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'language_accent_code': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'content_id_to_contents_map': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'created_on': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'deleted': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                'last_updated': base_models.EXPORT_POLICY.NOT_APPLICABLE,
+            },
+        )
+
+    def test_get_model_association_to_user_not_corresponding_to_user(
+        self,
+    ) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskBatchModel.get_model_association_to_user(),
+            base_models.MODEL_ASSOCIATION_TO_USER.NOT_CORRESPONDING_TO_USER,
+        )
+
+    def test_get_deletion_policy_not_applicable(self) -> None:
+        self.assertEqual(
+            cloud_task_models.VoiceoverRegenerationTaskBatchModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.NOT_APPLICABLE,
+        )
+
+    def test_should_get_models_by_parent_cloud_task_run_id(self) -> None:
+        cloud_task_models.VoiceoverRegenerationTaskBatchModel.create_voiceover_regeneration_task_batch_model(
+            parent_cloud_task_run_id='taskrun1',
+            child_cloud_task_run_id='childtaskrun1',
+            exploration_id='exp1',
+            exploration_version=1,
+            language_accent_code='en-US',
+            content_id_to_contents_map={'content_0': 'Hello world!'},
+        )
+
+        cloud_task_models.VoiceoverRegenerationTaskBatchModel.create_voiceover_regeneration_task_batch_model(
+            parent_cloud_task_run_id='taskrun1',
+            child_cloud_task_run_id='childtaskrun2',
+            exploration_id='exp1',
+            exploration_version=1,
+            language_accent_code='en-US',
+            content_id_to_contents_map={'content_1': 'Congratulations!'},
+        )
+
+        cloud_task_models.VoiceoverRegenerationTaskBatchModel.create_voiceover_regeneration_task_batch_model(
+            parent_cloud_task_run_id='taskrun2',
+            child_cloud_task_run_id='childtaskrun3',
+            exploration_id='exp1',
+            exploration_version=1,
+            language_accent_code='en-US',
+            content_id_to_contents_map={'content_2': 'Hello learners!'},
+        )
+
+        fetched_models = cloud_task_models.VoiceoverRegenerationTaskBatchModel.get_child_tasks_by_parent_id(
+            'taskrun1'
+        )
+
+        self.assertEqual(len(fetched_models), 2)
+        fetched_model_ids = [model.id for model in fetched_models]
+        expected_model_ids = [
+            'taskrun1:childtaskrun1',
+            'taskrun1:childtaskrun2',
+        ]
+        print(fetched_model_ids)
+        self.assertItemsEqual(fetched_model_ids, expected_model_ids)

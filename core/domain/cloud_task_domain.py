@@ -241,6 +241,27 @@ class VoiceoverRegenerationTaskMapping:
                     return False
         return True
 
+    def are_all_voiceovers_attempted(self) -> bool:
+        """Checks if all the contents for the voiceover regeneration request
+        have been attempted i.e., either succeeded or failed none
+        of them are still generating.
+
+        Returns:
+            bool. Whether all contents have been attempted or not.
+        """
+        for (
+            content_id_to_regeneration_status
+        ) in self.language_accent_to_content_status_map.values():
+            for (
+                regeneration_status
+            ) in content_id_to_regeneration_status.values():
+                if (
+                    regeneration_status
+                    == feconf.VoiceoverRegenerationState.GENERATING.value
+                ):
+                    return False
+        return True
+
     def update_final_content_status_for_cloud_task_run(
         self, language_accent_code: str, failed_content_ids: List[str]
     ) -> None:
@@ -286,4 +307,90 @@ class VoiceoverRegenerationTaskMapping:
 
         self.language_accent_to_content_status_map[language_accent_code] = (
             content_status_map
+        )
+
+
+class VoiceoverRegenerationTaskBatch:
+    """Voiceover regeneration for a large number of contents within a single
+    Cloud Task run (deferred request) significantly increases the workload and
+    may lead to timeout failures due to Gunicorn limitations.
+
+    To mitigate this issue, a single deferred regeneration task is split into
+    multiple smaller batches, organized in a parent-child relationship between
+    Cloud Task runs.
+
+    This class is the domain class representation for
+    VoiceoverRegenerationTaskBatchModel.
+    """
+
+    def __init__(
+        self,
+        parent_cloud_task_run_id: str,
+        child_cloud_task_run_id: List[str],
+        exploration_id: str,
+        exploration_version: int,
+        language_accent_code: str,
+        content_id_to_contents_map: Dict[str, str],
+    ) -> None:
+        self.parent_cloud_task_run_id = parent_cloud_task_run_id
+        self.child_cloud_task_run_id = child_cloud_task_run_id
+        self.exploration_id = exploration_id
+        self.exploration_version = exploration_version
+        self.language_accent_code = language_accent_code
+        self.content_id_to_contents_map = content_id_to_contents_map
+
+    def to_dict(self) -> Dict[str, str | List[str] | int | Dict[str, str]]:
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dictionary representation of the
+            VoiceoverRegenerationTaskBatch object, with keys matching the
+            attributes of the object.
+        """
+        return {
+            'parent_cloud_task_run_id': self.parent_cloud_task_run_id,
+            'child_cloud_task_run_id': self.child_cloud_task_run_id,
+            'exploration_id': self.exploration_id,
+            'exploration_version': self.exploration_version,
+            'language_accent_code': self.language_accent_code,
+            'content_id_to_contents_map': self.content_id_to_contents_map,
+        }
+
+    @classmethod
+    def from_dict(
+        cls,
+        voiceover_regeneration_task_batch_dict: Dict[
+            str, str | List[str] | int | Dict[str, str]
+        ],
+    ) -> VoiceoverRegenerationTaskBatch:
+        """Returns an instance of VoiceoverRegenerationTaskBatch from the
+        given dictionary.
+
+        Args:
+            voiceover_regeneration_task_batch_dict: dict. A dictionary
+                representation of the VoiceoverRegenerationTaskBatch object.
+
+        Returns:
+            VoiceoverRegenerationTaskBatch. A VoiceoverRegenerationTaskBatch
+            domain object created from the given dict representation.
+        """
+        return cls(
+            parent_cloud_task_run_id=voiceover_regeneration_task_batch_dict[
+                'parent_cloud_task_run_id'
+            ],
+            child_cloud_task_run_id=voiceover_regeneration_task_batch_dict[
+                'child_cloud_task_run_id'
+            ],
+            exploration_id=voiceover_regeneration_task_batch_dict[
+                'exploration_id'
+            ],
+            exploration_version=voiceover_regeneration_task_batch_dict[
+                'exploration_version'
+            ],
+            language_accent_code=voiceover_regeneration_task_batch_dict[
+                'language_accent_code'
+            ],
+            content_id_to_contents_map=voiceover_regeneration_task_batch_dict[
+                'content_id_to_contents_map'
+            ],
         )
