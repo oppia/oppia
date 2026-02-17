@@ -203,7 +203,7 @@ describe('Voiceover Submitter', function () {
     // Select "Content" voiceover option.
     await voiceoverSubmitter.selectVoiceoverContentType('Content');
     await voiceoverSubmitter.expectUploadVoiceoverButtonAccessibleNameToBe(
-      'Upload voiceovered file'
+      'ADD MANUAL VOICEOVER'
     );
 
     await voiceoverSubmitter.clickOnAddManualVoiceoverButton();

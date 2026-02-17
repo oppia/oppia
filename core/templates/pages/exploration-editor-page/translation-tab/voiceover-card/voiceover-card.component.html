@@ -70,10 +70,10 @@
         <i *ngIf="manualVoiceover.needsUpdate">The current manual voiceover is stale.</i>
       </div>
       <div class="add-voiceover-button-container" *ngIf="!manualVoiceover">
-        <button aria-label="Upload voiceovered file" (click)="addManualVoiceover()"
+        <button (click)="addManualVoiceover()"
                 class="add-manual-voiceover-button e2e-test-voiceover-upload-audio"
                 [disabled]="!contentAvailableForVoiceovers || doesTranslationForActiveContentNeedsUpdate()">
-          <mat-icon aria-hidden="true">attach_file</mat-icon>
+          <mat-icon>attach_file</mat-icon>
           ADD MANUAL VOICEOVER
         </button>
       </div>

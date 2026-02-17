@@ -300,7 +300,12 @@ export class VoiceoverSubmitter extends BaseUser {
 
     const accessibleName = await this.page.$eval(
       addManualVoiceoverBtnSelector,
-      el => (el.getAttribute('aria-label') || el.textContent || '').trim()
+      el =>
+        Array.from(el.childNodes)
+          .filter(node => node.nodeType === Node.TEXT_NODE)
+          .map(node => node.textContent)
+          .join('')
+          .trim()
     );
 
     expect(accessibleName).toBe(expectedAccessibleName);
