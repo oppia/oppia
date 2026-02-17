@@ -570,11 +570,7 @@ class EditableTopicDataHandler(
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id)
                 )
-                server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                    platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-                )
-                if server_can_send_emails:
-                    email_manager.send_mail_to_admin(
+                email_manager.send_mail_to_admin(
                         'Deleted skills present in topic',
                         'The deleted skills: %s are still present in '
                         'topic with id %s' % (deleted_skills_string, topic_id),
@@ -714,11 +710,7 @@ class EditableTopicDataHandler(
                 'The deleted skills: %s are still present in topic with id %s'
                 % (deleted_skills_string, topic_id)
             )
-            server_can_send_emails = platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-            if server_can_send_emails:
-                email_manager.send_mail_to_admin(
+            email_manager.send_mail_to_admin(
                     'Deleted skills present in topic',
                     'The deleted skills: %s are still present in topic with '
                     'id %s' % (deleted_skills_string, topic_id),
@@ -879,13 +871,7 @@ class TopicPublishSendMailHandler(
         """
         assert self.normalized_payload is not None
         topic_url = '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id)
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if server_can_send_emails:
-            email_manager.send_mail_to_admin(
+        email_manager.send_mail_to_admin(
                 'Request to review and publish a topic',
                 '%s wants to publish topic: %s at URL %s, please review'
                 ' and publish if it looks good.'

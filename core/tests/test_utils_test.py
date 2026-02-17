@@ -42,7 +42,6 @@ from typing import Callable, Final, List, OrderedDict, Tuple
 
 email_services = models.Registry.import_email_services()
 
-
 class EnableFeatureFlagTests(test_utils.GenericTestBase):
     """Tests for testing test_utils.enable_feature_flags."""
 
@@ -74,13 +73,11 @@ class EnableFeatureFlagTests(test_utils.GenericTestBase):
             feature_flag_services.is_feature_flag_enabled('blog_pages', None)
         )
 
-
 class SetPlatformParametersTests(test_utils.GenericTestBase):
     """Tests for testing test_utils.set_platform_parameters."""
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
         ]
     )
@@ -88,20 +85,11 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
         """Tests if platform parameters are set."""
         self.assertEqual(
             platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            ),
-            True,
-        )
-        self.assertEqual(
-            platform_parameter_services.get_platform_parameter_value(
                 platform_parameter_list.ParamName.EMAIL_SENDER_NAME.value
             ),
             'admin',
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_set_platform_parameters_decorator_with_invalid_param(self) -> None:
         """Tests if invalid platform parameter raises an error."""
         with self.assertRaisesRegex(
@@ -114,7 +102,6 @@ class SetPlatformParametersTests(test_utils.GenericTestBase):
             platform_parameter_services.get_platform_parameter_value(
                 'dummy_parameter'
             )
-
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
     """Test for testing test_utils.FunctionWrapper."""
@@ -240,7 +227,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         wrapped = test_utils.FunctionWrapper(mock_lambda)
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')
         self.assertEqual(data.get('value'), 'foobar')
-
 
 class AuthServicesStubTests(test_utils.GenericTestBase):
     """Test the methods for AuthServices."""
@@ -430,7 +416,6 @@ class AuthServicesStubTests(test_utils.GenericTestBase):
         # Should not raise.
         self.stub.delete_external_auth_associations('does_not_exist')
 
-
 class CallCounterTests(test_utils.GenericTestBase):
     def test_call_counter_counts_the_number_of_times_a_function_gets_called(
         self,
@@ -444,7 +429,6 @@ class CallCounterTests(test_utils.GenericTestBase):
         for i in range(5):
             self.assertEqual(wrapped_function(i), i**2)
             self.assertEqual(wrapped_function.times_called, i + 1)
-
 
 class FailingFunctionTests(test_utils.GenericTestBase):
 
@@ -476,7 +460,6 @@ class FailingFunctionTests(test_utils.GenericTestBase):
             'or equal to 0, or FailingFunction.INFINITY',
         ):
             test_utils.FailingFunction(function, MockError, -1)
-
 
 class TestUtilsTests(test_utils.GenericTestBase):
 
@@ -873,7 +856,6 @@ class TestUtilsTests(test_utils.GenericTestBase):
         ):
             self.mock_set_constants_to_default()
 
-
 class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
     def test_png_image_yields_true(self) -> None:
@@ -884,7 +866,6 @@ class CheckImagePngOrWebpTests(test_utils.GenericTestBase):
 
     def test_jpeg_image_yields_false(self) -> None:
         self.assertFalse(test_utils.check_image_png_or_webp('data:image/jpeg'))
-
 
 class ElasticSearchStubTests(test_utils.GenericTestBase):
 
@@ -922,7 +903,6 @@ class ElasticSearchStubTests(test_utils.GenericTestBase):
             r'index_not_found_exception: no such index \[index1\]',
         ):
             stub.mock_delete_by_query('index1', {'query': {'match_all': {}}})
-
 
 class EmailMockTests(test_utils.EmailTestBase):
     """Class for testing EmailTestBase."""
@@ -964,7 +944,6 @@ class EmailMockTests(test_utils.EmailTestBase):
         self.assertEqual(messages[0].body, 'plaintext_body 😂')
         self.assertEqual(messages[0].html, 'Hi abc,<br> 😂')
         self.assertEqual(messages[0].bcc, 'c@c.com')
-
 
 class SwapWithCheckTestClass:
     """Dummy class for testing check_with_swap. This class stores a few dummy

@@ -41,7 +41,6 @@ if MYPY:  # pragma: no cover
 
 (feedback_models,) = models.Registry.import_models([models.Names.FEEDBACK])
 
-
 class TasksTests(test_utils.EmailTestBase):
 
     USER_A_EMAIL: Final = 'a@example.com'
@@ -74,7 +73,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -191,7 +189,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -258,7 +255,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -327,7 +323,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (
@@ -394,7 +389,6 @@ class TasksTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (

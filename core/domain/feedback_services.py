@@ -411,19 +411,13 @@ def create_messages(
         suggestion_models_to_update
     )
 
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
     # TODO(#12079): Figure out a better way to avoid sending feedback
     # thread emails for contributor dashboard suggestions.
     message_changed = (
         len(text) > 0 or old_statuses[index] != new_statuses[index]
     )
     if (
-        server_can_send_emails
-        and feconf.CAN_SEND_TRANSACTIONAL_EMAILS
+        feconf.CAN_SEND_TRANSACTIONAL_EMAILS
         and author_id is not None
         and user_services.is_user_registered(author_id)
         and message_changed

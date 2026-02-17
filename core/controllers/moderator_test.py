@@ -21,7 +21,6 @@ from core.tests import test_utils
 
 from typing import Final
 
-
 class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     EXP_ID_1: Final = 'exp_id_1'
@@ -446,7 +445,6 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(featured_activity_references[1]['id'], self.COL_ID_1)
         self.logout()
 
-
 class EmailDraftHandlerTests(test_utils.GenericTestBase):
     def setUp(self) -> None:
         super().setUp()
@@ -455,7 +453,6 @@ class EmailDraftHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY,  # pylint: disable=line-too-long
                 'I\'m writing to inform you that '

@@ -46,7 +46,6 @@ if MYPY:  # pragma: no cover
 secrets_services = models.Registry.import_secrets_services()
 (user_models,) = models.Registry.import_models([models.Names.USER])
 
-
 class ProfilePageTests(test_utils.GenericTestBase):
 
     def test_get_profile_page_of_existing_user(self) -> None:
@@ -126,7 +125,6 @@ class ProfilePageTests(test_utils.GenericTestBase):
             )
             self.assertEqual(response, {})
             self.logout()
-
 
 class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
@@ -287,7 +285,6 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class UserContributionsTests(test_utils.GenericTestBase):
 
     USERNAME_A: Final = 'a'
@@ -372,7 +369,6 @@ class UserContributionsTests(test_utils.GenericTestBase):
             'the objective',
         )
 
-
 class FirstContributionDateTests(test_utils.GenericTestBase):
 
     USERNAME: Final = 'abc123'
@@ -413,7 +409,6 @@ class FirstContributionDateTests(test_utils.GenericTestBase):
         self.assertEqual(
             response_dict['first_contribution_msec'], first_time_in_msecs
         )
-
 
 class PreferencesHandlerTests(test_utils.GenericTestBase):
 
@@ -666,7 +661,6 @@ class PreferencesHandlerTests(test_utils.GenericTestBase):
                 )
         self.logout()
 
-
 class LongUserBioHandlerTests(test_utils.GenericTestBase):
     USERNAME_A: Final = 'a'
     EMAIL_A: Final = 'a@example.com'
@@ -718,7 +712,6 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             user_bio_response['error'],
         )
         self.logout()
-
 
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
@@ -796,7 +789,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
@@ -959,7 +951,6 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_editor_role_email)
         self.assertFalse(email_preferences.can_receive_feedback_message_email)
         self.assertFalse(email_preferences.can_receive_subscription_email)
-
 
 class SignupTests(test_utils.GenericTestBase):
 
@@ -1261,7 +1252,6 @@ class SignupTests(test_utils.GenericTestBase):
         self.get_html_response('%s?return_url=/' % feconf.SIGNUP_URL)
 
         values_dict = {
-            'server_can_send_emails': False,
             'has_agreed_to_latest_terms': False,
             'has_ever_registered': False,
             'username': None,
@@ -1273,7 +1263,6 @@ class SignupTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT,
                 'sub',
@@ -1308,7 +1297,6 @@ class SignupTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
         values_dict = {
-            'server_can_send_emails': True,
             'has_agreed_to_latest_terms': True,
             'has_ever_registered': True,
             'username': 'owner',
@@ -1318,7 +1306,6 @@ class SignupTests(test_utils.GenericTestBase):
         self.assertDictEqual(values_dict, response)
 
         self.logout()
-
 
 class DeleteAccountPageTests(test_utils.GenericTestBase):
 
@@ -1330,7 +1317,6 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
     def test_get_delete_account_page(self) -> None:
         response = self.get_html_response('/delete-account')
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
-
 
 class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
 
@@ -1424,7 +1410,6 @@ class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
             )
 
         self.logout()
-
 
 class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
 
@@ -1526,66 +1511,6 @@ class BulkEmailWebhookEndpointTests(test_utils.GenericTestBase):
                     'Received invalid Mailchimp webhook secret', captured_logs
                 )
 
-    @test_utils.set_platform_parameters(
-        [
-            (
-                platform_parameter_list.ParamName.MAILCHIMP_AUDIENCE_ID,
-                'audience_id',
-            ),
-            (
-                platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
-                'system@example.com',
-            ),
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
-        ]
-    )
-    def test_post(self) -> None:
-        with self.swap_secret:
-            user_services.update_email_preferences(
-                self.editor_id,
-                False,
-                feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
-                feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE,
-            )
-            email_preferences = user_services.get_email_preferences(
-                self.editor_id
-            )
-            self.assertEqual(email_preferences.can_receive_email_updates, False)
-
-            # User subscribed externally.
-            json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
-                {
-                    'data[list_id]': 'audience_id',
-                    'data[email]': self.EDITOR_EMAIL,
-                    'type': 'subscribe',
-                },
-                use_payload=False,
-            )
-            self.assertEqual(json_response, {})
-            email_preferences = user_services.get_email_preferences(
-                self.editor_id
-            )
-            self.assertEqual(email_preferences.can_receive_email_updates, True)
-
-            # User unsubscribed externally.
-            json_response = self.post_json(
-                '%s/secret' % feconf.BULK_EMAIL_WEBHOOK_ENDPOINT,
-                {
-                    'data[list_id]': 'audience_id',
-                    'data[email]': self.EDITOR_EMAIL,
-                    'type': 'unsubscribe',
-                },
-                use_payload=False,
-            )
-            self.assertEqual(json_response, {})
-            email_preferences = user_services.get_email_preferences(
-                self.editor_id
-            )
-            self.assertEqual(email_preferences.can_receive_email_updates, False)
-
-
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -1596,7 +1521,6 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
     def test_delete_delete_account_page(self) -> None:
         data = self.delete_json('/delete-account-handler')
         self.assertEqual(data, {'success': True})
-
 
 class ExportAccountHandlerTests(test_utils.GenericTestBase):
     GENERIC_DATE: Final = datetime.datetime(2021, 5, 20)
@@ -1776,13 +1700,11 @@ class ExportAccountHandlerTests(test_utils.GenericTestBase):
         self.logout()
         self.get_json('/export-account-handler', expected_status_int=401)
 
-
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page(self) -> None:
         response = self.get_html_response('/pending-account-deletion')
         self.assertIn(b'<oppia-root></oppia-root>', response.body)
-
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
@@ -1832,7 +1754,6 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class SiteLanguageHandlerTests(test_utils.GenericTestBase):
 
@@ -1886,7 +1807,6 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         )
         self.assertEqual(user_settings.preferred_site_language_code, 'en')
         self.logout()
-
 
 class UserInfoHandlerTests(test_utils.GenericTestBase):
 
@@ -1942,7 +1862,6 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             {'user_has_viewed_lesson_info_modal_once': True},
             csrf_token=csrf_token,
         )
-
 
 class UrlHandlerTests(test_utils.GenericTestBase):
 

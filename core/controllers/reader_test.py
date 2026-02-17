@@ -62,7 +62,6 @@ if MYPY:  # pragma: no cover
     ]
 )
 
-
 def _get_change_list(
     state_name: str, property_name: str, new_value: Union[bool, str]
 ) -> List[exp_domain.ExplorationChange]:
@@ -77,7 +76,6 @@ def _get_change_list(
             }
         )
     ]
-
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
@@ -137,7 +135,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID)
         )
 
-
 class FeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for giving feedback."""
 
@@ -168,7 +165,6 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for retrieving exploration pre-tests."""
@@ -415,7 +411,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'with exploration_id: 15',
         )
 
-
 class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
@@ -598,7 +593,6 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         )
         self.get_json(url, expected_status_int=400)
 
-
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
     """Test methods relating to exploration parameters."""
 
@@ -614,7 +608,6 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
             {}, [independent_pc], exp_param_specs
         )
         self.assertEqual(new_params, {'a': 'firstValue'})
-
 
 class RatingsIntegrationTests(test_utils.GenericTestBase):
     """Integration tests of ratings recording and display."""
@@ -716,7 +709,6 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0}
         )
         self.logout()
-
 
 class RecommendationsHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for recommended explorations for after an
@@ -1299,7 +1291,6 @@ class RecommendationsHandlerTests(test_utils.EmailTestBase):
             expected_status_int=400,
         )
 
-
 class FlagExplorationHandlerTests(test_utils.EmailTestBase):
     """Backend integration tests for flagging an exploration."""
 
@@ -1340,7 +1331,6 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
             (
@@ -1431,7 +1421,6 @@ class FlagExplorationHandlerTests(test_utils.EmailTestBase):
             csrf_token=csrf_token,
             expected_status_int=401,
         )
-
 
 class LearnerProgressTest(test_utils.GenericTestBase):
     """Tests for tracking learner progress."""
@@ -2011,7 +2000,6 @@ class LearnerProgressTest(test_utils.GenericTestBase):
             [],
         )
 
-
 class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
     """Tests for the handler that records playthroughs."""
 
@@ -2337,7 +2325,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             expected_status_int=400,
         )
 
-
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
 
@@ -2554,7 +2541,6 @@ class StatsEventHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
     """Tests for the answer submitted event handler."""
 
@@ -2680,7 +2666,6 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             'Type of 1.1 is not present in options',
         )
 
-
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -2788,7 +2773,6 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -2860,7 +2844,6 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -2908,7 +2891,6 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
         self.logout()
-
 
 class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
@@ -3086,7 +3068,6 @@ class ExplorationStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -3160,7 +3141,6 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -3230,7 +3210,6 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['error'], error_msg)
 
         self.logout()
-
 
 class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
     """Tests for learner answer info handler tests."""
@@ -3455,7 +3434,6 @@ class LearnerAnswerDetailsSubmissionHandlerTests(test_utils.GenericTestBase):
                 expected_status_int=500,
             )
 
-
 class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
     """Tests for checkpoint reached event handler."""
 
@@ -3580,7 +3558,6 @@ class CheckpointReachedEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
     """Tests for exploration restart event handler."""
 
@@ -3667,7 +3644,6 @@ class ExplorationRestartEventHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for save transient checkpoint progress handler."""
@@ -3774,7 +3750,6 @@ class SaveTransientCheckpointProgressHandlerTests(test_utils.GenericTestBase):
             updated_exp_user_data.most_recently_reached_checkpoint_state_name,
             'What language',
         )
-
 
 class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
     """Tests for transient checkpoint url handler."""
@@ -3965,7 +3940,6 @@ class TransientCheckpointUrlPageTests(test_utils.GenericTestBase):
             'Welcome!',
         )
 
-
 class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
     """Tests for sync logged out learner progress handler."""
 
@@ -4019,7 +3993,6 @@ class SyncLoggedOutLearnerProgressHandlerTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of a particular state of an
@@ -4136,7 +4109,6 @@ class StateVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
     """Tests for fetching the version history of the exploration metadata."""
 
@@ -4206,7 +4178,6 @@ class MetadataVersionHistoryHandlerUnitTests(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class EntityTranslationHandlerTest(test_utils.GenericTestBase):
     """Unit test for the EntityTranslationHandler."""

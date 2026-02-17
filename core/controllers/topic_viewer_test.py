@@ -32,7 +32,6 @@ from core.domain import (
 )
 from core.tests import test_utils
 
-
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -130,7 +129,6 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
         self.math_classroom = self.save_new_valid_classroom()
 
-
 class TopicPageDataHandlerTests(
     BaseTopicViewerControllerTests, test_utils.EmailTestBase
 ):
@@ -214,7 +212,6 @@ class TopicPageDataHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -684,7 +681,6 @@ class TopicPageDataHandlerTests(
         }
         self.assertDictContainsSubset(expected_dict, json_response)
         self.logout()
-
 
 class TopicNameHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicNameHandler."""

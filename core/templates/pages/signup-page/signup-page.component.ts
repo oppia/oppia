@@ -76,7 +76,7 @@ export class SignupPageComponent {
       this.username = data.username;
       this.hasEverRegistered = data.has_ever_registered;
       this.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-      this.showEmailPreferencesForm = data.server_can_send_emails;
+      this.showEmailPreferencesForm = true;
       this.hasUsername = Boolean(this.username);
       this.focusManagerService.setFocus('usernameInputField');
     });
