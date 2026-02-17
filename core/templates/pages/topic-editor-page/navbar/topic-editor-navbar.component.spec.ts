@@ -983,7 +983,11 @@ describe('Topic Editor Navbar', () => {
     componentInstance.topicId = 'topic_1';
     componentInstance.topic = topic;
     spyOn(topicRightsBackendApiService, 'publishTopicAsync').and.returnValue(
-      Promise.resolve() as unknown as Promise<TopicRightsBackendResponse>
+      Promise.resolve({
+        topic_id: 'topic_1',
+        topic_is_published: true,
+        manager_ids: [],
+      })
     );
     spyOn(alertsService, 'addSuccessMessage');
     // Topic is already published.
