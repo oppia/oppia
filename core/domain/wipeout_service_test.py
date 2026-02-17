@@ -116,7 +116,6 @@ if MYPY:  # pragma: no cover
 
 datastore_services = models.Registry.import_datastore_services()
 
-
 class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
     """Provides testing of the pre-deletion part of wipeout service."""
 
@@ -242,7 +241,6 @@ class WipeoutServiceHelpersTests(test_utils.GenericTestBase):
             pending_deletion_request_model_old.created_on,
             pending_deletion_request_model_new.created_on,
         )
-
 
 class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
     """Provides testing of the pre-deletion part of wipeout service."""
@@ -711,7 +709,6 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
             ):
                 wipeout_service.pre_delete_user(self.user_1_id)
 
-
 class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
     """Provides testing of the pre-deletion part of wipeout service."""
 
@@ -793,7 +790,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -848,7 +844,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -935,7 +930,6 @@ class WipeoutServiceRunFunctionsTests(test_utils.GenericTestBase):
         self.assertIsNotNone(
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
         )
-
 
 class WipeoutServiceDeleteAppFeedbackReportModelsTests(
     test_utils.GenericTestBase
@@ -1207,7 +1201,6 @@ class WipeoutServiceDeleteAppFeedbackReportModelsTests(
             report_model_1.scrubbed_by, report_model_2.scrubbed_by
         )
 
-
 class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
     test_utils.GenericTestBase
 ):
@@ -1381,7 +1374,6 @@ class WipeoutServiceVerifyDeleteAppFeedbackReportModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -1659,7 +1651,6 @@ class WipeoutServiceDeleteConfigModelsTests(test_utils.GenericTestBase):
             metadata_model_3.committer_id, config_mappings_2[self.CONFIG_1_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -1721,7 +1712,6 @@ class WipeoutServiceVerifyDeleteConfigModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -2097,7 +2087,6 @@ class WipeoutServiceDeleteCollectionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, collection_mappings[self.COL_2_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteCollectionModelsTests(
     test_utils.GenericTestBase
 ):
@@ -2147,7 +2136,6 @@ class WipeoutServiceVerifyDeleteCollectionModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -2506,7 +2494,6 @@ class WipeoutServiceDeleteExplorationModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, exploration_mappings[self.EXP_2_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteExplorationModelsTests(
     test_utils.GenericTestBase
 ):
@@ -2556,7 +2543,6 @@ class WipeoutServiceVerifyDeleteExplorationModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -2785,7 +2771,6 @@ class WipeoutServiceDeleteFeedbackModelsTests(test_utils.GenericTestBase):
             feedback_mappings_2[self.FEEDBACK_1_ID],
         )
 
-
 class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -2863,7 +2848,6 @@ class WipeoutServiceVerifyDeleteFeedbackModelsTests(test_utils.GenericTestBase):
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
 
-
 class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -2937,7 +2921,6 @@ class WipeoutServiceDeleteImprovementsModelsTests(test_utils.GenericTestBase):
         self.assertEqual(
             task_entry_model1.resolver_id, task_entry_model2.resolver_id
         )
-
 
 class WipeoutServiceVerifyDeleteImprovementsModelsTests(
     test_utils.GenericTestBase
@@ -3021,7 +3004,6 @@ class WipeoutServiceVerifyDeleteImprovementsModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -3388,7 +3370,6 @@ class WipeoutServiceDeleteQuestionModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, question_mappings_2[self.QUESTION_1_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -3457,7 +3438,6 @@ class WipeoutServiceVerifyDeleteQuestionModelsTests(test_utils.GenericTestBase):
             ],
             'Change language.',
         )
-
 
 class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -3751,7 +3731,6 @@ class WipeoutServiceDeleteSkillModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, skill_mappings_2[self.SKILL_1_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -3809,7 +3788,6 @@ class WipeoutServiceVerifyDeleteSkillModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_2_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
-
 
 class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -4134,7 +4112,6 @@ class WipeoutServiceDeleteStoryModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, story_mappings_2[self.STORY_1_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -4217,7 +4194,6 @@ class WipeoutServiceVerifyDeleteStoryModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_2_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_2_id))
-
 
 class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -4578,7 +4554,6 @@ class WipeoutServiceDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             subtopic_mappings_2['%s-%s' % (self.TOP_1_ID, self.SUBTOP_1_ID)],
         )
 
-
 class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -4622,7 +4597,6 @@ class WipeoutServiceVerifyDeleteSubtopicModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -4833,7 +4807,6 @@ class WipeoutServiceDeleteSuggestionModelsTests(test_utils.GenericTestBase):
             )
         )
 
-
 class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
     test_utils.GenericTestBase
 ):
@@ -4878,7 +4851,6 @@ class WipeoutServiceDeletePinnedOpportunitiesModelsTest(
             )
         )
 
-
 class WipeoutServiceVerifyDeleteSuggestionModelsTests(
     test_utils.GenericTestBase
 ):
@@ -4907,7 +4879,6 @@ class WipeoutServiceVerifyDeleteSuggestionModelsTests(
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -5174,7 +5145,6 @@ class WipeoutServiceDeleteTopicModelsTests(test_utils.GenericTestBase):
             commit_log_model.user_id, topic_mappings[self.TOP_2_ID]
         )
 
-
 class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -5220,7 +5190,6 @@ class WipeoutServiceVerifyDeleteTopicModelsTests(test_utils.GenericTestBase):
             wipeout_service.get_pending_deletion_request(self.user_1_id)
         )
         self.assertTrue(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -5644,7 +5613,6 @@ class WipeoutServiceDeleteUserModelsTests(test_utils.GenericTestBase):
             user_settings.preferred_language_codes = ['en']
             user_services.save_user_settings(user_settings)
 
-
 class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
     """Provides testing of the verification part of wipeout service."""
 
@@ -5826,7 +5794,6 @@ class WipeoutServiceVerifyDeleteUserModelsTests(test_utils.GenericTestBase):
             )
 
         self.assertFalse(wipeout_service.verify_user_deleted(self.user_1_id))
-
 
 class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -6110,7 +6077,6 @@ class WipeoutServiceDeleteBlogPostModelsTests(test_utils.GenericTestBase):
                 self.user_1_id not in blog_post_rights_model.editor_ids
             )
 
-
 class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
 
@@ -6319,7 +6285,6 @@ class WipeoutServiceDeletelLearnerGroupModelsTests(test_utils.GenericTestBase):
         # current user being facilitator.
         self.assertIsNone(learner_group_model_2)
 
-
 class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     """Provides testing for the delete users pending to be deleted taskqueue
     service methods of wipeout service."""
@@ -6372,7 +6337,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6402,9 +6366,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.delete_users_pending_to_be_deleted()
             self.assertEqual(len(self.email_bodies), 0)
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_no_email_is_sent_when_there_are_no_users_pending_deletion(
         self,
     ) -> None:
@@ -6420,7 +6381,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6453,7 +6413,6 @@ class PendingUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id)
         )
         self.assertTrue(pending_deletion_model.deletion_complete)
-
 
 class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
     """Provides testing for the check completion of user deletion taskqueue
@@ -6506,9 +6465,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             email_manager, 'send_mail_to_admin', _mock_send_mail_to_admin
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_verification_when_user_is_not_deleted_emails_enabled(self) -> None:
         with self.send_mail_to_admin_swap:
             wipeout_service.check_completion_of_user_deletion()
@@ -6531,7 +6487,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'senderName'),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
@@ -6568,7 +6523,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -6597,7 +6551,6 @@ class CheckCompletionOfUserDeletionTaskServiceTests(test_utils.GenericTestBase):
             wipeout_service.check_completion_of_user_deletion()
         self.assertIn('FAILURE', self.email_bodies[-1])
         self.assertIn(self.user_1_id, self.email_bodies[-1])
-
 
 class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
     """Provides testing of the deletion part of wipeout service."""
@@ -6687,7 +6640,6 @@ class WipeoutServiceDeleteVersionHistoryModelsTests(test_utils.GenericTestBase):
             ]
             self.assertNotIn(self.user_1_id, model.committer_ids)
             self.assertIn(pseudonymized_id, model.committer_ids)
-
 
 class WipeoutServiceVerifyProfilePictureIsDeletedTests(
     test_utils.GenericTestBase

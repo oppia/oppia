@@ -103,7 +103,6 @@ describe('Sign up page component', () => {
   });
 
   it('should intialize', fakeAsync(() => {
-    const canSendEmails = true;
     const hasAgreedToLatestTerms = true;
     const hasEverRegistered = true;
     const username = 'test_user';
@@ -116,7 +115,6 @@ describe('Sign up page component', () => {
       'fetchSignupPageDataAsync'
     ).and.returnValue(
       Promise.resolve({
-        server_can_send_emails: canSendEmails,
         has_agreed_to_latest_terms: hasAgreedToLatestTerms,
         has_ever_registered: hasEverRegistered,
         username: username,

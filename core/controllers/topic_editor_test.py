@@ -37,7 +37,6 @@ from core.tests import test_utils
 
 from typing import List
 
-
 class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -141,7 +140,6 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
             topic_id_to_prerequisite_topic_ids={self.topic_id: []}
         )
         self.logout()
-
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
@@ -516,7 +514,6 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
             'Story url fragment is not unique across the site.',
         )
 
-
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
     def test_get_can_not_access_handler_with_invalid_topic_id(self) -> None:
@@ -599,7 +596,6 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
             json_response['subtopic_page']['page_contents'],
         )
         self.logout()
-
 
 class StudyGuideEditorTests(BaseTopicEditorControllerTests):
 
@@ -772,14 +768,12 @@ class StudyGuideEditorTests(BaseTopicEditorControllerTests):
         )
         self.logout()
 
-
 class TopicEditorTests(
     BaseTopicEditorControllerTests, test_utils.EmailTestBase
 ):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -913,7 +907,6 @@ class TopicEditorTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -1387,14 +1380,12 @@ class TopicEditorTests(
 
         self.logout()
 
-
 class TopicPublishSendMailHandlerTests(
     BaseTopicEditorControllerTests, test_utils.EmailTestBase
 ):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -1423,7 +1414,6 @@ class TopicPublishSendMailHandlerTests(
         )
         self.assertEqual(len(messages), 1)
         self.assertIn(expected_email_html_body, messages[0].html)
-
 
 class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
 
@@ -1464,7 +1454,6 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
         )
 
         self.logout()
-
 
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
@@ -1609,7 +1598,6 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
         )
         self.assertEqual(response['error'], error_message)
 
-
 class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
     """Tests for TopicUrlFragmentHandler."""
 
@@ -1682,7 +1670,6 @@ class TopicUrlFragmentHandlerTest(BaseTopicEditorControllerTests):
         self.assertEqual(json_response['topic_url_fragment_exists'], True)
 
         self.logout()
-
 
 class TopicIdToTopicNameHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicIdToTopicNameHandlerTest."""

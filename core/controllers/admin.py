@@ -3002,12 +3002,7 @@ class SendDummyMailToAdminHandler(
 
     @acl_decorators.can_access_admin_page
     def post(self) -> None:
-        """Sends a dummy email to the admin if the application is
-        configured to send emails.
-
-        Raises:
-            InvalidInputException. This app cannot send emails.
-        """
+        """Sends a dummy email to the admin."""
         username = self.username
         assert username is not None
         email_manager.send_dummy_mail_to_admin(username)

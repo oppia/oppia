@@ -49,7 +49,6 @@ if MYPY:  # pragma: no cover
 
 (exp_models,) = models.Registry.import_models([models.Names.EXPLORATION])
 
-
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self) -> None:
@@ -269,7 +268,6 @@ class ExplorationChangeTests(test_utils.GenericTestBase):
         }
         exp_change_object = exp_domain.ExplorationChange(exp_change_dict)
         self.assertEqual(exp_change_object.to_dict(), exp_change_dict)
-
 
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
@@ -534,7 +532,6 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_change.version_number, 2)
 
-
 class ExpVersionReferenceTests(test_utils.GenericTestBase):
 
     def test_create_exp_version_reference_object(self) -> None:
@@ -561,7 +558,6 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
             Exception, 'Expected exp_id to be a str, received 0'
         ):
             exp_domain.ExpVersionReference(0, 1)  # type: ignore[arg-type]
-
 
 class TransientCheckpointUrlTests(test_utils.GenericTestBase):
     """Testing TransientCheckpointUrl domain object."""
@@ -678,7 +674,6 @@ class TransientCheckpointUrlTests(test_utils.GenericTestBase):
             'Expected most_recently_reached_checkpoint_exp_version to be an int',
         ):
             self.transient_checkpoint_url.validate()
-
 
 class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
     """Test checkpoints validations in an exploration."""
@@ -1431,7 +1426,6 @@ class ExplorationCheckpointsUnitTests(test_utils.GenericTestBase):
         ):
             self.exploration.validate(strict=True)
         d_state.update_card_is_checkpoint(False)
-
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -4957,7 +4951,6 @@ title: Title
         found_content = exploration.find_content_by_content_id('nonexistent_id')
         self.assertIsNone(found_content)
 
-
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -5372,7 +5365,6 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, self.exp_summary.contributor_ids
         )
 
-
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
@@ -5664,7 +5656,6 @@ title: Title
         ):
             exp_domain.Exploration.from_yaml('exp4', 'State1:\n(\nInvalid yaml')
 
-
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
     """Tests the presence of appropriate schema migration methods in the
     Exploration domain object class.
@@ -5721,7 +5712,6 @@ class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
                 % (current_exp_schema_version, current_exp_schema_version + 1),
             )
         )
-
 
 class SchemaMigrationUnitTests(test_utils.GenericTestBase):
     """Test migration methods for yaml content."""
@@ -13362,7 +13352,6 @@ version: 0
             exploration.to_yaml(), latest_sample_yaml_content_for_text_interac_2
         )
 
-
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
 
@@ -13446,7 +13435,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             },
         )
 
-
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 
@@ -13473,7 +13461,6 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegex(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
-
 
 class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
@@ -13789,7 +13776,6 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         actual_outcome_list = exploration.get_all_html_content_strings()
         self.assertItemsEqual(set(actual_outcome_list), set(expected_html_list))
-
 
 class ExplorationChangesMergeabilityUnitTests(
     exp_services_test.ExplorationServicesUnitTests, test_utils.EmailTestBase
@@ -19289,7 +19275,6 @@ class ExplorationChangesMergeabilityUnitTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -19696,7 +19681,6 @@ class ExplorationChangesMergeabilityUnitTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -19827,7 +19811,6 @@ class ExplorationChangesMergeabilityUnitTests(
             self.EXP_0_ID, 2, change_list_4
         )
         self.assertEqual(changes_are_not_mergeable_2, False)
-
 
 class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
 
@@ -20003,7 +19986,6 @@ class ExplorationMetadataDomainUnitTests(test_utils.GenericTestBase):
         ):
             self._require_metadata_properties_to_be_synced()
 
-
 class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_metadata_version_history_gets_created(self) -> None:
@@ -20033,7 +20015,6 @@ class MetadataVersionHistoryDomainUnitTests(test_utils.GenericTestBase):
             metadata_version_history_dict['last_edited_committer_id'],
         )
 
-
 class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
 
     def test_exploration_version_history_gets_created(self) -> None:
@@ -20062,7 +20043,6 @@ class ExplorationVersionHistoryUnitTests(test_utils.GenericTestBase):
         ).to_dict()
 
         self.assertEqual(actual_dict, expected_dict)
-
 
 class OldVersionExploration(translation_domain.BaseTranslatableObject):
     """Initailize old version Exploration object
@@ -20142,7 +20122,6 @@ class OldVersionExploration(translation_domain.BaseTranslatableObject):
         exploration_dict: exp_domain.SerializableExplorationDict = self.to_dict()  # type: ignore[assignment]
         exploration_dict['version'] = self.version
         return json.dumps(exploration_dict)
-
 
 def create_old_schema_exploration(
     exploration_id: str, yaml_content: str

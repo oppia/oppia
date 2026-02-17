@@ -65,7 +65,6 @@ if MYPY:  # pragma: no cover
     ]
 )
 
-
 class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
     def test_get_entity_voiceovers_returns_correctly(self) -> None:
         dummy_manual_voiceover_dict: state_domain.VoiceoverDict = {
@@ -705,7 +704,6 @@ class EntityVoiceoversServicesTests(test_utils.GenericTestBase):
             'filename1.mp3',
         )
 
-
 class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
     """Unit tests to validate the saving and fetching behavior in the
     VoiceoverAutogenerationPolicyModel.
@@ -780,7 +778,6 @@ class VoiceoverAutogenerationPolicyTests(test_utils.GenericTestBase):
             'hi'
         )
         self.assertItemsEqual(autogeneratable_accents_for_hindi, [])
-
 
 class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
     """Unit tests to validate the language-accent information saved as
@@ -932,7 +929,6 @@ class VoiceoversLanguageAccentConstantsTests(test_utils.GenericTestBase):
             ),
             expected_language_code,
         )
-
 
 class VoiceoverRegenerationTests(test_utils.GenericTestBase):
     """Test class to verify voiceover regeneration across various scenarios,
@@ -1224,7 +1220,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             (param_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
             (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'subject'),
             (param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),
@@ -1289,7 +1284,6 @@ class VoiceoverRegenerationTests(test_utils.GenericTestBase):
             (param_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
             (param_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
             (param_list.ParamName.NOREPLY_EMAIL_ADDRESS, 'noreply@example.com'),
-            (param_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (param_list.ParamName.SIGNUP_EMAIL_SUBJECT_CONTENT, 'subject'),
             (param_list.ParamName.SIGNUP_EMAIL_BODY_CONTENT, 'body'),
             (param_list.ParamName.SYSTEM_EMAIL_ADDRESS, 'dummy@system.com'),

@@ -27,7 +27,6 @@ from core.tests import test_utils
 
 from typing import Dict, Union
 
-
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 
@@ -36,9 +35,6 @@ class EmailTests(test_utils.GenericTestBase):
         self.admin_email_address = 'testadmin@example.com'
         self.system_email_address = 'system@example.com'
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_send_mail_logs_to_terminal(self) -> None:
         """In DEV Mode, platforms email_service API that sends a singular email
         logs the correct email info to terminal.
@@ -98,9 +94,6 @@ class EmailTests(test_utils.GenericTestBase):
             [logging_info_email_body, logging_info_notification],
         )
 
-    @test_utils.set_platform_parameters(
-        [(platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True)]
-    )
     def test_send_mail_to_multiple_recipients_logs_to_terminal(self) -> None:
         """In DEV Mode, platform email_services that sends mail to multiple
         recipients logs the correct info to terminal.

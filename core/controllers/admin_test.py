@@ -89,12 +89,10 @@ if MYPY:  # pragma: no cover
 BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 BOTH_MODERATOR_AND_ADMIN_USERNAME = 'moderatorandadm1n'
 
-
 class ParamName(enum.Enum):
     """Enum for parameter names."""
 
     TEST_PARAMETER_1 = 'test_param_1'
-
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
     """Server integration tests for operations on the admin page."""
@@ -1651,7 +1649,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Cannot revoke privileges from the default super admin account',
         )
 
-
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""
 
@@ -1799,7 +1796,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy question suggestions."""
 
@@ -1912,7 +1908,6 @@ class GenerateDummyQuestionSuggestionsTest(test_utils.GenericTestBase):
         self.assertNotEqual(len(generated_question_suggestions), 12)
         self.logout()
 
-
 class GenerateDummyStoriesTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy stories."""
 
@@ -2021,7 +2016,6 @@ class GenerateDummyStoriesTest(test_utils.GenericTestBase):
         generated_stories_count = len(topic.get_all_story_references())
         self.assertNotEqual(generated_stories_count, 5)
         self.logout()
-
 
 class GenerateDummyChaptersTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy chapters."""
@@ -2297,7 +2291,6 @@ class GenerateDummyChaptersTest(test_utils.GenericTestBase):
         self.assertNotEqual(generated_chapters_count, 7)
         self.logout()
 
-
 class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
     """Checks the conditions for generation of dummy translation
     opportunities."""
@@ -2457,7 +2450,6 @@ class GenerateDummyTranslationOpportunitiesTest(test_utils.GenericTestBase):
         self.assertEqual(published_exps, {})
 
         self.logout()
-
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
     """Checks the user role handling on the admin page."""
@@ -2804,7 +2796,6 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             },
         )
 
-
 class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
     """Tests for RegenerateTopicSummariesHandler."""
 
@@ -2861,7 +2852,6 @@ class RegenerateTopicSummariesHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-
 class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
     """Tests for GenerateStudyGuideModelsHandler."""
 
@@ -2912,7 +2902,6 @@ class GenerateStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-
 class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
     """Tests for DeleteStudyGuideModelsHandler."""
 
@@ -2962,7 +2951,6 @@ class DeleteStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
                 expected_status_int=200,
             )
 
-
 class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
     """Tests for VerifyStudyGuideModelsHandler."""
 
@@ -3011,7 +2999,6 @@ class VerifyStudyGuideModelsHandlerTest(test_utils.GenericTestBase):
                 {},
                 expected_status_int=200,
             )
-
 
 class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TopicManagerRoleHandler."""
@@ -3202,7 +3189,6 @@ class TopicManagerRoleHandlerTest(test_utils.GenericTestBase):
         )
 
         self.logout()
-
 
 class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
     """Tests for TranslationCoordinatorRoleHandler."""
@@ -3500,7 +3486,6 @@ class TranslationCoordinatorRoleHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-
 class BannedUsersHandlerTest(test_utils.GenericTestBase):
     """Tests for BannedUsersHandler."""
 
@@ -3678,7 +3663,6 @@ class BannedUsersHandlerTest(test_utils.GenericTestBase):
             params={'username': 'invalidUsername'},
             expected_status_int=404,
         )
-
 
 class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
     """Tests for data extraction handler."""
@@ -3866,7 +3850,6 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-
 class ClearSearchIndexTest(test_utils.GenericTestBase):
     """Tests that search index gets cleared."""
 
@@ -3914,7 +3897,6 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         )[0]
         self.assertEqual(result_blog_posts, [])
 
-
 class SendDummyMailTest(test_utils.GenericTestBase):
     """ "Tests for sending test mails to admin."""
 
@@ -3924,7 +3906,6 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -3946,7 +3927,6 @@ class SendDummyMailTest(test_utils.GenericTestBase):
             expected_status_int=200,
         )
         self.assertEqual(generated_response, {})
-
 
 class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
     """Tests for updating usernames."""
@@ -4174,7 +4154,6 @@ class UpdateUsernameHandlerTest(test_utils.GenericTestBase):
             expected_status_int=404,
         )
 
-
 class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
     """Tests NumberOfDeletionRequestsHandler."""
 
@@ -4197,7 +4176,6 @@ class NumberOfDeletionRequestsHandlerTest(test_utils.GenericTestBase):
 
         response = self.get_json('/numberofdeletionrequestshandler')
         self.assertEqual(response['number_of_pending_deletion_models'], 2)
-
 
 class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
     """Tests VerifyUserModelsDeletedHandler."""
@@ -4231,7 +4209,6 @@ class VerifyUserModelsDeletedHandlerTest(test_utils.GenericTestBase):
             params={'user_id': self.editor_user_id},
         )
         self.assertTrue(response['related_models_exist'])
-
 
 class DeleteUserHandlerTest(test_utils.GenericTestBase):
     """Tests DeleteUserHandler."""
@@ -4290,7 +4267,6 @@ class DeleteUserHandlerTest(test_utils.GenericTestBase):
         self.assertIsNotNone(
             wipeout_service.get_pending_deletion_request(self.new_user_id)
         )
-
 
 class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
     """Tests UpdateBlogPostHandler."""
@@ -4448,7 +4424,6 @@ class UpdateBlogPostHandlerTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
         )
 
-
 class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
     """Tests the generation of dummy blog post data."""
 
@@ -4552,7 +4527,6 @@ class GenerateDummyBlogPostTest(test_utils.GenericTestBase):
         self.assertEqual(blog_post_count, 0)
         self.logout()
 
-
 class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
     """Tests for interaction by exploration handler."""
 
@@ -4599,7 +4573,6 @@ class IntereactionByExplorationIdHandlerTests(test_utils.GenericTestBase):
             'At \'http://localhost/interactions\' these errors are happening:\n'
             'Missing key in handler args: exp_id.',
         )
-
 
 class AutomaticVoiceoverAdminControlHandlerTests(test_utils.GenericTestBase):
     """Tests for admin config for automatic voiceovers."""

@@ -305,13 +305,7 @@ def delete_users_pending_to_be_deleted() -> None:
         )
 
     email_subject = 'User Deletion job result'
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if server_can_send_emails:
-        email_manager.send_mail_to_admin(email_subject, email_message)
+    email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def check_completion_of_user_deletion() -> None:
@@ -338,13 +332,7 @@ def check_completion_of_user_deletion() -> None:
         completion_status = run_user_deletion_completion(
             pending_deletion_request
         )
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
-        )
-        if server_can_send_emails:
-            email_message += '\n-----------------------------------\n'
+        email_message += '\n-----------------------------------\n'
             email_message += (
                 'PendingDeletionRequestModel ID: %s\n'
                 'User ID: %s\n'
@@ -406,26 +394,14 @@ def run_user_deletion_completion(
             user_services.save_deleted_username(
                 pending_deletion_request.normalized_long_term_username
             )
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
+        email_manager.send_account_deleted_email(
+            pending_deletion_request.user_id, pending_deletion_request.email
         )
-        if server_can_send_emails:
-            email_manager.send_account_deleted_email(
-                pending_deletion_request.user_id, pending_deletion_request.email
-            )
         return wipeout_domain.USER_VERIFICATION_SUCCESS
     else:
-        server_can_send_emails = (
-            platform_parameter_services.get_platform_parameter_value(
-                platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-            )
+        email_manager.send_account_deletion_failed_email(
+            pending_deletion_request.user_id, pending_deletion_request.email
         )
-        if server_can_send_emails:
-            email_manager.send_account_deletion_failed_email(
-                pending_deletion_request.user_id, pending_deletion_request.email
-            )
         pending_deletion_request.deletion_complete = False
         save_pending_deletion_requests([pending_deletion_request])
         return wipeout_domain.USER_VERIFICATION_FAILURE

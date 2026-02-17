@@ -110,8 +110,6 @@ def send_mail(
             and `path` with their corresponding values.
 
     Raises:
-        Exception. The configuration in feconf.py forbids emails from being
-            sent.
         ValueError. Any recipient email address is malformed.
         ValueError. Any sender email address is malformed.
         Exception. The email was not sent correctly. In other words, the
@@ -185,22 +183,12 @@ def send_bulk_mail(
             and `path` with their corresponding values.
 
     Raises:
-        Exception. The configuration in feconf.py forbids emails from being
-            sent.
         ValueError. Any recipient email addresses are malformed.
         ValueError. Any sender email address is malformed.
         Exception. The emails were not sent correctly. In other words, the
             send_email_to_recipients() function returned False
             (signifying API returned bad status code).
     """
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if not server_can_send_emails:
-        raise Exception('This app cannot send emails to users.')
-
     for recipient_email in recipient_emails:
         if not _is_email_valid(recipient_email):
             raise ValueError(

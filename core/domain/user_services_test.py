@@ -67,7 +67,6 @@ datastore_services = models.Registry.import_datastore_services()
 )
 bulk_email_services = models.Registry.import_bulk_email_services()
 
-
 def _get_change_list(
     state_name: str, property_name: str, new_value: bool
 ) -> List[exp_domain.ExplorationChange]:
@@ -82,7 +81,6 @@ def _get_change_list(
             }
         )
     ]
-
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -794,7 +792,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -912,7 +909,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',
@@ -2608,7 +2604,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
                 'invalid_user_id', 'exp_1', strict=True
             )
 
-
 class UserCheckpointProgressUpdateTests(test_utils.GenericTestBase):
     """Tests whether user checkpoint progress is updated correctly"""
 
@@ -3026,7 +3021,6 @@ title: Title
             exp_user_data.most_recently_reached_checkpoint_state_name
         )
 
-
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
     exploration/collection and update of already published
@@ -3443,7 +3437,6 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             ).first_contribution_msec
         )
 
-
 class UserDashboardStatsTests(test_utils.GenericTestBase):
     """Test whether exploration-related statistics of a user change as events
     are registered.
@@ -3690,7 +3683,6 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
             ):
                 user_services.update_dashboard_stats_log(self.owner_id)
 
-
 class LastLoginIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing that the last login time for a user updates
     correctly.
@@ -3767,7 +3759,6 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
 
             self.assertGreater(last_logged_in, previous_last_logged_in_datetime)
             self.logout()
-
 
 class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for testing the time the user last edited an
@@ -3872,7 +3863,6 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         self.assertGreater(last_edited, previous_last_edited_an_exploration)
 
-
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
     """Integration tests for the time the user last created an exploration
     updates correctly.
@@ -3935,7 +3925,6 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         assert previous_last_created_an_exploration is not None
 
         self.assertGreater(last_created, previous_last_created_an_exploration)
-
 
 class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
     """Test the functionality related to updating the community contribution
@@ -4385,7 +4374,6 @@ class CommunityContributionStatsUnitTests(test_utils.GenericTestBase):
 
         self._assert_community_contribution_stats_is_in_default_state()
 
-
 class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     TRANSLATOR_EMAIL: Final = 'translator@community.org'
@@ -4811,7 +4799,6 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_id
         )
         self.assertFalse(user_contribution_rights.can_submit_questions)
-
 
 class TranslationCoordinatorRightsTests(test_utils.GenericTestBase):
     """Tests for handling translation coordinator rights"""

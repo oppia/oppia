@@ -71,7 +71,6 @@ if MYPY:  # pragma: no cover
     )
 )
 
-
 class CronJobTests(test_utils.GenericTestBase):
 
     FIVE_WEEKS: Final = datetime.timedelta(weeks=5)
@@ -277,7 +276,6 @@ class CronJobTests(test_utils.GenericTestBase):
             self.assertEqual(self.task_status, 'Started')
             self.logout()
 
-
 class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
     test_utils.GenericTestBase
 ):
@@ -392,7 +390,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 False,
@@ -425,7 +422,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
@@ -460,7 +456,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 True,
@@ -497,7 +492,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 True,
@@ -529,7 +523,6 @@ class CronMailReviewersContributorDashboardSuggestionsHandlerTests(
         self.assertEqual(len(self.reviewers_suggestion_email_infos), 0)
 
         self.logout()
-
 
 class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
@@ -591,7 +584,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 False,
@@ -656,7 +648,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
@@ -691,7 +682,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 True,
@@ -726,7 +716,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 True,
@@ -762,7 +751,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.CONTRIBUTOR_DASHBOARD_REVIEWER_EMAILS_IS_ENABLED,
                 True,
@@ -792,7 +780,6 @@ class CronMailReviewerNewSuggestionsHandlerTests(test_utils.GenericTestBase):
                 {'en': [self.reviewer_id]}, {'en': [mock.ANY]}
             )
             self.logout()
-
 
 class CronMailAdminContributorDashboardBottlenecksHandlerTests(
     test_utils.GenericTestBase
@@ -976,7 +963,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 True,
@@ -1021,7 +1007,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
@@ -1058,7 +1043,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 False,
@@ -1095,7 +1079,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ENABLE_ADMIN_NOTIFICATIONS_FOR_REVIEWER_SHORTAGE,
                 True,
@@ -1134,7 +1117,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'admin'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'dummy_footer'),
             (
@@ -1288,7 +1270,6 @@ class CronMailAdminContributorDashboardBottlenecksHandlerTests(
         with swap_with_checks, self.testapp_swap:
             self.get_html_response('/cron/users/dashboard_stats')
 
-
 class CronMailChapterPublicationsNotificationsHandlerTests(
     test_utils.GenericTestBase
 ):
@@ -1370,7 +1351,6 @@ class CronMailChapterPublicationsNotificationsHandlerTests(
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.SYSTEM_EMAIL_ADDRESS,
                 'system@example.com',

@@ -26,7 +26,6 @@ from core.tests import test_utils
 (email_models,) = models.Registry.import_models([models.Names.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
-
 class EmailServicesTest(test_utils.EmailTestBase):
     """Tests for email_services functions."""
 
@@ -37,7 +36,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
@@ -64,7 +62,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
@@ -90,26 +87,8 @@ class EmailServicesTest(test_utils.EmailTestBase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].bcc, self.admin_email_address)
 
-    def test_send_bulk_mail_exception_for_invalid_permissions(self) -> None:
-        """Tests the send_bulk_mail exception raised for invalid user
-        permissions.
-        """
-        send_email_exception = self.assertRaisesRegex(
-            Exception, 'This app cannot send emails to users.'
-        )
-
-        with send_email_exception, self.swap(constants, 'DEV_MODE', False):
-            email_services.send_bulk_mail(
-                self.system_email_address,
-                [self.admin_email_address],
-                'subject',
-                'body',
-                'html',
-            )
-
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
@@ -129,7 +108,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
         ]
@@ -239,7 +217,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_SENDER_NAME, 'sender'),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, ''),
             (
@@ -295,7 +272,6 @@ class EmailServicesTest(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',

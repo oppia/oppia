@@ -1077,13 +1077,7 @@ def _regenerate_voiceovers_for_given_contents(
         )
 
     # Confirming that the app can deliver emails.
-    server_can_send_emails = (
-        platform_parameter_services.get_platform_parameter_value(
-            platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS.value
-        )
-    )
-    if server_can_send_emails:
-        send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
+    send_email_to_voiceover_admins_and_tech_leads_after_regeneration(
             exploration_id,
             exploration_title,
             date_time,

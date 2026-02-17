@@ -69,7 +69,6 @@ if MYPY:  # pragma: no cover
     )
 )
 
-
 class BaseEditorControllerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -139,7 +138,6 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.USER_PERMISSIONS_URL_PREFIX, exp_id)
         )
         self.assertEqual(response['can_voiceover'], False)
-
 
 class EditorTests(BaseEditorControllerTests):
 
@@ -498,7 +496,6 @@ class EditorTests(BaseEditorControllerTests):
         self.assertEqual(updated_exploration.title, 'Updated Title')
 
         self.logout()
-
 
 class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
@@ -1074,7 +1071,6 @@ solicit_answer_details: false
 
         self.logout()
 
-
 class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -1152,7 +1148,6 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['snapshots'], snapshots)
 
         self.logout()
-
 
 class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
@@ -1235,7 +1230,6 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -1267,7 +1261,6 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
         self.logout()
 
-
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self) -> None:
@@ -1291,7 +1284,6 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['unresolved_answers'], [])
 
         self.logout()
-
 
 class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
 
@@ -1360,7 +1352,6 @@ class StateInteractionStatsHandlerTests(test_utils.GenericTestBase):
         )
 
         self.assertEqual(response['visualizations_info'], [])
-
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
@@ -1533,7 +1524,6 @@ class ExplorationDeletionRightsTests(BaseEditorControllerTests):
             )
             self.logout()
 
-
 class VersioningIntegrationTest(BaseEditorControllerTests):
     """Test retrieval of and reverting to old exploration versions."""
 
@@ -1705,7 +1695,6 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         )
         self.assertEqual(response['error'], error_msg)
 
-
 class ExplorationEditRightsTest(BaseEditorControllerTests):
     """Test the handling of edit rights for explorations."""
 
@@ -1744,7 +1733,6 @@ class ExplorationEditRightsTest(BaseEditorControllerTests):
         self.login('sandra@example.com')
         self.assert_can_edit(exp_id)
         self.logout()
-
 
 class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for managing exploration editing rights."""
@@ -2804,7 +2792,6 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
 
@@ -2891,7 +2878,6 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-
 class ModeratorEmailsTests(test_utils.EmailTestBase):
     """Integration test for post-moderator action emails."""
 
@@ -2943,7 +2929,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, False),
             (
                 platform_parameter_list.ParamName.ADMIN_EMAIL_ADDRESS,
                 'testadmin@example.com',
@@ -2996,7 +2981,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (platform_parameter_list.ParamName.EMAIL_FOOTER, 'footer'),
             (
                 platform_parameter_list.ParamName.EMAIL_SENDER_NAME,
@@ -3038,7 +3022,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
@@ -3130,7 +3113,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
 
     @test_utils.set_platform_parameters(
         [
-            (platform_parameter_list.ParamName.SERVER_CAN_SEND_EMAILS, True),
             (
                 platform_parameter_list.ParamName.EMAIL_FOOTER,
                 'You can change your email preferences via the '
@@ -3170,7 +3152,6 @@ class ModeratorEmailsTests(test_utils.EmailTestBase):
         )
 
         self.logout()
-
 
 class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     """Test the handling of request to fetch issues and playthroughs."""
@@ -3340,7 +3321,6 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             ],
         )
 
-
 class ResolveIssueHandlerTests(test_utils.GenericTestBase):
     """Test the handler for resolving issues."""
 
@@ -3501,7 +3481,6 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 csrf_token=csrf_token,
                 expected_status_int=404,
             )
-
 
 class EditorAutosaveTest(BaseEditorControllerTests):
     """Test the handling of editor autosave actions."""
@@ -3820,7 +3799,6 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
 
-
 class HasSeenTutorialTests(BaseEditorControllerTests):
 
     def test_get_user_has_seen_editor_tutorial(self) -> None:
@@ -3864,7 +3842,6 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
         self.assertFalse(response['show_state_translation_tutorial_on_load'])
 
         self.logout()
-
 
 class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
@@ -3916,7 +3893,6 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
             )
 
         self.assertEqual(state_stats['interaction_ids'], {})
-
 
 class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
@@ -4181,7 +4157,6 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             )
         self.logout()
 
-
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
 
     def test_rights_handler_returns_appropriate_rights(self) -> None:
@@ -4208,7 +4183,6 @@ class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):
         self.assertFalse(response['can_manage_voice_artist'])
 
         self.logout()
-
 
 class ImageUploadHandlerTests(BaseEditorControllerTests):
 
@@ -4479,7 +4453,6 @@ class ImageUploadHandlerTests(BaseEditorControllerTests):
         self.assertTrue(fs.isfile(filepath))
 
         self.logout()
-
 
 class EntityTranslationsBulkHandlerTest(test_utils.GenericTestBase):
     """Test fetching all translations of a given entity in bulk."""
