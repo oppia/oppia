@@ -933,10 +933,8 @@ describe('Blog home page component', () => {
   });
 
   describe('when toggling the search panel', () => {
-    let blogPostCardsContainer: HTMLElement;
-
     beforeEach(() => {
-      // Force desktop view for these tests to ensure the toggle logic is active
+      // Force desktop view for these tests to ensure the toggle logic is active.
       spyOn(windowDimensionsService, 'getWidth').and.returnValue(1028);
       spyOn(urlService, 'getUrlParams').and.returnValue({});
 
@@ -957,7 +955,7 @@ describe('Blog home page component', () => {
       expect(toggleButton.textContent).toContain('Hide');
       expect(toggleButton.querySelector('i').classList).toContain('fa-times');
 
-      // Check if layout changed to col-8
+      // Check if layout changed to col-8.
       let container = fixture.debugElement.nativeElement.querySelector(
         '.oppia-blog-post-card-container'
       );
