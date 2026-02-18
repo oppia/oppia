@@ -36,15 +36,17 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         delete_results = (
             self.pipeline
-            | 'Get ALL records from Firebase' >> firebase_io.GetStrongRecords()
+            | 'Get all records from Firebase' >> firebase_io.GetStrongRecords()
+            | 'Extract Firebase account ids' >> beam.Map(lambda r: r.auth_id)
             | 'Delete records from Firebase' >> firebase_io.DeleteRecords()
         )
 
         import_results = (
             self.pipeline
-            | 'Recreate ALL records from Oppia' >> firebase_io.GetWeakRecords()
+            | 'Get all records from Oppia' >> firebase_io.GetWeakRecords()
+            | 'Convert to Firebase type' >> beam.Map(lambda r: r.into_import())
             | 'Wait on DeleteRecords()' >> beam.WaitOn(delete_results)
             | 'Import records into Firebase' >> firebase_io.ImportRecords()
         )
 
-        return [delete_results, import_results] | beam.Flatten()
+        return (delete_results, import_results) | beam.Flatten()

@@ -33,13 +33,13 @@ auth_models, user_models = models.Registry.import_models(
 )
 
 
-@dataclasses.dataclass(frozen=True, eq=True, unsafe_hash=True)
+@dataclasses.dataclass(frozen=True, unsafe_hash=True, eq=False)
 class StrongRecord:
     """Adapts Firebase records fetched directly from the Firebase Admin SDK."""
 
-    auth_id: str = dataclasses.field(hash=True, compare=True)
-    email: str = dataclasses.field(hash=True, compare=True)
-    disabled: bool = dataclasses.field(hash=True, compare=True)
+    auth_id: str = dataclasses.field(hash=True)
+    email: str = dataclasses.field(hash=True)
+    disabled: bool = dataclasses.field(hash=True)
 
     # Here we use object because Python requires `==` to work between ALL types.
     def __eq__(self, other: object) -> bool:
@@ -65,11 +65,11 @@ class StrongRecord:
         return StrongRecord(record.uid, record.email, record.disabled)
 
 
-@dataclasses.dataclass(frozen=True, eq=True, unsafe_hash=True)
+@dataclasses.dataclass(frozen=True, unsafe_hash=True, eq=False)
 class WeakRecord(StrongRecord):
     """Adapts Firebase records ASSUMED to exist based on Oppia's auth models."""
 
-    user_id: str = dataclasses.field(hash=False, compare=False)
+    user_id: str = dataclasses.field(hash=False)
 
     @classmethod
     def from_export(cls, _: firebase_auth.ExportedUserRecord) -> 'WeakRecord':

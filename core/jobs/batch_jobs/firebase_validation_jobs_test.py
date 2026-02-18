@@ -33,7 +33,7 @@ auth_models, user_models = models.Registry.import_models(
 )
 
 
-class AuditFirebaseRecordsJobTests(
+class FirebaseAuditRecordsJobTests(
     job_test_utils.JobTestBase,
     firebase_auth_services_test.FirebaseAuthServicesTestBase,
 ):
@@ -86,8 +86,8 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia user with email=\'a@a.com\''
-                        ' has no Firebase record'
+                        'Oppia User (user_id=\'uid_a\') unlinked to '
+                        'Firebase Record'
                     )
                 ),
             ],
@@ -102,8 +102,7 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Firebase record with email=\'a@a.com\''
-                        ' has no Oppia user'
+                        'Firebase Record (uid=\'fb_a\') unlinked to Oppia User'
                     )
                 ),
             ],
@@ -139,8 +138,8 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia User IDs have same email=\'a@a.com\':'
-                        ' [\'uid_a\', \'uid_b\']'
+                        'Found Oppia Users with same email: '
+                        'ids=[\'uid_a\', \'uid_b\']'
                     )
                 ),
             ],
@@ -158,8 +157,8 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Firebase Auth IDs have same email=\'a@a.com\':'
-                        ' [\'fb_a\', \'fb_b\']'
+                        'Found Firebase Records with same email: '
+                        'ids=[\'fb_a\', \'fb_b\']'
                     )
                 ),
             ],
@@ -188,10 +187,9 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia user_id=\'uid_a\' does not match'
-                        ' with its Firebase record!'
-                        ' Oppia is using (disabled: False)'
-                        ' but Firebase is using (disabled: True)'
+                        'Oppia User (id=\'uid_a\') inconsistent with Firebase: '
+                        'the field \'disabled\' '
+                        'in firebase=True but in oppia=False'
                     )
                 ),
             ],
@@ -230,8 +228,8 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia User IDs have same email=\'a@a.com\':'
-                        ' [\'uid_a\', \'uid_b\']'
+                        'Found Oppia Users with same email: '
+                        'ids=[\'uid_a\', \'uid_b\']'
                     )
                 ),
             ],
@@ -275,14 +273,14 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia User IDs have same email=\'a@a.com\':'
-                        ' [\'uid_a\', \'uid_b\']'
+                        'Found Firebase Records with same email: '
+                        'ids=[\'fb_a\', \'fb_b\']'
                     )
                 ),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Firebase Auth IDs have same email=\'a@a.com\':'
-                        ' [\'fb_a\', \'fb_b\']'
+                        'Found Oppia Users with same email: '
+                        'ids=[\'uid_a\', \'uid_b\']'
                     )
                 ),
             ],
@@ -313,11 +311,11 @@ class AuditFirebaseRecordsJobTests(
             [
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia user_id=\'uid_a\' does not match'
-                        ' with its Firebase record!'
-                        ' Oppia is using (auth_id: \'fb_a\', disabled: False)'
-                        ' but Firebase is using'
-                        ' (auth_id: \'fb_x\', disabled: True)'
+                        'Oppia User (id=\'uid_a\') inconsistent with Firebase: '
+                        'the field \'auth_id\' '
+                        'in firebase=\'fb_x\' but in oppia=\'fb_a\', '
+                        'the field \'disabled\' '
+                        'in firebase=True but in oppia=False'
                     )
                 ),
             ],
@@ -357,8 +355,8 @@ class AuditFirebaseRecordsJobTests(
                 job_run_result.JobRunResult(stdout='OK: 1'),
                 job_run_result.JobRunResult(
                     stderr=(
-                        'ERROR: Oppia user with email=\'b@b.com\''
-                        ' has no Firebase record'
+                        'Oppia User (user_id=\'uid_b\') unlinked to '
+                        'Firebase Record'
                     )
                 ),
             ],

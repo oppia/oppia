@@ -24,7 +24,6 @@ from core.jobs.io import firebase_io
 from core.jobs.types import firebase_adapters, job_run_result
 from core.platform import models
 from core.platform.auth import firebase_auth_services_test
-from core.tests import test_utils
 
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
@@ -191,25 +190,19 @@ class GetWeakRecordsTests(AuthIoTestBase):
         )
 
 
-class BatchFnTests(test_utils.TestBase):
-
-    def test_call_batch_fn_without_override_raises_not_implemented(
-        self,
-    ) -> None:
-        batch_fn = firebase_io.BatchFn()
-        with self.assertRaisesRegex(
-            NotImplementedError, 'Subclasses must override call_batch_fn'
-        ):
-            batch_fn.call_batch_fn([])
-
-
 class ImportRecordsTests(AuthIoTestBase):
 
     def test_import_with_records_reports_ok(self) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
-            firebase_adapters.WeakRecord('fb_b', 'b@b.com', False, 'uid_b'),
-            firebase_adapters.WeakRecord('fb_c', 'c@c.com', True, 'uid_c'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
+            firebase_auth.ImportUserRecord(
+                uid='fb_b', email='b@b.com', disabled=False
+            ),
+            firebase_auth.ImportUserRecord(
+                uid='fb_c', email='c@c.com', disabled=True
+            ),
         ]
 
         with self.swap(constants, 'EMULATOR_MODE', False):
@@ -217,13 +210,17 @@ class ImportRecordsTests(AuthIoTestBase):
                 self.pipeline
                 | beam.Create(imported_records)
                 | firebase_io.ImportRecords(),
-                [job_run_result.JobRunResult(stdout='IMPORT OK: 3')],
+                [job_run_result.JobRunResult(stdout='import_users success: 3')],
             )
 
     def test_import_with_emulator_mode_reports_ok(self) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
-            firebase_adapters.WeakRecord('fb_b', 'b@b.com', False, 'uid_b'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
+            firebase_auth.ImportUserRecord(
+                uid='fb_b', email='b@b.com', disabled=False
+            ),
         ]
 
         with self.swap(constants, 'EMULATOR_MODE', True):
@@ -231,12 +228,14 @@ class ImportRecordsTests(AuthIoTestBase):
                 self.pipeline
                 | beam.Create(imported_records)
                 | firebase_io.ImportRecords(),
-                [job_run_result.JobRunResult(stdout='IMPORT OK: 2')],
+                [job_run_result.JobRunResult(stdout='import_users success: 2')],
             )
 
     def test_import_with_batch_failure_reports_error(self) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
         ]
 
         with (
@@ -255,20 +254,22 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='IMPORT ERROR: slice=0:1: error'
+                        stderr='import_users error at slice=[0:1]: error'
                     ),
                 ],
             )
 
     def test_import_with_value_error_reports_error(self) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
         ]
 
         with (
             self.swap(constants, 'EMULATOR_MODE', False),
-            self.swap_to_always_raise(
-                firebase_auth, 'import_users', ValueError('invalid records')
+            self.firebase_sdk_stub.mock_import_users_error(
+                batch_error_pattern=(ValueError('invalid records'),)
             ),
         ):
             self.assert_pcoll_equal(
@@ -277,7 +278,7 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='IMPORT ERROR: slice=0:1: invalid records'
+                        stderr='import_users error at slice=[0:1]: invalid records'
                     ),
                 ],
             )
@@ -286,7 +287,9 @@ class ImportRecordsTests(AuthIoTestBase):
         self,
     ) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
         ]
 
         with (
@@ -301,7 +304,7 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='IMPORT ERROR: slice=0:1: invalid records'
+                        stderr='import_users error at slice=[0:1]: invalid records'
                     ),
                 ],
             )
@@ -314,7 +317,9 @@ class ImportRecordsTests(AuthIoTestBase):
 
     def test_import_with_individual_failure_reports_error(self) -> None:
         imported_records = [
-            firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a'),
+            firebase_auth.ImportUserRecord(
+                uid='fb_a', email='a@a.com', disabled=False
+            ),
         ]
 
         with (
@@ -329,7 +334,7 @@ class ImportRecordsTests(AuthIoTestBase):
                 | firebase_io.ImportRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='IMPORT ERROR: index=0: bad record'
+                        stderr='import_users error at index=[0]: bad record'
                     ),
                 ],
             )
@@ -344,33 +349,24 @@ class DeleteRecordsTests(AuthIoTestBase):
 
         self.assert_pcoll_equal(
             self.pipeline
-            | beam.Create(
-                [
-                    firebase_adapters.StrongRecord('uid_a', 'a@a.com', False),
-                    firebase_adapters.StrongRecord('uid_b', 'b@b.com', False),
-                ]
-            )
+            | beam.Create(['uid_a', 'uid_b'])
             | firebase_io.DeleteRecords(),
-            [job_run_result.JobRunResult(stdout='DELETE OK: 2')],
+            [job_run_result.JobRunResult(stdout='delete_users success: 2')],
         )
 
     def test_delete_with_value_error_reports_error(self) -> None:
-        deleted_records = [
-            firebase_adapters.StrongRecord('uid_a', 'a@a.com', False),
-        ]
+        expected = job_run_result.JobRunResult(
+            stderr='delete_users error at slice=[0:1]: invalid uids'
+        )
 
-        with self.swap_to_always_raise(
-            firebase_auth, 'delete_users', ValueError('invalid uids')
+        with self.firebase_sdk_stub.mock_delete_users_error(
+            batch_error_pattern=(ValueError('invalid uids'),)
         ):
             self.assert_pcoll_equal(
                 self.pipeline
-                | beam.Create(deleted_records)
+                | beam.Create(['uid_a'])
                 | firebase_io.DeleteRecords(),
-                [
-                    job_run_result.JobRunResult(
-                        stderr='DELETE ERROR: slice=0:1: invalid uids'
-                    ),
-                ],
+                [expected],
             )
 
     def test_delete_with_no_records_produces_no_output(self) -> None:
@@ -379,10 +375,6 @@ class DeleteRecordsTests(AuthIoTestBase):
         )
 
     def test_delete_with_batch_failure_reports_error(self) -> None:
-        deleted_records = [
-            firebase_adapters.StrongRecord('uid_a', 'a@a.com', False),
-        ]
-
         with self.firebase_sdk_stub.mock_delete_users_error(
             batch_error_pattern=(
                 firebase_exceptions.FirebaseError(message='error', code='E111'),
@@ -390,30 +382,26 @@ class DeleteRecordsTests(AuthIoTestBase):
         ):
             self.assert_pcoll_equal(
                 self.pipeline
-                | beam.Create(deleted_records)
+                | beam.Create(['uid_a'])
                 | firebase_io.DeleteRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='DELETE ERROR: slice=0:1: error'
+                        stderr='delete_users error at slice=[0:1]: error'
                     ),
                 ],
             )
 
     def test_delete_with_individual_failure_reports_error(self) -> None:
-        deleted_records = [
-            firebase_adapters.StrongRecord('uid_a', 'a@a.com', False),
-        ]
-
         with self.firebase_sdk_stub.mock_delete_users_error(
             individual_error_pattern=('bad uid',),
         ):
             self.assert_pcoll_equal(
                 self.pipeline
-                | beam.Create(deleted_records)
+                | beam.Create(['uid_a'])
                 | firebase_io.DeleteRecords(),
                 [
                     job_run_result.JobRunResult(
-                        stderr='DELETE ERROR: index=0: bad uid'
+                        stderr='delete_users error at index=[0]: bad uid'
                     ),
                 ],
             )
