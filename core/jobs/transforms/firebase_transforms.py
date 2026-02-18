@@ -45,7 +45,7 @@ FirebaseBatchOutputType = TypeVar(
     bound=(firebase_auth.DeleteUsersResult | firebase_auth.UserImportResult),
 )
 
-OK_TAG = 'success'
+SUCCESS_TAG = 'success'
 ERROR_TAG = 'error'
 
 
@@ -69,11 +69,13 @@ class FirebaseBatchOperation(
             | 'Gather all inputs into a single worker'
             >> beam.combiners.ToList()
             | f'Handle inputs in batches using {self.operation_name}'
-            >> beam.FlatMap(self._handle_inputs).with_outputs(OK_TAG, ERROR_TAG)
+            >> beam.FlatMap(self._handle_inputs).with_outputs(
+                SUCCESS_TAG, ERROR_TAG
+            )
         )
 
         stdout = (
-            result[OK_TAG]
+            result[SUCCESS_TAG]
             | 'Count the inputs successfully handled'
             >> beam.CombineGlobally(sum)
             | 'Apply a standard format to success count'
@@ -141,7 +143,7 @@ class FirebaseBatchOperation(
                 handled_count += len(batch)
 
         if (success_count := handled_count - failure_count) > 0:
-            yield pvalue.TaggedOutput(OK_TAG, success_count)
+            yield pvalue.TaggedOutput(SUCCESS_TAG, success_count)
 
         for reason in failure_details:
             yield pvalue.TaggedOutput(ERROR_TAG, reason)
