@@ -36,10 +36,10 @@ describe('AttributionService', () => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
-    attributionService = TestBed.get(AttributionService);
-    pageContextService = TestBed.get(PageContextService);
-    csrfService = TestBed.get(CsrfTokenService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    attributionService = TestBed.inject(AttributionService);
+    pageContextService = TestBed.inject(PageContextService);
+    csrfService = TestBed.inject(CsrfTokenService);
+    httpTestingController = TestBed.inject(HttpTestingController);
 
     spyOn(csrfService, 'getTokenAsync').and.callFake(async () => {
       return Promise.resolve('simple-csrf-token');
