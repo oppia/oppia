@@ -46,6 +46,8 @@ from core.platform import models
 
 import apache_beam as beam
 
+from typing import Tuple
+
 MYPY = False
 if MYPY:  # pragma: no cover
     from mypy_imports import (
@@ -62,117 +64,6 @@ datastore_services = models.Registry.import_datastore_services()
 
 DELETED_USER_FALLBACK_AUTHOR_NAME = 'Deleted User'
 DELETED_USER_FALLBACK_AUTHOR_BIO = ''
-
-
-class AuditBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
-    """Job that audits published blog post summary models for deleted
-    author_ids that have no BlogAuthorDetailsModel.
-
-    An author_id is considered a deleted-user orphan only when ALL of
-    the following are true:
-    1. The author_id appears in at least one published BlogPostSummary.
-    2. No BlogAuthorDetailsModel exists for that author_id.
-    3. No (non-deleted) UserSettingsModel exists for that author_id,
-       meaning the user has been deleted from the platform.
-
-    Authors who are still active (have a UserSettingsModel) but simply
-    lack a BlogAuthorDetailsModel are NOT flagged — the runtime code
-    handles that case automatically.
-    """
-
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of audit results.
-
-        Returns:
-            PCollection. A PCollection of JobRunResult instances reporting
-            the orphaned author_ids and related counts.
-        """
-
-        blog_post_author_pairs = (
-            self.pipeline
-            | 'Get all BlogPostSummaryModels'
-            >> ndb_io.GetModels(
-                blog_models.BlogPostSummaryModel.get_all(include_deleted=False)
-            )
-            | 'Filter published summaries'
-            >> beam.Filter(lambda model: model.published_on is not None)
-            | 'Key by author_id from summaries'
-            >> beam.Map(lambda model: (model.author_id, None))
-            | 'Deduplicate author_id pairs'
-            >> beam.Distinct()  # pylint: disable=no-value-for-parameter
-        )
-
-        existing_author_detail_pairs = (
-            self.pipeline
-            | 'Get all BlogAuthorDetailsModels'
-            >> ndb_io.GetModels(
-                blog_models.BlogAuthorDetailsModel.get_all(
-                    include_deleted=False
-                )
-            )
-            | 'Key by author_id from details'
-            >> beam.Map(lambda model: (model.author_id, None))
-        )
-
-        existing_user_pairs = (
-            self.pipeline
-            | 'Get all UserSettingsModels'
-            >> ndb_io.GetModels(
-                user_models.UserSettingsModel.get_all(include_deleted=False)
-            )
-            | 'Key by user_id from user settings'
-            >> beam.Map(lambda model: (model.id, None))
-        )
-
-        orphaned_author_ids = (
-            {
-                'blog_post_authors': blog_post_author_pairs,
-                'existing_author_details': existing_author_detail_pairs,
-                'existing_users': existing_user_pairs,
-            }
-            | 'CoGroup by author_id' >> beam.CoGroupByKey()
-            | 'Filter deleted-user orphaned author_ids'
-            >> beam.Filter(
-                lambda item: (
-                    len(list(item[1]['blog_post_authors'])) > 0
-                    and len(list(item[1]['existing_author_details'])) == 0
-                    and len(list(item[1]['existing_users'])) == 0
-                )
-            )
-            | 'Extract orphaned author_id' >> beam.Map(lambda item: item[0])
-        )
-
-        orphaned_author_id_results = (
-            orphaned_author_ids
-            | 'Report orphaned author_ids'
-            >> beam.Map(
-                lambda author_id: job_run_result.JobRunResult.as_stdout(
-                    f'ORPHANED AUTHOR ID: {author_id}'
-                )
-            )
-        )
-
-        orphaned_count_results = (
-            orphaned_author_ids
-            | 'Count orphaned author_ids'
-            >> job_result_transforms.CountObjectsToJobRunResult(
-                'ORPHANED AUTHOR IDS COUNT'
-            )
-        )
-
-        total_blog_author_count_results = (
-            blog_post_author_pairs
-            | 'Count total blog post author_ids'
-            >> job_result_transforms.CountObjectsToJobRunResult(
-                'TOTAL BLOG POST AUTHOR IDS COUNT'
-            )
-        )
-
-        return (
-            orphaned_author_id_results,
-            orphaned_count_results,
-            total_blog_author_count_results,
-        ) | 'Combine audit results' >> beam.Flatten()
 
 
 class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
@@ -220,14 +111,19 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             model.update_timestamps()
         return model
 
-    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
-        """Returns a PCollection of migration results.
+    def _get_orphaned_author_ids(
+        self,
+    ) -> Tuple[beam.PCollection[str], beam.PCollection[str]]:
+        """Returns blog post author pairs and orphaned author_ids.
+
+        An author_id is orphaned when it appears in at least one published
+        BlogPostSummary, has no BlogAuthorDetailsModel, and has no
+        UserSettingsModel (i.e. the user was deleted).
 
         Returns:
-            PCollection. A PCollection of JobRunResult instances reporting
-            the migration outcomes.
+            tuple(PCollection[str], PCollection[str]). A tuple of
+            (blog_post_author_pairs, orphaned_author_ids).
         """
-
         blog_post_author_pairs = (
             self.pipeline
             | 'Get all BlogPostSummaryModels'
@@ -282,6 +178,17 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             | 'Extract orphaned author_id' >> beam.Map(lambda item: item[0])
         )
 
+        return (blog_post_author_pairs, orphaned_author_ids)
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of migration results.
+
+        Returns:
+            PCollection. A PCollection of JobRunResult instances reporting
+            the migration outcomes.
+        """
+        _, orphaned_author_ids = self._get_orphaned_author_ids()
+
         new_author_details_models = (
             orphaned_author_ids
             | 'Create BlogAuthorDetailsModel'
@@ -317,3 +224,54 @@ class MigrateBlogAuthorDetailsForDeletedUsersJob(base_jobs.JobBase):
             migration_results,
             migration_count_results,
         ) | 'Combine migration results' >> beam.Flatten()
+
+
+class AuditBlogAuthorDetailsForDeletedUsersJob(
+    MigrateBlogAuthorDetailsForDeletedUsersJob
+):
+    """Job that audits MigrateBlogAuthorDetailsForDeletedUsersJob."""
+
+    DATASTORE_UPDATES_ALLOWED = False
+
+    def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        """Returns a PCollection of audit results.
+
+        Returns:
+            PCollection. A PCollection of JobRunResult instances reporting
+            the orphaned author_ids and related counts.
+        """
+        blog_post_author_pairs, orphaned_author_ids = (
+            self._get_orphaned_author_ids()
+        )
+
+        orphaned_author_id_results = (
+            orphaned_author_ids
+            | 'Report orphaned author_ids'
+            >> beam.Map(
+                lambda author_id: job_run_result.JobRunResult.as_stdout(
+                    f'ORPHANED AUTHOR ID: {author_id}'
+                )
+            )
+        )
+
+        orphaned_count_results = (
+            orphaned_author_ids
+            | 'Count orphaned author_ids'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'ORPHANED AUTHOR IDS COUNT'
+            )
+        )
+
+        total_blog_author_count_results = (
+            blog_post_author_pairs
+            | 'Count total blog post author_ids'
+            >> job_result_transforms.CountObjectsToJobRunResult(
+                'TOTAL BLOG POST AUTHOR IDS COUNT'
+            )
+        )
+
+        return (
+            orphaned_author_id_results,
+            orphaned_count_results,
+            total_blog_author_count_results,
+        ) | 'Combine audit results' >> beam.Flatten()

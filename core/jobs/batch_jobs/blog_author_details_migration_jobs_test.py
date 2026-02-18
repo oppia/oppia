@@ -59,7 +59,7 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
         self.assert_job_output_is_empty()
 
     def test_no_orphaned_authors_produces_count_only(self) -> None:
-        """Tests that the job reports zero orphaned author_ids when every
+        """Tests that the job reports only the total count when every
         published blog post has a matching BlogAuthorDetailsModel.
         """
         blog_post_summary = self.create_model(
@@ -154,7 +154,6 @@ class AuditBlogAuthorDetailsForDeletedUsersJobTests(job_test_utils.JobTestBase):
         )
         self.put_multi([blog_post_summary, user_settings])
 
-        # Should only report the total count, NOT any orphans.
         self.assert_job_output_is(
             [
                 job_run_result.JobRunResult.as_stdout(
