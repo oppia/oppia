@@ -71,8 +71,8 @@ describe('RTE parser service', () => {
         return false;
       }
 
-      for (let i = 0; i < n.children.length; i++) {
-        if (!dfs(n.children[i], d.children[i])) {
+      for (let childIndex = 0; childIndex < n.children.length; childIndex++) {
+        if (!dfs(n.children[childIndex], d.children[childIndex])) {
           return false;
         }
       }

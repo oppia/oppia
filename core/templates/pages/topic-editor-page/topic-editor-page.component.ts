@@ -169,21 +169,25 @@ export class TopicEditorPageComponent implements OnInit, OnDestroy {
   }
 
   getNavbarText(): string {
-    if (this.topicEditorStateService.hasLoadedTopic()) {
-      const activeTab = this.getActiveTabName();
-      if (activeTab === 'main') {
-        return 'Topic Editor';
-      } else if (activeTab === 'subtopic_editor') {
-        return 'Subtopic Editor';
-      } else if (activeTab === 'subtopic_preview') {
-        return 'Subtopic Preview';
-      } else if (activeTab === 'questions') {
-        return 'Question Editor';
-      } else if (activeTab === 'topic_preview') {
-        return 'Topic Preview';
-      }
+    if (!this.topicEditorStateService.hasLoadedTopic()) {
+      return '';
     }
-    return '';
+
+    const activeTab = this.getActiveTabName();
+
+    if (activeTab === 'main') {
+      return 'Topic Editor';
+    } else if (activeTab === 'subtopic_editor') {
+      return 'Subtopic Editor';
+    } else if (activeTab === 'subtopic_preview') {
+      return 'Subtopic Preview';
+    } else if (activeTab === 'questions') {
+      return 'Question Editor';
+    } else if (activeTab === 'topic_preview') {
+      return 'Topic Preview';
+    } else {
+      return '';
+    }
   }
 
   _validateTopic(): void {
