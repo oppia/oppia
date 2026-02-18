@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import feature_flag_domain
 from core.jobs import job_test_utils
 from core.jobs.batch_jobs import firebase_sync_jobs
 from core.jobs.types import job_run_result
@@ -45,6 +46,19 @@ class FirebaseSyncRecordsJobTests(
 
     def test_run_with_no_data_produces_no_output(self) -> None:
         self.assert_job_output_is_empty()
+
+    def test_run_with_prod_server_mode_raises_permission_error(self) -> None:
+        with (
+            self.swap_to_always_return(
+                feature_flag_domain,
+                'get_server_mode',
+                feature_flag_domain.ServerMode.PROD,
+            ),
+            self.assertRaisesRegex(
+                PermissionError, 'must never be run in production'
+            ),
+        ):
+            self.assert_job_output_is_empty()
 
     def test_run_with_existing_data_deletes_and_imports_records(self) -> None:
         self.firebase_sdk_stub.create_user(

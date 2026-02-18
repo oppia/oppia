@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+from core.domain import feature_flag_domain
 from core.jobs import base_jobs
 from core.jobs.io import firebase_io
 from core.jobs.types import job_run_result
@@ -34,6 +35,13 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
     """
 
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
+        if (
+            feature_flag_domain.get_server_mode()
+            == feature_flag_domain.ServerMode.PROD
+        ):
+            name = self.__class__.__name__
+            raise PermissionError(f'{name} must never be run in production')
+
         delete_results = (
             self.pipeline
             | 'Get all records from Firebase' >> firebase_io.GetStrongRecords()
