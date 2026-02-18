@@ -39,8 +39,8 @@ class FirebaseSyncRecordsJob(base_jobs.JobBase):
             feature_flag_domain.get_server_mode()
             == feature_flag_domain.ServerMode.PROD
         ):
-            name = self.__class__.__name__
-            raise PermissionError(f'{name} must never be run in production')
+            job_name = self.__class__.__name__
+            raise PermissionError(f'{job_name} must never be run in production')
 
         delete_results = (
             self.pipeline

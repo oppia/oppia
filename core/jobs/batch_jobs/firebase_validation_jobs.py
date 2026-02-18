@@ -35,12 +35,6 @@ TAG_ERR = 'ERR'
 class FirebaseAuditRecordsJob(base_jobs.JobBase):
     """Audit Firebase records against the records that Oppia claims to exist."""
 
-    class RecordsGroupedByEmail(TypedDict):
-        """Typings for the CoGroupByKey() output of joined records."""
-
-        weak_entries: Iterable[firebase_adapters.WeakRecord]
-        strong_entries: Iterable[firebase_adapters.StrongRecord]
-
     def run(self) -> beam.PCollection[job_run_result.JobRunResult]:
         weak_entries = (
             self.pipeline
@@ -59,7 +53,7 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
             | 'Group record entries by email' >> beam.CoGroupByKey()
             | 'Drop email key' >> beam.Map(lambda key_value: key_value[1])
             | 'Audit grouped records'
-            >> beam.FlatMap(self.audit_grouped_records).with_outputs(
+            >> beam.FlatMap(self._audit_grouped_records).with_outputs(
                 TAG_ERR, TAG_OK
             )
         )
@@ -78,8 +72,14 @@ class FirebaseAuditRecordsJob(base_jobs.JobBase):
 
         return (ok_results, err_results) | 'Combine outputs' >> beam.Flatten()
 
-    def audit_grouped_records(
-        self, grouped: RecordsGroupedByEmail
+    class _RecordsGroupedByEmail(TypedDict):
+        """Typings for the CoGroupByKey() output of joined records."""
+
+        weak_entries: Iterable[firebase_adapters.WeakRecord]
+        strong_entries: Iterable[firebase_adapters.StrongRecord]
+
+    def _audit_grouped_records(
+        self, grouped: _RecordsGroupedByEmail
     ) -> Iterable[pvalue.TaggedOutput]:
         """Yields tagged details about the records grouped with the given email.
 

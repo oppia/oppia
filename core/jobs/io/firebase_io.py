@@ -80,12 +80,6 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
     the assumption that they are consistent with the "strong" (real) records.
     """
 
-    class OppiaModelsGroupedByUserId(TypedDict):
-        """Typings for the CoGroupByKey() output of joined models."""
-
-        settings: Iterable[user_models.UserSettingsModel]
-        auth_details: Iterable[auth_models.UserAuthDetailsModel]
-
     def expand(
         self, pbegin: pvalue.PBegin
     ) -> beam.PCollection[firebase_adapters.WeakRecord]:
@@ -119,11 +113,17 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
             {'settings': id_to_settings, 'auth_details': id_to_auth_details}
             | 'Group models by User ID' >> beam.CoGroupByKey()
             | 'Drop User ID key' >> beam.Map(lambda id_to_group: id_to_group[1])
-            | 'Build WeakRecords' >> beam.FlatMap(self.build_weak_records)
+            | 'Build WeakRecords' >> beam.FlatMap(self._build_weak_records)
         )
 
-    def build_weak_records(
-        self, grouped_models: OppiaModelsGroupedByUserId
+    class _OppiaModelsGroupedByUserId(TypedDict):
+        """Typings for the CoGroupByKey() output of joined models."""
+
+        settings: Iterable[user_models.UserSettingsModel]
+        auth_details: Iterable[auth_models.UserAuthDetailsModel]
+
+    def _build_weak_records(
+        self, grouped_models: _OppiaModelsGroupedByUserId
     ) -> Iterable[firebase_adapters.WeakRecord]:
         """Builds a WeakRecord from the models in the given group.
 
@@ -177,12 +177,12 @@ class ImportRecords(
         self, batch: list[firebase_auth.ImportUserRecord]
     ) -> firebase_auth.UserImportResult:
         return (
-            self.handle_input_batch_in_emulator_mode(batch)
+            self._handle_input_batch_in_emulator_mode(batch)
             if constants.EMULATOR_MODE
             else firebase_auth.import_users(batch)
         )
 
-    def handle_input_batch_in_emulator_mode(
+    def _handle_input_batch_in_emulator_mode(
         self, batch: list[firebase_auth.ImportUserRecord]
     ) -> firebase_auth.UserImportResult:
         """Creating users needs to be handled differently within EMULATOR_MODE.

@@ -69,7 +69,7 @@ class FirebaseBatchOperation(
             | 'Gather all inputs into a single worker'
             >> beam.combiners.ToList()
             | f'Handle inputs in batches using {self.operation_name}'
-            >> beam.FlatMap(self.handle_inputs).with_outputs(OK_TAG, ERROR_TAG)
+            >> beam.FlatMap(self._handle_inputs).with_outputs(OK_TAG, ERROR_TAG)
         )
 
         stdout = (
@@ -77,7 +77,7 @@ class FirebaseBatchOperation(
             | 'Count the inputs successfully handled'
             >> beam.CombineGlobally(sum)
             | 'Apply a standard format to success count'
-            >> beam.FlatMap(self.format_success_count)
+            >> beam.FlatMap(self._format_success_count)
             | 'Build stdout from the formatted success count'
             >> beam.Map(job_run_result.JobRunResult.as_stdout)
         )
@@ -85,7 +85,7 @@ class FirebaseBatchOperation(
         stderr = (
             result[ERROR_TAG]
             | 'Apply a standard format to error details'
-            >> beam.Map(self.format_error_details)
+            >> beam.Map(self._format_error_details)
             | 'Build stderr from the formatted error messages'
             >> beam.Map(job_run_result.JobRunResult.as_stderr)
         )
@@ -106,7 +106,7 @@ class FirebaseBatchOperation(
         """
         raise NotImplementedError('Subclasses must override handle_input_batch')
 
-    def handle_inputs(
+    def _handle_inputs(
         self,
         inputs: list[FirebaseBatchInputType],
     ) -> Iterator[beam.TaggedOutput]:
@@ -146,11 +146,11 @@ class FirebaseBatchOperation(
         for reason in failure_details:
             yield pvalue.TaggedOutput(ERROR_TAG, reason)
 
-    def format_success_count(self, count: int) -> Iterable[str]:
+    def _format_success_count(self, count: int) -> Iterable[str]:
         """Yields positive counts with a standard format."""
         if count > 0:
             yield f'{self.operation_name} success: {count}'
 
-    def format_error_details(self, details: str) -> str:
+    def _format_error_details(self, details: str) -> str:
         """Returns the error message with a standard format."""
         return f'{self.operation_name} error at {details}'
