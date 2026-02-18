@@ -75,6 +75,9 @@ from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: sk
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
     missing_translation_images_repair_jobs,
 )
+from core.jobs.batch_jobs import (  # pylint: disable=unused-import  # isort: skip
+    audit_stories_with_disconnected_node_ids_job
+)
 
 
 class FakeClass:
