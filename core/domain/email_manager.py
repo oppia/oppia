@@ -946,17 +946,12 @@ def get_moderator_unpublish_exploration_email() -> str:
         be sent.
     """
 
-    try:
-        except utils.ValidationError:
-        return ''
-
     unpublish_exp_email_html_body = platform_parameter_services.get_platform_parameter_value(
         platform_parameter_list.ParamName.UNPUBLISH_EXPLORATION_EMAIL_HTML_BODY.value
     )
     # Ruling out the possibility of Any for mypy type checking.
     assert isinstance(unpublish_exp_email_html_body, str)
     return unpublish_exp_email_html_body
-
 
 
 def send_moderator_action_email(
@@ -1075,7 +1070,6 @@ def send_role_notification_email(
         '<br>%s'
     )
 
-    # Return from here if sending email is turned off.
     # Return from here is sending editor role email is disabled.
     if not feconf.CAN_SEND_TRANSACTIONAL_EMAILS:
         logging.error('This app cannot send editor role emails to users.')
