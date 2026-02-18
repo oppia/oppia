@@ -7101,6 +7101,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.signup(self.CURRICULUM_ADMIN_EMAIL, self.CURRICULUM_ADMIN_USERNAME)
         self.signup(self.QUESTION_ADMIN_EMAIL, self.QUESTION_ADMIN_USERNAME)
+        self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
         self.signup(self.user_a_email, self.user_a)
         self.signup(self.user_b_email, self.user_b)
 
@@ -7112,6 +7113,7 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
         self.topic_id = topic_fetchers.get_new_topic_id()
         self.save_new_topic(self.topic_id, self.admin_id)
         self.set_question_admins([self.QUESTION_ADMIN_USERNAME])
+        self.set_topic_managers([self.user_a], self.topic_id)
 
         self.mock_testapp = webtest.TestApp(
             webapp2.WSGIApplication(
@@ -7135,6 +7137,15 @@ class DeleteQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_curriculum_admin_can_delete_question(self) -> None:
         self.login(self.CURRICULUM_ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_delete_question/%s' % self.question_id
+            )
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_delete_question(self) -> None:
+        self.login(self.user_a_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_delete_question/%s' % self.question_id

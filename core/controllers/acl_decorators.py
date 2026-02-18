@@ -3043,14 +3043,12 @@ def can_edit_question(
                     for skill_id in topic.get_all_skill_ids():
                         if skill_id in skill_ids:
                             return handler(self, question_id, **kwargs)
+
+        else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to edit the question.'
                 % self.user_id
             )
-        raise self.UnauthorizedUserException(
-            '%s does not have enough rights to edit the question.'
-            % self.user_id
-        )
 
     return test_can_edit
 
