@@ -105,6 +105,11 @@ export class SetInputValidationService {
         message: 'Label for this button should not be empty',
         type: AppConstants.WARNING_TYPES.ERROR,
       });
+    } else if (buttonText.unicode.length > 20) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: 'The button text should be at most 20 characters.',
+      });
     }
 
     return warningsList;

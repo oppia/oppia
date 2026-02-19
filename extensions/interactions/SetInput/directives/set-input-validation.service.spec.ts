@@ -127,6 +127,30 @@ describe('SetInputValidationService', () => {
         },
       ]);
     });
+
+    it('should generate errors when buttonText exceeds 20 characters', () => {
+      let badCustomizationArgs = {
+        buttonText: {
+          value: new SubtitledUnicode(
+            '123456789012345678901',
+            'ca_buttonText'
+          ),
+        },
+      };
+
+      let warnings = validatorService.getAllWarnings(
+        currentState,
+        badCustomizationArgs,
+        goodAnswerGroups,
+        goodDefaultOutcome
+      );
+      expect(warnings).toEqual([
+        {
+          type: WARNING_TYPES.ERROR,
+          message: 'The button text should be at most 20 characters.',
+        },
+      ]);
+    });
   });
 
   describe('.getRedundantRuleWarnings', () => {
