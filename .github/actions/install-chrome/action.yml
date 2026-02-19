@@ -25,7 +25,11 @@ runs:
           sudo mv chrome-${{ env.PLATFORM }}/* /opt/google/chrome/
           sudo chmod +x /opt/google/chrome/chrome
 
-          printf '#!/bin/bash\nexec /opt/google/chrome/chrome --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /usr/bin/google-chrome > /dev/null
+          sudo mv /opt/google/chrome/chrome /opt/google/chrome/chrome-real
+          printf '#!/bin/bash\nexec /opt/google/chrome/chrome-real --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /opt/google/chrome/chrome > /dev/null
+          sudo chmod +x /opt/google/chrome/chrome
+
+          printf '#!/bin/bash\nexec /opt/google/chrome/chrome-real --no-sandbox --disable-dev-shm-usage --disable-setuid-sandbox "$@"\n' | sudo tee /usr/bin/google-chrome > /dev/null
           sudo chmod +x /usr/bin/google-chrome
 
           # Download ChromeDriver
@@ -36,7 +40,8 @@ runs:
           sudo mv chromedriver-${{ env.PLATFORM }}/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-          # Verify installation
+          echo "CHROME_PATH=/opt/google/chrome/chrome" >> $GITHUB_ENV
+
           chrome_version=$(google-chrome --version 2>&1 | grep -oP '\d+\.\d+\.\d+\.\d+')
           echo "Installed Chrome version: $chrome_version"
           [[ "${{ env.CHROME_VERSION }}" == "$chrome_version" ]] || { echo "Error: Version mismatch. Expected ${{ env.CHROME_VERSION }}, got $chrome_version"; exit 1; }
