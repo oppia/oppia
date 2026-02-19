@@ -852,12 +852,15 @@ def accept_suggestion(
         )
 
     # Do not allow accepting a suggestion if the content has already been
-    # translated.
+    # translated. We use the current exploration version (not the version at
+    # submission) to match the version used when saving the translation in
+    # suggestion_registry.py.
     if suggestion.suggestion_type == feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        exploration = exp_fetchers.get_exploration_by_id(suggestion.target_id)
         entity_translation = translation_fetchers.get_entity_translation(
             feconf.TranslatableEntityType(suggestion.target_type),
             suggestion.target_id,
-            suggestion.target_version_at_submission,
+            exploration.version,
             suggestion.language_code,
         )
         if suggestion.change_cmd.content_id in entity_translation.translations:
