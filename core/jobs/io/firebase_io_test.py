@@ -189,6 +189,42 @@ class GetWeakRecordsTests(AuthIoTestBase):
             [firebase_adapters.WeakRecord('fb_a', 'a@a.com', False, 'uid_a')],
         )
 
+    def test_get_with_missing_auth_details_raises_value_error(self) -> None:
+        self.put_multi(
+            [
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                ),
+            ]
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'needs EXACTLY ONE of each model'
+        ):
+            self.assert_pcoll_equal(
+                self.pipeline | firebase_io.GetWeakRecords(), []
+            )
+
+    def test_get_with_missing_settings_raises_value_error(self) -> None:
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_a',
+                ),
+            ]
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'needs EXACTLY ONE of each model'
+        ):
+            self.assert_pcoll_equal(
+                self.pipeline | firebase_io.GetWeakRecords(), []
+            )
+
 
 class ImportRecordsTests(AuthIoTestBase):
 

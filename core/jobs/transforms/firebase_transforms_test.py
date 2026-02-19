@@ -39,7 +39,7 @@ class FakeBatchError(firebase_auth.ErrorInfo):
 
 class FakeBatchResult(
     firebase_auth.DeleteUsersResult,
-    firebase_auth.ImportUserRecord,
+    firebase_auth.UserImportResult,
 ):
     """Test stubs for DeleteUsersResult & UserImportResult."""
 

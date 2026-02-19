@@ -209,7 +209,7 @@ class FirebaseAdminSdkStub:
         """
         if uid in self._users_by_uid:
             raise firebase_auth.UidAlreadyExistsError(
-                'uid=%r already exists' % uid, None, None
+                f'{uid=!r} already exists', None, None
             )
         if uid is None:
             # NOTE: Firebase UIDs usually, but not always, have a length of 28.
@@ -229,7 +229,7 @@ class FirebaseAdminSdkStub:
             UserNotFoundError. The Firebase account has not been created yet.
         """
         if uid not in self._users_by_uid:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         del self._users_by_uid[uid]
 
     def delete_users(self, uids: List[str]) -> firebase_auth.DeleteUsersResult:
@@ -276,7 +276,7 @@ class FirebaseAdminSdkStub:
         """
         users = self.get_users([firebase_auth.UidIdentifier(uid)]).users
         if len(users) == 0:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         return users[0]
 
     def get_users(
@@ -321,7 +321,7 @@ class FirebaseAdminSdkStub:
         matches = (u for u in self._users_by_uid.values() if u.email == email)
         user = next(matches, None)
         if user is None:
-            raise firebase_auth.UserNotFoundError('%s not found' % email)
+            raise firebase_auth.UserNotFoundError(f'{email} not found')
         return user
 
     def import_users(
@@ -374,7 +374,7 @@ class FirebaseAdminSdkStub:
                 accounts.
         """
         if max_results > 1000:
-            raise ValueError('max_results=%r must be <= 1000' % max_results)
+            raise ValueError(f'{max_results=!r} must be <= 1000')
 
         # NOTE: This is only sorted to make unit testing easier.
         all_users = sorted(self._users_by_uid.values(), key=lambda u: u.uid)
@@ -389,12 +389,12 @@ class FirebaseAdminSdkStub:
         try:
             page_index = int(page_token) if page_token is not None else 0
         except (ValueError, TypeError) as e:
-            raise ValueError('page_token=%r is invalid' % page_token) from e
+            raise ValueError(f'{page_token=!r} is invalid') from e
 
         if 0 <= page_index < len(page_list):
             return self._create_list_users_page_fragile(page_list, page_index)
         else:
-            raise ValueError('page_token=%r is invalid' % page_token)
+            raise ValueError(f'{page_token=!r} is invalid')
 
     def revoke_refresh_tokens(self, uid: str) -> None:
         """Revokes all refresh tokens for an existing user.
@@ -406,7 +406,7 @@ class FirebaseAdminSdkStub:
             UserNotFoundError. The Firebase account has not been created yet.
         """
         if uid not in self._users_by_uid:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         self._uid_by_session_cookie = {
             k: v for k, v in self._uid_by_session_cookie.items() if v != uid
         }
@@ -456,7 +456,7 @@ class FirebaseAdminSdkStub:
             UserNotFoundError. The Firebase account has not been created yet.
         """
         if uid not in self._users_by_uid:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         user = self._users_by_uid[uid]
         disabled = kwargs.get('disabled', user.disabled)
         email = kwargs.get('email', user.email)
@@ -478,7 +478,7 @@ class FirebaseAdminSdkStub:
         assert claims is not None
         uid = claims['sub']
         if uid not in self._users_by_uid:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         return claims
 
     def verify_session_cookie(
@@ -503,7 +503,7 @@ class FirebaseAdminSdkStub:
         assert claims is not None
         uid = claims['sub']
         if uid not in self._users_by_uid:
-            raise firebase_auth.UserNotFoundError('%s not found' % uid)
+            raise firebase_auth.UserNotFoundError(f'{uid} not found')
         return claims
 
     def assert_is_user(self, uid: str) -> None:
@@ -519,7 +519,7 @@ class FirebaseAdminSdkStub:
         self._test.assertIn(
             uid,
             self._users_by_uid,
-            msg='Firebase account not found: uid=%r' % uid,
+            msg=f'Firebase account not found: {uid=!r}',
         )
 
     def assert_is_not_user(self, uid: str) -> None:
@@ -535,7 +535,7 @@ class FirebaseAdminSdkStub:
         self._test.assertNotIn(
             uid,
             self._users_by_uid,
-            msg='Unexpected Firebase account exists: uid=%r' % uid,
+            msg=f'Unexpected Firebase account exists: {uid=!r}',
         )
 
     def assert_is_super_admin(self, uid: str) -> None:
@@ -610,7 +610,7 @@ class FirebaseAdminSdkStub:
         self._test.assertEqual(
             not_found,
             [],
-            msg='Firebase accounts not found: uids=%r' % (not_found,),
+            msg=f'Firebase accounts not found: uids={not_found!r}',
         )
 
     def assert_is_not_user_multi(self, uids: List[str]) -> None:
@@ -627,7 +627,7 @@ class FirebaseAdminSdkStub:
         self._test.assertEqual(
             found,
             [],
-            msg='Unexpected Firebase accounts exists: uids=%r' % (found,),
+            msg=f'Unexpected Firebase accounts exists: uids={found!r}',
         )
 
     def mock_delete_users_error(
@@ -1055,7 +1055,7 @@ class FirebaseAuthServicesTestBase(test_utils.AppEngineTestBase):
         """
         req = webapp2.Request.blank('/')
         if id_token:
-            req.headers['Authorization'] = 'Bearer %s' % id_token
+            req.headers['Authorization'] = f'Bearer {id_token}'
         if session_cookie:
             req.cookies[constants.FIREBASE_AUTH_SESSION_COOKIE_NAME] = (
                 session_cookie

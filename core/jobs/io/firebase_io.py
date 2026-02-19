@@ -112,8 +112,7 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         return (
             {'settings': id_to_settings, 'auth_details': id_to_auth_details}
             | 'Group models by User ID' >> beam.CoGroupByKey()
-            | 'Drop User ID key' >> beam.Map(lambda id_to_group: id_to_group[1])
-            | 'Build WeakRecords' >> beam.FlatMap(self._build_weak_records)
+            | 'Build WeakRecords' >> beam.FlatMapTuple(self._build_weak_records)
         )
 
     class _OppiaModelsGroupedByUserId(TypedDict):
@@ -123,7 +122,7 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         auth_details: Iterable[auth_models.UserAuthDetailsModel]
 
     def _build_weak_records(
-        self, grouped_models: _OppiaModelsGroupedByUserId
+        self, user_id: str, grouped_models: _OppiaModelsGroupedByUserId
     ) -> Iterable[firebase_adapters.WeakRecord]:
         """Builds a WeakRecord from the models in the given group.
 
@@ -131,6 +130,7 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         "parent" user for signing in, so they are skipped by this function.
 
         Args:
+            user_id: str. The user ID shared by the models.
             grouped_models: OppiaModelsGroupedByUserId. The grouped models.
 
         Yields:
@@ -139,8 +139,17 @@ class GetWeakRecords(beam.PTransform):  # type: ignore[misc]
         Raises:
             ValueError. If the group doesn't hold EXACTLY ONE of each model.
         """
-        [settings] = grouped_models['settings']
-        [auth_details] = grouped_models['auth_details']
+        settings_models = list(grouped_models['settings'])
+        auth_details_models = list(grouped_models['auth_details'])
+        try:
+            [(settings, auth_details)] = zip(
+                settings_models, auth_details_models, strict=True
+            )
+        except ValueError as e:
+            raise ValueError(
+                f'Oppia User ({user_id=!r}) needs EXACTLY ONE of each model, '
+                f'but {len(settings_models)=} and {len(auth_details_models)=}'
+            ) from e
         if record := firebase_adapters.WeakRecord.from_oppia_models(
             settings, auth_details
         ):

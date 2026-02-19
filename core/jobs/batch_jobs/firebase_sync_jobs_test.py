@@ -123,3 +123,39 @@ class FirebaseSyncRecordsJobTests(
                     ),
                 ],
             )
+
+    def test_run_with_profile_users_skips_import(self) -> None:
+        self.put_multi(
+            [
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_a',
+                    firebase_auth_id='fb_a',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_a',
+                    email='a@a.com',
+                ),
+                self.create_model(
+                    auth_models.UserAuthDetailsModel,
+                    id='uid_b',
+                    firebase_auth_id='fb_b',
+                    parent_user_id='uid_a',
+                ),
+                self.create_model(
+                    user_models.UserSettingsModel,
+                    id='uid_b',
+                    email='b@b.com',
+                ),
+            ]
+        )
+
+        self.assert_job_output_is(
+            [job_run_result.JobRunResult(stdout='import_users success: 1')],
+        )
+
+        with self.assertRaisesRegex(
+            firebase_auth.UserNotFoundError, 'not found'
+        ):
+            self.firebase_sdk_stub.get_user('fb_b')

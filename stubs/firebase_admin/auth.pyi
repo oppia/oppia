@@ -12,8 +12,6 @@ from typing import (
     Union,
 )
 
-from core.domain import auth_domain
-
 from . import App
 
 class UserRecord:
@@ -235,7 +233,7 @@ def set_custom_user_claims(
 def revoke_refresh_tokens(uid: str, app: Optional[App] = ...) -> None: ...
 def verify_session_cookie(
     session_cookie: str, check_revoked: bool = ..., app: Optional[App] = ...
-) -> auth_domain.AuthClaimsDict: ...
+) -> Dict[str, Any]: ...
 def list_users(
     page_token: Optional[str] = ...,
     max_results: int = ...,

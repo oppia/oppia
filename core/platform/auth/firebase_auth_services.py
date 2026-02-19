@@ -617,13 +617,12 @@ def _get_auth_claims_from_session_cookie(
 
 
 def _create_auth_claims(
-    firebase_claims: auth_domain.AuthClaimsDict,
+    firebase_claims: dict[str, str],
 ) -> auth_domain.AuthClaims:
     """Returns a new AuthClaims domain object from Firebase claims.
 
     Args:
-        firebase_claims: dict(str: *). The raw claims returned by the Firebase
-            SDK.
+        firebase_claims: dict(str: *). The raw claims returned by Firebase SDK.
 
     Returns:
         AuthClaims. Oppia's representation of auth claims.

@@ -21,17 +21,12 @@ from __future__ import annotations
 import itertools
 
 from core.jobs.types import job_run_result
-from core.platform import models
 
 import apache_beam as beam
 import firebase_admin.auth as firebase_auth
 import firebase_admin.exceptions as firebase_exceptions
 from apache_beam import pvalue
 from typing import Generic, Iterable, Iterator, TypeVar
-
-auth_models, user_models = models.Registry.import_models(
-    [models.Names.AUTH, models.Names.USER]
-)
 
 FIREBASE_BATCH_LIMIT = 1000
 
