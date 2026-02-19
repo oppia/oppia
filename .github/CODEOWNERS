@@ -55,7 +55,6 @@
 /core/templates/modules/ @oppia/lace-frontend-reviewers
 /core/templates/pages/common-imports.ts @oppia/lace-frontend-reviewers
 /core/templates/pages/oppia-root/ @oppia/lace-frontend-reviewers
-/core/templates/pages/lightweight-oppia-root/ @oppia/lace-frontend-reviewers
 /core/templates/i18n/ @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.ts @oppia/lace-frontend-reviewers
 /core/templates/services/contextual/logger.service.spec.ts @oppia/lace-frontend-reviewers
@@ -335,6 +334,7 @@
 # Global stylesheet.
 /core/templates/css/oppia.css @oppia/lace-frontend-reviewers
 /core/templates/css/oppia-material.css @oppia/lace-frontend-reviewers
+/core/templates/css/guppy-custom.css @oppia/lace-frontend-reviewers
 
 
 # Interaction project.
