@@ -24,9 +24,11 @@ from core.constants import constants
 from core.domain import (
     change_domain,
     exp_domain,
+    exp_fetchers,
     exp_services,
     fs_services,
     html_validation_service,
+    opportunity_services,
     platform_parameter_list,
     question_domain,
     question_services,
@@ -1937,10 +1939,74 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
         self.assertEqual(translations[0].language_code, 'hi')
         self.assertEqual(len(translations[0].translations), 1)
 
+    def test_accept_suggestion_saves_to_current_exploration_version(
+        self,
+    ) -> None:
+        exp = self.save_new_default_exploration('exp1', self.author_id)
+        old_version = exp.version
+
+        exp_services.update_exploration(
+            self.author_id,
+            exp.id,
+            [
+                exp_domain.ExplorationChange(
+                    {
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'title',
+                        'new_value': 'New title',
+                    }
+                )
+            ],
+            'Updated title',
+        )
+        updated_exp = exp_fetchers.get_exploration_by_id(exp.id)
+        new_version = updated_exp.version
+        self.assertGreater(new_version, old_version)
+
+        suggestion = suggestion_registry.SuggestionTranslateContent(
+            self.suggestion_dict['suggestion_id'],
+            self.suggestion_dict['target_id'],
+            old_version,
+            self.suggestion_dict['status'],
+            self.author_id,
+            self.reviewer_id,
+            self.suggestion_dict['change_cmd'],
+            self.suggestion_dict['score_category'],
+            self.suggestion_dict['language_code'],
+            False,
+            self.fake_date,
+            self.fake_date,
+        )
+
+        with self.swap(
+            opportunity_services,
+            'update_translation_opportunity_with_accepted_suggestion',
+            lambda *args: None,
+        ):
+            suggestion.accept(
+                'Accepted suggestion by translator: Add translation change.'
+            )
+
+        old_version_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, old_version
+            )
+        )
+        self.assertEqual(len(old_version_translations), 0)
+
+        new_version_translations = (
+            translation_fetchers.get_all_entity_translations_for_entity(
+                feconf.TranslatableEntityType.EXPLORATION, exp.id, new_version
+            )
+        )
+        self.assertEqual(len(new_version_translations), 1)
+        self.assertEqual(new_version_translations[0].language_code, 'hi')
+
     def test_accept_suggestion_with_set_of_string_adds_translation(
         self,
     ) -> None:
         exp = self.save_new_default_exploration('exp1', self.author_id)
+
         translations = (
             translation_fetchers.get_all_entity_translations_for_entity(
                 feconf.TranslatableEntityType.EXPLORATION, exp.id, exp.version
