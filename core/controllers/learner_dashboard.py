@@ -292,17 +292,13 @@ class LearnerDashboardExplorationsProgressHandler(
         # Add checkpoint progress counts to each exploration summary.
         # Frontend will calculate percentage using the classroom lessons pattern.
         for summary_dict in incomplete_exp_summary_dicts:
-            progress_data = progress_by_exp_id.get(summary_dict['id'])
-            if progress_data:
-                summary_dict['visited_checkpoints_count'] = progress_data[
-                    'visited_checkpoints_count'
-                ]
-                summary_dict['total_checkpoints_count'] = progress_data[
-                    'total_checkpoints_count'
-                ]
-            else:
-                summary_dict['visited_checkpoints_count'] = 0
-                summary_dict['total_checkpoints_count'] = 0
+            progress_data = progress_by_exp_id.get(summary_dict['id'], {})
+            summary_dict['visited_checkpoints_count'] = progress_data.get(
+                'visited_checkpoints_count', 0
+            )
+            summary_dict['total_checkpoints_count'] = progress_data.get(
+                'total_checkpoints_count', 0
+            )
 
         for summary_dict in completed_exp_summary_dicts:
             progress_data = progress_by_exp_id.get(summary_dict['id'])
