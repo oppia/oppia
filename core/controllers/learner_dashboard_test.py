@@ -1229,15 +1229,10 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.viewer_id, self.EXP_ID_1, exploration.init_state_name, 1
         )
 
-        def mock_get_checkpoint_progress_for_explorations(
-            *_args: str, **_kwargs: str
-        ) -> dict[str, dict[str, int]]:
-            return {}
-
-        with self.swap(
+        with self.swap_to_always_return(
             learner_progress_services,
             'get_checkpoint_progress_for_explorations',
-            mock_get_checkpoint_progress_for_explorations,
+            {},
         ):
             response = self.get_json(
                 feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
