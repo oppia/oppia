@@ -42,4 +42,3 @@ class OppiaRootPage(base.BaseHandler[Dict[str, str], Dict[str, str]]):
             return
 
         self.render_template('oppia-root.mainpage.html')
-

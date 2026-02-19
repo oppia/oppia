@@ -1425,9 +1425,7 @@ for stewards_route in constants.STEWARDS_LANDING_PAGE['ROUTES']:
 for page in constants.PAGES_REGISTERED_WITH_FRONTEND.values():
     if not 'MANUALLY_REGISTERED_WITH_BACKEND' in page:
             URLS.append(
-                get_redirect_route(
-                    r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage
-                )
+                get_redirect_route(r'/%s' % page['ROUTE'], oppia_root.OppiaRootPage)
             )
 
 # Manually redirect routes with url fragments to the oppia root page.
