@@ -42,6 +42,7 @@ from core.jobs import base_jobs
 # registry depends on JobMetaclass to handle the responsibility of keeping track
 # of every job.
 from core.jobs.batch_jobs import (  # pylint: disable=unused-import
+    audit_stories_with_disconnected_node_ids_job,
     audit_topics_with_hanging_stories_job,
     blog_post_search_indexing_jobs,
     blog_validation_jobs,
