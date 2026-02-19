@@ -89,7 +89,14 @@ def get_file_spec(file_path: str) -> str | None:
     Returns:
         str | None. The path of the spec file if it exists, otherwise None.
         If the file is not a TypeScript or JavaScript file, None is returned.
+        Acceptance test specs (under puppeteer-acceptance-tests) are
+        excluded because they are not frontend unit tests.
     """
+    # Acceptance test specs are not frontend unit tests and should not
+    # be run by Karma.
+    if 'puppeteer-acceptance-tests' in file_path:
+        return None
+
     if file_path.endswith(
         ('.spec.ts', '.spec.js', 'Spec.js')
     ) and os.path.exists(file_path):
