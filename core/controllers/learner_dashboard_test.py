@@ -29,6 +29,7 @@ from core.domain import (
     topic_domain,
     topic_services,
 )
+from core.platform import models
 from core.tests import test_utils
 
 from typing import Final
@@ -1026,8 +1027,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         )
 
         # Record checkpoint progress (visited the only checkpoint).
-        from core.platform import models
-
         user_models = models.Registry.import_models([models.Names.USER])[0]
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_1),
@@ -1131,8 +1130,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
     def test_multiple_explorations_have_individual_progress(self) -> None:
         """Test that multiple explorations each have their own progress."""
         self.login(self.VIEWER_EMAIL)
-
-        from core.platform import models
 
         user_models = models.Registry.import_models([models.Names.USER])[0]
 
