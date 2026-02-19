@@ -22,9 +22,9 @@ import glob
 import json
 import os
 import re
-from typing import Any, Dict, Final, List, Tuple, TypedDict
 
 import yaml
+from typing import Any, Dict, Final, List, Tuple, TypedDict
 
 from .. import concurrent_task_utils
 from . import linter_utils
@@ -43,48 +43,54 @@ class ThirdPartyLibDict(TypedDict):
     type_defs_filename_prefix: str
 
 
-STRICT_TS_CONFIG_FILE_NAME: Final = "tsconfig-strict.json"
-STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(os.getcwd(), STRICT_TS_CONFIG_FILE_NAME)
+STRICT_TS_CONFIG_FILE_NAME: Final = 'tsconfig-strict.json'
+STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
+    os.getcwd(), STRICT_TS_CONFIG_FILE_NAME
+)
 
-WEBPACK_CONFIG_FILE_NAME: Final = "webpack.common.config.ts"
-WEBPACK_CONFIG_FILEPATH: Final = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
+WEBPACK_CONFIG_FILE_NAME: Final = 'webpack.common.config.ts'
+WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
+    os.getcwd(), WEBPACK_CONFIG_FILE_NAME
+)
 
-APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), "app_dev.yaml")
+APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), 'app_dev.yaml')
 
-DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), "dependencies.json")
-PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), "package.json")
-_TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len(".d.ts")
-_DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = "dependencies.json"
-_DEPENDENCY_SOURCE_PACKAGE: Final = "package.json"
+DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(
+    os.getcwd(), 'dependencies.json'
+)
+PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), 'package.json')
+_TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len('.d.ts')
+_DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = 'dependencies.json'
+_DEPENDENCY_SOURCE_PACKAGE: Final = 'package.json'
 
-WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), ".github", "workflows")
-WORKFLOW_FILENAME_REGEX: Final = r"\.(yaml)|(yml)$"
-GIT_COMMIT_HASH_REGEX: Final = r"^git\+https:\/\/github\.com\/.*#(.*)$"
+WORKFLOWS_DIR: Final = os.path.join(os.getcwd(), '.github', 'workflows')
+WORKFLOW_FILENAME_REGEX: Final = r'\.(yaml)|(yml)$'
+GIT_COMMIT_HASH_REGEX: Final = r'^git\+https:\/\/github\.com\/.*#(.*)$'
 
 THIRD_PARTY_LIBS: List[ThirdPartyLibDict] = [
     {
-        "name": "Guppy",
-        "dependency_key": "guppy-dev",
-        "dependency_source": _DEPENDENCY_SOURCE_PACKAGE,
-        "type_defs_filename_prefix": "guppy-defs-",
+        'name': 'Guppy',
+        'dependency_key': 'guppy-dev',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
+        'type_defs_filename_prefix': 'guppy-defs-',
     },
     {
-        "name": "Skulpt",
-        "dependency_key": "skulpt-dist",
-        "dependency_source": _DEPENDENCY_SOURCE_PACKAGE,
-        "type_defs_filename_prefix": "skulpt-defs-",
+        'name': 'Skulpt',
+        'dependency_key': 'skulpt-dist',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
+        'type_defs_filename_prefix': 'skulpt-defs-',
     },
     {
-        "name": "MIDI",
-        "dependency_key": "midi",
-        "dependency_source": _DEPENDENCY_SOURCE_PACKAGE,
-        "type_defs_filename_prefix": "midi-defs-",
+        'name': 'MIDI',
+        'dependency_key': 'midi',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
+        'type_defs_filename_prefix': 'midi-defs-',
     },
     {
-        "name": "Nerdamer",
-        "dependency_key": "nerdamer",
-        "dependency_source": _DEPENDENCY_SOURCE_PACKAGE,
-        "type_defs_filename_prefix": "nerdamer-defs-",
+        'name': 'Nerdamer',
+        'dependency_key': 'nerdamer',
+        'dependency_source': _DEPENDENCY_SOURCE_PACKAGE,
+        'type_defs_filename_prefix': 'nerdamer-defs-',
     },
 ]
 
@@ -107,51 +113,35 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         """Check to ensure that all lines in skip_files in app_dev.yaml
         reference valid files in the repository.
         """
-        name = "App dev file"
+        name = 'App dev file'
 
         failed = False
         error_messages = []
         skip_files_section_found = False
-
-        for line_num, line in enumerate(self.file_cache.readlines(APP_YAML_FILEPATH)):
+        for line_num, line in enumerate(
+            self.file_cache.readlines(APP_YAML_FILEPATH)
+        ):
             stripped_line = line.strip()
-
-            # Detect the start of the third-party block.
-            if stripped_line == "# Third party files:":
+            if '# Third party files:' in stripped_line:
                 skip_files_section_found = True
-                continue
-
-            # Ignore everything before that block.
             if not skip_files_section_found:
                 continue
-
-            # Stop once YAML resumes (we left the block).
-            if not stripped_line or stripped_line.startswith("#"):
-                break
-
-            if not stripped_line.startswith("- "):
-                break
-
-            # Extract the filesystem pattern.
-            line_in_concern = stripped_line[len("- ") :]
-
-            # Normalize trailing slash.
-            if line_in_concern.endswith("/"):
+            if not stripped_line or stripped_line[0] == '#':
+                continue
+            # Extract the file pattern from the line as all skipped file
+            # lines start with a dash(-).
+            line_in_concern = stripped_line[len('- ') :]
+            # Adjustments to the dir paths in app_dev.yaml file
+            # for glob-style patterns to match correctly.
+            if line_in_concern.endswith('/'):
                 line_in_concern = line_in_concern[:-1]
-
             if not glob.glob(line_in_concern):
                 error_message = (
-                    "%s --> Pattern on line %s doesn't match "
-                    "any file or directory" % (APP_YAML_FILEPATH, line_num + 1)
+                    '%s --> Pattern on line %s doesn\'t match '
+                    'any file or directory' % (APP_YAML_FILEPATH, line_num + 1)
                 )
                 error_messages.append(error_message)
                 failed = True
-
-        # Oppia linters append status message AFTER processing.
-        if failed:
-            error_messages.append("FAILED  App dev file check failed")
-        else:
-            error_messages.append("SUCCESS  App dev file check passed")
 
         return concurrent_task_utils.TaskResult(
             name, failed, error_messages, error_messages
@@ -167,24 +157,24 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        name = "Third party type defs"
+        name = 'Third party type defs'
 
         failed = False
         error_messages = []
 
-        package = json.load(open(PACKAGE_JSON_FILE_PATH, "r", encoding="utf-8"))[
-            "dependencies"
-        ]
+        package = json.load(
+            open(PACKAGE_JSON_FILE_PATH, 'r', encoding='utf-8')
+        )['dependencies']
 
-        files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), "typings"))
+        files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), 'typings'))
 
         for third_party_lib in THIRD_PARTY_LIBS:
-            lib_dependency_source = third_party_lib["dependency_source"]
+            lib_dependency_source = third_party_lib['dependency_source']
 
             if lib_dependency_source == _DEPENDENCY_SOURCE_PACKAGE:
-                lib_version = package[third_party_lib["dependency_key"]]
+                lib_version = package[third_party_lib['dependency_key']]
 
-                if lib_version[0] == "^":
+                if lib_version[0] == '^':
                     lib_version = lib_version[1:]
                 # In cases where the version is in the form of git commit hashes
                 # such as 'git+https://github.com/username/repo#commit-hash',
@@ -198,7 +188,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                     if match:
                         lib_version = match.group(1)
 
-            prefix_name = third_party_lib["type_defs_filename_prefix"]
+            prefix_name = third_party_lib['type_defs_filename_prefix']
 
             files_with_prefix_name = []
 
@@ -210,15 +200,15 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
             if len(files_with_prefix_name) > 1:
                 error_message = (
-                    "There are multiple type definitions for %s in the typings "
-                    "dir." % third_party_lib["name"]
+                    'There are multiple type definitions for %s in the typings '
+                    'dir.' % third_party_lib['name']
                 )
                 error_messages.append(error_message)
                 failed = True
             elif len(files_with_prefix_name) == 0:
                 error_message = (
-                    "There are no type definitions for %s in the typings "
-                    "dir." % third_party_lib["name"]
+                    'There are no type definitions for %s in the typings '
+                    'dir.' % third_party_lib['name']
                 )
                 error_messages.append(error_message)
                 failed = True
@@ -231,13 +221,13 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
 
                 if lib_version != type_defs_version:
                     error_message = (
-                        "Type definitions for %s are not up to date. The "
-                        "current version of %s is %s and the type definitions "
-                        "are for version %s. Please refer typings/README.md "
-                        "for more details."
+                        'Type definitions for %s are not up to date. The '
+                        'current version of %s is %s and the type definitions '
+                        'are for version %s. Please refer typings/README.md '
+                        'for more details.'
                         % (
-                            third_party_lib["name"],
-                            third_party_lib["name"],
+                            third_party_lib['name'],
+                            third_party_lib['name'],
                             lib_version,
                             type_defs_version,
                         )
@@ -257,7 +247,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             TaskResult. A TaskResult object representing the result of the lint
             check.
         """
-        name = "Webpack config file"
+        name = 'Webpack config file'
 
         failed = False
         error_messages = []
@@ -267,37 +257,39 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             self.file_cache.readlines(WEBPACK_CONFIG_FILEPATH)
         ):
             stripped_line = line.strip()
-            if stripped_line.startswith("plugins:"):
+            if stripped_line.startswith('plugins:'):
                 plugins_section_found = True
             if not plugins_section_found:
                 continue
-            if stripped_line.startswith("new HtmlWebpackPlugin("):
+            if stripped_line.startswith('new HtmlWebpackPlugin('):
                 error_line_num = line_num
                 htmlwebpackplugin_section_found = True
                 keys = [
-                    "chunks",
-                    "filename",
-                    "meta",
-                    "template",
-                    "minify",
-                    "inject",
+                    'chunks',
+                    'filename',
+                    'meta',
+                    'template',
+                    'minify',
+                    'inject',
                 ]
-            elif htmlwebpackplugin_section_found and stripped_line.startswith("}),"):
+            elif htmlwebpackplugin_section_found and stripped_line.startswith(
+                '}),'
+            ):
                 htmlwebpackplugin_section_found = False
                 if keys:
                     error_message = (
-                        "Line %s: The following keys: %s are missing in "
-                        "HtmlWebpackPlugin block in %s"
+                        'Line %s: The following keys: %s are missing in '
+                        'HtmlWebpackPlugin block in %s'
                         % (
                             error_line_num + 1,
-                            ", ".join(keys),
+                            ', '.join(keys),
                             WEBPACK_CONFIG_FILE_NAME,
                         )
                     )
                     error_messages.append(error_message)
                     failed = True
             if htmlwebpackplugin_section_found:
-                key = stripped_line.split(":")[0]
+                key = stripped_line.split(':')[0]
                 if key in keys:
                     keys.remove(key)
 
@@ -314,7 +306,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             TaskResult. A TaskResult object describing any workflows
             steps that do not have a name.
         """
-        name = "Github workflow steps have a name"
+        name = 'Github workflow steps have a name'
         workflow_paths = {
             os.path.join(WORKFLOWS_DIR, filename)
             for filename in os.listdir(WORKFLOWS_DIR)
@@ -327,7 +319,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             errors += self._check_that_workflow_steps_have_name(
                 workflow_dict, workflow_path
             )
-        return concurrent_task_utils.TaskResult(name, bool(errors), errors, errors)
+        return concurrent_task_utils.TaskResult(
+            name, bool(errors), errors, errors
+        )
 
     # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
@@ -348,13 +342,13 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             with unnamed steps.
         """
         jobs_with_unnamed_step = []
-        for job, job_dict in workflow_dict["jobs"].items():
-            if "steps" in job_dict and any(
-                "name" not in step for step in job_dict["steps"]
+        for job, job_dict in workflow_dict['jobs'].items():
+            if 'steps' in job_dict and any(
+                'name' not in step for step in job_dict['steps']
             ):
                 jobs_with_unnamed_step.append(job)
         return [
-            "%s --> Job %s has an unnamed step" % (workflow_path, job)
+            '%s --> Job %s has an unnamed step' % (workflow_path, job)
             for job in jobs_with_unnamed_step
         ]
 
