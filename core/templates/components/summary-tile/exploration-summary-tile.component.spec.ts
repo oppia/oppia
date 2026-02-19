@@ -369,6 +369,12 @@ describe('Exploration Summary Tile Component', () => {
     expect(urlPathSpy).toHaveBeenCalled();
     expect(component.mobileCardToBeShown).toBe(true);
 
+    urlPathSpy.and.returnValue('/create');
+
+    component.checkIfMobileCardToBeShown();
+
+    expect(component.mobileCardToBeShown).toBe(true);
+
     urlPathSpy.and.returnValue('/not-community-library');
 
     component.checkIfMobileCardToBeShown();
