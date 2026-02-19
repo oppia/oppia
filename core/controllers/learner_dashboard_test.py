@@ -35,6 +35,9 @@ from core.tests import test_utils
 from typing import Final
 
 
+user_models = models.Registry.import_models([models.Names.USER])[0]
+
+
 class OldLearnerDashboardRedirectPageTest(test_utils.GenericTestBase):
     """Test for redirecting the old learner dashboard page URL
     to the new one.
@@ -1027,7 +1030,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
         )
 
         # Record checkpoint progress (visited the only checkpoint).
-        user_models = models.Registry.import_models([models.Names.USER])[0]
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.viewer_id, self.EXP_ID_1),
             user_id=self.viewer_id,
@@ -1130,8 +1132,6 @@ class LearnerDashboardExplorationsProgressHandlerTests(
     def test_multiple_explorations_have_individual_progress(self) -> None:
         """Test that multiple explorations each have their own progress."""
         self.login(self.VIEWER_EMAIL)
-
-        user_models = models.Registry.import_models([models.Names.USER])[0]
 
         # Create three explorations with checkpoints.
         for i, exp_id in enumerate(
@@ -1275,15 +1275,10 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.viewer_id, self.EXP_ID_1
         )
 
-        def mock_get_checkpoint_progress_for_explorations(
-            *_args: str, **_kwargs: str
-        ) -> dict[str, dict[str, int]]:
-            return {}
-
-        with self.swap(
+        with self.swap_to_always_return(
             learner_progress_services,
             'get_checkpoint_progress_for_explorations',
-            mock_get_checkpoint_progress_for_explorations,
+            {},
         ):
             response = self.get_json(
                 feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL
@@ -1329,15 +1324,10 @@ class LearnerDashboardExplorationsProgressHandlerTests(
             self.viewer_id, self.EXP_ID_1
         )
 
-        def mock_get_checkpoint_progress_for_explorations(
-            *_args: str, **_kwargs: str
-        ) -> dict[str, dict[str, int]]:
-            return {}
-
-        with self.swap(
+        with self.swap_to_always_return(
             learner_progress_services,
             'get_checkpoint_progress_for_explorations',
-            mock_get_checkpoint_progress_for_explorations,
+            {},
         ):
             response = self.get_json(
                 feconf.LEARNER_DASHBOARD_EXPLORATION_DATA_URL

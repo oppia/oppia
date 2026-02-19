@@ -2707,15 +2707,13 @@ def get_checkpoint_progress_for_explorations(
         model = exp_user_data_models[index]
         if (
             most_recently_visited_checkpoint := (
-                model
-                and model.most_recently_reached_checkpoint_state_name
+                model and model.most_recently_reached_checkpoint_state_name
             )
             and most_recently_visited_checkpoint in checkpoints_in_exp
         ):
-                visited_checkpoints = (
-                    checkpoints_in_exp.index(most_recently_visited_checkpoint)
-                    + 1
-                )
+            visited_checkpoints = (
+                checkpoints_in_exp.index(most_recently_visited_checkpoint) + 1
+            )
 
         progress_by_exp_id[exp_id] = {
             'visited_checkpoints_count': visited_checkpoints,
