@@ -706,6 +706,23 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         model = opportunity_models.ExplorationOpportunitySummaryModel.get('0')
         self.assertEqual(model.translation_counts['hi'], 1)
 
+    def test_update_opportunity_with_no_translation_sets_count_to_zero(
+        self,
+    ) -> None:
+        """Test to verify that accepting a suggestion when no translation exists
+        in the datastore sets the translation count to 0.
+        """
+        self.add_exploration_0_to_story()
+
+        # No translation has been added for exploration '0' in language 'hi'.
+        # Simulate the acceptance of a suggestion.
+        opportunity_services.update_translation_opportunity_with_accepted_suggestion(
+            '0', 'hi'
+        )
+
+        model = opportunity_models.ExplorationOpportunitySummaryModel.get('0')
+        self.assertEqual(model.translation_counts['hi'], 0)
+
     def test_completing_translation_removes_language_from_incomplete_language_codes(  # pylint: disable=line-too-long
         self,
     ) -> None:
