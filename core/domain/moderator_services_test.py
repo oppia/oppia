@@ -21,6 +21,7 @@ from __future__ import annotations
 from core.domain import moderator_services, platform_parameter_list
 from core.tests import test_utils
 
+
 class FlagExplorationEmailEnqueueTaskTests(test_utils.EmailTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 

@@ -27,6 +27,7 @@ from core.tests import test_utils
 
 from typing import Dict, Union
 
+
 class EmailTests(test_utils.GenericTestBase):
     """Tests for sending emails."""
 

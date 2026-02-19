@@ -26,6 +26,7 @@ from core.tests import test_utils
 (email_models,) = models.Registry.import_models([models.Names.EMAIL])
 platform_email_services = models.Registry.import_email_services()
 
+
 class EmailServicesTest(test_utils.EmailTestBase):
     """Tests for email_services functions."""
 

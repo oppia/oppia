@@ -724,6 +724,21 @@ class TakeoutServiceFullUserUnitTests(test_utils.GenericTestBase):
             'Created new exploration right',
             [{'cmd': rights_domain.CMD_CREATE_NEW}],
         )
+        exploration_models.ExplorationRightsModel(
+            id=self.THREAD_ENTITY_ID,
+            owner_ids=[self.USER_ID_1],
+            editor_ids=[],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0,
+        ).save(
+            'cid',
+            'Created new exploration right',
+            [{'cmd': rights_domain.CMD_CREATE_NEW}],
+        )
 
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
