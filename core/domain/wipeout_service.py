@@ -333,17 +333,17 @@ def check_completion_of_user_deletion() -> None:
             pending_deletion_request
         )
         email_message += '\n-----------------------------------\n'
-            email_message += (
-                'PendingDeletionRequestModel ID: %s\n'
-                'User ID: %s\n'
-                'Completion status: %s\n'
-            ) % (
-                request_model.id,
-                pending_deletion_request.user_id,
-                completion_status,
-            )
-            email_subject = 'Completion of User Deletion job result'
-            email_manager.send_mail_to_admin(email_subject, email_message)
+        email_message += (
+            'PendingDeletionRequestModel ID: %s\n'
+            'User ID: %s\n'
+            'Completion status: %s\n'
+        ) % (
+            request_model.id,
+            pending_deletion_request.user_id,
+            completion_status,
+        )
+        email_subject = 'Completion of User Deletion job result'
+        email_manager.send_mail_to_admin(email_subject, email_message)
 
 
 def run_user_deletion(

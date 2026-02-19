@@ -7854,11 +7854,6 @@ class ModeratorActionEmailsTests(test_utils.EmailTestBase):
         d_text = email_manager.get_moderator_unpublish_exploration_email()
         self.assertEqual(d_text, expected_draft_text_body)
 
-    ) -> None:
-        expected_draft_text_body = ''
-        d_text = email_manager.get_moderator_unpublish_exploration_email()
-        self.assertEqual(d_text, expected_draft_text_body)
-
     @test_utils.set_platform_parameters(
         [
             (param_list.ParamName.EMAIL_FOOTER, EMAIL_FOOTER),
@@ -7912,18 +7907,6 @@ class CDUserEmailTest(test_utils.EmailTestBase):
         user_services.update_email_preferences(
             self.question_submitter_id, True, False, False, False
         )
-
-    ) -> None:
-        email_manager.send_email_to_new_cd_user(
-            self.translation_reviewer_id,
-            constants.CD_USER_RIGHTS_CATEGORY_REVIEW_TRANSLATION,
-            language_code='hi',
-        )
-
-        messages = self._get_sent_email_messages(
-            self.TRANSLATION_REVIEWER_EMAIL
-        )
-        self.assertEqual(len(messages), 0)
 
     def test_without_language_code_email_not_sent_to_new_translation_reviewer(
         self,
