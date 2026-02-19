@@ -367,7 +367,6 @@ def synthesize_voiceover_for_html_string(
             )
         except Exception as e:
             error_details = str(e)
-
     if error_details:
         logging.error(
             'Voiceover synthesis error: Error during speech synthesis for exploration ID: %s, content_html: %s. Error details: %s'
@@ -375,11 +374,18 @@ def synthesize_voiceover_for_html_string(
         )
         raise Exception(error_details)
 
-    tempbuffer = io.BytesIO()
-    tempbuffer.write(binary_audio_data)
-    tempbuffer.seek(0)
-    audio = mp3.MP3(tempbuffer)
-    tempbuffer.close()
+    if not binary_audio_data:
+        logging.error(
+            'Voiceover synthesis error: Invalid audio returned from Azure Text-to-Speech service for exploration ID: %s, content_html: %s. Error details: %s'
+            % (exploration_id, content_html, error_details)
+        )
+        raise Exception(
+            'Invalid audio returned from Azure Text-to-Speech service.'
+        )
+
+    with io.BytesIO(binary_audio_data) as tempbuffer:
+        audio = mp3.MP3(tempbuffer)
+
     mimetype = 'audio/mpeg'
     # For a strange, unknown reason, the audio variable must be
     # deleted before opening cloud storage. If not, cloud storage

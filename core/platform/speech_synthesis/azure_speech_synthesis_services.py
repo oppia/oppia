@@ -342,7 +342,7 @@ def regenerate_speech_from_text(
     plaintext: str,
     language_accent_code: str,
     oppia_project_id: Optional[str] = None,
-) -> Tuple[bytes, List[Dict[str, Union[str, float]]], Optional[str]]:
+) -> Tuple[Optional[bytes], List[Dict[str, Union[str, float]]], Optional[str]]:
     """Regenerates speech (Oppia's voiceovers) from the provided text.
 
     This method uses Azure Text-to-Speech to synthesize speech from the input
@@ -407,25 +407,30 @@ def regenerate_speech_from_text(
         plaintext, language_accent_code
     )
 
-    delay_before_retrying_in_sec = 1
+    delay_in_sec_before_retrying = 1
+    binary_audio_data = None
+    error_details = None
 
     for _ in range(
         MAX_RETRIES_FOR_VOICEOVER_SYNTHESIS_WITH_EXPONENTIAL_BACKOFF
     ):
-        # Adding a delay before retrying the speech synthesis.
-        time.sleep(delay_before_retrying_in_sec)
         logging.info(
             'Voiceover synthesis log: Retrying speech synthesis after %s seconds delay.',
-            delay_before_retrying_in_sec,
+            delay_in_sec_before_retrying,
         )
+        time.sleep(delay_in_sec_before_retrying)
+
         speech_synthesis_result = speech_synthesizer.speak_ssml_async(
             ssml_text_for_speech_synthesis
         ).get()
 
-        binary_audio_data = speech_synthesis_result.audio_data
-
-        error_details = None
-        error_code = None
+        if (
+            speech_synthesis_result.reason
+            == speechsdk.ResultReason.SynthesizingAudioCompleted
+        ):
+            binary_audio_data = speech_synthesis_result.audio_data
+            error_details = None
+            break
 
         if speech_synthesis_result.reason == speechsdk.ResultReason.Canceled:
             cancellation_details = speech_synthesis_result.cancellation_details
@@ -435,32 +440,50 @@ def regenerate_speech_from_text(
                 == speechsdk.CancellationReason.Error
             ):
                 error_details = cancellation_details.error_details
-                error_code = str(cancellation_details.error_code)
+                error_code = cancellation_details.error_code
 
-            logging.error(
-                'Voiceover synthesis error: Speech synthesis failed for content %s with error code %s and details: %s'
-                % (plaintext, error_code, error_details)
-            )
-
-            # Exponential backoff for retrying speech synthesis in case of too
-            # many requests, connection failure, or service timeout errors.
-            if error_code in [
-                'CancellationErrorCode.TooManyRequests',
-                'CancellationErrorCode.ConnectionFailure',
-                'CancellationErrorCode.ServiceTimeout',
-            ]:
-                logging.info(
-                    'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                logging.error(
+                    'Voiceover synthesis log: Speech synthesis failed for content %s with error code %s and details: %s'
+                    % (plaintext, error_code, error_details)
                 )
-                delay_before_retrying_in_sec *= 2
-            else:
+
+                # Exponential backoff for retrying speech synthesis in case of too
+                # many requests, connection failure, or service timeout errors.
+                if error_code in [
+                    speechsdk.CancellationErrorCode.TooManyRequests,
+                    speechsdk.CancellationErrorCode.ConnectionFailure,
+                    speechsdk.CancellationErrorCode.ServiceTimeout,
+                ]:
+                    logging.info(
+                        'Voiceover synthesis log: Known error encountered, retrying with exponential backoff.'
+                    )
+                    delay_in_sec_before_retrying *= 2
+                    continue
+
                 logging.info(
                     'Voiceover synthesis log: Non-retryable error encountered, aborting further attempts.'
                 )
                 break
 
-        if error_details is None:
+            error_details = (
+                'Speech synthesis was canceled for reason: %s'
+                % cancellation_details.reason
+            )
+            logging.error(
+                'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+                % (error_details, plaintext)
+            )
             break
+
+        error_details = (
+            'Speech synthesis failed for reason: %s'
+            % speech_synthesis_result.reason
+        )
+        logging.error(
+            'Voiceover synthesis log: Voiceover synthesis error: %s for content: %s'
+            % (error_details, plaintext)
+        )
+        break
 
     logging.info('Voiceover synthesis log: Speech synthesis attempt completed.')
 
