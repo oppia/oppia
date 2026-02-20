@@ -228,6 +228,11 @@
 }
 
 @media (max-width: 610px) {
+  .oppia-profile-picture-container {
+    float: left;
+    height: auto;
+    width: 100%;
+  }
   .oppia-profile-container {
     width: 90%;
   }

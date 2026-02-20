@@ -4026,14 +4026,6 @@ div.oppia-issues-learner-action {
   height: auto;
 }
 
-@media (max-width: 610px) {
-  .oppia-profile-picture-container {
-    float: left;
-    height: auto;
-    width: 100%;
-  }
-}
-
 .oppia-profile-picture .oppia-profile-picture-mask {
   background-color: #eee;
   bottom: 0;
