@@ -63,8 +63,7 @@ describe('Voiceover Submitter', function () {
     await curriculumAdm.navigateToCreatorDashboardPage();
     await curriculumAdm.navigateToExplorationEditorFromCreatorDashboard();
     await curriculumAdm.waitForPageToFullyLoad();
-    await curriculumAdm.waitForNetworkIdle();
-    await curriculumAdm.dismissWelcomeModalIfPresent();
+    await curriculumAdm.dismissWelcomeModal();
 
     // Card 1 (Introduction).
     await curriculumAdm.updateCardContent('What is 2 + 3?');
@@ -125,10 +124,10 @@ describe('Voiceover Submitter', function () {
     );
   }, 600000);
 
-  it('should display correct content for voiceover in exploration language', async function () {
+  it('should see content for voiceover in exploration language', async function () {
     // Navigate to the exploration editor.
     await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
-    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
+    await voiceoverSubmitter.dismissWelcomeModal();
 
     // Navigate to translation tab.
     await voiceoverSubmitter.navigateToTranslationsTab();
@@ -136,15 +135,11 @@ describe('Voiceover Submitter', function () {
 
     // Content.
     await voiceoverSubmitter.selectVoiceoverContentType('Content');
-    await voiceoverSubmitter.expectVoiceoverTextToContain(
-      '.e2e-test-content-text',
-      'What is 2 + 3?'
-    );
+    await voiceoverSubmitter.expectContentVoiceoverToContain('What is 2 + 3?');
 
     // Interaction.
     await voiceoverSubmitter.selectVoiceoverContentType('Interaction');
-    await voiceoverSubmitter.expectVoiceoverTextToContain(
-      '.e2e-test-interaction-text',
+    await voiceoverSubmitter.expectInteractionVoiceoverToContain(
       'Type your answer here.'
     );
 
@@ -163,19 +158,12 @@ describe('Voiceover Submitter', function () {
 
     // Solution.
     await voiceoverSubmitter.selectVoiceoverContentType('Solution');
-    await voiceoverSubmitter.expectVoiceoverTextToContain(
-      '.e2e-test-solution-text',
-      '5'
-    );
+    await voiceoverSubmitter.expectSolutionVoiceoverToContain('5');
   });
 
-  it('should display correct accessibility labels in the voiceover translation tab', async function () {
-    // Navigate to the exploration editor.
-    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
-    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
-
-    // Navigate to the translations tab.
-    await voiceoverSubmitter.navigateToTranslationsTab();
+  it('should see correct accessibility labels in the voiceover translation tab', async function () {
+    // Select "Content" voiceover option.
+    await voiceoverSubmitter.selectVoiceoverContentType('Content');
 
     // 1. Numerical status accessibility.
     await voiceoverSubmitter.expectTranslationProgressAriaLabelToMatch(
@@ -200,13 +188,14 @@ describe('Voiceover Submitter', function () {
       'Solutions for the state'
     );
 
-    // Select "Content" voiceover option.
-    await voiceoverSubmitter.selectVoiceoverContentType('Content');
-    await voiceoverSubmitter.expectUploadVoiceoverButtonAccessibleNameToBe(
-      'ADD MANUAL VOICEOVER'
-    );
+    // Select language accent
+    await voiceoverSubmitter.selectVoiceoverLanguageAccent('English (India)');
 
     await voiceoverSubmitter.clickOnAddManualVoiceoverButton();
+
+    await voiceoverSubmitter.expectUploadVoiceoverFileButtonAccessibleNameToBe(
+      'Upload voiceover file'
+    );
 
     // Upload a voiceover file to make play button visible.
     await voiceoverSubmitter.uploadFile(
@@ -224,14 +213,7 @@ describe('Voiceover Submitter', function () {
     await voiceoverSubmitter.saveExplorationDraft();
   });
 
-  it('should add, play, and delete a voiceover correctly', async function () {
-    // Navigate to the exploration editor.
-    await voiceoverSubmitter.navigateToExplorationEditor(explorationId);
-    await voiceoverSubmitter.dismissWelcomeModalIfPresent();
-
-    // Navigate to translation tab.
-    await voiceoverSubmitter.navigateToTranslationsTab();
-
+  it('should be able to add and remove voiceovers to explorations', async function () {
     // Add voiceover in English (India).
     await voiceoverSubmitter.addVoiceoverToContent(
       'English',

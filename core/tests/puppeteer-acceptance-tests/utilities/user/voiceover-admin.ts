@@ -300,8 +300,6 @@ export class VoiceoverAdmin extends BaseUser {
     voiceArtistUsername: string
   ): Promise<void> {
     await this.navigateToExplorationEditor(explorationId);
-    await this.waitForPageToFullyLoad();
-    await this.waitForNetworkIdle();
     await this.dismissWelcomeModal();
     await this.navigateToExplorationSettingsTab();
     await this.addVoiceoverArtistsToExploration([voiceArtistUsername]);

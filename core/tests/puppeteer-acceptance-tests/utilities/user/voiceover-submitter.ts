@@ -35,6 +35,14 @@ const audioDoesNotNeedUpdateIconSelector = '.does-not-needs-update-button-icon';
 const translationNumericalStatusSelector =
   '.e2e-test-translation-numerical-status';
 
+const contentVoiceoverTextSelector = '.e2e-test-content-text';
+const interactionVoiceoverTextSelector = '.e2e-test-interaction-text';
+const solutionVoiceoverTextSelector = '.e2e-test-solution-text';
+const uploadVoiceoverFileInputSelector = '.e2e-test-upload-audio-input';
+
+const voiceoverLanguageAccentSelector =
+  '.e2e-test-voiceover-language-accent-selector';
+
 const TRANSLATION_TAB_SELECTORS = {
   Content: '.e2e-test-translation-content-tab',
   Interaction: '.e2e-test-translation-interaction-tab',
@@ -173,6 +181,11 @@ export class VoiceoverSubmitter extends BaseUser {
     );
   }
 
+  /**
+   * Selects the specified voiceover content type tab in the translation tab.
+   * @param type - The voiceover content type to select (e.g., "Content", "Interaction",
+   * "Feedback", "Hints", or "Solution").
+   */
   async selectVoiceoverContentType(
     type: 'Content' | 'Interaction' | 'Feedback' | 'Hints' | 'Solution'
   ): Promise<void> {
@@ -195,17 +208,47 @@ export class VoiceoverSubmitter extends BaseUser {
       {},
       selector
     );
-    await this.waitForNetworkIdle();
   }
 
-  async expectVoiceoverTextToContain(
-    selector: string,
+  /**
+   * Checks if the content voiceover text contains the specified expected text.
+   * @param expectedText - The expected text to be present in the content voiceover.
+   */
+  async expectContentVoiceoverToContain(expectedText: string): Promise<void> {
+    await this.expectTextContentToContain(
+      contentVoiceoverTextSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the interaction voiceover text contains the specified expected text.
+   * @param expectedText - The expected text to be present in the interaction voiceover.
+   */
+  async expectInteractionVoiceoverToContain(
     expectedText: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(selector);
-    await this.expectTextContentToContain(selector, expectedText);
+    await this.expectTextContentToContain(
+      interactionVoiceoverTextSelector,
+      expectedText
+    );
   }
 
+  /**
+   * Checks if the solution voiceover text contains the specified expected text.
+   * @param expectedText - The expected text to be present in the solution voiceover.
+   */
+  async expectSolutionVoiceoverToContain(expectedText: string): Promise<void> {
+    await this.expectTextContentToContain(
+      solutionVoiceoverTextSelector,
+      expectedText
+    );
+  }
+
+  /**
+   * Checks if the visible feedback texts contain the specified expected texts.
+   * @param expectedTexts - The list of expected feedback texts to verify.
+   */
   async expectVisibleFeedbackTextsToContain(
     expectedTexts: string[]
   ): Promise<void> {
@@ -224,6 +267,10 @@ export class VoiceoverSubmitter extends BaseUser {
     }
   }
 
+  /**
+   * Checks if the visible hint texts contain the specified expected texts.
+   * @param expectedTexts - The list of expected hint texts to verify.
+   */
   async expectVisibleHintTextsToContain(
     expectedTexts: string[]
   ): Promise<void> {
@@ -241,6 +288,10 @@ export class VoiceoverSubmitter extends BaseUser {
     }
   }
 
+  /**
+   * Checks if the translation progress element has an aria-label matching the expected text.
+   * @param expectedText - The expected aria-label text for the translation progress element.
+   */
   async expectTranslationProgressAriaLabelToMatch(
     expectedText: string
   ): Promise<void> {
@@ -269,6 +320,12 @@ export class VoiceoverSubmitter extends BaseUser {
     expect(ariaLabel).toMatch(expectedText);
   }
 
+  /**
+   * Checks if the specified translation sub-tab has the expected aria-label.
+   * @param tabName - The name of the translation sub-tab (e.g., "Content", "Feedback",
+   * "Hints", or "Solution").
+   * @param expectedAriaLabel - The expected aria-label value of the sub-tab.
+   */
   async expectTranslationSubTabAriaLabelToBe(
     tabName: 'Content' | 'Feedback' | 'Hints' | 'Solution',
     expectedAriaLabel: string
@@ -293,24 +350,49 @@ export class VoiceoverSubmitter extends BaseUser {
     expect(ariaLabel).toBe(expectedAriaLabel);
   }
 
-  async expectUploadVoiceoverButtonAccessibleNameToBe(
+  /**
+   * Selects the specified voiceover language accent from the language accent dropdown
+   * in the translation tab.
+   * @param accentDescription - The description of the language accent to select
+   * (e.g., "English (India)").
+   */
+  async selectVoiceoverLanguageAccent(
+    accentDescription: string
+  ): Promise<void> {
+    // Wait for accent selector to appear.
+    await this.expectElementToBeVisible(voiceoverLanguageAccentSelector);
+
+    // Open the accent dropdown.
+    await this.clickOnElementWithSelector(voiceoverLanguageAccentSelector);
+
+    // Click the accent option using visible text.
+    await this.clickOnElementWithText(accentDescription);
+
+    // Wait for accent selection to fully apply.
+    await this.waitForNetworkIdle();
+  }
+
+  /**
+   * Checks if the upload voiceover file input has the expected accessible name.
+   * @param expectedAccessibleName - The expected aria-label of the upload voiceover file input.
+   */
+  async expectUploadVoiceoverFileButtonAccessibleNameToBe(
     expectedAccessibleName: string
   ): Promise<void> {
-    await this.expectElementToBeVisible(addManualVoiceoverBtnSelector);
+    await this.expectElementToBeVisible(uploadVoiceoverFileInputSelector);
 
     const accessibleName = await this.page.$eval(
-      addManualVoiceoverBtnSelector,
-      el =>
-        Array.from(el.childNodes)
-          .filter(node => node.nodeType === Node.TEXT_NODE)
-          .map(node => node.textContent)
-          .join('')
-          .trim()
+      uploadVoiceoverFileInputSelector,
+      el => el.getAttribute('aria-label') || ''
     );
 
     expect(accessibleName).toBe(expectedAccessibleName);
   }
 
+  /**
+   * Checks if the play voiceover button has the expected accessible name.
+   * @param expectedAccessibleName - The expected aria-label of the play voiceover button.
+   */
   async expectPlayVoiceoverButtonAccessibleNameToBe(
     expectedAccessibleName: string
   ): Promise<void> {
