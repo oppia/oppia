@@ -181,4 +181,103 @@ describe('StateHintsEditorComponent', () => {
 
     expect(result).toBeFalse();
   });
+
+  it('should return false when preview card is not found', () => {
+    spyOn(document, 'querySelector').and.returnValue(null);
+
+    expect(component.isCardHeightLimitReached()).toBeFalse();
+  });
+
+  it('should return false when card height is within limit', () => {
+    const mockEl = document.createElement('div');
+    spyOnProperty(mockEl, 'offsetHeight').and.returnValue(500);
+    spyOn(document, 'querySelector').and.returnValue(mockEl);
+
+    expect(component.isCardHeightLimitReached()).toBeFalse();
+  });
+
+  it('should return true when card height exceeds limit', () => {
+    const mockEl = document.createElement('div');
+    spyOnProperty(mockEl, 'offsetHeight').and.returnValue(700);
+    spyOn(document, 'querySelector').and.returnValue(mockEl);
+
+    expect(component.isCardHeightLimitReached()).toBeTrue();
+  });
+
+  it('should update cardHeightLimitReached after view check', () => {
+    spyOn(component, 'isCardHeightLimitReached').and.returnValue(true);
+    const cdRef = TestBed.inject(ChangeDetectorRef);
+    spyOn(cdRef, 'detectChanges');
+
+    component.ngAfterViewChecked();
+
+    expect(component.cardHeightLimitReached).toBeTrue();
+  });
+
+  it('should not autosave when editor is closed', () => {
+    component['contentEditorIsOpen'] = false;
+    component['autosaveInitialized'] = true;
+
+    component['detectContentChangeAndAutosave']();
+
+    expect(component['autosaveTimer']).toBeNull();
+  });
+
+  it('should not autosave when html is unchanged', () => {
+    component['contentEditorIsOpen'] = true;
+    component['autosaveInitialized'] = true;
+
+    component['lastSavedHtml'] = 'same';
+    stateContentService.displayed.html = 'same';
+
+    component['detectContentChangeAndAutosave']();
+
+    expect(component['autosaveTimer']).toBeNull();
+  });
+
+  it('should schedule autosave when html changes', () => {
+    jasmine.clock().install();
+
+    component['contentEditorIsOpen'] = true;
+    component['autosaveInitialized'] = true;
+    component['lastSavedHtml'] = 'old';
+
+    stateContentService.displayed.html = 'new';
+
+    spyOn<any>(component, 'autoSaveContent');
+
+    component['detectContentChangeAndAutosave']();
+
+    jasmine.clock().tick(1500);
+
+    expect(component['autoSaveContent']).toHaveBeenCalledWith('new');
+
+    jasmine.clock().uninstall();
+  });
+
+  it('should not auto save if editor closed during timer', () => {
+    component['contentEditorIsOpen'] = false;
+
+    component['autoSaveContent']('html');
+
+    expect(component['lastSavedHtml']).not.toBe('html');
+  });
+
+  it('should save when external save is triggered', () => {
+    spyOn(component, 'saveContent');
+
+    component.contentEditorIsOpen = true;
+    externalSaveService.onExternalSave.emit();
+
+    expect(component.saveContent).toHaveBeenCalled();
+  });
+
+  it('should clear autosave timer on destroy', () => {
+    component['autosaveTimer'] = setTimeout(() => {}, 1000);
+    spyOn(window, 'clearTimeout');
+
+    component.ngOnDestroy();
+
+    expect(clearTimeout).toHaveBeenCalled();
+  });
 });
