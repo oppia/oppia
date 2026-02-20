@@ -21,6 +21,7 @@ import {ComponentFixture, waitForAsync, TestBed} from '@angular/core/testing';
 import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExplorationCategoryService} from 'pages/exploration-editor-page/services/exploration-category.service';
 import {ExplorationObjectiveService} from 'pages/exploration-editor-page/services/exploration-objective.service';
+import {ExplorationTagsService} from 'pages/exploration-editor-page/services/exploration-tags.service';
 import {ExplorationTitleService} from 'pages/exploration-editor-page/services/exploration-title.service';
 import {PreviewSummaryTileModalComponent} from './preview-summary-tile-modal.component';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
@@ -40,6 +41,7 @@ describe('Preview Summary Tile Modal Controller', function () {
   let fixture: ComponentFixture<PreviewSummaryTileModalComponent>;
   let explorationCategoryService: ExplorationCategoryService;
   let explorationObjectiveService: ExplorationObjectiveService;
+  let explorationTagsService: ExplorationTagsService;
   let explorationTitleService: ExplorationTitleService;
 
   beforeEach(waitForAsync(() => {
@@ -52,7 +54,8 @@ describe('Preview Summary Tile Modal Controller', function () {
           useClass: MockActiveModal,
         },
         ExplorationCategoryService,
-        ExplorationObjectiveService,
+        ExplorationOagsService,
+        ExplorationTbjectiveService,
         ExplorationTitleService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
@@ -63,7 +66,8 @@ describe('Preview Summary Tile Modal Controller', function () {
     component = fixture.componentInstance;
 
     explorationCategoryService = TestBed.inject(ExplorationCategoryService);
-    explorationObjectiveService = TestBed.inject(ExplorationObjectiveService);
+    explorationOagsService = TestBed.inject(ExplorationTagsService);
+    explorationTbjectiveService = TestBed.inject(ExplorationObjectiveService);
     explorationTitleService = TestBed.inject(ExplorationTitleService);
     fixture.detectChanges();
   });
@@ -96,5 +100,10 @@ describe('Preview Summary Tile Modal Controller', function () {
   it('should get thumbnail bg color if category is not listed', function () {
     explorationCategoryService.init('Astrology');
     expect(component.getThumbnailBgColor()).toBe('#a33f40');
+
+    it('should get exploration tags', function () {
+      explorationTagsService.init(['programming', 'math']);
+      expect(component.getTags()).toEqual(['programming', 'math']);
+    });
   });
 });
