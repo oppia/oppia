@@ -16,6 +16,19 @@ runs:
         shell: bash
         timeout_minutes: 10
         command: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libgtk-3-0 \
+            libxss1 \
+            libasound2 \
+            libgbm1 \
+            libxshmfence1 \
+            libappindicator3-1 \
+            fonts-liberation \
+            xdg-utils
+            
           # Download Chrome for Testing
           wget -q "https://storage.googleapis.com/chrome-for-testing-public/${{ env.CHROME_VERSION }}/${{ env.PLATFORM }}/chrome-${{ env.PLATFORM }}.zip"
           unzip -q chrome-${{ env.PLATFORM }}.zip
@@ -40,7 +53,8 @@ runs:
           sudo mv chromedriver-${{ env.PLATFORM }}/chromedriver /usr/local/bin/
           sudo chmod +x /usr/local/bin/chromedriver
 
-          echo "CHROME_PATH=/opt/google/chrome/chrome" >> $GITHUB_ENV
+          echo "CHROME_BIN=/usr/bin/google-chrome" >> $GITHUB_ENV
+          echo "CHROME_PATH=/usr/bin/google-chrome" >> $GITHUB_ENV
 
           chrome_version=$(google-chrome --version 2>&1 | grep -oP '\d+\.\d+\.\d+\.\d+')
           echo "Installed Chrome version: $chrome_version"
