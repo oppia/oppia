@@ -131,10 +131,7 @@ describe('SetInputValidationService', () => {
     it('should generate errors when buttonText exceeds 20 characters', () => {
       let badCustomizationArgs = {
         buttonText: {
-          value: new SubtitledUnicode(
-            '123456789012345678901',
-            'ca_buttonText'
-          ),
+          value: new SubtitledUnicode('123456789012345678901', 'ca_buttonText'),
         },
       };
 
