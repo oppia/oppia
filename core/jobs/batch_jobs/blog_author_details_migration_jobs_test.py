@@ -376,6 +376,20 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
             ]
         )
 
+        created_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.AUTHOR_ID_2
+        )
+        self.assertIsNotNone(created_model)
+        assert created_model is not None
+        self.assertEqual(
+            created_model.displayed_author_name,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_NAME,
+        )
+        self.assertEqual(
+            created_model.author_bio,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
+        )
+
     def test_active_user_without_author_details_is_not_migrated(
         self,
     ) -> None:
@@ -512,6 +526,28 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
             ]
         )
 
+        migrated_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.AUTHOR_ID_2
+        )
+        self.assertIsNotNone(migrated_model)
+        assert migrated_model is not None
+        self.assertEqual(
+            migrated_model.displayed_author_name,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_NAME,
+        )
+        self.assertEqual(
+            migrated_model.author_bio,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
+        )
+
+        existing_model = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.AUTHOR_ID_1
+        )
+        self.assertIsNotNone(existing_model)
+        assert existing_model is not None
+        self.assertEqual(existing_model.displayed_author_name, 'Valid Author')
+        self.assertEqual(existing_model.author_bio, 'A valid author bio.')
+
     def test_multiple_deleted_authors_are_all_migrated(self) -> None:
         """Tests that all deleted author_ids get migrated when multiple
         deleted users have published blog posts.
@@ -552,6 +588,33 @@ class MigrateBlogAuthorDetailsForDeletedUsersJobTests(
                     'MIGRATED AUTHOR DETAILS COUNT SUCCESS: 2'
                 ),
             ]
+        )
+
+        model_2 = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.AUTHOR_ID_2
+        )
+        self.assertIsNotNone(model_2)
+        assert model_2 is not None
+        self.assertEqual(
+            model_2.displayed_author_name,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_NAME,
+        )
+        self.assertEqual(
+            model_2.author_bio,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
+        )
+        model_3 = blog_models.BlogAuthorDetailsModel.get_by_author(
+            self.AUTHOR_ID_3
+        )
+        self.assertIsNotNone(model_3)
+        assert model_3 is not None
+        self.assertEqual(
+            model_3.displayed_author_name,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_NAME,
+        )
+        self.assertEqual(
+            model_3.author_bio,
+            blog_author_details_migration_jobs.DELETED_USER_FALLBACK_AUTHOR_BIO,
         )
 
     def test_draft_blog_posts_are_excluded_from_migration(self) -> None:
