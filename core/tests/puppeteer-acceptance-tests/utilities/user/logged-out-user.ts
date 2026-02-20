@@ -16,7 +16,7 @@
  * @fileoverview Logged-out users utility file.
  */
 
-import puppeteer from 'puppeteer';
+import puppeteer, {Page} from 'puppeteer';
 import {BaseUser} from '../common/puppeteer-utils';
 import testConstants from '../common/test-constants';
 import {showMessage} from '../common/show-message';
@@ -588,6 +588,24 @@ const voiceoverSelectSelector = '.e2e-test-audio-lang-select';
 const conceptCardCloseButtonSelector = '.e2e-test-close-concept-card';
 const promoBarTextSelector = '.e2e-test-promo-bar-text';
 const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
+
+// New lesson player page.
+const lessonPlayerSideBarToggleButton = '.player-sidebar-toggle';
+const lessonPlayerHeaderCloseButton = '.lesson-player-header-close-button';
+const lessonShareButton = '.e2e-lesson-share-button';
+const lessonShareButtonInMobileView =
+  '.player-mobile-menu-options .fa-share-alt';
+const lessonCopyLinkbutton = '.e2e-copy-link-button';
+const lessonLinkCopiedMessageSelector = '.success-message';
+const LINK_COPIED_MESSAGE = 'Link Copied';
+const lessonEmbedInWebpageButton = '.e2e-embed-in-webpage-button';
+const shareGoogleClassroomSelector = '.e2e-test-share-link-classroom';
+const shareFacebookSelector = '.e2e-test-share-link-facebook';
+const shareModalCloseButton = '.share-modal-close-button';
+const generateLessonAttributionSelector = '.lesson-attribution-text';
+const attributionTextSelector = '.cc-attribution-input';
+const ccButtonSelector = '.copy-cc-btn';
+const copiedMessageSelector = '.success-message';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5815,6 +5833,290 @@ export class LoggedOutUser extends BaseUser {
    */
   async playLesson(explorationId: string | null): Promise<void> {
     await this.goto(`${baseUrl}/lesson/${explorationId as string}`);
+  }
+
+  /**
+   * Open 'Open Options' in new lesson player page.
+   */
+  async clickOpenOptions(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    if (isMobileViewport) {
+      await this.page.waitForSelector(lessonPlayerHeaderCloseButton);
+      await this.page.click(lessonPlayerHeaderCloseButton);
+      return;
+    }
+    await this.page.waitForSelector(lessonPlayerSideBarToggleButton);
+    await this.page.click(lessonPlayerSideBarToggleButton);
+  }
+
+  /**
+   * Open share modal in new lesson player page.
+   */
+  async clickShareLessonButton(): Promise<void> {
+    const isMobileViewport = this.isViewportAtMobileWidth();
+    if (isMobileViewport) {
+      await this.page.waitForSelector(lessonShareButtonInMobileView);
+      await this.page.click(lessonShareButtonInMobileView);
+      return;
+    }
+    await this.page.waitForSelector(lessonShareButton);
+    await this.page.click(lessonShareButton);
+  }
+
+  /**
+   * Copy share link in share model of new lesson player.
+   */
+  async clickCopyLinkButton(): Promise<void> {
+    await this.page.waitForSelector(lessonCopyLinkbutton);
+    await this.page.click(lessonCopyLinkbutton);
+  }
+
+  /**
+   * Function to verify copy link message.
+   */
+  async expectLinkCopiedMessage(): Promise<void> {
+    await this.page.waitForSelector(lessonLinkCopiedMessageSelector);
+
+    const linkCopiedMessage = await this.page.$eval(
+      lessonLinkCopiedMessageSelector,
+      element => element.textContent
+    );
+
+    if (
+      !linkCopiedMessage ||
+      !linkCopiedMessage.includes(LINK_COPIED_MESSAGE)
+    ) {
+      throw new Error('Link copied message did not shown');
+    }
+
+    showMessage('Lesson share link copied');
+  }
+
+  /**
+   * Open new browser tab and paste clipboard text.
+   */
+  async openCopiedLink(): Promise<Page> {
+    const clipboardText = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+
+    if (!clipboardText) {
+      throw new Error('Clipboard is empty, link is not copied');
+    }
+
+    // Open new tab with that link.
+    const newBrowserTab = await this.browserObject.newPage();
+    await newBrowserTab.goto(clipboardText, {
+      waitUntil: 'networkidle2',
+    });
+    return newBrowserTab;
+  }
+
+  /**
+   * Click classroom icon and verify the URL with expectedClassroomURL.
+   * @param expectedClassroomURL - Expected share URL via Google Classroom.
+   */
+  async shareViaGoogleClassroomAndVerifyURL(
+    expectedClassroomURL: string
+  ): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(shareGoogleClassroomSelector, {
+      visible: true,
+    });
+
+    await this.clickLinkButtonToNewTab(
+      shareGoogleClassroomSelector,
+      'Classroom',
+      expectedClassroomURL,
+      'Google Classroom'
+    );
+  }
+  /**
+   * Click facebook icon and verify the URL with expectedFacebookURL.
+   * @param expectedFacebookURL - Expected share URL via Facebook.
+   */
+  async shareViaFacebookAndVerifyURL(
+    expectedFacebookURL: string
+  ): Promise<void> {
+    await this.waitForStaticAssetsToLoad();
+    await this.page.waitForSelector(shareFacebookSelector, {
+      visible: true,
+    });
+
+    await this.clickLinkButtonToNewTab(
+      shareFacebookSelector,
+      'Facebook',
+      expectedFacebookURL,
+      'Facebook'
+    );
+  }
+  /**
+   * Get share URL for the selected social platform (e.g., Facebook,
+   * Google Classroom, Twitter).
+   * @param platform - The social platform used for sharing (Facebook, Classroom, Twitter).
+   * @param explorationId - The exploration ID appended to the share URL.
+   */
+  async getExpectedShareURL(
+    platform: string,
+    explorationId: string
+  ): Promise<string> {
+    let expectedUrl: string;
+    switch (platform) {
+      case 'Facebook':
+        expectedUrl =
+          testConstants.SocialsShareLesson.Facebook.Domain +
+          explorationId +
+          testConstants.SocialsShareLesson.Facebook.queryString;
+        break;
+      case 'Twitter':
+        expectedUrl =
+          testConstants.SocialsShareLesson.Twitter.Domain + explorationId;
+        break;
+      case 'Classroom':
+        expectedUrl =
+          testConstants.SocialsShareLesson.Classroom.Domain + explorationId;
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${platform}`);
+    }
+
+    return expectedUrl;
+  }
+
+  /**
+   * Close the share modal in lesson
+   */
+  async closeShareModal(): Promise<void> {
+    await this.page.waitForSelector(shareModalCloseButton, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(shareModalCloseButton);
+    showMessage('share modal closed successfully');
+
+    await this.page.waitForSelector(shareModalCloseButton, {
+      hidden: true,
+    });
+  }
+
+  /**
+   * Generates lesson attribution
+   */
+  async clickLessonAttribution(): Promise<void> {
+    await this.page.waitForSelector(generateLessonAttributionSelector, {
+      visible: true,
+    });
+    await this.clickOnElementWithSelector(generateLessonAttributionSelector);
+  }
+
+  /**
+   * Verifies the text/value inside the given selector.
+   *
+   * @param textSelector - CSS selector of the element (e.g., textarea).
+   * @param expectedText - Expected text/value to match.
+   */
+  async verifyText(textSelector: string, expectedText: string): Promise<void> {
+    await this.page.waitForSelector(textSelector, {
+      visible: true,
+    });
+
+    const actualText = await this.page.$eval(textSelector, el => {
+      if (el instanceof HTMLTextAreaElement || el instanceof HTMLInputElement) {
+        return el.value;
+      }
+      return el.textContent;
+    });
+
+    const trimmedExpected = expectedText.trim();
+    const trimmedActual = actualText ? actualText.trim() : '';
+
+    if (!trimmedActual || !trimmedActual.includes(trimmedExpected)) {
+      throw new Error(
+        `Text did not match.\nExpected: ${trimmedExpected}\nFound: ${trimmedActual}`
+      );
+    }
+
+    showMessage(`Text matched: ${trimmedActual}`);
+  }
+
+  /**
+   * Verify attribution text.
+   * @param expectedAttributionText - Expected text in attribution.
+   */
+  async verifyAttributionText(expectedAttributionText: string): Promise<void> {
+    await this.verifyText(attributionTextSelector, expectedAttributionText);
+  }
+
+  /**
+   * Copy attribution and verify.
+   * @param lessonAttributionPrintContent - Expected lesson attribution text content.
+   */
+  async copyAttributionAndVerify(
+    lessonAttributionPrintContent: string
+  ): Promise<void> {
+    await this.page.waitForSelector(ccButtonSelector);
+    await this.page.click(ccButtonSelector);
+
+    await this.verifyText(copiedMessageSelector, 'Attribution Copied');
+
+    const clipboardText = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+
+    if (!clipboardText) {
+      throw new Error('Clipboard is empty. Attribution text was not copied.');
+    }
+
+    if (lessonAttributionPrintContent !== clipboardText) {
+      throw new Error(
+        'Copied attribution text does not match the expected content.'
+      );
+    }
+    showMessage('Attribution text copied and verified successfully.');
+  }
+
+  /**
+   * Click embed in webpage button.
+   */
+  async clickEmbedInWebpageButton(): Promise<void> {
+    await this.page.waitForSelector(lessonEmbedInWebpageButton);
+    await this.page.click(lessonEmbedInWebpageButton);
+  }
+
+  /**
+   * Verify embed in webpage HTML content
+   * @param htmlContent - HTML content to embed in webpage.
+   */
+  async verifyEmbedHTMLContent(htmlContent: string): Promise<void> {
+    await this.verifyText(attributionTextSelector, htmlContent);
+  }
+
+  /**
+   * Copy HTML Code and verify.
+   * @param lessonEmbedHTMLContent - Expected lesson HTML Code.
+   */
+  async copyHTMLContentAndVerify(
+    lessonEmbedHTMLContent: string
+  ): Promise<void> {
+    await this.page.waitForSelector(ccButtonSelector);
+    await this.page.click(ccButtonSelector);
+
+    await this.verifyText(
+      copiedMessageSelector,
+      'HTML Code Copied check_circle'
+    );
+
+    const clipboardText = await this.page.evaluate(async () => {
+      return await navigator.clipboard.readText();
+    });
+
+    if (!clipboardText) {
+      throw new Error('Clipboard is empty. Embed HTML Code was not copied.');
+    }
+
+    if (lessonEmbedHTMLContent !== clipboardText) {
+      throw new Error('Copied HTML code does not match the expected code.');
+    }
+    showMessage('Embed HTML code copied and verified successfully.');
   }
 
   /**

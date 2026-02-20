@@ -4,7 +4,7 @@
   <button *ngIf="backBtnIsVisible" mat-icon-button (click)="goBackToCopyModal()" aria-label="Back to the previous step">
     <mat-icon>arrow_back</mat-icon>
   </button>
-  <button mat-icon-button (click)="closeModal()" aria-label="Close the modal">
+  <button mat-icon-button (click)="closeModal()" aria-label="Close the modal" class="share-modal-close-button">
     <mat-icon>close</mat-icon>
   </button>
 </div>
@@ -17,7 +17,7 @@
 
   <ng-container *ngSwitchCase="modalStates.COPY">
     <div class="share-icon-container copy-modal-body">
-      <a [href]="shareWithNetwork('classroom')" target="_blank" rel="noopener" aria-label="Share via Classroom">
+      <a [href]="shareWithNetwork('classroom')" target="_blank" rel="noopener" aria-label="Share via Classroom" class="e2e-test-share-link-classroom">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-classroom">
           <title id="share-classroom">Classroom Icon</title>
           <rect x="1" y="1" width="46" height="46" rx="23" fill="#20A366"/>
@@ -31,7 +31,7 @@
         </svg>
       </a>
 
-      <a [href]="shareWithNetwork('facebook')" target="_blank" rel="noopener" aria-label="Share via Facebook">
+      <a [href]="shareWithNetwork('facebook')" target="_blank" rel="noopener" aria-label="Share via Facebook" class="e2e-test-share-link-facebook">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="share-facebook">
           <title id="share-facebook">Facebook Icon</title>
           <path d="M48 24C48 10.7452 37.2549 0 24 0C10.7452 0 0 10.7452 0 24C0 35.9791 8.77645 45.908 20.25 47.7085V30.9375H14.1563V24H20.25V18.7125C20.25 12.6975 23.833 9.37502 29.3152 9.37502C31.941 9.37502 34.6875 9.84376 34.6875 9.84376V15.75H31.6612C28.6798 15.75 27.75 17.6 27.75 19.498V24H34.4063L33.3422 30.9375H27.75V47.7085C39.2236 45.908 48 35.9791 48 24Z" fill="#1877F2"/>
@@ -41,11 +41,11 @@
     </div>
 
     <div class="copy-modal-body copy-modal-body-btn">
-      <button mat-button class="share-modal-btn" (click)="copyLessonLink()" aria-label="Copy lesson link">
+      <button mat-button class="share-modal-btn e2e-copy-link-button" (click)="copyLessonLink()" aria-label="Copy lesson link">
         <span class="button-content">{{'I18N_SHARE_MODAL_COPY_LINK_BUTTON' | translate}} <mat-icon>code</mat-icon></span>
       </button>
 
-      <button mat-button class="share-modal-btn" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
+      <button mat-button class="share-modal-btn e2e-embed-in-webpage-button" (click)="showEmbedModal()" aria-label="Show embed code for webpage">
         <span class="button-content">{{'I18N_SHARE_MODAL_EMBED_IN_WEBPAGE' | translate}} <mat-icon>link</mat-icon></span>
       </button>
     </div>

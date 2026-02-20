@@ -218,7 +218,21 @@ export default {
         'https://classroom.google.com/share?url=http://localhost:8181/explore/',
     },
   },
-
+  SocialsShareLesson: {
+    Facebook: {
+      Domain:
+        'https://www.facebook.com/sharer/sharer.php?sdk=joey&u=http://localhost:8181/lesson/',
+      queryString: '&display=popup&ref=plugin&src=share_button',
+    },
+    Twitter: {
+      Domain:
+        'https://twitter.com/share?text=Check%20out%20this%20interactive%20lesson%20on%20Oppia%20-%20a%20free%20platform%20for%20teaching%20and%20learning!&url=http://localhost:8181/lesson/',
+    },
+    Classroom: {
+      Domain:
+        'https://classroom.google.com/share?url=http://localhost:8181/lesson/',
+    },
+  },
   OppiaSocials: {
     YouTube: {
       Domain: 'youtube.com',
