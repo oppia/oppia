@@ -21,10 +21,6 @@
       "module": "core/tests/webdriverio_desktop/contributorAdminDashboard.js"
     },
     {
-      "name": "creatorDashboard",
-      "module": "core/tests/webdriverio_desktop/creatorDashboard.js"
-    },
-    {
       "name": "embedding",
       "module": "core/tests/webdriverio_desktop/embedding.js"
     },

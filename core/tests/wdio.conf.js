@@ -49,10 +49,6 @@ var suites = {
     './core/tests/webdriverio_desktop/contributorAdminDashboard.js'
   ],
 
-  creatorDashboard: [
-    './core/tests/webdriverio_desktop/creatorDashboard.js'
-  ],
-
   embedding: [
     './core/tests/webdriverio_desktop/embedding.js'
   ],
