@@ -1611,6 +1611,9 @@ def delete_explorations(
         feconf.ENTITY_TYPE_EXPLORATION, exploration_ids
     )
 
+    if exploration_ids:
+        suggestion_services.regenerate_contributor_stats()
+
     # Remove from subscribers.
     taskqueue_services.defer(
         feconf.FUNCTION_ID_TO_FUNCTION_NAME_FOR_DEFERRED_JOBS[

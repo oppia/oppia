@@ -30,6 +30,7 @@ from core.domain import (
     story_domain,
     story_fetchers,
     story_services,
+    suggestion_services,
     topic_domain,
     topic_fetchers,
     topic_services,
@@ -854,7 +855,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(orig_story_dict, new_story_dict)
 
     def test_delete_story(self) -> None:
-        story_services.delete_story(self.USER_ID, self.STORY_ID)
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            story_services.delete_story(self.USER_ID, self.STORY_ID)
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
         self.assertEqual(
             story_fetchers.get_story_by_id(self.STORY_ID, strict=False), None
         )
@@ -862,6 +868,46 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_fetchers.get_story_summary_by_id(self.STORY_ID, strict=False),
             None,
         )
+
+    def test_update_story_with_changed_exploration_links_regenerates_stats(
+        self,
+    ) -> None:
+        self.save_new_valid_exploration(
+            'exp_2',
+            self.user_id_admin,
+            title='Title 2',
+            category='Mathematics',
+            language_code='en',
+        )
+        self.publish_exploration(self.user_id_admin, 'exp_2')
+        topic_services.publish_story(
+            self.TOPIC_ID, self.STORY_ID, self.user_id_admin
+        )
+        change_list = [
+            story_domain.StoryChange(
+                {
+                    'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                    'property_name': (
+                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID
+                    ),
+                    'node_id': self.NODE_ID_1,
+                    'old_value': self.EXP_ID,
+                    'new_value': 'exp_2',
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            story_services.update_story(
+                self.USER_ID,
+                self.STORY_ID,
+                change_list,
+                'Updated story node.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
 
     def test_cannot_get_story_from_model_with_invalid_schema_version(
         self,

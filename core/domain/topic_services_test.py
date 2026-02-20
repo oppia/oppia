@@ -1291,6 +1291,78 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 0)
         self.assertEqual(topic_summary.additional_story_count, 0)
 
+    def test_publish_story_regenerates_contributor_stats(self) -> None:
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.publish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_unpublish_story_regenerates_contributor_stats(self) -> None:
+        topic_services.publish_story(
+            self.TOPIC_ID, self.story_id_1, self.user_id_admin
+        )
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.unpublish_story(
+                self.TOPIC_ID, self.story_id_1, self.user_id_admin
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_update_topic_regenerates_stats_for_assignment_change(self) -> None:
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+                    'uncategorized_skill_id': self.skill_id_1,
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin,
+                self.TOPIC_ID,
+                changelist,
+                'Removed skill from topic.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 1)
+
+    def test_update_topic_does_not_regenerate_stats_for_metadata_changes(
+        self,
+    ) -> None:
+        changelist = [
+            topic_domain.TopicChange(
+                {
+                    'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                    'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                    'old_value': 'Description',
+                    'new_value': 'Updated description.',
+                }
+            )
+        ]
+
+        with self.swap_with_call_counter(
+            suggestion_services, 'regenerate_contributor_stats'
+        ) as (regenerate_contributor_stats):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin,
+                self.TOPIC_ID,
+                changelist,
+                'Updated topic description.',
+            )
+
+        self.assertEqual(regenerate_contributor_stats.times_called, 0)
+
     def test_invalid_publish_and_unpublish_story(self) -> None:
         with self.assertRaisesRegex(
             Exception,

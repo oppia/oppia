@@ -903,6 +903,10 @@ def update_story(
     suggestion_services.auto_reject_translation_suggestions_for_exp_ids(
         exp_ids_removed_from_story
     )
+    if story_is_published and (
+        exp_ids_removed_from_story or exp_ids_added_to_story
+    ):
+        suggestion_services.regenerate_contributor_stats()
 
     exp_models.ExplorationContextModel.delete_multi(
         exploration_context_models_to_be_deleted
@@ -971,6 +975,7 @@ def delete_story(
     opportunity_services.delete_exp_opportunities_corresponding_to_story(
         story_id
     )
+    suggestion_services.regenerate_contributor_stats()
 
     # Delete references of the story from all related learner groups.
     learner_group_services.remove_story_reference_from_learner_groups(story_id)

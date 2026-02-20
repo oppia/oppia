@@ -27,6 +27,7 @@ from core.domain import (
     exp_fetchers,
     exp_services,
     feedback_services,
+    opportunity_services,
     question_domain,
     rights_domain,
     rights_manager,
@@ -5117,6 +5118,123 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         self.assertEqual(
             question_submitter_total_stats_model.overall_accuracy, 100.0
+        )
+
+    def test_regenerate_stats_skips_translations_without_opportunities(
+        self,
+    ) -> None:
+        change_dict = self._set_up_topics_and_stories_for_translations()
+        translation_suggestion = suggestion_services.create_suggestion(
+            feconf.SUGGESTION_TYPE_TRANSLATE_CONTENT,
+            feconf.ENTITY_TYPE_EXPLORATION,
+            '0',
+            1,
+            self.author_id,
+            change_dict,
+            'description',
+        )
+        suggestion_services.update_translation_contribution_stats_at_submission(
+            translation_suggestion
+        )
+
+        self.assertIsNotNone(
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
+            )
+        )
+
+        opportunity_services.delete_exploration_opportunities(['0'])
+        suggestion_services.regenerate_contributor_stats()
+
+        self.assertIsNone(
+            suggestion_models.TranslationContributionStatsModel.get(
+                'hi', self.author_id, '0'
+            )
+        )
+        translation_submitter_total_model_cls = (
+            suggestion_models.TranslationSubmitterTotalContributionStatsModel
+        )
+        self.assertIsNone(
+            translation_submitter_total_model_cls.get('hi', self.author_id)
+        )
+
+    def test_regenerate_stats_updates_question_topic_assignments(
+        self,
+    ) -> None:
+        skill_id_1 = self._create_skill()
+        skill_id_2 = self._create_skill()
+        skill_id_3 = self._create_skill()
+
+        topic_id_1 = self._create_topic(skill_id_1, skill_id_2)
+        topic_id_2 = topic_fetchers.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_2,
+            'topic_admin',
+            name='Topic2',
+            abbreviated_name='topic-two',
+            url_fragment='topic-two',
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[skill_id_3],
+            subtopics=[],
+            next_subtopic_id=1,
+        )
+
+        question_suggestion = self._create_question_suggestion(skill_id_1)
+        suggestion_services.update_question_contribution_stats_at_submission(
+            question_suggestion
+        )
+
+        self.assertIsNotNone(
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id_1
+            )
+        )
+
+        with self.swap(
+            suggestion_services,
+            'regenerate_contributor_stats',
+            lambda: None,
+        ):
+            topic_services.remove_uncategorized_skill(
+                self.admin_id, topic_id_1, skill_id_1
+            )
+            topic_services.add_uncategorized_skill(
+                self.admin_id, topic_id_2, skill_id_1
+            )
+
+        suggestion_services.regenerate_contributor_stats()
+
+        self.assertIsNone(
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id_1
+            )
+        )
+        question_contribution_stats_model = (
+            suggestion_models.QuestionContributionStatsModel.get(
+                self.author_id, topic_id_2
+            )
+        )
+        assert question_contribution_stats_model is not None
+        self.assertEqual(
+            question_contribution_stats_model.submitted_questions_count, 1
+        )
+
+        question_submitter_total_stats_model_cls = (
+            suggestion_models.QuestionSubmitterTotalContributionStatsModel
+        )
+        question_submitter_total_stats_model = (
+            question_submitter_total_stats_model_cls.get_by_id(self.author_id)
+        )
+        assert question_submitter_total_stats_model is not None
+        topic_ids_with_question_submissions = (
+            question_submitter_total_stats_model
+            .topic_ids_with_question_submissions
+        )
+        self.assertEqual(
+            topic_ids_with_question_submissions,
+            [topic_id_2],
         )
 
     def generate_random_string(self, length: int) -> str:
