@@ -16,9 +16,9 @@
  * @fileoverview Service for informing of the i18n language code changes.
  */
 
-import { Injectable, EventEmitter } from '@angular/core';
-import { AppConstants } from 'app.constants';
-import { ClassroomTranslationKeys } from 'pages/classroom-page/classroom-page.component';
+import {EventEmitter, Injectable} from '@angular/core';
+import {AppConstants} from 'app.constants';
+import {ClassroomTranslationKeys} from 'pages/classroom-page/classroom-page.component';
 
 /**
  * Used to define if the translation key is type title or desciption.
@@ -58,7 +58,7 @@ export class I18nLanguageCodeService {
     )
   );
 
-  constructor() { }
+  constructor() {}
 
   getCurrentI18nLanguageCode(): string {
     return this.languageCode;

@@ -47,7 +47,7 @@ export class CollectionEditorStateService {
     private undoRedoService: UndoRedoService
   ) {}
 
-  private _setCollection(collection: Collection) {
+  private _setCollection(collection: Collection): void {
     this._collection.copyFromCollection(collection);
     if (this._collectionIsInitialized) {
       this._collectionInitializedEventEmitter.emit();
