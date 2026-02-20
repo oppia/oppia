@@ -44,20 +44,14 @@ class ThirdPartyLibDict(TypedDict):
 
 
 STRICT_TS_CONFIG_FILE_NAME: Final = "tsconfig-strict.json"
-STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(
-    os.getcwd(), STRICT_TS_CONFIG_FILE_NAME
-)
+STRICT_TS_CONFIG_FILEPATH: Final = os.path.join(os.getcwd(), STRICT_TS_CONFIG_FILE_NAME)
 
 WEBPACK_CONFIG_FILE_NAME: Final = "webpack.common.config.ts"
-WEBPACK_CONFIG_FILEPATH: Final = os.path.join(
-    os.getcwd(), WEBPACK_CONFIG_FILE_NAME
-)
+WEBPACK_CONFIG_FILEPATH: Final = os.path.join(os.getcwd(), WEBPACK_CONFIG_FILE_NAME)
 
 APP_YAML_FILEPATH: Final = os.path.join(os.getcwd(), "app_dev.yaml")
 
-DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(
-    os.getcwd(), "dependencies.json"
-)
+DEPENDENCIES_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), "dependencies.json")
 PACKAGE_JSON_FILE_PATH: Final = os.path.join(os.getcwd(), "package.json")
 _TYPE_DEFS_FILE_EXTENSION_LENGTH: Final = len(".d.ts")
 _DEPENDENCY_SOURCE_DEPENDENCIES_JSON: Final = "dependencies.json"
@@ -118,9 +112,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
         skip_files_section_found = False
-        for line_num, line in enumerate(
-            self.file_cache.readlines(APP_YAML_FILEPATH)
-        ):
+        for line_num, line in enumerate(self.file_cache.readlines(APP_YAML_FILEPATH)):
             stripped_line = line.strip()
             if "# Third party files:" in stripped_line:
                 skip_files_section_found = True
@@ -165,9 +157,9 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
         failed = False
         error_messages = []
 
-        package = json.load(
-            open(PACKAGE_JSON_FILE_PATH, "r", encoding="utf-8")
-        )["dependencies"]
+        package = json.load(open(PACKAGE_JSON_FILE_PATH, "r", encoding="utf-8"))[
+            "dependencies"
+        ]
 
         files_in_typings_dir = os.listdir(os.path.join(os.getcwd(), "typings"))
 
@@ -275,9 +267,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                     "minify",
                     "inject",
                 ]
-            elif htmlwebpackplugin_section_found and stripped_line.startswith(
-                "}),"
-            ):
+            elif htmlwebpackplugin_section_found and stripped_line.startswith("}),"):
                 htmlwebpackplugin_section_found = False
                 if keys:
                     error_message = (
@@ -322,9 +312,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             errors += self._check_that_workflow_steps_have_name(
                 workflow_dict, workflow_path
             )
-        return concurrent_task_utils.TaskResult(
-            name, bool(errors), errors, errors
-        )
+        return concurrent_task_utils.TaskResult(name, bool(errors), errors, errors)
 
     # Here we use type Any because the argument 'workflow_dict' accepts
     # dictionaries that represents the content of workflow YAML file and
