@@ -71,10 +71,10 @@ describe('FeedbackPopupComponent', () => {
   }));
 
   beforeEach(() => {
-    userService = TestBed.get(UserService);
-    playerPositionService = TestBed.get(PlayerPositionService);
-    windowDimensionsService = TestBed.get(WindowDimensionsService);
-    feedbackPopupBackendApiService = TestBed.get(
+    userService = TestBed.inject(UserService);
+    playerPositionService = TestBed.inject(PlayerPositionService);
+    windowDimensionsService = TestBed.inject(WindowDimensionsService);
+    feedbackPopupBackendApiService = TestBed.inject(
       FeedbackPopupBackendApiService
     );
     fixture = TestBed.createComponent(FeedbackPopupComponent);

@@ -34,8 +34,8 @@ describe('FeatureFlagDummyBackendApiService', () => {
       imports: [HttpClientTestingModule],
     });
 
-    apiService = TestBed.get(FeatureFlagDummyBackendApiService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    apiService = TestBed.inject(FeatureFlagDummyBackendApiService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {
