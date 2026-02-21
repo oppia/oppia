@@ -158,8 +158,8 @@ def get_question_from_model(
 
 def migrate_state_schema(
     versioned_question_state: question_domain.VersionedQuestionStateDict,
-    current_next_content_id_index: Optional[int] = None,
-) -> Optional[int]:
+    current_next_content_id_index: int,
+) -> int:
     """Holds the responsibility of performing a step-by-step, sequential update
     of the state structure based on the schema version of the input
     state dictionary. If the current State schema changes, a new
@@ -173,9 +173,11 @@ def migrate_state_schema(
             state: The State domain object representing the question
                 state data.
 
-        current_next_content_id_index: Optional[int]. A variable passed
-            by the functions utilizing migrate_state_schema so
-            that current_node_id_index is never set to None
+        current_next_content_id_index: int. The existing next_content_id_index 
+            value before the state migration begins. This value is preserved 
+            and returned as the fallback, unless the migration specifically 
+            extracts a new value from an older state schema (e.g., during the 
+            v54 to v55 transition).
 
     Returns:
         int. The next content id index for generating content id.
