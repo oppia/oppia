@@ -43,7 +43,7 @@ describe('SetInputValidationService', () => {
       providers: [SetInputValidationService],
     });
 
-    validatorService = TestBed.get(SetInputValidationService);
+    validatorService = TestBed.inject(SetInputValidationService);
 
     WARNING_TYPES = AppConstants.WARNING_TYPES;
 
