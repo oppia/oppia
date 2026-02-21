@@ -80,7 +80,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_page(self) -> None:
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain('<oppia-root></oppia-root>')
+        response.mustcontain('<oppia-root>')
 
     def test_library_handler_for_collection_summaries(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)

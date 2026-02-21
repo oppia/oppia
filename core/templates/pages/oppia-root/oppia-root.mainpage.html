@@ -4,7 +4,22 @@
     @load('base-components/header.template.html', {"title": "Loading | Oppia"})
   </head>
   <body>
-    <oppia-root></oppia-root>
+    <oppia-root>
+      <!-- Static loader shown before Angular bootstraps. Angular replaces
+           this content once it finishes initialising. After that,
+           PageNavigationLoadingService takes over for route transitions. -->
+      <div class="oppia-loading-fullpage e2e-test-loading-fullpage"
+           role="status"
+           aria-live="polite"
+           aria-busy="true">
+        <div class="oppia-align-center">
+          <span>Loading</span>
+          <span class="oppia-loading-dot-one">.</span>
+          <span class="oppia-loading-dot-two">.</span>
+          <span class="oppia-loading-dot-three">.</span>
+        </div>
+      </div>
+    </oppia-root>
 
     @load('pages/footer_js_libs.html')
   </body>

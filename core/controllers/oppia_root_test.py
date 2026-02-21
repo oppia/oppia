@@ -34,7 +34,7 @@ class OppiaRootPageTests(test_utils.GenericTestBase):
                         '<lightweight-oppia-root></lightweight-oppia-root>'
                     )
                 else:
-                    response.mustcontain('<oppia-root></oppia-root>')
+                    response.mustcontain('<oppia-root>')
 
 
 class OppiaLightweightRootPageTests(test_utils.GenericTestBase):
