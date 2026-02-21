@@ -202,15 +202,15 @@
     },
     {
       "name": "topic-manager/create-and-delete-questions-in-skill-editor",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/create-and-delete-questions-in-skill-editor.spec.ts"
     },
     {
       "name": "topic-manager/cannot-do-curriculum-admin-actions",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/cannot-do-curriculum-admin-actions.spec.ts"
     },
     {
       "name": "topic-manager/edit-and-republish-story-with-mobile-supported-explorations",
-      "module": "core/tests/puppeteer-acceptance-tests/specs-old/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
+      "module": "core/tests/puppeteer-acceptance-tests/specs/topic-manager/edit-and-republish-story-with-mobile-supported-explorations.spec.ts"
     },
     {
       "name": "voiceover-admin/assign-unassign-voiceover-artist-to-an-exploration",
