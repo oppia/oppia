@@ -52,7 +52,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
     def test_get_profile_page_of_existing_user(self) -> None:
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
     def test_page_not_found(self) -> None:
         exception = 'Could not find the resource {}/profilehandler/data/{}.'
@@ -283,7 +283,7 @@ class ProfileDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response(feconf.PREFERENCES_URL)
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
         self.logout()
 
@@ -1329,7 +1329,7 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
 
     def test_get_delete_account_page(self) -> None:
         response = self.get_html_response('/delete-account')
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class MailingListSubscriptionHandlerTests(test_utils.GenericTestBase):
@@ -1781,7 +1781,7 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
     def test_get_pending_account_deletion_page(self) -> None:
         response = self.get_html_response('/pending-account-deletion')
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):

@@ -565,7 +565,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             )
             response = self.get_html_response('/', expected_status_int=200)
             self.assertIn(
-                b'<lightweight-oppia-root>',
+                b'<lightweight-oppia-root></lightweight-oppia-root>',
                 response.body,
             )
 
@@ -709,7 +709,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 
@@ -725,7 +725,7 @@ class MaintenanceModeTests(test_utils.GenericTestBase):
 
         response = self.get_html_response('/community-library')
 
-        self.assertIn(b'<oppia-root>', response.body)
+        self.assertIn(b'<oppia-root></oppia-root>', response.body)
         self.assertNotIn(b'<oppia-maintenance-page>', response.body)
         self.assertEqual(destroy_auth_session_call_counter.times_called, 0)
 

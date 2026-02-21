@@ -29,7 +29,7 @@ import {PageTitleService} from 'services/page-title.service';
 import {SidebarStatusService} from 'services/sidebar-status.service';
 import {BackgroundMaskService} from 'services/stateful/background-mask.service';
 import {I18nLanguageCodeService} from 'services/i18n-language-code.service';
-import {NavigationEnd, NavigationStart, Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import './base-content.component.css';
 import {PlatformFeatureService} from 'services/platform-feature.service';
 
@@ -65,15 +65,11 @@ export class BaseContentComponent {
 
   ngOnInit(): void {
     /**
-     * Show loading indicator during navigation and scroll to top
-     * when navigation completes. This prevents blank screens during
-     * lazy-loaded module transitions (see issue #24279).
+     * Scroll to the top of the page while navigating
+     * through the static pages.
      */
     this.router.events.subscribe(evt => {
-      if (evt instanceof NavigationStart) {
-        this.loaderService.showLoadingScreen('Loading');
-      } else if (evt instanceof NavigationEnd) {
-        this.loaderService.hideLoadingScreen();
+      if (evt instanceof NavigationEnd) {
         window.scrollTo(0, 0);
       }
     });

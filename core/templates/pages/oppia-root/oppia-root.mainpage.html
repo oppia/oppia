@@ -2,88 +2,9 @@
 <html itemscope itemtype="http://schema.org/Organization">
   <head>
     @load('base-components/header.template.html', {"title": "Loading | Oppia"})
-    <style>
-      /* Initial page loader - shown before Angular bootstraps.
-         Uses same styles as Angular loader for seamless transition. */
-      .oppia-navigation-loading-overlay {
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.97);
-        display: flex;
-        height: 100vh;
-        justify-content: center;
-        left: 0;
-        position: fixed;
-        top: 0;
-        width: 100vw;
-        z-index: 9999;
-      }
-      .oppia-navigation-loading-spinner {
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-      }
-      .oppia-loading-spinner-circle {
-        animation: oppia-spinner-rotate 1s linear infinite;
-        border: 4px solid #e0e0e0;
-        border-radius: 50%;
-        border-top-color: #00645c;
-        box-sizing: border-box;
-        display: block;
-        height: 48px;
-        width: 48px;
-      }
-      @keyframes oppia-spinner-rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-      }
-      .oppia-loading-spinner-text {
-        color: #333;
-        font-family: "Capriola", "Roboto", Arial, sans-serif;
-        font-size: 1.25em;
-        font-weight: 500;
-      }
-      .oppia-loading-dot-one,
-      .oppia-loading-dot-two,
-      .oppia-loading-dot-three {
-        animation: dot 1.5s infinite;
-        opacity: 0;
-      }
-      .oppia-loading-dot-two { animation-delay: 0.3s; }
-      .oppia-loading-dot-three { animation-delay: 0.6s; }
-      @keyframes dot {
-        0%, 20% { opacity: 0; }
-        50% { opacity: 1; }
-        100% { opacity: 0; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .oppia-loading-spinner-circle {
-          animation: none;
-          border-color: #00645c;
-          border-style: dashed;
-        }
-        .oppia-loading-dot-one,
-        .oppia-loading-dot-two,
-        .oppia-loading-dot-three {
-          animation: none;
-          opacity: 1;
-        }
-      }
-    </style>
   </head>
   <body>
-    <oppia-root>
-      <!-- Initial loader shown before Angular bootstraps. Replaced by Angular. -->
-      <div class="oppia-loading-fullpage e2e-test-loading-fullpage">
-        <div class="oppia-align-center">
-          <span>Loading</span>
-          <span class="oppia-loading-dot-one">.</span>
-          <span class="oppia-loading-dot-two">.</span>
-          <span class="oppia-loading-dot-three">.</span>
-        </div>
-      </div>
-    </oppia-root>
+    <oppia-root></oppia-root>
 
     @load('pages/footer_js_libs.html')
   </body>
