@@ -36,7 +36,7 @@
           {{ 'I18N_SHARE_LESSON' | translate }}
         </span>
       </button>
-      <button class="player-sidebar-button" aria-label="Give feedback" (click)="showFeedbackModal()"
+      <button class="player-sidebar-button e2e-lesson-feedback-button" aria-label="Give feedback" (click)="showFeedbackModal()"
           matTooltip="{{ 'I18N_LESSON_PLAYER_FEEDBACK_BUTTON' | translate }}"
           matTooltipPosition="above">
         <i *ngIf="!sidebarIsExpanded" class="fa fa-lg fa-comments"></i>

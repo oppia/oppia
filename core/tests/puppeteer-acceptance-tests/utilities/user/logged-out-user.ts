@@ -606,6 +606,8 @@ const generateLessonAttributionSelector = '.lesson-attribution-text';
 const attributionTextSelector = '.cc-attribution-input';
 const ccButtonSelector = '.copy-cc-btn';
 const copiedMessageSelector = '.success-message';
+const lessonFeedbackButton = '.e2e-lesson-feedback-button';
+const feedbackInputArea = '.e2e-test-exploration-feedback-textarea';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -6117,6 +6119,29 @@ export class LoggedOutUser extends BaseUser {
       throw new Error('Copied HTML code does not match the expected code.');
     }
     showMessage('Embed HTML code copied and verified successfully.');
+  }
+
+  /**
+   * Open the feedback modal of new lesson player.
+   */
+  async clickFeedbackButton(): Promise<void> {
+    await this.page.waitForSelector(lessonFeedbackButton);
+    await this.page.click(lessonFeedbackButton);
+    await this.page.waitForSelector(feedbackInputArea, {
+      visible: true,
+    });
+  }
+
+  /**
+   * Verify the feedback message in feedback modal.
+   * @param message - Expected feedback submission success message.
+   */
+  async expectFeedbackMessage(message: string): Promise<void> {
+    const text = await this.page.$eval('p', el => el.textContent);
+    if (!text || !text.includes(message)) {
+      throw new Error('Feedback success message not shown');
+    }
+    showMessage('Feedback submitted successfully');
   }
 
   /**

@@ -6,12 +6,12 @@
   </div>
 
   <div class="modal-body oppia-long-text">
-    <textarea [(ngModel)]="feedbackText" rows="5" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
+    <textarea class="e2e-test-exploration-feedback-textarea" [(ngModel)]="feedbackText" rows="5" [attr.maxlength]="MAX_REVIEW_MESSAGE_LENGTH"
               [attr.aria-label]="('I18N_PLAYER_LEAVE_FEEDBACK' | translate)+ '. ' +('I18N_FEEDBACK_INSTRUCTION' | translate: { count: MAX_REVIEW_MESSAGE_LENGTH })" placeholder="{{ 'I18N_PLAYER_LEAVE_FEEDBACK' | translate }}" [oppiaFocusOn]="feedbackModalId">
     </textarea>
     <div class="checkbox oppia-checkbox" *ngIf="isLoggedIn">
       <label>
-        <input type="checkbox" [(ngModel)]="isSubmitterAnonymized">
+        <input class="e2e-test-stay-anonymous-checkbox" type="checkbox" [(ngModel)]="isSubmitterAnonymized">
         <span>{{ 'I18N_PLAYER_STAY_ANONYMOUS' | translate }}</span>
       </label>
     </div>
