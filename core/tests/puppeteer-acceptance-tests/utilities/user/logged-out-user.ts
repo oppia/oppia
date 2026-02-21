@@ -7171,30 +7171,24 @@ export class LoggedOutUser extends BaseUser {
   /**
    * Expects the blog welcome message to be visible.
    */
-  async expectBlogWelcomeMessageToBeVisible(): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string) =>
-        document
-          .querySelector(selector)
-          ?.textContent?.includes('Welcome to the Oppia Blog!') === true,
-      {timeout: 10000},
-      blogWelcomeHeadingSelector
+  async expectBlogWelcomeMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogWelcomeHeadingSelector,
+      expectedText
     );
   }
 
   /**
    * Expects the "no blog posts" message to be visible.
    */
-  async expectNoBlogPostsMessageToBeVisible(): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string) =>
-        document
-          .querySelector(selector)
-          ?.textContent?.includes(
-            'Sorry, there are no blog posts matching this query'
-          ) === true,
-      {timeout: 10000},
-      blogNoResultsFoundSelector
+  async expectNoBlogPostsMessageToBeVisible(
+    expectedText: string
+  ): Promise<void> {
+    await this.expectElementContentToBe(
+      blogNoResultsFoundSelector,
+      expectedText
     );
   }
 
@@ -7219,18 +7213,7 @@ export class LoggedOutUser extends BaseUser {
    * @param title - The title of the blog post to check for.
    */
   async expectBlogPostWithTitleToBePresent(title: string): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string, expectedTitle: string) => {
-        const titles = Array.from(document.querySelectorAll(selector)).map(el =>
-          el.textContent?.trim()
-        );
-        return titles.includes(expectedTitle);
-      },
-      {timeout: 10000},
-      blogPostTitleSelector,
-      title
-    );
-
+    await this.expectTextContentToContain(blogPostListSelector, title);
     showMessage(`Blog post with title "${title}" is present.`);
   }
 
@@ -7262,11 +7245,7 @@ export class LoggedOutUser extends BaseUser {
    * Clicks on the first blog post in the list.
    */
   async clickOnFirstBlogPost(): Promise<void> {
-    await this.page.waitForFunction(
-      (selector: string) => document.querySelectorAll(selector).length > 0,
-      {timeout: 10000},
-      blogPostTitleSelector
-    );
+    await this.expectElementToBeVisible(blogPostTitleSelector);
 
     const firstBlogPost = await this.page.$(blogPostTitleSelector);
 
@@ -7285,14 +7264,37 @@ export class LoggedOutUser extends BaseUser {
   }
 
   /**
-   * Expects all blog post page elements to be visible (title, author, publish time, content, tags, share icon, suggested posts).
+   * Expects blog post title to be visible.
    */
-  async expectBlogPostPageElementsToBeVisible(): Promise<void> {
+  async expectBlogPostTitleToBeVisible(): Promise<void> {
     await this.expectElementToBeVisible(blogPostTitleContainerSelector);
-    await this.expectElementToBeVisible(blogAuthorNameSelector);
-    await this.expectElementToBeVisible(blogPostContentSelector);
-    await this.expectElementToBeVisible(blogShareButtonSelector);
+  }
 
+  /**
+   * Expects blog post author name to be visible.
+   */
+  async expectBlogPostAuthorToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogAuthorNameSelector);
+  }
+
+  /**
+   * Expects blog post content to be visible.
+   */
+  async expectBlogPostContentToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogPostContentSelector);
+  }
+
+  /**
+   * Expects blog share button to be visible.
+   */
+  async expectBlogShareButtonToBeVisible(): Promise<void> {
+    await this.expectElementToBeVisible(blogShareButtonSelector);
+  }
+
+  /**
+   * Expects suggested posts section to be visible (if present).
+   */
+  async expectSuggestedBlogPostsSectionToBeVisible(): Promise<void> {
     const suggestedSection = await this.page.$(
       blogSuggestedForYouSectionSelector
     );
@@ -7300,8 +7302,6 @@ export class LoggedOutUser extends BaseUser {
     if (suggestedSection) {
       await this.expectElementToBeVisible(blogSuggestedForYouHeadingSelector);
     }
-
-    showMessage('All blog post page elements are visible.');
   }
 }
 

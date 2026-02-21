@@ -42,25 +42,29 @@ describe('Logged-out User', function () {
   }, DEFAULT_SPEC_TIMEOUT_MSECS);
 
   it(
-    'should display the welcome message and empty-state notice when no blog posts exist',
+    'should observe the welcome message and empty-state notice when no blog posts exist',
     async function () {
       await interestParent.navigateToBlogPageViaNavbar();
-      await interestParent.expectBlogWelcomeMessageToBeVisible();
-      await interestParent.expectNoBlogPostsMessageToBeVisible();
+      await interestParent.expectBlogWelcomeMessageToBeVisible(
+        'Welcome to the Oppia Blog!'
+      );
+      await interestParent.expectNoBlogPostsMessageToBeVisible(
+        'Sorry, there are no blog posts matching this query.'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
 
   it(
-    'should not display draft blog posts to logged-out users',
+    'should observe blogs with navigation',
     async function () {
-      // As blogPostWriter: Create and publish blog "Blog 1".
+      // As blogPostWriter: Create and publish blog "International Blog".
       await blogPostWriter.navigateToBlogDashboardPage();
       await blogPostWriter.openBlogEditorPage();
       await blogPostWriter.uploadBlogPostThumbnailImage();
-      await blogPostWriter.updateBlogPostTitle('Blog 1');
-      await blogPostWriter.updateBodyTextTo('Content for Blog 1');
-      await blogPostWriter.selectTag('News');
+      await blogPostWriter.updateBlogPostTitle('International Blog');
+      await blogPostWriter.updateBodyTextTo('International News Blog');
+      await blogPostWriter.selectTag('International');
       await blogPostWriter.saveBlogBodyChanges();
       await blogPostWriter.publishTheBlogPost();
 
@@ -77,7 +81,9 @@ describe('Logged-out User', function () {
       await interestParent.navigateToBlogPage();
 
       await interestParent.expectNumberOfBlogPostsOnPageToBe(1);
-      await interestParent.expectBlogPostWithTitleToBePresent('Blog 1');
+      await interestParent.expectBlogPostWithTitleToBePresent(
+        'International Blog'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -121,10 +127,13 @@ describe('Logged-out User', function () {
   it(
     'should display blog post page with all required elements',
     async function () {
-      await interestParent.navigateToBlogPage();
       await interestParent.clickOnFirstBlogPost();
 
-      await interestParent.expectBlogPostPageElementsToBeVisible();
+      await interestParent.expectBlogPostTitleToBeVisible();
+      await interestParent.expectBlogPostAuthorToBeVisible();
+      await interestParent.expectBlogPostContentToBeVisible();
+      await interestParent.expectBlogShareButtonToBeVisible();
+      await interestParent.expectSuggestedBlogPostsSectionToBeVisible();
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
@@ -132,15 +141,6 @@ describe('Logged-out User', function () {
   it(
     'should be able to search and filter blog posts',
     async function () {
-      await blogPostWriter.navigateToBlogDashboardPage();
-      await blogPostWriter.openBlogEditorPage();
-      await blogPostWriter.uploadBlogPostThumbnailImage();
-      await blogPostWriter.updateBlogPostTitle('International Blog');
-      await blogPostWriter.updateBodyTextTo('International News Blog');
-      await blogPostWriter.selectTag('International');
-      await blogPostWriter.saveBlogBodyChanges();
-      await blogPostWriter.publishTheBlogPost();
-
       await interestParent.navigateToBlogPage();
       await interestParent.filterBlogPostsByTag('International');
       await interestParent.expectBlogSearchResultsToHaveTag('International');
@@ -150,8 +150,10 @@ describe('Logged-out User', function () {
       await interestParent.expectBlogSearchResultsToContain('International');
 
       await interestParent.navigateToBlogPage();
-      await interestParent.filterBlogPostsByKeyword('educators');
-      await interestParent.expectNoBlogPostsMessageToBeVisible();
+      await interestParent.filterBlogPostsByKeyword('fashion');
+      await interestParent.expectNoBlogPostsMessageToBeVisible(
+        'Sorry, there are no blog posts matching this query.'
+      );
     },
     DEFAULT_SPEC_TIMEOUT_MSECS
   );
