@@ -591,10 +591,7 @@ const practiceQuestionHeaderSelector = '.e2e-test-practice-question-header';
 
 // New lesson player page.
 const lessonPlayerSideBarToggleButton = '.player-sidebar-toggle';
-const lessonPlayerHeaderCloseButton = '.lesson-player-header-close-button';
-const lessonShareButton = '.e2e-lesson-share-button';
-const lessonShareButtonInMobileView =
-  '.player-mobile-menu-options .fa-share-alt';
+const mobileOpenOptionsButton = '.mobile-open-options-button';
 const lessonCopyLinkbutton = '.e2e-copy-link-button';
 const lessonLinkCopiedMessageSelector = '.success-message';
 const LINK_COPIED_MESSAGE = 'Link Copied';
@@ -606,8 +603,6 @@ const generateLessonAttributionSelector = '.lesson-attribution-text';
 const attributionTextSelector = '.cc-attribution-input';
 const ccButtonSelector = '.copy-cc-btn';
 const copiedMessageSelector = '.success-message';
-const lessonFeedbackButton = '.e2e-lesson-feedback-button';
-const feedbackInputArea = '.e2e-test-exploration-feedback-textarea';
 
 /**
  * The KeyInput type is based on the key names from the UI Events KeyboardEvent key Values specification.
@@ -5843,8 +5838,8 @@ export class LoggedOutUser extends BaseUser {
   async clickOpenOptions(): Promise<void> {
     const isMobileViewport = this.isViewportAtMobileWidth();
     if (isMobileViewport) {
-      await this.page.waitForSelector(lessonPlayerHeaderCloseButton);
-      await this.page.click(lessonPlayerHeaderCloseButton);
+      await this.page.waitForSelector(mobileOpenOptionsButton);
+      await this.page.click(mobileOpenOptionsButton);
       return;
     }
     await this.page.waitForSelector(lessonPlayerSideBarToggleButton);
@@ -5855,14 +5850,7 @@ export class LoggedOutUser extends BaseUser {
    * Open share modal in new lesson player page.
    */
   async clickShareLessonButton(): Promise<void> {
-    const isMobileViewport = this.isViewportAtMobileWidth();
-    if (isMobileViewport) {
-      await this.page.waitForSelector(lessonShareButtonInMobileView);
-      await this.page.click(lessonShareButtonInMobileView);
-      return;
-    }
-    await this.page.waitForSelector(lessonShareButton);
-    await this.page.click(lessonShareButton);
+    this.clickOnElementWithText('Share this lesson');
   }
 
   /**
@@ -6125,21 +6113,31 @@ export class LoggedOutUser extends BaseUser {
    * Open the feedback modal of new lesson player.
    */
   async clickFeedbackButton(): Promise<void> {
-    await this.page.waitForSelector(lessonFeedbackButton);
-    await this.page.click(lessonFeedbackButton);
-    await this.page.waitForSelector(feedbackInputArea, {
-      visible: true,
-    });
+    this.clickOnElementWithText('Feedback');
   }
 
   /**
-   * Verify the feedback message in feedback modal.
-   * @param message - Expected feedback submission success message.
+   * Verify the success message in the "Thank You" feedback modal.
+   * @param expectedMessage - Expected feedback submission success message.
    */
-  async expectFeedbackMessage(message: string): Promise<void> {
-    const text = await this.page.$eval('p', el => el.textContent);
-    if (!text || !text.includes(message)) {
-      throw new Error('Feedback success message not shown');
+  async expectThankYouFeedbackMessage(expectedMessage: string): Promise<void> {
+    const SuccessMessageselector =
+      'oppia-customizable-thank-you-modal .modal-body p';
+
+    // Wait for the modal message to appear.
+    await this.page.waitForSelector(SuccessMessageselector, {visible: true});
+
+    // Extract text content from the modal only.
+    const text = await this.page.$eval(
+      SuccessMessageselector,
+      el => el.textContent?.trim() || ''
+    );
+
+    // Validate message.
+    if (!text.includes(expectedMessage)) {
+      showMessage(`Actual feedback message: "${text}"`);
+      showMessage(`Expected feedback message: "${expectedMessage}"`);
+      throw new Error('Feedback success message not shown in modal');
     }
     showMessage('Feedback submitted successfully');
   }

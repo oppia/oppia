@@ -123,8 +123,8 @@ describe('Logged-Out Learner', function () {
       false,
       false
     );
-    await loggedOutLearner.expectFeedbackMessage(
-      ' Thank you for the feedback!'
+    await loggedOutLearner.expectThankYouFeedbackMessage(
+      'Thank you for the feedback!'
     );
   });
 
