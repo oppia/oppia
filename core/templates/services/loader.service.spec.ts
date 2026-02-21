@@ -22,17 +22,17 @@ import {TestBed} from '@angular/core/testing';
 
 describe('Loader Service', () => {
   let loaderService: LoaderService;
-  let loadingMessage: string = '';
+  let loadingMessage = '';
   let subscriptions: Subscription;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LoaderService]
+      providers: [LoaderService],
     });
     loaderService = TestBed.inject(LoaderService);
     subscriptions = new Subscription();
     subscriptions.add(
       loaderService.onLoadingMessageChange.subscribe(
-        (message: string) => (loadingMessage = message)
+        (message: string) => (loadingMessage = message),
       )
     );
   });

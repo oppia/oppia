@@ -42,31 +42,14 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  // TODO(#8472): Remove static when migration is complete.
-  // Until then, we need to use static so that the two instances of the service
-  // created by our hybrid app (one for Angular, the other for AngularJS) can
-  // refer to the same objects.
-  private static warnings: Warning[] = [];
-  get warnings(): Warning[] {
-    return AlertsService.warnings;
-  }
-
-  private static messages: Message[] = [];
-  get messages(): Message[] {
-    return AlertsService.messages;
-  }
+  private warnings: Warning[] = [];
+  private messages: Message[] = [];
 
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
 
-  constructor(private log: LoggerService) {
-    // Since warnings and messages are static, clearing them in the constructor
-    // retain "instance-like" behavior.
-    this.clearWarnings();
-    this.clearMessages();
-  }
-
+  constructor(private log: LoggerService) {}
   /**
    * Adds a warning message.
    * @param {string} warning - The warning message to display.
@@ -132,7 +115,7 @@ export class AlertsService {
    * @param {Object} messageToDelete - Message to be deleted.
    */
   deleteMessage(messageToDelete: Message): void {
-    const isMessageToKeep = (m: Message) =>
+    const isMessageToKeep = (m: Message) : boolean =>
       m.type !== messageToDelete.type || m.content !== messageToDelete.content;
     const filteredMessages = this.messages.filter(isMessageToKeep);
     this.messages.splice(0, this.messages.length, ...filteredMessages);

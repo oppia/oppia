@@ -54,7 +54,7 @@ export class CollectionCreationService {
     this.loaderService.showLoadingScreen('Creating collection');
 
     this.collectionCreationBackendService.createCollectionAsync().then(
-      response => {
+      (response: {collectionId: string}) => {
         this.siteAnalyticsService.registerCreateNewCollectionEvent(
           response.collectionId
         );
