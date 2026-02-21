@@ -5197,7 +5197,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'regenerate_contributor_stats',
             lambda: None,
         ):
-            topic_services.remove_uncategorized_skill(
+            topic_services.delete_uncategorized_skill(
                 self.admin_id, topic_id_1, skill_id_1
             )
             topic_services.add_uncategorized_skill(
@@ -5229,8 +5229,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         )
         assert question_submitter_total_stats_model is not None
         topic_ids_with_question_submissions = (
-            question_submitter_total_stats_model
-            .topic_ids_with_question_submissions
+            question_submitter_total_stats_model.topic_ids_with_question_submissions
         )
         self.assertEqual(
             topic_ids_with_question_submissions,

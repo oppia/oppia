@@ -2741,8 +2741,8 @@ def _get_all_suggestion_models_of_type(
     ] = []
     offset = 0
     while True:
-        current_batch = query.fetch(
-            feconf.DEFAULT_SUGGESTION_QUERY_LIMIT, offset=offset
+        current_batch: Sequence[suggestion_models.GeneralSuggestionModel] = (
+            query.fetch(feconf.DEFAULT_SUGGESTION_QUERY_LIMIT, offset=offset)
         )
         if len(current_batch) == 0:
             break
@@ -2754,30 +2754,30 @@ def _get_all_suggestion_models_of_type(
 
 def _delete_all_contributor_stats_models() -> None:
     """Deletes all contributor stats models."""
-    translation_contribution_stats_models = (
-        suggestion_models.TranslationContributionStatsModel.get_all().fetch()
-    )
+    translation_contribution_stats_models: Sequence[
+        suggestion_models.TranslationContributionStatsModel
+    ] = suggestion_models.TranslationContributionStatsModel.get_all().fetch()
     suggestion_models.TranslationContributionStatsModel.delete_multi(
         list(translation_contribution_stats_models)
     )
 
-    translation_review_stats_models = (
-        suggestion_models.TranslationReviewStatsModel.get_all().fetch()
-    )
+    translation_review_stats_models: Sequence[
+        suggestion_models.TranslationReviewStatsModel
+    ] = suggestion_models.TranslationReviewStatsModel.get_all().fetch()
     suggestion_models.TranslationReviewStatsModel.delete_multi(
         list(translation_review_stats_models)
     )
 
-    question_contribution_stats_models = (
-        suggestion_models.QuestionContributionStatsModel.get_all().fetch()
-    )
+    question_contribution_stats_models: Sequence[
+        suggestion_models.QuestionContributionStatsModel
+    ] = suggestion_models.QuestionContributionStatsModel.get_all().fetch()
     suggestion_models.QuestionContributionStatsModel.delete_multi(
         list(question_contribution_stats_models)
     )
 
-    question_review_stats_models = (
-        suggestion_models.QuestionReviewStatsModel.get_all().fetch()
-    )
+    question_review_stats_models: Sequence[
+        suggestion_models.QuestionReviewStatsModel
+    ] = suggestion_models.QuestionReviewStatsModel.get_all().fetch()
     suggestion_models.QuestionReviewStatsModel.delete_multi(
         list(question_review_stats_models)
     )
@@ -2785,9 +2785,9 @@ def _delete_all_contributor_stats_models() -> None:
     translation_submitter_total_model_cls = (
         suggestion_models.TranslationSubmitterTotalContributionStatsModel
     )
-    translation_submitter_total_stats_models = (
-        translation_submitter_total_model_cls.get_all().fetch()
-    )
+    translation_submitter_total_stats_models: Sequence[
+        suggestion_models.TranslationSubmitterTotalContributionStatsModel
+    ] = translation_submitter_total_model_cls.get_all().fetch()
     translation_submitter_total_model_cls.delete_multi(
         list(translation_submitter_total_stats_models)
     )
@@ -2795,9 +2795,9 @@ def _delete_all_contributor_stats_models() -> None:
     translation_reviewer_total_model_cls = (
         suggestion_models.TranslationReviewerTotalContributionStatsModel
     )
-    translation_reviewer_total_stats_models = (
-        translation_reviewer_total_model_cls.get_all().fetch()
-    )
+    translation_reviewer_total_stats_models: Sequence[
+        suggestion_models.TranslationReviewerTotalContributionStatsModel
+    ] = translation_reviewer_total_model_cls.get_all().fetch()
     translation_reviewer_total_model_cls.delete_multi(
         list(translation_reviewer_total_stats_models)
     )
@@ -2805,9 +2805,9 @@ def _delete_all_contributor_stats_models() -> None:
     question_submitter_total_model_cls = (
         suggestion_models.QuestionSubmitterTotalContributionStatsModel
     )
-    question_submitter_total_stats_models = (
-        question_submitter_total_model_cls.get_all().fetch()
-    )
+    question_submitter_total_stats_models: Sequence[
+        suggestion_models.QuestionSubmitterTotalContributionStatsModel
+    ] = question_submitter_total_model_cls.get_all().fetch()
     question_submitter_total_model_cls.delete_multi(
         list(question_submitter_total_stats_models)
     )
@@ -2815,9 +2815,9 @@ def _delete_all_contributor_stats_models() -> None:
     question_reviewer_total_model_cls = (
         suggestion_models.QuestionReviewerTotalContributionStatsModel
     )
-    question_reviewer_total_stats_models = (
-        question_reviewer_total_model_cls.get_all().fetch()
-    )
+    question_reviewer_total_stats_models: Sequence[
+        suggestion_models.QuestionReviewerTotalContributionStatsModel
+    ] = question_reviewer_total_model_cls.get_all().fetch()
     question_reviewer_total_model_cls.delete_multi(
         list(question_reviewer_total_stats_models)
     )
@@ -2835,11 +2835,29 @@ def _get_suggestion_submission_datetime(
     Returns:
         datetime.datetime. The suggestion submission datetime.
     """
-    return (
-        suggestion_model.created_on
-        if suggestion_model.created_on is not None
-        else suggestion_model.last_updated
-    )
+    submission_datetime = suggestion_model.created_on
+    if submission_datetime is None:
+        submission_datetime = suggestion_model.last_updated
+
+    assert isinstance(submission_datetime, datetime.datetime)
+    return submission_datetime
+
+
+def _get_suggestion_last_updated_datetime(
+    suggestion_model: suggestion_models.GeneralSuggestionModel,
+) -> datetime.datetime:
+    """Returns the datetime when the suggestion was last updated.
+
+    Args:
+        suggestion_model: GeneralSuggestionModel. The suggestion model to fetch
+            the last updated datetime from.
+
+    Returns:
+        datetime.datetime. The suggestion last updated datetime.
+    """
+    last_updated = suggestion_model.last_updated
+    assert isinstance(last_updated, datetime.datetime)
+    return last_updated
 
 
 def regenerate_contributor_stats() -> None:
@@ -2866,9 +2884,12 @@ def regenerate_contributor_stats() -> None:
         assert isinstance(
             suggestion, suggestion_registry.SuggestionTranslateContent
         )
-        if opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        ) is None:
+        if (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+            is None
+        ):
             continue
         suggestion.last_updated = _get_suggestion_submission_datetime(
             suggestion_model
@@ -2881,9 +2902,7 @@ def regenerate_contributor_stats() -> None:
         suggestion = get_suggestion_from_model(suggestion_model)
         # Narrowing down the type from BaseSuggestion to
         # SuggestionAddQuestion.
-        assert isinstance(
-            suggestion, suggestion_registry.SuggestionAddQuestion
-        )
+        assert isinstance(suggestion, suggestion_registry.SuggestionAddQuestion)
         suggestion.last_updated = _get_suggestion_submission_datetime(
             suggestion_model
         )
@@ -2895,7 +2914,8 @@ def regenerate_contributor_stats() -> None:
     ]
 
     for suggestion_model in sorted(
-        translation_suggestion_models, key=lambda model: model.last_updated
+        translation_suggestion_models,
+        key=_get_suggestion_last_updated_datetime,
     ):
         if suggestion_model.status not in reviewed_statuses:
             continue
@@ -2907,23 +2927,25 @@ def regenerate_contributor_stats() -> None:
         )
         if suggestion.final_reviewer_id is None:
             continue
-        if opportunity_services.get_exploration_opportunity_summary_by_id(
-            suggestion.target_id
-        ) is None:
+        if (
+            opportunity_services.get_exploration_opportunity_summary_by_id(
+                suggestion.target_id
+            )
+            is None
+        ):
             continue
         update_translation_review_stats(suggestion)
 
     for suggestion_model in sorted(
-        question_suggestion_models, key=lambda model: model.last_updated
+        question_suggestion_models,
+        key=_get_suggestion_last_updated_datetime,
     ):
         if suggestion_model.status not in reviewed_statuses:
             continue
         suggestion = get_suggestion_from_model(suggestion_model)
         # Narrowing down the type from BaseSuggestion to
         # SuggestionAddQuestion.
-        assert isinstance(
-            suggestion, suggestion_registry.SuggestionAddQuestion
-        )
+        assert isinstance(suggestion, suggestion_registry.SuggestionAddQuestion)
         if suggestion.final_reviewer_id is None:
             continue
         update_question_review_stats(suggestion)
