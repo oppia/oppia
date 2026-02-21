@@ -118,20 +118,18 @@ export class RearrangeSkillsInSubtopicsModalComponent
         event.previousIndex,
         event.currentIndex
       );
+
       if (newSubtopicId === this.oldSubtopicId) {
         return;
       }
 
-      if (newSubtopicId === null) {
-        // Note: oldSubtopicId cannot be null here because if both were null,
-        // the check above (newSubtopicId === this.oldSubtopicId) would have
-        // already returned.
+      if (newSubtopicId === null && this.oldSubtopicId !== null) {
         this.topicUpdateService.removeSkillFromSubtopic(
           this.topic,
           this.oldSubtopicId,
           this.skillSummaryToMove
         );
-      } else {
+      } else if (newSubtopicId !== null) {
         this.topicUpdateService.moveSkillToSubtopic(
           this.topic,
           this.oldSubtopicId,
@@ -140,6 +138,7 @@ export class RearrangeSkillsInSubtopicsModalComponent
         );
       }
     }
+
     this.initEditor();
   }
 
