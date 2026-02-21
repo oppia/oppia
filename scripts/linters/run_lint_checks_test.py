@@ -23,6 +23,8 @@ import os
 import subprocess
 import sys
 
+os.environ['GRPC_ENABLE_FORK_SUPPORT'] = '1'
+
 from core.tests import test_utils
 
 from typing import List, Optional
