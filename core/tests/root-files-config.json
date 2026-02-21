@@ -29,6 +29,7 @@
     "core/templates/pages/topic-editor-page/topic-editor-page.constants.ts",
     "core/tests/karma.conf.ts",
     "core/tests/protractor-browserstack.conf.js",
+    "core/tests/webdriverio_utils/SubscriptionDashboardPage.js",
     "core/tests/wdio.conf.js",
     "data/README.md",
     "data/voiceovers/README.md",
