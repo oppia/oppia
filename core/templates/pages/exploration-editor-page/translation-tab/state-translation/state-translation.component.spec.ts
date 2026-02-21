@@ -57,7 +57,10 @@ import {RouterService} from 'pages/exploration-editor-page/services/router.servi
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {Hint} from 'domain/exploration/hint-object.model';
 import {AnswerGroup} from 'domain/exploration/answer-group.model';
-
+import {TruncatePipe} from 'filters/string-utility-filters/truncate.pipe';
+import {FormatRtePreviewPipe} from 'filters/format-rte-preview.pipe';
+import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 const DEFAULT_OBJECT_VALUES = require('objects/object_defaults.json');
 
 class MockNgbModal {
@@ -290,6 +293,9 @@ describe('State translation component', () => {
 
     ckEditorCopyContentService = TestBed.inject(CkEditorCopyContentService);
     stateEditorService = TestBed.inject(StateEditorService);
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
+    );
     explorationStatesService = TestBed.inject(ExplorationStatesService);
     translationLanguageService = TestBed.inject(TranslationLanguageService);
     translationTabActiveContentIdService = TestBed.inject(
@@ -648,7 +654,7 @@ describe('State translation component', () => {
             0,
             'true'
           )
-        ).toBe('[] Feedback Text');
+        ).toBe('[When the button is clicked] Feedback Text');
       });
 
       it(
@@ -662,7 +668,7 @@ describe('State translation component', () => {
               1,
               'true'
             )
-          ).toBe('[] Feedback Text');
+          ).toBe('[All other answers] Feedback Text');
         }
       );
 
@@ -677,7 +683,7 @@ describe('State translation component', () => {
               0,
               'true'
             )
-          ).toBe('[] Feedback Text');
+          ).toBe('[All answers] Feedback Text');
         }
       );
 
@@ -701,7 +707,7 @@ describe('State translation component', () => {
             null,
             true
           )
-        ).toBe('[] Feedback text');
+        ).toBe('[Answer] Feedback text');
       });
     }
   );
@@ -712,6 +718,7 @@ describe('State translation component', () => {
   let fixture: ComponentFixture<StateTranslationComponent>;
   let ckEditorCopyContentService: CkEditorCopyContentService;
   let entityTranslationsService: EntityTranslationsService;
+  let explorationLanguageCodeService: ExplorationLanguageCodeService;
   let explorationStatesService: ExplorationStatesService;
   let stateEditorService: StateEditorService;
   let translationLanguageService: TranslationLanguageService;
@@ -903,6 +910,9 @@ describe('State translation component', () => {
     );
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
+    );
+    explorationLanguageCodeService = TestBed.inject(
+      ExplorationLanguageCodeService
     );
     explorationStatesService.init(explorationState1, false);
 
@@ -2020,6 +2030,7 @@ describe('State translation component', () => {
     translationTabActiveModeService = TestBed.inject(
       TranslationTabActiveModeService
     );
+
     explorationStatesService.init(explorationState1, false);
     explorationHtmlFormatterService = TestBed.inject(
       ExplorationHtmlFormatterService

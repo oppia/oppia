@@ -55,6 +55,7 @@ import {EntityTranslationsService} from 'services/entity-translations.services';
 import {TranslatedContent} from 'domain/exploration/translated-content.model';
 import {TranslationLanguageService} from '../services/translation-language.service';
 import {PlatformFeatureService} from 'services/platform-feature.service';
+import {ExplorationLanguageCodeService} from 'pages/exploration-editor-page/services/exploration-language-code.service';
 
 @Component({
   selector: 'oppia-state-translation',
@@ -121,58 +122,71 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
     private truncatePipe: TruncatePipe,
     private wrapTextWithEllipsisPipe: WrapTextWithEllipsisPipe,
     private parameterizeRuleDescriptionPipe: ParameterizeRuleDescriptionPipe,
-    private platformFeatureService: PlatformFeatureService
+    private platformFeatureService: PlatformFeatureService,
+    private explorationLanguageCodeService: ExplorationLanguageCodeService
   ) {}
 
   isVoiceoverModeActive(): boolean {
     return this.translationTabActiveModeService.isVoiceoverModeActive();
   }
 
-  getRequiredHtml(subtitledHtml: SubtitledHtml): string {
+  getRequiredHtml(subtitledHtml: SubtitledHtml): string | null {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return subtitledHtml.html;
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
+
+    // If viewing in the exploration's original language, return the original.
+    if (langCode === this.explorationLanguageCodeService.displayed) {
+      return subtitledHtml.html;
+    }
+
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return subtitledHtml.html;
+      return null;
     }
 
     let translationContent =
       this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(subtitledHtml.contentId);
-    if (!translationContent) {
-      return subtitledHtml.html;
+    if (!translationContent || !translationContent.translation) {
+      return null;
     }
 
     return translationContent.translation as string;
   }
 
-  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string {
+  getRequiredUnicode(SubtitledUnicode: SubtitledUnicode): string | null {
     if (this.translationTabActiveModeService.isTranslationModeActive()) {
       return SubtitledUnicode.unicode;
     }
 
     let langCode = this.translationLanguageService.getActiveLanguageCode();
+
+    // If viewing in the exploration's original language, return the original.
+    if (langCode === this.explorationLanguageCodeService.displayed) {
+      return SubtitledUnicode.unicode;
+    }
+
     if (
       !this.entityTranslationsService.languageCodeToLatestEntityTranslations.hasOwnProperty(
         langCode
       )
     ) {
-      return SubtitledUnicode.unicode;
+      return null;
     }
 
     let translationContent =
       this.entityTranslationsService.languageCodeToLatestEntityTranslations[
         langCode
       ].getWrittenTranslation(SubtitledUnicode.contentId);
-    if (!translationContent) {
-      return SubtitledUnicode.unicode;
+    if (!translationContent || !translationContent.translation) {
+      return null;
     }
 
     return translationContent.translation as string;
@@ -180,6 +194,10 @@ export class StateTranslationComponent implements OnInit, OnDestroy {
 
   getEmptyContentMessage(): string {
     if (this.translationTabActiveModeService.isVoiceoverModeActive()) {
+      let langCode = this.translationLanguageService.getActiveLanguageCode();
+      if (langCode === this.explorationLanguageCodeService.displayed) {
+        return 'There is no content available for voiceover.';
+      }
       return (
         'The translation for this section has not been created yet. ' +
         'Switch to translation mode to add a text translation.'
