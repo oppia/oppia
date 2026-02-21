@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import glob
 import json
 import os
 import re
@@ -124,14 +123,14 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
             stripped_line = line.strip()
             if '# Third party files:' in stripped_line:
                 skip_files_section_found = True
+                continue
             if not skip_files_section_found:
                 continue
-            if not stripped_line or stripped_line[0] == '#':
+            if not stripped_line or stripped_line.startswith('#'):
                 continue
             # Extract the file pattern from the line as all skipped file
             # lines start with a dash(-).
             line_in_concern = stripped_line[len('- ') :]
-            # Instead of checking filesystem existence (which breaks tests),
             # validate that the entry follows the expected third_party format.
             if not re.match(r'^third_party/static/.+-\d+\.\d+\.\d+/?$', line_in_concern):
                 error_message = (
@@ -140,6 +139,7 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
                 )
                 error_messages.append(error_message)
                 failed = True
+                break 
         
         if failed:
                 error_messages.append("FAILED  App dev file check failed")
