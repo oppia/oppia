@@ -2705,10 +2705,13 @@ def get_checkpoint_progress_for_explorations(
         )
         visited_checkpoints = 0
         model = exp_user_data_models[index]
+        most_recently_visited_checkpoint = (
+            model.most_recently_reached_checkpoint_state_name
+            if model is not None
+            else None
+        )
         if (
-            most_recently_visited_checkpoint := (
-                model and model.most_recently_reached_checkpoint_state_name
-            )
+            most_recently_visited_checkpoint is not None
             and most_recently_visited_checkpoint in checkpoints_in_exp
         ):
             visited_checkpoints = (

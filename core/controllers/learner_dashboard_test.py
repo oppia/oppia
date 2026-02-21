@@ -34,7 +34,6 @@ from core.tests import test_utils
 
 from typing import Final
 
-
 user_models = models.Registry.import_models([models.Names.USER])[0]
 
 

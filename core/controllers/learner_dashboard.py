@@ -288,35 +288,47 @@ class LearnerDashboardExplorationsProgressHandler(
                 self.user_id, exploration_ids_for_progress
             )
         )
+        default_progress_data: (
+            learner_progress_services.ExplorationCheckpointProgressDict
+        ) = {
+            'visited_checkpoints_count': 0,
+            'total_checkpoints_count': 0,
+        }
 
         # Add checkpoint progress counts to each exploration summary.
         # Frontend will calculate percentage using the classroom lessons pattern.
         for summary_dict in incomplete_exp_summary_dicts:
-            progress_data = progress_by_exp_id.get(summary_dict['id'], {})
-            summary_dict['visited_checkpoints_count'] = progress_data.get(
-                'visited_checkpoints_count', 0
+            progress_data = progress_by_exp_id.get(
+                summary_dict['id'], default_progress_data
             )
-            summary_dict['total_checkpoints_count'] = progress_data.get(
-                'total_checkpoints_count', 0
-            )
+            summary_dict['visited_checkpoints_count'] = progress_data[
+                'visited_checkpoints_count'
+            ]
+            summary_dict['total_checkpoints_count'] = progress_data[
+                'total_checkpoints_count'
+            ]
 
         for summary_dict in completed_exp_summary_dicts:
-            progress_data = progress_by_exp_id.get(summary_dict['id'], {})
-            summary_dict['visited_checkpoints_count'] = progress_data.get(
-                'visited_checkpoints_count', 0
+            progress_data = progress_by_exp_id.get(
+                summary_dict['id'], default_progress_data
             )
-            summary_dict['total_checkpoints_count'] = progress_data.get(
-                'total_checkpoints_count', 0
-            )
+            summary_dict['visited_checkpoints_count'] = progress_data[
+                'visited_checkpoints_count'
+            ]
+            summary_dict['total_checkpoints_count'] = progress_data[
+                'total_checkpoints_count'
+            ]
 
         for summary_dict in exploration_playlist_summary_dicts:
-            progress_data = progress_by_exp_id.get(summary_dict['id'], {})
-            summary_dict['visited_checkpoints_count'] = progress_data.get(
-                'visited_checkpoints_count', 0
+            progress_data = progress_by_exp_id.get(
+                summary_dict['id'], default_progress_data
             )
-            summary_dict['total_checkpoints_count'] = progress_data.get(
-                'total_checkpoints_count', 0
-            )
+            summary_dict['visited_checkpoints_count'] = progress_data[
+                'visited_checkpoints_count'
+            ]
+            summary_dict['total_checkpoints_count'] = progress_data[
+                'total_checkpoints_count'
+            ]
 
         creators_subscribed_to = (
             subscription_services.get_all_creators_subscribed_to(self.user_id)
