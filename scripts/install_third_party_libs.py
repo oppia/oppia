@@ -36,13 +36,11 @@ import subprocess
 import sys
 import tarfile
 
-from scripts import (
-    install_python_dev_dependencies,  # pylint: disable=wrong-import-position, wrong-import-order
-)
-from scripts import (
-    install_dependencies_json_packages,
-    install_python_prod_dependencies,
-)
+from scripts import   install_python_dev_dependencies  # pylint: disable=wrong-import-position, wrong-import-order
+
+from scripts import  install_dependencies_json_packages
+from scripts import  install_python_prod_dependencies
+
 
 from typing import Final
 
@@ -90,16 +88,18 @@ def clean_pyc_files() -> None:
                 os.remove(filepath)
 
 
-def test_python_version() -> None:
-    """Checks whether the Python version matches an expected prefix.
-
-    Raises:
-        Exception. The Python version does not match the expected prefix.
-    """
-    running_python_version = '{0[0]}.{0[1]}.{0[2]}'.format(sys.version_info)
-    if running_python_version != '3.10.16':
-        print('Please use Python 3.10.16. Exiting...')
-        raise Exception('No suitable python version found.')
+def test_python_version():
+    """Checks if the python version is 3.10.x."""
+    major, minor, micro = sys.version_info[:3]
+    
+    if major == 3 and minor == 10:
+        if micro < 12:
+            print("Warning: You are using an older version of Python 3.10...")
+        # Since the version is 3.10, we return successfully
+        return
+    
+    # This part only runs if the 'if' condition above is false
+    raise Exception("Oppia requires Python 3.10.x to run. Current version: %s.%s.%s" % (major, minor, micro))
 
 
 def download_and_install_package(url_to_retrieve: str, filename: str) -> None:

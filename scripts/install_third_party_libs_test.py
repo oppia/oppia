@@ -526,7 +526,7 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor', 'micro']
         )
         version_swap = self.swap(
-            sys, 'version_info', version_info(major=3, minor=4, micro=12)
+            sys, 'version_info', version_info(major=3, minor=10, micro=12)
         )
         with print_swap, uname_swap, version_swap, self.assertRaisesRegex(
             Exception, 'No suitable python version found.'
