@@ -482,9 +482,9 @@ describe('Exploration Editor', function () {
     await explorationEditor.navigateToCard(CARD_NAMES.TWELFTH);
   });
 
-  it('should be able to use "Algebric Expression" intreaction', async function () {
+  it('should be able to use "Algebraic Expression" interaction', async function () {
     // Update card content.
-    await explorationEditor.updateCardContent('Enter a algebric expression.');
+    await explorationEditor.updateCardContent('Enter a algebraic expression.');
     // Add Algebric Expression interaction.
     await explorationEditor.addInteraction(
       INTERACTION_TYPES.ALGEBRAIC_EXPRESSION,

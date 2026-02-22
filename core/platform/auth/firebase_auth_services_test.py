@@ -246,7 +246,7 @@ class FirebaseAdminSdkStub:
                 1000 identifiers are specified.
         """
         if len(uids) > 1000:
-            raise ValueError('`uids` paramter must have <= 1000 entries.')
+            raise ValueError('`uids` parameter must have <= 1000 entries.')
 
         if force_delete:
             uids_to_delete = set(uids)

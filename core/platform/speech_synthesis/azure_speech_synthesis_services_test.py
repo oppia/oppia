@@ -250,7 +250,7 @@ class AzureSpeechSynthesisTests(test_utils.GenericTestBase):
         mock_cancellation_details = mock.MagicMock()
 
         error_details = (
-            'Azure speech synthesis failed becuase of `custom message`.'
+            'Azure speech synthesis failed because of `custom message`.'
         )
         mock_cancellation_details.reason = speechsdk.CancellationReason.Error
         mock_cancellation_details.error_details = error_details

@@ -869,7 +869,7 @@ var ExplorationEditorMainTab = function () {
     expect(parameterValues.length).toEqual(parameterTypes.length);
     await waitFor.visibilityOf(
       answerDescriptionElement,
-      'Answer description fragement is not visible'
+      'Answer description fragment is not visible'
     );
     var answerDescriptionFragment = await $$(
       '.e2e-test-answer-description-fragment'

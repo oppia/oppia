@@ -242,7 +242,7 @@ def get_exploration_components_from_dir(
                 )
 
     if yaml_content is None:
-        raise Exception('No yaml file specifed for %s' % dir_path)
+        raise Exception('No yaml file specified for %s' % dir_path)
 
     return yaml_content, assets_list
 

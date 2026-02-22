@@ -213,10 +213,10 @@ var BlogDashboardPage = function () {
     await action.click('Publish Blog Post Button', publishBlogPostButton);
     await action.click('Confirm Publish Blog Post button', confirmButton);
     await waitFor.visibilityOfSuccessToast(
-      'Blog Post Saved and Published Succesfully.'
+      'Blog Post Saved and Published Successfully.'
     );
     await waitFor.invisibilityOfSuccessToast(
-      'Blog Post Saved and Published Succesfully.'
+      'Blog Post Saved and Published Successfully.'
     );
   };
 
@@ -226,10 +226,10 @@ var BlogDashboardPage = function () {
     await action.click('Publish Blog Post Button', publishBlogPostButton);
     await action.click('Confirm Publish Blog Post button', confirmButton);
     await waitFor.visibilityOfSuccessToast(
-      'Blog Post Saved and Published Succesfully.'
+      'Blog Post Saved and Published Successfully.'
     );
     await waitFor.invisibilityOfSuccessToast(
-      'Blog Post Saved and Published Succesfully.'
+      'Blog Post Saved and Published Successfully.'
     );
   };
 

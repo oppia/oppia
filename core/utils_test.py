@@ -618,7 +618,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self,
     ) -> None:
         with self.assertRaisesRegex(
-            Exception, 'No yaml file specifed for core/tests/data/dummy_assets'
+            Exception, 'No yaml file specified for core/tests/data/dummy_assets'
         ):
             utils.get_exploration_components_from_dir(
                 'core/tests/data/dummy_assets/'

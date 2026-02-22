@@ -564,7 +564,7 @@ var ExplorationEditorTranslationTab = function () {
 
   this.expectFeedbackTabToBeActive = async function () {
     var activeTabName = await action.getText(
-      'Active Transalation Tab',
+      'Active Translation Tab',
       activeTranslationTabElement
     );
     expect(activeTabName).toEqual('Feedback');
