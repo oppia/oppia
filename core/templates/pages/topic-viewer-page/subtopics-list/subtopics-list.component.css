@@ -63,3 +63,10 @@ subtopics-list .subtopics-container {
     justify-content: space-between;
   }
 }
+
+subtopics-list.topic-preview-mode .oppia-page-card.oppia-long-text {
+  box-sizing: border-box;
+  margin-bottom: 0;
+  margin-top: 0;
+  width: 100%;
+}
