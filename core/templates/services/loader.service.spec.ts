@@ -32,7 +32,7 @@ describe('Loader Service', () => {
     subscriptions = new Subscription();
     subscriptions.add(
       loaderService.onLoadingMessageChange.subscribe(
-        (message: string) => (loadingMessage = message),
+        (message: string) => (loadingMessage = message)
       )
     );
   });

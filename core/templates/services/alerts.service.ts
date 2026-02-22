@@ -115,7 +115,7 @@ export class AlertsService {
    * @param {Object} messageToDelete - Message to be deleted.
    */
   deleteMessage(messageToDelete: Message): void {
-    const isMessageToKeep = (m: Message) : boolean =>
+    const isMessageToKeep = (m: Message): boolean =>
       m.type !== messageToDelete.type || m.content !== messageToDelete.content;
     const filteredMessages = this.messages.filter(isMessageToKeep);
     this.messages.splice(0, this.messages.length, ...filteredMessages);
