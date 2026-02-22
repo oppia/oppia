@@ -550,4 +550,14 @@ describe('Translator Overview component', () => {
 
     expect(component.selectedLanguageAccentCode).toEqual('en-US');
   }));
+
+  it('should correctly identify RTL languages', () => {
+    component.languageCode = 'ar';
+    expect(component.isTranslationLanguageRTL()).toBe(true);
+  });
+
+  it('should correctly identify LTR languages', () => {
+    component.languageCode = 'en';
+    expect(component.isTranslationLanguageRTL()).toBe(false);
+  });
 });

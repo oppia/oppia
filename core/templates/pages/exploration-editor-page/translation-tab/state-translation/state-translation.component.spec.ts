@@ -2110,6 +2110,24 @@ describe('State translation component', () => {
 
         expect(component.isDisabled('any')).toBeTrue();
       });
+
+      it('should correctly identify RTL languages', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageCode'
+        ).and.returnValue('ar');
+
+        expect(component.isTranslationLanguageRTL()).toBe(true);
+      });
+
+      it('should correctly identify LTR languages', () => {
+        spyOn(
+          translationLanguageService,
+          'getActiveLanguageCode'
+        ).and.returnValue('en');
+
+        expect(component.isTranslationLanguageRTL()).toBe(false);
+      });
     }
   );
 });
