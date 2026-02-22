@@ -25,6 +25,7 @@ import {
   TestBed,
   tick,
 } from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
 import {TranslationLanguageService} from 'pages/exploration-editor-page/translation-tab/services/translation-language.service';
 import {TranslationTopicService} from 'pages/exploration-editor-page/translation-tab/services/translation-topic.service';
 import {ExplorationOpportunity} from '../opportunities-list-item/opportunities-list-item.component';
@@ -42,7 +43,7 @@ describe('Opportunities List Component', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule, MatIconModule],
+      imports: [HttpClientTestingModule, MatIconModule, FormsModule],
       declarations: [OpportunitiesListComponent],
       providers: [
         ContributionOpportunitiesService,
@@ -999,5 +1000,158 @@ describe('Opportunities List Component', () => {
         expect(component.unpinOpportunity).toHaveBeenCalledWith(updatedData);
       }
     );
+  });
+
+  describe('when searching for skills', () => {
+    const mockActiveLanguageEventEmitter = new EventEmitter();
+    const mockActiveTopicEventEmitter = new EventEmitter();
+    const mockReloadOpportunitiesEventEmitter = new EventEmitter();
+    const mockRemoveOpportunitiesEventEmitter = new EventEmitter();
+
+    const searchOpportunities: ExplorationOpportunity[] = [
+      {
+        id: 'id1',
+        heading: 'Addition of fractions',
+        subheading: 'Math',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50,
+        topicName: 'Math',
+      },
+      {
+        id: 'id2',
+        heading: 'Subtraction basics',
+        subheading: 'Math',
+        labelText: 'text',
+        labelColor: 'red',
+        progressPercentage: 50,
+        inReviewCount: 20,
+        totalCount: 100,
+        translationsCount: 50,
+        topicName: 'Math',
+      },
+      {
+        id: 'id3',
+        heading: 'Reading comprehension',
+        subheading: 'English',
+        labelText: 'text',
+        labelColor: 'blue',
+        progressPercentage: 30,
+        inReviewCount: 10,
+        totalCount: 50,
+        translationsCount: 15,
+        topicName: 'English',
+      },
+    ];
+
+    beforeEach(() => {
+      component.loadOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: searchOpportunities,
+          more: false,
+        });
+      component.loadMoreOpportunities = () =>
+        Promise.resolve({
+          opportunitiesDicts: [],
+          more: false,
+        });
+
+      spyOnProperty(
+        translationLanguageService,
+        'onActiveLanguageChanged'
+      ).and.returnValue(mockActiveLanguageEventEmitter);
+      spyOnProperty(
+        translationTopicService,
+        'onActiveTopicChanged'
+      ).and.returnValue(mockActiveTopicEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService,
+        'reloadOpportunitiesEventEmitter'
+      ).and.returnValue(mockReloadOpportunitiesEventEmitter);
+      spyOnProperty(
+        contributionOpportunitiesService,
+        'removeOpportunitiesEventEmitter'
+      ).and.returnValue(mockRemoveOpportunitiesEventEmitter);
+    });
+
+    it('should filter opportunities by heading when search text is set', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      expect(component.opportunities.length).toBe(3);
+
+      component.searchText = 'addition';
+      component.onSearchTextChange();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities[0].id).toBe('id1');
+    }));
+
+    it('should filter opportunities by subheading when search text matches', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      component.searchText = 'English';
+      component.onSearchTextChange();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities[0].id).toBe('id3');
+    }));
+
+    it('should show all opportunities when search text is cleared', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      component.searchText = 'addition';
+      component.onSearchTextChange();
+      expect(component.visibleOpportunities.length).toBe(1);
+
+      component.searchText = '';
+      component.onSearchTextChange();
+      expect(component.visibleOpportunities.length).toBe(3);
+    }));
+
+    it('should reset to page 1 when searching', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      component.activePageNumber = 2;
+      component.searchText = 'subtraction';
+      component.onSearchTextChange();
+
+      expect(component.activePageNumber).toBe(1);
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities[0].id).toBe('id2');
+    }));
+
+    it('should show no opportunities when search text matches nothing', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      component.searchText = 'nonexistent skill';
+      component.onSearchTextChange();
+
+      expect(component.visibleOpportunities.length).toBe(0);
+    }));
+
+    it('should do case-insensitive search', fakeAsync(() => {
+      component.init();
+      component.onChangeLanguage('en');
+      tick();
+
+      component.searchText = 'ADDITION';
+      component.onSearchTextChange();
+
+      expect(component.visibleOpportunities.length).toBe(1);
+      expect(component.visibleOpportunities[0].id).toBe('id1');
+    }));
   });
 });

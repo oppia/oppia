@@ -1,15 +1,19 @@
 <div class="oppia-opportunities-list">
+  <div class="oppia-search-bar-container">
+    <span class="material-icons oppia-search-icon">search</span>
+    <input type="text" class="oppia-search-input e2e-test-search-input" placeholder="Search for a skill..."
+      [(ngModel)]="searchText" (input)="onSearchTextChange()" aria-label="Search for a skill">
+    <button *ngIf="searchText" class="oppia-search-clear-button e2e-test-search-clear-button"
+      (click)="searchText = ''; onSearchTextChange()" aria-label="Clear search">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
   <div [hidden]="loadingOpportunityData" *ngFor="let opportunity of visibleOpportunities">
-    <oppia-opportunities-list-item [opportunity]="opportunity"
-                                   (clickActionButton)="clickActionButton.emit($event)"
-                                   (clickPinButton)="clickPinButton.emit($event)"
-                                   (clickUnpinButton)="clickUnpinButton.emit($event)"
-                                   [progressBarRequired]="progressBarRequired"
-                                   [labelRequired]="labelRequired"
-                                   [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength"
-                                   [opportunityType]="opportunityType"
-                                   [showOpportunityButton]="showOpportunityButton"
-                                   [showPinUnpinButton]="showPinUnpinButton">
+    <oppia-opportunities-list-item [opportunity]="opportunity" (clickActionButton)="clickActionButton.emit($event)"
+      (clickPinButton)="clickPinButton.emit($event)" (clickUnpinButton)="clickUnpinButton.emit($event)"
+      [progressBarRequired]="progressBarRequired" [labelRequired]="labelRequired"
+      [opportunityHeadingTruncationLength]="opportunityHeadingTruncationLength" [opportunityType]="opportunityType"
+      [showOpportunityButton]="showOpportunityButton" [showPinUnpinButton]="showPinUnpinButton">
     </oppia-opportunities-list-item>
   </div>
   <div [hidden]="!loadingOpportunityData" class="e2e-test-opportunity-loading-placeholder">
@@ -19,24 +23,22 @@
   <div class="oppia-opportunity-pagination-container" *ngIf="visibleOpportunities.length > 0">
     <div class="oppia-pagination-button-wrapper">
       <button *ngIf="activePageNumber > 1" type="button"
-              class="oppia-pagination-button e2e-test-pagination-button-previous"
-              (click)="gotoPage(activePageNumber - 1)"
-              [disabled]="activePageNumber == 1">
+        class="oppia-pagination-button e2e-test-pagination-button-previous" (click)="gotoPage(activePageNumber - 1)"
+        [disabled]="activePageNumber == 1">
         <span class="material-icons">navigate_before</span>Previous
       </button>
     </div>
     <div class="oppia-pagination-button-wrapper">
-      <button *ngIf="!userIsOnLastPage" type="button"
-              class="oppia-pagination-button e2e-test-pagination-button-next"
-              (click)="gotoPage(activePageNumber + 1)"
-              [disabled]="loadingOpportunityData || userIsOnLastPage">
+      <button *ngIf="!userIsOnLastPage" type="button" class="oppia-pagination-button e2e-test-pagination-button-next"
+        (click)="gotoPage(activePageNumber + 1)" [disabled]="loadingOpportunityData || userIsOnLastPage">
         Next<span class="material-icons">navigate_next</span>
       </button>
     </div>
   </div>
   <div class="oppia-end-availability" [hidden]="!(visibleOpportunities.length === 0 && !loadingOpportunityData)">
     <div class="oppia-end-availability-line"></div>
-    <div class="oppia-opportunity-availablity-message e2e-test-opportunity-list-empty-availability-message">No opportunity available!</div>
+    <div class="oppia-opportunity-availablity-message e2e-test-opportunity-list-empty-availability-message">No
+      opportunity available!</div>
     <div class="oppia-end-availability-line"></div>
   </div>
 </div>
@@ -48,16 +50,19 @@
     overflow: hidden;
     padding: 0 2%;
   }
+
   .oppia-end-availability {
     align-items: center;
     display: flex;
     justify-content: center;
     margin: 20px 0;
   }
+
   .oppia-end-availability-line {
     border: 1px solid #ababab;
     flex-grow: 1;
   }
+
   .oppia-opportunities-list {
     margin: auto;
     max-width: 1200px;
@@ -65,11 +70,13 @@
     padding-bottom: 20px;
     width: 95%;
   }
+
   .oppia-opportunity-pagination-container {
     display: flex;
     margin: 20px 0;
     width: 100%;
   }
+
   .oppia-pagination-button {
     background-color: transparent;
     border: none;
@@ -81,26 +88,71 @@
     min-width: 100px;
     text-align: center;
   }
+
   .oppia-pagination-button-wrapper {
     display: flex;
     flex-grow: 1;
     justify-content: center;
     max-width: 50%;
   }
+
   .oppia-pagination-button:hover {
     border: 2px solid #009688;
     border-radius: 5px;
   }
+
   .oppia-pagination-button[disabled] {
     color: #a9e5df;
   }
+
   .oppia-pagination-button[disabled]:hover {
     border: none;
   }
+
   @media only screen and (max-width: 700px) {
     .oppia-opportunities-list {
       margin: auto 0;
       width: 100%;
     }
+  }
+
+  .oppia-search-bar-container {
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    margin-bottom: 15px;
+    padding: 0 10px;
+  }
+
+  .oppia-search-bar-container:focus-within {
+    border-color: #009688;
+    box-shadow: 0 0 0 1px #009688;
+  }
+
+  .oppia-search-icon {
+    color: #888;
+    font-size: 20px;
+    margin-right: 8px;
+  }
+
+  .oppia-search-input {
+    border: none;
+    flex-grow: 1;
+    font-size: 16px;
+    outline: none;
+    padding: 10px 0;
+  }
+
+  .oppia-search-clear-button {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .oppia-search-clear-button:hover {
+    color: #333;
   }
 </style>

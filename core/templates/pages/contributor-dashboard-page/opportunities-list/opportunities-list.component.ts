@@ -71,6 +71,7 @@ export class OpportunitiesListComponent {
   more: boolean = false;
   userIsOnLastPage: boolean = true;
   languageCode: string = '';
+  searchText: string = '';
 
   constructor(
     private zone: NgZone,
@@ -223,6 +224,33 @@ export class OpportunitiesListComponent {
     }
   }
 
+  getFilteredOpportunities(): ExplorationOpportunity[] {
+    if (!this.searchText) {
+      return this.opportunities;
+    }
+    const lowerSearchText = this.searchText.toLowerCase();
+    return this.opportunities.filter(opportunity => {
+      const heading = (opportunity.heading || '').toLowerCase();
+      const subheading = (opportunity.subheading || '').toLowerCase();
+      return (
+        heading.includes(lowerSearchText) ||
+        subheading.includes(lowerSearchText)
+      );
+    });
+  }
+
+  onSearchTextChange(): void {
+    this.activePageNumber = 1;
+    const filtered = this.getFilteredOpportunities();
+    this.visibleOpportunities = filtered.slice(0, this.OPPORTUNITIES_PAGE_SIZE);
+    this.userIsOnLastPage = this.calculateUserIsOnLastPage(
+      filtered,
+      this.OPPORTUNITIES_PAGE_SIZE,
+      this.activePageNumber,
+      !this.searchText && this.more
+    );
+  }
+
   fetchAndLoadOpportunities(): void {
     if (!this.loadOpportunities) {
       return;
@@ -233,12 +261,13 @@ export class OpportunitiesListComponent {
       this.zone.run(() => {
         this.opportunities = opportunitiesDicts;
         this.more = more;
-        this.visibleOpportunities = this.opportunities.slice(
+        const filtered = this.getFilteredOpportunities();
+        this.visibleOpportunities = filtered.slice(
           0,
           this.OPPORTUNITIES_PAGE_SIZE
         );
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          this.opportunities,
+          filtered,
           this.OPPORTUNITIES_PAGE_SIZE,
           this.activePageNumber,
           this.more
@@ -249,39 +278,35 @@ export class OpportunitiesListComponent {
   }
 
   gotoPage(pageNumber: number): void {
+    const filtered = this.getFilteredOpportunities();
     const startIndex = (pageNumber - 1) * this.OPPORTUNITIES_PAGE_SIZE;
     const endIndex = pageNumber * this.OPPORTUNITIES_PAGE_SIZE;
     // Load new opportunities based on endIndex as the backend can return
     // opportunities greater than the page size. See issue #14004.
-    if (endIndex >= this.opportunities.length && this.more) {
+    if (endIndex >= filtered.length && this.more && !this.searchText) {
       this.visibleOpportunities = [];
       this.loadingOpportunityData = true;
       this.loadMoreOpportunities().then(({opportunitiesDicts, more}) => {
         this.more = more;
         this.opportunities = this.opportunities.concat(opportunitiesDicts);
-        this.visibleOpportunities = this.opportunities.slice(
-          startIndex,
-          endIndex
-        );
+        const updatedFiltered = this.getFilteredOpportunities();
+        this.visibleOpportunities = updatedFiltered.slice(startIndex, endIndex);
         this.loadingOpportunityData = false;
         this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-          this.opportunities,
+          updatedFiltered,
           this.OPPORTUNITIES_PAGE_SIZE,
           pageNumber,
           this.more
         );
       });
     } else {
-      this.visibleOpportunities = this.opportunities.slice(
-        startIndex,
-        endIndex
-      );
+      this.visibleOpportunities = filtered.slice(startIndex, endIndex);
     }
     this.userIsOnLastPage = this.calculateUserIsOnLastPage(
-      this.opportunities,
+      filtered,
       this.OPPORTUNITIES_PAGE_SIZE,
       pageNumber,
-      this.more
+      !this.searchText && this.more
     );
     this.activePageNumber = pageNumber;
   }
