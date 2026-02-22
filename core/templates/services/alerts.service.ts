@@ -42,9 +42,8 @@ export class AlertsService {
    *   - content: a string containing the warning or message.
    */
 
-  private warnings: Warning[] = [];
-  private messages: Message[] = [];
-
+  public warnings: Warning[] = [];
+  public messages: Message[] = [];
   // This is to prevent infinite loops.
   MAX_TOTAL_WARNINGS: number = 10;
   MAX_TOTAL_MESSAGES: number = 10;
@@ -109,7 +108,6 @@ export class AlertsService {
       timeout: timeoutMilliseconds,
     });
   }
-
   /**
    * Deletes the message from the messages list.
    * @param {Object} messageToDelete - Message to be deleted.
