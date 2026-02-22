@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import glob
 import json
 import os
 import re
@@ -109,46 +110,52 @@ class CustomLintChecksManager(linter_utils.BaseLinter):
     def check_skip_files_in_app_dev_yaml(
         self,
     ) -> concurrent_task_utils.TaskResult:
-        """Check to ensure that all lines in skip_files in app_dev.yaml
-        reference valid files in the repository.
+        """Check skip_files section in app_dev.yaml follows expected format.
+
+        We validate the format of entries in the "# Third party files:" block
+        using a regex that matches versioned paths under third_party/static
+        instead of consulting the filesystem.
         """
         name = 'App dev file'
 
         failed = False
-        error_messages = []
+        error_messages: List[str] = []
         skip_files_section_found = False
-        for line_num, line in enumerate(
-            self.file_cache.readlines(APP_YAML_FILEPATH)
-        ):
+
+        for line_num, line in enumerate(self.file_cache.readlines(APP_YAML_FILEPATH)):
             stripped_line = line.strip()
+
             if '# Third party files:' in stripped_line:
                 skip_files_section_found = True
                 continue
+
             if not skip_files_section_found:
                 continue
+
+            # Stop once we leave the section.
+            if stripped_line and not stripped_line.startswith(('-', '#')):
+                break
+
             if not stripped_line or stripped_line.startswith('#'):
                 continue
-            # Extract the file pattern from the line as all skipped file
-            # lines start with a dash(-).
+
+            # Extract pattern (remove "- ")
             line_in_concern = stripped_line[len('- ') :]
-            # validate that the entry follows the expected third_party format.
-            if not re.match(r'^third_party/static/.+-\d+\.\d+\.\d+/?$', line_in_concern):
+
+            # Validate expected format instead of checking filesystem.
+            if not re.match(
+                r'^third_party/static/.+-\d+\.\d+\.\d+/?$',
+                line_in_concern,
+            ):
                 error_message = (
                     '%s --> Pattern on line %s doesn\'t match '
                     'any file or directory' % (APP_YAML_FILEPATH, line_num + 1)
                 )
                 error_messages.append(error_message)
                 failed = True
-                break 
-        
-        if failed:
-                error_messages.append("FAILED  App dev file check failed")
-        else:
-                error_messages.append("SUCCESS  App dev file check passed")
-                    
-        return concurrent_task_utils.TaskResult(
-            name, failed, error_messages, error_messages
-        )
+                break
+
+        return concurrent_task_utils.TaskResult(name, failed, error_messages, error_messages)
 
     def check_third_party_libs_type_defs(
         self,
